@@ -35,18 +35,33 @@ type TimerCallback = (handle: number, elapsed: number) => void;
 type BrowserTimer = {
   callback: TimerCallback;
   repeating: boolean;
-  startedAt: number;
+  cycleStartedAt: number;
   browserHandle: number;
 };
 
 const browserTimers = new Map<number, BrowserTimer>();
 let nextTimerHandle = 1;
 
-function fireTimer(handle: number): boolean {
+function elapsedSeconds(timer: BrowserTimer): number {
+  return (performance.now() - timer.cycleStartedAt) / 1000;
+}
+
+function fireScheduledTimer(handle: number): boolean {
   const timer = browserTimers.get(handle);
   if (!timer) return false;
-  timer.callback(handle, (performance.now() - timer.startedAt) / 1000);
-  if (!timer.repeating) browserTimers.delete(handle);
+  const elapsed = elapsedSeconds(timer);
+  if (timer.repeating) timer.cycleStartedAt = performance.now();
+  else browserTimers.delete(handle);
+  timer.callback(handle, elapsed);
+  return true;
+}
+
+function triggerTimer(handle: number): boolean {
+  const timer = browserTimers.get(handle);
+  if (!timer) return false;
+  // Defold's timer.trigger invokes the callback without changing the timer's
+  // schedule or consuming a one-shot timer.
+  timer.callback(handle, elapsedSeconds(timer));
   return true;
 }
 
@@ -64,12 +79,12 @@ globalThis.__defoldModulesV1 = {
       const handle = nextTimerHandle++;
       const milliseconds = Math.max(0, delay * 1000);
       const browserHandle = repeating
-        ? window.setInterval(() => fireTimer(handle), milliseconds)
-        : window.setTimeout(() => fireTimer(handle), milliseconds);
+        ? window.setInterval(() => fireScheduledTimer(handle), milliseconds)
+        : window.setTimeout(() => fireScheduledTimer(handle), milliseconds);
       browserTimers.set(handle, {
         callback,
         repeating,
-        startedAt: performance.now(),
+        cycleStartedAt: performance.now(),
         browserHandle
       });
       return handle;
@@ -83,7 +98,7 @@ globalThis.__defoldModulesV1 = {
       return true;
     },
     trigger(handle: number) {
-      return fireTimer(handle);
+      return triggerTimer(handle);
     }
   }
 };

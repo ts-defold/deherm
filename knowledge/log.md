@@ -2,6 +2,8 @@
 
 ## 2026-09-17
 
+* **Bob tooling**: Pinned and checksum-verified Bob 1.14.0 at the exact Defold revision, added a local toolchain doctor, and added explicit build/bundle commands guarded by consent before uploading native-extension inputs to a build server.
+* **Review hardening**: Corrected browser timer trigger/elapsed parity, bounded and generation-isolated the HTML5 callback pool, removed callback-dispatch handle allocations, made native/browser finalization release roots after exceptions, and generated rollback for partially acquired multi-callback bindings.
 * **Developer workflow**: Documented the current source, bytecode, browser, release-planning, and extension-packaging commands; separated them from the future public CLI and identified pinned Bob build/launch as the next tooling boundary.
 * **TypeGPU**: Designed a build-time-only TypeGPU shader lane that emits Defold-owned shader/material assets and typed bindings while retaining Bob, glslang, SPIR-V reflection, and target cross-compilation as the authority.
 * **Lua callbacks**: Generated the complete `timer.delay` callback path across Hermes JSI, the C ABI, cached Lua thunks, and deterministic one-shot/repeating release, backed by fixed-capacity callback and timer pools.

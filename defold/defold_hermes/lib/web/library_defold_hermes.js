@@ -2,12 +2,16 @@ var LibraryDefoldHermes = {
   $DEFOLD_HERMES_WEB_CALLBACKS: {
     runtime: 1,
     type: 1,
+    capacity: 4096,
     functions: [],
     generations: [],
     free: [],
 
     acquire: function(callback) {
       if (typeof callback !== 'function') throw new TypeError('Expected a timer callback');
+      if (!this.free.length && this.functions.length >= this.capacity) {
+        throw new RangeError('Browser callback pool is exhausted');
+      }
       var slot = this.free.length ? this.free.pop() : this.functions.length;
       if (this.generations[slot] === undefined) this.generations[slot] = 1;
       this.functions[slot] = callback;
@@ -20,16 +24,24 @@ var LibraryDefoldHermes = {
     },
 
     resolve: function(handle) {
-      if (handle.runtime !== this.runtime || handle.type !== this.type) return null;
-      if (this.generations[handle.slot] !== handle.generation) return null;
-      return this.functions[handle.slot] || null;
+      return this.resolveParts(handle.runtime, handle.slot, handle.generation, handle.type);
+    },
+
+    resolveParts: function(runtime, slot, generation, type) {
+      if (runtime !== this.runtime || type !== this.type) return null;
+      if (this.generations[slot] !== generation) return null;
+      return this.functions[slot] || null;
     },
 
     release: function(handle) {
-      if (!this.resolve(handle)) return false;
-      this.functions[handle.slot] = null;
-      this.generations[handle.slot] = (this.generations[handle.slot] + 1) >>> 0 || 1;
-      this.free.push(handle.slot);
+      return this.releaseParts(handle.runtime, handle.slot, handle.generation, handle.type);
+    },
+
+    releaseParts: function(runtime, slot, generation, type) {
+      if (!this.resolveParts(runtime, slot, generation, type)) return false;
+      this.functions[slot] = null;
+      this.generations[slot] = (this.generations[slot] + 1) >>> 0 || 1;
+      this.free.push(slot);
       return true;
     },
 
@@ -37,6 +49,7 @@ var LibraryDefoldHermes = {
       this.functions.length = 0;
       this.generations.length = 0;
       this.free.length = 0;
+      this.runtime = (this.runtime + 1) >>> 0 || 1;
     }
   },
 
@@ -46,6 +59,14 @@ var LibraryDefoldHermes = {
   ],
   $DEFOLD_HERMES_BRIDGE: {
     app: null,
+
+    reset: function() {
+      this.app = null;
+      globalThis.__defoldAppV1 = undefined;
+      globalThis.__defoldHostV1 = undefined;
+      globalThis.__defoldModulesV1 = undefined;
+      DEFOLD_HERMES_WEB_CALLBACKS.reset();
+    },
 
     load: function(sourcePointer, sourceSize) {
       var source = UTF8ToString(sourcePointer, sourceSize);
@@ -65,9 +86,14 @@ var LibraryDefoldHermes = {
       };
       globalThis.__defoldModulesV1 = DEFOLD_HERMES_GENERATED_MODULES.install();
 
-      (0, eval)(source + '\n//# sourceURL=defold-hermes://app.js');
-      DEFOLD_HERMES_BRIDGE.app = globalThis.__defoldAppV1;
-      if (!DEFOLD_HERMES_BRIDGE.app) throw new Error('Application did not register');
+      try {
+        (0, eval)(source + '\n//# sourceURL=defold-hermes://app.js');
+        DEFOLD_HERMES_BRIDGE.app = globalThis.__defoldAppV1;
+        if (!DEFOLD_HERMES_BRIDGE.app) throw new Error('Application did not register');
+      } catch (error) {
+        DEFOLD_HERMES_BRIDGE.reset();
+        throw error;
+      }
     },
 
     init: function() {
@@ -83,14 +109,13 @@ var LibraryDefoldHermes = {
     },
 
     finalize: function() {
-      if (DEFOLD_HERMES_BRIDGE.app && DEFOLD_HERMES_BRIDGE.app.final) {
-        DEFOLD_HERMES_BRIDGE.app.final();
+      try {
+        if (DEFOLD_HERMES_BRIDGE.app && DEFOLD_HERMES_BRIDGE.app.final) {
+          DEFOLD_HERMES_BRIDGE.app.final();
+        }
+      } finally {
+        DEFOLD_HERMES_BRIDGE.reset();
       }
-      DEFOLD_HERMES_BRIDGE.app = null;
-      globalThis.__defoldAppV1 = undefined;
-      globalThis.__defoldHostV1 = undefined;
-      globalThis.__defoldModulesV1 = undefined;
-      DEFOLD_HERMES_WEB_CALLBACKS.reset();
     }
   },
 
@@ -119,8 +144,7 @@ var LibraryDefoldHermes = {
 
   defoldHermesWebInvokeCallback__deps: ['$DEFOLD_HERMES_WEB_CALLBACKS'],
   defoldHermesWebInvokeCallback: function(runtime, slot, generation, type, timer, elapsed) {
-    var handle = { runtime: runtime, slot: slot, generation: generation, type: type };
-    var callback = DEFOLD_HERMES_WEB_CALLBACKS.resolve(handle);
+    var callback = DEFOLD_HERMES_WEB_CALLBACKS.resolveParts(runtime, slot, generation, type);
     if (!callback) return 0;
     try {
       callback(timer, elapsed);
@@ -133,12 +157,7 @@ var LibraryDefoldHermes = {
 
   defoldHermesWebReleaseCallback__deps: ['$DEFOLD_HERMES_WEB_CALLBACKS'],
   defoldHermesWebReleaseCallback: function(runtime, slot, generation, type) {
-    DEFOLD_HERMES_WEB_CALLBACKS.release({
-      runtime: runtime,
-      slot: slot,
-      generation: generation,
-      type: type
-    });
+    DEFOLD_HERMES_WEB_CALLBACKS.releaseParts(runtime, slot, generation, type);
   }
 };
 

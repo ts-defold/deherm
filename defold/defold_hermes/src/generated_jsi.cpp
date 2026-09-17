@@ -92,7 +92,9 @@ void installGeneratedModules(jsi::Runtime& runtime, jsi::Object& modules, Callba
         }
         auto callback_handle = callbacks.acquire(
             args[2].asObject(runtime).asFunction(runtime));
-        if (!callback_handle) throw jsi::JSError(runtime, callbacks.lastError());
+        if (!callback_handle) {
+          throw jsi::JSError(runtime, callbacks.lastError());
+        }
         const auto result = defold_hermes_lua_timer_delay(args[0].asNumber(), args[1].getBool() ? 1 : 0, callback_handle.runtime, callback_handle.slot, callback_handle.generation, callback_handle.type);
         if (result == 4294967295) {
           callbacks.release(callback_handle);

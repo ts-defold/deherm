@@ -435,11 +435,18 @@ function generateJsiSource(schema) {
         lines.push(`          throw jsi::JSError(runtime, "${displayName}: argument ${index + 1} (${parameter.name}) must be ${parameter.type}");`);
         lines.push("        }");
       }
-      for (const [index, parameter] of fn.parameters.entries()) {
-        if (parameter.type !== "callback") continue;
+      const callbacks = fn.parameters
+        .map((parameter, index) => ({ parameter, index }))
+        .filter(({ parameter }) => parameter.type === "callback");
+      for (const [callbackIndex, { parameter, index }] of callbacks.entries()) {
         lines.push(`        auto ${parameter.name}_handle = callbacks.acquire(`);
         lines.push(`            args[${index}].asObject(runtime).asFunction(runtime));`);
-        lines.push(`        if (!${parameter.name}_handle) throw jsi::JSError(runtime, callbacks.lastError());`);
+        lines.push(`        if (!${parameter.name}_handle) {`);
+        for (const { parameter: acquired } of callbacks.slice(0, callbackIndex)) {
+          lines.push(`          callbacks.release(${acquired.name}_handle);`);
+        }
+        lines.push("          throw jsi::JSError(runtime, callbacks.lastError());");
+        lines.push("        }");
       }
       const invocationArguments = fn.parameters.flatMap(jsiArguments).join(", ");
       const invocation = `${cSymbol(module, fn)}(${invocationArguments})`;
@@ -526,8 +533,21 @@ function generateEmscriptenModules(schema) {
         return [parameter.type === "bool" ? `(${parameter.name} ? 1 : 0)` : parameter.name];
       }).join(", ");
       lines.push(`          ${fn.name}: function(${parameters}) {`);
-      for (const parameter of fn.parameters.filter(({ type }) => type === "callback")) {
-        lines.push(`            var ${parameter.name}Handle = DEFOLD_HERMES_WEB_CALLBACKS.acquire(${parameter.name});`);
+      const callbacks = fn.parameters.filter(({ type }) => type === "callback");
+      for (const [callbackIndex, parameter] of callbacks.entries()) {
+        if (callbackIndex === 0) {
+          lines.push(`            var ${parameter.name}Handle = DEFOLD_HERMES_WEB_CALLBACKS.acquire(${parameter.name});`);
+          continue;
+        }
+        lines.push(`            var ${parameter.name}Handle;`);
+        lines.push("            try {");
+        lines.push(`              ${parameter.name}Handle = DEFOLD_HERMES_WEB_CALLBACKS.acquire(${parameter.name});`);
+        lines.push("            } catch (error) {");
+        for (const acquired of callbacks.slice(0, callbackIndex)) {
+          lines.push(`              DEFOLD_HERMES_WEB_CALLBACKS.release(${acquired.name}Handle);`);
+        }
+        lines.push("              throw error;");
+        lines.push("            }");
       }
       const call = `_${cSymbol(module, fn)}(${args})`;
       if (fn.returns === "void") {

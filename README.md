@@ -18,8 +18,11 @@ The working developer experience is:
 
 ```sh
 npm install
+npm run bootstrap
+npm run doctor
 npm run check
 npm run build
+npm run verify
 npm run build:release-plan
 npm run check:static-hermes
 npm run bench:bindings
@@ -27,6 +30,7 @@ npm run run:native
 npm run run:device-dev
 npm run run:web
 npm run package:defold
+npm run bob:version
 ```
 
 `run:native` executes the bundle in embedded Hermes through JSI. `run:web`
@@ -71,5 +75,8 @@ The status of every declaration is machine-readable under
 `bindings/generated/` and drift-gated by `npm run check`.
 
 Exact upstream revisions live in `upstream.lock`; `npm run bootstrap`
-materializes ignored working copies. The current Defold package is an arm64
-macOS proof, not yet a multi-platform release.
+materializes ignored working copies and downloads the checksum-pinned Bob JAR.
+The current Defold package is an arm64 macOS proof, not yet a multi-platform
+release. A real native-extension build uploads its build payload to the Defold
+build service, so `npm run bob:build` and `npm run bob:bundle` require the
+explicit `DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1` opt-in.

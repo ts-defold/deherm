@@ -4,6 +4,8 @@ DEFOLD_REF=dev
 DEFOLD_REV=7f0f554f41f9dce1e0ddff99bf08200657d1ee05
 DEFOLD_REF_DOC_URL=https://d.defold.com/archive/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/engine/share/ref-doc.zip
 DEFOLD_REF_DOC_SHA256=c6b52a54f147f6a8fa0cbf522fa59fab8ec549e2d11de3902a8c631c4ffbc855
+DEFOLD_BOB_URL=https://d.defold.com/archive/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/bob/bob.jar
+DEFOLD_BOB_SHA256=8a8a8c4ebc725279d8ddae17c4eb3d72d6db90a498302960ca341e61fa489cb8
 
 HERMES_URL=https://github.com/facebook/hermes.git
 HERMES_REF=static_h

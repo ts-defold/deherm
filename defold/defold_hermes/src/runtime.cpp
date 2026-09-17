@@ -54,7 +54,12 @@ class Runtime::Impl {
   }
 
   void finalize() {
-    callOptional("final");
+    try {
+      callOptional("final");
+    } catch (...) {
+      app_.reset();
+      throw;
+    }
     app_.reset();
   }
 

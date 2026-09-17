@@ -24,6 +24,7 @@ checkout setup is:
 ```sh
 npm install
 npm run bootstrap
+npm run doctor
 npm run check
 ```
 
@@ -44,32 +45,40 @@ ordinary edit loop.
 | Check Static Hermes declarations | `npm run check:static-hermes` | Parses the generated `extern_c` surface |
 | Exercise the cached Lua bridge | `npm run test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
 | Stage the native extension | `npm run package:defold` | Defold package directory/archive inputs |
+| Compile the real Defold project | `npm run bob:build` | Uses pinned Bob and the native-extension build service |
+| Produce a desktop app bundle | `npm run bob:bundle` | Writes the application under `build/bundle` |
 
-The strongest local verification currently requires more than `npm test`:
+The strongest local verification is one command:
 
 ```sh
-npm test
-npm run test:native
-npm run test:device-dev
-npm run test:lua-bridge
-npm run test:lua-hermes
-npm run check:static-hermes
-npm run check:extension-syntax
-npm run package:defold
+npm run verify
 ```
+
+`npm test` remains the faster generator/type/browser loop. `verify` additionally
+builds and runs native Hermes source and bytecode, the Lua bridge, Static Hermes
+parsing, extension syntax checks, and Defold extension packaging.
 
 # Missing Bob boundary
 
-`npm run package:defold` stages an extension, but the repository does not yet
-download pinned Bob, compile the sample as an actual Defold application, or
-launch the result. That is the next tooling milestone. It must:
+Pinned Bob is downloaded and checksum-verified by `npm run bootstrap:bob`.
+Because this project includes a native extension, Bob sends the extension
+sources and packaged libraries to the configured Defold build server. That
+external upload is deliberately opt-in:
 
-1. resolve Bob from the same Defold revision represented by the package;
-2. verify JDK 25 and all native toolchain prerequisites;
-3. copy the bundle or bytecode into the project as a Defold resource;
-4. invoke Bob for the selected platform and architecture;
-5. report extension build logs without hiding the failing compiler command;
-6. launch desktop outputs and provide a stable path for device outputs.
+```sh
+DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 npm run bob:build
+DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 npm run bob:bundle
+```
+
+The default server is `https://build.defold.com`; override it with
+`DEFOLD_HERMES_BUILD_SERVER`. The remaining milestone is to complete a real
+build, launch the resulting application, and make that result a CI gate. It
+must:
+
+1. verify JDK 25 and all native toolchain prerequisites;
+2. copy the bundle or bytecode into the project as a Defold resource;
+3. report extension build logs without hiding the failing compiler command;
+4. launch desktop outputs and provide a stable path for device outputs.
 
 # Intended public CLI
 

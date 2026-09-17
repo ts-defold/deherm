@@ -68,6 +68,32 @@ test("the compiler rejects ambiguous and unsupported ABI types", () => {
   assert.throws(() => validateSchema(invalid), /unsupported parameter type "number"/);
 });
 
+test("multi-callback acquisition rolls back earlier rooted callbacks", () => {
+  const multipleCallbacks = {
+    schemaVersion: 1,
+    abiVersion: 1,
+    types: [],
+    modules: [{
+      name: "Events",
+      functions: [{
+        name: "subscribePair",
+        parameters: [
+          { name: "first", type: "callback" },
+          { name: "second", type: "callback" }
+        ],
+        returns: "u32",
+        callbackFailureValue: 4294967295
+      }]
+    }]
+  };
+
+  const artifacts = generateArtifacts(multipleCallbacks);
+  const jsi = artifacts.get("defold/defold_hermes/src/generated_jsi.cpp");
+  const web = artifacts.get("defold/defold_hermes/lib/web/generated_modules.js");
+  assert.match(jsi, /if \(!second_handle\) \{\n          callbacks\.release\(first_handle\);/);
+  assert.match(web, /catch \(error\) \{\n              DEFOLD_HERMES_WEB_CALLBACKS\.release\(firstHandle\);/);
+});
+
 test("large binding surfaces generate quickly", () => {
   const synthetic = {
     schemaVersion: 1,

@@ -163,6 +163,29 @@ int main() {
     Fail("Hermes final transcript is wrong");
   }
 
+  defold_hermes::Runtime failingRuntime(host);
+  failingRuntime.load(R"JS(
+    globalThis.__defoldAppV1 = {
+      final: function() {
+        globalThis.__defoldHostV1.log('info', 'failing-final');
+        throw new Error('expected final failure');
+      }
+    };
+  )JS", "defold-hermes://failing-final.js");
+  try {
+    failingRuntime.finalize();
+    Fail("failing final hook did not throw");
+  } catch (const std::exception&) {
+  }
+  try {
+    failingRuntime.finalize();
+    Fail("failed finalization retained the application root");
+  } catch (const std::exception&) {
+  }
+  if (host.transcript.size() != 3 || host.transcript[2] != "info:failing-final") {
+    Fail("failed finalization invoked the application hook more than once");
+  }
+
   luaBridge.shutdown();
   defold_hermes::uninstallLuaTimerCapi();
   gRuntime = nullptr;
