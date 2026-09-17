@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "stackReserve": 32,
+  "modules": [
+    {
+      "name": "Timer",
+      "luaModule": "timer",
+      "functions": [
+        {
+          "name": "delay",
+          "luaFunction": "delay",
+          "timerOperation": "delay",
+          "parameters": [
+            { "name": "delay", "type": "f64" },
+            { "name": "repeating", "type": "bool" },
+            { "name": "callback", "type": "callback", "repeatingParameter": "repeating" }
+          ],
+          "returns": "u32"
+        },
+        {
+          "name": "cancel",
+          "luaFunction": "cancel",
+          "timerOperation": "cancel",
+          "parameters": [
+            { "name": "handle", "type": "u32" }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "trigger",
+          "luaFunction": "trigger",
+          "parameters": [
+            { "name": "handle", "type": "u32" }
+          ],
+          "returns": "bool"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Defold Hermes bridge spike</title>
+    <style>
+      :root { color-scheme: dark; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #10151d; color: #dbe7f3; }
+      main { width: min(760px, calc(100vw - 48px)); }
+      h1 { font: 600 28px/1.2 system-ui, sans-serif; }
+      p { color: #9fb0c3; font-family: system-ui, sans-serif; }
+      pre { min-height: 260px; padding: 20px; overflow: auto; border: 1px solid #314154; border-radius: 10px; background: #0a0e14; }
+      html[data-status="passed"] h1::after { content: "  ✓"; color: #65d18b; }
+      html[data-status="failed"] h1::after { content: "  ✕"; color: #ff7474; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Defold Hermes bridge spike</h1>
+      <p>The application bundle below is the same one executed by embedded Hermes.</p>
+      <pre id="output" aria-live="polite">loading…</pre>
+    </main>
+    <script src="/dist/web-host.js"></script>
+    <script src="/dist/sample.js"></script>
+    <script src="/dist/web-runner.js"></script>
+  </body>
+</html>

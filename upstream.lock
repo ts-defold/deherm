@@ -1,0 +1,15 @@
+# Revisions verified with git ls-remote on 2026-09-17.
+DEFOLD_URL=https://github.com/defold/defold.git
+DEFOLD_REF=dev
+DEFOLD_REV=7f0f554f41f9dce1e0ddff99bf08200657d1ee05
+DEFOLD_REF_DOC_URL=https://d.defold.com/archive/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/engine/share/ref-doc.zip
+DEFOLD_REF_DOC_SHA256=c6b52a54f147f6a8fa0cbf522fa59fab8ec549e2d11de3902a8c631c4ffbc855
+
+HERMES_URL=https://github.com/facebook/hermes.git
+HERMES_REF=static_h
+HERMES_REV=4947871513667919bf2fe225134af3e3a1a3772c
+HERMES_MAIN_REV=378a5f023e51ec88f4ffdf4d48efe2fae51553fc
+
+TMIKOV_HERMES_URL=https://github.com/tmikov/hermes.git
+TMIKOV_HERMES_REF=hermes-x
+TMIKOV_HERMES_REV=bacc663f7671ddec995308ac05833f87075f958d

@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "profiles": {
+    "dev": {
+      "runtime": "dynamic-hermes",
+      "source": "javascript",
+      "bindings": "complete",
+      "nativeCompilationOnEdit": false
+    },
+    "device-dev": {
+      "runtime": "dynamic-hermes",
+      "source": "hermes-bytecode",
+      "bindings": "complete",
+      "nativeCompilationOnEdit": false
+    },
+    "release": {
+      "runtime": "static-hermes",
+      "source": "native-aot",
+      "bindings": "reachable",
+      "nativeCompilationOnEdit": false
+    }
+  }
+}

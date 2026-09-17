@@ -1,0 +1,54 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+async function json(path) {
+  return JSON.parse(await readFile(new URL(path, import.meta.url), "utf8"));
+}
+
+test("a statically imported binding emits an exact usage manifest", async () => {
+  const usage = await json("../dist/sample.usage.json");
+  assert.equal(usage.dynamicAccess, false);
+  assert.deepEqual(usage.symbols.map(({ id }) => id), ["ExampleMath.add"]);
+});
+
+test("the dynamic registry conservatively retains the complete surface", async () => {
+  const usage = await json("../dist/binding-benchmark.usage.json");
+  assert.equal(usage.dynamicAccess, true);
+  assert.deepEqual(usage.symbols.map(({ id }) => id), [
+    "ExampleMath.add",
+    "ExampleMath.multiply",
+    "Timer.delay",
+    "Timer.cancel",
+    "Timer.trigger"
+  ]);
+});
+
+test("release binding generation contains only reachable symbols", async () => {
+  const root = "../build/profiles/release/";
+  const paths = [
+    "defold/defold_hermes/include/defold_hermes/generated_modules.h",
+    "defold/defold_hermes/src/generated_jsi.cpp",
+    "defold/defold_hermes/lib/web/generated_modules.js",
+    "packages/static-hermes/src/generated/ffi.js",
+    "packages/sdk/src/generated/modules.ts",
+    "packages/abi/src/generated/layouts.ts",
+    "bindings/generated/symbol-map.json"
+  ];
+  const [header, jsi, web, staticHermes, sdk, layouts, symbolMap] = await Promise.all(
+    paths.map((path) => readFile(new URL(`${root}${path}`, import.meta.url), "utf8"))
+  );
+  assert.match(header, /defold_hermes_example_math_add/);
+  assert.doesNotMatch(header, /defold_hermes_example_math_multiply/);
+  assert.doesNotMatch(header, /DefoldHermesVec3/);
+  assert.match(jsi, /ExampleMath\.add/);
+  assert.doesNotMatch(jsi, /ExampleMath\.multiply/);
+  assert.match(web, /defold_hermes_example_math_add/);
+  assert.doesNotMatch(web, /defold_hermes_example_math_multiply/);
+  assert.match(staticHermes, /defold_hermes_example_math_add/);
+  assert.doesNotMatch(staticHermes, /defold_hermes_example_math_multiply/);
+  assert.match(sdk, /add\(/);
+  assert.doesNotMatch(sdk, /multiply\(/);
+  assert.doesNotMatch(layouts, /Vec3Layout/);
+  assert.deepEqual(JSON.parse(symbolMap).symbols.map(({ id }) => id), ["ExampleMath.add"]);
+});

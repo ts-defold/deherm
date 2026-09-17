@@ -1,0 +1,16 @@
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[display]
+width = 960
+height = 640
+
+[project]
+title = Defold Hermes Spike
+bundle_resources = /defold_hermes_app
+
+[library]
+include_dirs = defold_hermes defold_hermes_app
+
+[defold_hermes]
+app = /defold_hermes_app/app.js

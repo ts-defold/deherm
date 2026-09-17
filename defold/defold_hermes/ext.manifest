@@ -1,0 +1,7 @@
+name: "defold_hermes"
+
+platforms:
+    arm64-osx:
+        context:
+            frameworks: ["CoreFoundation"]
+            flags: ["-fexceptions"]

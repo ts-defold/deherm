@@ -1,0 +1,5 @@
+-- Generated gameplay-free companion for the extension delivery model.
+-- Its only responsibility is to provide Defold's current script instance.
+function init(self)
+    assert(defold_hermes.attach(self))
+end

@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "abiVersion": 1,
+  "types": [
+    {
+      "kind": "struct",
+      "name": "Vec3",
+      "description": "A fixed-layout three-component vector shared with native and Wasm memory.",
+      "fields": [
+        { "name": "x", "type": "f32" },
+        { "name": "y", "type": "f32" },
+        { "name": "z", "type": "f32" }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "name": "ExampleMath",
+      "description": "Minimal generated native module used by the end-to-end spike.",
+      "functions": [
+        {
+          "name": "add",
+          "symbol": "defold_hermes_example_math_add",
+          "description": "Adds two IEEE-754 doubles through the generated C ABI.",
+          "parameters": [
+            { "name": "a", "type": "f64" },
+            { "name": "b", "type": "f64" }
+          ],
+          "returns": "f64"
+        },
+        {
+          "name": "multiply",
+          "symbol": "defold_hermes_example_math_multiply",
+          "description": "Multiplies two IEEE-754 doubles through the generated C ABI.",
+          "parameters": [
+            { "name": "a", "type": "f64" },
+            { "name": "b", "type": "f64" }
+          ],
+          "returns": "f64"
+        }
+      ]
+    },
+    {
+      "name": "Timer",
+      "description": "Lua compatibility projection for Defold's instance-bound timer module.",
+      "functions": [
+        {
+          "name": "delay",
+          "symbol": "defold_hermes_lua_timer_delay",
+          "callbackFailureValue": 4294967295,
+          "parameters": [
+            { "name": "delay", "type": "f64" },
+            { "name": "repeating", "type": "bool" },
+            { "name": "callback", "type": "callback" }
+          ],
+          "returns": "u32"
+        },
+        {
+          "name": "cancel",
+          "symbol": "defold_hermes_lua_timer_cancel",
+          "parameters": [
+            { "name": "handle", "type": "u32" }
+          ],
+          "returns": "bool"
+        },
+        {
+          "name": "trigger",
+          "symbol": "defold_hermes_lua_timer_trigger",
+          "parameters": [
+            { "name": "handle", "type": "u32" }
+          ],
+          "returns": "bool"
+        }
+      ]
+    }
+  ]
+}

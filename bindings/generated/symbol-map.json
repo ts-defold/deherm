@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "symbols": [
+    {
+      "id": "ExampleMath.add",
+      "module": "ExampleMath",
+      "function": "add",
+      "cSymbol": "defold_hermes_example_math_add",
+      "source": "packages/sdk/src/generated/functions/ExampleMath/add.ts"
+    },
+    {
+      "id": "ExampleMath.multiply",
+      "module": "ExampleMath",
+      "function": "multiply",
+      "cSymbol": "defold_hermes_example_math_multiply",
+      "source": "packages/sdk/src/generated/functions/ExampleMath/multiply.ts"
+    },
+    {
+      "id": "Timer.delay",
+      "module": "Timer",
+      "function": "delay",
+      "cSymbol": "defold_hermes_lua_timer_delay",
+      "source": "packages/sdk/src/generated/functions/Timer/delay.ts"
+    },
+    {
+      "id": "Timer.cancel",
+      "module": "Timer",
+      "function": "cancel",
+      "cSymbol": "defold_hermes_lua_timer_cancel",
+      "source": "packages/sdk/src/generated/functions/Timer/cancel.ts"
+    },
+    {
+      "id": "Timer.trigger",
+      "module": "Timer",
+      "function": "trigger",
+      "cSymbol": "defold_hermes_lua_timer_trigger",
+      "source": "packages/sdk/src/generated/functions/Timer/trigger.ts"
+    }
+  ]
+}
