@@ -10,6 +10,7 @@ okf_version: "0.2"
 * [Architecture](architecture.md) - Target architecture and the shared native/browser contract.
 * [Tooling workflow](tooling.md) - Commands that work now, the Bob boundary, and the intended public CLI.
 * [Runtime strategy](decisions/runtime-strategy.md) - Decision to use Hermes natively and the host browser VM on HTML5.
+* [HTML5 bundle and Static Wasm profiles](decisions/html5-bundle-and-static-wasm.md) - Browser-host packaging, generated Emscripten glue, and a benchmark-gated Static Hermes AOT lane.
 * [Native module strategy](decisions/native-modules.md) - TurboModule/Nitro compatibility direction and the module-registry proof.
 * [Binding compiler](decisions/binding-compiler.md) - Direct C ABI, generated JSI/Static Hermes adapters, and fixed Emscripten memory layouts.
 * [Generator product contract](decisions/generator-product-contract.md) - One-command, deterministic, no-LLM API compilation with a zero-per-symbol-edit gate.

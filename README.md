@@ -35,6 +35,7 @@ npm run run:device-dev
 npm run run:web
 npm run package:defold
 npm run bob:version
+npm run bob:web:bundle
 npm run cli -- doctor --project defold
 npm run cli -- extensions --project defold
 npm run cli -- generate --project defold
@@ -69,6 +70,16 @@ ships; ordinary TypeScript 7 checking works now.
 executes that same bundle in the browser, without Hermes in Wasm. The sample
 also exercises a typed `DefoldModules.getEnforcing()` lookup whose native
 implementation is a zero-serialization JSI host function.
+
+`bob:web:bundle` builds the actual Defold `wasm-web` game against local
+Extender. It first emits an IIFE application bundle through ttsc and esbuild,
+then stores it as `/defold_hermes_app/app.js` in the game archive. Extender
+automatically links the generated files under the extension's `lib/web`
+directory as Emscripten JavaScript libraries. The HTML5 extension loads the
+archived application and runs it in the browser VM; no Hermes library is added
+to the default web build. See the [HTML5 bundle decision](knowledge/decisions/html5-bundle-and-static-wasm.md)
+for the production loader, development reload, and optional Static Hermes AOT
+profile.
 
 `run:device-dev` uses the matching host `hermesc` to produce bytecode and loads
 it in the same runtime binary. Published development tooling must keep the

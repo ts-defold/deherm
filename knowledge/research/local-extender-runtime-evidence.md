@@ -1,8 +1,8 @@
 ---
 type: Research Note
 title: Local Bob, standalone Extender, and Hermes runtime evidence
-description: Reproducible evidence that pinned Bob and a pinned standalone Extender build and run the Defold Hermes native extension on macOS arm64, including the failures resolved on the way.
-tags: [research, evidence, defold, bob, extender, hermes, macos, arm64, native-extension]
+description: Reproducible evidence that pinned Bob and standalone Extender build and run the Defold Hermes extension on macOS arm64 and HTML5 Wasm, including the failures resolved on the way.
+tags: [research, evidence, defold, bob, extender, hermes, macos, arm64, html5, wasm, native-extension]
 status: verified
 generated: { by: codex/gpt-5, at: 2026-09-17T18:26:03-04:00 }
 sources:
@@ -38,6 +38,10 @@ sources:
     resource: ../../defold/game.project
     title: Defold proof-project configuration
     author: team:ts-defold
+  - id: html5-check
+    resource: ../../scripts/check-html5-runtime.mjs
+    title: Chrome DevTools Protocol HTML5 runtime check
+    author: team:ts-defold
 ---
 
 # Result and boundary
@@ -52,12 +56,20 @@ Bob 1.14.0 -> standalone Extender -> arm64 dmengine -> extension init
   -> app.js loaded by dmResource -> Hermes init -> generated ExampleMath call
 ```
 
-This is a **macOS arm64 debug proof only**. It proves that this exact native
-configuration builds, links, starts Defold, loads the custom JavaScript
-resource, initializes dynamic Hermes, and invokes one generated module
-binding. It does not certify Static Hermes AOT inside Defold, release builds,
-bytecode, iOS, Android, Windows, Linux, HTML5, every generated binding,
-long-running stability, leak freedom, hot reload, or performance budgets.
+The same pinned toolchain now also completes the HTML5 browser-host path:
+
+```text
+Bob 1.14.0 -> standalone Extender + Emscripten 4.0.6 -> wasm-web custom engine
+  -> archived app.js -> browser VM -> generated ExampleMath Wasm call
+```
+
+These are **macOS arm64 and `wasm-web` debug proofs only**. They prove that
+these exact configurations build, link, start Defold, load the custom
+JavaScript resource, initialize dynamic Hermes on native or the browser host
+on HTML5, and invoke one generated module binding. They do not certify Static
+Hermes AOT inside Defold, release builds, bytecode, iOS, Android, Windows,
+Linux, every generated binding, long-running stability, leak freedom, hot
+reload, or performance budgets.
 
 The sample's `ExampleMath` module is deherm-owned proof glue. It makes **zero
 public Defold game API calls**. Internal extension use of resource/config/script
@@ -81,6 +93,8 @@ ergonomic script surface is 0/926 and its dmSDK surface is 0/1361.
 | Extender endpoint | standalone profile on `http://localhost:9010` |
 | Bob platform/architecture | `arm64-macos` |
 | Bob variant | `debug` |
+| Emscripten | 4.0.6, emsdk revision `24fc909c0da13ef641d5ae75e89b5a97f25e37aa` |
+| HTML5 platform/architecture | `wasm-web` |
 
 The bare `java` command was not available through the shell's default runtime
 lookup. The project scripts therefore deliberately select the Homebrew JDK 25
@@ -127,6 +141,37 @@ pinned Defold revision; `dmResource::GetRaw` found and loaded the JavaScript
 payload; the Lua bootstrap attached the current Defold script instance and
 started Hermes; and the TypeScript sample reached the generated `ExampleMath`
 binding and obtained `20 + 22 = 42`.
+
+The HTML5 proof used `npm run bob:web:bundle`, served the generated bundle from
+`build/bundle/Defold Hermes Spike`, and connected the checked-in CDP verifier to
+a clean headless Chrome process with software WebGL. The verifier observed:
+
+```json
+{
+  "engineStarted": true,
+  "appRegistered": true,
+  "hostRuntime": "browser",
+  "modules": ["ExampleMath", "Timer"]
+}
+```
+
+It also captured the application transcript `init:browser`, `module:42`,
+`clock-ready:true`, and at least one `update` callback, with no JavaScript
+exception or non-favicon browser error. This proves an actual Defold engine
+call: `ExampleMath.add(20, 22)` traveled through generated browser glue into
+the linked Wasm export and returned `42`. Inspection of the emitted
+`DefoldHermesSpike_wasm.js` also found the generated lifecycle imports and
+the exported scalar binding symbols.
+
+The Emscripten variables were initially absent from the standalone macOS
+Extender profile, producing a Mustache failure while resolving
+`env.EMSCRIPTEN_*`. The project now pins and bootstraps emsdk 4.0.6—the version
+used by the matching Defold/Extender configuration—and generates the local
+Extender environment automatically. The first browser check then found that
+the development server did not URL-decode the space in the bundle directory;
+fixing the server exposed the actual game. Headless Chrome additionally needs
+software WebGL enabled; without a WebGL context Emscripten starts but Defold
+does not reach the extension lifecycle.
 
 The retained native outputs were also inspected after the successful build:
 

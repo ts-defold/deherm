@@ -2,6 +2,8 @@
 
 ## 2026-09-17
 
+* **HTML5 runtime proof**: Pinned and bootstrapped Emscripten 4.0.6, built the `wasm-web` custom engine through local Extender, ran it in headless Chrome with software WebGL, and observed `init:browser`, `module:42`, and repeated TypeScript updates through the generated Wasm binding.
+* **HTML5 profiles**: Documented the browser-host default and an opt-in Static Hermes extension profile that emits an exported C unit and links it with Defold into one Wasm module, gated by workload benchmarks and compatibility.
 * **Local Extender proof**: Pinned Extender at `2a17252`, generated the installed Xcode 26.5/clang 21 environment, and made `bob:local:build`/`bob:local:bundle` one-command standalone macOS workflows without Google Cloud authentication.
 * **Defold runtime proof**: Linked `_defold_hermes`, bundled JavaScript with `custom_resources`, launched the arm64 app, and observed the embedded-Hermes transcript `init:hermes` and `module:42`.
 * **Archive hygiene**: Removed Hermes's unreferenced compiler-side `zip.c.o` from the Defold-facing archive under a fail-closed reference check; the rebuilt custom engine links without duplicate `zip_*` symbols and retains the runtime transcript.
