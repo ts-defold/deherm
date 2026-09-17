@@ -2,6 +2,11 @@
 
 ## 2026-09-17
 
+* **API ground truth**: Selected the exact Defold engine SHA as the version key; matching ref-doc artifacts, packaged dmSDK headers, and resolved project extensions are hashed and may be reused from editor/Bob caches without mixing versions.
+* **Generated script SDK**: Generated compiling camelCase TypeScript modules, rich TSDoc, overloads, types, and per-symbol IR for all 926 public script functions and 410 declared types; runtime implementation coverage remains a separate gate.
+* **Generated dmSDK SDK**: Expanded the Clang importer to retain record fields, access, and enum values; generated a raw typed surface and ABI-strategy ledger for all 2,140 discovered declarations while explicitly hiding non-public entries.
+* **VS Code ownership**: Chose VS Code as the only TypeScript editor; the planned LSP adds Defold project semantics and the DAP combines Hermes CDP with live engine-instance introspection and inline values.
+* **Typed addressing**: Added template-literal Defold address types for fragments, absolute paths, socket-qualified paths, and shorthands; bare relative ids now require an explicit branded constructor instead of accepting arbitrary strings.
 * **API examples**: Added a binding cookbook with a per-symbol state machine and worked scalar, current-instance, callback, URL/hash, engine-handle, and third-party-extension designs for API review.
 * **Developer runtime**: Chose a Babel-free ttsc transform pipeline, transactional runtime-generation hot reload, and a shared VS Code/CDP debugger-profiler direction for native Hermes and HTML5.
 * **Project IR**: Normalized extension `.script_api` declarations into stable symbol/type/lowering IR; both generated declarations and executable camelCase TypeScript SDK modules now consume it.

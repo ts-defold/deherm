@@ -13,6 +13,7 @@ Commands:
 Options:
   --project <path>   Defold project directory or game.project
   --out-dir <path>   Generated directory relative to the project (default: .defold-hermes)
+  --defold-sdk <sha> Exact Defold engine SHA expected by generated API inputs
   --json             Print machine-readable JSON
   -h, --help         Show this help
 `;
@@ -27,6 +28,7 @@ function parseArguments(argv) {
     else if (value === "-h" || value === "--help") options.help = true;
     else if (value === "--project") options.project = args.shift();
     else if (value === "--out-dir") options.outDir = args.shift();
+    else if (value === "--defold-sdk") options.defoldSdk = args.shift();
     else throw new Error(`Unknown option: ${value}`);
   }
   return options;
@@ -56,10 +58,12 @@ export async function run(argv = process.argv.slice(2)) {
     return inventory.diagnostics.some(({ severity }) => severity === "error") ? 1 : 0;
   }
   if (options.command === "generate") {
-    const output = await writeGeneratedProject(inventory, options.outDir);
+    if (options.defoldSdk && !/^[a-f0-9]{40}$/i.test(options.defoldSdk)) throw new Error("--defold-sdk must be a 40-character SHA");
+    const output = await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk });
     if (options.json) console.log(JSON.stringify({ ...output, summary: inventory.summary }, null, 2));
     else {
       console.log(`Generated extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
+      console.log(`Pinned Defold API: ${output.defoldRevision}`);
       if (output.created.tsconfig) console.log("Created tsconfig.json extending tsconfig.defold-hermes.json");
       else console.log("Kept existing tsconfig.json; extend tsconfig.defold-hermes.json from your project config");
     }

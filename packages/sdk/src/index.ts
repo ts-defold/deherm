@@ -1,8 +1,23 @@
 export type RuntimeKind = "hermes" | "browser" | "test";
 export type LogLevel = "debug" | "info" | "warn" | "error";
+export {
+  address,
+  relativeAddress,
+  type DefoldAbsolutePath,
+  type DefoldAddress,
+  type DefoldAddressLiteral,
+  type DefoldAddressShorthand,
+  type DefoldFragmentAddress,
+  type DefoldHash,
+  type DefoldRelativeAddress,
+  type DefoldSocketAddress,
+  type DefoldUrl
+} from "./address";
 export type { DefoldModuleMap, ExampleMathSpec, Vec3 } from "./generated/modules";
 export { DEFOLD_HERMES_ABI_VERSION } from "./generated/modules";
 export { DefoldModules, type DefoldModuleRegistry } from "./registry";
+export * from "./generated/script/index";
+export * from "./generated/dmsdk/index";
 
 export interface DefoldApiV1 {
   readonly version: 1;

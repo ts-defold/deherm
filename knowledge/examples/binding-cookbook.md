@@ -179,17 +179,32 @@ slots and a rooted callback descriptor rather than a runtime options parser.
 
 # Example 5: URL and hash values
 
-Proposed values are branded, compact, and explicit:
+Accepted direction: values are branded, compact, and explicit, while address
+literals use template-literal types:
 
 ```ts
 const animation = hash("run");
 const spriteUrl = url("main:/player#sprite");
 
 msg.post(spriteUrl, animation, { speed: 2 });
+msg.post("#sprite", animation);
+msg.post("main:/player#sprite", animation);
 ```
 
-`Hash` is represented as the engine's exact-width hash value, not an ordinary
-JavaScript number. `Url` has a fixed native/Wasm layout. String overloads are
+The compiler accepts structured literals such as `${string}#${string}`,
+`/${string}`, and `${string}:${string}`, plus Defold's `"."` and `"#"`
+shorthands. A bare relative id is valid Defold syntax but indistinguishable from
+an arbitrary runtime string, so it is explicit:
+
+```ts
+go.getPosition(relativeAddress("player"));
+
+// Type error: use relativeAddress("player") or a parsed Url.
+go.getPosition("player");
+```
+
+`Hash` is represented as an opaque engine value, not an ordinary JavaScript
+number. `Url` has a fixed native/Wasm layout. Literal constructors are
 compile-time sugar where possible; dynamic strings hash or parse through a
 generated intrinsic. Arbitrary message tables remain a slower compatibility
 path until a typed message schema supplies a fixed codec.

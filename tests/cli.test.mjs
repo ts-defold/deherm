@@ -31,6 +31,11 @@ async function fixture() {
           type: string
       return:
         type: boolean
+    - name: focus_target
+      type: function
+      parameters:
+        - name: target
+          type: string|hash|url
 `);
   const archive = zipSync({
     "math/ext.manifest": strToU8("name: XMath\n"),
@@ -92,8 +97,10 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   const project = await fixture();
   const inventory = await inspectDefoldProject({ project });
   const types = generateExtensionTypes(inventory);
+  assert.match(types, /from "\.\/sdk\/address\.js"/);
   assert.match(types, /export interface CameraExtension/);
   assert.match(types, /start\(facing: string\): boolean/);
+  assert.match(types, /focusTarget\(target: DefoldAddressLiteral \| DefoldRelativeAddress \| DefoldHash \| DefoldUrl\): void/);
   assert.match(types, /export interface XmathExtension/);
   assert.match(types, /dot\(left: number, right: number\): number/);
 
@@ -101,6 +108,8 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(ir.modules[0].id, "script:camera");
   assert.equal(ir.modules[0].members[0].id, "script:camera.start");
   assert.equal(ir.modules[0].members[0].lowering.dynamicHermes, "lua-compatibility");
+  assert.equal(ir.modules[0].members[1].rawName, "focus_target");
+  assert.equal(ir.modules[0].members[1].jsName, "focusTarget");
 
   const output = await writeGeneratedProject(inventory);
   const saved = await readFile(path.join(output.root, "extensions.d.ts"), "utf8");
@@ -109,8 +118,22 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   const camera = await readFile(path.join(output.root, "sdk", "modules", "camera.ts"), "utf8");
   assert.match(camera, /export const camera: CameraExtension/);
   assert.match(camera, /callExtension\("camera", "start", \[facing\]\)/);
+  assert.match(camera, /focusTarget\(target: DefoldAddressLiteral \| DefoldRelativeAddress \| DefoldHash \| DefoldUrl\)/);
   const index = await readFile(path.join(output.root, "sdk", "index.ts"), "utf8");
+  assert.match(index, /export \* from "\.\/generated\/script\/index\.js"/);
+  assert.match(index, /export \* from "\.\/generated\/dmsdk\/index\.js"/);
   assert.match(index, /export \{ camera \} from "\.\/modules\/camera\.js"/);
+  const manifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
+  assert.match(manifest.defoldRevision, /^[a-f0-9]{40}$/);
+  assert.equal(manifest.coverage.script.functions, 926);
+  assert.equal(manifest.coverage.script.typeSurfaceUnresolved, 0);
+  assert.equal(manifest.coverage.dmsdk.declarations, 2140);
+  assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, 0);
+  assert.match(await readFile(path.join(output.root, "sdk", "generated", "script", "types.ts"), "utf8"), /export interface MsgApi/);
+  assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
+  const lock = JSON.parse(await readFile(path.join(project, "defold-hermes.lock"), "utf8"));
+  assert.equal(lock.defoldRevision, manifest.defoldRevision);
+  assert.deepEqual(lock.inputs, manifest.inputs);
 
   const config = JSON.parse(await readFile(path.join(project, "tsconfig.defold-hermes.json"), "utf8"));
   assert.equal(config.compilerOptions.plugins[0].transform, "@ts-defold/hermes/ttsc");

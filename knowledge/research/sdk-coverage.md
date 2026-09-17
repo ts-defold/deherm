@@ -34,6 +34,10 @@ policy. Nothing is silently discarded.
 `needs-policy` is the generator queue: pointers, ownership, callbacks,
 lifetimes, templates, arrays/spans, named handles, and wide integers must gain
 an explicit ABI rule. It is not counted as implemented runtime compatibility.
+`scripts/generate-dmsdk-sdk.mjs` expands these reason classes into explicit
+per-symbol ABI strategies, hides non-public members, and emits the raw
+TypeScript surface. Runtime implementation and conformance remain independent
+coverage gates.
 
 ## Declaration kinds
 
@@ -61,3 +65,4 @@ None.
 The machine-readable inventory is
 `bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it
 so new or removed upstream API cannot drift unnoticed.
+The enriched per-symbol ledger is `bindings/generated/defold-sdk-ir.json`.

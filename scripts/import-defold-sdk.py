@@ -105,6 +105,51 @@ def function_parts(node: dict[str, Any]) -> tuple[str, list[dict[str, str]]]:
     return result, parameters
 
 
+def enum_value(node: dict[str, Any]) -> str | int | None:
+    pending = [node]
+    while pending:
+        current = pending.pop()
+        if "value" in current:
+            value = current["value"]
+            try:
+                return int(value)
+            except (TypeError, ValueError):
+                return str(value)
+        pending.extend(current.get("inner", []))
+    return None
+
+
+def record_members(node: dict[str, Any]) -> list[dict[str, Any]]:
+    members = []
+    access = "public" if node.get("tagUsed") == "struct" else "private"
+    for child in node.get("inner", []):
+        if child.get("kind") == "AccessSpecDecl":
+            access = child.get("access", access)
+        elif child.get("kind") == "FieldDecl" and child.get("name"):
+            members.append(
+                {
+                    "name": child["name"],
+                    "type": child.get("type", {}).get("qualType", "unknown"),
+                    "access": child.get("access", access),
+                    "line": child.get("loc", {}).get("line"),
+                }
+            )
+    return members
+
+
+def enum_members(node: dict[str, Any]) -> list[dict[str, Any]]:
+    members = []
+    for child in node.get("inner", []):
+        if child.get("kind") != "EnumConstantDecl" or not child.get("name"):
+            continue
+        member = {"name": child["name"], "line": child.get("loc", {}).get("line")}
+        value = enum_value(child)
+        if value is not None:
+            member["value"] = value
+        members.append(member)
+    return members
+
+
 def normalize_type(type_name: str) -> str:
     value = re.sub(r"\b(const|volatile|restrict)\b", "", type_name)
     value = re.sub(r"\s+", " ", value).strip()
@@ -139,7 +184,7 @@ def lowering_for(kind: str, node: dict[str, Any]) -> tuple[str, list[str]]:
 
 
 def symbol_from_node(
-    node: dict[str, Any], kind: str, scope: tuple[str, ...], header: Path
+    node: dict[str, Any], kind: str, scope: tuple[str, ...], header: Path, access: str
 ) -> dict[str, Any] | None:
     name = node.get("name")
     if not name or node.get("isImplicit"):
@@ -151,6 +196,7 @@ def symbol_from_node(
         "header": relative(header),
         "line": node.get("loc", {}).get("line"),
         "status": status,
+        "access": node.get("access", access),
     }
     type_name = node.get("type", {}).get("qualType")
     if type_name:
@@ -159,6 +205,17 @@ def symbol_from_node(
         result, parameters = function_parts(node)
         symbol["returns"] = result
         symbol["parameters"] = parameters
+    if kind == "record":
+        symbol["recordKind"] = node.get("tagUsed", "class")
+        symbol["completeDefinition"] = node.get("completeDefinition", False)
+        symbol["members"] = record_members(node)
+        if node.get("bases"):
+            symbol["bases"] = [
+                base.get("type", {}).get("qualType", "unknown")
+                for base in node["bases"]
+            ]
+    if kind == "enum":
+        symbol["members"] = enum_members(node)
     if reasons:
         symbol["policyReasons"] = reasons
     return symbol
@@ -172,26 +229,37 @@ def declarations_for(ast: dict[str, Any], header: Path) -> list[dict[str, Any]]:
         children: Iterable[dict[str, Any]],
         scope: tuple[str, ...],
         inherited_source: Path | None,
+        inherited_access: str = "public",
     ) -> None:
         last_source = inherited_source
+        current_access = inherited_access
         for node in children:
             explicit_source = node_source(node)
             source = explicit_source or last_source
             if explicit_source:
                 last_source = explicit_source
             kind_name = node.get("kind", "")
+            if kind_name == "AccessSpecDecl":
+                current_access = node.get("access", current_access)
+                continue
             in_target = source == target
             public_kind = DECL_KINDS.get(kind_name)
 
             if in_target and public_kind:
-                symbol = symbol_from_node(node, public_kind, scope, header)
+                symbol = symbol_from_node(node, public_kind, scope, header, current_access)
                 if symbol:
                     declarations.append(symbol)
 
             if kind_name in CONTAINER_KINDS and in_target:
                 container_name = node.get("name")
                 child_scope = (*scope, container_name) if container_name else scope
-                visit_scope(node.get("inner", []), child_scope, source)
+                child_access = (
+                    "public"
+                    if kind_name in {"NamespaceDecl", "LinkageSpecDecl", "ExternCContextDecl"}
+                    or node.get("tagUsed") == "struct"
+                    else "private"
+                )
+                visit_scope(node.get("inner", []), child_scope, source, child_access)
 
     visit_scope(ast.get("inner", []), (), None)
     return declarations
@@ -359,6 +427,10 @@ policy. Nothing is silently discarded.
 `needs-policy` is the generator queue: pointers, ownership, callbacks,
 lifetimes, templates, arrays/spans, named handles, and wide integers must gain
 an explicit ABI rule. It is not counted as implemented runtime compatibility.
+`scripts/generate-dmsdk-sdk.mjs` expands these reason classes into explicit
+per-symbol ABI strategies, hides non-public members, and emits the raw
+TypeScript surface. Runtime implementation and conformance remain independent
+coverage gates.
 
 ## Declaration kinds
 
@@ -377,6 +449,7 @@ an explicit ABI rule. It is not counted as implemented runtime compatibility.
 The machine-readable inventory is
 `bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it
 so new or removed upstream API cannot drift unnoticed.
+The enriched per-symbol ledger is `bindings/generated/defold-sdk-ir.json`.
 """
 
 

@@ -126,14 +126,17 @@ remain the source for the lower-level `defold.sdk.*` surface.
 | --- | ---: |
 {rows}
 
-Every one of the **{data['countsByKind']['function']} functions** starts as
-`needs-native-mapping`. A mapping can resolve to a direct generated C ABI call,
-a generated composition of lower-level calls, or a temporary Lua compatibility
-bridge. CI must not call the script surface complete while any public function
-is unaccounted for.
+The discovery inventory deliberately records each of the
+**{data['countsByKind']['function']} functions** as `needs-native-mapping`.
+`scripts/generate-script-sdk.mjs` enriches that source ledger into the binding
+IR, emits the complete TypeScript/TSDoc surface, and records runtime
+implementation separately. A generated declaration is not automatically a
+linked or conformance-tested binding.
 
 The machine-readable inventory is
 `bindings/generated/defold-script-api-inventory.json`.
+The enriched per-symbol ledger is
+`bindings/generated/defold-script-api-ir.json`.
 """
 
 

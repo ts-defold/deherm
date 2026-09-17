@@ -29,6 +29,27 @@ default pipeline. Dynamic Hermes consumes the resulting JavaScript or matched
 Hermes bytecode; Static Hermes consumes the stricter ttsc output and generated
 C ABI imports.
 
+VS Code is the sole TypeScript code editor. Defold remains the scene, resource,
+build, and run editor; first-class `.ts` editing inside Defold is out of scope.
+This removes the need for an editor fork in the normal workflow.
+
+The npm package will ship an editor-neutral language server and debug adapter,
+with a thin VS Code extension acting as their client:
+
+* TypeScript's built-in language service owns syntax, types, generated TSDoc,
+  source navigation, and ordinary refactors.
+* The Defold-Hermes LSP adds project semantics: resource paths, collection and
+  component addresses, message payloads, material constants, dependency
+  extensions, and generated-source provenance.
+* The DAP owns breakpoints, stack/scopes, watches, inline runtime values, and
+  profile/debug transport. Hermes CDP is its JavaScript-debug backend; a small
+  Defold introspection channel supplies live game-object, component, property,
+  and message state that CDP alone cannot know.
+
+An optional Defold editor hook passes `editor.engine_sha1`, notifies the CLI,
+and advertises the active game-session endpoint. It does not implement a code
+editor.
+
 # Reload transaction
 
 TypeScript-only edits do not rebuild Hermes or the custom engine:
@@ -98,3 +119,6 @@ shipping runtime does not carry the debugger server.
    standard tooling.
 6. Run the equivalent breakpoint and reload smoke test on HTML5 through browser
    CDP.
+7. Show live instance, component, and property values beside authored
+   TypeScript in VS Code, visibly invalidate stale generation handles, and
+   navigate a live Defold address back to its project resource.

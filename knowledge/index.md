@@ -13,6 +13,7 @@ okf_version: "0.2"
 * [Native module strategy](decisions/native-modules.md) - TurboModule/Nitro compatibility direction and the module-registry proof.
 * [Binding compiler](decisions/binding-compiler.md) - Direct C ABI, generated JSI/Static Hermes adapters, and fixed Emscripten memory layouts.
 * [Full SDK compatibility](decisions/full-sdk-compatibility.md) - The two API surfaces, semantic overlay, ttsc role, and native extension contract.
+* [API source resolution](decisions/api-source-resolution.md) - Exact engine-SHA selection, canonical Defold artifacts, extension merging, and cache integrity.
 * [Lua compatibility backend](decisions/lua-compatibility-backend.md) - Cached stack thunks, scratch arenas, generational pools, and instance discipline for Lua-only APIs.
 * [Hybrid TypeScript toolchain](decisions/hybrid-toolchain.md) - Lua scripts plus Hermes modules, coordinated by TypeScript 7 and ttsc.
 * [Runtime profiles and reachability](decisions/runtime-profiles-and-reachability.md) - Precompiled development runtimes, release-only AOT, and cross-layer tree shaking.
