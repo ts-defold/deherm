@@ -48,8 +48,11 @@ ordinary edit loop.
 | Check Static Hermes declarations | `npm run check:static-hermes` | Parses the generated `extern_c` surface |
 | Exercise the cached Lua bridge | `npm run test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
 | Stage the native extension | `npm run package:defold` | Defold package directory/archive inputs |
-| Compile the real Defold project | `npm run bob:build` | Uses pinned Bob and the native-extension build service |
-| Produce a desktop app bundle | `npm run bob:bundle` | Writes the application under `defold/build/bundle` |
+| Prepare pinned local Extender | `npm run extender:prepare` | Builds the pinned jars and maps the installed Xcode SDK |
+| Start/inspect local Extender | `npm run extender:start`; `npm run extender:status`; `npm run extender:logs` | Standalone macOS service on port 9010 |
+| Compile the real Defold project | `npm run bob:local:build` | Starts a temporary pinned Extender when needed, then builds with Bob |
+| Produce a desktop app bundle | `npm run bob:local:bundle` | Writes `build/bundle/Defold Hermes Spike.app` |
+| Reuse a running local Extender | `npm run bob:build`; `npm run bob:bundle` | Local port 9010 is the default |
 
 The strongest local verification is one command:
 
@@ -61,29 +64,47 @@ npm run verify
 builds and runs native Hermes source and bytecode, the Lua bridge, Static Hermes
 parsing, extension syntax checks, and Defold extension packaging.
 
-# Bob boundary
+# Local Bob and Extender
 
 Pinned Bob is downloaded and checksum-verified by `npm run bootstrap:bob`.
-Because this project includes a native extension, Bob sends the extension
-sources and packaged libraries to the configured Defold build server. That
-external upload is deliberately opt-in:
+Pinned Extender is checked out from `upstream.lock`. On macOS, the one-command
+paths prepare its jars, detect the installed Xcode SDK/clang/Swift ABI, create
+repo-local SDK links, start Extender for the duration of the build, and stop it:
 
 ```sh
-DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 npm run bob:build
-DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 npm run bob:bundle
+npm run bob:local:build
+npm run bob:local:bundle
 ```
 
-The default server is `https://build.defold.com`; override it with
-`DEFOLD_HERMES_BUILD_SERVER`. A real payload reached that service, but it
-rejected the pinned development SDK before compiling our source because the
-SDK's platform schema contains a newer `r8Cmd` property. A matching local
-Extender is the durable developer path; a stable cloud-compatible SDK pin is an
-alternative verification lane. Completing and launching the engine must:
+For a persistent edit loop, run `npm run extender:start` once and then use
+`npm run bob:build` or `npm run bob:bundle`. `npm run extender:foreground` is
+the inspectable foreground form. The current proof is arm64 macOS; other target
+toolchains still need their Extender builders.
+
+Because this project includes a native extension, a non-local build server
+receives extension sources and packaged libraries. Localhost is the default and
+does not require an upload opt-in. A remote server is deliberately explicit:
+
+```sh
+DEFOLD_HERMES_BUILD_SERVER=https://build.defold.com \
+DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 npm run bob:build
+```
+
+Google Cloud CLI is only needed if a developer chooses Defold's Docker setup
+and must authenticate to its Google Artifact Registry. It is not part of
+deherm, Bob, Hermes, or the standalone macOS path.
+
+The validated macOS path now:
 
 1. verify JDK 25 and all native toolchain prerequisites;
-2. copy the bundle or bytecode into the project as a Defold resource;
+2. includes generated JavaScript with Defold `custom_resources`;
 3. report extension build logs without hiding the failing compiler command;
-4. launch desktop outputs and provide a stable path for device outputs.
+4. links a custom engine exporting `_defold_hermes`;
+5. bundles and launches the app through embedded Hermes.
+
+The runtime smoke emitted `init:hermes` and `module:42`. Full platform support,
+automated launch/termination, and the complete generated API remain separate
+work; a successful custom-engine link does not imply complete API coverage.
 
 # npm CLI
 

@@ -450,6 +450,33 @@ The machine-readable inventory is
 `bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it
 so new or removed upstream API cannot drift unnoticed.
 The enriched per-symbol ledger is `bindings/generated/defold-sdk-ir.json`.
+
+## Executable coverage audit
+
+The complete declaration surface is generated, but the runtime bridge is still
+early. Against this same pinned revision:
+
+| Stage | Callable declarations |
+| --- | ---: |
+| Raw TypeScript signatures generated | 1361 |
+| C ABI scalar thunks generated and packaged-SDK compiled | 26 |
+| Host source-linked and behavior-tested | 25 |
+| Retained in the final Defold engine | 0 |
+| Callable from TypeScript/Hermes | 0 |
+| Remaining callable lowerings | 1335 |
+
+The successful custom-engine build proves all 26 thunk translation units
+compile against the packaged Defold SDK and exist in the extension archive.
+Because no JSI installer references them yet, the linker correctly dead-strips
+them from `dmengine`. The 25 host behavior tests are representative local
+tests, not full cross-target conformance.
+
+The remaining primary lowering families are 436 pointer, 380 enum/handle, 103
+out-parameter, 93 callback, 70 template/opaque, 56 method, 54 constructor, 44
+pointer/span, 42 platform-gated, 37 record/reference, eight destructor, seven
+variadic, and five blocked scalar declarations. “Zero unresolved TypeScript
+tokens” therefore means the generator classified every token; it does not mean
+ABI layout, ownership, lifetime, or runtime compatibility is complete.
 """
 
 

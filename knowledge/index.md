@@ -12,6 +12,7 @@ okf_version: "0.2"
 * [Runtime strategy](decisions/runtime-strategy.md) - Decision to use Hermes natively and the host browser VM on HTML5.
 * [Native module strategy](decisions/native-modules.md) - TurboModule/Nitro compatibility direction and the module-registry proof.
 * [Binding compiler](decisions/binding-compiler.md) - Direct C ABI, generated JSI/Static Hermes adapters, and fixed Emscripten memory layouts.
+* [Generator product contract](decisions/generator-product-contract.md) - One-command, deterministic, no-LLM API compilation with a zero-per-symbol-edit gate.
 * [Full SDK compatibility](decisions/full-sdk-compatibility.md) - The two API surfaces, semantic overlay, ttsc role, and native extension contract.
 * [API source resolution](decisions/api-source-resolution.md) - Exact engine-SHA selection, canonical Defold artifacts, extension merging, and cache integrity.
 * [Semantic translation tokens](decisions/semantic-translation-tokens.md) - Provenance-preserving names, types, ABI projections, reproduced claims, and conformance states.
@@ -34,6 +35,8 @@ okf_version: "0.2"
 * [dmSDK coverage](research/sdk-coverage.md) - Generated, declaration-level coverage of every public dmSDK header.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.
 * [TypeGPU shader lane](research/typegpu-shader-lane.md) - Build-time TypeGPU authoring, Defold shader adaptation, typed material bindings, and validation gates.
+* [React and hooks over Defold GUI](research/react-defold-gui.md) - Recommended custom React renderer, dense commit bridge, Yoga/Clay tradeoff, and Static Hermes conformance gates.
+* [Local Extender runtime evidence](research/local-extender-runtime-evidence.md) - Pinned macOS arm64 Bob/Extender build, bundle, runtime transcript, reproduced failures, and proof boundaries.
 * [Binding compiler cookbook](examples/binding-cookbook.md) - Concrete source-to-IR-to-TypeScript examples for reviewing the public API.
 * [Risks and unknowns](risks.md) - Technical risks that the spike must retire.
 

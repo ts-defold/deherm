@@ -2,6 +2,12 @@
 
 ## 2026-09-17
 
+* **Local Extender proof**: Pinned Extender at `2a17252`, generated the installed Xcode 26.5/clang 21 environment, and made `bob:local:build`/`bob:local:bundle` one-command standalone macOS workflows without Google Cloud authentication.
+* **Defold runtime proof**: Linked `_defold_hermes`, bundled JavaScript with `custom_resources`, launched the arm64 app, and observed the embedded-Hermes transcript `init:hermes` and `module:42`.
+* **Archive hygiene**: Removed Hermes's unreferenced compiler-side `zip.c.o` from the Defold-facing archive under a fail-closed reference check; the rebuilt custom engine links without duplicate `zip_*` symbols and retains the runtime transcript.
+* **Executable API audit**: Separated complete generated declarations from runtime truth: Lua-shaped SDK 0/926 wired (three timer operations proven through a separate module) and dmSDK 0/1361 TypeScript-callable (26 generated scalar thunks, 25 host behavior-tested).
+* **Generator contract**: Made zero-agent, zero-per-symbol-edit generation a product gate; all ambiguity overlays must be versioned, source-validated data and fresh Defold revisions must regenerate from one CLI command.
+* **React GUI frontier**: Recommended a real React mutation renderer over a pooled shadow tree and dense commit buffer, Yoga first with Clay/Preact measured alternatives, and mandatory Static Hermes/browser/device conformance before adoption.
 * **Extension SDK frontier**: Reserved a post-core-API strict-TypeScript authoring flow that AOT-compiles extension logic with Static Hermes and generates the Defold bootstrap, C ABI, Lua/TypeScript metadata, and browser projection; selected a data-oriented ECS as the proving project.
 * **Memory policy**: Assigned allocations to runtime, rooted-object, dispatch, stack, or compile-time lifetimes; required bounded pools, no-fallback arenas, dense hot tables, observable budgets, and scoped sanitizer/allocation evidence.
 * **Semantic translation**: Defined provenance-preserving per-position tokens for source names, TypeScript synonyms, overloads, generics, ABI layouts, target lowering, and conformance; recorded reproduced and rejected adversarial-review claims.
