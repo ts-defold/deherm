@@ -36,6 +36,9 @@ ordinary edit loop.
 | Intent | Command | Result |
 | --- | --- | --- |
 | Validate generated sources, inventories, types, and OKF | `npm run check` | No native rebuild |
+| Inspect a Defold project | `npm run cli -- doctor --project <path>` | Finds local and resolved extensions |
+| List extension binding inputs | `npm run cli -- extensions --project <path>` | Reports script API, headers, and schema gaps |
+| Generate a project SDK | `npm run cli -- generate --project <path>` | Writes types, executable TS modules, tsconfig, and VS Code setup |
 | Bundle TypeScript | `npm run build:js` | `dist/sample.js` plus its symbol-usage manifest |
 | Build the standalone embedded-Hermes runner | `npm run build:native` | Native test runner, not a Defold game |
 | Compile and run JS source in Hermes | `npm run run:native` | Fast source-interpreter development proof |
@@ -46,7 +49,7 @@ ordinary edit loop.
 | Exercise the cached Lua bridge | `npm run test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
 | Stage the native extension | `npm run package:defold` | Defold package directory/archive inputs |
 | Compile the real Defold project | `npm run bob:build` | Uses pinned Bob and the native-extension build service |
-| Produce a desktop app bundle | `npm run bob:bundle` | Writes the application under `build/bundle` |
+| Produce a desktop app bundle | `npm run bob:bundle` | Writes the application under `defold/build/bundle` |
 
 The strongest local verification is one command:
 
@@ -58,7 +61,7 @@ npm run verify
 builds and runs native Hermes source and bytecode, the Lua bridge, Static Hermes
 parsing, extension syntax checks, and Defold extension packaging.
 
-# Missing Bob boundary
+# Bob boundary
 
 Pinned Bob is downloaded and checksum-verified by `npm run bootstrap:bob`.
 Because this project includes a native extension, Bob sends the extension
@@ -71,23 +74,52 @@ DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 npm run bob:bundle
 ```
 
 The default server is `https://build.defold.com`; override it with
-`DEFOLD_HERMES_BUILD_SERVER`. The remaining milestone is to complete a real
-build, launch the resulting application, and make that result a CI gate. It
-must:
+`DEFOLD_HERMES_BUILD_SERVER`. A real payload reached that service, but it
+rejected the pinned development SDK before compiling our source because the
+SDK's platform schema contains a newer `r8Cmd` property. A matching local
+Extender is the durable developer path; a stable cloud-compatible SDK pin is an
+alternative verification lane. Completing and launching the engine must:
 
 1. verify JDK 25 and all native toolchain prerequisites;
 2. copy the bundle or bytecode into the project as a Defold resource;
 3. report extension build logs without hiding the failing compiler command;
 4. launch desktop outputs and provide a stable path for device outputs.
 
-# Intended public CLI
+# npm CLI
 
-The package should expose one command rather than require knowledge of its
-internal npm/CMake graph:
+The npm package now exposes project inspection and generation:
 
 ```sh
 npx defold-hermes doctor
+npx defold-hermes extensions
 npx defold-hermes generate
+```
+
+These are the installed-package commands verified from a local tarball. The
+package name is not published yet; in this checkout use `npm run cli --` before
+the command and options.
+
+`generate` reads local extensions and Bob-resolved ZIPs, then writes:
+
+```text
+.defold-hermes/extensions.json       sanitized deterministic inventory
+.defold-hermes/bindings.ir.json      normalized symbol/type/lowering IR
+.defold-hermes/extensions.d.ts       extension interfaces
+.defold-hermes/sdk/**                executable TypeScript compatibility SDK
+tsconfig.defold-hermes.json          TS 7 + future ttsc transform configuration
+tsconfig.json                        created only when the project has none
+.vscode/extensions.json              created only when absent
+.vscode/settings.json                created only when absent
+```
+
+Existing root `tsconfig.json` and VS Code files are never overwritten. The
+generated ttsc plugin entry is disabled until the Defold transform package is
+implemented; this keeps the scaffold type-checkable today while fixing the
+future configuration contract.
+
+The next commands will orchestrate the internal build graph:
+
+```sh
 npx defold-hermes dev
 npx defold-hermes build --profile=device-dev
 npx defold-hermes build --profile=release

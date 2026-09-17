@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "lib": [
+      "ES2020",
+      "DOM"
+    ],
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "@defold-hermes/project": [
+        "./.defold-hermes/sdk/index.ts"
+      ],
+      "@defold-hermes/project/*": [
+        "./.defold-hermes/sdk/*"
+      ]
+    },
+    "plugins": [
+      {
+        "transform": "@ts-defold/hermes/ttsc",
+        "enabled": false,
+        "inventory": "./.defold-hermes/extensions.json",
+        "profile": "development"
+      }
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    ".defold-hermes/**/*.ts"
+  ]
+}

@@ -1,13 +1,39 @@
 {
-  "name": "defold-hermes",
+  "name": "@ts-defold/hermes",
   "version": "0.0.0",
-  "private": true,
+  "description": "TypeScript tooling and Hermes runtime integration for Defold",
+  "private": false,
   "type": "module",
+  "files": [
+    "bin/",
+    "packages/cli/",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ts-defold/defold-hermes.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "defold",
+    "hermes",
+    "typescript",
+    "gamedev"
+  ],
+  "bin": {
+    "defold-hermes": "bin/defold-hermes.mjs"
+  },
   "scripts": {
     "bootstrap": "npm run bootstrap:upstreams && npm run bootstrap:bob",
     "bootstrap:upstreams": "./scripts/bootstrap-upstreams.sh",
     "bootstrap:bob": "./scripts/bootstrap-bob.sh",
     "doctor": "node scripts/doctor.mjs",
+    "cli": "node bin/defold-hermes.mjs",
     "generate:bindings": "node scripts/generate-bindings.mjs",
     "generate:lua-bridge": "node scripts/generate-lua-bridge.mjs",
     "generate:sdk-inventory": "python3 scripts/import-defold-sdk.py",
@@ -44,17 +70,26 @@
     "test:contract": "npm run build:js && node --test tests/contract.test.mjs",
     "test:web-host": "npm run build:js && node --test tests/web-host.test.mjs",
     "test:web-library": "node --test tests/web-library.test.mjs",
+    "test:cli": "node --test tests/cli.test.mjs",
     "test:usage": "npm run build:release-plan && node --test tests/usage.test.mjs",
     "test:native": "npm run build && node --test tests/native.test.mjs",
     "test:device-dev": "npm run build:native && npm run build:device-dev && node --test tests/bytecode.test.mjs",
     "test:lua-bridge": "npm run bench:lua-bridge",
     "test:lua-hermes": "npm run generate:bindings && npm run generate:lua-bridge && npm run configure:native && cmake --build build/native --target defold-hermes-lua-hermes-e2e --parallel && build/native/defold-hermes-lua-hermes-e2e",
-    "test": "npm run check && npm run test:codegen && npm run test:lua-codegen && npm run test:coverage && npm run test:contract && npm run test:web-host && npm run test:web-library && npm run test:usage",
+    "test": "npm run check && npm run test:codegen && npm run test:lua-codegen && npm run test:coverage && npm run test:contract && npm run test:web-host && npm run test:web-library && npm run test:cli && npm run test:usage",
     "verify": "npm test && npm run test:native && npm run test:device-dev && npm run test:lua-bridge && npm run test:lua-hermes && npm run check:static-hermes && npm run check:extension-syntax && npm run package:defold"
   },
   "devDependencies": {
     "@ttsc/unplugin": "0.30.4",
     "esbuild": "0.25.10",
+    "ttsc": "0.30.4",
+    "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "fflate": "0.8.3",
+    "yaml": "2.8.3"
+  },
+  "peerDependencies": {
     "ttsc": "0.30.4",
     "typescript": "7.0.2"
   }

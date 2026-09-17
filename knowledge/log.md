@@ -2,6 +2,14 @@
 
 ## 2026-09-17
 
+* **API examples**: Added a binding cookbook with a per-symbol state machine and worked scalar, current-instance, callback, URL/hash, engine-handle, and third-party-extension designs for API review.
+* **Developer runtime**: Chose a Babel-free ttsc transform pipeline, transactional runtime-generation hot reload, and a shared VS Code/CDP debugger-profiler direction for native Hermes and HTML5.
+* **Project IR**: Normalized extension `.script_api` declarations into stable symbol/type/lowering IR; both generated declarations and executable camelCase TypeScript SDK modules now consume it.
+* **Editor setup**: Project generation now creates a TypeScript 7 configuration and non-destructive VS Code recommendations/settings, preserving any existing root project/editor files.
+* **Project CLI**: Added an npm-installable `defold-hermes` binary with project discovery, extension inventory, project diagnostics, and deterministic TypeScript generation from extension `.script_api` metadata.
+* **Extension inputs**: Discover local and Bob-resolved native extensions, public headers, `src`/`commonsrc` implementation files, and native-schema gaps; sanitize credentials and signed parameters from recorded dependency URLs.
+* **Package verification**: Packed `@ts-defold/hermes`, installed it into a clean npm project, invoked its installed binary against the sample project, and upgraded the archive/YAML parsers to releases with zero reported advisories.
+* **Bob integration**: Reached the public Extender service with a valid extension payload; the build stopped before our compiler invocation because the pinned Defold dev SDK's `r8Cmd` platform schema is newer than the deployed service. A matching local Extender or stable cloud-compatible SDK pin is required for that final boundary.
 * **Bob tooling**: Pinned and checksum-verified Bob 1.14.0 at the exact Defold revision, added a local toolchain doctor, and added explicit build/bundle commands guarded by consent before uploading native-extension inputs to a build server.
 * **Review hardening**: Corrected browser timer trigger/elapsed parity, bounded and generation-isolated the HTML5 callback pool, removed callback-dispatch handle allocations, made native/browser finalization release roots after exceptions, and generated rollback for partially acquired multi-callback bindings.
 * **Developer workflow**: Documented the current source, bytecode, browser, release-planning, and extension-packaging commands; separated them from the future public CLI and identified pinned Bob build/launch as the next tooling boundary.

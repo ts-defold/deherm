@@ -123,12 +123,18 @@ mock interpreter.
 4. Add a sample Defold project whose Lua bootstrap only starts the TypeScript
    runtime. Expand toward direct engine APIs after the lifecycle is reliable.
 5. Document the platform-library build matrix and build-server constraints.
+6. Discover local and Bob-resolved third-party extensions from the npm CLI;
+   generate project types from `.script_api` and inventory headers requiring a
+   direct-native binding schema.
 
 Exit: a Defold application can call the sample TypeScript lifecycle on macOS.
 
 Current boundary: the extension sources compile against the pinned Defold SDK
-headers and its packaged Hermes archive links independently, but a full Defold
-editor/cloud-build bundle has not yet been run.
+headers and its packaged Hermes archive links independently. Bob submitted a
+real payload to the public Extender service, which rejected the newer pinned
+development SDK's `r8Cmd` platform property before our compiler ran. The next
+engine boundary is a matching local Extender (or a cloud-compatible stable SDK
+pin), followed by launching the resulting application.
 
 ## Phase 4 - HTML5/browser adapter
 

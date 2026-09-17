@@ -32,7 +32,7 @@ MESSAGE
   exit 2
 fi
 
-platform="${DEFOLD_HERMES_PLATFORM:-arm64-osx}"
+platform="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
 variant="${DEFOLD_HERMES_VARIANT:-debug}"
 build_server="${DEFOLD_HERMES_BUILD_SERVER:-https://build.defold.com}"
 
@@ -40,8 +40,8 @@ npm --prefix "$repo_root" run package:defold
 
 arguments=(
   --root "$repo_root/defold"
-  --output "$repo_root/build/bob"
-  --bundle-output "$repo_root/build/bundle"
+  --output build/bob
+  --bundle-output build/bundle
   --platform "$platform"
   --architectures "$platform"
   --variant "$variant"

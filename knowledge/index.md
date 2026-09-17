@@ -17,6 +17,8 @@ okf_version: "0.2"
 * [Hybrid TypeScript toolchain](decisions/hybrid-toolchain.md) - Lua scripts plus Hermes modules, coordinated by TypeScript 7 and ttsc.
 * [Runtime profiles and reachability](decisions/runtime-profiles-and-reachability.md) - Precompiled development runtimes, release-only AOT, and cross-layer tree shaking.
 * [Delivery model](decisions/delivery-model.md) - What ships as a Defold library/native extension and what would require a fork.
+* [Project extension discovery](decisions/project-extension-discovery.md) - How the npm CLI discovers local and resolved extensions and decides which binding route is safe.
+* [Development loop and debugging](decisions/development-loop-and-debugging.md) - ttsc-only transforms, generation-safe hot reload, Hermes CDP, VS Code, and profiling.
 * [Upstream contribution policy](upstream-contributions.md) - Evidence and quality gates for focused Static Hermes and Defold pull requests.
 
 ## Research
@@ -27,6 +29,7 @@ okf_version: "0.2"
 * [dmSDK coverage](research/sdk-coverage.md) - Generated, declaration-level coverage of every public dmSDK header.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.
 * [TypeGPU shader lane](research/typegpu-shader-lane.md) - Build-time TypeGPU authoring, Defold shader adaptation, typed material bindings, and validation gates.
+* [Binding compiler cookbook](examples/binding-cookbook.md) - Concrete source-to-IR-to-TypeScript examples for reviewing the public API.
 * [Risks and unknowns](risks.md) - Technical risks that the spike must retire.
 
 ## History

@@ -1,0 +1,3 @@
+{
+  "extends": "./tsconfig.defold-hermes.json"
+}

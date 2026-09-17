@@ -31,7 +31,35 @@ npm run run:device-dev
 npm run run:web
 npm run package:defold
 npm run bob:version
+npm run cli -- doctor --project defold
+npm run cli -- extensions --project defold
+npm run cli -- generate --project defold
 ```
+
+## Project CLI
+
+The npm package exposes a `defold-hermes` binary. Its first vertical slice
+discovers native extensions already present in a Defold project, including
+Bob-resolved library ZIPs, and generates a stable inventory, declarations,
+executable TypeScript SDK modules, a TypeScript 7 project, and non-destructive
+VS Code setup from extension `.script_api` metadata:
+
+```sh
+npm install --save-dev @ts-defold/hermes
+npx defold-hermes doctor
+npx defold-hermes extensions
+npx defold-hermes generate
+```
+
+The package has not been published yet; use `npm run cli -- ...` in this
+checkout until the first release. Public C/C++ headers are included in the
+inventory, but direct native bindings are intentionally marked as requiring a
+versioned ABI and lifetime schema rather than being guessed from syntax alone.
+The generator writes a normalized `bindings.ir.json`; both declarations and
+executable SDK modules consume that IR, including collision-checked camelCase
+names and per-target lowering status.
+The generated ttsc transform entry is present but disabled until that transform
+ships; ordinary TypeScript 7 checking works now.
 
 `run:native` executes the bundle in embedded Hermes through JSI. `run:web`
 executes that same bundle in the browser, without Hermes in Wasm. The sample
