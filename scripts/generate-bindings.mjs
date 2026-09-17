@@ -560,9 +560,9 @@ function generateEmscriptenModules(schema) {
         }
         lines.push(`              throw new Error('${module.name}.${fn.name} failed');`);
         lines.push("            }");
-        lines.push("            return result;");
+        lines.push(`            return ${fn.returns === "bool" ? "result !== 0" : "result"};`);
       } else {
-        lines.push(`            return ${call};`);
+        lines.push(`            return ${fn.returns === "bool" ? `${call} !== 0` : call};`);
       }
       lines.push(`          }${functionIndex + 1 === module.functions.length ? "" : ","}`);
     }

@@ -64,3 +64,19 @@ test("web callback storage enforces the same fixed capacity as native", async ()
   callbacks.acquire(() => {});
   assert.throws(() => callbacks.acquire(() => {}), /pool is exhausted/);
 });
+
+test("generated web bindings normalize C ABI booleans to JavaScript booleans", async () => {
+  const { context } = await loadLibrary();
+  const source = await readFile(
+    new URL("../defold/defold_hermes/lib/web/generated_modules.js", import.meta.url),
+    "utf8"
+  );
+  context._defold_hermes_lua_timer_cancel = () => 1;
+  context._defold_hermes_lua_timer_trigger = () => 0;
+  vm.runInContext(source, context, { filename: "generated_modules.js" });
+
+  const modules = context.LibraryDefoldHermesGeneratedModules.$DEFOLD_HERMES_GENERATED_MODULES.install();
+  assert.equal(modules.Timer.cancel(7), true);
+  assert.equal(modules.Timer.trigger(7), false);
+  assert.equal(typeof modules.Timer.cancel(7), "boolean");
+});

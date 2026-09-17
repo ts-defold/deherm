@@ -23,10 +23,10 @@ var LibraryDefoldHermesGeneratedModules = {
             return result;
           },
           cancel: function(handle) {
-            return _defold_hermes_lua_timer_cancel(handle);
+            return _defold_hermes_lua_timer_cancel(handle) !== 0;
           },
           trigger: function(handle) {
-            return _defold_hermes_lua_timer_trigger(handle);
+            return _defold_hermes_lua_timer_trigger(handle) !== 0;
           }
         }
       };
