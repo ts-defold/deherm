@@ -52,7 +52,16 @@ fi
 platform="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
 variant="${DEFOLD_HERMES_VARIANT:-debug}"
 
-npm --prefix "$repo_root" run package:defold
+case "$platform" in
+  *-web)
+    # HTML5 executes authored JavaScript in the browser. The extension's
+    # lib/web Emscripten libraries are source files and need no Hermes archive.
+    npm --prefix "$repo_root" run package:defold:web
+    ;;
+  *)
+    npm --prefix "$repo_root" run package:defold
+    ;;
+esac
 
 arguments=(
   --root "$repo_root/defold"

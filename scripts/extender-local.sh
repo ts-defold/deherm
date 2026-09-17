@@ -11,6 +11,7 @@ app_dir="$extender_root/server/app"
 platformsdk_dir="$extender_root/platformsdk"
 service_script="$extender_root/server/scripts/standalone/service-standalone.sh"
 override_env="$env_dir/deherm-macos.env"
+emsdk_root="$platformsdk_dir/emsdk-$EMSDK_VERSION"
 java_home="${JAVA_HOME:-/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home}"
 action="${1:-status}"
 
@@ -63,9 +64,38 @@ EOF
   echo "Configured Xcode SDK $sdk_version, iOS SDK $ios_version, clang $clang_version, Swift ABI $swift_version."
 }
 
+configure_emscripten_sdk() {
+  local emscripten_bin emscripten_cache emscripten_temp node_path node_bin python_bin
+  "$repo_root/scripts/bootstrap-emsdk.sh"
+  emscripten_bin="$emsdk_root/upstream/emscripten"
+  emscripten_cache="$platformsdk_dir/emcache_$EMSDK_VERSION"
+  emscripten_temp="$platformsdk_dir/ems_temp"
+  node_path="$(find "$emsdk_root/node" -type f -path '*/bin/node' -perm -111 -print -quit)"
+  [[ -n "$node_path" ]] || fail "Emscripten $EMSDK_VERSION did not install its matching Node runtime."
+  node_bin="$(dirname "$node_path")"
+  python_bin="$(command -v python3)"
+  [[ -x "$emscripten_bin/em++" && -n "$node_bin" && -x "$python_bin" ]] || fail "Emscripten $EMSDK_VERSION activation is incomplete."
+  mkdir -p "$emscripten_cache" "$emscripten_temp"
+
+  cat >> "$override_env" <<EOF
+EMSCRIPTEN_SDK=$emsdk_root
+EMSCRIPTEN_HOME=$emsdk_root
+EMSCRIPTEN_CACHE=$emscripten_cache
+EMSCRIPTEN_CONFIG=$emsdk_root/.emscripten
+EMSCRIPTEN_PYTHON=$python_bin
+EMSCRIPTEN_BIN=$emscripten_bin
+EMSCRIPTEN_TEMP_DIR=$emscripten_temp
+EMSCRIPTEN_PATH=$emsdk_root:$emsdk_root/upstream/bin:$node_bin:$emscripten_bin
+PATH="$emsdk_root:$emsdk_root/upstream/bin:$node_bin:$emscripten_bin:\${PATH}"
+EOF
+
+  echo "Configured Emscripten SDK $EMSDK_VERSION at $emsdk_root."
+}
+
 prepare() {
   require_checkout
   configure_apple_sdk
+  configure_emscripten_sdk
   (
     cd "$extender_root"
     JAVA_HOME="$java_home" ./gradlew server:bootJar manifestmergetool:mainJar
