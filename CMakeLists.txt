@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.20)
 
+if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+  # Match the pinned Defold SDK so packaged Hermes objects can be linked into
+  # the custom engine instead of inheriting the host Xcode/macOS version.
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "11.5" CACHE STRING "" FORCE)
+endif()
+
 project(DefoldHermesSpike LANGUAGES C CXX)
 
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/upstream/hermes/CMakeLists.txt")

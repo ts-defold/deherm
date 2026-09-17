@@ -23,18 +23,34 @@ if [[ "$action" == "version" ]]; then
   exec "$java_bin" -jar "$bob_jar" --version
 fi
 
-if [[ "${DEFOLD_HERMES_ALLOW_REMOTE_BUILD:-}" != "1" ]]; then
+build_server="${DEFOLD_HERMES_BUILD_SERVER:-http://localhost:9010}"
+case "$build_server" in
+  http://localhost:*|http://127.0.0.1:*|http://\[::1\]:*)
+    local_build=1
+    ;;
+  *)
+    local_build=0
+    ;;
+esac
+
+if [[ "$local_build" == "0" && "${DEFOLD_HERMES_ALLOW_REMOTE_BUILD:-}" != "1" ]]; then
   cat >&2 <<'MESSAGE'
 This project contains a native extension. Bob sends its extension sources and
-packaged libraries to the configured Defold build server. Re-run with
-DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 after approving that upload.
+packaged libraries to the configured remote Defold build server. Re-run with
+DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 after approving that upload. Local Extender
+at http://localhost:9010 is the default and never requires this opt-in.
 MESSAGE
   exit 2
 fi
 
+if [[ "$local_build" == "1" ]] && ! curl --silent --fail --max-time 2 "$build_server/actuator/health" >/dev/null; then
+  echo "Local Extender is not healthy at $build_server." >&2
+  echo "Run npm run extender:prepare && npm run extender:start first." >&2
+  exit 1
+fi
+
 platform="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
 variant="${DEFOLD_HERMES_VARIANT:-debug}"
-build_server="${DEFOLD_HERMES_BUILD_SERVER:-https://build.defold.com}"
 
 npm --prefix "$repo_root" run package:defold
 

@@ -4,4 +4,4 @@ platforms:
     arm64-osx:
         context:
             frameworks: ["CoreFoundation"]
-            flags: ["-fexceptions"]
+            flags: ["-std=c++17", "-fexceptions"]

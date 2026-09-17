@@ -28,6 +28,22 @@ if (javaResult.status === 0 && !`${javaResult.stderr}${javaResult.stdout}`.inclu
 
 const lock = await readFile(new URL("../upstream.lock", import.meta.url), "utf8");
 const expectedBob = lock.match(/^DEFOLD_BOB_SHA256=(.+)$/m)?.[1];
+const pinnedCheckouts = [
+  ["Defold", "defold", lock.match(/^DEFOLD_REV=(.+)$/m)?.[1]],
+  ["Hermes", "hermes", lock.match(/^HERMES_REV=(.+)$/m)?.[1]],
+  ["Extender", "extender", lock.match(/^EXTENDER_REV=(.+)$/m)?.[1]]
+];
+
+for (const [name, directory, expected] of pinnedCheckouts) {
+  const result = spawnSync("git", ["-C", new URL(`../upstream/${directory}`, import.meta.url).pathname, "rev-parse", "HEAD"], { encoding: "utf8" });
+  const actual = result.stdout?.trim();
+  checks.push({
+    ok: result.status === 0 && actual === expected,
+    name: `${name} checkout`,
+    detail: result.status !== 0 ? "missing; run npm run bootstrap:upstreams" : actual === expected ? `pinned ${actual.slice(0, 12)}` : `expected ${expected}, got ${actual}`
+  });
+}
+
 try {
   const bytes = await readFile(new URL("../build/tooling/bob.jar", import.meta.url));
   const actual = createHash("sha256").update(bytes).digest("hex");
@@ -38,6 +54,15 @@ try {
   });
 } catch {
   checks.push({ ok: false, name: "bob.jar", detail: "missing; run npm run bootstrap:bob" });
+}
+
+if (process.platform === "darwin") {
+  const sdk = spawnSync("xcrun", ["--sdk", "macosx", "--show-sdk-version"], { encoding: "utf8" });
+  checks.push({
+    ok: sdk.status === 0,
+    name: "Xcode macOS SDK",
+    detail: sdk.status === 0 ? sdk.stdout.trim() : "missing; install/select Xcode"
+  });
 }
 
 for (const check of checks) {

@@ -30,6 +30,7 @@ checkout_revision() {
 
 checkout_revision defold "$DEFOLD_URL" "$DEFOLD_REV"
 checkout_revision hermes "$HERMES_URL" "$HERMES_REV"
+checkout_revision extender "$EXTENDER_URL" "$EXTENDER_REV"
 
 ref_doc="$repo_root/upstream/ref-doc.zip"
 curl -fL "$DEFOLD_REF_DOC_URL" -o "$ref_doc"

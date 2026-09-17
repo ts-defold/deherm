@@ -7,7 +7,7 @@ height = 640
 
 [project]
 title = Defold Hermes Spike
-bundle_resources = /defold_hermes_app
+custom_resources = /defold_hermes_app
 
 [library]
 include_dirs = defold_hermes defold_hermes_app

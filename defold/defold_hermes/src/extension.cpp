@@ -1,6 +1,7 @@
-#define EXTENSION_NAME DefoldHermesExt
 #define LIB_NAME "defold_hermes"
+#ifndef DLIB_LOG_DOMAIN
 #define DLIB_LOG_DOMAIN LIB_NAME
+#endif
 
 #include <dmsdk/dlib/configfile_gen.hpp>
 #include <dmsdk/dlib/log.h>
@@ -299,8 +300,13 @@ dmExtension::Result AppFinalizeExtension(dmExtension::AppParams*) {
 
 }  // namespace
 
+// Defold derives the required C registration symbol from the extension folder
+// name. A C-linkage function declared in a namespace still exports the global
+// `defold_hermes` symbol, while the scoped C++ identifier avoids colliding with
+// our public `defold_hermes` namespace.
+namespace deherm_registration {
 DM_DECLARE_EXTENSION(
-    EXTENSION_NAME,
+    defold_hermes,
     LIB_NAME,
     AppInitializeExtension,
     AppFinalizeExtension,
@@ -308,3 +314,4 @@ DM_DECLARE_EXTENSION(
     UpdateExtension,
     0,
     FinalizeExtension)
+}  // namespace deherm_registration
