@@ -1355,7 +1355,7 @@ export type ResourceData = DefoldOpaque<"userdata">;
  *
  * [Open in Browser](https://defold.com/ref/socket-lua#socket_selectable)
  */
-export type SocketSelectable = SocketMaster | SocketClient | SocketServer | SocketConnected | SocketUnconnected | Readonly<{ getfd: (self: unknown) => number; dirty: (self: unknown) => boolean }>;
+export type SocketSelectable = SocketMaster | SocketClient | SocketServer | SocketConnected | SocketUnconnected | (Readonly<{ getfd: (self: unknown) => number; dirty: (self: unknown) => boolean }>);
 /**
  * Network connectivity states
  *
@@ -20143,7 +20143,7 @@ export interface Html5Api {
    * @param callback The interaction callback. Pass an empty function or `nil` if you no longer wish to receive callbacks.  `self` `script_instance` The calling script instance
    */
   readonly setInteractionListener: {
-    (callback?: (self: ScriptInstance) => void | null): void;
+    (callback?: ((self: ScriptInstance) => void) | null): void;
   };
 }
 
@@ -21973,7 +21973,7 @@ export interface PhysicsApi {
    * @param callback A callback that receives information about all physics interactions in this physics world. Pass `nil` to remove the listener.  `self` `script_instance` The calling script instance  `events` `physics.event[]` An array of event tables. Each event table contains a `type` field with the hashed name of one of these messages, together with fields specific to that event type:  - `contact_point_event` - `collision_event` - `trigger_event` - `ray_cast_response` - `ray_cast_missed`
    */
   readonly setEventListener: {
-    (callback?: (self: ScriptInstance, events: ReadonlyArray<PhysicsEvent>) => void | null): void;
+    (callback?: ((self: ScriptInstance, events: ReadonlyArray<PhysicsEvent>) => void) | null): void;
   };
   /**
    * Set the gravity in runtime. The gravity change is not global, it will only affect
@@ -23446,7 +23446,7 @@ export interface RenderApi {
    * @param callback A callback that receives all render related events. Pass `nil` if want to remove listener.
    */
   readonly setListener: {
-    (callback?: (self: ScriptInstance, eventType: RenderCONTEXTEVENT) => void | null): void;
+    (callback?: ((self: ScriptInstance, eventType: RenderCONTEXTEVENT) => void) | null): void;
   };
   /**
    * Sets the scale and units used to calculate depth values.
@@ -25096,7 +25096,7 @@ export interface SocketApi {
    * @param arg2 the values from which to drop arguments.
    */
   readonly skip: {
-    (d: number, ...args: unknown[]): DefoldOpaque<"...">;
+    (d: number, ...args: unknown[]): readonly unknown[];
   };
   /**
    * Freezes the program execution during a given amount of time.
@@ -26999,84 +26999,84 @@ export interface TypesApi {
    *
    * [Open in Browser](https://defold.com/ref/types-lua#types.is_hash:var)
    *
-   * @param arg1 Variable to check type
+   * @param value Variable to check type
    *
    * @returns result True if passed type is hash
    */
   readonly isHash: {
-    (arg1: unknown): boolean;
+    (value: unknown): boolean;
   };
   /**
    * Check if passed type is matrix4.
    *
    * [Open in Browser](https://defold.com/ref/types-lua#types.is_matrix4:var)
    *
-   * @param arg1 Variable to check type
+   * @param value Variable to check type
    *
    * @returns result True if passed type is matrix4
    */
   readonly isMatrix4: {
-    (arg1: unknown): boolean;
+    (value: unknown): boolean;
   };
   /**
    * Check if passed type is quaternion.
    *
    * [Open in Browser](https://defold.com/ref/types-lua#types.is_quat:var)
    *
-   * @param arg1 Variable to check type
+   * @param value Variable to check type
    *
    * @returns result True if passed type is quaternion
    */
   readonly isQuat: {
-    (arg1: unknown): boolean;
+    (value: unknown): boolean;
   };
   /**
    * Check if passed type is URL.
    *
    * [Open in Browser](https://defold.com/ref/types-lua#types.is_url:var)
    *
-   * @param arg1 Variable to check type
+   * @param value Variable to check type
    *
    * @returns result True if passed type is URL
    */
   readonly isUrl: {
-    (arg1: unknown): boolean;
+    (value: unknown): boolean;
   };
   /**
    * Check if passed type is vector.
    *
    * [Open in Browser](https://defold.com/ref/types-lua#types.is_vector:var)
    *
-   * @param arg1 Variable to check type
+   * @param value Variable to check type
    *
    * @returns result True if passed type is vector
    */
   readonly isVector: {
-    (arg1: unknown): boolean;
+    (value: unknown): boolean;
   };
   /**
    * Check if passed type is vector3.
    *
    * [Open in Browser](https://defold.com/ref/types-lua#types.is_vector3:var)
    *
-   * @param arg1 Variable to check type
+   * @param value Variable to check type
    *
    * @returns result True if passed type is vector3
    */
   readonly isVector3: {
-    (arg1: unknown): boolean;
+    (value: unknown): boolean;
   };
   /**
    * Check if passed type is vector4.
    *
    * [Open in Browser](https://defold.com/ref/types-lua#types.is_vector4:var)
    *
-   * @param arg1 Variable to check type
+   * @param value Variable to check type
    *
    * @returns result True if passed type is vector4
    */
   readonly isVector4: {
-    (arg1: unknown): boolean;
+    (value: unknown): boolean;
   };
 }
 
@@ -27111,7 +27111,7 @@ export interface VmathApi {
    * @returns clamped_value Clamped value or vector
    */
   readonly clamp: {
-    (value: DefoldOpaque<"T">, min: DefoldOpaque<"T">, max: DefoldOpaque<"T">): DefoldOpaque<"T">;
+    <T extends number | Vector3 | Vector4>(value: T, min: T, max: T): T;
   };
   /**
    * Calculates the conjugate of a quaternion. The result is a
@@ -27195,7 +27195,7 @@ export interface VmathApi {
    * @returns n dot product
    */
   readonly dot: {
-    (v1: DefoldOpaque<"T">, v2: DefoldOpaque<"T">): number;
+    <T extends Vector3 | Vector4>(v1: T, v2: T): number;
   };
   /**
    * Converts euler angles (x, y, z) in degrees into a quaternion
@@ -27371,7 +27371,7 @@ export interface VmathApi {
   readonly lerp: {
     (t: number, q1: Quaternion, q2: Quaternion): Quaternion;
     (t: number, n1: number, n2: number): number;
-    (t: number, v1: DefoldOpaque<"T">, v2: DefoldOpaque<"T">): DefoldOpaque<"T">;
+    <T extends Vector3 | Vector4>(t: number, v1: T, v2: T): T;
   };
   /**
    * The resulting identity matrix describes a transform with
@@ -27747,7 +27747,7 @@ export interface VmathApi {
    * @returns v multiplied vector
    */
   readonly mulPerElem: {
-    (v1: DefoldOpaque<"T">, v2: DefoldOpaque<"T">): DefoldOpaque<"T">;
+    <T extends Vector3 | Vector4>(v1: T, v2: T): T;
   };
   /**
    * Normalizes a vector, i.e. returns a new vector with the same
@@ -27772,7 +27772,7 @@ export interface VmathApi {
    * @returns v new normalized vector
    */
   readonly normalize: {
-    (v1: DefoldOpaque<"T">): DefoldOpaque<"T">;
+    <T extends Vector3 | Vector4 | Quaternion>(v1: T): T;
   };
   /**
    * The resulting matrix is the inverse of the supplied matrix.
@@ -28133,7 +28133,7 @@ export interface VmathApi {
    */
   readonly slerp: {
     (t: number, q1: Quaternion, q2: Quaternion): Quaternion;
-    (t: number, v1: DefoldOpaque<"T">, v2: DefoldOpaque<"T">): DefoldOpaque<"T">;
+    <T extends Vector3 | Vector4>(t: number, v1: T, v2: T): T;
   };
   /**
    * Creates a vector of arbitrary size. The vector is initialized
@@ -28411,7 +28411,7 @@ export interface WindowApi {
    * @param callback A callback which receives info about window events. Pass an empty function or `nil` if you no longer wish to receive callbacks.
    */
   readonly setListener: {
-    (callback?: (self: ScriptInstance, event: WindowWINDOWEVENT, data: WindowEventData) => void | null): void;
+    (callback?: ((self: ScriptInstance, event: WindowWINDOWEVENT, data: WindowEventData) => void) | null): void;
   };
   /**
    * Set the locking state for current mouse cursor on a PC platform.

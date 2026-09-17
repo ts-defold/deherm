@@ -9,6 +9,7 @@
     "enums": 66
   },
   "typeSurfaceUnresolvedCount": 0,
+  "unresolvedTypes": [],
   "runtimeImplementedCount": 3,
   "runtimeUnimplementedCount": 923,
   "functions": [

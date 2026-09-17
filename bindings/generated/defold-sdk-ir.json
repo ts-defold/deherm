@@ -1,7 +1,11 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "platform": "arm64-macos",
   "headerCount": 121,
+  "parsedHeaderCount": 121,
+  "failedHeaderCount": 0,
+  "diagnosticHeaderCount": 35,
   "declarationCount": 2140,
   "typeSurfaceUnresolvedCount": 0,
   "runtimeImplementedCount": 0,
@@ -65955,6 +65959,250 @@
       "disposition": "generated-raw-call",
       "abiStrategies": [
         "named-type-or-wide-integer-adapter"
+      ]
+    }
+  ],
+  "unresolvedTypes": [],
+  "opaqueTypes": [
+    {
+      "name": "(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)",
+      "reason": "anonymous-native-record",
+      "contexts": [
+        "dmRender::StencilTestParams"
+      ]
+    },
+    {
+      "name": "(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)",
+      "reason": "anonymous-native-record",
+      "contexts": [
+        "dmRender::StencilTestParams"
+      ]
+    },
+    {
+      "name": "dmArray<dmhash_t>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<dmParticle::HPrototype>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<dmRig::RigBone>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::RigSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<FontResource *>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<GuiSceneTextureSetResource>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<MaterialResource *>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<PollFD>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmFileDescriptor::Poller"
+      ]
+    },
+    {
+      "name": "dmArray<RigBone>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmRig::CopyBindPose"
+      ]
+    },
+    {
+      "name": "dmArray<T>",
+      "reason": "template-specialization",
+      "contexts": [
+        "Swap",
+        "dmArray::dmArray::Swap",
+        "dmObjectPool::dmObjectPool::GetRawObjects"
+      ]
+    },
+    {
+      "name": "dmArray<uint8_t>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmDDF::SaveMessageToArray"
+      ]
+    },
+    {
+      "name": "dmArray<void *>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::CollectionFactoryResource"
+      ]
+    },
+    {
+      "name": "dmHashTable<dmhash_t, dmhash_t>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameObject::InstanceIdMap"
+      ]
+    },
+    {
+      "name": "dmHashTable<dmhash_t, HPropertyContainer>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameObject::InstancePropertyContainers"
+      ]
+    },
+    {
+      "name": "dmHashTable<KEY, T>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmHashTable::dmHashTable::Iterator",
+        "dmHashTable::dmHashTable::Iterator::Iterator",
+        "dmHashTable::dmHashTable::Swap"
+      ]
+    },
+    {
+      "name": "dmHashTable64<dmhash_t>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "dmHashTable64<uint32_t>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::SkeletonResource",
+        "dmGameSystem::TextureSetResource"
+      ]
+    },
+    {
+      "name": "dmHashTable64<void *>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameObject::ComponentTypeCreateCtx",
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "id",
+      "reason": "objective-c-object",
+      "contexts": [
+        "dmGraphics::GetNativeOSXNSOpenGLContext",
+        "dmGraphics::GetNativeOSXNSView",
+        "dmGraphics::GetNativeOSXNSWindow",
+        "dmGraphics::GetNativeiOSEAGLContext",
+        "dmGraphics::GetNativeiOSUIView",
+        "dmGraphics::GetNativeiOSUIWindow"
+      ]
+    },
+    {
+      "name": "KEY",
+      "reason": "template-parameter",
+      "contexts": [
+        "dmHashTable::dmHashTable::Erase",
+        "dmHashTable::dmHashTable::Get",
+        "dmHashTable::dmHashTable::Iterator::GetKey",
+        "dmHashTable::dmHashTable::Put",
+        "dmHashTable::dmHashTable::key_t"
+      ]
+    },
+    {
+      "name": "T",
+      "reason": "template-parameter",
+      "contexts": [
+        "Back",
+        "EraseSwap",
+        "EraseSwapRef",
+        "Front",
+        "Push",
+        "dmArray::dmArray::Back",
+        "dmArray::dmArray::EraseSwap",
+        "dmArray::dmArray::EraseSwapRef",
+        "dmArray::dmArray::Front",
+        "dmArray::dmArray::Push",
+        "dmArray::dmArray::operator[]",
+        "dmHashTable::dmHashTable::Iterator::GetValue",
+        "dmHashTable::dmHashTable::Put",
+        "dmHashTable::dmHashTable::value_t",
+        "dmObjectPool::dmObjectPool::Get",
+        "dmObjectPool::dmObjectPool::Set",
+        "operator[]"
+      ]
+    },
+    {
+      "name": "union (unnamed union at /Users/mini/Documents/defold-hermes/upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)",
+      "reason": "anonymous-native-record",
+      "contexts": [
+        "dmGameObject::SceneNodeProperty"
+      ]
+    },
+    {
+      "name": "va_list",
+      "reason": "platform-variadic-list",
+      "contexts": [
+        "dm_lua_pushvfstring"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Matrix3",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Matrix3"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Matrix4",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Matrix4"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Point3",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Point3"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Quat",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Quat"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Vector3",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Vector3"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Vector4",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Vector4"
       ]
     }
   ]

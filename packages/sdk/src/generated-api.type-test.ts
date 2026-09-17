@@ -4,11 +4,17 @@ import {
   msg,
   relativeAddress,
   type DmPointer,
+  type DmReadonlyPointer,
   type DmSdkTypes,
-  type Vector3
+  type Vector3,
+  vmath
 } from "./index";
 
 const position: Vector3 = { x: 10, y: 20, z: 0 };
+const clampedPosition: Vector3 = vmath.clamp(position, position, position);
+const interpolatedPosition: Vector3 = vmath.lerp(0.5, position, position);
+void clampedPosition;
+void interpolatedPosition;
 go.setPosition(position);
 go.setPosition(position, "#controller");
 go.setPosition(position, relativeAddress("player"));
@@ -21,8 +27,22 @@ const arbitraryString: string = "player";
 msg.post(arbitraryString, "enable");
 
 declare const cString: DmPointer<"char">;
+const readonlyCString: DmReadonlyPointer<"char"> = cString;
 const hash64: bigint = callDmSdk("dmHashString64", cString);
+void readonlyCString;
 void hash64;
+
+declare const ddfBuffer: DmReadonlyPointer<"void">;
+declare const ddfDescriptor: DmReadonlyPointer<"dmDDF::Descriptor">;
+declare const ddfMessage: DmPointer<"void">;
+const loadedMessage: DmSdkTypes["dmDDF::Result"] = callDmSdk(
+  "dmDDF::LoadMessage",
+  ddfBuffer,
+  128,
+  ddfDescriptor,
+  ddfMessage,
+);
+void loadedMessage;
 
 const ddfResult: DmSdkTypes["dmDDF::Result"] = 0;
 // @ts-expect-error The generated enum contains only public native values.

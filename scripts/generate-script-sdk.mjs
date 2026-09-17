@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { strFromU8, unzipSync } from "fflate";
+import { reservedParameterSynonyms, safeParameterIdentifier } from "../packages/cli/src/names.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archivePath = path.join(root, "upstream", "ref-doc.zip");
@@ -109,8 +110,7 @@ function fieldDeclaration(field, renderType) {
 
 function parameterName(value, index) {
   const candidate = camel(value.replace(/\?$/, ""));
-  if (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(candidate) && !new Set(["function", "var", "let", "const", "class", "new", "delete", "default", "in"]).has(candidate)) return candidate;
-  return `arg${index + 1}`;
+  return safeParameterIdentifier(candidate, index);
 }
 
 function parseArchive() {
@@ -214,6 +214,7 @@ let requireBuffer;
 function createTypeRenderer(model) {
   const named = new Map();
   const used = new Set();
+  const unresolved = new Set();
   const allocate = (item, suffix = "") => {
     if (item.name.startsWith("defold_api.")) return;
     const base = `${pascal(item.name)}${suffix}`;
@@ -234,10 +235,11 @@ function createTypeRenderer(model) {
     ["number", "number"], ["integer", "number"], ["string", "string"], ["void", "void"],
     ["hash", "DefoldHash"], ["url", "DefoldUrl"], ["table", "Readonly<Record<PropertyKey, unknown>>"],
     ["function", "(...args: readonly unknown[]) => unknown"], ["userdata", "DefoldOpaque<\"userdata\">"],
+    ["...", "readonly unknown[]"],
     ["vector3", "Vector3"], ["vector4", "Vector4"], ["quaternion", "Quaternion"], ["matrix4", "Matrix4"]
   ]);
 
-  function renderObject(value) {
+  function renderObject(value, localNames) {
     const contents = value.slice(1, -1).trim();
     if (!contents) return "Readonly<Record<string, never>>";
     const fields = [];
@@ -247,10 +249,10 @@ function createTypeRenderer(model) {
       if (!separator) return "Readonly<Record<PropertyKey, unknown>>";
       const [rawKey, rawValue] = separator;
       if (rawKey.startsWith("[") && rawKey.endsWith("]")) {
-        records.push(`Readonly<Record<${render(rawKey.slice(1, -1))}, ${render(rawValue)}>>`);
+        records.push(`Readonly<Record<${render(rawKey.slice(1, -1), localNames)}, ${render(rawValue, localNames)}>>`);
       } else {
         const optional = rawKey.endsWith("?");
-        fields.push(`${property(rawKey.replace(/\?$/, ""))}${optional ? "?" : ""}: ${render(rawValue)}`);
+        fields.push(`${property(rawKey.replace(/\?$/, ""))}${optional ? "?" : ""}: ${render(rawValue, localNames)}`);
       }
     }
     const object = fields.length ? `Readonly<{ ${fields.join("; ")} }>` : "";
@@ -268,17 +270,21 @@ function createTypeRenderer(model) {
     return undefined;
   }
 
-  function renderFunction(value) {
-    if (!value.startsWith("fun(")) return "(...args: readonly unknown[]) => unknown";
+  function functionCloseIndex(value) {
     let depth = 0;
-    let close = -1;
     for (let index = 3; index < value.length; index += 1) {
       if (value[index] === "(") depth += 1;
       else if (value[index] === ")") {
         depth -= 1;
-        if (depth === 0) { close = index; break; }
+        if (depth === 0) return index;
       }
     }
+    return -1;
+  }
+
+  function renderFunction(value, localNames) {
+    if (!value.startsWith("fun(")) return "(...args: readonly unknown[]) => unknown";
+    const close = functionCloseIndex(value);
     if (close < 0) return "(...args: readonly unknown[]) => unknown";
     const rawParameters = value.slice(4, close);
     const rawResult = value.slice(close + 1).replace(/^:/, "");
@@ -286,44 +292,53 @@ function createTypeRenderer(model) {
       const pair = splitAtTopLevelColon(item);
       if (!pair) return `arg${index + 1}: unknown`;
       const rawName = pair[0];
-      if (rawName === "...") return `...args: ${render(pair[1])}[]`;
-      return `${parameterName(rawName, index)}${rawName.endsWith("?") ? "?" : ""}: ${render(pair[1])}`;
+      if (rawName === "...") return `...args: ${render(pair[1], localNames)}[]`;
+      return `${parameterName(rawName, index)}${rawName.endsWith("?") ? "?" : ""}: ${render(pair[1], localNames)}`;
     });
-    const result = rawResult ? render(rawResult) : "void";
+    const result = rawResult ? render(rawResult, localNames) : "void";
     return `(${params.join(", ")}) => ${result}`;
   }
 
-  function render(rawValue) {
+  function render(rawValue, localNames) {
     let value = rawValue.trim();
     if (!value) return "unknown";
+    if (value.startsWith("fun(")) {
+      const close = functionCloseIndex(value);
+      const suffix = close < 0 ? "" : value.slice(close + 1);
+      if (!suffix || suffix.startsWith(":")) return renderFunction(value, localNames);
+    }
     const union = splitTopLevel(value, "|");
-    if (union.length > 1) return [...new Set(union.map(render))].join(" | ");
-    if (value.endsWith("[]")) return `ReadonlyArray<${render(value.slice(0, -2))}>`;
+    if (union.length > 1) {
+      const rendered = [...new Set(union.map((item) => render(item, localNames)))];
+      return rendered.map((item) => item.includes("=>") ? `(${item})` : item).join(" | ");
+    }
+    if (value.endsWith("[]")) return `ReadonlyArray<${render(value.slice(0, -2), localNames)}>`;
     if (balancedOuter(value, "(", ")")) {
       const inner = value.slice(1, -1);
       const tuple = splitTopLevel(inner, ",");
-      return tuple.length > 1 ? `readonly [${tuple.map(render).join(", ")}]` : render(inner);
+      return tuple.length > 1 ? `readonly [${tuple.map((item) => render(item, localNames)).join(", ")}]` : render(inner, localNames);
     }
-    if (value.startsWith("fun(")) return renderFunction(value);
     if (value.startsWith("table<") && value.endsWith(">")) {
       const args = splitTopLevel(value.slice(6, -1), ",");
-      if (args.length === 1) return `readonly ${render(args[0])}[]`;
+      if (args.length === 1) return `readonly ${render(args[0], localNames)}[]`;
       if (args.length === 2) {
-        const renderedValue = render(args[1]);
+        const renderedValue = render(args[1], localNames);
         if (args[0] === "string") return `Readonly<Record<string, ${renderedValue}>>`;
         if (args[0] === "integer" || args[0] === "number") return `Readonly<Record<number, ${renderedValue}>>`;
         if (args[0] === "any") return `Readonly<Record<PropertyKey, ${renderedValue}>>`;
-        return `ReadonlyMap<${render(args[0])}, ${renderedValue}>`;
+        return `ReadonlyMap<${render(args[0], localNames)}, ${renderedValue}>`;
       }
     }
-    if (value.startsWith("{") && value.endsWith("}")) return renderObject(value);
+    if (value.startsWith("{") && value.endsWith("}")) return renderObject(value, localNames);
+    if (localNames?.has(value)) return localNames.get(value);
     if (primitives.has(value)) return primitives.get(value);
     if (/^-?\d+(?:\.\d+)?$/.test(value) || /^(?:true|false)$/.test(value)) return value;
     if (/^(['"]).*\1$/.test(value)) return JSON.stringify(value.slice(1, -1));
     if (named.has(value)) return named.get(value);
+    unresolved.add(value);
     return `DefoldOpaque<${JSON.stringify(value)}>`;
   }
-  return { render, named };
+  return { render, named, unresolved };
 }
 
 function treeNode() {
@@ -382,6 +397,24 @@ function renderReturns(fn, renderType) {
   return `readonly [${fn.returns.map(renderType).join(", ")}]`;
 }
 
+function renderGenerics(fn, renderType) {
+  const localNames = new Map();
+  const parsed = fn.generics.map((value, index) => {
+    const separator = value.indexOf(":");
+    const rawName = (separator < 0 ? value : value.slice(0, separator)).trim();
+    const constraint = separator < 0 ? "unknown" : value.slice(separator + 1).trim();
+    const name = /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(rawName) && !reservedParameterSynonyms.has(rawName)
+      ? rawName
+      : `T${index + 1}`;
+    localNames.set(rawName, name);
+    return { name, constraint };
+  });
+  const declaration = parsed.length
+    ? `<${parsed.map(({ name, constraint }) => `${name} extends ${renderType(constraint, localNames)}`).join(", ")}>`
+    : "";
+  return { declaration, localNames };
+}
+
 function renderNodeInterface(node, renderType, indent = "  ") {
   const lines = ["{"];
   for (const field of node.fields.sort((a, b) => a.rawName.localeCompare(b.rawName))) {
@@ -399,7 +432,9 @@ function renderNodeInterface(node, renderType, indent = "  ") {
       const callable = overloadType.match(/^(\(.*\)) => (.+)$/)?.slice(1);
       lines.push(`${indent}  ${callable ? `${callable[0]}: ${callable[1]}` : `(...args: readonly unknown[]): ${overloadType}`};`);
     }
-    lines.push(`${indent}  (${renderParameters(fn, renderType)}): ${renderReturns(fn, renderType)};`);
+    const generics = renderGenerics(fn, renderType);
+    const localRender = (value) => renderType(value, generics.localNames);
+    lines.push(`${indent}  ${generics.declaration}(${renderParameters(fn, localRender)}): ${renderReturns(fn, localRender)};`);
     lines.push(`${indent}};`);
   }
   for (const [name, child] of [...node.children].sort(([left], [right]) => left.localeCompare(right))) {
@@ -540,20 +575,23 @@ for (const fn of model.functions) {
 }
 const renderer = createTypeRenderer(model);
 const trees = buildApiTrees(model);
+const typesSource = generateTypes(model, renderer, trees);
+const unresolvedTypes = [...renderer.unresolved].sort();
 const ir = {
   schemaVersion: 1,
   defoldRevision: (await readFile(path.join(root, "upstream.lock"), "utf8")).match(/^DEFOLD_REV=(\w+)$/m)?.[1] ?? "unknown",
   sourceFileCount: model.files.length,
   counts: { functions: model.functions.length, classes: model.classes.length, aliases: model.aliases.length, enums: model.enums.length },
-  typeSurfaceUnresolvedCount: 0,
+  typeSurfaceUnresolvedCount: unresolvedTypes.length,
+  unresolvedTypes,
   runtimeImplementedCount: model.functions.filter(({ runtimeStatus }) => runtimeStatus.startsWith("implemented-")).length,
   runtimeUnimplementedCount: model.functions.filter(({ runtimeStatus }) => runtimeStatus.startsWith("requires-")).length,
   functions: model.functions,
   types: [...model.classes.map((item) => ({ ...item, kind: "class", disposition: "generated-type" })), ...model.aliases.map((item) => ({ ...item, kind: "alias", disposition: "generated-type" })), ...model.enums.map((item) => ({ ...item, kind: "enum", disposition: "generated-type" }))]
 };
 await output(irPath, `${JSON.stringify(ir, null, 2)}\n`);
-await output(path.join(generatedRoot, "types.ts"), generateTypes(model, renderer, trees));
+await output(path.join(generatedRoot, "types.ts"), typesSource);
 await output(path.join(generatedRoot, "modules.ts"), generateModules(trees));
 await output(path.join(generatedRoot, "runtime.ts"), generateRuntime());
 await output(path.join(generatedRoot, "index.ts"), generateIndex(trees));
-console.log(`${check ? "checked" : "generated"} ${model.functions.length} script functions, ${model.classes.length + model.aliases.length + model.enums.length} types, 0 type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);
+console.log(`${check ? "checked" : "generated"} ${model.functions.length} script functions, ${model.classes.length + model.aliases.length + model.enums.length} types, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);

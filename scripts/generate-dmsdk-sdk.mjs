@@ -3,6 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { strFromU8, unzipSync } from "fflate";
+import { safeParameterIdentifier } from "../packages/cli/src/names.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const inventoryPath = path.join(root, "bindings", "generated", "defold-sdk-inventory.json");
@@ -19,37 +20,107 @@ function property(value) {
 
 function parameter(value, index) {
   const cleaned = String(value || `arg${index + 1}`).replace(/[^A-Za-z0-9_$]/g, "_");
-  return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(cleaned) && !new Set(["function", "class", "new", "delete", "default", "in", "var", "let", "const"]).has(cleaned)
-    ? cleaned
-    : `arg${index + 1}`;
+  return safeParameterIdentifier(cleaned, index);
 }
 
 function normalizeType(raw) {
   return String(raw || "void").replace(/\b(?:const|volatile|restrict)\b/g, "").replace(/\s+/g, " ").trim();
 }
 
-function renderType(raw) {
-  const original = String(raw || "void").trim();
-  const value = normalizeType(original);
-  if (/\(\s*[*&^]\s*\)/.test(value) || /\(\s*[*&^]\w+\s*\)/.test(value)) return "DmNativeCallback";
-  const array = value.match(/^(.*)\[([^\]]*)\]$/);
-  if (array) return `DmSpan<${renderType(array[1])}>`;
-  if (value.endsWith("&&") || value.endsWith("&")) return `DmReference<${renderType(value.replace(/&&?$/, ""))}>`;
-  if (value.endsWith("*")) {
-    const pointee = value.replace(/\*+$/, "").trim();
-    return `DmPointer<${JSON.stringify(pointee || "void")}>`;
+function createTypeRenderer(ir) {
+  const declarations = new Map();
+  for (const declaration of ir.declarations) {
+    if (["record", "enum", "type-alias"].includes(declaration.kind) && !declarations.has(declaration.name)) {
+      declarations.set(declaration.name, declaration);
+    }
   }
-  if (value.includes("<") || value.includes(">")) return `DmNativeType<${JSON.stringify(value)}>`;
+  const suffixes = new Map();
+  for (const name of declarations.keys()) {
+    const suffix = name.split("::").at(-1);
+    const values = suffixes.get(suffix) ?? [];
+    values.push(name);
+    suffixes.set(suffix, values);
+  }
+  const unresolved = new Map();
+  const opaque = new Map();
   const scalar = new Map([
     ["void", "void"], ["bool", "boolean"], ["float", "number"], ["double", "number"],
     ["char", "number"], ["signed char", "number"], ["unsigned char", "number"],
     ["int8_t", "number"], ["uint8_t", "number"], ["int16_t", "number"], ["uint16_t", "number"],
     ["int32_t", "number"], ["uint32_t", "number"], ["int", "number"], ["unsigned int", "number"],
     ["short", "number"], ["unsigned short", "number"], ["size_t", "number"], ["ptrdiff_t", "number"],
-    ["int64_t", "bigint"], ["uint64_t", "bigint"], ["long long", "bigint"], ["unsigned long long", "bigint"]
+    ["int64_t", "bigint"], ["uint64_t", "bigint"], ["intptr_t", "bigint"], ["uintptr_t", "bigint"],
+    ["long long", "bigint"], ["unsigned long long", "bigint"]
   ]);
-  if (scalar.has(value)) return scalar.get(value);
-  return `DmNativeType<${JSON.stringify(value)}>`;
+
+  function cleanName(value) {
+    return value.replace(/^(?:struct|class|enum)\s+/, "").replace(/^::/, "").trim();
+  }
+
+  function resolveName(value, contextName) {
+    const name = cleanName(value);
+    if (declarations.has(name)) return name;
+    if (!name.includes("::") && contextName) {
+      const context = contextName.split("::").slice(0, -1);
+      for (let length = context.length; length > 0; length -= 1) {
+        const candidate = `${context.slice(0, length).join("::")}::${name}`;
+        if (declarations.has(candidate)) return candidate;
+      }
+    }
+    const matches = suffixes.get(name) ?? [];
+    return matches.length === 1 ? matches[0] : undefined;
+  }
+
+  function noteUnresolved(value, contextName) {
+    const name = cleanName(value);
+    const contexts = unresolved.get(name) ?? new Set();
+    if (contextName) contexts.add(contextName);
+    unresolved.set(name, contexts);
+  }
+
+  function opaqueReason(value) {
+    if (value === "T" || value === "KEY") return "template-parameter";
+    if (value === "id") return "objective-c-object";
+    if (value === "va_list") return "platform-variadic-list";
+    if (value.startsWith("Vectormath::Aos::")) return "external-vectormath-type";
+    if (/^(?:(?:struct|union) )?\(unnamed (?:struct|union) at /.test(value)) return "anonymous-native-record";
+    if (value.includes("<") || value.includes(">")) return "template-specialization";
+    return undefined;
+  }
+
+  function noteOpaque(value, contextName, reason) {
+    const name = cleanName(value);
+    const item = opaque.get(name) ?? { reason, contexts: new Set() };
+    if (contextName) item.contexts.add(contextName);
+    opaque.set(name, item);
+  }
+
+  function renderType(raw, contextName) {
+    const original = String(raw || "void").trim();
+    const value = normalizeType(original);
+    if (/\(\s*[*&^]\s*\)/.test(value) || /\(\s*[*&^]\w+\s*\)/.test(value)) return "DmNativeCallback";
+    const array = value.match(/^(.*)\[([^\]]*)\]$/);
+    if (array) return `DmSpan<${renderType(array[1], contextName)}>`;
+    if (value.endsWith("&&") || value.endsWith("&")) return `DmReference<${renderType(value.replace(/&&?$/, ""), contextName)}>`;
+    if (value.endsWith("*")) {
+      const pointee = cleanName(value.replace(/\*+$/, "").trim()) || "void";
+      const canonical = resolveName(pointee, contextName) ?? pointee;
+      const pointer = /\bconst\b/.test(original.replace(/\*+$/, "")) ? "DmReadonlyPointer" : "DmPointer";
+      return `${pointer}<${JSON.stringify(canonical)}>`;
+    }
+    if (scalar.has(value)) return scalar.get(value);
+    const canonical = resolveName(value, contextName);
+    if (canonical) return `DmSdkTypes[${JSON.stringify(canonical)}]`;
+    const reason = opaqueReason(value);
+    if (reason) {
+      noteOpaque(value, contextName, reason);
+      return `DmNativeType<${JSON.stringify(cleanName(value))}>`;
+    }
+    noteUnresolved(value, contextName);
+    return `DmNativeType<${JSON.stringify(cleanName(value))}>`;
+  }
+
+  return { renderType, unresolved, opaque, resolveName };
 }
 
 function strategies(declaration) {
@@ -130,18 +201,22 @@ function enrich(inventory) {
   return {
     schemaVersion: 1,
     defoldRevision: inventory.defoldRevision,
+    platform: inventory.platform,
     headerCount: inventory.headerCount,
+    parsedHeaderCount: inventory.parsedHeaderCount,
+    failedHeaderCount: inventory.failedHeaderCount,
+    diagnosticHeaderCount: inventory.diagnosticHeaderCount,
     declarationCount: declarations.length,
-    typeSurfaceUnresolvedCount: 0,
+    typeSurfaceUnresolvedCount: undefined,
     runtimeImplementedCount: 0,
     runtimeUnimplementedCount: declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call").length,
     declarations
   };
 }
 
-function signature(declaration) {
-  const parameters = (declaration.parameters ?? []).map((item, index) => `${parameter(item.name, index)}: ${renderType(item.type)}`).join(", ");
-  return `(${parameters}): ${renderType(declaration.returns ?? "void")}`;
+function signature(declaration, renderType) {
+  const parameters = (declaration.parameters ?? []).map((item, index) => `${parameter(item.name, index)}: ${renderType(item.type, declaration.name)}`).join(", ");
+  return `(${parameters}): ${renderType(declaration.returns ?? "void", declaration.name)}`;
 }
 
 function signatureDocumentation(declaration) {
@@ -153,10 +228,10 @@ function signatureDocumentation(declaration) {
   return lines.join("\n");
 }
 
-function publicRecordType(declaration) {
+function publicRecordType(declaration, renderType) {
   const members = (declaration.members ?? []).filter(({ access }) => access === "public");
   if (!declaration.completeDefinition || !members.length) return `DmNativeType<${JSON.stringify(declaration.name)}>`;
-  return `Readonly<{ ${members.map((member) => `${property(member.name)}: ${renderType(member.type)}`).join("; ")} }>`;
+  return `Readonly<{ ${members.map((member) => `${property(member.name)}: ${renderType(member.type, declaration.name)}`).join("; ")} }>`;
 }
 
 function enumType(declaration) {
@@ -164,7 +239,8 @@ function enumType(declaration) {
   return values.length ? values.join(" | ") : `DmNativeType<${JSON.stringify(declaration.name)}>`;
 }
 
-function generateTypes(ir) {
+function generateTypes(ir, renderer) {
+  const { renderType } = renderer;
   const groups = new Map();
   for (const declaration of ir.declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call")) {
     const list = groups.get(declaration.name) ?? [];
@@ -175,10 +251,12 @@ function generateTypes(ir) {
     banner,
     "declare const nativeTypeBrand: unique symbol;",
     "declare const nativePointerBrand: unique symbol;",
+    "declare const nativeMutablePointerBrand: unique symbol;",
     "declare const nativeReferenceBrand: unique symbol;",
     "declare const nativeCallbackBrand: unique symbol;",
     "export type DmNativeType<Name extends string> = { readonly [nativeTypeBrand]: Name };",
-    "export type DmPointer<Pointee extends string = string> = number & { readonly [nativePointerBrand]: Pointee };",
+    "export type DmReadonlyPointer<Pointee extends string = string> = number & { readonly [nativePointerBrand]: Pointee };",
+    "export type DmPointer<Pointee extends string = string> = DmReadonlyPointer<Pointee> & { readonly [nativeMutablePointerBrand]: true };",
     "export type DmReference<Value = unknown> = DmPointer<\"reference\"> & { readonly value?: Value; readonly [nativeReferenceBrand]: true };",
     "export type DmNativeCallback = DmPointer<\"callback\"> & { readonly [nativeCallbackBrand]: true };",
     "export interface DmSpan<Value> { readonly data: DmPointer; readonly length: number; readonly __value?: Value; }",
@@ -188,9 +266,9 @@ function generateTypes(ir) {
   for (const [name, declarations] of [...groups].sort(([left], [right]) => left.localeCompare(right))) {
     lines.push(...documentation(declarations.find(({ description }) => description)?.description, "  "));
     lines.push(`  readonly ${property(name)}: {`);
-    const signatures = [...new Set(declarations.map(signature))];
+    const signatures = [...new Set(declarations.map((declaration) => signature(declaration, renderType)))];
     for (const item of signatures) {
-      const declaration = declarations.find((candidate) => signature(candidate) === item);
+      const declaration = declarations.find((candidate) => signature(candidate, renderType) === item);
       lines.push(...documentation(signatureDocumentation(declaration), "    "));
       lines.push(`    ${item};`);
     }
@@ -205,10 +283,10 @@ function generateTypes(ir) {
   }
   for (const [name, declaration] of [...typeGroups].sort(([left], [right]) => left.localeCompare(right))) {
     const type = declaration.kind === "record"
-      ? publicRecordType(declaration)
+      ? publicRecordType(declaration, renderType)
       : declaration.kind === "enum"
         ? enumType(declaration)
-        : renderType(declaration.type);
+        : renderType(declaration.type, declaration.name);
     lines.push(`  readonly ${property(name)}: ${type};`);
   }
   lines.push("}", "");
@@ -216,7 +294,7 @@ function generateTypes(ir) {
   const variables = new Map();
   for (const declaration of ir.declarations.filter((item) => item.kind === "variable")) variables.set(declaration.name, declaration);
   for (const [name, declaration] of [...variables].sort(([left], [right]) => left.localeCompare(right))) {
-    lines.push(`  readonly ${property(name)}: ${renderType(declaration.type)};`);
+    lines.push(`  readonly ${property(name)}: ${renderType(declaration.type, declaration.name)};`);
   }
   lines.push("}", "");
   lines.push("export interface DmSdkDeclarationMap {");
@@ -227,28 +305,48 @@ function generateTypes(ir) {
   return lines.join("\n");
 }
 
-function generateRuntime() {
-  return `${banner}
-import type { DmSdkCalls, DmSdkSymbol } from "./types";
-
-export interface DmSdkBridge {
-  call(symbol: string, args: readonly unknown[]): unknown;
-}
-
-let activeBridge: DmSdkBridge | undefined;
-
-export function installDmSdkBridge(bridge: DmSdkBridge): void {
-  activeBridge = bridge;
-}
-
-export function callDmSdk<Symbol extends DmSdkSymbol>(
-  symbol: Symbol,
-  ...args: Parameters<DmSdkCalls[Symbol]>
-): ReturnType<DmSdkCalls[Symbol]> {
-  if (!activeBridge) throw new Error("dmSDK bridge has not been installed");
-  return activeBridge.call(symbol, args) as ReturnType<DmSdkCalls[Symbol]>;
-}
-`;
+function generateRuntime(ir, renderer) {
+  const groups = new Map();
+  for (const declaration of ir.declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call")) {
+    const declarations = groups.get(declaration.name) ?? [];
+    declarations.push(declaration);
+    groups.set(declaration.name, declarations);
+  }
+  const lines = [
+    banner,
+    'import type { DmNativeCallback, DmNativeType, DmPointer, DmReadonlyPointer, DmReference, DmSdkTypes, DmSpan } from "./types";',
+    "",
+    "export interface DmSdkBridge {",
+    "  call(symbol: string, args: readonly unknown[]): unknown;",
+    "}",
+    "",
+    "let activeBridge: DmSdkBridge | undefined;",
+    "",
+    "export function installDmSdkBridge(bridge: DmSdkBridge): void {",
+    "  activeBridge = bridge;",
+    "}",
+    ""
+  ];
+  for (const [name, declarations] of [...groups].sort(([left], [right]) => left.localeCompare(right))) {
+    const signatures = new Set();
+    for (const declaration of declarations) {
+      const parameters = (declaration.parameters ?? []).map((item, index) => `${parameter(item.name, index)}: ${renderer.renderType(item.type, declaration.name)}`).join(", ");
+      const result = renderer.renderType(declaration.returns ?? "void", declaration.name);
+      const overload = `export function callDmSdk(symbol: ${JSON.stringify(name)}${parameters ? `, ${parameters}` : ""}): ${result};`;
+      if (!signatures.has(overload)) {
+        lines.push(overload);
+        signatures.add(overload);
+      }
+    }
+  }
+  lines.push(
+    "export function callDmSdk(symbol: string, ...args: readonly unknown[]): unknown {",
+    '  if (!activeBridge) throw new Error("dmSDK bridge has not been installed");',
+    "  return activeBridge.call(symbol, args);",
+    "}",
+    ""
+  );
+  return lines.join("\n");
 }
 
 async function output(file, contents) {
@@ -266,8 +364,21 @@ async function output(file, contents) {
 const inventory = JSON.parse(await readFile(inventoryPath, "utf8"));
 const referenceArchive = unzipSync(new Uint8Array(await readFile(path.join(root, "upstream", "ref-doc.zip"))));
 const ir = enrich({ ...inventory, declarations: attachDocumentation(inventory, docsByHeader(referenceArchive)) });
+const renderer = createTypeRenderer(ir);
+const typesSource = generateTypes(ir, renderer);
+const runtimeSource = generateRuntime(ir, renderer);
+ir.unresolvedTypes = [...renderer.unresolved].sort(([left], [right]) => left.localeCompare(right)).map(([name, contexts]) => ({
+  name,
+  contexts: [...contexts].sort()
+}));
+ir.opaqueTypes = [...renderer.opaque].sort(([left], [right]) => left.localeCompare(right)).map(([name, item]) => ({
+  name,
+  reason: item.reason,
+  contexts: [...item.contexts].sort()
+}));
+ir.typeSurfaceUnresolvedCount = ir.unresolvedTypes.length;
 await output(irPath, JSON.stringify(ir, null, 2));
-await output(path.join(generatedRoot, "types.ts"), generateTypes(ir));
-await output(path.join(generatedRoot, "runtime.ts"), generateRuntime());
+await output(path.join(generatedRoot, "types.ts"), typesSource);
+await output(path.join(generatedRoot, "runtime.ts"), runtimeSource);
 await output(path.join(generatedRoot, "index.ts"), `${banner}\nexport * from "./types";\nexport * from "./runtime";\n`);
-console.log(`${check ? "checked" : "generated"} ${ir.declarationCount} dmSDK declarations, ${Object.keys(inventory.countsByKind).length} kinds, 0 type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);
+console.log(`${check ? "checked" : "generated"} ${ir.declarationCount} dmSDK declarations, ${Object.keys(inventory.countsByKind).length} kinds, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);
