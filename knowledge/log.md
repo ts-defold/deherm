@@ -2,6 +2,7 @@
 
 ## 2026-09-17
 
+* **Developer workflow**: Documented the current source, bytecode, browser, release-planning, and extension-packaging commands; separated them from the future public CLI and identified pinned Bob build/launch as the next tooling boundary.
 * **TypeGPU**: Designed a build-time-only TypeGPU shader lane that emits Defold-owned shader/material assets and typed bindings while retaining Bob, glslang, SPIR-V reflection, and target cross-compilation as the authority.
 * **Lua callbacks**: Generated the complete `timer.delay` callback path across Hermes JSI, the C ABI, cached Lua thunks, and deterministic one-shot/repeating release, backed by fixed-capacity callback and timer pools.
 * **Lua performance**: Measured one million cached primitive calls at roughly 0.18–0.21 microseconds/call and 100,000 callback dispatches at roughly 0.39–0.43 microseconds/call with zero steady-state Lua allocator calls on local arm64 macOS release builds.

@@ -8,6 +8,7 @@ okf_version: "0.2"
 
 * [Implementation plan](plan.md) - Phased proof-of-concept plan, acceptance criteria, and delivery boundaries.
 * [Architecture](architecture.md) - Target architecture and the shared native/browser contract.
+* [Tooling workflow](tooling.md) - Commands that work now, the Bob boundary, and the intended public CLI.
 * [Runtime strategy](decisions/runtime-strategy.md) - Decision to use Hermes natively and the host browser VM on HTML5.
 * [Native module strategy](decisions/native-modules.md) - TurboModule/Nitro compatibility direction and the module-registry proof.
 * [Binding compiler](decisions/binding-compiler.md) - Direct C ABI, generated JSI/Static Hermes adapters, and fixed Emscripten memory layouts.
