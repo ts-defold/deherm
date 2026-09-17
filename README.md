@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/brand/deherm-wordmark-basalt-heart.png" alt="deherm" width="960">
+</p>
+
 # Defold Hermes
 
 An experimental TypeScript runtime for Defold, backed by Hermes on native
