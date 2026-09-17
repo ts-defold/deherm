@@ -1,0 +1,2494 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "inputSha256": "e9b74f37972fc5504a5c0551bea3658296970b565a26b86e99b5470f41978eff",
+  "stableIdAlgorithm": "FNV-1a 32-bit over canonical script:<module>.<member> id; collisions fail generation",
+  "coverageClaim": "Descriptors for all 90 scalar-classified functions; only the generic codec and mock representatives are executable in this slice.",
+  "allocationClaim": "Generated tables and native dispatch use fixed storage. Lua may allocate while interning new strings, formatting errors, or inside called engine functions.",
+  "bindingCount": 90,
+  "argumentCodecCount": 102,
+  "maxArgumentCount": 6,
+  "semanticOverrideCount": 1,
+  "bindings": [
+    {
+      "id": "script:render.set_blend_func",
+      "stableId": 12859057,
+      "enumName": "RenderSetBlendFunc",
+      "rawName": "render.set_blend_func",
+      "modulePath": "render",
+      "member": "set_blend_func",
+      "source": "doc/render.lua",
+      "line": 697,
+      "parameters": [
+        {
+          "name": "source_factor",
+          "rawType": "graphics.BLEND_FACTOR",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "destination_factor",
+          "rawType": "graphics.BLEND_FACTOR",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.set_connectivity_host",
+      "stableId": 161653622,
+      "enumName": "SysSetConnectivityHost",
+      "rawName": "sys.set_connectivity_host",
+      "modulePath": "sys",
+      "member": "set_connectivity_host",
+      "source": "doc/sys.lua",
+      "line": 657,
+      "parameters": [
+        {
+          "name": "host",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.disable_state",
+      "stableId": 182835960,
+      "enumName": "RenderDisableState",
+      "rawName": "render.disable_state",
+      "modulePath": "render",
+      "member": "disable_state",
+      "source": "doc/render.lua",
+      "line": 209,
+      "parameters": [
+        {
+          "name": "state",
+          "rawType": "graphics.STATE",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.dump_frame",
+      "stableId": 206098425,
+      "enumName": "ProfilerDumpFrame",
+      "rawName": "profiler.dump_frame",
+      "modulePath": "profiler",
+      "member": "dump_frame",
+      "source": "doc/profiler.lua",
+      "line": 80,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_config_boolean",
+      "stableId": 236701305,
+      "enumName": "SysGetConfigBoolean",
+      "rawName": "sys.get_config_boolean",
+      "modulePath": "sys",
+      "member": "get_config_boolean",
+      "source": "doc/sys.lua",
+      "line": 213,
+      "parameters": [
+        {
+          "name": "key",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        },
+        {
+          "name": "default_value",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": true
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Boolean",
+        "nullable": false,
+        "rawType": "boolean"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.get_height",
+      "stableId": 286597108,
+      "enumName": "RenderGetHeight",
+      "rawName": "render.get_height",
+      "modulePath": "render",
+      "member": "get_height",
+      "source": "doc/render.lua",
+      "line": 444,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Integer",
+        "nullable": false,
+        "rawType": "integer"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.reboot",
+      "stableId": 309934808,
+      "enumName": "SysReboot",
+      "rawName": "sys.reboot",
+      "modulePath": "sys",
+      "member": "reboot",
+      "source": "doc/sys.lua",
+      "line": 600,
+      "parameters": [
+        {
+          "name": "arg1",
+          "rawType": "string",
+          "codec": "String",
+          "optional": true
+        },
+        {
+          "name": "arg2",
+          "rawType": "string",
+          "codec": "String",
+          "optional": true
+        },
+        {
+          "name": "arg3",
+          "rawType": "string",
+          "codec": "String",
+          "optional": true
+        },
+        {
+          "name": "arg4",
+          "rawType": "string",
+          "codec": "String",
+          "optional": true
+        },
+        {
+          "name": "arg5",
+          "rawType": "string",
+          "codec": "String",
+          "optional": true
+        },
+        {
+          "name": "arg6",
+          "rawType": "string",
+          "codec": "String",
+          "optional": true
+        }
+      ],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 6,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:zlib.deflate",
+      "stableId": 314843756,
+      "enumName": "ZlibDeflate",
+      "rawName": "zlib.deflate",
+      "modulePath": "zlib",
+      "member": "deflate",
+      "source": "doc/zlib.lua",
+      "line": 33,
+      "parameters": [
+        {
+          "name": "buf",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.exit",
+      "stableId": 389692837,
+      "enumName": "SysExit",
+      "rawName": "sys.exit",
+      "modulePath": "sys",
+      "member": "exit",
+      "source": "doc/sys.lua",
+      "line": 122,
+      "parameters": [
+        {
+          "name": "code",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:html5.run",
+      "stableId": 475687915,
+      "enumName": "Html5Run",
+      "rawName": "html5.run",
+      "modulePath": "html5",
+      "member": "run",
+      "source": "doc/html5.lua",
+      "line": 34,
+      "parameters": [
+        {
+          "name": "code",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.scope_begin",
+      "stableId": 507784421,
+      "enumName": "ProfilerScopeBegin",
+      "rawName": "profiler.scope_begin",
+      "modulePath": "profiler",
+      "member": "scope_begin",
+      "source": "doc/profiler.lua",
+      "line": 197,
+      "parameters": [
+        {
+          "name": "name",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.lshift",
+      "stableId": 553650099,
+      "enumName": "BitLshift",
+      "rawName": "bit.lshift",
+      "modulePath": "bit",
+      "member": "lshift",
+      "source": "doc/bit.lua",
+      "line": 139,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.tobit",
+      "stableId": 578552117,
+      "enumName": "BitTobit",
+      "rawName": "bit.tobit",
+      "modulePath": "bit",
+      "member": "tobit",
+      "source": "doc/bit.lua",
+      "line": 206,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.set_render_enable",
+      "stableId": 606958618,
+      "enumName": "SysSetRenderEnable",
+      "rawName": "sys.set_render_enable",
+      "modulePath": "sys",
+      "member": "set_render_enable",
+      "source": "doc/sys.lua",
+      "line": 722,
+      "parameters": [
+        {
+          "name": "enable",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_connectivity",
+      "stableId": 610646079,
+      "enumName": "SysGetConnectivity",
+      "rawName": "sys.get_connectivity",
+      "modulePath": "sys",
+      "member": "get_connectivity",
+      "source": "doc/sys.lua",
+      "line": 299,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Integer",
+        "nullable": false,
+        "rawType": "sys.NETWORK"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_blend_equation_separate",
+      "stableId": 721632055,
+      "enumName": "RenderSetBlendEquationSeparate",
+      "rawName": "render.set_blend_equation_separate",
+      "modulePath": "render",
+      "member": "set_blend_equation_separate",
+      "source": "doc/render.lua",
+      "line": 655,
+      "parameters": [
+        {
+          "name": "equation_color",
+          "rawType": "graphics.BLEND_EQUATION",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "equation_alpha",
+          "rawType": "graphics.BLEND_EQUATION",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.get_window_height",
+      "stableId": 821977639,
+      "enumName": "RenderGetWindowHeight",
+      "rawName": "render.get_window_height",
+      "modulePath": "render",
+      "member": "get_window_height",
+      "source": "doc/render.lua",
+      "line": 510,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Integer",
+        "nullable": false,
+        "rawType": "integer"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.enable_ui",
+      "stableId": 844414261,
+      "enumName": "ProfilerEnableUi",
+      "rawName": "profiler.enable_ui",
+      "modulePath": "profiler",
+      "member": "enable_ui",
+      "source": "doc/profiler.lua",
+      "line": 112,
+      "parameters": [
+        {
+          "name": "enabled",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_polygon_offset",
+      "stableId": 851073219,
+      "enumName": "RenderSetPolygonOffset",
+      "rawName": "render.set_polygon_offset",
+      "modulePath": "render",
+      "member": "set_polygon_offset",
+      "source": "doc/render.lua",
+      "line": 904,
+      "parameters": [
+        {
+          "name": "factor",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "units",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:socket.sleep",
+      "stableId": 902564824,
+      "enumName": "SocketSleep",
+      "rawName": "socket.sleep",
+      "modulePath": "socket",
+      "member": "sleep",
+      "source": "doc/socket.lua",
+      "line": 235,
+      "parameters": [
+        {
+          "name": "time",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sound.is_phone_call_active",
+      "stableId": 1027591192,
+      "enumName": "SoundIsPhoneCallActive",
+      "rawName": "sound.is_phone_call_active",
+      "modulePath": "sound",
+      "member": "is_phone_call_active",
+      "source": "doc/sound.lua",
+      "line": 181,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Boolean",
+        "nullable": false,
+        "rawType": "boolean"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.set_mouse_lock",
+      "stableId": 1050223476,
+      "enumName": "WindowSetMouseLock",
+      "rawName": "window.set_mouse_lock",
+      "modulePath": "window",
+      "member": "set_mouse_lock",
+      "source": "doc/window.lua",
+      "line": 165,
+      "parameters": [
+        {
+          "name": "flag",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:socket.gettime",
+      "stableId": 1053915798,
+      "enumName": "SocketGettime",
+      "rawName": "socket.gettime",
+      "modulePath": "socket",
+      "member": "gettime",
+      "source": "doc/socket.lua",
+      "line": 130,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.hide_keyboard",
+      "stableId": 1066639565,
+      "enumName": "GuiHideKeyboard",
+      "rawName": "gui.hide_keyboard",
+      "modulePath": "gui",
+      "member": "hide_keyboard",
+      "source": "doc/gui.lua",
+      "line": 1427,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.get_dim_mode",
+      "stableId": 1130709659,
+      "enumName": "WindowGetDimMode",
+      "rawName": "window.get_dim_mode",
+      "modulePath": "window",
+      "member": "get_dim_mode",
+      "source": "doc/window.lua",
+      "line": 91,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Integer",
+        "nullable": false,
+        "rawType": "window.DIMMING"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.bswap",
+      "stableId": 1151793552,
+      "enumName": "BitBswap",
+      "rawName": "bit.bswap",
+      "modulePath": "bit",
+      "member": "bswap",
+      "source": "doc/bit.lua",
+      "line": 106,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.set_user_field",
+      "stableId": 1193509462,
+      "enumName": "CrashSetUserField",
+      "rawName": "crash.set_user_field",
+      "modulePath": "crash",
+      "member": "set_user_field",
+      "source": "doc/crash.lua",
+      "line": 169,
+      "parameters": [
+        {
+          "name": "index",
+          "rawType": "crash.USERFIELD",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "value",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.arshift",
+      "stableId": 1244951420,
+      "enumName": "BitArshift",
+      "rawName": "bit.arshift",
+      "modulePath": "bit",
+      "member": "arshift",
+      "source": "doc/bit.lua",
+      "line": 47,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.get_signum",
+      "stableId": 1269208753,
+      "enumName": "CrashGetSignum",
+      "rawName": "crash.get_signum",
+      "modulePath": "crash",
+      "member": "get_signum",
+      "source": "doc/crash.lua",
+      "line": 125,
+      "parameters": [
+        {
+          "name": "handle",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_config_int",
+      "stableId": 1282948964,
+      "enumName": "SysGetConfigInt",
+      "rawName": "sys.get_config_int",
+      "modulePath": "sys",
+      "member": "get_config_int",
+      "source": "doc/sys.lua",
+      "line": 236,
+      "parameters": [
+        {
+          "name": "key",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        },
+        {
+          "name": "default_value",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": true
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:socket.dns.gethostname",
+      "stableId": 1367399751,
+      "enumName": "SocketDnsGethostname",
+      "rawName": "socket.dns.gethostname",
+      "modulePath": "socket.dns",
+      "member": "gethostname",
+      "source": "doc/socket.lua",
+      "line": 76,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_color_mask",
+      "stableId": 1380158343,
+      "enumName": "RenderSetColorMask",
+      "rawName": "render.set_color_mask",
+      "modulePath": "render",
+      "member": "set_color_mask",
+      "source": "doc/render.lua",
+      "line": 769,
+      "parameters": [
+        {
+          "name": "red",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        },
+        {
+          "name": "green",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        },
+        {
+          "name": "blue",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        },
+        {
+          "name": "alpha",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.exists",
+      "stableId": 1421868765,
+      "enumName": "SysExists",
+      "rawName": "sys.exists",
+      "modulePath": "sys",
+      "member": "exists",
+      "source": "doc/sys.lua",
+      "line": 104,
+      "parameters": [
+        {
+          "name": "path",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "Boolean",
+        "nullable": false,
+        "rawType": "boolean"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.get_memory_usage",
+      "stableId": 1450101103,
+      "enumName": "ProfilerGetMemoryUsage",
+      "rawName": "profiler.get_memory_usage",
+      "modulePath": "profiler",
+      "member": "get_memory_usage",
+      "source": "doc/profiler.lua",
+      "line": 156,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_stencil_op",
+      "stableId": 1483760217,
+      "enumName": "RenderSetStencilOp",
+      "rawName": "render.set_stencil_op",
+      "modulePath": "render",
+      "member": "set_stencil_op",
+      "source": "doc/render.lua",
+      "line": 1063,
+      "parameters": [
+        {
+          "name": "sfail",
+          "rawType": "graphics.STENCIL_OP",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "dpfail",
+          "rawType": "graphics.STENCIL_OP",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "dppass",
+          "rawType": "graphics.STENCIL_OP",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.rshift",
+      "stableId": 1486569517,
+      "enumName": "BitRshift",
+      "rawName": "bit.rshift",
+      "modulePath": "bit",
+      "member": "rshift",
+      "source": "doc/bit.lua",
+      "line": 187,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.set_vsync_swap_interval",
+      "stableId": 1577053319,
+      "enumName": "SysSetVsyncSwapInterval",
+      "rawName": "sys.set_vsync_swap_interval",
+      "modulePath": "sys",
+      "member": "set_vsync_swap_interval",
+      "source": "doc/sys.lua",
+      "line": 777,
+      "parameters": [
+        {
+          "name": "swap_interval",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_config_number",
+      "stableId": 1601401386,
+      "enumName": "SysGetConfigNumber",
+      "rawName": "sys.get_config_number",
+      "modulePath": "sys",
+      "member": "get_config_number",
+      "source": "doc/sys.lua",
+      "line": 252,
+      "parameters": [
+        {
+          "name": "key",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        },
+        {
+          "name": "default_value",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": true
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_stencil_func",
+      "stableId": 1699887816,
+      "enumName": "RenderSetStencilFunc",
+      "rawName": "render.set_stencil_func",
+      "modulePath": "render",
+      "member": "set_stencil_func",
+      "source": "doc/render.lua",
+      "line": 1011,
+      "parameters": [
+        {
+          "name": "func",
+          "rawType": "graphics.COMPARE_FUNC",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "ref",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "mask",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_depth_func",
+      "stableId": 1832879575,
+      "enumName": "RenderSetDepthFunc",
+      "rawName": "render.set_depth_func",
+      "modulePath": "render",
+      "member": "set_depth_func",
+      "source": "doc/render.lua",
+      "line": 828,
+      "parameters": [
+        {
+          "name": "func",
+          "rawType": "graphics.COMPARE_FUNC",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.set_size",
+      "stableId": 1882390770,
+      "enumName": "WindowSetSize",
+      "rawName": "window.set_size",
+      "modulePath": "window",
+      "member": "set_size",
+      "source": "doc/window.lua",
+      "line": 179,
+      "parameters": [
+        {
+          "name": "width",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "height",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.set_safe_area_mode",
+      "stableId": 1932609869,
+      "enumName": "GuiSetSafeAreaMode",
+      "rawName": "gui.set_safe_area_mode",
+      "modulePath": "gui",
+      "member": "set_safe_area_mode",
+      "source": "doc/gui.lua",
+      "line": 2047,
+      "parameters": [
+        {
+          "name": "mode",
+          "rawType": "gui.SAFE_AREA",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.get_height",
+      "stableId": 1986171713,
+      "enumName": "GuiGetHeight",
+      "rawName": "gui.get_height",
+      "modulePath": "gui",
+      "member": "get_height",
+      "source": "doc/gui.lua",
+      "line": 1108,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sound.is_music_playing",
+      "stableId": 2034901354,
+      "enumName": "SoundIsMusicPlaying",
+      "rawName": "sound.is_music_playing",
+      "modulePath": "sound",
+      "member": "is_music_playing",
+      "source": "doc/sound.lua",
+      "line": 161,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Boolean",
+        "nullable": false,
+        "rawType": "boolean"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.get_width",
+      "stableId": 2048321486,
+      "enumName": "GuiGetWidth",
+      "rawName": "gui.get_width",
+      "modulePath": "gui",
+      "member": "get_width",
+      "source": "doc/gui.lua",
+      "line": 1408,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.reset_nodes",
+      "stableId": 2107179008,
+      "enumName": "GuiResetNodes",
+      "rawName": "gui.reset_nodes",
+      "modulePath": "gui",
+      "member": "reset_nodes",
+      "source": "doc/gui.lua",
+      "line": 1639,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.load_previous",
+      "stableId": 2128448069,
+      "enumName": "CrashLoadPrevious",
+      "rawName": "crash.load_previous",
+      "modulePath": "crash",
+      "member": "load_previous",
+      "source": "doc/crash.lua",
+      "line": 148,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": true,
+        "rawType": "number|nil"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.write_dump",
+      "stableId": 2139022713,
+      "enumName": "CrashWriteDump",
+      "rawName": "crash.write_dump",
+      "modulePath": "crash",
+      "member": "write_dump",
+      "source": "doc/crash.lua",
+      "line": 176,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.get_display_scale",
+      "stableId": 2150954578,
+      "enumName": "WindowGetDisplayScale",
+      "rawName": "window.get_display_scale",
+      "modulePath": "window",
+      "member": "get_display_scale",
+      "source": "doc/window.lua",
+      "line": 97,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.get_window_width",
+      "stableId": 2157256624,
+      "enumName": "RenderGetWindowWidth",
+      "rawName": "render.get_window_width",
+      "modulePath": "render",
+      "member": "get_window_width",
+      "source": "doc/render.lua",
+      "line": 526,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Integer",
+        "nullable": false,
+        "rawType": "integer"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_viewport",
+      "stableId": 2171506453,
+      "enumName": "RenderSetViewport",
+      "rawName": "render.set_viewport",
+      "modulePath": "render",
+      "member": "set_viewport",
+      "source": "doc/render.lua",
+      "line": 1111,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "width",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "height",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.set_ui_mode",
+      "stableId": 2218436408,
+      "enumName": "ProfilerSetUiMode",
+      "rawName": "profiler.set_ui_mode",
+      "modulePath": "profiler",
+      "member": "set_ui_mode",
+      "source": "doc/profiler.lua",
+      "line": 220,
+      "parameters": [
+        {
+          "name": "mode",
+          "rawType": "profiler.MODE",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.get_sys_field",
+      "stableId": 2320525628,
+      "enumName": "CrashGetSysField",
+      "rawName": "crash.get_sys_field",
+      "modulePath": "crash",
+      "member": "get_sys_field",
+      "source": "doc/crash.lua",
+      "line": 133,
+      "parameters": [
+        {
+          "name": "handle",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "index",
+          "rawType": "crash.SYSFIELD",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "String",
+        "nullable": true,
+        "rawType": "string|nil"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.recorded_frame_count",
+      "stableId": 2347140851,
+      "enumName": "ProfilerRecordedFrameCount",
+      "rawName": "profiler.recorded_frame_count",
+      "modulePath": "profiler",
+      "member": "recorded_frame_count",
+      "source": "doc/profiler.lua",
+      "line": 182,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.set_file_path",
+      "stableId": 2406941902,
+      "enumName": "CrashSetFilePath",
+      "rawName": "crash.set_file_path",
+      "modulePath": "crash",
+      "member": "set_file_path",
+      "source": "doc/crash.lua",
+      "line": 160,
+      "parameters": [
+        {
+          "name": "path",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.disable_material",
+      "stableId": 2431147342,
+      "enumName": "RenderDisableMaterial",
+      "rawName": "render.disable_material",
+      "modulePath": "render",
+      "member": "disable_material",
+      "source": "doc/render.lua",
+      "line": 194,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_depth_mask",
+      "stableId": 2443358201,
+      "enumName": "RenderSetDepthMask",
+      "rawName": "render.set_depth_mask",
+      "modulePath": "render",
+      "member": "set_depth_mask",
+      "source": "doc/render.lua",
+      "line": 845,
+      "parameters": [
+        {
+          "name": "depth",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.set_dim_mode",
+      "stableId": 2490982863,
+      "enumName": "WindowSetDimMode",
+      "rawName": "window.set_dim_mode",
+      "modulePath": "window",
+      "member": "set_dim_mode",
+      "source": "doc/window.lua",
+      "line": 128,
+      "parameters": [
+        {
+          "name": "mode",
+          "rawType": "window.DIMMING",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.tohex",
+      "stableId": 2491340691,
+      "enumName": "BitTohex",
+      "rawName": "bit.tohex",
+      "modulePath": "bit",
+      "member": "tohex",
+      "source": "doc/bit.lua",
+      "line": 225,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": true
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": {
+        "source": "engine/script/src/bitop/bitop.c",
+        "line": 128,
+        "claim": "The second argument is optional and defaults to 8.",
+        "observed": "lua_isnone(L, 2) ? 8 : (SBits)barg(L, 2)"
+      },
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.show_keyboard",
+      "stableId": 2609195142,
+      "enumName": "GuiShowKeyboard",
+      "rawName": "gui.show_keyboard",
+      "modulePath": "gui",
+      "member": "show_keyboard",
+      "source": "doc/gui.lua",
+      "line": 2222,
+      "parameters": [
+        {
+          "name": "type",
+          "rawType": "gui.KEYBOARD_TYPE",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "autoclose",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:liveupdate.is_built_with_excluded_files",
+      "stableId": 2617193436,
+      "enumName": "LiveupdateIsBuiltWithExcludedFiles",
+      "rawName": "liveupdate.is_built_with_excluded_files",
+      "modulePath": "liveupdate",
+      "member": "is_built_with_excluded_files",
+      "source": "doc/liveupdate.lua",
+      "line": 175,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Boolean",
+        "nullable": false,
+        "rawType": "boolean"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.set_position",
+      "stableId": 2677153760,
+      "enumName": "WindowSetPosition",
+      "rawName": "window.set_position",
+      "modulePath": "window",
+      "member": "set_position",
+      "source": "doc/window.lua",
+      "line": 172,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "rawType": "integer",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_stencil_mask",
+      "stableId": 2717264638,
+      "enumName": "RenderSetStencilMask",
+      "rawName": "render.set_stencil_mask",
+      "modulePath": "render",
+      "member": "set_stencil_mask",
+      "source": "doc/render.lua",
+      "line": 1032,
+      "parameters": [
+        {
+          "name": "mask",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_config_string",
+      "stableId": 2745305294,
+      "enumName": "SysGetConfigString",
+      "rawName": "sys.get_config_string",
+      "modulePath": "sys",
+      "member": "get_config_string",
+      "source": "doc/sys.lua",
+      "line": 280,
+      "parameters": [
+        {
+          "name": "key",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        },
+        {
+          "name": "default_value",
+          "rawType": "string",
+          "codec": "String",
+          "optional": true
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "String",
+        "nullable": true,
+        "rawType": "string|nil"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.set_engine_throttle",
+      "stableId": 2847174763,
+      "enumName": "SysSetEngineThrottle",
+      "rawName": "sys.set_engine_throttle",
+      "modulePath": "sys",
+      "member": "set_engine_throttle",
+      "source": "doc/sys.lua",
+      "line": 678,
+      "parameters": [
+        {
+          "name": "enable",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        },
+        {
+          "name": "cooldown",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_host_path",
+      "stableId": 2971433320,
+      "enumName": "SysGetHostPath",
+      "rawName": "sys.get_host_path",
+      "modulePath": "sys",
+      "member": "get_host_path",
+      "source": "doc/sys.lua",
+      "line": 340,
+      "parameters": [
+        {
+          "name": "filename",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.get_width",
+      "stableId": 3019471645,
+      "enumName": "RenderGetWidth",
+      "rawName": "render.get_width",
+      "modulePath": "render",
+      "member": "get_width",
+      "source": "doc/render.lua",
+      "line": 494,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Integer",
+        "nullable": false,
+        "rawType": "integer"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.enable",
+      "stableId": 3042163066,
+      "enumName": "ProfilerEnable",
+      "rawName": "profiler.enable",
+      "modulePath": "profiler",
+      "member": "enable",
+      "source": "doc/profiler.lua",
+      "line": 95,
+      "parameters": [
+        {
+          "name": "enabled",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.set_update_frequency",
+      "stableId": 3058596528,
+      "enumName": "SysSetUpdateFrequency",
+      "rawName": "sys.set_update_frequency",
+      "modulePath": "sys",
+      "member": "set_update_frequency",
+      "source": "doc/sys.lua",
+      "line": 751,
+      "parameters": [
+        {
+          "name": "frequency",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.set_ui_vsync_wait_visible",
+      "stableId": 3083074845,
+      "enumName": "ProfilerSetUiVsyncWaitVisible",
+      "rawName": "profiler.set_ui_vsync_wait_visible",
+      "modulePath": "profiler",
+      "member": "set_ui_vsync_wait_visible",
+      "source": "doc/profiler.lua",
+      "line": 259,
+      "parameters": [
+        {
+          "name": "visible",
+          "rawType": "boolean",
+          "codec": "Boolean",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.enable_state",
+      "stableId": 3190141495,
+      "enumName": "RenderEnableState",
+      "rawName": "render.enable_state",
+      "modulePath": "render",
+      "member": "enable_state",
+      "source": "doc/render.lua",
+      "line": 365,
+      "parameters": [
+        {
+          "name": "state",
+          "rawType": "graphics.STATE",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.scope_end",
+      "stableId": 3195307493,
+      "enumName": "ProfilerScopeEnd",
+      "rawName": "profiler.scope_end",
+      "modulePath": "profiler",
+      "member": "scope_end",
+      "source": "doc/profiler.lua",
+      "line": 202,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_blend_func_separate",
+      "stableId": 3206577455,
+      "enumName": "RenderSetBlendFuncSeparate",
+      "rawName": "render.set_blend_func_separate",
+      "modulePath": "render",
+      "member": "set_blend_func_separate",
+      "source": "doc/render.lua",
+      "line": 717,
+      "parameters": [
+        {
+          "name": "source_factor_color",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "destination_factor_color",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "source_factor_alpha",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "destination_factor_alpha",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.get_extra_data",
+      "stableId": 3280962645,
+      "enumName": "CrashGetExtraData",
+      "rawName": "crash.get_extra_data",
+      "modulePath": "crash",
+      "member": "get_extra_data",
+      "source": "doc/crash.lua",
+      "line": 111,
+      "parameters": [
+        {
+          "name": "handle",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.get_user_field",
+      "stableId": 3344562290,
+      "enumName": "CrashGetUserField",
+      "rawName": "crash.get_user_field",
+      "modulePath": "crash",
+      "member": "get_user_field",
+      "source": "doc/crash.lua",
+      "line": 141,
+      "parameters": [
+        {
+          "name": "handle",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "index",
+          "rawType": "crash.USERFIELD",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.set_ui_view_mode",
+      "stableId": 3352616584,
+      "enumName": "ProfilerSetUiViewMode",
+      "rawName": "profiler.set_ui_view_mode",
+      "modulePath": "profiler",
+      "member": "set_ui_view_mode",
+      "source": "doc/profiler.lua",
+      "line": 233,
+      "parameters": [
+        {
+          "name": "mode",
+          "rawType": "profiler.VIEW_MODE",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:zlib.inflate",
+      "stableId": 3500234696,
+      "enumName": "ZlibInflate",
+      "rawName": "zlib.inflate",
+      "modulePath": "zlib",
+      "member": "inflate",
+      "source": "doc/zlib.lua",
+      "line": 48,
+      "parameters": [
+        {
+          "name": "buf",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_save_file",
+      "stableId": 3514141112,
+      "enumName": "SysGetSaveFile",
+      "rawName": "sys.get_save_file",
+      "modulePath": "sys",
+      "member": "get_save_file",
+      "source": "doc/sys.lua",
+      "line": 394,
+      "parameters": [
+        {
+          "name": "application_id",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        },
+        {
+          "name": "file_name",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.ror",
+      "stableId": 3586131806,
+      "enumName": "BitRor",
+      "rawName": "bit.ror",
+      "modulePath": "bit",
+      "member": "ror",
+      "source": "doc/bit.lua",
+      "line": 169,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.set_title",
+      "stableId": 3682979203,
+      "enumName": "WindowSetTitle",
+      "rawName": "window.set_title",
+      "modulePath": "window",
+      "member": "set_title",
+      "source": "doc/window.lua",
+      "line": 185,
+      "parameters": [
+        {
+          "name": "title",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.set_render_order",
+      "stableId": 3733202233,
+      "enumName": "GuiSetRenderOrder",
+      "rawName": "gui.set_render_order",
+      "modulePath": "gui",
+      "member": "set_render_order",
+      "source": "doc/gui.lua",
+      "line": 2033,
+      "parameters": [
+        {
+          "name": "order",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.rol",
+      "stableId": 3753907996,
+      "enumName": "BitRol",
+      "rawName": "bit.rol",
+      "modulePath": "bit",
+      "member": "rol",
+      "source": "doc/bit.lua",
+      "line": 154,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        },
+        {
+          "name": "n",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:bit.bnot",
+      "stableId": 3772371256,
+      "enumName": "BitBnot",
+      "rawName": "bit.bnot",
+      "modulePath": "bit",
+      "member": "bnot",
+      "source": "doc/bit.lua",
+      "line": 78,
+      "parameters": [
+        {
+          "name": "x",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:render.set_cull_face",
+      "stableId": 3782563365,
+      "enumName": "RenderSetCullFace",
+      "rawName": "render.set_cull_face",
+      "modulePath": "render",
+      "member": "set_cull_face",
+      "source": "doc/render.lua",
+      "line": 808,
+      "parameters": [
+        {
+          "name": "face_type",
+          "rawType": "graphics.FACE_TYPE",
+          "codec": "Integer",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:gui.reset_keyboard",
+      "stableId": 3823880698,
+      "enumName": "GuiResetKeyboard",
+      "rawName": "gui.reset_keyboard",
+      "modulePath": "gui",
+      "member": "reset_keyboard",
+      "source": "doc/gui.lua",
+      "line": 1617,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:crash.release",
+      "stableId": 3860576604,
+      "enumName": "CrashRelease",
+      "rawName": "crash.release",
+      "modulePath": "crash",
+      "member": "release",
+      "source": "doc/crash.lua",
+      "line": 154,
+      "parameters": [
+        {
+          "name": "handle",
+          "rawType": "number",
+          "codec": "Number",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.log_text",
+      "stableId": 3938384805,
+      "enumName": "ProfilerLogText",
+      "rawName": "profiler.log_text",
+      "modulePath": "profiler",
+      "member": "log_text",
+      "source": "doc/profiler.lua",
+      "line": 168,
+      "parameters": [
+        {
+          "name": "text",
+          "rawType": "string",
+          "codec": "String",
+          "optional": false
+        }
+      ],
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "result": {
+        "codec": "None",
+        "nullable": false,
+        "rawType": null
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:profiler.get_cpu_usage",
+      "stableId": 3944657330,
+      "enumName": "ProfilerGetCpuUsage",
+      "rawName": "profiler.get_cpu_usage",
+      "modulePath": "profiler",
+      "member": "get_cpu_usage",
+      "source": "doc/profiler.lua",
+      "line": 125,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Number",
+        "nullable": false,
+        "rawType": "number"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:sys.get_application_path",
+      "stableId": 3996665900,
+      "enumName": "SysGetApplicationPath",
+      "rawName": "sys.get_application_path",
+      "modulePath": "sys",
+      "member": "get_application_path",
+      "source": "doc/sys.lua",
+      "line": 197,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "String",
+        "nullable": false,
+        "rawType": "string"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    },
+    {
+      "id": "script:window.get_mouse_lock",
+      "stableId": 4036039488,
+      "enumName": "WindowGetMouseLock",
+      "rawName": "window.get_mouse_lock",
+      "modulePath": "window",
+      "member": "get_mouse_lock",
+      "source": "doc/window.lua",
+      "line": 103,
+      "parameters": [],
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "result": {
+        "codec": "Boolean",
+        "nullable": false,
+        "rawType": "boolean"
+      },
+      "semanticOverride": null,
+      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+    }
+  ]
+}
