@@ -1,4 +1,4 @@
-import { readFile, readdir } from "node:fs/promises";
+import { readFile, readdir, realpath, stat } from "node:fs/promises";
 import path from "node:path";
 
 import { unzipSync } from "fflate";
@@ -80,17 +80,32 @@ function sanitizeDependencyUrl(value) {
   }
 }
 
-async function walk(root, accept, includeIgnored = false) {
+async function walk(root, accept, includeIgnored = false, diagnostics = []) {
   const matches = [];
+  const visited = new Set();
   async function visit(current) {
+    const canonical = await realpath(current);
+    if (visited.has(canonical)) return;
+    visited.add(canonical);
     const entries = await readdir(current, { withFileTypes: true });
     entries.sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
-      if (entry.isSymbolicLink()) continue;
       const absolute = path.join(current, entry.name);
-      if (entry.isDirectory()) {
+      let isDirectory = entry.isDirectory();
+      let isFile = entry.isFile();
+      if (entry.isSymbolicLink()) {
+        try {
+          const target = await stat(absolute);
+          isDirectory = target.isDirectory();
+          isFile = target.isFile();
+        } catch (error) {
+          diagnostics.push({ severity: "warning", path: portable(path.relative(root, absolute)), message: `Skipped unreadable symlink: ${error.message}` });
+          continue;
+        }
+      }
+      if (isDirectory) {
         if (includeIgnored || !ignoredDirectories.has(entry.name)) await visit(absolute);
-      } else if (entry.isFile() && accept(absolute)) {
+      } else if (isFile && accept(absolute)) {
         matches.push(absolute);
       }
     }
@@ -147,11 +162,11 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
   const relativeRoot = portable(path.relative(projectRoot, root)) || ".";
   const manifestSource = await readFile(manifestPath, "utf8");
   const manifest = parseManifest(manifestSource, `${relativeRoot}/ext.manifest`, diagnostics);
-  const files = await walk(root, (file) => file.endsWith(".script_api"));
+  const files = await walk(root, (file) => file.endsWith(".script_api"), false, diagnostics);
   const nativeFiles = await walk(root, (file) => {
     const relative = portable(path.relative(root, file));
     return isPublicHeader(relative) || isNativeSource(relative);
-  });
+  }, false, diagnostics);
   const scriptApis = [];
   for (const file of files) {
     const relative = portable(path.relative(projectRoot, file));
@@ -251,7 +266,7 @@ export async function inspectDefoldProject(options = {}) {
   const projectRoot = await findProjectRoot(options.cwd, options.project);
   const properties = parseGameProject(await readFile(path.join(projectRoot, "game.project"), "utf8"));
   const diagnostics = [];
-  const manifestPaths = await walk(projectRoot, (file) => path.basename(file) === "ext.manifest");
+  const manifestPaths = await walk(projectRoot, (file) => path.basename(file) === "ext.manifest", false, diagnostics);
   const local = [];
   for (const manifestPath of manifestPaths) {
     local.push(await localExtension(projectRoot, manifestPath, diagnostics));

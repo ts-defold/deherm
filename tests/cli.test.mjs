@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -93,6 +93,30 @@ test("project inspection finds local and resolved dependency extensions", async 
   assert.deepEqual(inventory.diagnostics, []);
 });
 
+test("project inspection follows symlinked extensions without duplicate traversal", async () => {
+  const project = await fixture();
+  const external = await mkdtemp(path.join(tmpdir(), "defold-hermes-linked-extension-"));
+  await writeFile(path.join(external, "ext.manifest"), "name: LinkedPhysics\n");
+  await writeFile(path.join(external, "physics.script_api"), `
+- name: linked_physics
+  type: table
+  members:
+    - name: step
+      type: function
+      parameters:
+        - name: dt
+          type: number
+`);
+  await symlink(external, path.join(project, "linked-physics"), "dir");
+
+  const inventory = await inspectDefoldProject({ project });
+  const linked = inventory.extensions.find(({ name }) => name === "LinkedPhysics");
+  assert.ok(linked);
+  assert.equal(linked.root, "linked-physics");
+  assert.equal(linked.scriptApis[0].path, "linked-physics/physics.script_api");
+  assert.deepEqual(inventory.diagnostics, []);
+});
+
 test("extension script APIs produce deterministic TypeScript declarations", async () => {
   const project = await fixture();
   const inventory = await inspectDefoldProject({ project });
@@ -129,11 +153,20 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(manifest.coverage.script.typeSurfaceUnresolved, 0);
   assert.equal(manifest.coverage.dmsdk.declarations, 2140);
   assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, 0);
+  assert.equal(manifest.platform, "arm64-macos");
+  assert.equal(manifest.coverage.dmsdk.diagnosticHeaders, 35);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "script", "types.ts"), "utf8"), /export interface MsgApi/);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
   const lock = JSON.parse(await readFile(path.join(project, "defold-hermes.lock"), "utf8"));
   assert.equal(lock.defoldRevision, manifest.defoldRevision);
+  assert.equal(lock.platform, manifest.platform);
   assert.deepEqual(lock.inputs, manifest.inputs);
+
+  await writeFile(path.join(output.root, "sdk", "modules", "stale.ts"), "export {};\n");
+  await writeFile(path.join(output.root, "sdk", "generated", "stale.ts"), "export {};\n");
+  await writeGeneratedProject(inventory);
+  await assert.rejects(readFile(path.join(output.root, "sdk", "modules", "stale.ts"), "utf8"));
+  await assert.rejects(readFile(path.join(output.root, "sdk", "generated", "stale.ts"), "utf8"));
 
   const config = JSON.parse(await readFile(path.join(project, "tsconfig.defold-hermes.json"), "utf8"));
   assert.equal(config.compilerOptions.plugins[0].transform, "@ts-defold/hermes/ttsc");
@@ -148,4 +181,52 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
     encoding: "utf8"
   });
   assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
+});
+
+test("project binding identities survive normalized-name collisions and reserved parameters", async () => {
+  const project = await fixture();
+  const inventory = await inspectDefoldProject({ project });
+  inventory.extensions[0].scriptApis[0].declarations.push(
+    {
+      name: "my_ext",
+      type: "table",
+      members: [{
+        name: "invoke",
+        type: "function",
+        parameters: [
+          { name: "function", type: "function" },
+          { name: "default", type: "number" },
+          { name: "var", type: "string" }
+        ]
+      }]
+    },
+    { name: "myExt", type: "table", members: [{ name: "ping", type: "function" }] }
+  );
+
+  const ir = buildProjectBindingIr(inventory);
+  const colliding = ir.modules.filter(({ runtimeName }) => runtimeName === "my_ext" || runtimeName === "myExt");
+  assert.equal(colliding.length, 2);
+  assert.equal(new Set(colliding.map(({ jsName }) => jsName)).size, 2);
+  assert.equal(new Set(colliding.map(({ typeName }) => typeName)).size, 2);
+  assert.ok(colliding.every(({ jsName }) => /^myExt_[a-f0-9]{8}$/.test(jsName)));
+  assert.deepEqual(
+    colliding.find(({ runtimeName }) => runtimeName === "my_ext").members[0].parameters.map(({ jsName }) => jsName),
+    ["callback", "defaultValue", "value"]
+  );
+
+  const output = await writeGeneratedProject(inventory);
+  const index = await readFile(path.join(output.root, "sdk", "index.ts"), "utf8");
+  for (const module of colliding) {
+    assert.match(index, new RegExp(`export \\{ ${module.jsName} \\} from "\\./modules/${module.fileName}\\.js"`));
+    await readFile(path.join(output.root, "sdk", "modules", `${module.fileName}.ts`), "utf8");
+  }
+});
+
+test("project generation rejects output outside the project", async () => {
+  const project = await fixture();
+  const inventory = await inspectDefoldProject({ project });
+  await assert.rejects(
+    writeGeneratedProject(inventory, "../outside"),
+    /subdirectory of the Defold project/
+  );
 });
