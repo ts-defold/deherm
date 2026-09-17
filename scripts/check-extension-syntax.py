@@ -30,6 +30,11 @@ def include_roots() -> list[Path]:
 
 
 def compile_source(source: Path, platform: str) -> None:
+    generated_dmsdk_defines = (
+        ['-DDLIB_LOG_DOMAIN="defold_hermes"']
+        if source.name.startswith("generated_dmsdk_scalar_")
+        else []
+    )
     command = [
         "clang++",
         "-std=c++17",
@@ -38,6 +43,7 @@ def compile_source(source: Path, platform: str) -> None:
         "-Wno-deprecated-declarations",
         "-fexceptions",
         "-DLUA_API=",
+        *generated_dmsdk_defines,
         f"-DDM_PLATFORM_{platform}=1",
         *(f"-I{path}" for path in include_roots()),
         str(source),
@@ -57,6 +63,14 @@ def main() -> None:
         EXTENSION / "src" / "extension.cpp",
         EXTENSION / "src" / "generated_jsi.cpp",
         EXTENSION / "src" / "generated_lua_bridge.cpp",
+        EXTENSION / "src" / "generated_scalar_lua_descriptors.cpp",
+        EXTENSION / "src" / "scalar_lua_dispatch.cpp",
+        EXTENSION / "src" / "generated_dmsdk_scalar_endian.cpp",
+        EXTENSION / "src" / "generated_dmsdk_scalar_log.cpp",
+        EXTENSION / "src" / "generated_dmsdk_scalar_profile.cpp",
+        EXTENSION / "src" / "generated_dmsdk_scalar_time.cpp",
+        EXTENSION / "src" / "generated_dmsdk_scalar_trig.cpp",
+        EXTENSION / "src" / "generated_dmsdk_scalar_utf8.cpp",
         EXTENSION / "src" / "lua_bridge.cpp",
         EXTENSION / "src" / "lua_bridge_core.cpp",
     ]

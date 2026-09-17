@@ -70,6 +70,8 @@ add_library(defold-hermes-lua-bridge STATIC
   defold/defold_hermes/src/lua_bridge_core.cpp
   defold/defold_hermes/src/lua_bridge.cpp
   defold/defold_hermes/src/generated_lua_bridge.cpp
+  defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp
+  defold/defold_hermes/src/scalar_lua_dispatch.cpp
 )
 target_compile_features(defold-hermes-lua-bridge PUBLIC cxx_std_17)
 target_include_directories(defold-hermes-lua-bridge PUBLIC
@@ -81,6 +83,15 @@ target_link_libraries(defold-hermes-lua-bridge PUBLIC defold-lua-test)
 add_executable(defold-hermes-lua-bridge-test native/lua_bridge_test.cpp)
 target_compile_features(defold-hermes-lua-bridge-test PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-lua-bridge-test PRIVATE defold-hermes-lua-bridge)
+
+add_executable(defold-hermes-scalar-lua-dispatch-test native/scalar_lua_dispatch_test.cpp)
+target_compile_features(defold-hermes-scalar-lua-dispatch-test PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-scalar-lua-dispatch-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
+target_link_libraries(defold-hermes-scalar-lua-dispatch-test PRIVATE defold-hermes-lua-bridge)
 
 add_executable(defold-hermes-lua-hermes-e2e native/lua_hermes_e2e.cpp)
 target_compile_features(defold-hermes-lua-hermes-e2e PRIVATE cxx_std_17)
