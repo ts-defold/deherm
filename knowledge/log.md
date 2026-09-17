@@ -2,6 +2,8 @@
 
 ## 2026-09-17
 
+* **Semantic translation**: Defined provenance-preserving per-position tokens for source names, TypeScript synonyms, overloads, generics, ABI layouts, target lowering, and conformance; recorded reproduced and rejected adversarial-review claims.
+* **Math language frontier**: Reserved checker-aware `"use math"` regions and a backend-neutral math IR for `vmath`, xMath, Static Hermes, and TypeGPU, with matching ttsc and VS Code behavior required before implementation.
 * **API ground truth**: Selected the exact Defold engine SHA as the version key; matching ref-doc artifacts, packaged dmSDK headers, and resolved project extensions are hashed and may be reused from editor/Bob caches without mixing versions.
 * **Generated script SDK**: Generated compiling camelCase TypeScript modules, rich TSDoc, overloads, types, and per-symbol IR for all 926 public script functions and 410 declared types; runtime implementation coverage remains a separate gate.
 * **Generated dmSDK SDK**: Expanded the Clang importer to retain record fields, access, and enum values; generated a raw typed surface and ABI-strategy ledger for all 2,140 discovered declarations while explicitly hiding non-public entries.
