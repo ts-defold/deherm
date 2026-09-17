@@ -61,10 +61,12 @@ of six trivial input cells in call-local storage and has no heap fallback.
 Function lookup, Lua registry references, and stack reservation occur before
 the hot path.
 
-The native harness demonstrates zero Lua allocator calls and zero C++
-`operator new` calls across 500,000 warmed numeric dispatches, stack restoration
-after success and failure, arena rewind after every call, and zero live bytes
-after `lua_close`. This does not imply that every Lua call is allocation-free:
+The native harness installs instance get/set hooks, captures a target instance,
+and demonstrates zero Lua allocator calls and zero C++ `operator new` calls
+across 500,000 warmed numeric dispatches including instance swap/restore. It
+also checks stack restoration after success and failure, arena rewind after
+every call, and zero live bytes after `lua_close`. This does not imply that
+every Lua call is allocation-free:
 new strings may be interned, Lua errors may be formatted, and the selected
 Defold function may allocate internally. String results are copied into a
 caller-provided bounded buffer before stack restoration; the bridge never

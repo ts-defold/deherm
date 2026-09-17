@@ -331,7 +331,7 @@ function renderBitEnum(name, underlyingType, entries) {
 }
 
 function renderCppHeader(artifact) {
-  const { hot, cold } = artifact;
+  const { hot } = artifact;
   const bindingCount = artifact.bindingCount;
   const parameterCount = artifact.parameterSlotCount;
   const returnCount = artifact.returnSlotCount;
@@ -408,38 +408,6 @@ ${renderNumbers(hot.returnCodecMask)}
 }};
 
 }  // namespace hot
-
-namespace cold {
-
-inline constexpr std::array<std::string_view, ${cold.sourceFiles.length}> kSourceFiles = {{
-${renderStrings(cold.sourceFiles)}
-}};
-inline constexpr std::array<std::string_view, ${cold.modulePaths.length}> kModulePaths = {{
-${renderStrings(cold.modulePaths)}
-}};
-inline constexpr std::array<std::string_view, kBindingCount> kStableKeys = {{
-${renderStrings(cold.stableKeys)}
-}};
-inline constexpr std::array<std::string_view, kBindingCount> kRawNames = {{
-${renderStrings(cold.rawNames)}
-}};
-inline constexpr std::array<std::string_view, kBindingCount> kJsNames = {{
-${renderStrings(cold.jsNames)}
-}};
-inline constexpr std::array<std::string_view, kBindingCount> kMembers = {{
-${renderStrings(cold.members)}
-}};
-inline constexpr std::array<std::uint8_t, kBindingCount> kSourceFileIndex = {{
-${renderNumbers(cold.sourceFileIndex)}
-}};
-inline constexpr std::array<std::uint16_t, kBindingCount> kSourceLines = {{
-${renderNumbers(cold.sourceLines)}
-}};
-inline constexpr std::array<std::uint8_t, kBindingCount> kModulePathIndex = {{
-${renderNumbers(cold.modulePathIndex)}
-}};
-
-}  // namespace cold
 
 constexpr bool isValidDenseIndex(DenseBindingIndex index) noexcept { return index < kBindingCount; }
 constexpr bool hasCodec(std::uint16_t mask, Codec codec) noexcept {

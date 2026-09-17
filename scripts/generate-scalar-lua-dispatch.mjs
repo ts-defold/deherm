@@ -29,6 +29,26 @@ const semanticOverrides = new Map([
   }]
 ]);
 
+async function validateSemanticOverrides() {
+  const validated = new Map();
+  for (const [id, override] of semanticOverrides) {
+    const sourceUrl = new URL(`upstream/defold/${override.evidence.source}`, root);
+    const contents = await readFile(sourceUrl, "utf8");
+    const line = contents.split(/\r?\n/)[override.evidence.line - 1] ?? "";
+    if (!line.includes(override.evidence.observed)) {
+      throw new Error(`Semantic override evidence is stale for ${id} at ${override.evidence.source}:${override.evidence.line}`);
+    }
+    validated.set(id, {
+      ...override,
+      evidence: {
+        ...override.evidence,
+        sourceSha256: createHash("sha256").update(contents).digest("hex")
+      }
+    });
+  }
+  return validated;
+}
+
 function pascal(value) {
   return value.split(/[^A-Za-z0-9]+/).filter(Boolean)
     .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join("");
@@ -67,12 +87,13 @@ function cppString(value) {
   return JSON.stringify(value);
 }
 
-function makeOutputs(patternsText, irText) {
+function makeOutputs(patternsText, irText, validatedOverrides) {
   const patterns = JSON.parse(patternsText);
   const ir = JSON.parse(irText);
   const functions = new Map(ir.functions.map((entry) => [entry.id, entry]));
   const registry = typeRegistry(ir);
   const ids = new Map();
+  const usedOverrides = new Set();
   const bindings = patterns.bindings
     .filter((entry) => entry.loweringFamily === "scalar")
     .map((pattern) => {
@@ -82,7 +103,8 @@ function makeOutputs(patternsText, irText) {
       const collision = ids.get(stableId);
       if (collision) throw new Error(`FNV-1a collision ${hex32(stableId)}: ${collision} and ${pattern.id}`);
       ids.set(stableId, pattern.id);
-      const override = semanticOverrides.get(pattern.id);
+      const override = validatedOverrides.get(pattern.id);
+      if (override) usedOverrides.add(pattern.id);
       const parameters = fn.parameters.map((parameter) => {
         const lowered = resolveCodec(parameter.rawType, registry);
         if (lowered.nullable) throw new Error(`Nullable scalar input needs an explicit policy: ${pattern.id}`);
@@ -121,6 +143,9 @@ function makeOutputs(patternsText, irText) {
     .sort((left, right) => left.stableId - right.stableId);
 
   if (bindings.length !== 90) throw new Error(`Expected 90 scalar bindings, got ${bindings.length}`);
+  for (const id of validatedOverrides.keys()) {
+    if (!usedOverrides.has(id)) throw new Error(`Semantic override does not match an emitted scalar binding: ${id}`);
+  }
   const duplicateNames = new Set();
   for (const binding of bindings) {
     if (duplicateNames.has(binding.enumName)) throw new Error(`Duplicate generated enum name ${binding.enumName}`);
@@ -128,7 +153,10 @@ function makeOutputs(patternsText, irText) {
   }
   const argumentsFlat = bindings.flatMap((binding) => binding.parameters);
   const maxArguments = Math.max(...bindings.map((binding) => binding.maximumArgumentCount));
-  const inputHash = createHash("sha256").update(patternsText).update("\0").update(irText).digest("hex");
+  const overrideEvidence = [...validatedOverrides.entries()];
+  const inputHash = createHash("sha256")
+    .update(patternsText).update("\0").update(irText).update("\0")
+    .update(JSON.stringify(overrideEvidence)).digest("hex");
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
@@ -163,7 +191,8 @@ async function main(argv = process.argv.slice(2)) {
     readFile(patternsUrl, "utf8"),
     readFile(irUrl, "utf8")
   ]);
-  const outputs = makeOutputs(patternsText, irText);
+  const validatedOverrides = await validateSemanticOverrides();
+  const outputs = makeOutputs(patternsText, irText, validatedOverrides);
   const targets = [
     [reportUrl, outputs.report],
     [headerUrl, outputs.header],

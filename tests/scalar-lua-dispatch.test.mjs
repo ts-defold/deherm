@@ -28,6 +28,7 @@ test("source-validated bit.tohex optionality is explicit", async () => {
   assert.equal(binding.parameters[1].optional, true);
   assert.match(binding.semanticOverride.source, /bitop\.c$/);
   assert.match(binding.semanticOverride.observed, /lua_isnone/);
+  assert.match(binding.semanticOverride.sourceSha256, /^[a-f0-9]{64}$/);
 });
 
 test("descriptor report keeps allocation and coverage claims bounded", async () => {

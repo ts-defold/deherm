@@ -112,6 +112,8 @@ class Dispatcher {
 
   bool initialize(lua_State* state, uint32_t stackReserve = 16, InstanceApi instanceApi = {}) noexcept;
   void shutdown() noexcept;
+  /** Clears references without touching Lua after the owner has already closed the state. */
+  void detach() noexcept;
   bool captureInstance(int stackIndex) noexcept;
   bool bind(uint32_t stableId) noexcept;
   bool isBound(uint32_t stableId) const noexcept;
@@ -127,6 +129,7 @@ class Dispatcher {
  private:
   size_t findDenseIndex(uint32_t stableId) const noexcept;
   bool pushModulePath(const char* path) noexcept;
+  bool reserveStack(size_t slots) noexcept;
   bool validateArguments(size_t denseIndex, binding::Span<const ScalarInput> arguments) noexcept;
   bool pushArgument(ScalarCodec codec, const ScalarInput& input) noexcept;
   bool readResult(size_t denseIndex, ScalarOutput* output) noexcept;

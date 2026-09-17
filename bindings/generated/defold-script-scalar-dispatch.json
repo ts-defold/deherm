@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "e9b74f37972fc5504a5c0551bea3658296970b565a26b86e99b5470f41978eff",
+  "inputSha256": "b5db8cd3d4957d750122a7d4ecf513482edbf7aa085bac604520a1b7de9fb330",
   "stableIdAlgorithm": "FNV-1a 32-bit over canonical script:<module>.<member> id; collisions fail generation",
   "coverageClaim": "Descriptors for all 90 scalar-classified functions; only the generic codec and mock representatives are executable in this slice.",
   "allocationClaim": "Generated tables and native dispatch use fixed storage. Lua may allocate while interning new strings, formatting errors, or inside called engine functions.",
@@ -1632,7 +1632,8 @@
         "source": "engine/script/src/bitop/bitop.c",
         "line": 128,
         "claim": "The second argument is optional and defaults to 8.",
-        "observed": "lua_isnone(L, 2) ? 8 : (SBits)barg(L, 2)"
+        "observed": "lua_isnone(L, 2) ? 8 : (SBits)barg(L, 2)",
+        "sourceSha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb"
       },
       "executableStatus": "descriptor-generated; engine-context execution not claimed"
     },

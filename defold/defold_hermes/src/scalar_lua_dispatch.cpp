@@ -13,19 +13,25 @@ constexpr int64_t kMaxExactLuaInteger = 9007199254740991LL;
 
 class StackRestore {
  public:
-  StackRestore(lua_State* state, InstanceApi instanceApi, int baseTop) noexcept
-      : state_(state), instanceApi_(instanceApi), baseTop_(baseTop) {}
+  StackRestore(lua_State* state, int baseTop) noexcept
+      : state_(state), baseTop_(baseTop) {}
 
   ~StackRestore() {
-    if (!state_) return;
-    if (instanceActive_) {
-      lua_settop(state_, baseTop_ + 1);
-      instanceApi_.set(state_);
-    }
-    lua_settop(state_, baseTop_);
+    if (state_) lua_settop(state_, baseTop_);
   }
 
-  void activateInstance() noexcept { instanceActive_ = true; }
+  void activateInstance(InstanceApi instanceApi) noexcept {
+    instanceApi_ = instanceApi;
+    instanceActive_ = true;
+  }
+
+  void restoreInstance() noexcept {
+    if (!instanceActive_) return;
+    lua_settop(state_, baseTop_ + 1);
+    instanceApi_.set(state_);
+    instanceActive_ = false;
+    lua_settop(state_, baseTop_);
+  }
 
  private:
   lua_State* state_;
@@ -119,15 +125,21 @@ void Dispatcher::shutdown() noexcept {
   } else {
     functionRefs_.fill(LUA_NOREF);
   }
+  detach();
+}
+
+void Dispatcher::detach() noexcept {
   state_ = nullptr;
   instanceApi_ = {};
   instanceRef_ = LUA_NOREF;
+  functionRefs_.fill(LUA_NOREF);
   stats_.boundFunctions = 0;
   stats_.reservedStackSlots = 0;
 }
 
 bool Dispatcher::captureInstance(int stackIndex) noexcept {
   if (!state_ || !instanceApi_.get) return fail("instance capture is not configured");
+  if (!reserveStack(1)) return false;
   if (instanceRef_ != LUA_NOREF && instanceRef_ != LUA_REFNIL) {
     luaL_unref(state_, LUA_REGISTRYINDEX, instanceRef_);
   }
@@ -185,11 +197,15 @@ bool Dispatcher::bind(uint32_t stableId) noexcept {
   if (!state_) return fail("scalar Lua dispatcher is not initialized");
   const size_t denseIndex = findDenseIndex(stableId);
   if (denseIndex == kMissingIndex) return fail("unknown stable scalar binding id");
-  if (functionRefs_[denseIndex] != LUA_NOREF && functionRefs_[denseIndex] != LUA_REFNIL) return true;
+  if (functionRefs_[denseIndex] != LUA_NOREF && functionRefs_[denseIndex] != LUA_REFNIL) {
+    error_[0] = '\0';
+    return true;
+  }
+  if (!reserveStack(2)) return false;
 
   error_[0] = '\0';
   const int baseTop = lua_gettop(state_);
-  StackRestore restore(state_, {}, baseTop);
+  StackRestore restore(state_, baseTop);
   const auto& table = generated::tables();
   if (!pushModulePath(table.modulePaths[denseIndex])) {
     if (error_[0] == '\0') fail("Lua module is unavailable for scalar binding");
@@ -207,6 +223,14 @@ bool Dispatcher::isBound(uint32_t stableId) const noexcept {
   const size_t denseIndex = findDenseIndex(stableId);
   return denseIndex != kMissingIndex &&
       functionRefs_[denseIndex] != LUA_NOREF && functionRefs_[denseIndex] != LUA_REFNIL;
+}
+
+bool Dispatcher::reserveStack(size_t slots) noexcept {
+  if (slots > static_cast<size_t>(std::numeric_limits<int>::max()) ||
+      !lua_checkstack(state_, static_cast<int>(slots))) {
+    return fail("unable to reserve the scalar Lua dispatch stack");
+  }
+  return true;
 }
 
 bool Dispatcher::validateArguments(
@@ -241,11 +265,7 @@ bool Dispatcher::pushArgument(ScalarCodec codec, const ScalarInput& input) noexc
       if (input.integer < -kMaxExactLuaInteger || input.integer > kMaxExactLuaInteger) {
         return fail("integer argument is not exactly representable by Defold Lua 5.1");
       }
-      if (input.integer < static_cast<int64_t>(std::numeric_limits<lua_Integer>::min()) ||
-          input.integer > static_cast<int64_t>(std::numeric_limits<lua_Integer>::max())) {
-        return fail("integer argument is outside this Defold Lua target's integer range");
-      }
-      lua_pushinteger(state_, static_cast<lua_Integer>(input.integer));
+      lua_pushnumber(state_, static_cast<lua_Number>(input.integer));
       return true;
     case ScalarCodec::kNumber:
       lua_pushnumber(state_, static_cast<lua_Number>(input.number));
@@ -301,6 +321,7 @@ bool Dispatcher::readResult(size_t denseIndex, ScalarOutput* output) noexcept {
       if (size > std::numeric_limits<uint32_t>::max()) return fail("scalar Lua string result exceeds ABI size");
       output->stringSize = static_cast<uint32_t>(size);
       if (size > output->stringCapacity || (size != 0 && !output->stringData)) {
+        output->tag = ScalarTag::kNil;
         return fail("scalar Lua string result buffer is too small");
       }
       if (size != 0) std::memcpy(output->stringData, data, size);
@@ -318,6 +339,7 @@ bool Dispatcher::dispatch(
     binding::Span<const ScalarInput> arguments,
     ScalarOutput* output) noexcept {
   if (!state_) return fail("scalar Lua dispatcher is not initialized");
+  if (!reserveStack(arguments.size + 3)) return false;
   const size_t denseIndex = findDenseIndex(stableId);
   if (denseIndex == kMissingIndex) return fail("unknown stable scalar binding id");
   const int reference = functionRefs_[denseIndex];
@@ -332,7 +354,7 @@ bool Dispatcher::dispatch(
   }
 
   const int baseTop = lua_gettop(state_);
-  StackRestore restore(state_, instanceApi_, baseTop);
+  StackRestore restore(state_, baseTop);
   if (instanceApi_.get) {
     if (instanceRef_ == LUA_NOREF || instanceRef_ == LUA_REFNIL) {
       return fail("Defold instance hooks are configured but no instance is captured");
@@ -340,23 +362,31 @@ bool Dispatcher::dispatch(
     instanceApi_.get(state_);
     lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
     instanceApi_.set(state_);
-    restore.activateInstance();
+    restore.activateInstance(instanceApi_);
   }
 
   lua_rawgeti(state_, LUA_REGISTRYINDEX, reference);
   const size_t argumentOffset = table.argumentOffsets[denseIndex];
+  bool succeeded = true;
   for (size_t index = 0; index < arguments.size; ++index) {
-    if (!pushArgument(table.argumentCodecs[argumentOffset + index], arguments[index])) return false;
+    if (!pushArgument(table.argumentCodecs[argumentOffset + index], arguments[index])) {
+      succeeded = false;
+      break;
+    }
   }
-  ++stats_.calls;
-  const int resultCount = resultCodec == ScalarCodec::kNone ? 0 : 1;
-  if (lua_pcall(state_, static_cast<int>(arguments.size), resultCount, 0) != 0) {
-    const char* message = lua_tostring(state_, -1);
-    return fail(message ? message : "Lua scalar binding failed without an error string");
+  if (succeeded) {
+    ++stats_.calls;
+    const int resultCount = resultCodec == ScalarCodec::kNone ? 0 : 1;
+    if (lua_pcall(state_, static_cast<int>(arguments.size), resultCount, 0) != 0) {
+      const char* message = lua_tostring(state_, -1);
+      succeeded = fail(message ? message : "Lua scalar binding failed without an error string");
+    } else {
+      succeeded = readResult(denseIndex, output);
+    }
   }
-  if (!readResult(denseIndex, output)) return false;
-  error_[0] = '\0';
-  return true;
+  restore.restoreInstance();
+  if (succeeded) error_[0] = '\0';
+  return succeeded;
 }
 
 bool Dispatcher::fail(const char* message) noexcept {

@@ -62,8 +62,37 @@ void Expect(bool condition, const char* message) {
 
 int32_t gViewport[4]{};
 uint64_t gViewportCalls = 0;
+int gPreviousInstance = 0;
+int gCapturedInstance = 0;
+void* gExpectedInstance = nullptr;
+uint64_t gInstanceGets = 0;
+uint64_t gInstanceSets = 0;
+bool gReturnInexactInteger = false;
+
+void MockGetInstance(lua_State* state) {
+  ++gInstanceGets;
+  lua_pushlightuserdata(state, &gPreviousInstance);
+  lua_rawget(state, LUA_REGISTRYINDEX);
+}
+
+void MockSetInstance(lua_State* state) {
+  ++gInstanceSets;
+  lua_pushlightuserdata(state, &gPreviousInstance);
+  lua_insert(state, -2);
+  lua_rawset(state, LUA_REGISTRYINDEX);
+}
+
+void* CurrentInstance(lua_State* state) {
+  MockGetInstance(state);
+  void* instance = lua_touserdata(state, -1);
+  lua_pop(state, 1);
+  return instance;
+}
 
 int MockSetViewport(lua_State* state) {
+  if (CurrentInstance(state) != gExpectedInstance) {
+    return luaL_error(state, "captured instance was not installed");
+  }
   for (int index = 0; index < 4; ++index) {
     gViewport[index] = static_cast<int32_t>(luaL_checkinteger(state, index + 1));
   }
@@ -81,7 +110,31 @@ int MockGetConfigBoolean(lua_State* state) {
     fallback = lua_toboolean(state, 2) != 0;
   }
   const bool configured = keySize == 13 && std::memcmp(key, "display.vsync", keySize) == 0;
+  if (keySize == 10 && std::memcmp(key, "return.nil", keySize) == 0) {
+    lua_pushnil(state);
+    return 1;
+  }
   lua_pushboolean(state, configured ? 1 : (fallback ? 1 : 0));
+  return 1;
+}
+
+int MockGetHeight(lua_State* state) {
+  lua_pushnumber(state, gReturnInexactInteger ? 9007199254740992.0 : 720.0);
+  return 1;
+}
+
+int MockSetRenderEnable(lua_State* state) {
+  luaL_checktype(state, 1, LUA_TBOOLEAN);
+  return 0;
+}
+
+int MockGetTime(lua_State* state) {
+  lua_pushnumber(state, 12.5);
+  return 1;
+}
+
+int MockLoadPrevious(lua_State* state) {
+  lua_pushnil(state);
   return 1;
 }
 
@@ -111,6 +164,7 @@ int MockGetHostname(lua_State* state) {
 void RegisterMocks(lua_State* state) {
   const luaL_Reg renderFunctions[] = {
     {"set_viewport", MockSetViewport},
+    {"get_height", MockGetHeight},
     {nullptr, nullptr}
   };
   luaL_register(state, "render", renderFunctions);
@@ -118,6 +172,7 @@ void RegisterMocks(lua_State* state) {
 
   const luaL_Reg sysFunctions[] = {
     {"get_config_boolean", MockGetConfigBoolean},
+    {"set_render_enable", MockSetRenderEnable},
     {nullptr, nullptr}
   };
   luaL_register(state, "sys", sysFunctions);
@@ -131,11 +186,20 @@ void RegisterMocks(lua_State* state) {
   lua_pop(state, 1);
 
   lua_newtable(state);
+  lua_pushcfunction(state, MockGetTime);
+  lua_setfield(state, -2, "gettime");
   lua_newtable(state);
   lua_pushcfunction(state, MockGetHostname);
   lua_setfield(state, -2, "gethostname");
   lua_setfield(state, -2, "dns");
   lua_setglobal(state, "socket");
+
+  const luaL_Reg crashFunctions[] = {
+    {"load_previous", MockLoadPrevious},
+    {nullptr, nullptr}
+  };
+  luaL_register(state, "crash", crashFunctions);
+  lua_pop(state, 1);
 }
 
 uint32_t Id(generated::BindingId id) {
@@ -181,12 +245,23 @@ int main() {
   const int baseTop = lua_gettop(state);
 
   scalar::Dispatcher dispatcher;
-  Expect(dispatcher.initialize(state), dispatcher.lastError());
+  lua_pushlightuserdata(state, &gPreviousInstance);
+  MockSetInstance(state);
+  Expect(dispatcher.initialize(state, 16, {MockGetInstance, MockSetInstance}), dispatcher.lastError());
+  lua_pushlightuserdata(state, &gCapturedInstance);
+  Expect(dispatcher.captureInstance(-1), dispatcher.lastError());
+  lua_pop(state, 1);
+  gExpectedInstance = &gCapturedInstance;
   Expect(dispatcher.bind(Id(generated::BindingId::RenderSetViewport)), dispatcher.lastError());
+  Expect(dispatcher.bind(Id(generated::BindingId::RenderGetHeight)), dispatcher.lastError());
   Expect(dispatcher.bind(Id(generated::BindingId::SysGetConfigBoolean)), dispatcher.lastError());
+  Expect(dispatcher.bind(Id(generated::BindingId::SysSetRenderEnable)), dispatcher.lastError());
   Expect(dispatcher.bind(Id(generated::BindingId::BitTohex)), dispatcher.lastError());
   Expect(dispatcher.bind(Id(generated::BindingId::SocketDnsGethostname)), dispatcher.lastError());
-  Expect(dispatcher.stats().boundFunctions == 4, "bound function count is wrong");
+  Expect(dispatcher.bind(Id(generated::BindingId::SocketGettime)), dispatcher.lastError());
+  Expect(dispatcher.bind(Id(generated::BindingId::CrashLoadPrevious)), dispatcher.lastError());
+  Expect(dispatcher.stats().boundFunctions == 8, "bound function count is wrong");
+  Expect(CurrentInstance(state) == &gPreviousInstance, "binding changed the current instance");
 
   scalar::ScalarCallArena arena;
   {
@@ -201,6 +276,47 @@ int main() {
     Expect(result.tag == scalar::ScalarTag::kBoolean && result.boolean, "boolean result was decoded incorrectly");
   }
   Expect(arena.stats().used == 0, "call arena frame did not rewind");
+  Expect(CurrentInstance(state) == &gPreviousInstance, "successful dispatch did not restore the instance");
+
+  {
+    scalar::ScalarOutput result;
+    Expect(dispatcher.dispatch(Id(generated::BindingId::RenderGetHeight), {}, &result),
+        dispatcher.lastError());
+    Expect(result.tag == scalar::ScalarTag::kInteger && result.integer == 720,
+        "integer result was decoded incorrectly");
+    gReturnInexactInteger = true;
+    Expect(!dispatcher.dispatch(Id(generated::BindingId::RenderGetHeight), {}, &result),
+        "inexact integer result unexpectedly succeeded");
+    gReturnInexactInteger = false;
+  }
+
+  {
+    scalar::ScalarOutput result;
+    Expect(dispatcher.dispatch(Id(generated::BindingId::SocketGettime), {}, &result),
+        dispatcher.lastError());
+    Expect(result.tag == scalar::ScalarTag::kNumber && std::fabs(result.number - 12.5) < 0.0001,
+        "number result was decoded incorrectly");
+  }
+
+  {
+    scalar::ScalarOutput result;
+    Expect(dispatcher.dispatch(Id(generated::BindingId::CrashLoadPrevious), {}, &result),
+        dispatcher.lastError());
+    Expect(result.tag == scalar::ScalarTag::kNil, "nullable nil result was decoded incorrectly");
+  }
+
+  {
+    scalar::ScalarInput enabled = scalar::ScalarInput::booleanValue(true);
+    Expect(dispatcher.dispatch(Id(generated::BindingId::SysSetRenderEnable), {&enabled, 1}),
+        dispatcher.lastError());
+  }
+
+  {
+    scalar::ScalarInput key = scalar::ScalarInput::stringValue("return.nil", 10);
+    scalar::ScalarOutput result;
+    Expect(!dispatcher.dispatch(Id(generated::BindingId::SysGetConfigBoolean), {&key, 1}, &result),
+        "unexpected nil result was accepted for a non-nullable binding");
+  }
 
   {
     char text[8];
@@ -277,6 +393,7 @@ int main() {
       "warmed numeric dispatch invoked C++ operator new");
   Expect(arena.stats().used == 0, "hot call frames leaked arena bytes");
   Expect(lua_gettop(state) == baseTop, "hot dispatch leaked Lua stack slots");
+  Expect(CurrentInstance(state) == &gPreviousInstance, "hot dispatch did not restore the instance");
 
   {
     scalar::ScalarInput wrong = scalar::ScalarInput::numberValue(1.0);
@@ -296,6 +413,8 @@ int main() {
     Expect(std::strstr(dispatcher.lastError(), "synthetic viewport failure") != nullptr,
         "Lua error text was not preserved");
     Expect(lua_gettop(state) == baseTop, "failed Lua dispatch leaked stack slots");
+    Expect(CurrentInstance(state) == &gPreviousInstance,
+        "failed Lua dispatch did not restore the instance");
   }
 
   const uint64_t expectedCalls = kIterations + 1000;
@@ -311,8 +430,22 @@ int main() {
       static_cast<unsigned long long>(gCppAllocations.load(std::memory_order_relaxed)));
 
   dispatcher.shutdown();
+  dispatcher.shutdown();
   lua_close(state);
   Expect(luaAllocator.liveBytes == 0, "pinned Defold Lua state leaked allocator bytes");
+
+  LuaAllocatorStats detachedAllocator;
+  lua_State* detachedState = lua_newstate(CountingLuaAllocator, &detachedAllocator);
+  Expect(detachedState != nullptr, "unable to create detach test Lua state");
+  luaL_openlibs(detachedState);
+  RegisterMocks(detachedState);
+  scalar::Dispatcher detachedDispatcher;
+  Expect(detachedDispatcher.initialize(detachedState), detachedDispatcher.lastError());
+  Expect(detachedDispatcher.bind(Id(generated::BindingId::RenderGetHeight)),
+      detachedDispatcher.lastError());
+  lua_close(detachedState);
+  detachedDispatcher.detach();
+  Expect(detachedAllocator.liveBytes == 0, "detached Lua state leaked allocator bytes");
   std::printf("scalar-lua-dispatch:ok\n");
   return 0;
 }

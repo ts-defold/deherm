@@ -83,6 +83,8 @@ test("separates cold names and provenance from the hot descriptor tables", () =>
   assert.ok(checked.cold.sourceLines.every((line) => Number.isInteger(line) && line > 0 && line <= 0xffff));
   assert.equal("stableKeys" in checked.hot, false);
   assert.equal("sourceLines" in checked.hot, false);
+  assert.doesNotMatch(checkedHeader, /namespace cold/);
+  assert.doesNotMatch(checkedHeader, /script:bit\.band/);
 });
 
 test("encodes pattern families, codecs, and arity without losing rows", () => {
@@ -156,7 +158,6 @@ using namespace defold_hermes::script_descriptors;
 static_assert(kBindingCount == 923);
 static_assert(kParameterSlotCount == 1577);
 static_assert(kReturnSlotCount == 624);
-static_assert(cold::kStableKeys[${dynamicId}] == "script:bit.band");
 static_assert(hot::kFamily[${dynamicId}] == Family::DynamicValues);
 static_assert(hasTrait(${dynamicId}, TraitVariableArguments));
 static_assert(hasCodec(hot::kReturnCodecUnion[${dynamicCodecId}], CodecDynamic));

@@ -33,16 +33,18 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   assert.deepEqual(report.coverage, {
     reviewed: 31,
-    generated: 30,
-    objectCompileCovered: 30,
+    generated: 26,
+    objectCompileCovered: 26,
     hostSourceLinkCovered: 25,
     hostBehaviorCovered: 25,
-    blocked: 1,
+    blocked: 5,
+    policyBlocked: 4,
+    sourceBlocked: 1,
     packagedLibraryLinked: 0,
     allTargetConformant: 0,
   });
   assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 31);
-  assert.equal(new Set(report.declarations.filter(({ emitted }) => emitted).map(({ wrapper }) => wrapper)).size, 30);
+  assert.equal(new Set(report.declarations.filter(({ emitted }) => emitted).map(({ wrapper }) => wrapper)).size, 26);
   for (const declaration of report.declarations) {
     assert.ok(declaration.headerEvidence.sha256.match(/^[a-f0-9]{64}$/));
     assert.ok(declaration.headerEvidence.declarationLine > 0);
@@ -55,7 +57,18 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
   assert.equal(graphics.emitted, false);
   assert.equal(graphics.blocker.missingDependency, "graphics/graphics_ddf.h");
   assert.equal(graphics.blocker.checkedPath, "upstream/defold/engine/graphics/src/graphics/graphics_ddf.h");
-  assert.equal(report.declarations.filter(({ stages }) => stages.linked.status === "not-yet-tested").length, 5);
+  const unsafeLifecycle = new Set([
+    "dmLog::LogFinalize", "dmLogFinalize", "ProfileInitialize", "ProfileFinalize"
+  ]);
+  for (const declaration of report.declarations.filter(({ symbol }) => unsafeLifecycle.has(symbol))) {
+    assert.equal(declaration.emitted, false);
+    assert.equal(declaration.blocker.policy, "lifecycle-capability-required");
+    assert.equal(declaration.stages.generated.status, "blocked-by-policy");
+  }
+  const publicHeader = await readFile(join(repositoryRoot,
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"), "utf8");
+  assert.doesNotMatch(publicHeader, /(?:log_finalize|profile_initialize|profile_finalize)/);
+  assert.equal(report.declarations.filter(({ stages }) => stages.linked.status === "not-yet-tested").length, 1);
 });
 
 test("every emitted module compiles to an object against pinned Defold headers", async () => {
