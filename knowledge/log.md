@@ -2,6 +2,7 @@
 
 ## 2026-09-17
 
+* **Extension SDK frontier**: Reserved a post-core-API strict-TypeScript authoring flow that AOT-compiles extension logic with Static Hermes and generates the Defold bootstrap, C ABI, Lua/TypeScript metadata, and browser projection; selected a data-oriented ECS as the proving project.
 * **Memory policy**: Assigned allocations to runtime, rooted-object, dispatch, stack, or compile-time lifetimes; required bounded pools, no-fallback arenas, dense hot tables, observable budgets, and scoped sanitizer/allocation evidence.
 * **Semantic translation**: Defined provenance-preserving per-position tokens for source names, TypeScript synonyms, overloads, generics, ABI layouts, target lowering, and conformance; recorded reproduced and rejected adversarial-review claims.
 * **Math language frontier**: Reserved checker-aware `"use math"` regions and a backend-neutral math IR for `vmath`, xMath, Static Hermes, and TypeGPU, with matching ttsc and VS Code behavior required before implementation.
