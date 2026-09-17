@@ -36,6 +36,17 @@ add_executable(defold-hermes-runner native/runner.cpp)
 target_compile_features(defold-hermes-runner PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-runner PRIVATE defold-hermes-runtime)
 
+add_executable(defold-hermes-binding-arena-test native/binding_arena_test.cpp)
+target_compile_features(defold-hermes-binding-arena-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-binding-arena-test PRIVATE
+  defold/defold_hermes/include
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-binding-arena-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
+
 # The compatibility backend is built against Defold's exact Lua 5.1 sources so
 # its stack behavior and allocator profile are tested without requiring a full
 # engine link. Shipping extensions resolve these symbols from Defold itself.
