@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "generator": "@ts-defold/deherm component-proxy-generator/v1",
+  "lifecycleSlots": {
+    "init": 0,
+    "update": 1,
+    "final": 2,
+    "onMessage": 3,
+    "onInput": 4,
+    "onReload": 5
+  },
+  "propertyCodecs": {
+    "1": "number",
+    "2": "boolean",
+    "3": "string",
+    "4": "hash",
+    "5": "url",
+    "6": "vector3",
+    "7": "vector4",
+    "8": "quaternion",
+    "9": "resource"
+  },
+  "components": [
+    {
+      "componentId": "deherm.component/v1/bf9d9d8ca59e486805b929b32e188c5c6c8b4fafded4442d26e6ad27f931304b",
+      "schemaFingerprint": "86ee3419221d007f14096a22ac7dbfd337c4dd7af7ec6f2e70c97fdfef48946c",
+      "nativeSymbol": "deherm_component_bf9d9d8ca59e486805b929b32e188c5c",
+      "proxyKind": "script",
+      "contextKind": "game-object",
+      "reloadPolicy": "preserve-instance-state",
+      "lifecycleMask": 63,
+      "dispatchSlots": {
+        "init": 0,
+        "update": 1,
+        "final": 2,
+        "onMessage": 3,
+        "onInput": 4,
+        "onReload": 5
+      },
+      "propertySlots": [
+        {
+          "name": "speed",
+          "slot": 0,
+          "codecId": 1
+        },
+        {
+          "name": "enabled",
+          "slot": 1,
+          "codecId": 2
+        },
+        {
+          "name": "title",
+          "slot": 2,
+          "codecId": 3
+        },
+        {
+          "name": "team",
+          "slot": 3,
+          "codecId": 4
+        },
+        {
+          "name": "target",
+          "slot": 4,
+          "codecId": 5
+        },
+        {
+          "name": "spawn",
+          "slot": 5,
+          "codecId": 6
+        },
+        {
+          "name": "tint",
+          "slot": 6,
+          "codecId": 7
+        },
+        {
+          "name": "rotation",
+          "slot": 7,
+          "codecId": 8
+        },
+        {
+          "name": "tankAtlas",
+          "slot": 8,
+          "codecId": 9,
+          "resourceKind": "atlas"
+        }
+      ]
+    }
+  ]
+}

@@ -152,6 +152,13 @@ bool Dispatcher::captureInstance(int stackIndex) noexcept {
   return true;
 }
 
+void Dispatcher::detachInstance() noexcept {
+  if (state_ && instanceRef_ != LUA_NOREF && instanceRef_ != LUA_REFNIL) {
+    luaL_unref(state_, LUA_REGISTRYINDEX, instanceRef_);
+  }
+  instanceRef_ = LUA_NOREF;
+}
+
 size_t Dispatcher::findDenseIndex(uint32_t stableId) const noexcept {
   const auto& table = generated::tables();
   size_t first = 0;

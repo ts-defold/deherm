@@ -1,4 +1,4 @@
-#include <defold_hermes/generated_dmsdk_scalar.h>
+#include <defold_hermes/capi.h>
 
 int main(void)
 {

@@ -146,18 +146,30 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   const index = await readFile(path.join(output.root, "sdk", "index.ts"), "utf8");
   assert.match(index, /export \* from "\.\/generated\/script\/index\.js"/);
   assert.match(index, /export \* from "\.\/generated\/dmsdk\/index\.js"/);
+  assert.match(index, /export \* from "\.\/generated\/dmsdk\/scalar\.js"/);
   assert.match(index, /export \{ camera \} from "\.\/modules\/camera\.js"/);
   const manifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
   assert.match(manifest.defoldRevision, /^[a-f0-9]{40}$/);
   assert.equal(manifest.coverage.script.functions, 926);
   assert.equal(manifest.coverage.script.typeSurfaceUnresolved, 0);
+  assert.equal(manifest.coverage.script.runtimeImplemented, 93);
+  assert.equal(manifest.coverage.script.runtimePending, 833);
+  assert.deepEqual(manifest.coverage.script.runtimeLanes, {
+    specializedLuaCompatibility: 3,
+    generatedScalarDispatch: 90
+  });
   assert.equal(manifest.coverage.dmsdk.declarations, 2140);
   assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, 0);
+  assert.equal(manifest.coverage.dmsdk.runtimeImplemented, 26);
+  assert.equal(manifest.coverage.dmsdk.runtimePending, 1335);
+  assert.deepEqual(manifest.coverage.dmsdk.runtimeLanes, { generatedScalarThunks: 26 });
   assert.equal(manifest.platform, "arm64-macos");
   assert.equal(manifest.coverage.dmsdk.diagnosticHeaders, 35);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "script", "types.ts"), "utf8"), /export interface MsgApi/);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
-  const lock = JSON.parse(await readFile(path.join(project, "defold-hermes.lock"), "utf8"));
+  assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8")).bindingCount, 90);
+  assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk-scalar-thunks.json"), "utf8")).coverage.generated, 26);
+  const lock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
   assert.equal(lock.defoldRevision, manifest.defoldRevision);
   assert.equal(lock.platform, manifest.platform);
   assert.deepEqual(lock.inputs, manifest.inputs);
@@ -168,8 +180,8 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   await assert.rejects(readFile(path.join(output.root, "sdk", "modules", "stale.ts"), "utf8"));
   await assert.rejects(readFile(path.join(output.root, "sdk", "generated", "stale.ts"), "utf8"));
 
-  const config = JSON.parse(await readFile(path.join(project, "tsconfig.defold-hermes.json"), "utf8"));
-  assert.equal(config.compilerOptions.plugins[0].transform, "@ts-defold/hermes/ttsc");
+  const config = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.json"), "utf8"));
+  assert.equal(config.compilerOptions.plugins[0].transform, "@ts-defold/deherm/ttsc");
   assert.equal(config.compilerOptions.plugins[0].enabled, false);
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "extensions.json"), "utf8")), {
     recommendations: ["samchon.ttsc"]

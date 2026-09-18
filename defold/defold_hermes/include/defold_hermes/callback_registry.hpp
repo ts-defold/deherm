@@ -14,7 +14,10 @@ namespace defold_hermes {
 
 class CallbackRegistry {
  public:
-  CallbackRegistry(facebook::jsi::Runtime& runtime, uint32_t capacity);
+  CallbackRegistry(
+      facebook::jsi::Runtime& runtime,
+      uint32_t capacity,
+      uint32_t runtimeId);
   ~CallbackRegistry();
 
   lua_bridge::Handle acquire(facebook::jsi::Function function);
@@ -26,10 +29,10 @@ class CallbackRegistry {
   const lua_bridge::HandlePoolStats& stats() const { return handles_.stats(); }
 
  private:
-  static constexpr uint32_t kRuntime = 1;
   static constexpr uint32_t kTimerCallbackType = 1;
 
   facebook::jsi::Runtime& runtime_;
+  uint32_t runtimeId_;
   lua_bridge::HandlePool handles_;
   std::unique_ptr<std::optional<facebook::jsi::Function>[]> functions_;
   char error_[512]{};

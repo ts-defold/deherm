@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "scope": "Reviewed semantic exceptions that cannot be inferred safely from the pinned script IR",
+  "expectedRouteCounts": {
+    "lua-table": 148,
+    "multi-result": 37,
+    "total": 185
+  },
+  "expectedBucketCounts": {
+    "binary-string-tuple": 1,
+    "dynamic-recursive": 5,
+    "fixed-scalar-tuple": 17,
+    "fixed-value-tuple": 7,
+    "flat-record": 57,
+    "opaque-record": 2,
+    "owned-handle-tuple": 5,
+    "semantic-flat-record": 6,
+    "table-tuple-schema": 7,
+    "tagged-table-union": 3,
+    "typed-map": 15,
+    "typed-sequence": 60
+  },
+  "overrides": [
+    {
+      "id": "script:physics.get_shape",
+      "bucket": "semantic-flat-record",
+      "reasonCode": "type-discriminated-record",
+      "descriptionAnchor": "returns a table with sphere.diameter",
+      "parameters": ["string|hash|url", "string|hash"],
+      "returns": ["physics.shape_data"]
+    },
+    {
+      "id": "script:physics.set_shape",
+      "bucket": "semantic-flat-record",
+      "reasonCode": "type-discriminated-record",
+      "descriptionAnchor": "Hull and mesh geometry cannot be changed",
+      "parameters": ["string|hash|url", "string|hash", "physics.shape_data"],
+      "returns": []
+    },
+    {
+      "id": "script:resource.create_buffer",
+      "bucket": "semantic-flat-record",
+      "reasonCode": "ownership-transfer",
+      "descriptionAnchor": "take ownership of the buffer lua reference",
+      "parameters": ["string", "resource.buffer_creation_params"],
+      "returns": ["hash"]
+    },
+    {
+      "id": "script:resource.create_sound_data",
+      "bucket": "semantic-flat-record",
+      "reasonCode": "binary-string",
+      "descriptionAnchor": "initial chunk of the file",
+      "parameters": ["string", "resource.sound_data_options"],
+      "returns": ["hash"]
+    },
+    {
+      "id": "script:resource.get_texture_info",
+      "bucket": "semantic-flat-record",
+      "reasonCode": "borrowed-numeric-handle",
+      "descriptionAnchor": "the-numeric-handle",
+      "parameters": ["hash|string|texture"],
+      "returns": ["resource.texture_info"]
+    },
+    {
+      "id": "script:resource.set_buffer",
+      "bucket": "semantic-flat-record",
+      "reasonCode": "ownership-transfer",
+      "descriptionAnchor": "transfer_ownership",
+      "parameters": ["hash|string", "buffer_data", "resource.buffer_update_options"],
+      "returns": []
+    },
+    {
+      "id": "script:socket.connect",
+      "bucket": "owned-handle-tuple",
+      "reasonCode": "owned-lua-userdata",
+      "descriptionAnchor": "creates and returns a TCP client object",
+      "parameters": ["string", "number", "string", "number", "string"],
+      "returns": ["socket_client|nil", "string|nil"]
+    },
+    {
+      "id": "script:socket.tcp",
+      "bucket": "owned-handle-tuple",
+      "reasonCode": "owned-lua-userdata",
+      "descriptionAnchor": "IPv4 TCP master object",
+      "parameters": [],
+      "returns": ["socket_master|nil", "string|nil"]
+    },
+    {
+      "id": "script:socket.tcp6",
+      "bucket": "owned-handle-tuple",
+      "reasonCode": "owned-lua-userdata",
+      "descriptionAnchor": "Creates and returns an IPv6 TCP master object",
+      "parameters": [],
+      "returns": ["socket_master|nil", "string|nil"]
+    },
+    {
+      "id": "script:socket.udp",
+      "bucket": "owned-handle-tuple",
+      "reasonCode": "owned-lua-userdata",
+      "descriptionAnchor": "unconnected IPv4 UDP object",
+      "parameters": [],
+      "returns": ["socket_unconnected|nil", "string|nil"]
+    },
+    {
+      "id": "script:socket.udp6",
+      "bucket": "owned-handle-tuple",
+      "reasonCode": "owned-lua-userdata",
+      "descriptionAnchor": "Creates and returns an unconnected IPv6 UDP object",
+      "parameters": [],
+      "returns": ["socket_unconnected|nil", "string|nil"]
+    },
+    {
+      "id": "script:sys.load_resource",
+      "bucket": "binary-string-tuple",
+      "reasonCode": "binary-string",
+      "descriptionAnchor": "file data is returned as a string",
+      "parameters": ["string"],
+      "returns": ["string|nil", "string|nil"]
+    }
+  ]
+}

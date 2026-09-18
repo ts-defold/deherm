@@ -1,0 +1,5770 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "inputSha256": "b565043a742a1f8db1db1631f61de53a059eda973f0f41f4b4d5b9ec0c43d50e",
+  "sourceEvidence": [
+    {
+      "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2"
+    },
+    {
+      "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2"
+    },
+    {
+      "path": "upstream/defold/engine/script/src/script_hash.cpp",
+      "sha256": "0d76c65543191cc9866615ba37109e77f430a216c98dedf474d4f546f9f9ed10"
+    },
+    {
+      "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+      "sha256": "fb3577778af004b43b0585fafb5369bd18b89b0a0aa4b7eb322555ccda9a8c51"
+    },
+    {
+      "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74"
+    },
+    {
+      "path": "upstream/defold/engine/script/src/script_msg.cpp",
+      "sha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2"
+    },
+    {
+      "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_factory.cpp",
+      "sha256": "df20de4ae9494abf875e71f468b56b732add418c770f745aaeb79d0b0affbfbb"
+    },
+    {
+      "path": "upstream/defold/engine/gui/src/gui_script.cpp",
+      "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
+    }
+  ],
+  "operationTemplateVocabulary": [
+    "hash-string",
+    "value-constructor",
+    "value-unary",
+    "quaternion-axis-rotation",
+    "vmath-fixed-pod",
+    "vmath-matrix4",
+    "current-instance-transform-get",
+    "current-instance-transform-set",
+    "message-post",
+    "factory-spawn",
+    "game-object-delete",
+    "gui-node-lookup",
+    "gui-node-text-set",
+    "gui-node-setter"
+  ],
+  "coverageClaim": "The listed routes have generated native dispatch and structured call-shape validation. Captured-Lua routes have focused native backend tests but remain explicitly unverified in a packaged Defold engine until their component dispatchers run the real-engine scenarios.",
+  "allocationClaim": "POD dispatch uses inline ScriptValue cells, bounded context stacks, stack-local dmVMath values, and a fixed-capacity generation-checked Matrix4 frame arena with no heap fallback. Structured calls use fixed-capacity table staging and a 256-slot generational node pool; Lua registry growth and the documented engine operations may allocate. Debug dmHashBuffer64 may allocate once to register a previously unseen short string in Defold's reverse-hash table.",
+  "floatPolicy": "Numeric constructor arguments follow Lua-number conversion, including NaN and infinity; finite values outside float32 range deterministically become signed infinity. Defold-value and Matrix4 inputs reject NaN components through pinned CheckVector3/CheckVector4/CheckQuat/CheckMatrix4 semantics, while normalize and unchanged degenerate dmVMath operations may produce NaN from otherwise valid inputs.",
+  "bindingCount": 78,
+  "callShapeCount": 112,
+  "argumentCodecCount": 205,
+  "bindings": [
+    {
+      "id": "script:factory.create",
+      "sourceSymbol": "FactoryComp_Create",
+      "sourceOperation": [
+        "dmScript::CheckGOInstance(L)",
+        "dmScript::GetComponentFromLua(L, 1, FACTORY_EXT",
+        "dmGameObject::PropertyContainerCreateFromLua(L, 4)",
+        "CompFactorySpawn(world, component, collection",
+        "lua_pushnil(L)"
+      ],
+      "operation": {
+        "template": "factory-spawn",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-go",
+          "componentType": "factoryc",
+          "positionDefault": "sender-world-position",
+          "rotationDefault": "sender-world-rotation",
+          "scaleDefault": "sender-world-scale",
+          "propertyKeyReality": "string-only",
+          "resultPolicy": "hash-or-undefined",
+          "reentrant": true,
+          "allocationPolicy": "engine-property-spawn-resource-may-allocate"
+        }
+      },
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Url"
+        ],
+        [
+          "String",
+          "Vector3"
+        ],
+        [
+          "Hash",
+          "Vector3"
+        ],
+        [
+          "Url",
+          "Vector3"
+        ],
+        [
+          "String",
+          "Vector3",
+          "Quaternion"
+        ],
+        [
+          "Hash",
+          "Vector3",
+          "Quaternion"
+        ],
+        [
+          "Url",
+          "Vector3",
+          "Quaternion"
+        ],
+        [
+          "String",
+          "Vector3",
+          "Quaternion",
+          "Table"
+        ],
+        [
+          "Hash",
+          "Vector3",
+          "Quaternion",
+          "Table"
+        ],
+        [
+          "Url",
+          "Vector3",
+          "Quaternion",
+          "Table"
+        ],
+        [
+          "String",
+          "Vector3",
+          "Quaternion",
+          "Table",
+          "Number"
+        ],
+        [
+          "String",
+          "Vector3",
+          "Quaternion",
+          "Table",
+          "Vector3"
+        ],
+        [
+          "Hash",
+          "Vector3",
+          "Quaternion",
+          "Table",
+          "Number"
+        ],
+        [
+          "Hash",
+          "Vector3",
+          "Quaternion",
+          "Table",
+          "Vector3"
+        ],
+        [
+          "Url",
+          "Vector3",
+          "Quaternion",
+          "Table",
+          "Number"
+        ],
+        [
+          "Url",
+          "Vector3",
+          "Quaternion",
+          "Table",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "String"
+        ],
+        [
+          "String",
+          "Vector3",
+          "Nil",
+          "Table"
+        ]
+      ],
+      "resultCodec": "Hash",
+      "stableId": 96184340,
+      "rawName": "factory.create",
+      "jsName": "create",
+      "source": "doc/factory.lua",
+      "line": 83,
+      "ownership": "Factory inputs are call-local snapshots. Defold owns the spawned instance and copied property container. Property conversion, spawning, and synchronous dynamic resource loading may allocate by engine contract.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_enabled",
+      "sourceSymbol": "LuaSetEnabled",
+      "sourceOperation": "{\"set_enabled\",     LuaSetEnabled}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 344287147,
+      "rawName": "gui.set_enabled",
+      "jsName": "setEnabled",
+      "source": "doc/gui.lua",
+      "line": 1845,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_clipping_inverted",
+      "sourceSymbol": "LuaSetClippingInverted",
+      "sourceOperation": "{\"set_clipping_inverted\",LuaSetClippingInverted}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 344438576,
+      "rawName": "gui.set_clipping_inverted",
+      "jsName": "setClippingInverted",
+      "source": "doc/gui.lua",
+      "line": 1807,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.get_node",
+      "sourceSymbol": "LuaGetNode",
+      "sourceOperation": [
+        "GuiScriptInstance_Check(L)",
+        "GetNodeById(scene, id)",
+        "lua_newuserdata(L, sizeof(NodeProxy))"
+      ],
+      "operation": {
+        "template": "gui-node-lookup",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "notFound": "error"
+        }
+      },
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "String"
+        ]
+      ],
+      "resultCodec": "Node",
+      "stableId": 509983822,
+      "rawName": "gui.get_node",
+      "jsName": "getNode",
+      "source": "doc/gui.lua",
+      "line": 1246,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_id",
+      "sourceSymbol": "LuaSetId",
+      "sourceOperation": "{\"set_id\",          LuaSetId}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 510669267,
+      "rawName": "gui.set_id",
+      "jsName": "setId",
+      "source": "doc/gui.lua",
+      "line": 1906,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_inner_radius",
+      "sourceSymbol": "LuaSetInnerRadius",
+      "sourceOperation": "{\"set_inner_radius\", LuaSetInnerRadius}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 599811265,
+      "rawName": "gui.set_inner_radius",
+      "jsName": "setInnerRadius",
+      "source": "doc/gui.lua",
+      "line": 1921,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat_rotation_y",
+      "sourceSymbol": "Quat_RotationY",
+      "sourceOperation": [
+        "{\"quat_rotation_y\", Quat_RotationY}",
+        "Quat::rotationY(angle)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-rotation-y"
+        }
+      },
+      "callShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.quat-rotation-y",
+        "arguments": [
+          3.141592653589793
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            0,
+            1,
+            0,
+            0
+          ],
+          "tolerance": 0.000001
+        }
+      },
+      "stableId": 603084884,
+      "rawName": "vmath.quat_rotation_y",
+      "jsName": "quatRotationY",
+      "source": "doc/vmath.lua",
+      "line": 773,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:go.set_position",
+      "sourceSymbol": "Script_SetPosition",
+      "sourceOperation": "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))",
+      "operation": {
+        "template": "current-instance-transform-set",
+        "parameters": {
+          "property": "position",
+          "kind": "Vector3",
+          "rejectNaN": true
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector3",
+          "String"
+        ],
+        [
+          "Vector3",
+          "Hash"
+        ],
+        [
+          "Vector3",
+          "Url"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "None",
+      "stableId": 608141138,
+      "rawName": "go.set_position",
+      "jsName": "setPosition",
+      "source": "doc/go.lua",
+      "line": 943,
+      "ownership": "The active HInstance is borrowed only for the synchronous component-dispatch scope. Inputs and results are copied fixed-layout values; no engine pointer is exposed to JavaScript or retained.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat_rotation_x",
+      "sourceSymbol": "Quat_RotationX",
+      "sourceOperation": [
+        "{\"quat_rotation_x\", Quat_RotationX}",
+        "Quat::rotationX(angle)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-rotation-x"
+        }
+      },
+      "callShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.quat-rotation-x",
+        "arguments": [
+          3.141592653589793
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0
+          ],
+          "tolerance": 0.000001
+        }
+      },
+      "stableId": 619862503,
+      "rawName": "vmath.quat_rotation_x",
+      "jsName": "quatRotationX",
+      "source": "doc/vmath.lua",
+      "line": 757,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_particlefx",
+      "sourceSymbol": "LuaSetParticlefx",
+      "sourceOperation": "{\"set_particlefx\",  LuaSetParticlefx}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Hash"
+        ],
+        [
+          "Node",
+          "String"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Hash"
+        ],
+        [
+          "Node",
+          "String"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 634729758,
+      "rawName": "gui.set_particlefx",
+      "jsName": "setParticlefx",
+      "source": "doc/gui.lua",
+      "line": 2001,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat_rotation_z",
+      "sourceSymbol": "Quat_RotationZ",
+      "operation": {
+        "template": "quaternion-axis-rotation",
+        "parameters": {
+          "axis": "z"
+        }
+      },
+      "callShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "implementedCallShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "stableId": 653417741,
+      "rawName": "vmath.quat_rotation_z",
+      "jsName": "quatRotationZ",
+      "source": "doc/vmath.lua",
+      "line": 789,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_color",
+      "sourceSymbol": "LuaSetColor",
+      "sourceOperation": "REGGETSET(Color, color)",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 681356529,
+      "rawName": "gui.set_color",
+      "jsName": "setColor",
+      "source": "doc/gui.lua",
+      "line": 1837,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_outline",
+      "sourceSymbol": "LuaSetOutline",
+      "sourceOperation": "REGGETSET(Outline, outline)",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 852399392,
+      "rawName": "gui.set_outline",
+      "jsName": "setOutline",
+      "source": "doc/gui.lua",
+      "line": 1986,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_translation",
+      "sourceSymbol": "Matrix4_Translation",
+      "sourceOperation": [
+        "{\"matrix4_translation\", Matrix4_Translation}",
+        "Matrix4::translation",
+        "t1->getXYZ()"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-translation"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.translation",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Vector4",
+            "components": [
+              1,
+              2,
+              3,
+              999
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            1,
+            2,
+            3,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 889923285,
+      "rawName": "vmath.matrix4_translation",
+      "jsName": "matrix4Translation",
+      "source": "doc/vmath.lua",
+      "line": 553,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_perspective",
+      "sourceSymbol": "Matrix4_Perspective",
+      "sourceOperation": [
+        "{\"matrix4_perspective\", Matrix4_Perspective}",
+        "Matrix4::perspective(fov, aspect, near_z, far_z)",
+        "if(near_z == 0.0f)",
+        "dmLogWarning"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-perspective"
+        }
+      },
+      "callShapes": [
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.perspective",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          1.5707963267948966,
+          1,
+          1,
+          10
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            -1.2222222,
+            -1,
+            0,
+            0,
+            -2.2222222,
+            0
+          ],
+          "tolerance": 0.00001
+        }
+      },
+      "stableId": 1058276904,
+      "rawName": "vmath.matrix4_perspective",
+      "jsName": "matrix4Perspective",
+      "source": "doc/vmath.lua",
+      "line": 445,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:msg.post",
+      "sourceSymbol": "Msg_Post",
+      "sourceOperation": [
+        "ResolveURL(L, 1, &receiver, &sender)",
+        "dmDDF::GetDescriptorFromHash(message_id)",
+        "dmScript::CheckTable(L, data, MAX_MESSAGE_DATA_SIZE, 3)",
+        "dmMessage::Post(&sender, &receiver, message_id"
+      ],
+      "operation": {
+        "template": "message-post",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "script-sender-url",
+          "maxPayloadBytes": 2048,
+          "descriptorLookup": true,
+          "ddfCodec": "defold-generated",
+          "fallbackCodec": "defold-table-wire",
+          "allocationPolicy": "engine-message-queue-may-allocate"
+        }
+      },
+      "callShapes": [
+        [
+          "String",
+          "String"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Url",
+          "String"
+        ],
+        [
+          "Url",
+          "Hash"
+        ],
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Hash",
+          "Hash"
+        ],
+        [
+          "String",
+          "String",
+          "Table"
+        ],
+        [
+          "String",
+          "String",
+          "Nil"
+        ],
+        [
+          "String",
+          "Hash",
+          "Table"
+        ],
+        [
+          "String",
+          "Hash",
+          "Nil"
+        ],
+        [
+          "Url",
+          "String",
+          "Table"
+        ],
+        [
+          "Url",
+          "String",
+          "Nil"
+        ],
+        [
+          "Url",
+          "Hash",
+          "Table"
+        ],
+        [
+          "Url",
+          "Hash",
+          "Nil"
+        ],
+        [
+          "Hash",
+          "String",
+          "Table"
+        ],
+        [
+          "Hash",
+          "String",
+          "Nil"
+        ],
+        [
+          "Hash",
+          "Hash",
+          "Table"
+        ],
+        [
+          "Hash",
+          "Hash",
+          "Nil"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "String",
+          "String"
+        ],
+        [
+          "String",
+          "String",
+          "Table"
+        ]
+      ],
+      "resultCodec": "None",
+      "stableId": 1111726479,
+      "rawName": "msg.post",
+      "jsName": "post",
+      "source": "doc/msg.lua",
+      "line": 46,
+      "ownership": "Message arguments are borrowed only for the synchronous Lua call. Defold copies the encoded payload into its bounded message queue before dispatch returns; the queue may allocate internally.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.ortho_inv",
+      "sourceSymbol": "OrthoInverse",
+      "sourceOperation": [
+        "{\"ortho_inv\", OrthoInverse}",
+        "dmVMath::OrthoInverse(*m)"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-ortho-inverse"
+        }
+      },
+      "callShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.ortho-inv",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Matrix4",
+            "components": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 1292408212,
+      "rawName": "vmath.ortho_inv",
+      "jsName": "orthoInv",
+      "source": "doc/vmath.lua",
+      "line": 613,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.euler_to_quat",
+      "sourceSymbol": "EulerToQuat",
+      "sourceOperation": [
+        "{\"euler_to_quat\", EulerToQuat}",
+        "dmVMath::EulerToQuat"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "euler-to-quaternion"
+        }
+      },
+      "callShapes": [
+        [
+          "Number"
+        ],
+        [
+          "Vector3"
+        ],
+        [
+          "Number",
+          "Number"
+        ],
+        [
+          "Vector3",
+          "Number"
+        ],
+        [
+          "Number",
+          "Number",
+          "Number"
+        ],
+        [
+          "Vector3",
+          "Number",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.euler-to-quat",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              0,
+              90
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            0,
+            0,
+            0.70710677,
+            0.70710677
+          ],
+          "tolerance": 0.000001
+        }
+      },
+      "stableId": 1329930197,
+      "rawName": "vmath.euler_to_quat",
+      "jsName": "eulerToQuat",
+      "source": "doc/vmath.lua",
+      "line": 155,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_size",
+      "sourceSymbol": "LuaSetSize",
+      "sourceOperation": "{\"set_size\",        LuaSetSize}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1335131087,
+      "rawName": "gui.set_size",
+      "jsName": "setSize",
+      "source": "doc/gui.lua",
+      "line": 2078,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_leading",
+      "sourceSymbol": "LuaSetLeading",
+      "sourceOperation": "{\"set_leading\",     LuaSetLeading}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1425442548,
+      "rawName": "gui.set_leading",
+      "jsName": "setLeading",
+      "source": "doc/gui.lua",
+      "line": 1945,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat_from_to",
+      "sourceSymbol": "Quat_FromTo",
+      "sourceOperation": [
+        "{\"quat_from_to\", Quat_FromTo}",
+        "Quat::rotation(*v1, *v2)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-from-to"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.quat-from-to",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              1,
+              0
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            0,
+            0,
+            0.70710677,
+            0.70710677
+          ],
+          "tolerance": 0.000001
+        }
+      },
+      "stableId": 1458980654,
+      "rawName": "vmath.quat_from_to",
+      "jsName": "quatFromTo",
+      "source": "doc/vmath.lua",
+      "line": 733,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_position",
+      "sourceSymbol": "LuaSetPosition",
+      "sourceOperation": "REGGETSET(Position, position)",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1474440329,
+      "rawName": "gui.set_position",
+      "jsName": "setPosition",
+      "source": "doc/gui.lua",
+      "line": 2022,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_text",
+      "sourceSymbol": "LuaSetText",
+      "sourceOperation": [
+        "luaL_checkstring(L, 2)",
+        "strdup(text)"
+      ],
+      "operation": {
+        "template": "gui-node-text-set",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "numberFormat": "lua-5.1-%.14g"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "stableId": 1480837389,
+      "rawName": "gui.set_text",
+      "jsName": "setText",
+      "source": "doc/gui.lua",
+      "line": 2104,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_shadow",
+      "sourceSymbol": "LuaSetShadow",
+      "sourceOperation": "REGGETSET(Shadow, shadow)",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1482532654,
+      "rawName": "gui.set_shadow",
+      "jsName": "setShadow",
+      "source": "doc/gui.lua",
+      "line": 2069,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_texture",
+      "sourceSymbol": "LuaSetTexture",
+      "sourceOperation": "{\"set_texture\",     LuaSetTexture}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1539901009,
+      "rawName": "gui.set_texture",
+      "jsName": "setTexture",
+      "source": "doc/gui.lua",
+      "line": 2142,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_clipping_mode",
+      "sourceSymbol": "LuaSetClippingMode",
+      "sourceOperation": "{\"set_clipping_mode\",  LuaSetClippingMode}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1648551722,
+      "rawName": "gui.set_clipping_mode",
+      "jsName": "setClippingMode",
+      "source": "doc/gui.lua",
+      "line": 1814,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_outer_bounds",
+      "sourceSymbol": "LuaSetOuterBounds",
+      "sourceOperation": "{\"set_outer_bounds\", LuaSetOuterBounds}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1712128015,
+      "rawName": "gui.set_outer_bounds",
+      "jsName": "setOuterBounds",
+      "source": "doc/gui.lua",
+      "line": 1978,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_axis_angle",
+      "sourceSymbol": "Matrix4_AxisAngle",
+      "sourceOperation": [
+        "{\"matrix4_axis_angle\", Matrix4_AxisAngle}",
+        "Matrix4::rotation(angle, *axis)"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-axis-angle"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.axis-angle",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              0,
+              1
+            ]
+          },
+          0
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 1732915491,
+      "rawName": "vmath.matrix4_axis_angle",
+      "jsName": "matrix4AxisAngle",
+      "source": "doc/vmath.lua",
+      "line": 327,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_tracking",
+      "sourceSymbol": "LuaSetTracking",
+      "sourceOperation": "{\"set_tracking\",    LuaSetTracking}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1740794531,
+      "rawName": "gui.set_tracking",
+      "jsName": "setTracking",
+      "source": "doc/gui.lua",
+      "line": 2190,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_blend_mode",
+      "sourceSymbol": "LuaSetBlendMode",
+      "sourceOperation": "{\"set_blend_mode\",  LuaSetBlendMode}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1874419309,
+      "rawName": "gui.set_blend_mode",
+      "jsName": "setBlendMode",
+      "source": "doc/gui.lua",
+      "line": 1800,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_fill_angle",
+      "sourceSymbol": "LuaSetPieFillAngle",
+      "sourceOperation": "{\"set_fill_angle\", LuaSetPieFillAngle}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 1932260719,
+      "rawName": "gui.set_fill_angle",
+      "jsName": "setFillAngle",
+      "source": "doc/gui.lua",
+      "line": 1860,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_yanchor",
+      "sourceSymbol": "LuaSetYAnchor",
+      "sourceOperation": "{\"set_yanchor\",     LuaSetYAnchor}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2042797604,
+      "rawName": "gui.set_yanchor",
+      "jsName": "setYanchor",
+      "source": "doc/gui.lua",
+      "line": 2211,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:go.set_rotation",
+      "sourceSymbol": "Script_SetRotation",
+      "sourceOperation": "dmGameObject::SetRotation(instance, *q)",
+      "operation": {
+        "template": "current-instance-transform-set",
+        "parameters": {
+          "property": "rotation",
+          "kind": "Quaternion",
+          "rejectNaN": true
+        }
+      },
+      "callShapes": [
+        [
+          "Quaternion"
+        ],
+        [
+          "Quaternion",
+          "String"
+        ],
+        [
+          "Quaternion",
+          "Hash"
+        ],
+        [
+          "Quaternion",
+          "Url"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Quaternion"
+        ]
+      ],
+      "resultCodec": "None",
+      "stableId": 2093413559,
+      "rawName": "go.set_rotation",
+      "jsName": "setRotation",
+      "source": "doc/go.lua",
+      "line": 966,
+      "ownership": "The active HInstance is borrowed only for the synchronous component-dispatch scope. Inputs and results are copied fixed-layout values; no engine pointer is exposed to JavaScript or retained.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_size_mode",
+      "sourceSymbol": "LuaSetSizeMode",
+      "sourceOperation": "{\"set_size_mode\",   LuaSetSizeMode}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2104597123,
+      "rawName": "gui.set_size_mode",
+      "jsName": "setSizeMode",
+      "source": "doc/gui.lua",
+      "line": 2090,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_adjust_mode",
+      "sourceSymbol": "LuaSetAdjustMode",
+      "sourceOperation": "{\"set_adjust_mode\", LuaSetAdjustMode}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2124339589,
+      "rawName": "gui.set_adjust_mode",
+      "jsName": "setAdjustMode",
+      "source": "doc/gui.lua",
+      "line": 1785,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_look_at",
+      "sourceSymbol": "Matrix4_LookAt",
+      "sourceOperation": [
+        "{\"matrix4_look_at\", Matrix4_LookAt}",
+        "Matrix4::lookAt(Point3(*CheckVector3(L, 1)), Point3(*CheckVector3(L, 2)), *CheckVector3(L, 3))"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-look-at"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.look-at",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              1,
+              0
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            -1,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 2149531511,
+      "rawName": "vmath.matrix4_look_at",
+      "jsName": "matrix4LookAt",
+      "source": "doc/vmath.lua",
+      "line": 396,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_flipbook_playback_rate",
+      "sourceSymbol": "LuaSetFlipbookPlaybackRate",
+      "sourceOperation": "{\"set_flipbook_playback_rate\", LuaSetFlipbookPlaybackRate}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2274625155,
+      "rawName": "gui.set_flipbook_playback_rate",
+      "jsName": "setFlipbookPlaybackRate",
+      "source": "doc/gui.lua",
+      "line": 1874,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.length",
+      "sourceSymbol": "Length",
+      "operation": {
+        "template": "value-unary",
+        "parameters": {
+          "operator": "length",
+          "kinds": [
+            "Vector3",
+            "Vector4",
+            "Quaternion"
+          ],
+          "rejectNaNInput": true
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ],
+        [
+          "Quaternion"
+        ]
+      ],
+      "resultCodec": "Number",
+      "implementedCallShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ],
+        [
+          "Quaternion"
+        ]
+      ],
+      "stableId": 2370510694,
+      "rawName": "vmath.length",
+      "jsName": "length",
+      "source": "doc/vmath.lua",
+      "line": 199,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_compose",
+      "sourceSymbol": "Matrix4_Compose",
+      "sourceOperation": [
+        "{\"matrix4_compose\", Matrix4_Compose}",
+        "translation_matrix * rotation_matrix * scale_matrix",
+        "translation->getXYZ()"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-compose"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Quaternion",
+          "Vector3"
+        ],
+        [
+          "Vector4",
+          "Quaternion",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Quaternion",
+          "Vector3"
+        ],
+        [
+          "Vector4",
+          "Quaternion",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.compose",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              0,
+              0
+            ]
+          },
+          {
+            "codec": "Quaternion",
+            "components": [
+              0,
+              0,
+              0,
+              1
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              1,
+              1,
+              1
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 2501238546,
+      "rawName": "vmath.matrix4_compose",
+      "jsName": "matrix4Compose",
+      "source": "doc/vmath.lua",
+      "line": 347,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_y",
+      "sourceSymbol": "Matrix4_RotationY",
+      "sourceOperation": [
+        "{\"matrix4_rotation_y\", Matrix4_RotationY}",
+        "Matrix4::rotationY((float) luaL_checknumber(L, 1))"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-rotation-y"
+        }
+      },
+      "callShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.rotation-y",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          0
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 2509648852,
+      "rawName": "vmath.matrix4_rotation_y",
+      "jsName": "matrix4RotationY",
+      "source": "doc/vmath.lua",
+      "line": 493,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_x",
+      "sourceSymbol": "Matrix4_RotationX",
+      "sourceOperation": [
+        "{\"matrix4_rotation_x\", Matrix4_RotationX}",
+        "Matrix4::rotationX((float) luaL_checknumber(L, 1))"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-rotation-x"
+        }
+      },
+      "callShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.rotation-x",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          0
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 2526426471,
+      "rawName": "vmath.matrix4_rotation_x",
+      "jsName": "matrix4RotationX",
+      "source": "doc/vmath.lua",
+      "line": 477,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_z",
+      "sourceSymbol": "Matrix4_RotationZ",
+      "sourceOperation": [
+        "{\"matrix4_rotation_z\", Matrix4_RotationZ}",
+        "Matrix4::rotationZ((float) luaL_checknumber(L, 1))"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-rotation-z"
+        }
+      },
+      "callShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.rotation-z",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          0
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 2559981709,
+      "rawName": "vmath.matrix4_rotation_z",
+      "jsName": "matrix4RotationZ",
+      "source": "doc/vmath.lua",
+      "line": 509,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.project",
+      "sourceSymbol": "Project",
+      "sourceOperation": [
+        "{\"project\", Project}",
+        "dmVMath::Dot(*v1, *v2) / sq_len"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "vector3-project"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "Number",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.project",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              1,
+              1,
+              0
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              2,
+              0,
+              0
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "number",
+          "value": 0.5,
+          "tolerance": 0
+        }
+      },
+      "stableId": 2686972787,
+      "rawName": "vmath.project",
+      "jsName": "project",
+      "source": "doc/vmath.lua",
+      "line": 634,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_alpha",
+      "sourceSymbol": "LuaSetAlpha",
+      "sourceOperation": "{\"set_alpha\", LuaSetAlpha}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2749898006,
+      "rawName": "gui.set_alpha",
+      "jsName": "setAlpha",
+      "source": "doc/gui.lua",
+      "line": 1792,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat",
+      "sourceSymbol": "Quat_new",
+      "operation": {
+        "template": "value-constructor",
+        "parameters": {
+          "kind": "Quaternion",
+          "default": "identity",
+          "scalarSplat": false,
+          "rejectNaNCopy": true
+        }
+      },
+      "callShapes": [
+        [],
+        [
+          "Quaternion"
+        ],
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "implementedCallShapes": [
+        [],
+        [
+          "Quaternion"
+        ],
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "stableId": 2756728049,
+      "rawName": "vmath.quat",
+      "jsName": "quat",
+      "source": "doc/vmath.lua",
+      "line": 667,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_clipping_visible",
+      "sourceSymbol": "LuaSetClippingVisible",
+      "sourceOperation": "{\"set_clipping_visible\",LuaSetClippingVisible}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2765276089,
+      "rawName": "gui.set_clipping_visible",
+      "jsName": "setClippingVisible",
+      "source": "doc/gui.lua",
+      "line": 1821,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_orthographic",
+      "sourceSymbol": "Matrix4_Orthographic",
+      "sourceOperation": [
+        "{\"matrix4_orthographic\", Matrix4_Orthographic}",
+        "Matrix4::orthographic(left, right, bottom, top, near_z, far_z)"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-orthographic"
+        }
+      },
+      "callShapes": [
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.orthographic",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            -1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 2797369728,
+      "rawName": "vmath.matrix4_orthographic",
+      "jsName": "matrix4Orthographic",
+      "source": "doc/vmath.lua",
+      "line": 420,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_screen_position",
+      "sourceSymbol": "LuaSetScreenPosition",
+      "sourceOperation": "{\"set_screen_position\", LuaSetScreenPosition}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2837486932,
+      "rawName": "gui.set_screen_position",
+      "jsName": "setScreenPosition",
+      "source": "doc/gui.lua",
+      "line": 2061,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:hash",
+      "sourceSymbol": "Hash_new",
+      "sourceOperation": "dmHashString64(str)",
+      "operation": {
+        "template": "hash-string",
+        "parameters": {
+          "algorithm": "dmHashBuffer64",
+          "termination": "nul-or-length",
+          "coercionPolicy": "documented-string-only"
+        }
+      },
+      "callShapes": [
+        [
+          "String"
+        ]
+      ],
+      "resultCodec": "Hash",
+      "implementedCallShapes": [
+        [
+          "String"
+        ]
+      ],
+      "stableId": 2845099200,
+      "rawName": "hash",
+      "jsName": "hash",
+      "source": "doc/builtins.lua",
+      "line": 30,
+      "ownership": "Hashes cross the ABI as exact unsigned 64-bit POD values in ScriptValue.payload and JavaScript bigint values. No Lua userdata, registry root, host object, or owned heap pointer crosses the ABI. In debug engines, Defold's dmHashBuffer64 may allocate once to register each previously unseen short string in its reverse-hash table, exactly as Lua hash() does.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "generated-executable",
+          "backend": "emscripten-primitive-c-abi"
+        }
+      }
+    },
+    {
+      "id": "script:go.delete",
+      "sourceSymbol": "Script_Delete",
+      "sourceOperation": [
+        "ResolveInstance(L, 1)",
+        "dmGameObject::IsBone(instance)",
+        "dmGameObject::Delete(collection, instance, recursive)"
+      ],
+      "operation": {
+        "template": "game-object-delete",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-go",
+          "async": true,
+          "rejectBone": true,
+          "singleMissing": "error",
+          "listMissing": "warn-continue",
+          "explicitNil": "error",
+          "allocationPolicy": "bridge-zero-heap"
+        }
+      },
+      "callShapes": [
+        [],
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Url"
+        ],
+        [
+          "AddressArray"
+        ],
+        [
+          "String",
+          "Boolean"
+        ],
+        [
+          "Hash",
+          "Boolean"
+        ],
+        [
+          "Url",
+          "Boolean"
+        ],
+        [
+          "AddressArray",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [],
+        [
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "stableId": 2920192283,
+      "rawName": "go.delete",
+      "jsName": "delete",
+      "source": "doc/go.lua",
+      "line": 442,
+      "ownership": "The active HInstance is borrowed only for the synchronous component-dispatch scope. Inputs and results are copied fixed-layout values; no engine pointer is exposed to JavaScript or retained.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_inherit_alpha",
+      "sourceSymbol": "LuaSetInheritAlpha",
+      "sourceOperation": "{\"set_inherit_alpha\", LuaSetInheritAlpha}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2930785382,
+      "rawName": "gui.set_inherit_alpha",
+      "jsName": "setInheritAlpha",
+      "source": "doc/gui.lua",
+      "line": 1913,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat_basis",
+      "sourceSymbol": "Quat_Basis",
+      "sourceOperation": [
+        "{\"quat_basis\", Quat_Basis}",
+        "PushQuat(L, Quat(m))"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-basis"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.quat-basis",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              1,
+              0
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              0,
+              1
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 2962238768,
+      "rawName": "vmath.quat_basis",
+      "jsName": "quatBasis",
+      "source": "doc/vmath.lua",
+      "line": 711,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.length_sqr",
+      "sourceSymbol": "LengthSqr",
+      "sourceOperation": [
+        "{\"length_sqr\", LengthSqr}",
+        "dmVMath::LengthSqr(*v)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "length-squared"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ],
+        [
+          "Quaternion"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ],
+        [
+          "Quaternion"
+        ]
+      ],
+      "resultCodec": "Number",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.length-sqr",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              3,
+              4,
+              0
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "number",
+          "value": 25,
+          "tolerance": 0
+        }
+      },
+      "stableId": 2981849211,
+      "rawName": "vmath.length_sqr",
+      "jsName": "lengthSqr",
+      "source": "doc/vmath.lua",
+      "line": 215,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_xanchor",
+      "sourceSymbol": "LuaSetXAnchor",
+      "sourceOperation": "{\"set_xanchor\",     LuaSetXAnchor}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 2994148867,
+      "rawName": "gui.set_xanchor",
+      "jsName": "setXanchor",
+      "source": "doc/gui.lua",
+      "line": 2204,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.cross",
+      "sourceSymbol": "Cross",
+      "sourceOperation": [
+        "{\"cross\", Cross}",
+        "dmVMath::Cross(*v1, *v2)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "vector3-cross"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "Vector3",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.cross",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              1,
+              0,
+              0
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              1,
+              0
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 3022880242,
+      "rawName": "vmath.cross",
+      "jsName": "cross",
+      "source": "doc/vmath.lua",
+      "line": 108,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_quat",
+      "sourceSymbol": "Matrix4_Quat",
+      "sourceOperation": [
+        "{\"matrix4_quat\", Matrix4_Quat}",
+        "Matrix4::rotation(*CheckQuat(L, 1))"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-quaternion"
+        }
+      },
+      "callShapes": [
+        [
+          "Quaternion"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Quaternion"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.quat",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Quaternion",
+            "components": [
+              0,
+              0,
+              0,
+              1
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 3063853257,
+      "rawName": "vmath.matrix4_quat",
+      "jsName": "matrix4Quat",
+      "source": "doc/vmath.lua",
+      "line": 461,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_flipbook_cursor",
+      "sourceSymbol": "LuaSetFlipbookCursor",
+      "sourceOperation": "{\"set_flipbook_cursor\", LuaSetFlipbookCursor}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3158379927,
+      "rawName": "gui.set_flipbook_cursor",
+      "jsName": "setFlipbookCursor",
+      "source": "doc/gui.lua",
+      "line": 1867,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_perimeter_vertices",
+      "sourceSymbol": "LuaSetPerimeterVertices",
+      "sourceOperation": "{\"set_perimeter_vertices\", LuaSetPerimeterVertices}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3222725677,
+      "rawName": "gui.set_perimeter_vertices",
+      "jsName": "setPerimeterVertices",
+      "source": "doc/gui.lua",
+      "line": 2008,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat_matrix4",
+      "sourceSymbol": "Quat_Matrix4",
+      "sourceOperation": [
+        "{\"quat_matrix4\", Quat_Matrix4}",
+        "dmVMath::Quat(matrix->getUpper3x3())"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-from-matrix"
+        }
+      },
+      "callShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.quat-from-matrix",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Matrix4",
+            "components": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 3312627817,
+      "rawName": "vmath.quat_matrix4",
+      "jsName": "quatMatrix4",
+      "source": "doc/vmath.lua",
+      "line": 741,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_font",
+      "sourceSymbol": "LuaSetFont",
+      "sourceOperation": "{\"set_font\",        LuaSetFont}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3446342703,
+      "rawName": "gui.set_font",
+      "jsName": "setFont",
+      "source": "doc/gui.lua",
+      "line": 1882,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.vector3",
+      "sourceSymbol": "Vector3_new",
+      "operation": {
+        "template": "value-constructor",
+        "parameters": {
+          "kind": "Vector3",
+          "default": "zero",
+          "scalarSplat": true,
+          "rejectNaNCopy": true
+        }
+      },
+      "callShapes": [
+        [],
+        [
+          "Number"
+        ],
+        [
+          "Vector3"
+        ],
+        [
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Vector3",
+      "implementedCallShapes": [
+        [],
+        [
+          "Number"
+        ],
+        [
+          "Vector3"
+        ],
+        [
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "stableId": 3491633886,
+      "rawName": "vmath.vector3",
+      "jsName": "vector3",
+      "source": "doc/vmath.lua",
+      "line": 948,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.inv",
+      "sourceSymbol": "Inverse",
+      "sourceOperation": [
+        "{\"inv\", Inverse}",
+        "dmVMath::Inverse(*m)"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-inverse"
+        }
+      },
+      "callShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.inv",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          {
+            "codec": "Matrix4",
+            "components": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 3499206161,
+      "rawName": "vmath.inv",
+      "jsName": "inv",
+      "source": "doc/vmath.lua",
+      "line": 176,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.normalize",
+      "sourceSymbol": "Normalize",
+      "operation": {
+        "template": "value-unary",
+        "parameters": {
+          "operator": "normalize",
+          "kinds": [
+            "Vector3",
+            "Vector4",
+            "Quaternion"
+          ],
+          "rejectNaNInput": true
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ],
+        [
+          "Quaternion"
+        ]
+      ],
+      "resultCodec": "SameDefoldValue",
+      "implementedCallShapes": [
+        [
+          "Vector3"
+        ],
+        [
+          "Vector4"
+        ],
+        [
+          "Quaternion"
+        ]
+      ],
+      "stableId": 3582341977,
+      "rawName": "vmath.normalize",
+      "jsName": "normalize",
+      "source": "doc/vmath.lua",
+      "line": 592,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.rotate",
+      "sourceSymbol": "Rotate",
+      "sourceOperation": [
+        "{\"rotate\", Rotate}",
+        "dmVMath::Rotate(*q, *v)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-rotate-vector3"
+        }
+      },
+      "callShapes": [
+        [
+          "Quaternion",
+          "Vector3"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Quaternion",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "Vector3",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.rotate",
+        "arguments": [
+          {
+            "codec": "Quaternion",
+            "components": [
+              0,
+              0,
+              1,
+              0
+            ]
+          },
+          {
+            "codec": "Vector3",
+            "components": [
+              1,
+              1,
+              0
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            -1,
+            -1,
+            0
+          ],
+          "tolerance": 0.000001
+        }
+      },
+      "stableId": 3691011585,
+      "rawName": "vmath.rotate",
+      "jsName": "rotate",
+      "source": "doc/vmath.lua",
+      "line": 830,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_visible",
+      "sourceSymbol": "LuaSetVisible",
+      "sourceOperation": "{\"set_visible\",     LuaSetVisible}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3757373152,
+      "rawName": "gui.set_visible",
+      "jsName": "setVisible",
+      "source": "doc/gui.lua",
+      "line": 2197,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_rotation",
+      "sourceSymbol": "LuaSetRotation",
+      "sourceOperation": "REGGETSET(Rotation, rotation)",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Quaternion"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Quaternion"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3759172468,
+      "rawName": "gui.set_rotation",
+      "jsName": "setRotation",
+      "source": "doc/gui.lua",
+      "line": 2041,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_slice9",
+      "sourceSymbol": "LuaSetSlice9",
+      "sourceOperation": "{\"set_slice9\",      LuaSetSlice9}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3771988895,
+      "rawName": "gui.set_slice9",
+      "jsName": "setSlice9",
+      "source": "doc/gui.lua",
+      "line": 2097,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:go.get_position",
+      "sourceSymbol": "Script_GetPosition",
+      "sourceOperation": "dmGameObject::GetPosition(instance)",
+      "operation": {
+        "template": "current-instance-transform-get",
+        "parameters": {
+          "property": "position",
+          "kind": "Vector3"
+        }
+      },
+      "callShapes": [
+        [],
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Url"
+        ]
+      ],
+      "implementedCallShapes": [
+        []
+      ],
+      "resultCodec": "Vector3",
+      "stableId": 3918772974,
+      "rawName": "go.get_position",
+      "jsName": "getPosition",
+      "source": "doc/go.lua",
+      "line": 601,
+      "ownership": "The active HInstance is borrowed only for the synchronous component-dispatch scope. Inputs and results are copied fixed-layout values; no engine pointer is exposed to JavaScript or retained.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_euler",
+      "sourceSymbol": "LuaSetEuler",
+      "sourceOperation": "REGGETSET(Euler, euler)",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3920485847,
+      "rawName": "gui.set_euler",
+      "jsName": "setEuler",
+      "source": "doc/gui.lua",
+      "line": 1853,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_scale",
+      "sourceSymbol": "LuaSetScale",
+      "sourceOperation": "REGGETSET(Scale, scale)",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3923373356,
+      "rawName": "gui.set_scale",
+      "jsName": "setScale",
+      "source": "doc/gui.lua",
+      "line": 2054,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_layer",
+      "sourceSymbol": "LuaSetLayer",
+      "sourceOperation": "{\"set_layer\",        LuaSetLayer}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3974957251,
+      "rawName": "gui.set_layer",
+      "jsName": "setLayer",
+      "source": "doc/gui.lua",
+      "line": 1928,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_parent",
+      "sourceSymbol": "LuaSetParent",
+      "sourceOperation": "{\"set_parent\",      LuaSetParent}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node"
+        ],
+        [
+          "Node",
+          "Node"
+        ],
+        [
+          "Node",
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node"
+        ],
+        [
+          "Node",
+          "Node"
+        ],
+        [
+          "Node",
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3975981566,
+      "rawName": "gui.set_parent",
+      "jsName": "setParent",
+      "source": "doc/gui.lua",
+      "line": 1994,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_pivot",
+      "sourceSymbol": "LuaSetPivot",
+      "sourceOperation": "{\"set_pivot\",       LuaSetPivot}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 3991574614,
+      "rawName": "gui.set_pivot",
+      "jsName": "setPivot",
+      "source": "doc/gui.lua",
+      "line": 2015,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_line_break",
+      "sourceSymbol": "LuaSetLineBreak",
+      "sourceOperation": "{\"set_line_break\",  LuaSetLineBreak}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 4102050116,
+      "rawName": "gui.set_line_break",
+      "jsName": "setLineBreak",
+      "source": "doc/gui.lua",
+      "line": 1953,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:gui.set_material",
+      "sourceSymbol": "LuaSetMaterial",
+      "sourceOperation": "{\"set_material\",    LuaSetMaterial}",
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      },
+      "callShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "generatedFamily": "gui-node-setters",
+      "familyTypeCodecs": {
+        "node": "Node",
+        "number": "Number",
+        "boolean": "Boolean",
+        "string": "String",
+        "hash": "Hash",
+        "vector3": "Vector3",
+        "vector4": "Vector4",
+        "quaternion": "Quaternion",
+        "gui.ADJUST": "Number",
+        "gui.ANCHOR": "Number",
+        "gui.BLEND": "Number",
+        "gui.CLIPPING_MODE": "Number",
+        "gui.PIEBOUNDS": "Number",
+        "gui.PIVOT": "Number",
+        "gui.SIZE_MODE": "Number"
+      },
+      "stableId": 4118133459,
+      "rawName": "gui.set_material",
+      "jsName": "setMaterial",
+      "source": "doc/gui.lua",
+      "line": 1971,
+      "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-captured-lua",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.quat_axis_angle",
+      "sourceSymbol": "Quat_AxisAngle",
+      "sourceOperation": [
+        "{\"quat_axis_angle\", Quat_AxisAngle}",
+        "Quat::rotation(angle, *axis)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-axis-angle"
+        }
+      },
+      "callShapes": [
+        [
+          "Vector3",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Vector3",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.quat-axis-angle",
+        "arguments": [
+          {
+            "codec": "Vector3",
+            "components": [
+              0,
+              0,
+              1
+            ]
+          },
+          3.141592653589793
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            0,
+            0,
+            1,
+            0
+          ],
+          "tolerance": 0.000001
+        }
+      },
+      "stableId": 4121318819,
+      "rawName": "vmath.quat_axis_angle",
+      "jsName": "quatAxisAngle",
+      "source": "doc/vmath.lua",
+      "line": 685,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.conj",
+      "sourceSymbol": "Conj",
+      "sourceOperation": [
+        "{\"conj\", Conj}",
+        "dmVMath::Conjugate(*q)"
+      ],
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "quaternion-conjugate"
+        }
+      },
+      "callShapes": [
+        [
+          "Quaternion"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Quaternion"
+        ]
+      ],
+      "resultCodec": "Quaternion",
+      "generatedFamily": "vmath-fixed-pod",
+      "generatedProbe": {
+        "key": "vmath-fixed-pod.conj",
+        "arguments": [
+          {
+            "codec": "Quaternion",
+            "components": [
+              1,
+              2,
+              3,
+              4
+            ]
+          }
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            -1,
+            -2,
+            -3,
+            4
+          ],
+          "tolerance": 0
+        }
+      },
+      "stableId": 4233115420,
+      "rawName": "vmath.conj",
+      "jsName": "conj",
+      "source": "doc/vmath.lua",
+      "line": 84,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_frustum",
+      "sourceSymbol": "Matrix4_Frustum",
+      "sourceOperation": [
+        "{\"matrix4_frustum\", Matrix4_Frustum}",
+        "Matrix4::frustum(left, right, bottom, top, near_z, far_z)",
+        "if(near_z == 0.0f)",
+        "dmLogWarning"
+      ],
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none",
+          "operator": "matrix-frustum"
+        }
+      },
+      "callShapes": [
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "implementedCallShapes": [
+        [
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number",
+          "Number"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "generatedFamily": "vmath-matrix4",
+      "generatedProbe": {
+        "key": "vmath-matrix4.frustum",
+        "state": "planned",
+        "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+        "arguments": [
+          -1,
+          1,
+          -1,
+          1,
+          1,
+          10
+        ],
+        "expectation": {
+          "kind": "components",
+          "values": [
+            1,
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            -1.2222222,
+            -1,
+            0,
+            0,
+            -2.2222222,
+            0
+          ],
+          "tolerance": 0.00001
+        }
+      },
+      "stableId": 4245225016,
+      "rawName": "vmath.matrix4_frustum",
+      "jsName": "matrix4Frustum",
+      "source": "doc/vmath.lua",
+      "line": 371,
+      "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+      "targetSupport": {
+        "arm64DynamicHermes": {
+          "status": "generated-executable",
+          "backend": "generated-native-pod",
+          "evidence": "native-focused-test-not-packaged-engine-proof"
+        },
+        "html5BrowserHost": {
+          "status": "not-executable",
+          "backend": "unavailable",
+          "reason": "html5-browser-host-codec-or-context-not-implemented"
+        }
+      }
+    }
+  ]
+}

@@ -13,24 +13,24 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "paths": {
-      "@defold-hermes/project": [
-        "./.defold-hermes/sdk/index.ts"
+      "@deherm/project": [
+        "./.deherm/sdk/index.ts"
       ],
-      "@defold-hermes/project/*": [
-        "./.defold-hermes/sdk/*"
+      "@deherm/project/*": [
+        "./.deherm/sdk/*"
       ]
     },
     "plugins": [
       {
-        "transform": "@ts-defold/hermes/ttsc",
+        "transform": "@ts-defold/deherm/ttsc",
         "enabled": false,
-        "inventory": "./.defold-hermes/extensions.json",
+        "inventory": "./.deherm/extensions.json",
         "profile": "development"
       }
     ]
   },
   "include": [
     "src/**/*.ts",
-    ".defold-hermes/**/*.ts"
+    ".deherm/**/*.ts"
   ]
 }

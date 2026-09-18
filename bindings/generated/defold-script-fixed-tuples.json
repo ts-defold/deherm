@@ -1,0 +1,1469 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "bindingCount": 24,
+  "bucketCounts": {
+    "fixed-scalar-tuple": 17,
+    "fixed-value-tuple": 7
+  },
+  "tupleArityCounts": {
+    "2": 17,
+    "3": 4,
+    "4": 3
+  },
+  "publicTypeScriptReachableCount": 8,
+  "blockedHandleProducerCount": 16,
+  "codecVocabulary": [
+    "Boolean",
+    "GuiNode",
+    "Hash",
+    "Integer",
+    "LuaUserdata",
+    "Nil",
+    "Number",
+    "Quaternion",
+    "String",
+    "Url",
+    "Vector3"
+  ],
+  "allocationPolicy": "Fixed descriptor arrays and caller-owned result/string scratch; result strings and Defold POD values are copied before Lua stack restoration; no recursive marshaler.",
+  "bindings": [
+    {
+      "id": "script:bullet3d.constraint.get_anchors",
+      "stableId": "0x0127f3cb",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_anchors",
+      "context": "Global",
+      "bucket": "fixed-value-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_anchors"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_hinge_motor",
+      "stableId": "0x03109b88",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_hinge_motor",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "boolean",
+          "codecs": [
+            "Boolean"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_hinge_motor"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_cone_twist_limits",
+      "stableId": "0x04753021",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_cone_twist_limits",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_cone_twist_limits"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_hinge_limits",
+      "stableId": "0x25708427",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_hinge_limits",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_hinge_limits"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.shape.get_local_transform",
+      "stableId": "0x2d956755",
+      "modulePath": [
+        "bullet3d",
+        "shape"
+      ],
+      "member": "get_local_transform",
+      "context": "Global",
+      "bucket": "fixed-value-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btCollisionShape",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "quaternion",
+          "codecs": [
+            "Quaternion"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
+        "sha256": "c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285",
+        "registration": "get_local_transform"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:collectionproxy.set_collection",
+      "stableId": "0x2fe0fffb",
+      "modulePath": [
+        "collectionproxy"
+      ],
+      "member": "set_collection",
+      "context": "ScriptInstance",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "string|hash|url",
+          "optional": true,
+          "codecs": [
+            "Hash",
+            "String",
+            "Url"
+          ],
+          "implementedCodecs": [
+            "Hash",
+            "String"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "string|nil",
+          "optional": true,
+          "codecs": [
+            "Nil",
+            "String"
+          ],
+          "implementedCodecs": [
+            "Nil",
+            "String"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "boolean",
+          "codecs": [
+            "Boolean"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "collectionproxy.RESULT",
+          "codecs": [
+            "Integer"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/script_collectionproxy.cpp",
+        "sha256": "5b8ddb008d2895a95d8be0dda1ee88a3e00e154545766234acfc3d944ec0477a",
+        "registration": "set_collection"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_slider_motor",
+      "stableId": "0x513bd984",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_slider_motor",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "string",
+          "optional": false,
+          "codecs": [
+            "String"
+          ],
+          "implementedCodecs": [
+            "String"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "boolean",
+          "codecs": [
+            "Boolean"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_slider_motor"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:gui.get_type",
+      "stableId": "0x55520562",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_type",
+      "context": "GuiScriptInstance",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "node",
+          "optional": false,
+          "codecs": [
+            "GuiNode"
+          ],
+          "implementedCodecs": [
+            "GuiNode"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "gui.TYPE",
+          "codecs": [
+            "Integer"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number|nil",
+          "codecs": [
+            "Nil",
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gui/src/gui_script.cpp",
+        "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4",
+        "registration": "get_type"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    },
+    {
+      "id": "script:bullet3d.rigid_body.get_damping",
+      "stableId": "0x55619c24",
+      "modulePath": [
+        "bullet3d",
+        "rigid_body"
+      ],
+      "member": "get_damping",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btRigidBody",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp",
+        "sha256": "7fe92ecb9e32332bd612aabaf3e1276f5e78bb83e17cd08667116ab3c1928e1b",
+        "registration": "get_damping"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_6dof_motor",
+      "stableId": "0x797d3f36",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_6dof_motor",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "integer",
+          "optional": false,
+          "codecs": [
+            "Integer"
+          ],
+          "implementedCodecs": [
+            "Integer"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "boolean",
+          "codecs": [
+            "Boolean"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 3,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_6dof_motor"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_limit",
+      "stableId": "0x7f5eb33e",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_limit",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "integer",
+          "optional": false,
+          "codecs": [
+            "Integer"
+          ],
+          "implementedCodecs": [
+            "Integer"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_limit"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:tilemap.get_bounds",
+      "stableId": "0x80ab2ee8",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_bounds",
+      "context": "ScriptInstance",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "string|hash|url",
+          "optional": false,
+          "codecs": [
+            "Hash",
+            "String",
+            "Url"
+          ],
+          "implementedCodecs": [
+            "Hash",
+            "String"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "integer",
+          "codecs": [
+            "Integer"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "integer",
+          "codecs": [
+            "Integer"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "integer",
+          "codecs": [
+            "Integer"
+          ]
+        },
+        {
+          "index": 3,
+          "rawType": "integer",
+          "codecs": [
+            "Integer"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/script_tilemap.cpp",
+        "sha256": "2bdf30bc2919fdd76f010910ad5c7876d30efeb3bcdfee10234729f63f4a5cd8",
+        "registration": "get_bounds"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    },
+    {
+      "id": "script:bullet3d.collision_object.get_world_transform",
+      "stableId": "0x8abce1d3",
+      "modulePath": [
+        "bullet3d",
+        "collision_object"
+      ],
+      "member": "get_world_transform",
+      "context": "Global",
+      "bucket": "fixed-value-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btCollisionObject",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "quaternion",
+          "codecs": [
+            "Quaternion"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
+        "sha256": "c90f5f10b5b2ccbeb5f77ec3cf986d1dfe36a93eb2a0f79ce9e858e7f35aaf2b",
+        "registration": "get_world_transform"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:sound.get_rms",
+      "stableId": "0x9d103820",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_rms",
+      "context": "ScriptInstance",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "string|hash",
+          "optional": false,
+          "codecs": [
+            "Hash",
+            "String"
+          ],
+          "implementedCodecs": [
+            "Hash",
+            "String"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "optional": false,
+          "codecs": [
+            "Number"
+          ],
+          "implementedCodecs": [
+            "Number"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+        "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053",
+        "registration": "get_rms"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    },
+    {
+      "id": "script:vmath.quat_to_euler",
+      "stableId": "0x9d6efd31",
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "quat_to_euler",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "quaternion",
+          "optional": false,
+          "codecs": [
+            "Quaternion"
+          ],
+          "implementedCodecs": [
+            "Quaternion"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "registration": "quat_to_euler"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    },
+    {
+      "id": "script:sound.get_peak",
+      "stableId": "0xa241b215",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_peak",
+      "context": "ScriptInstance",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "string|hash",
+          "optional": false,
+          "codecs": [
+            "Hash",
+            "String"
+          ],
+          "implementedCodecs": [
+            "Hash",
+            "String"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "optional": false,
+          "codecs": [
+            "Number"
+          ],
+          "implementedCodecs": [
+            "Number"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+        "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053",
+        "registration": "get_peak"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    },
+    {
+      "id": "script:gui.new_texture",
+      "stableId": "0xa8cda9fb",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "new_texture",
+      "context": "GuiScriptInstance",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 6,
+      "maximumArgumentCount": 6,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "string|hash",
+          "optional": false,
+          "codecs": [
+            "Hash",
+            "String"
+          ],
+          "implementedCodecs": [
+            "Hash",
+            "String"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "optional": false,
+          "codecs": [
+            "Number"
+          ],
+          "implementedCodecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "number",
+          "optional": false,
+          "codecs": [
+            "Number"
+          ],
+          "implementedCodecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 3,
+          "rawType": "string|image.TYPE",
+          "optional": false,
+          "codecs": [
+            "Integer",
+            "String"
+          ],
+          "implementedCodecs": [
+            "Integer",
+            "String"
+          ]
+        },
+        {
+          "index": 4,
+          "rawType": "string",
+          "optional": false,
+          "codecs": [
+            "String"
+          ],
+          "implementedCodecs": [
+            "String"
+          ]
+        },
+        {
+          "index": 5,
+          "rawType": "boolean",
+          "optional": false,
+          "codecs": [
+            "Boolean"
+          ],
+          "implementedCodecs": [
+            "Boolean"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "boolean",
+          "codecs": [
+            "Boolean"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "gui.RESULT|nil",
+          "codecs": [
+            "Integer",
+            "Nil"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gui/src/gui_script.cpp",
+        "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4",
+        "registration": "new_texture"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_frame_a",
+      "stableId": "0xae915cbc",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_frame_a",
+      "context": "Global",
+      "bucket": "fixed-value-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "quaternion",
+          "codecs": [
+            "Quaternion"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_frame_a"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_frame_b",
+      "stableId": "0xb1916175",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_frame_b",
+      "context": "Global",
+      "bucket": "fixed-value-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "quaternion",
+          "codecs": [
+            "Quaternion"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_frame_b"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_pivots",
+      "stableId": "0xb915411e",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_pivots",
+      "context": "Global",
+      "bucket": "fixed-value-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_pivots"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_angles",
+      "stableId": "0xc4ec6ea3",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_angles",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_angles"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_slider_limits",
+      "stableId": "0xca333d93",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_slider_limits",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 2,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        },
+        {
+          "index": 3,
+          "rawType": "number",
+          "codecs": [
+            "Number"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_slider_limits"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.get_axes",
+      "stableId": "0xd052ca5a",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_axes",
+      "context": "Global",
+      "bucket": "fixed-value-tuple",
+      "requiredArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "arguments": [
+        {
+          "index": 0,
+          "rawType": "btTypedConstraint",
+          "optional": false,
+          "codecs": [
+            "LuaUserdata"
+          ],
+          "implementedCodecs": [
+            "LuaUserdata"
+          ]
+        }
+      ],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "vector3",
+          "codecs": [
+            "Vector3"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+        "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+        "registration": "get_axes"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "blocked-missing-handle-producer"
+      }
+    },
+    {
+      "id": "script:window.get_size",
+      "stableId": "0xeb7b27de",
+      "modulePath": [
+        "window"
+      ],
+      "member": "get_size",
+      "context": "Global",
+      "bucket": "fixed-scalar-tuple",
+      "requiredArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "arguments": [],
+      "results": [
+        {
+          "index": 0,
+          "rawType": "integer",
+          "codecs": [
+            "Integer"
+          ]
+        },
+        {
+          "index": 1,
+          "rawType": "integer",
+          "codecs": [
+            "Integer"
+          ]
+        }
+      ],
+      "sourceEvidence": {
+        "path": "engine/gamesys/src/gamesys/scripts/script_window.cpp",
+        "sha256": "03b4962f55c626f2b73ebe978035be93215eb6e0ef91802bf8c8f12c81c2544b",
+        "registration": "get_size"
+      },
+      "targetSupport": {
+        "nativeHermes": "generated-executable",
+        "html5BrowserHost": "not-executable",
+        "publicTypeScriptFixture": "reachable"
+      }
+    }
+  ]
+}

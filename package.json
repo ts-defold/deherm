@@ -1,9 +1,22 @@
 {
-  "name": "@ts-defold/hermes",
+  "name": "@ts-defold/deherm",
   "version": "0.0.0",
   "description": "TypeScript tooling and Hermes runtime integration for Defold",
   "private": false,
   "type": "module",
+  "types": "./packages/sdk/src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./packages/sdk/src/index.ts",
+      "import": "./packages/sdk/src/index.ts",
+      "default": "./packages/sdk/src/index.ts"
+    },
+    "./component": {
+      "types": "./packages/sdk/src/component.ts",
+      "import": "./packages/sdk/src/component.ts",
+      "default": "./packages/sdk/src/component.ts"
+    }
+  },
   "files": [
     "bin/",
     "bindings/generated/defold-script-api-ir.json",
@@ -12,9 +25,22 @@
     "bindings/generated/defold-dmsdk-binding-patterns.json",
     "bindings/generated/defold-script-binding-descriptors.json",
     "bindings/generated/defold-script-scalar-dispatch.json",
+    "bindings/generated/defold-script-real-engine-probes.json",
+    "bindings/generated/defold-script-value-bindings.json",
+    "bindings/generated/defold-script-fixed-tuples.json",
+    "bindings/generated/defold-script-fixed-tuple-probes.json",
+    "bindings/generated/defold-script-value-real-engine-probes.json",
+    "bindings/generated/defold-script-api-accounting.json",
+    "bindings/generated/defold-script-borrowed-handle-classification.json",
+    "bindings/generated/defold-script-table-tuple-schemas.json",
+    "bindings/generated/defold-script-url-address-classification.json",
+    "bindings/generated/defold-script-real-engine-matrix.json",
     "bindings/generated/defold-dmsdk-scalar-thunks.json",
     "packages/cli/",
     "packages/sdk/",
+    "packages/telemetry/schema/",
+    "scripts/lib/binding-identity.mjs",
+    "scripts/lib/component-proxy-generator.mjs",
     "!packages/**/*.type-test.ts",
     "README.md"
   ],
@@ -23,7 +49,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ts-defold/defold-hermes.git"
+    "url": "git+https://github.com/ts-defold/deherm.git"
   },
   "publishConfig": {
     "access": "public"
@@ -35,7 +61,7 @@
     "gamedev"
   ],
   "bin": {
-    "defold-hermes": "bin/defold-hermes.mjs"
+    "deherm": "bin/deherm.mjs"
   },
   "scripts": {
     "bootstrap": "npm run bootstrap:upstreams && npm run bootstrap:bob",
@@ -49,7 +75,7 @@
     "extender:status": "./scripts/extender-local.sh status",
     "extender:logs": "./scripts/extender-local.sh logs",
     "doctor": "node scripts/doctor.mjs",
-    "cli": "node bin/defold-hermes.mjs",
+    "cli": "node bin/deherm.mjs",
     "generate:bindings": "node scripts/generate-bindings.mjs",
     "generate:lua-bridge": "node scripts/generate-lua-bridge.mjs",
     "generate:sdk-inventory": "python3 scripts/import-defold-sdk.py",
@@ -57,7 +83,18 @@
     "generate:script-sdk": "node scripts/generate-script-sdk.mjs",
     "generate:dmsdk-sdk": "node scripts/generate-dmsdk-sdk.mjs",
     "generate:binding-patterns": "node scripts/classify-script-bindings.mjs && node scripts/classify-dmsdk-bindings.mjs",
-    "generate:script-descriptors": "node scripts/generate-script-binding-descriptors.mjs && node scripts/generate-scalar-lua-dispatch.mjs",
+    "generate:script-descriptors": "node scripts/generate-script-binding-descriptors.mjs && node scripts/generate-scalar-lua-dispatch.mjs && node scripts/generate-script-value-bindings.mjs && node scripts/generate-script-fixed-tuples.mjs && node scripts/generate-static-hermes-vmath.mjs && node scripts/generate-script-real-engine-probes.mjs && node scripts/generate-script-value-real-engine-probes.mjs && node scripts/generate-script-api-accounting.mjs && node scripts/generate-borrowed-handle-classification.mjs && node scripts/generate-script-table-tuple-schemas.mjs && node scripts/generate-script-url-address-classification.mjs && node scripts/generate-script-real-engine-matrix.mjs",
+    "generate:script-value-bindings": "node scripts/generate-script-value-bindings.mjs",
+    "generate:script-fixed-tuples": "node scripts/generate-script-fixed-tuples.mjs",
+    "generate:static-hermes-vmath": "node scripts/generate-static-hermes-vmath.mjs",
+    "generate:script-real-engine-probes": "node scripts/generate-script-real-engine-probes.mjs",
+    "generate:script-value-real-engine-probes": "node scripts/generate-script-value-real-engine-probes.mjs",
+    "generate:script-api-accounting": "node scripts/generate-script-api-accounting.mjs",
+    "generate:borrowed-handle-classification": "node scripts/generate-borrowed-handle-classification.mjs",
+    "generate:script-table-tuple-schemas": "node scripts/generate-script-table-tuple-schemas.mjs",
+    "generate:script-url-address-classification": "node scripts/generate-script-url-address-classification.mjs",
+    "generate:script-real-engine-matrix": "node scripts/generate-script-real-engine-matrix.mjs",
+    "generate:war-battles-real-engine-probes": "node scripts/generate-war-battles-real-engine-probes.mjs",
     "generate:dmsdk-scalar-thunks": "node scripts/generate-dmsdk-scalar-thunks.mjs",
     "check:bindings": "node scripts/generate-bindings.mjs --check",
     "check:lua-bridge": "node scripts/generate-lua-bridge.mjs --check",
@@ -66,13 +103,28 @@
     "check:script-sdk": "node scripts/generate-script-sdk.mjs --check",
     "check:dmsdk-sdk": "node scripts/generate-dmsdk-sdk.mjs --check",
     "check:binding-patterns": "node scripts/classify-script-bindings.mjs --check && node scripts/classify-dmsdk-bindings.mjs --check",
-    "check:script-descriptors": "node scripts/generate-script-binding-descriptors.mjs --check && node scripts/generate-scalar-lua-dispatch.mjs --check",
+    "check:script-descriptors": "node scripts/generate-script-binding-descriptors.mjs --check && node scripts/generate-scalar-lua-dispatch.mjs --check && node scripts/generate-script-value-bindings.mjs --check && node scripts/generate-script-fixed-tuples.mjs --check && node scripts/generate-static-hermes-vmath.mjs --check && node scripts/generate-script-real-engine-probes.mjs --check && node scripts/generate-script-value-real-engine-probes.mjs --check && node scripts/generate-script-api-accounting.mjs --check && node scripts/generate-borrowed-handle-classification.mjs --check && node scripts/generate-script-table-tuple-schemas.mjs --check && node scripts/generate-script-url-address-classification.mjs --check && node scripts/generate-script-real-engine-matrix.mjs --check",
+    "check:script-value-bindings": "node scripts/generate-script-value-bindings.mjs --check",
+    "check:script-fixed-tuples": "node scripts/generate-script-fixed-tuples.mjs --check",
+    "check:static-hermes-vmath": "node scripts/generate-static-hermes-vmath.mjs --check",
+    "check:script-real-engine-probes": "node scripts/generate-script-real-engine-probes.mjs --check",
+    "check:script-value-real-engine-probes": "node scripts/generate-script-value-real-engine-probes.mjs --check",
+    "check:script-api-accounting": "node scripts/generate-script-api-accounting.mjs --check",
+    "check:borrowed-handle-classification": "node scripts/generate-borrowed-handle-classification.mjs --check",
+    "check:script-table-tuple-schemas": "node scripts/generate-script-table-tuple-schemas.mjs --check",
+    "check:script-url-address-classification": "node scripts/generate-script-url-address-classification.mjs --check",
+    "check:script-real-engine-matrix": "node scripts/generate-script-real-engine-matrix.mjs --check",
+    "check:script-clean-room": "node scripts/check-script-clean-room-regeneration.mjs",
+    "check:war-battles-real-engine-probes": "node scripts/generate-war-battles-real-engine-probes.mjs --check",
     "check:dmsdk-scalar-thunks": "node scripts/generate-dmsdk-scalar-thunks.mjs --check",
-    "check:static-hermes": "cmake --build build/native --target shermes --parallel && node scripts/check-static-hermes.mjs",
+    "check:static-hermes": "npm run check:static-hermes-vmath && cmake --build build/native --target shermes --parallel && node scripts/check-static-hermes.mjs",
+    "test:static-hermes": "npm run check:static-hermes-vmath && npm run build:js && npm run configure:native && cmake --build build/native --target defold-hermes-static-runner --parallel && build/native/defold-hermes-static-runner",
     "check:extension-syntax": "python3 scripts/check-extension-syntax.py",
+    "check:war-battles-gate": "node scripts/check-war-battles-runtime-gate.mjs --check",
+    "generate:war-battles-gate": "node scripts/check-war-battles-runtime-gate.mjs",
     "check:knowledge": "node scripts/check-okf.mjs",
     "check:types": "ttsc check",
-    "check": "npm run check:bindings && npm run check:lua-bridge && npm run check:sdk-inventory && npm run check:script-api-inventory && npm run check:script-sdk && npm run check:dmsdk-sdk && npm run check:binding-patterns && npm run check:script-descriptors && npm run check:dmsdk-scalar-thunks && npm run check:types && npm run check:knowledge",
+    "check": "npm run check:bindings && npm run check:lua-bridge && npm run check:sdk-inventory && npm run check:script-api-inventory && npm run check:script-sdk && npm run check:dmsdk-sdk && npm run check:binding-patterns && npm run check:script-descriptors && npm run check:war-battles-real-engine-probes && npm run check:script-clean-room && npm run check:dmsdk-scalar-thunks && npm run check:war-battles-gate && npm run check:types && npm run check:knowledge",
     "build:js": "npm run generate:bindings && node scripts/build.mjs",
     "build:device-dev": "npm run build:js && cmake --build build/native --target hermesc --parallel && build/native/bin/hermesc -Og -g2 -emit-binary -out=dist/sample.hbc dist/sample.js",
     "generate:release-bindings": "node scripts/generate-bindings.mjs --usage dist/sample.usage.json --output-root build/profiles/release",
@@ -99,34 +151,44 @@
     "test:lua-codegen": "node --test tests/lua-codegen.test.mjs",
     "test:coverage": "node --test tests/coverage.test.mjs",
     "test:binding-patterns": "node --test tests/script-binding-patterns.test.mjs tests/dmsdk-binding-patterns.test.mjs",
-    "test:binding-runtime-codegen": "node --test tests/script-binding-descriptors.test.mjs tests/scalar-lua-dispatch.test.mjs tests/dmsdk-scalar-thunks.test.mjs",
+    "test:binding-runtime-codegen": "node --test tests/script-binding-descriptors.test.mjs tests/scalar-lua-dispatch.test.mjs tests/script-value-bindings.test.mjs tests/script-fixed-tuples.test.mjs tests/static-hermes-vmath.test.mjs tests/script-api-accounting.test.mjs tests/borrowed-handle-classification.test.mjs tests/script-table-tuple-schemas.test.mjs tests/script-url-address-classification.test.mjs tests/script-real-engine-matrix.test.mjs tests/native-runtime-probe-report.test.mjs tests/war-battles-real-engine-probes.test.mjs tests/dmsdk-scalar-thunks.test.mjs",
+    "test:static-hermes-vmath": "node --test tests/static-hermes-vmath.test.mjs",
+    "test:script-clean-room": "node --test tests/script-clean-room-regeneration.test.mjs",
     "test:contract": "npm run build:js && node --test tests/contract.test.mjs",
     "test:web-host": "npm run build:js && node --test tests/web-host.test.mjs",
     "test:web-library": "node --test tests/web-library.test.mjs",
+    "test:polyfills": "node --test tests/polyfill-manifest.test.mjs",
+    "test:conformance": "node --test tests/conformance-harness.test.mjs",
+    "test:lua-value-registry": "node --test tests/lua-value-registry.test.mjs",
+    "test:component-proxies": "node --test tests/component-proxy-generator.test.mjs",
     "test:html5:runtime": "node scripts/check-html5-runtime.mjs",
-    "test:cli": "node --test tests/cli.test.mjs",
+    "test:native-defold:runtime": "node scripts/check-native-defold-runtime.mjs",
+    "test:native-defold:hot-reload": "node --test tests/native-hot-reload-fixture.test.mjs && node scripts/check-native-defold-hot-reload.mjs",
+    "test:extension-retention": "node --test tests/dmsdk-scalar-extension-retention.test.mjs",
+    "test:cli": "node --test tests/cli.test.mjs tests/package-smoke.test.mjs",
+    "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs",
     "test:usage": "npm run build:release-plan && node --test tests/usage.test.mjs",
     "test:native": "npm run build && node --test tests/native.test.mjs",
     "test:binding-arena": "npm run configure:native && cmake --build build/native --target defold-hermes-binding-arena-test --parallel && build/native/defold-hermes-binding-arena-test",
     "test:scalar-lua-runtime": "npm run configure:native && cmake --build build/native --target defold-hermes-scalar-lua-dispatch-test --parallel && build/native/defold-hermes-scalar-lua-dispatch-test",
+    "test:script-value-runtime": "npm run configure:native && cmake --build build/native --target defold-hermes-script-value-binding-test defold-hermes-script-bridge-capi-test --parallel && build/native/defold-hermes-script-value-binding-test && build/native/defold-hermes-script-bridge-capi-test",
+    "test:script-value-sanitize": "cmake -S . -B build/sanitize -G Ninja -DCMAKE_BUILD_TYPE=Debug -DDEHERM_SANITIZE=ON && cmake --build build/sanitize --target defold-hermes-script-value-binding-test defold-hermes-script-bridge-capi-test --parallel && ASAN_OPTIONS=halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 build/sanitize/defold-hermes-script-value-binding-test && ASAN_OPTIONS=halt_on_error=1 UBSAN_OPTIONS=halt_on_error=1 build/sanitize/defold-hermes-script-bridge-capi-test",
+    "test:script-api-hermes": "npm run build:js && node scripts/build-script-api-e2e.mjs && npm run configure:native && cmake --build build/native --target defold-hermes-script-api-hermes-e2e --parallel && build/native/defold-hermes-script-api-hermes-e2e build/script-api-e2e.js",
     "test:device-dev": "npm run build:native && npm run build:device-dev && node --test tests/bytecode.test.mjs",
     "test:lua-bridge": "npm run bench:lua-bridge",
     "test:lua-hermes": "npm run generate:bindings && npm run generate:lua-bridge && npm run configure:native && cmake --build build/native --target defold-hermes-lua-hermes-e2e --parallel && build/native/defold-hermes-lua-hermes-e2e",
-    "test": "npm run check && npm run test:codegen && npm run test:lua-codegen && npm run test:coverage && npm run test:binding-patterns && npm run test:binding-runtime-codegen && npm run test:contract && npm run test:web-host && npm run test:web-library && npm run test:cli && npm run test:usage",
-    "verify": "npm test && npm run test:binding-arena && npm run test:scalar-lua-runtime && npm run test:native && npm run test:device-dev && npm run test:lua-bridge && npm run test:lua-hermes && npm run check:static-hermes && npm run check:extension-syntax && npm run package:defold"
-  },
-  "devDependencies": {
-    "@ttsc/unplugin": "0.30.4",
-    "esbuild": "0.25.10",
-    "ttsc": "0.30.4",
-    "typescript": "7.0.2"
+    "test": "npm run check && npm run test:codegen && npm run test:lua-codegen && npm run test:coverage && npm run test:binding-patterns && npm run test:binding-runtime-codegen && npm run test:contract && npm run test:web-host && npm run test:web-library && npm run test:polyfills && npm run test:conformance && npm run test:lua-value-registry && npm run test:component-proxies && npm run test:cli && npm run test:dev && npm run test:usage",
+    "verify": "npm test && npm run test:binding-arena && npm run test:scalar-lua-runtime && npm run test:script-value-runtime && npm run test:script-api-hermes && npm run test:native && npm run test:device-dev && npm run test:lua-bridge && npm run test:lua-hermes && npm run test:static-hermes && npm run check:static-hermes && npm run check:extension-syntax && npm run test:extension-retention && npm run package:defold",
+    "verify:engine:native": "npm run bob:local:bundle && DEHERM_REQUIRE_ENGINE_ARTIFACTS=1 npm run test:extension-retention && npm run test:native-defold:runtime"
   },
   "dependencies": {
+    "@rezi-ui/core": "0.1.0-beta.2",
+    "@rezi-ui/node": "0.1.0-beta.2",
+    "@ttsc/unplugin": "0.30.4",
+    "esbuild": "0.25.10",
     "fflate": "0.8.3",
-    "yaml": "2.8.3"
-  },
-  "peerDependencies": {
     "ttsc": "0.30.4",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "yaml": "2.8.3"
   }
 }

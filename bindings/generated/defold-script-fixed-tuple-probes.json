@@ -1,0 +1,440 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "Planned real-engine evidence dispositions for generated fixed tuples; no observation is promoted by generation",
+  "routeCount": 24,
+  "scenarios": [
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_anchors",
+      "routeId": "script:bullet3d.constraint.get_anchors",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Vector3,Vector3",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_hinge_motor",
+      "routeId": "script:bullet3d.constraint.get_hinge_motor",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 3,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Boolean,Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_cone_twist_limits",
+      "routeId": "script:bullet3d.constraint.get_cone_twist_limits",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 3,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Number,Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_hinge_limits",
+      "routeId": "script:bullet3d.constraint.get_hinge_limits",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.shape.get_local_transform",
+      "routeId": "script:bullet3d.shape.get_local_transform",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Vector3,Quaternion",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.collectionproxy.set_collection",
+      "routeId": "script:collectionproxy.set_collection",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:ScriptInstance",
+        "exact-positional-codecs:Boolean,Integer",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_slider_motor",
+      "routeId": "script:bullet3d.constraint.get_slider_motor",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 3,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Boolean,Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.gui.get_type",
+      "routeId": "script:gui.get_type",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": true,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:GuiScriptInstance",
+        "exact-positional-codecs:Integer,Nil|Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.rigid_body.get_damping",
+      "routeId": "script:bullet3d.rigid_body.get_damping",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_6dof_motor",
+      "routeId": "script:bullet3d.constraint.get_6dof_motor",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 4,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Boolean,Number,Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_limit",
+      "routeId": "script:bullet3d.constraint.get_limit",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.tilemap.get_bounds",
+      "routeId": "script:tilemap.get_bounds",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 4,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:ScriptInstance",
+        "exact-positional-codecs:Integer,Integer,Integer,Integer",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.collision_object.get_world_transform",
+      "routeId": "script:bullet3d.collision_object.get_world_transform",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Vector3,Quaternion",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.sound.get_rms",
+      "routeId": "script:sound.get_rms",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:ScriptInstance",
+        "exact-positional-codecs:Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.vmath.quat_to_euler",
+      "routeId": "script:vmath.quat_to_euler",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 3,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Number,Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.sound.get_peak",
+      "routeId": "script:sound.get_peak",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:ScriptInstance",
+        "exact-positional-codecs:Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.gui.new_texture",
+      "routeId": "script:gui.new_texture",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": true,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:GuiScriptInstance",
+        "exact-positional-codecs:Boolean,Integer|Nil",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_frame_a",
+      "routeId": "script:bullet3d.constraint.get_frame_a",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Vector3,Quaternion",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_frame_b",
+      "routeId": "script:bullet3d.constraint.get_frame_b",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Vector3,Quaternion",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_pivots",
+      "routeId": "script:bullet3d.constraint.get_pivots",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Vector3,Vector3",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_angles",
+      "routeId": "script:bullet3d.constraint.get_angles",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_slider_limits",
+      "routeId": "script:bullet3d.constraint.get_slider_limits",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 4,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Number,Number,Number,Number",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.bullet3d.constraint.get_axes",
+      "routeId": "script:bullet3d.constraint.get_axes",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "blocked-missing-handle-producer",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Vector3,Vector3",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    },
+    {
+      "id": "fixed-tuple.window.get_size",
+      "routeId": "script:window.get_size",
+      "evidence": {
+        "compile": "planned",
+        "link": "planned",
+        "runtime": "planned"
+      },
+      "exactResultCount": 2,
+      "preserveInteriorNil": false,
+      "publicTypeScriptFixture": "reachable",
+      "requirements": [
+        "active-context:Global",
+        "exact-positional-codecs:Integer,Integer",
+        "copy-before-stack-restore",
+        "reject-wrong-tag-arity-context-target"
+      ]
+    }
+  ]
+}

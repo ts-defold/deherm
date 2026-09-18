@@ -1,0 +1,306 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "target": "arm64-macos-dynamic-hermes",
+  "inputSha256": "9fbcfece3a03794e2980367caccbeb8850d6254702899249e4cc92ff429d0b82",
+  "coverageClaim": "Five context-specific War Battles harness calls are generated and signature-checked. Compile, link, and runtime behavior remain unverified until the SHA-bound evidence matrix observes them in a packaged engine.",
+  "scenarioCount": 5,
+  "executableScenarioCount": 5,
+  "awaitingRouteCount": 0,
+  "verifiedCompileCount": 0,
+  "verifiedLinkCount": 0,
+  "verifiedRuntimeCount": 0,
+  "setups": [
+    {
+      "id": "war-battles-game-object",
+      "context": "game-object",
+      "fixture": {
+        "collection": "/conformance/war_battles.collection",
+        "gameObject": "/probe",
+        "component": "#probe",
+        "factory": "#probe_factory",
+        "factoryPrototype": "/conformance/factory_probe.go",
+        "requiredContextBehavior": "Factory child init executes with the child active, then the parent game-object context is restored before factory.create returns."
+      }
+    },
+    {
+      "id": "war-battles-gui-scene",
+      "context": "gui-scene",
+      "fixture": {
+        "collection": "/conformance/war_battles.collection",
+        "component": "/probe#probe_gui",
+        "node": "status",
+        "initialText": "BEFORE",
+        "expectedText": "DEHERM_PROBE_TEXT",
+        "contextSource": "generated .gui_script Lua proxy with captured Lua/HScene identity",
+        "publicDmSdkAvailable": false
+      }
+    }
+  ],
+  "probes": [
+    {
+      "key": "war-battles.msg.post.current-object",
+      "routeId": "script:msg.post",
+      "setupId": "war-battles-game-object",
+      "entrypoint": "gameObject",
+      "expectedMarkers": [
+        "DEBUG:SCRIPT: war-battles-api:msg:post:receiver-observes-full-sender-url:ok",
+        "DEBUG:SCRIPT: war-battles-api:msg:post:serialized-payload-at-or-below-2048-bytes-is-delivered:ok",
+        "DEBUG:SCRIPT: war-battles-api:msg:post:serialized-payload-above-2048-bytes-is-rejected:ok"
+      ],
+      "expectedCallShape": [
+        "String",
+        "String"
+      ],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "script-sender-url",
+        "maxPayloadBytes": 2048
+      },
+      "assertions": [
+        "receiver-observes-full-sender-url",
+        "serialized-payload-at-or-below-2048-bytes-is-delivered",
+        "serialized-payload-above-2048-bytes-is-rejected"
+      ],
+      "assertionHarnessState": "planned",
+      "harnessState": "generated-not-run",
+      "routeStatus": "generated-executable-route",
+      "routeKind": "value",
+      "stableId": 1111726479,
+      "implementedCallShapes": [
+        [
+          "String",
+          "String"
+        ],
+        [
+          "String",
+          "String",
+          "Table"
+        ]
+      ],
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "key": "war-battles.factory.create",
+      "routeId": "script:factory.create",
+      "setupId": "war-battles-game-object",
+      "entrypoint": "gameObject",
+      "expectedMarkers": [
+        "DEBUG:SCRIPT: war-battles-api:factory:create:factory-child-init-runs-with-child-context:ok",
+        "DEBUG:SCRIPT: war-battles-api:factory:create:parent-game-object-context-restored-after-child-init:ok"
+      ],
+      "expectedCallShape": [
+        "String"
+      ],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-go",
+        "resultPolicy": "hash-or-undefined",
+        "reentrant": true
+      },
+      "assertions": [
+        "factory-child-init-runs-with-child-context",
+        "parent-game-object-context-restored-after-child-init"
+      ],
+      "assertionHarnessState": "planned",
+      "harnessState": "generated-not-run",
+      "routeStatus": "generated-executable-route",
+      "routeKind": "value",
+      "stableId": 96184340,
+      "implementedCallShapes": [
+        [
+          "String"
+        ],
+        [
+          "String",
+          "Vector3",
+          "Nil",
+          "Table"
+        ]
+      ],
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "key": "war-battles.go.delete-created",
+      "routeId": "script:go.delete",
+      "setupId": "war-battles-game-object",
+      "entrypoint": "gameObject",
+      "expectedMarkers": [
+        "DEBUG:SCRIPT: war-battles-api:go:delete:created-object-remains-live-until-end-of-frame:ok",
+        "DEBUG:SCRIPT: war-battles-api:go:delete:created-object-is-deleted-after-end-of-frame:ok"
+      ],
+      "expectedCallShape": [
+        "Hash"
+      ],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-go",
+        "async": true
+      },
+      "assertions": [
+        "created-object-remains-live-until-end-of-frame",
+        "created-object-is-deleted-after-end-of-frame"
+      ],
+      "assertionHarnessState": "planned",
+      "harnessState": "generated-not-run",
+      "routeStatus": "generated-executable-route",
+      "routeKind": "value",
+      "stableId": 2920192283,
+      "implementedCallShapes": [
+        [],
+        [
+          "Hash"
+        ]
+      ],
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "key": "war-battles.gui.get-node",
+      "routeId": "script:gui.get_node",
+      "setupId": "war-battles-gui-scene",
+      "entrypoint": "gui",
+      "expectedMarkers": [
+        "DEBUG:SCRIPT: war-battles-api:gui:get_node:active-gui-scene-token-required:ok",
+        "DEBUG:SCRIPT: war-battles-api:gui:get_node:wrong-scene-token-rejected:ok",
+        "DEBUG:SCRIPT: war-battles-api:gui:get_node:deleted-node-token-rejected:ok",
+        "DEBUG:SCRIPT: war-battles-api:gui:get_node:finalized-scene-token-rejected:ok"
+      ],
+      "expectedCallShape": [
+        "String"
+      ],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-gui-scene",
+        "handlePolicy": "generational-registry-ref"
+      },
+      "assertions": [
+        "active-gui-scene-token-required",
+        "wrong-scene-token-rejected",
+        "deleted-node-token-rejected",
+        "finalized-scene-token-rejected"
+      ],
+      "assertionHarnessState": "planned",
+      "harnessState": "generated-not-run",
+      "routeStatus": "generated-executable-route",
+      "routeKind": "value",
+      "stableId": 509983822,
+      "implementedCallShapes": [
+        [
+          "String"
+        ]
+      ],
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "key": "war-battles.gui.set-text",
+      "routeId": "script:gui.set_text",
+      "setupId": "war-battles-gui-scene",
+      "entrypoint": "gui",
+      "expectedMarkers": [
+        "DEBUG:SCRIPT: war-battles-api:gui:set_text:active-gui-scene-token-required:ok",
+        "DEBUG:SCRIPT: war-battles-api:gui:set_text:wrong-scene-token-rejected:ok",
+        "DEBUG:SCRIPT: war-battles-api:gui:set_text:deleted-node-token-rejected:ok",
+        "DEBUG:SCRIPT: war-battles-api:gui:set_text:finalized-scene-token-rejected:ok",
+        "DEBUG:SCRIPT: war-battles-api:gui:set_text:numeric-text-uses-defold-number-formatting:ok"
+      ],
+      "expectedCallShape": [
+        "Node",
+        "String"
+      ],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-gui-scene",
+        "handlePolicy": "generational-registry-ref",
+        "numberFormat": "lua-5.1-%.14g"
+      },
+      "assertions": [
+        "active-gui-scene-token-required",
+        "wrong-scene-token-rejected",
+        "deleted-node-token-rejected",
+        "finalized-scene-token-rejected",
+        "numeric-text-uses-defold-number-formatting"
+      ],
+      "assertionHarnessState": "planned",
+      "harnessState": "generated-not-run",
+      "routeStatus": "generated-executable-route",
+      "routeKind": "value",
+      "stableId": 1480837389,
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    }
+  ]
+}

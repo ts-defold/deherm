@@ -55,7 +55,9 @@ var LibraryDefoldHermes = {
 
   $DEFOLD_HERMES_BRIDGE__deps: [
     '$DEFOLD_HERMES_GENERATED_MODULES',
-    '$DEFOLD_HERMES_WEB_CALLBACKS'
+    '$DEFOLD_HERMES_WEB_CALLBACKS',
+    '$DEFOLD_HERMES_SCRIPT_BRIDGE',
+    '$UTF8ToString'
   ],
   $DEFOLD_HERMES_BRIDGE: {
     app: null,
@@ -65,6 +67,7 @@ var LibraryDefoldHermes = {
       globalThis.__defoldAppV1 = undefined;
       globalThis.__defoldHostV1 = undefined;
       globalThis.__defoldModulesV1 = undefined;
+      globalThis.__defoldScriptBridgeV1 = undefined;
       DEFOLD_HERMES_WEB_CALLBACKS.reset();
     },
 
@@ -85,6 +88,7 @@ var LibraryDefoldHermes = {
         }
       };
       globalThis.__defoldModulesV1 = DEFOLD_HERMES_GENERATED_MODULES.install();
+      globalThis.__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_BRIDGE.install();
 
       try {
         (0, eval)(source + '\n//# sourceURL=defold-hermes://app.js');

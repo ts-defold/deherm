@@ -35,12 +35,19 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
     reviewed: 31,
     generated: 26,
     objectCompileCovered: 26,
-    hostSourceLinkCovered: 25,
-    hostBehaviorCovered: 25,
+    hostSourceLinkCovered: 26,
+    hostBehaviorCovered: 26,
     blocked: 5,
     policyBlocked: 4,
     sourceBlocked: 1,
-    packagedLibraryLinked: 0,
+    packagedLibraryLinked: 26,
+    dispatchReferenceCovered: 26,
+    hostExecutableRetained: 26,
+    extensionFinalBinaryRetained: 26,
+    nativeTypeScriptAdapterGenerated: 26,
+    nativeHermesRuntimeSmokeTested: 2,
+    browserTypeScriptAdapterGenerated: 16,
+    browserAdapterBehaviorTested: 16,
     allTargetConformant: 0,
   });
   assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 31);
@@ -48,7 +55,7 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
   for (const declaration of report.declarations) {
     assert.ok(declaration.headerEvidence.sha256.match(/^[a-f0-9]{64}$/));
     assert.ok(declaration.headerEvidence.declarationLine > 0);
-    for (const stage of ["generated", "compiled", "linked", "conformant"]) {
+    for (const stage of ["generated", "compiled", "linked", "conformant", "retained", "typescriptCallable"]) {
       assert.ok(declaration.stages[stage].status);
       assert.ok(declaration.stages[stage].evidence);
     }
@@ -68,7 +75,7 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
   const publicHeader = await readFile(join(repositoryRoot,
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"), "utf8");
   assert.doesNotMatch(publicHeader, /(?:log_finalize|profile_initialize|profile_finalize)/);
-  assert.equal(report.declarations.filter(({ stages }) => stages.linked.status === "not-yet-tested").length, 1);
+  assert.equal(report.declarations.filter(({ stages }) => stages.linked.status === "not-yet-tested").length, 0);
 });
 
 test("every emitted module compiles to an object against pinned Defold headers", async () => {
@@ -105,7 +112,7 @@ test("the public thunk header is C-compatible, C-linkable, and generated glue is
       "-c", "native/dmsdk_scalar_c_header_test.c", "-o", cObject,
     ]);
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter", "-pedantic",
       `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
       "-isystem", join(repositoryRoot, "upstream/defold/engine/dlib/src"),
       "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp", cObject,
@@ -122,7 +129,7 @@ test("the public thunk header is C-compatible, C-linkable, and generated glue is
   }
 });
 
-test("25 wrappers link to pinned host sources and pass behavior checks", async (context) => {
+test("all 26 wrappers link to pinned host sources, are retained, and pass host behavior checks", async (context) => {
   if (process.platform !== "darwin" && process.platform !== "linux") {
     context.skip(`host source-link harness is not defined for ${process.platform}`);
     return;
@@ -134,22 +141,30 @@ test("25 wrappers link to pinned host sources and pass behavior checks", async (
       : "upstream/defold/engine/dlib/src/dlib/time_posix.cpp";
     const sources = [
       "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+      "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
+      "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp",
       "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
       "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
       "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
       "upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp",
+      "upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp",
       timeSource,
       "native/dmsdk_scalar_thunks_test.cpp",
     ];
     const executable = join(outputDirectory, "dmsdk-scalar-thunks-test");
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter", "-pedantic",
       `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
       "-isystem", join(repositoryRoot, "upstream/defold/engine/dlib/src"),
       ...sources,
       "-o", executable,
     ]);
     assert.equal(run(executable, []).trim(), "dmsdk-scalar-thunks:ok");
+    const symbols = run("nm", [executable]);
+    const report = JSON.parse(await readFile(reportPath, "utf8"));
+    for (const { wrapper } of report.declarations.filter(({ emitted }) => emitted)) {
+      assert.match(symbols, new RegExp(`\\b_?${wrapper}\\b`), `${wrapper} was not retained`);
+    }
   } finally {
     await rm(outputDirectory, { recursive: true, force: true });
   }

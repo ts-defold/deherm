@@ -9110,7 +9110,7 @@
         },
         {
           "rawName": "n",
-          "optional": false,
+          "optional": true,
           "rawType": "number",
           "description": "number of hex digits to return"
         }
@@ -9127,6 +9127,18 @@
       "line": 225,
       "description": "Converts its first argument to a hex string. The number of hex digits is given by the absolute value of the optional second argument. Positive numbers between 1 and 8 generate lowercase hex digits. Negative numbers generate uppercase hex digits. Only the least-significant 4*|n| bits are used. The default is to generate 8 lowercase hex digits.\n\n**Examples:**\n\n```lua\nprint(bit.tohex(1))              --> 00000001\nprint(bit.tohex(-1))             --> ffffffff\nprint(bit.tohex(0xffffffff))     --> ffffffff\nprint(bit.tohex(-1, -8))         --> FFFFFFFF\nprint(bit.tohex(0x21, 4))        --> 0021\nprint(bit.tohex(0x87654321, 4))  --> 4321\n```\n\n[Open in Browser](https://defold.com/ref/bit-lua#bit.tohex:x-n)",
       "disposition": "generated-lua-bridge",
+      "semanticOverride": {
+        "parameterOptional": {
+          "n": true
+        },
+        "evidence": {
+          "source": "engine/script/src/bitop/bitop.c",
+          "line": 128,
+          "claim": "The second argument is optional and defaults to 8.",
+          "observed": "lua_isnone(L, 2) ? 8 : (SBits)barg(L, 2)",
+          "sourceSha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb"
+        }
+      },
       "runtimeStatus": "requires-universal-lua-bridge"
     },
     {

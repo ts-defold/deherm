@@ -1,8 +1,10 @@
 #include <defold_hermes/generated_dmsdk_scalar.h>
+#include <defold_hermes/generated_dmsdk_scalar_runtime.h>
 
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 
 namespace
 {
@@ -22,6 +24,47 @@ namespace
 
 int main()
 {
+    CHECK(deherm_dmsdk_scalar_count() == UINT32_C(26));
+    const DehermDmSdkScalarDescriptor* descriptors = deherm_dmsdk_scalar_descriptors();
+    uint32_t native_js_count = 0;
+    uint32_t browser_js_count = 0;
+    for (uint16_t id = 0; id < deherm_dmsdk_scalar_count(); ++id)
+    {
+        const DehermDmSdkScalarDescriptor& descriptor = descriptors[id];
+        CHECK(descriptor.id == id);
+        CHECK(descriptor.declaration_id != nullptr);
+        CHECK(descriptor.symbol != nullptr);
+        native_js_count += (descriptor.flags & DEHERM_DMSDK_SCALAR_NATIVE_JS) != 0;
+        browser_js_count += (descriptor.flags & DEHERM_DMSDK_SCALAR_BROWSER_JS) != 0;
+
+        uint64_t arguments[DEHERM_DMSDK_SCALAR_MAX_ARGUMENTS] = { UINT64_C(0) };
+        if (descriptor.argument_count != 0)
+        {
+            switch (descriptor.argument_kinds[0])
+            {
+                case DEHERM_DMSDK_SCALAR_U16: arguments[0] = UINT16_C(0x1234); break;
+                case DEHERM_DMSDK_SCALAR_U32: arguments[0] = UINT32_C(0x20); break;
+                case DEHERM_DMSDK_SCALAR_U64: arguments[0] = UINT64_C(0x0123456789abcdef); break;
+                case DEHERM_DMSDK_SCALAR_F32: {
+                    const float value = 0.375f;
+                    uint32_t bits = 0;
+                    std::memcpy(&bits, &value, sizeof(bits));
+                    arguments[0] = bits;
+                    break;
+                }
+                default: break;
+            }
+        }
+        uint64_t result = UINT64_C(0);
+        CHECK(deherm_dmsdk_scalar_dispatch(id, arguments, descriptor.argument_count, &result) ==
+              DEHERM_DMSDK_SCALAR_OK);
+    }
+    CHECK(native_js_count == UINT32_C(26));
+    CHECK(browser_js_count == UINT32_C(16));
+    uint64_t ignored = 0;
+    CHECK(deherm_dmsdk_scalar_dispatch(UINT16_C(26), nullptr, 0, &ignored) ==
+          DEHERM_DMSDK_SCALAR_UNKNOWN_ID);
+
     CHECK(deherm_dmsdk_endian_swap16_u16(UINT16_C(0x1234)) == UINT16_C(0x3412));
     CHECK(deherm_dmsdk_endian_swap32_u32(UINT32_C(0x12345678)) == UINT32_C(0x78563412));
     CHECK(deherm_dmsdk_endian_swap64_u64(UINT64_C(0x0123456789abcdef)) == UINT64_C(0xefcdab8967452301));
@@ -70,6 +113,7 @@ int main()
     const uint64_t after = deherm_dmsdk_dm_time_get_monotonic_time_v();
     CHECK(after >= before);
     CHECK(after - before >= UINT64_C(500));
+    CHECK(deherm_dmsdk_profile_is_initialized_v() == UINT8_C(0));
 
     if (g_Failures != 0) return 1;
     std::puts("dmsdk-scalar-thunks:ok");

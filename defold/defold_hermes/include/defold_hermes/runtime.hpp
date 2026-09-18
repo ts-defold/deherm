@@ -1,11 +1,16 @@
 #pragma once
 
 #include <memory>
+#include <cstddef>
 #include <string>
 
 #include <defold_hermes/lua_bridge_core.hpp>
 
+struct SHUnit;
+
 namespace defold_hermes {
+
+using StaticUnitCreator = ::SHUnit* (*)();
 
 class Host {
  public:
@@ -26,6 +31,11 @@ class Runtime {
   Runtime& operator=(const Runtime&) = delete;
 
   void load(const std::string& source, const std::string& sourceUrl);
+  /** Evaluate AOT units and capture the application registered by the final unit. */
+  void loadStatic(
+      const StaticUnitCreator* unitCreators,
+      size_t unitCount,
+      const std::string& sourceUrl);
   void init();
   void update(double dt);
   void onMessage(const std::string& message);

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 2,
+  "irSource": "doc/builtins.lua",
+  "source": "engine/script/src/script_hash.cpp",
+  "sourceSha256": "0d76c65543191cc9866615ba37109e77f430a216c98dedf474d4f546f9f9ed10",
+  "additionalSourceEvidence": [
+    {
+      "source": "engine/dlib/src/dlib/hash.cpp",
+      "sourceSha256": "fb3577778af004b43b0585fafb5369bd18b89b0a0aa4b7eb322555ccda9a8c51",
+      "anchors": ["return dmHashBuffer64(string, strlen(string));"]
+    }
+  ],
+  "ownership": "Hashes cross the ABI as exact unsigned 64-bit POD values in ScriptValue.payload and JavaScript bigint values. No Lua userdata, registry root, host object, or owned heap pointer crosses the ABI. In debug engines, Defold's dmHashBuffer64 may allocate once to register each previously unseen short string in its reverse-hash table, exactly as Lua hash() does.",
+  "bindings": [
+    {
+      "id": "script:hash",
+      "sourceSymbol": "Hash_new",
+      "sourceOperation": "dmHashString64(str)",
+      "operation": {
+        "template": "hash-string",
+        "parameters": {
+          "algorithm": "dmHashBuffer64",
+          "termination": "nul-or-length",
+          "coercionPolicy": "documented-string-only"
+        }
+      },
+      "callShapes": [["String"]],
+      "resultCodec": "Hash"
+    }
+  ]
+}

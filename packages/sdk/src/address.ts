@@ -2,8 +2,8 @@ declare const defoldHashBrand: unique symbol;
 declare const defoldUrlBrand: unique symbol;
 declare const defoldRelativeAddressBrand: unique symbol;
 
-/** Exact engine hash value. Its runtime representation is adapter-owned. */
-export type DefoldHash<Name extends string = string> = {
+/** Exact unsigned 64-bit engine hash represented as a JavaScript bigint. */
+export type DefoldHash<Name extends string = string> = bigint & {
   readonly [defoldHashBrand]: Name;
 };
 

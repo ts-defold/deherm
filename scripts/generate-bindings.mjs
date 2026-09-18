@@ -391,6 +391,7 @@ function generateJsiSource(schema) {
     "",
     "#if !defined(DM_PLATFORM_HTML5)",
     "#include <defold_hermes/callback_registry.hpp>",
+    "#include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>",
     "#include <defold_hermes/generated_modules.h>",
     "",
     "#include <cmath>",
@@ -467,7 +468,7 @@ function generateJsiSource(schema) {
     }
     lines.push(`  modules.setProperty(runtime, "${module.name}", std::move(${snake(module.name)}));`, "");
   }
-  lines.push("}", "", "}  // namespace defold_hermes", "", "#endif  // !DM_PLATFORM_HTML5", "");
+  lines.push("  installDmSdkScalarModule(runtime, modules);", "}", "", "}  // namespace defold_hermes", "", "#endif  // !DM_PLATFORM_HTML5", "");
   return lines.join("\n");
 }
 
@@ -509,6 +510,7 @@ function generateEmscriptenModules(schema) {
     "var LibraryDefoldHermesGeneratedModules = {",
     `  $DEFOLD_HERMES_GENERATED_MODULES__deps: [${[
       ...symbols,
+      "'$DEFOLD_HERMES_DMSDK_SCALAR'",
       ...(schema.modules.some((module) => module.functions.some((fn) => fn.parameters.some(({ type }) => type === "callback")))
         ? ["'$DEFOLD_HERMES_WEB_CALLBACKS'"]
         : [])
@@ -566,9 +568,10 @@ function generateEmscriptenModules(schema) {
       }
       lines.push(`          }${functionIndex + 1 === module.functions.length ? "" : ","}`);
     }
-    lines.push(`        }${moduleIndex + 1 === schema.modules.length ? "" : ","}`);
+    lines.push("        },");
   }
   lines.push(
+    "        DmSdkScalar: DEFOLD_HERMES_DMSDK_SCALAR.install()",
     "      };",
     "    }",
     "  }",

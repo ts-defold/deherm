@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 2,
+  "irSource": "doc/msg.lua",
+  "source": "engine/script/src/script_msg.cpp",
+  "sourceSha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2",
+  "ownership": "Message arguments are borrowed only for the synchronous Lua call. Defold copies the encoded payload into its bounded message queue before dispatch returns; the queue may allocate internally.",
+  "bindings": [
+    {
+      "id": "script:msg.post",
+      "sourceSymbol": "Msg_Post",
+      "sourceOperation": ["ResolveURL(L, 1, &receiver, &sender)", "dmDDF::GetDescriptorFromHash(message_id)", "dmScript::CheckTable(L, data, MAX_MESSAGE_DATA_SIZE, 3)", "dmMessage::Post(&sender, &receiver, message_id"],
+      "operation": {
+        "template": "message-post",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "script-sender-url",
+          "maxPayloadBytes": 2048,
+          "descriptorLookup": true,
+          "ddfCodec": "defold-generated",
+          "fallbackCodec": "defold-table-wire",
+          "allocationPolicy": "engine-message-queue-may-allocate"
+        }
+      },
+      "callShapes": [["String", "String"], ["String", "Hash"], ["Url", "String"], ["Url", "Hash"], ["Hash", "String"], ["Hash", "Hash"], ["String", "String", "Table"], ["String", "String", "Nil"], ["String", "Hash", "Table"], ["String", "Hash", "Nil"], ["Url", "String", "Table"], ["Url", "String", "Nil"], ["Url", "Hash", "Table"], ["Url", "Hash", "Nil"], ["Hash", "String", "Table"], ["Hash", "String", "Nil"], ["Hash", "Hash", "Table"], ["Hash", "Hash", "Nil"]],
+      "implementedCallShapes": [["String", "String"], ["String", "String", "Table"]],
+      "resultCodec": "None"
+    }
+  ]
+}

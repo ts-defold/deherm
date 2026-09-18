@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 2,
+  "irSource": "doc/go.lua",
+  "source": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+  "sourceSha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74",
+  "ownership": "The active HInstance is borrowed only for the synchronous component-dispatch scope. Inputs and results are copied fixed-layout values; no engine pointer is exposed to JavaScript or retained.",
+  "bindings": [
+    {
+      "id": "script:go.get_position",
+      "sourceSymbol": "Script_GetPosition",
+      "sourceOperation": "dmGameObject::GetPosition(instance)",
+      "operation": {
+        "template": "current-instance-transform-get",
+        "parameters": { "property": "position", "kind": "Vector3" }
+      },
+      "callShapes": [[], ["String"], ["Hash"], ["Url"]],
+      "implementedCallShapes": [[]],
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:go.set_position",
+      "sourceSymbol": "Script_SetPosition",
+      "sourceOperation": "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))",
+      "operation": {
+        "template": "current-instance-transform-set",
+        "parameters": { "property": "position", "kind": "Vector3", "rejectNaN": true }
+      },
+      "callShapes": [["Vector3"], ["Vector3", "String"], ["Vector3", "Hash"], ["Vector3", "Url"]],
+      "implementedCallShapes": [["Vector3"]],
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.set_rotation",
+      "sourceSymbol": "Script_SetRotation",
+      "sourceOperation": "dmGameObject::SetRotation(instance, *q)",
+      "operation": {
+        "template": "current-instance-transform-set",
+        "parameters": { "property": "rotation", "kind": "Quaternion", "rejectNaN": true }
+      },
+      "callShapes": [["Quaternion"], ["Quaternion", "String"], ["Quaternion", "Hash"], ["Quaternion", "Url"]],
+      "implementedCallShapes": [["Quaternion"]],
+      "resultCodec": "None"
+    },
+    {
+      "id": "script:go.delete",
+      "sourceSymbol": "Script_Delete",
+      "sourceOperation": ["ResolveInstance(L, 1)", "dmGameObject::IsBone(instance)", "dmGameObject::Delete(collection, instance, recursive)"],
+      "operation": {
+        "template": "game-object-delete",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-go",
+          "async": true,
+          "rejectBone": true,
+          "singleMissing": "error",
+          "listMissing": "warn-continue",
+          "explicitNil": "error",
+          "allocationPolicy": "bridge-zero-heap"
+        }
+      },
+      "callShapes": [[], ["String"], ["Hash"], ["Url"], ["AddressArray"], ["String", "Boolean"], ["Hash", "Boolean"], ["Url", "Boolean"], ["AddressArray", "Boolean"]],
+      "implementedCallShapes": [[], ["Hash"]],
+      "resultCodec": "None"
+    }
+  ]
+}

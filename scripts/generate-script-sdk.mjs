@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { strFromU8, unzipSync } from "fflate";
 import { reservedParameterSynonyms, safeParameterIdentifier } from "../packages/cli/src/names.mjs";
+import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
+import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archivePath = path.join(root, "upstream", "ref-doc.zip");
@@ -453,7 +455,7 @@ function renderNodeValue(rootName, pathSegments, node, interfaceAccess, indent =
     lines.push(`${indent}get ${property(jsName)}() { return getScriptApiValue(${JSON.stringify(pathSegments.join("."))}, ${JSON.stringify(field.rawName)}) as ${interfaceAccess}[${JSON.stringify(jsName)}]; },`);
   }
   for (const fn of node.functions.sort((a, b) => a.jsName.localeCompare(b.jsName))) {
-    lines.push(`${indent}${property(fn.jsName)}: ((...args: readonly unknown[]) => callScriptApi(${JSON.stringify(pathSegments.join("."))}, ${JSON.stringify(fn.member)}, args)) as ${interfaceAccess}[${JSON.stringify(fn.jsName)}],`);
+    lines.push(`${indent}${property(fn.jsName)}: ((...args: readonly unknown[]) => callScriptApi(${hexBindingId(fn.stableId).replace(/u$/, "")}, args)) as ${interfaceAccess}[${JSON.stringify(fn.jsName)}],`);
   }
   for (const [name, child] of [...node.children].sort(([left], [right]) => left.localeCompare(right))) {
     const jsName = camel(name);
@@ -472,10 +474,11 @@ function generateTypes(model, renderer, trees) {
     'import type { DefoldAddress, DefoldHash, DefoldUrl } from "../../address";',
     "",
     "declare const opaqueBrand: unique symbol;",
+    "declare const defoldValueBrand: unique symbol;",
     "export type DefoldOpaque<Name extends string> = { readonly [opaqueBrand]: Name };",
-    "export type Vector3 = Readonly<{ x: number; y: number; z: number }>;",
-    "export type Vector4 = Readonly<{ x: number; y: number; z: number; w: number }>;",
-    "export type Quaternion = Readonly<{ x: number; y: number; z: number; w: number }>;",
+    "export type Vector3 = Readonly<{ x: number; y: number; z: number; readonly [defoldValueBrand]: \"vector3\" }>;",
+    "export type Vector4 = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: \"vector4\" }>;",
+    "export type Quaternion = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: \"quaternion\" }>;",
     "export type Matrix4 = readonly [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];",
     ""
   ];
@@ -520,9 +523,20 @@ function generateModules(trees) {
 
 function generateRuntime() {
   return `${banner}
+import { assertValueRouteTargetSupport } from "./value-target-support";
+import { assertFixedTupleTargetSupport } from "./fixed-tuple-target-support";
+
 export interface DefoldScriptBridge {
-  call(modulePath: string, memberName: string, args: readonly unknown[]): unknown;
-  get(modulePath: string, memberName: string): unknown;
+  /** Stable-ID universal call surface. Primitive scalar values are the first executable lane. */
+  call(stableId: number, args: readonly unknown[]): unknown;
+  /** Generated execution target used to fail closed before unsupported host codecs run. */
+  readonly target?: "native-hermes" | "html5-browser-host";
+  /** Constants remain name-addressed until generated constant IDs join the universal ABI. */
+  get?(modulePath: string, memberName: string): unknown;
+}
+
+declare global {
+  var __defoldScriptBridgeV1: DefoldScriptBridge | undefined;
 }
 
 let activeBridge: DefoldScriptBridge | undefined;
@@ -532,16 +546,22 @@ export function installDefoldScriptBridge(bridge: DefoldScriptBridge): void {
 }
 
 function bridge(): DefoldScriptBridge {
-  if (!activeBridge) throw new Error("Defold script bridge has not been installed");
-  return activeBridge;
+  const installed = activeBridge ?? globalThis.__defoldScriptBridgeV1;
+  if (!installed) throw new Error("Defold script bridge has not been installed");
+  return installed;
 }
 
-export function callScriptApi(modulePath: string, memberName: string, args: readonly unknown[]): unknown {
-  return bridge().call(modulePath, memberName, args);
+export function callScriptApi(stableId: number, args: readonly unknown[]): unknown {
+  const installed = bridge();
+  assertValueRouteTargetSupport(stableId, installed.target);
+  assertFixedTupleTargetSupport(installed.target, stableId);
+  return installed.call(stableId, args);
 }
 
 export function getScriptApiValue(modulePath: string, memberName: string): unknown {
-  return bridge().get(modulePath, memberName);
+  const installed = bridge();
+  if (!installed.get) throw new Error("Defold script constants are not executable through the universal bridge yet");
+  return installed.get(modulePath, memberName);
 }
 `;
 }
@@ -564,6 +584,26 @@ async function output(file, contents) {
 
 requireBuffer = await readFile(archivePath);
 const model = parseArchive();
+const semanticOverrides = await loadScriptSemanticOverrides(new URL("../", import.meta.url));
+const functionsById = new Map(model.functions.map((fn) => [fn.id, fn]));
+for (const [id, override] of semanticOverrides) {
+  const fn = functionsById.get(id);
+  if (!fn) throw new Error(`Script semantic override does not match an imported function: ${id}`);
+  for (const [rawName, optional] of Object.entries(override.parameterOptional)) {
+    const parameter = fn.parameters.find((candidate) => candidate.rawName === rawName);
+    if (!parameter) throw new Error(`Script semantic override does not match ${id} parameter ${rawName}`);
+    if (typeof optional !== "boolean") throw new Error(`Script semantic override optionality must be boolean: ${id}.${rawName}`);
+    parameter.optional = optional;
+  }
+  fn.semanticOverride = override;
+}
+const stableIds = new Map();
+for (const fn of model.functions) {
+  fn.stableId = stableBindingId(fn.id);
+  const collision = stableIds.get(fn.stableId);
+  if (collision) throw new Error(`Stable script binding ID collision ${hexBindingId(fn.stableId)}: ${collision} and ${fn.id}`);
+  stableIds.set(fn.stableId, fn.id);
+}
 const luaCompatibility = JSON.parse(await readFile(path.join(root, "bindings", "lua-compat.json"), "utf8"));
 const implementedLuaFunctions = new Set(luaCompatibility.modules.flatMap((module) =>
   module.functions.map((fn) => `${module.luaModule}.${fn.luaFunction}`)
@@ -586,7 +626,7 @@ const ir = {
   unresolvedTypes,
   runtimeImplementedCount: model.functions.filter(({ runtimeStatus }) => runtimeStatus.startsWith("implemented-")).length,
   runtimeUnimplementedCount: model.functions.filter(({ runtimeStatus }) => runtimeStatus.startsWith("requires-")).length,
-  functions: model.functions,
+  functions: model.functions.map(({ stableId: _stableId, ...fn }) => fn),
   types: [...model.classes.map((item) => ({ ...item, kind: "class", disposition: "generated-type" })), ...model.aliases.map((item) => ({ ...item, kind: "alias", disposition: "generated-type" })), ...model.enums.map((item) => ({ ...item, kind: "enum", disposition: "generated-type" }))]
 };
 await output(irPath, `${JSON.stringify(ir, null, 2)}\n`);

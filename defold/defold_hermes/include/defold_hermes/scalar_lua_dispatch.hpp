@@ -115,6 +115,7 @@ class Dispatcher {
   /** Clears references without touching Lua after the owner has already closed the state. */
   void detach() noexcept;
   bool captureInstance(int stackIndex) noexcept;
+  void detachInstance() noexcept;
   bool bind(uint32_t stableId) noexcept;
   bool isBound(uint32_t stableId) const noexcept;
 

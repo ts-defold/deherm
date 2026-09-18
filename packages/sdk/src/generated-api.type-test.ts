@@ -10,7 +10,7 @@ import {
   vmath
 } from "./index";
 
-const position: Vector3 = { x: 10, y: 20, z: 0 };
+const position: Vector3 = vmath.vector3(10, 20, 0);
 const clampedPosition: Vector3 = vmath.clamp(position, position, position);
 const interpolatedPosition: Vector3 = vmath.lerp(0.5, position, position);
 void clampedPosition;

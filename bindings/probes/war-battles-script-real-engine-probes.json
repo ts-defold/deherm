@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "target": "arm64-macos-dynamic-hermes",
+  "setups": [
+    {
+      "id": "war-battles-game-object",
+      "context": "game-object",
+      "fixture": {
+        "collection": "/conformance/war_battles.collection",
+        "gameObject": "/probe",
+        "component": "#probe",
+        "factory": "#probe_factory",
+        "factoryPrototype": "/conformance/factory_probe.go",
+        "requiredContextBehavior": "Factory child init executes with the child active, then the parent game-object context is restored before factory.create returns."
+      }
+    },
+    {
+      "id": "war-battles-gui-scene",
+      "context": "gui-scene",
+      "fixture": {
+        "collection": "/conformance/war_battles.collection",
+        "component": "/probe#probe_gui",
+        "node": "status",
+        "initialText": "BEFORE",
+        "expectedText": "DEHERM_PROBE_TEXT",
+        "contextSource": "generated .gui_script Lua proxy with captured Lua/HScene identity",
+        "publicDmSdkAvailable": false
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "key": "war-battles.msg.post.current-object",
+      "routeId": "script:msg.post",
+      "setupId": "war-battles-game-object",
+      "entrypoint": "gameObject",
+      "expectedSignature": {
+        "parameters": ["string|url|hash", "string|hash", "table<any, any>|nil"],
+        "returns": []
+      },
+      "expectedCallShape": ["String", "String"],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "script-sender-url",
+        "maxPayloadBytes": 2048
+      },
+      "invocation": {
+        "arguments": [
+          { "kind": "literal", "value": "." },
+          { "kind": "literal", "value": "deherm_probe_message" }
+        ]
+      },
+      "assertions": [
+        "receiver-observes-full-sender-url",
+        "serialized-payload-at-or-below-2048-bytes-is-delivered",
+        "serialized-payload-above-2048-bytes-is-rejected"
+      ],
+      "assertionHarnessState": "planned"
+    },
+    {
+      "key": "war-battles.factory.create",
+      "routeId": "script:factory.create",
+      "setupId": "war-battles-game-object",
+      "entrypoint": "gameObject",
+      "expectedSignature": {
+        "parameters": ["string|hash|url", "vector3", "quaternion", "table<string|hash, any>", "number|vector3"],
+        "returns": ["hash"]
+      },
+      "expectedCallShape": ["String"],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-go",
+        "resultPolicy": "hash-or-undefined",
+        "reentrant": true
+      },
+      "invocation": {
+        "capture": "createdId",
+        "arguments": [
+          { "kind": "literal", "value": "#probe_factory" }
+        ]
+      },
+      "assertions": [
+        "factory-child-init-runs-with-child-context",
+        "parent-game-object-context-restored-after-child-init"
+      ],
+      "assertionHarnessState": "planned"
+    },
+    {
+      "key": "war-battles.go.delete-created",
+      "routeId": "script:go.delete",
+      "setupId": "war-battles-game-object",
+      "entrypoint": "gameObject",
+      "expectedSignature": {
+        "parameters": ["string|hash|url|(string|hash|url)[]", "boolean"],
+        "returns": []
+      },
+      "expectedCallShape": ["Hash"],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-go",
+        "async": true
+      },
+      "invocation": {
+        "arguments": [
+          { "kind": "capture", "name": "createdId" }
+        ]
+      },
+      "assertions": [
+        "created-object-remains-live-until-end-of-frame",
+        "created-object-is-deleted-after-end-of-frame"
+      ],
+      "assertionHarnessState": "planned"
+    },
+    {
+      "key": "war-battles.gui.get-node",
+      "routeId": "script:gui.get_node",
+      "setupId": "war-battles-gui-scene",
+      "entrypoint": "gui",
+      "expectedSignature": {
+        "parameters": ["string|hash"],
+        "returns": ["node"]
+      },
+      "expectedCallShape": ["String"],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-gui-scene",
+        "handlePolicy": "generational-registry-ref"
+      },
+      "invocation": {
+        "capture": "statusNode",
+        "arguments": [
+          { "kind": "literal", "value": "status" }
+        ]
+      },
+      "assertions": [
+        "active-gui-scene-token-required",
+        "wrong-scene-token-rejected",
+        "deleted-node-token-rejected",
+        "finalized-scene-token-rejected"
+      ],
+      "assertionHarnessState": "planned"
+    },
+    {
+      "key": "war-battles.gui.set-text",
+      "routeId": "script:gui.set_text",
+      "setupId": "war-battles-gui-scene",
+      "entrypoint": "gui",
+      "expectedSignature": {
+        "parameters": ["node", "string|number"],
+        "returns": []
+      },
+      "expectedCallShape": ["Node", "String"],
+      "expectedOperationParameters": {
+        "backend": "captured-lua",
+        "context": "active-gui-scene",
+        "handlePolicy": "generational-registry-ref",
+        "numberFormat": "lua-5.1-%.14g"
+      },
+      "invocation": {
+        "arguments": [
+          { "kind": "capture", "name": "statusNode" },
+          { "kind": "literal", "value": "DEHERM_PROBE_TEXT" }
+        ]
+      },
+      "assertions": [
+        "active-gui-scene-token-required",
+        "wrong-scene-token-rejected",
+        "deleted-node-token-rejected",
+        "finalized-scene-token-rejected",
+        "numeric-text-uses-defold-number-formatting"
+      ],
+      "assertionHarnessState": "planned"
+    }
+  ],
+  "observations": []
+}

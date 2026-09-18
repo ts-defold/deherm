@@ -1,11 +1,15 @@
 import { build } from "esbuild";
 import ttsc from "@ttsc/unplugin/esbuild";
 import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import path from "node:path";
+
+const pendingFingerprint = "0".repeat(64);
 
 const result = await build({
   entryPoints: {
-    sample: "sample/src/main.ts",
+    sample: "sample/src/standalone.ts",
+    "defold-app": "sample/src/main.ts",
     "binding-benchmark": "benchmarks/binding.ts",
     "web-host": "packages/web-adapter/src/host.ts",
     "web-runner": "packages/web-adapter/src/runner.ts"
@@ -16,12 +20,29 @@ const result = await build({
   platform: "neutral",
   target: "es2020",
   plugins: [ttsc()],
+  define: {
+    __DEFOLD_HERMES_BUILD_FINGERPRINT__: JSON.stringify(pendingFingerprint)
+  },
   sourcemap: true,
   sourcesContent: true,
   legalComments: "none",
   logLevel: "info",
   metafile: true
 });
+
+const defoldAppPath = "dist/defold-app.js";
+const defoldAppWithPlaceholder = await readFile(defoldAppPath, "utf8");
+const placeholderOccurrences = defoldAppWithPlaceholder.split(pendingFingerprint).length - 1;
+if (placeholderOccurrences !== 1) {
+  throw new Error(`Expected one Defold runtime fingerprint placeholder, found ${placeholderOccurrences}`);
+}
+const defoldAppFingerprint = createHash("sha256")
+  .update(defoldAppWithPlaceholder)
+  .digest("hex");
+await writeFile(
+  defoldAppPath,
+  defoldAppWithPlaceholder.replace(pendingFingerprint, defoldAppFingerprint)
+);
 
 const symbolMap = JSON.parse(await readFile("bindings/generated/symbol-map.json", "utf8"));
 const symbolsBySource = new Map(symbolMap.symbols.map((symbol) => [symbol.source, symbol]));
@@ -50,5 +71,6 @@ for (const [output, metadata] of Object.entries(result.metafile.outputs)) {
   await writeFile(usagePath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
-await mkdir("defold/defold_hermes_app", { recursive: true });
-await copyFile("dist/sample.js", "defold/defold_hermes_app/app.js");
+await mkdir("defold/deherm", { recursive: true });
+await copyFile(defoldAppPath, "defold/deherm/app.dehermc");
+await copyFile(`${defoldAppPath}.map`, "defold/deherm/app.dehermc.map");

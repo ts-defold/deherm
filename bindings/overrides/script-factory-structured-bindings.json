@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "irSource": "doc/factory.lua",
+  "source": "engine/gamesys/src/gamesys/scripts/script_factory.cpp",
+  "sourceSha256": "df20de4ae9494abf875e71f468b56b732add418c770f745aaeb79d0b0affbfbb",
+  "ownership": "Factory inputs are call-local snapshots. Defold owns the spawned instance and copied property container. Property conversion, spawning, and synchronous dynamic resource loading may allocate by engine contract.",
+  "bindings": [
+    {
+      "id": "script:factory.create",
+      "sourceSymbol": "FactoryComp_Create",
+      "sourceOperation": ["dmScript::CheckGOInstance(L)", "dmScript::GetComponentFromLua(L, 1, FACTORY_EXT", "dmGameObject::PropertyContainerCreateFromLua(L, 4)", "CompFactorySpawn(world, component, collection", "lua_pushnil(L)"],
+      "operation": {
+        "template": "factory-spawn",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-go",
+          "componentType": "factoryc",
+          "positionDefault": "sender-world-position",
+          "rotationDefault": "sender-world-rotation",
+          "scaleDefault": "sender-world-scale",
+          "propertyKeyReality": "string-only",
+          "resultPolicy": "hash-or-undefined",
+          "reentrant": true,
+          "allocationPolicy": "engine-property-spawn-resource-may-allocate"
+        }
+      },
+      "callShapes": [["String"], ["Hash"], ["Url"], ["String", "Vector3"], ["Hash", "Vector3"], ["Url", "Vector3"], ["String", "Vector3", "Quaternion"], ["Hash", "Vector3", "Quaternion"], ["Url", "Vector3", "Quaternion"], ["String", "Vector3", "Quaternion", "Table"], ["Hash", "Vector3", "Quaternion", "Table"], ["Url", "Vector3", "Quaternion", "Table"], ["String", "Vector3", "Quaternion", "Table", "Number"], ["String", "Vector3", "Quaternion", "Table", "Vector3"], ["Hash", "Vector3", "Quaternion", "Table", "Number"], ["Hash", "Vector3", "Quaternion", "Table", "Vector3"], ["Url", "Vector3", "Quaternion", "Table", "Number"], ["Url", "Vector3", "Quaternion", "Table", "Vector3"]],
+      "implementedCallShapes": [["String"], ["String", "Vector3", "Nil", "Table"]],
+      "resultCodec": "Hash"
+    }
+  ]
+}

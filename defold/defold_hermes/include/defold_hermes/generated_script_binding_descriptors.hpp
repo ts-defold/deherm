@@ -15,7 +15,7 @@ inline constexpr std::size_t kBindingCount = 923;
 inline constexpr std::size_t kParameterSlotCount = 1577;
 inline constexpr std::size_t kReturnSlotCount = 624;
 inline constexpr std::uint8_t kVariableArity = 255;
-inline constexpr std::string_view kDescriptorAbiSha256 = "c79e665df9f20b3f74399ebf6e41ba064598528ff2dd91bf30e886a5b8856881";
+inline constexpr std::string_view kDescriptorAbiSha256 = "c9436592d52ed41bdbf83833304093aa2d12e0e837ab5e0ca6a95b1aabc15e74";
 
 enum class Family : std::uint8_t {
   DynamicValues = 0,
@@ -438,7 +438,7 @@ inline constexpr std::array<std::uint8_t, kBindingCount> kMinimumArity = {{
     2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 2, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 3, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 1, 4, 2, 2, 3, 2, 2, 2, 1, 1,
-    1, 1, 1, 2, 2, 2, 2, 1, 2, 5, 5, 2, 2, 2, 2, 4, 1, 2, 1, 1,
+    1, 1, 1, 2, 2, 2, 2, 1, 1, 5, 5, 2, 2, 2, 2, 4, 1, 2, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 2, 2, 3, 2,
     3, 2, 2, 3, 1, 2, 3, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -773,7 +773,7 @@ inline constexpr std::array<std::uint8_t, kParameterSlotCount> kParameterFlags =
     1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
-    0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

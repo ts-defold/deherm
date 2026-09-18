@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 1,
+  "target": "arm64-macos-dynamic-hermes",
+  "instrumentedProbeSet": {
+    "marker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+    "semanticSha256": "7a0fccc202a689ab85d6345e98277aa627d04297435b10a65e8ef4bddcaae33c"
+  },
+  "plannedFamilyRecipes": [
+    {
+      "generatedFamily": "gui-node-setters",
+      "context": "active-gui-scene",
+      "scenarioKeyPrefix": "planned:gui-node-setter:",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution."
+    }
+  ],
+  "probes": [
+    {
+      "key": "builtins.hash.my_hash",
+      "id": "script:hash",
+      "arguments": ["my_hash"],
+      "expectation": { "kind": "hashHex", "value": "a2bc06d97f580aab" }
+    },
+    {
+      "key": "vmath.vector3.zero",
+      "id": "script:vmath.vector3",
+      "arguments": [],
+      "expectation": { "kind": "components", "values": [0, 0, 0], "tolerance": 0 }
+    },
+    {
+      "key": "vmath.length.vector3",
+      "id": "script:vmath.length",
+      "arguments": [{ "codec": "Vector3", "components": [3, 4, 0] }],
+      "expectation": { "kind": "number", "value": 5, "tolerance": 0 }
+    },
+    {
+      "key": "vmath.normalize.vector3",
+      "id": "script:vmath.normalize",
+      "arguments": [{ "codec": "Vector3", "components": [3, 4, 0] }],
+      "expectation": { "kind": "components", "values": [0.6, 0.8, 0], "tolerance": 0.000001 }
+    },
+    {
+      "key": "vmath.quat_rotation_z.pi",
+      "id": "script:vmath.quat_rotation_z",
+      "arguments": [3.141592653589793],
+      "expectation": { "kind": "components", "values": [0, 0, 1, 0], "tolerance": 0.000001 }
+    },
+    {
+      "key": "vmath.quat.identity",
+      "id": "script:vmath.quat",
+      "arguments": [],
+      "expectation": { "kind": "components", "values": [0, 0, 0, 1], "tolerance": 0 }
+    },
+    {
+      "key": "go.set_position.current",
+      "id": "script:go.set_position",
+      "arguments": [{ "codec": "Vector3", "components": [13, 21, 34] }],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_position.current:ok"
+      }
+    },
+    {
+      "key": "go.get_position.current",
+      "id": "script:go.get_position",
+      "arguments": [],
+      "expectation": { "kind": "components", "values": [13, 21, 34], "tolerance": 0 }
+    },
+    {
+      "key": "go.set_rotation.current",
+      "id": "script:go.set_rotation",
+      "arguments": [{ "codec": "Quaternion", "components": [0, 0, 0.7071067811865476, 0.7071067811865476] }],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_rotation.current:ok"
+      }
+    },
+    {
+      "key": "msg.post.current-object",
+      "id": "script:msg.post",
+      "state": "planned",
+      "reason": "Requires the generated message receiver fixture and delivery assertion harness.",
+      "arguments": [".", "deherm_probe_message"],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:msg.post.current-object:ok"
+      }
+    },
+    {
+      "key": "factory.create.probe",
+      "id": "script:factory.create",
+      "state": "planned",
+      "reason": "Requires a real #probe_factory component plus child-init and parent-context assertions.",
+      "arguments": ["#probe_factory"],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:factory.create.probe:ok"
+      }
+    },
+    {
+      "key": "go.delete.factory-probe",
+      "id": "script:go.delete",
+      "state": "planned",
+      "reason": "Requires a real factory fixture and before/after end-of-frame deletion assertions.",
+      "arguments": [{ "codec": "Hash", "factoryCreate": "#probe_factory" }],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.delete.factory-probe:ok"
+      }
+    },
+    {
+      "key": "gui.get_node.status",
+      "id": "script:gui.get_node",
+      "state": "planned",
+      "reason": "Requires execution from a real generated .gui_script with an active GUI scene.",
+      "arguments": ["status"],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:gui.get_node.status:ok"
+      }
+    },
+    {
+      "key": "gui.set_text.status",
+      "id": "script:gui.set_text",
+      "state": "planned",
+      "reason": "Requires execution from a real generated .gui_script and text readback assertions.",
+      "arguments": [{ "codec": "Node", "guiGetNode": "status" }, "DEHERM_PROBE_TEXT"],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:gui.set_text.status:ok"
+      }
+    }
+  ]
+}

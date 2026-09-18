@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "overrides": [
+    {
+      "id": "script:bit.tohex",
+      "parameterOptional": { "n": true },
+      "evidence": {
+        "source": "engine/script/src/bitop/bitop.c",
+        "line": 128,
+        "claim": "The second argument is optional and defaults to 8.",
+        "observed": "lua_isnone(L, 2) ? 8 : (SBits)barg(L, 2)"
+      }
+    }
+  ]
+}

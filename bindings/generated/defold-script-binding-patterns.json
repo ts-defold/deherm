@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "sourceSha256": "a5603ef4b7c2ef94a5503693cc5692cc4f0e165d11a4ee8b44453093eef33f89",
+  "sourceSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
   "scope": "runtime-pending Defold script functions only",
   "coverageClaim": "classification only; no executable binding coverage is claimed",
   "pendingFunctionCount": 923,
@@ -11428,7 +11428,7 @@
         {
           "name": "n",
           "rawType": "number",
-          "optional": false,
+          "optional": true,
           "codecs": [
             "scalar"
           ]

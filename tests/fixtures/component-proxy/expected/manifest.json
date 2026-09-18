@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "generator": "@ts-defold/deherm component-proxy-generator/v1",
+  "componentIdNamespace": "deherm.component/v1",
+  "components": [
+    {
+      "componentId": "deherm.component/v1/bf9d9d8ca59e486805b929b32e188c5c6c8b4fafded4442d26e6ad27f931304b",
+      "source": "player.script.ts",
+      "proxy": "player.script",
+      "proxyKind": "script",
+      "contextKind": "game-object",
+      "sourceSha256": "c5bfaf7b53440054264c93d212626548a67c9ec2c5054f46be5a9be0087eb00d",
+      "schemaFingerprint": "86ee3419221d007f14096a22ac7dbfd337c4dd7af7ec6f2e70c97fdfef48946c",
+      "reloadPolicy": "preserve-instance-state",
+      "lifecycleMask": 63,
+      "lifecycles": {
+        "init": true,
+        "update": true,
+        "final": true,
+        "onMessage": true,
+        "onInput": true,
+        "onReload": true
+      },
+      "properties": [
+        {
+          "name": "speed",
+          "slot": 0,
+          "kind": "number",
+          "codecId": 1,
+          "default": 120
+        },
+        {
+          "name": "enabled",
+          "slot": 1,
+          "kind": "boolean",
+          "codecId": 2,
+          "default": true
+        },
+        {
+          "name": "title",
+          "slot": 2,
+          "kind": "string",
+          "codecId": 3,
+          "default": "War Battles"
+        },
+        {
+          "name": "team",
+          "slot": 3,
+          "kind": "hash",
+          "codecId": 4,
+          "default": "blue"
+        },
+        {
+          "name": "target",
+          "slot": 4,
+          "kind": "url",
+          "codecId": 5,
+          "default": null
+        },
+        {
+          "name": "spawn",
+          "slot": 5,
+          "kind": "vector3",
+          "codecId": 6,
+          "default": [
+            1,
+            2.5,
+            -3
+          ]
+        },
+        {
+          "name": "tint",
+          "slot": 6,
+          "kind": "vector4",
+          "codecId": 7,
+          "default": [
+            1,
+            0.5,
+            0.25,
+            1
+          ]
+        },
+        {
+          "name": "rotation",
+          "slot": 7,
+          "kind": "quaternion",
+          "codecId": 8,
+          "default": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "name": "tankAtlas",
+          "slot": 8,
+          "kind": "resource",
+          "resourceKind": "atlas",
+          "codecId": 9,
+          "default": "/assets/tanks.atlas"
+        }
+      ],
+      "native": {
+        "symbol": "deherm_component_bf9d9d8ca59e486805b929b32e188c5c"
+      }
+    }
+  ]
+}

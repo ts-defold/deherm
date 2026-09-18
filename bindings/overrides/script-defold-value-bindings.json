@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "irSource": "doc/vmath.lua",
+  "source": "engine/script/src/script_vmath.cpp",
+  "sourceSha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+  "additionalSourceEvidence": [
+    {
+      "source": "engine/script/src/script_vmath.cpp",
+      "sourceSha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+      "anchors": [
+        "return !isnan(v->getX()) && !isnan(v->getY()) && !isnan(v->getZ());",
+        "return !isnan(v->getX()) && !isnan(v->getY()) && !isnan(v->getZ()) && !isnan(v->getW());",
+        "return !isnan(q->getX()) && !isnan(q->getY()) && !isnan(q->getZ()) && !isnan(q->getW());",
+        "CheckMatrix4Components(Matrix4* m)"
+      ]
+    }
+  ],
+  "ownership": "Values cross the ABI as caller-owned inline float32 snapshots. Matrix4 values use a generation-checked, fixed-capacity frame arena; no Lua userdata pointer, registry root, or heap allocation crosses or survives a call.",
+  "families": [
+    {
+      "id": "vmath-matrix4",
+      "selector": {
+        "modulePath": ["vmath"],
+        "loweringFamily": "defold-value",
+        "allowedTypes": ["number", "vector3", "vector4", "quaternion", "matrix4"],
+        "requiredIds": [
+          "script:vmath.inv",
+          "script:vmath.matrix4_axis_angle",
+          "script:vmath.matrix4_compose",
+          "script:vmath.matrix4_frustum",
+          "script:vmath.matrix4_look_at",
+          "script:vmath.matrix4_orthographic",
+          "script:vmath.matrix4_perspective",
+          "script:vmath.matrix4_quat",
+          "script:vmath.matrix4_rotation_x",
+          "script:vmath.matrix4_rotation_y",
+          "script:vmath.matrix4_rotation_z",
+          "script:vmath.matrix4_translation",
+          "script:vmath.ortho_inv",
+          "script:vmath.quat_matrix4"
+        ],
+        "expectedRouteCount": 14,
+        "expectedCallShapeCount": 16,
+        "terminalOperations": [
+          { "id": "script:vmath.inv", "operator": "matrix-inverse", "sourceAnchor": "dmVMath::Inverse(*m)", "implementedCallShapes": [["Matrix4"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.inv", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Matrix4", "components": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] }], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_axis_angle", "operator": "matrix-axis-angle", "sourceAnchor": "Matrix4::rotation(angle, *axis)", "implementedCallShapes": [["Vector3", "Number"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.axis-angle", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Vector3", "components": [0, 0, 1] }, 0], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_compose", "operator": "matrix-compose", "sourceAnchor": "translation_matrix * rotation_matrix * scale_matrix", "extraSourceAnchors": ["translation->getXYZ()"], "implementedCallShapes": [["Vector3", "Quaternion", "Vector3"], ["Vector4", "Quaternion", "Vector3"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.compose", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Vector3", "components": [0, 0, 0] }, { "codec": "Quaternion", "components": [0, 0, 0, 1] }, { "codec": "Vector3", "components": [1, 1, 1] }], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_frustum", "operator": "matrix-frustum", "sourceAnchor": "Matrix4::frustum(left, right, bottom, top, near_z, far_z)", "extraSourceAnchors": ["if(near_z == 0.0f)", "dmLogWarning"], "implementedCallShapes": [["Number", "Number", "Number", "Number", "Number", "Number"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.frustum", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [-1, 1, -1, 1, 1, 10], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.2222222, -1, 0, 0, -2.2222222, 0], "tolerance": 0.00001 } } },
+          { "id": "script:vmath.matrix4_look_at", "operator": "matrix-look-at", "sourceAnchor": "Matrix4::lookAt(Point3(*CheckVector3(L, 1)), Point3(*CheckVector3(L, 2)), *CheckVector3(L, 3))", "implementedCallShapes": [["Vector3", "Vector3", "Vector3"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.look-at", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Vector3", "components": [0, 0, 1] }, { "codec": "Vector3", "components": [0, 0, 0] }, { "codec": "Vector3", "components": [0, 1, 0] }], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -1, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_orthographic", "operator": "matrix-orthographic", "sourceAnchor": "Matrix4::orthographic(left, right, bottom, top, near_z, far_z)", "implementedCallShapes": [["Number", "Number", "Number", "Number", "Number", "Number"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.orthographic", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [-1, 1, -1, 1, -1, 1], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_perspective", "operator": "matrix-perspective", "sourceAnchor": "Matrix4::perspective(fov, aspect, near_z, far_z)", "extraSourceAnchors": ["if(near_z == 0.0f)", "dmLogWarning"], "implementedCallShapes": [["Number", "Number", "Number", "Number"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.perspective", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [1.5707963267948966, 1, 1, 10], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, -1.2222222, -1, 0, 0, -2.2222222, 0], "tolerance": 0.00001 } } },
+          { "id": "script:vmath.matrix4_quat", "operator": "matrix-quaternion", "sourceAnchor": "Matrix4::rotation(*CheckQuat(L, 1))", "implementedCallShapes": [["Quaternion"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.quat", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Quaternion", "components": [0, 0, 0, 1] }], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_rotation_x", "operator": "matrix-rotation-x", "sourceAnchor": "Matrix4::rotationX((float) luaL_checknumber(L, 1))", "implementedCallShapes": [["Number"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.rotation-x", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [0], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_rotation_y", "operator": "matrix-rotation-y", "sourceAnchor": "Matrix4::rotationY((float) luaL_checknumber(L, 1))", "implementedCallShapes": [["Number"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.rotation-y", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [0], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_rotation_z", "operator": "matrix-rotation-z", "sourceAnchor": "Matrix4::rotationZ((float) luaL_checknumber(L, 1))", "implementedCallShapes": [["Number"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.rotation-z", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [0], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.matrix4_translation", "operator": "matrix-translation", "sourceAnchor": "Matrix4::translation", "extraSourceAnchors": ["t1->getXYZ()"], "implementedCallShapes": [["Vector3"], ["Vector4"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.translation", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Vector4", "components": [1, 2, 3, 999] }], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.ortho_inv", "operator": "matrix-ortho-inverse", "sourceAnchor": "dmVMath::OrthoInverse(*m)", "implementedCallShapes": [["Matrix4"]], "resultCodec": "Matrix4", "probe": { "key": "vmath-matrix4.ortho-inv", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Matrix4", "components": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] }], "expectation": { "kind": "components", "values": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1], "tolerance": 0 } } },
+          { "id": "script:vmath.quat_matrix4", "operator": "quaternion-from-matrix", "sourceAnchor": "dmVMath::Quat(matrix->getUpper3x3())", "implementedCallShapes": [["Matrix4"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-matrix4.quat-from-matrix", "state": "planned", "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.", "arguments": [{ "codec": "Matrix4", "components": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1] }], "expectation": { "kind": "components", "values": [0, 0, 0, 1], "tolerance": 0 } } }
+        ]
+      },
+      "operation": {
+        "template": "vmath-matrix4",
+        "parameters": {
+          "layout": "column-major-16-float32",
+          "storage": "generation-checked-frame-arena",
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none"
+        }
+      }
+    },
+    {
+      "id": "vmath-fixed-pod",
+      "selector": {
+        "modulePath": ["vmath"],
+        "loweringFamily": "defold-value",
+        "allowedTypes": ["number", "vector3", "vector4", "quaternion"],
+        "excludedIds": [
+          "script:vmath.length",
+          "script:vmath.normalize",
+          "script:vmath.quat",
+          "script:vmath.quat_rotation_z",
+          "script:vmath.vector3"
+        ],
+        "expectedRouteCount": 11,
+        "terminalOperations": [
+          { "operator": "quaternion-conjugate", "sourceAnchor": "dmVMath::Conjugate(*q)", "implementedCallShapes": [["Quaternion"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-fixed-pod.conj", "arguments": [{ "codec": "Quaternion", "components": [1, 2, 3, 4] }], "expectation": { "kind": "components", "values": [-1, -2, -3, 4], "tolerance": 0 } } },
+          { "operator": "vector3-cross", "sourceAnchor": "dmVMath::Cross(*v1, *v2)", "implementedCallShapes": [["Vector3", "Vector3"]], "resultCodec": "Vector3", "probe": { "key": "vmath-fixed-pod.cross", "arguments": [{ "codec": "Vector3", "components": [1, 0, 0] }, { "codec": "Vector3", "components": [0, 1, 0] }], "expectation": { "kind": "components", "values": [0, 0, 1], "tolerance": 0 } } },
+          { "operator": "euler-to-quaternion", "sourceAnchor": "dmVMath::EulerToQuat", "implementedCallShapes": [["Vector3"], ["Number", "Number", "Number"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-fixed-pod.euler-to-quat", "arguments": [{ "codec": "Vector3", "components": [0, 0, 90] }], "expectation": { "kind": "components", "values": [0, 0, 0.70710677, 0.70710677], "tolerance": 0.000001 } } },
+          { "operator": "length-squared", "sourceAnchor": "dmVMath::LengthSqr(*v)", "implementedCallShapes": [["Vector3"], ["Vector4"], ["Quaternion"]], "resultCodec": "Number", "probe": { "key": "vmath-fixed-pod.length-sqr", "arguments": [{ "codec": "Vector3", "components": [3, 4, 0] }], "expectation": { "kind": "number", "value": 25, "tolerance": 0 } } },
+          { "operator": "vector3-project", "sourceAnchor": "dmVMath::Dot(*v1, *v2) / sq_len", "implementedCallShapes": [["Vector3", "Vector3"]], "resultCodec": "Number", "probe": { "key": "vmath-fixed-pod.project", "arguments": [{ "codec": "Vector3", "components": [1, 1, 0] }, { "codec": "Vector3", "components": [2, 0, 0] }], "expectation": { "kind": "number", "value": 0.5, "tolerance": 0 } } },
+          { "operator": "quaternion-axis-angle", "sourceAnchor": "Quat::rotation(angle, *axis)", "implementedCallShapes": [["Vector3", "Number"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-fixed-pod.quat-axis-angle", "arguments": [{ "codec": "Vector3", "components": [0, 0, 1] }, 3.141592653589793], "expectation": { "kind": "components", "values": [0, 0, 1, 0], "tolerance": 0.000001 } } },
+          { "operator": "quaternion-basis", "sourceAnchor": "PushQuat(L, Quat(m))", "implementedCallShapes": [["Vector3", "Vector3", "Vector3"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-fixed-pod.quat-basis", "arguments": [{ "codec": "Vector3", "components": [1, 0, 0] }, { "codec": "Vector3", "components": [0, 1, 0] }, { "codec": "Vector3", "components": [0, 0, 1] }], "expectation": { "kind": "components", "values": [0, 0, 0, 1], "tolerance": 0 } } },
+          { "operator": "quaternion-from-to", "sourceAnchor": "Quat::rotation(*v1, *v2)", "implementedCallShapes": [["Vector3", "Vector3"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-fixed-pod.quat-from-to", "arguments": [{ "codec": "Vector3", "components": [1, 0, 0] }, { "codec": "Vector3", "components": [0, 1, 0] }], "expectation": { "kind": "components", "values": [0, 0, 0.70710677, 0.70710677], "tolerance": 0.000001 } } },
+          { "operator": "quaternion-rotation-x", "sourceAnchor": "Quat::rotationX(angle)", "implementedCallShapes": [["Number"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-fixed-pod.quat-rotation-x", "arguments": [3.141592653589793], "expectation": { "kind": "components", "values": [1, 0, 0, 0], "tolerance": 0.000001 } } },
+          { "operator": "quaternion-rotation-y", "sourceAnchor": "Quat::rotationY(angle)", "implementedCallShapes": [["Number"]], "resultCodec": "Quaternion", "probe": { "key": "vmath-fixed-pod.quat-rotation-y", "arguments": [3.141592653589793], "expectation": { "kind": "components", "values": [0, 1, 0, 0], "tolerance": 0.000001 } } },
+          { "operator": "quaternion-rotate-vector3", "sourceAnchor": "dmVMath::Rotate(*q, *v)", "implementedCallShapes": [["Quaternion", "Vector3"]], "resultCodec": "Vector3", "probe": { "key": "vmath-fixed-pod.rotate", "arguments": [{ "codec": "Quaternion", "components": [0, 0, 1, 0] }, { "codec": "Vector3", "components": [1, 1, 0] }], "expectation": { "kind": "components", "values": [-1, -1, 0], "tolerance": 0.000001 } } }
+        ]
+      },
+      "operation": {
+        "template": "vmath-fixed-pod",
+        "parameters": {
+          "rejectNaNDefoldInputs": true,
+          "numberNarrowing": "lua-number-to-float32",
+          "normalization": "none"
+        }
+      }
+    }
+  ],
+  "bindings": [
+    { "id": "script:vmath.vector3", "sourceSymbol": "Vector3_new", "operation": { "template": "value-constructor", "parameters": { "kind": "Vector3", "default": "zero", "scalarSplat": true, "rejectNaNCopy": true } }, "callShapes": [[], ["Number"], ["Vector3"], ["Number", "Number", "Number"]], "resultCodec": "Vector3" },
+    { "id": "script:vmath.length", "sourceSymbol": "Length", "operation": { "template": "value-unary", "parameters": { "operator": "length", "kinds": ["Vector3", "Vector4", "Quaternion"], "rejectNaNInput": true } }, "callShapes": [["Vector3"], ["Vector4"], ["Quaternion"]], "resultCodec": "Number" },
+    { "id": "script:vmath.normalize", "sourceSymbol": "Normalize", "operation": { "template": "value-unary", "parameters": { "operator": "normalize", "kinds": ["Vector3", "Vector4", "Quaternion"], "rejectNaNInput": true } }, "callShapes": [["Vector3"], ["Vector4"], ["Quaternion"]], "resultCodec": "SameDefoldValue" },
+    { "id": "script:vmath.quat_rotation_z", "sourceSymbol": "Quat_RotationZ", "operation": { "template": "quaternion-axis-rotation", "parameters": { "axis": "z" } }, "callShapes": [["Number"]], "resultCodec": "Quaternion" },
+    { "id": "script:vmath.quat", "sourceSymbol": "Quat_new", "operation": { "template": "value-constructor", "parameters": { "kind": "Quaternion", "default": "identity", "scalarSplat": false, "rejectNaNCopy": true } }, "callShapes": [[], ["Quaternion"], ["Number", "Number", "Number", "Number"]], "resultCodec": "Quaternion" }
+  ]
+}

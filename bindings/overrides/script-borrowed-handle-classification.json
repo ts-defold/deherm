@@ -1,0 +1,412 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "expectedCounts": {
+    "checked-handle-input-terminal": 367,
+    "checked-handle-return-capture": 33,
+    "checked-handle-invalidate": 7,
+    "declaration-token": 8,
+    "total": 415
+  },
+  "coverageClaim": "Classification and implementation-order planning only. A classified route is not runtime evidence and does not claim native, HTML5, or Static Hermes conformance.",
+  "allocationClaim": "After fixed-capacity bridge registries and Lua stack/registry storage are prewarmed, the generated lookup and dispatch glue can avoid C++ heap allocation on handle-consuming calls. This does not claim that Lua, Defold, Box2D, Bullet, GUI, graphics, resource, or user callbacks are allocation-free; handle capture, object creation, table growth, and engine operations may allocate.",
+  "implementationOrder": [
+    {
+      "order": 1,
+      "operationClass": "checked-handle-input-terminal",
+      "reason": "Consumes existing handles without creating bridge ownership or retiring engine identity."
+    },
+    {
+      "order": 2,
+      "operationClass": "checked-handle-return-capture",
+      "reason": "Introduces concrete return-kind checks, Lua rooting, ownership policy, and finalizer behavior."
+    },
+    {
+      "order": 3,
+      "operationClass": "checked-handle-invalidate",
+      "reason": "Must retire bridge identity only after the engine operation succeeds and must preserve deferred engine invalidation semantics."
+    },
+    {
+      "order": 4,
+      "operationClass": "declaration-token",
+      "reason": "Belongs in the TypeScript component/property compiler and must not be represented as a runtime handle."
+    }
+  ],
+  "sourceEvidence": [
+    {
+      "id": "box2d-body",
+      "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+      "sha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95",
+      "anchors": [
+        "uint32_t                  m_InstanceGeneration;",
+        "if (!b2Body_IsValid(luabody->m_Body))"
+      ]
+    },
+    {
+      "id": "box2d-joint",
+      "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_joint_v3.cpp",
+      "sha256": "071739e89c148fce85b78fb5c9dfbb05870b11c34d87c99a56870f996a0df5f4",
+      "anchors": [
+        "static dmHashTable64<uint8_t> g_JointIds;",
+        "Cannot destroy a joint not created by b2d.joint."
+      ]
+    },
+    {
+      "id": "box2d-shape",
+      "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_shape_v3.cpp",
+      "sha256": "5cb292452bdaa01e3b43a772912ee6bd5f2cc61dd5c36ce3f2b9d9ddaf01ee79",
+      "anchors": ["struct B2DLuaShape", "b2Shape_IsValid"]
+    },
+    {
+      "id": "box2d-chain",
+      "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_chain_v3.cpp",
+      "sha256": "9769cc82a9fe93c92c2a08ca9a092c5051f235d09f4b80885ffa5c1a39fc72e2",
+      "anchors": ["struct B2DLuaChain", "b2DestroyChain"]
+    },
+    {
+      "id": "box2d-world",
+      "source": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_world_v3.cpp",
+      "sha256": "9a9f8517256cc928c05e7838c782f1d82266a01e0d32f05f97447458197d32b0",
+      "anchors": ["struct B2DLuaWorld", "b2World_IsValid"]
+    },
+    {
+      "id": "bullet-object",
+      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
+      "sha256": "c90f5f10b5b2ccbeb5f77ec3cf986d1dfe36a93eb2a0f79ce9e858e7f35aaf2b",
+      "anchors": [
+        "g_NextBullet3DCollisionObjectId",
+        "ScriptBullet3DInvalidateCollisionObject"
+      ]
+    },
+    {
+      "id": "bullet-rigid-body",
+      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp",
+      "sha256": "7fe92ecb9e32332bd612aabaf3e1276f5e78bb83e17cd08667116ab3c1928e1b",
+      "anchors": ["btRigidBody::upcast(collision_object)"]
+    },
+    {
+      "id": "bullet-shape",
+      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
+      "sha256": "c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285",
+      "anchors": ["uint64_t m_OwnerId;", "uint32_t m_ShapeIndex;"]
+    },
+    {
+      "id": "bullet-constraint",
+      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
+      "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7",
+      "anchors": [
+        "g_NextBullet3DConstraintId",
+        "DestroyConstraintId(lua_constraint->m_Id)"
+      ]
+    },
+    {
+      "id": "bullet-world",
+      "source": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_world.cpp",
+      "sha256": "a0e72844d9e70b1aa580271e62181edeea39bbc43f8a5d9f81aa20814ad909fc",
+      "anchors": ["g_NextBullet3DWorldId", "ScriptBullet3DInvalidateWorld"]
+    },
+    {
+      "id": "gui-script",
+      "source": "engine/gui/src/gui_script.cpp",
+      "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4",
+      "anchors": [
+        "if (np->m_Scene != GetScene(L))",
+        "n->m_Deleted = 1;"
+      ]
+    },
+    {
+      "id": "gui-core",
+      "source": "engine/gui/src/gui.cpp",
+      "sha256": "09e198339463070e61431f53699736db09a28aeeb6c196f941a28663f45a6a7c",
+      "anchors": [
+        "return n->m_Version == version && n->m_Index == index;",
+        "scene->m_NextVersionNumber"
+      ]
+    },
+    {
+      "id": "buffer-script",
+      "source": "engine/gamesys/src/gamesys/scripts/script_buffer.cpp",
+      "sha256": "9c74a08b7aa39afe4f88c26f78b9bf11fd162b67bc5b0c270f85a523568f7b22",
+      "anchors": [
+        "int                 m_BufferRef;",
+        "dmBuffer::IsBufferValid(stream->m_Buffer)"
+      ]
+    },
+    {
+      "id": "buffer-sdk",
+      "source": "engine/gamesys/src/dmsdk/gamesys/script.h",
+      "sha256": "f81f616a398726257bff530596840acd0ef8bc61ad0dd1f9b1d5c0e614259916",
+      "anchors": ["OWNER_C   = 0", "OWNER_LUA = 1", "OWNER_RES = 2"]
+    },
+    {
+      "id": "render-script",
+      "source": "engine/render/src/render/render_script.cpp",
+      "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e",
+      "anchors": [
+        "dmGraphics::IsAssetHandleValid(graphics_context, asset_handle)",
+        "DeleteNamedConstantBuffer(cb->m_ConstantBuffer)"
+      ]
+    },
+    {
+      "id": "resource-script",
+      "source": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e",
+      "anchors": [
+        "They can only be used as default values passed to",
+        "The referenced resource is loaded together with the script."
+      ]
+    },
+    {
+      "id": "go-property",
+      "source": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74",
+      "anchors": ["@name go.property", "resource constructors"]
+    }
+  ],
+  "handleKinds": [
+    {
+      "id": "box2d-body",
+      "rawTypes": ["b2Body"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-engine-object",
+      "validity": "Validate stored game-object collection/id/generation when present, then b2Body_IsValid on every terminal call.",
+      "invalidationBoundary": "Owning collision object, game object, or Box2D world destruction; explicit body-owned child destruction does not transfer ownership to the wrapper.",
+      "sourceEvidence": ["box2d-body"]
+    },
+    {
+      "id": "box2d-joint",
+      "rawTypes": ["b2Joint"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-or-explicit-native-lifecycle",
+      "validity": "Validate b2Joint_IsValid on every terminal call and retain source tracking for whether destroy is permitted.",
+      "invalidationBoundary": "Explicit destroy, connected body/world destruction, or Box2D generation mismatch.",
+      "sourceEvidence": ["box2d-joint"]
+    },
+    {
+      "id": "box2d-world",
+      "rawTypes": ["b2World"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-engine-world",
+      "validity": "Validate b2World_IsValid on every terminal call.",
+      "invalidationBoundary": "Owning physics component-world destruction or Box2D generation mismatch.",
+      "sourceEvidence": ["box2d-world"]
+    },
+    {
+      "id": "box2d-shape",
+      "rawTypes": ["b2Shape"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-body-child",
+      "validity": "Validate b2Shape_IsValid on every terminal call.",
+      "invalidationBoundary": "Explicit fixture/shape destruction, owning body/world destruction, or Box2D generation mismatch.",
+      "sourceEvidence": ["box2d-shape"]
+    },
+    {
+      "id": "box2d-chain",
+      "rawTypes": ["b2Chain"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-or-explicit-native-lifecycle",
+      "validity": "Validate b2Chain_IsValid on every terminal call.",
+      "invalidationBoundary": "Explicit chain destruction, owning body/world destruction, or Box2D generation mismatch.",
+      "sourceEvidence": ["box2d-chain"]
+    },
+    {
+      "id": "bullet-object",
+      "rawTypes": ["btCollisionObject", "btRigidBody"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-component-object",
+      "validity": "Resolve the source monotonic collision-object id, validate collection/instance generation, and for btRigidBody require a successful checked upcast.",
+      "invalidationBoundary": "Collision-object or game-object destruction invokes source invalidation; owning world teardown also invalidates.",
+      "sourceEvidence": ["bullet-object", "bullet-rigid-body"]
+    },
+    {
+      "id": "bullet-shape",
+      "rawTypes": ["btCollisionShape"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-object-child-view",
+      "validity": "Resolve owner by source monotonic id and bounds-check the stored shape index on every call.",
+      "invalidationBoundary": "Owner invalidation or removal of the indexed shape slot.",
+      "sourceEvidence": ["bullet-shape", "bullet-object"]
+    },
+    {
+      "id": "bullet-constraint",
+      "rawTypes": ["btTypedConstraint"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "explicit-native-lifecycle",
+      "validity": "Resolve the source monotonic constraint id on every call and preserve world-lock checks.",
+      "invalidationBoundary": "Explicit destroy, connected body destruction, world destruction, or script Bullet finalization.",
+      "sourceEvidence": ["bullet-constraint"]
+    },
+    {
+      "id": "bullet-world",
+      "rawTypes": ["btDiscreteDynamicsWorld"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-engine-world",
+      "validity": "Resolve the source monotonic world id on every call.",
+      "invalidationBoundary": "Physics component-world destruction invokes source invalidation.",
+      "sourceEvidence": ["bullet-world"]
+    },
+    {
+      "id": "gui-node",
+      "rawTypes": ["node"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-scene-node",
+      "validity": "Require the active GUI scene to equal the proxy scene, then validate the HNode version/index.",
+      "invalidationBoundary": "Deferred GUI delete flush, parent subtree deletion, node-slot version change, or scene destruction.",
+      "sourceEvidence": ["gui-script", "gui-core"]
+    },
+    {
+      "id": "buffer-data",
+      "rawTypes": ["buffer_data"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "wrapper-dependent-owner-c-owner-lua-or-owner-resource",
+      "validity": "Preserve the exact LuaHBuffer wrapper and validate resource path/version plus dmBuffer::IsBufferValid.",
+      "invalidationBoundary": "Lua-owned GC, resource replacement/release, explicit native destruction, or buffer generation invalidation.",
+      "sourceEvidence": ["buffer-sdk", "buffer-script"]
+    },
+    {
+      "id": "buffer-stream",
+      "rawTypes": ["buffer_stream"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "borrowed-view-rooting-parent-buffer",
+      "validity": "Preserve the stream userdata registry reference to its parent and validate dmBuffer::IsBufferValid before access.",
+      "invalidationBoundary": "Parent buffer invalidation; the source view retains a raw stream pointer and therefore must not be flattened.",
+      "sourceEvidence": ["buffer-script"]
+    },
+    {
+      "id": "render-constant-buffer",
+      "rawTypes": ["constant_buffer"],
+      "representation": "lua-rooted-userdata",
+      "ownership": "lua-owned-native-object",
+      "validity": "Require the registered constant-buffer userdata type in the active render script.",
+      "invalidationBoundary": "Lua userdata finalization deletes the named constant buffer; bridge release must preserve that finalizer boundary.",
+      "sourceEvidence": ["render-script"]
+    },
+    {
+      "id": "graphics-render-target",
+      "rawTypes": ["render_target"],
+      "representation": "numeric-graphics-asset-handle",
+      "ownership": "borrowed-or-explicit-native-lifecycle",
+      "validity": "Validate against the active graphics context with IsAssetHandleValid and require ASSET_TYPE_RENDER_TARGET.",
+      "invalidationBoundary": "Explicit render-target deletion, resource replacement, or graphics-context teardown.",
+      "sourceEvidence": ["render-script"]
+    },
+    {
+      "id": "graphics-texture",
+      "rawTypes": ["texture"],
+      "representation": "numeric-graphics-asset-handle",
+      "ownership": "borrowed-resource-or-render-target-asset",
+      "validity": "Validate against the active graphics context and expected texture asset type before use.",
+      "invalidationBoundary": "Owning resource/render-target deletion or graphics-context teardown.",
+      "sourceEvidence": ["render-script"]
+    },
+    {
+      "id": "resource-declaration",
+      "rawTypes": ["resource_data"],
+      "representation": "declaration-only-token",
+      "ownership": "compiler-owned-metadata",
+      "validity": "Accept only inside the go.property declaration compiler and resolve to a compiled resource path/hash.",
+      "invalidationBoundary": "Compile-time component schema regeneration; never place this token in the runtime handle registry.",
+      "sourceEvidence": ["resource-script", "go-property"]
+    }
+  ],
+  "contextRules": [
+    {
+      "requiredContext": "game-object-instance",
+      "ids": [
+        "script:b2d.get_body",
+        "script:b2d.get_world",
+        "script:bullet3d.get_collision_object",
+        "script:bullet3d.get_rigid_body",
+        "script:bullet3d.get_world"
+      ]
+    },
+    {
+      "requiredContext": "gui-scene",
+      "module": "gui"
+    },
+    {
+      "requiredContext": "render-script-instance-and-graphics-context",
+      "module": "render"
+    },
+    {
+      "requiredContext": "explicit-physics-handle",
+      "module": "b2d"
+    },
+    {
+      "requiredContext": "explicit-physics-handle",
+      "module": "bullet3d"
+    },
+    {
+      "requiredContext": "runtime-global",
+      "module": "buffer"
+    },
+    {
+      "requiredContext": "runtime-global",
+      "module": "resource"
+    },
+    {
+      "requiredContext": "runtime-global",
+      "module": "sys"
+    },
+    {
+      "requiredContext": "component-property-compiler",
+      "operationClass": "declaration-token"
+    }
+  ],
+  "exceptionalRoutes": {
+    "checked-handle-return-capture": [
+      { "id": "script:b2d.body.get_next", "stableId": 1887140972 },
+      { "id": "script:b2d.body.get_world", "stableId": 3271172727 },
+      { "id": "script:b2d.chain.from_shape", "stableId": 2813724309 },
+      { "id": "script:b2d.chain.get_world", "stableId": 1117101178 },
+      { "id": "script:b2d.get_body", "stableId": 1348712235 },
+      { "id": "script:b2d.get_world", "stableId": 3600623753 },
+      { "id": "script:b2d.joint.get_body_a", "stableId": 76897113 },
+      { "id": "script:b2d.joint.get_body_b", "stableId": 26564256 },
+      { "id": "script:b2d.joint.get_joint1", "stableId": 1578643662 },
+      { "id": "script:b2d.joint.get_joint2", "stableId": 1561866043 },
+      { "id": "script:b2d.joint.get_world", "stableId": 1990790943 },
+      { "id": "script:b2d.shape.get_body", "stableId": 2944082506 },
+      { "id": "script:b2d.shape.get_world", "stableId": 1138630650 },
+      { "id": "script:buffer.get_stream", "stableId": 3111756709 },
+      { "id": "script:bullet3d.collision_object.get_shape", "stableId": 463523689 },
+      { "id": "script:bullet3d.constraint.get_body_a", "stableId": 2420295687 },
+      { "id": "script:bullet3d.constraint.get_body_b", "stableId": 2437073306 },
+      { "id": "script:bullet3d.constraint.get_world", "stableId": 1391478857 },
+      { "id": "script:bullet3d.get_collision_object", "stableId": 4240041128 },
+      { "id": "script:bullet3d.get_rigid_body", "stableId": 986235210 },
+      { "id": "script:bullet3d.get_world", "stableId": 1630000402 },
+      { "id": "script:bullet3d.rigid_body.get_world", "stableId": 3815014814 },
+      { "id": "script:bullet3d.shape.get_collision_object", "stableId": 3986175953 },
+      { "id": "script:gui.clone", "stableId": 1520695164 },
+      { "id": "script:gui.get_parent", "stableId": 3125128426 },
+      { "id": "script:gui.new_box_node", "stableId": 4256374046 },
+      { "id": "script:gui.new_particlefx_node", "stableId": 2603122601 },
+      { "id": "script:gui.new_pie_node", "stableId": 2624398591 },
+      { "id": "script:gui.new_text_node", "stableId": 763092804 },
+      { "id": "script:render.constant_buffer", "stableId": 747345077 },
+      { "id": "script:resource.get_buffer", "stableId": 4087860613 },
+      { "id": "script:resource.load", "stableId": 306454494 },
+      { "id": "script:sys.load_buffer", "stableId": 667618348 }
+    ],
+    "checked-handle-invalidate": [
+      { "id": "script:b2d.body.destroy_fixture", "stableId": 203543744 },
+      { "id": "script:b2d.body.destroy_shape", "stableId": 1886957296 },
+      { "id": "script:b2d.chain.destroy", "stableId": 469246619 },
+      { "id": "script:b2d.joint.destroy", "stableId": 4156305370 },
+      { "id": "script:bullet3d.constraint.destroy", "stableId": 3471585260 },
+      { "id": "script:gui.delete_node", "stableId": 39559745 },
+      { "id": "script:render.delete_render_target", "stableId": 1966474874 }
+    ],
+    "declaration-token": [
+      { "id": "script:go.property", "stableId": 993185129 },
+      { "id": "script:resource.atlas", "stableId": 2388713725 },
+      { "id": "script:resource.buffer", "stableId": 4133042792 },
+      { "id": "script:resource.font", "stableId": 3095822367 },
+      { "id": "script:resource.material", "stableId": 959596835 },
+      { "id": "script:resource.render_target", "stableId": 5925882 },
+      { "id": "script:resource.texture", "stableId": 3793434401 },
+      { "id": "script:resource.tile_source", "stableId": 3293163098 }
+    ]
+  }
+}

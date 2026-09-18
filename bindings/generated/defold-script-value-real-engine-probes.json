@@ -1,0 +1,1681 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "target": "arm64-macos-dynamic-hermes",
+  "inputSha256": "29268804321484580c0bb1b863ab40559c7e3b222b3c3e8461c6733da6c259de",
+  "expectedInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+  "instrumentedSemanticSha256": "7a0fccc202a689ab85d6345e98277aa627d04297435b10a65e8ef4bddcaae33c",
+  "coverageClaim": "All 78 generated native value bindings have a deterministic packaged-engine probe disposition for dynamic Hermes on arm64 macOS; 39 family routes are planned-only and are neither emitted nor claimed as observed.",
+  "probeCount": 39,
+  "generatedProbeCount": 25,
+  "instrumentedProbeCount": 20,
+  "explicitPlannedProbeCount": 19,
+  "plannedProbeCount": 58,
+  "plannedFamilyProbeCount": 39,
+  "routeDispositionCount": 78,
+  "uniqueBindingCount": 78,
+  "probes": [
+    {
+      "key": "builtins.hash.my_hash",
+      "id": "script:hash",
+      "stableId": 2845099200,
+      "state": "instrumented",
+      "callShape": [
+        "String"
+      ],
+      "resultCodec": "Hash",
+      "expectation": {
+        "kind": "hashHex",
+        "value": "a2bc06d97f580aab"
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:builtins.hash.my_hash:ok"
+    },
+    {
+      "key": "vmath.vector3.zero",
+      "id": "script:vmath.vector3",
+      "stableId": 3491633886,
+      "state": "instrumented",
+      "callShape": [],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          0
+        ],
+        "tolerance": 0
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath.vector3.zero:ok"
+    },
+    {
+      "key": "vmath.length.vector3",
+      "id": "script:vmath.length",
+      "stableId": 2370510694,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3"
+      ],
+      "resultCodec": "Number",
+      "expectation": {
+        "kind": "number",
+        "value": 5,
+        "tolerance": 0
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath.length.vector3:ok"
+    },
+    {
+      "key": "vmath.normalize.vector3",
+      "id": "script:vmath.normalize",
+      "stableId": 3582341977,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3"
+      ],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0.6,
+          0.8,
+          0
+        ],
+        "tolerance": 0.000001
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath.normalize.vector3:ok"
+    },
+    {
+      "key": "vmath.quat_rotation_z.pi",
+      "id": "script:vmath.quat_rotation_z",
+      "stableId": 653417741,
+      "state": "instrumented",
+      "callShape": [
+        "Number"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "tolerance": 0.000001
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath.quat_rotation_z.pi:ok"
+    },
+    {
+      "key": "vmath.quat.identity",
+      "id": "script:vmath.quat",
+      "stableId": 2756728049,
+      "state": "instrumented",
+      "callShape": [],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath.quat.identity:ok"
+    },
+    {
+      "key": "go.set_position.current",
+      "id": "script:go.set_position",
+      "stableId": 608141138,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_position.current:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:go.set_position.current:ok"
+    },
+    {
+      "key": "go.get_position.current",
+      "id": "script:go.get_position",
+      "stableId": 3918772974,
+      "state": "instrumented",
+      "callShape": [],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          13,
+          21,
+          34
+        ],
+        "tolerance": 0
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.current:ok"
+    },
+    {
+      "key": "go.set_rotation.current",
+      "id": "script:go.set_rotation",
+      "stableId": 2093413559,
+      "state": "instrumented",
+      "callShape": [
+        "Quaternion"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_rotation.current:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:go.set_rotation.current:ok"
+    },
+    {
+      "key": "msg.post.current-object",
+      "id": "script:msg.post",
+      "stableId": 1111726479,
+      "state": "planned",
+      "reason": "Requires the generated message receiver fixture and delivery assertion harness.",
+      "callShape": [
+        "String",
+        "String"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:msg.post.current-object:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:msg.post.current-object:ok"
+    },
+    {
+      "key": "factory.create.probe",
+      "id": "script:factory.create",
+      "stableId": 96184340,
+      "state": "planned",
+      "reason": "Requires a real #probe_factory component plus child-init and parent-context assertions.",
+      "callShape": [
+        "String"
+      ],
+      "resultCodec": "Hash",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:factory.create.probe:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:factory.create.probe:ok"
+    },
+    {
+      "key": "go.delete.factory-probe",
+      "id": "script:go.delete",
+      "stableId": 2920192283,
+      "state": "planned",
+      "reason": "Requires a real factory fixture and before/after end-of-frame deletion assertions.",
+      "callShape": [
+        "Hash"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.delete.factory-probe:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:go.delete.factory-probe:ok"
+    },
+    {
+      "key": "gui.get_node.status",
+      "id": "script:gui.get_node",
+      "stableId": 509983822,
+      "state": "planned",
+      "reason": "Requires execution from a real generated .gui_script with an active GUI scene.",
+      "callShape": [
+        "String"
+      ],
+      "resultCodec": "Node",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:gui.get_node.status:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:gui.get_node.status:ok"
+    },
+    {
+      "key": "gui.set_text.status",
+      "id": "script:gui.set_text",
+      "stableId": 1480837389,
+      "state": "planned",
+      "reason": "Requires execution from a real generated .gui_script and text readback assertions.",
+      "callShape": [
+        "Node",
+        "String"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:gui.set_text.status:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:gui.set_text.status:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.quat-rotation-y",
+      "id": "script:vmath.quat_rotation_y",
+      "stableId": 603084884,
+      "state": "instrumented",
+      "callShape": [
+        "Number"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          1,
+          0,
+          0
+        ],
+        "tolerance": 0.000001
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-rotation-y:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.quat-rotation-x",
+      "id": "script:vmath.quat_rotation_x",
+      "stableId": 619862503,
+      "state": "instrumented",
+      "callShape": [
+        "Number"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0
+        ],
+        "tolerance": 0.000001
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-rotation-x:ok"
+    },
+    {
+      "key": "vmath-matrix4.translation",
+      "id": "script:vmath.matrix4_translation",
+      "stableId": 889923285,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Vector4"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          1,
+          2,
+          3,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.translation:ok"
+    },
+    {
+      "key": "vmath-matrix4.perspective",
+      "id": "script:vmath.matrix4_perspective",
+      "stableId": 1058276904,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Number",
+        "Number",
+        "Number",
+        "Number"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1.2222222,
+          -1,
+          0,
+          0,
+          -2.2222222,
+          0
+        ],
+        "tolerance": 0.00001
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.perspective:ok"
+    },
+    {
+      "key": "vmath-matrix4.ortho-inv",
+      "id": "script:vmath.ortho_inv",
+      "stableId": 1292408212,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Matrix4"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.ortho-inv:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.euler-to-quat",
+      "id": "script:vmath.euler_to_quat",
+      "stableId": 1329930197,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          0.70710677,
+          0.70710677
+        ],
+        "tolerance": 0.000001
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.euler-to-quat:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.quat-from-to",
+      "id": "script:vmath.quat_from_to",
+      "stableId": 1458980654,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "Vector3"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          0.70710677,
+          0.70710677
+        ],
+        "tolerance": 0.000001
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-from-to:ok"
+    },
+    {
+      "key": "vmath-matrix4.axis-angle",
+      "id": "script:vmath.matrix4_axis_angle",
+      "stableId": 1732915491,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Vector3",
+        "Number"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.axis-angle:ok"
+    },
+    {
+      "key": "vmath-matrix4.look-at",
+      "id": "script:vmath.matrix4_look_at",
+      "stableId": 2149531511,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Vector3",
+        "Vector3",
+        "Vector3"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          -1,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.look-at:ok"
+    },
+    {
+      "key": "vmath-matrix4.compose",
+      "id": "script:vmath.matrix4_compose",
+      "stableId": 2501238546,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Vector3",
+        "Quaternion",
+        "Vector3"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.compose:ok"
+    },
+    {
+      "key": "vmath-matrix4.rotation-y",
+      "id": "script:vmath.matrix4_rotation_y",
+      "stableId": 2509648852,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Number"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.rotation-y:ok"
+    },
+    {
+      "key": "vmath-matrix4.rotation-x",
+      "id": "script:vmath.matrix4_rotation_x",
+      "stableId": 2526426471,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Number"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.rotation-x:ok"
+    },
+    {
+      "key": "vmath-matrix4.rotation-z",
+      "id": "script:vmath.matrix4_rotation_z",
+      "stableId": 2559981709,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Number"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.rotation-z:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.project",
+      "id": "script:vmath.project",
+      "stableId": 2686972787,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "Vector3"
+      ],
+      "resultCodec": "Number",
+      "expectation": {
+        "kind": "number",
+        "value": 0.5,
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.project:ok"
+    },
+    {
+      "key": "vmath-matrix4.orthographic",
+      "id": "script:vmath.matrix4_orthographic",
+      "stableId": 2797369728,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Number",
+        "Number",
+        "Number",
+        "Number",
+        "Number",
+        "Number"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.orthographic:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.quat-basis",
+      "id": "script:vmath.quat_basis",
+      "stableId": 2962238768,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "Vector3",
+        "Vector3"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-basis:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.length-sqr",
+      "id": "script:vmath.length_sqr",
+      "stableId": 2981849211,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3"
+      ],
+      "resultCodec": "Number",
+      "expectation": {
+        "kind": "number",
+        "value": 25,
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.length-sqr:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.cross",
+      "id": "script:vmath.cross",
+      "stableId": 3022880242,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "Vector3"
+      ],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.cross:ok"
+    },
+    {
+      "key": "vmath-matrix4.quat",
+      "id": "script:vmath.matrix4_quat",
+      "stableId": 3063853257,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Quaternion"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.quat:ok"
+    },
+    {
+      "key": "vmath-matrix4.quat-from-matrix",
+      "id": "script:vmath.quat_matrix4",
+      "stableId": 3312627817,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Matrix4"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.quat-from-matrix:ok"
+    },
+    {
+      "key": "vmath-matrix4.inv",
+      "id": "script:vmath.inv",
+      "stableId": 3499206161,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Matrix4"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.inv:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.rotate",
+      "id": "script:vmath.rotate",
+      "stableId": 3691011585,
+      "state": "instrumented",
+      "callShape": [
+        "Quaternion",
+        "Vector3"
+      ],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          -1,
+          -1,
+          0
+        ],
+        "tolerance": 0.000001
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.rotate:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.quat-axis-angle",
+      "id": "script:vmath.quat_axis_angle",
+      "stableId": 4121318819,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "Number"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          0,
+          0,
+          1,
+          0
+        ],
+        "tolerance": 0.000001
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-axis-angle:ok"
+    },
+    {
+      "key": "vmath-fixed-pod.conj",
+      "id": "script:vmath.conj",
+      "stableId": 4233115420,
+      "state": "instrumented",
+      "callShape": [
+        "Quaternion"
+      ],
+      "resultCodec": "Quaternion",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          -1,
+          -2,
+          -3,
+          4
+        ],
+        "tolerance": 0
+      },
+      "generatedFamily": "vmath-fixed-pod",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.conj:ok"
+    },
+    {
+      "key": "vmath-matrix4.frustum",
+      "id": "script:vmath.matrix4_frustum",
+      "stableId": 4245225016,
+      "state": "planned",
+      "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle.",
+      "callShape": [
+        "Number",
+        "Number",
+        "Number",
+        "Number",
+        "Number",
+        "Number"
+      ],
+      "resultCodec": "Matrix4",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          -1.2222222,
+          -1,
+          0,
+          0,
+          -2.2222222,
+          0
+        ],
+        "tolerance": 0.00001
+      },
+      "generatedFamily": "vmath-matrix4",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:vmath-matrix4.frustum:ok"
+    }
+  ],
+  "plannedProbes": [
+    {
+      "key": "planned:gui-node-setter:script:gui.set_enabled",
+      "id": "script:gui.set_enabled",
+      "stableId": 344287147,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_clipping_inverted",
+      "id": "script:gui.set_clipping_inverted",
+      "stableId": 344438576,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_id",
+      "id": "script:gui.set_id",
+      "stableId": 510669267,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_inner_radius",
+      "id": "script:gui.set_inner_radius",
+      "stableId": 599811265,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_particlefx",
+      "id": "script:gui.set_particlefx",
+      "stableId": 634729758,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Hash"
+        ],
+        [
+          "Node",
+          "String"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_color",
+      "id": "script:gui.set_color",
+      "stableId": 681356529,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_outline",
+      "id": "script:gui.set_outline",
+      "stableId": 852399392,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_size",
+      "id": "script:gui.set_size",
+      "stableId": 1335131087,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_leading",
+      "id": "script:gui.set_leading",
+      "stableId": 1425442548,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_position",
+      "id": "script:gui.set_position",
+      "stableId": 1474440329,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_shadow",
+      "id": "script:gui.set_shadow",
+      "stableId": 1482532654,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_texture",
+      "id": "script:gui.set_texture",
+      "stableId": 1539901009,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_clipping_mode",
+      "id": "script:gui.set_clipping_mode",
+      "stableId": 1648551722,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_outer_bounds",
+      "id": "script:gui.set_outer_bounds",
+      "stableId": 1712128015,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_tracking",
+      "id": "script:gui.set_tracking",
+      "stableId": 1740794531,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_blend_mode",
+      "id": "script:gui.set_blend_mode",
+      "stableId": 1874419309,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_fill_angle",
+      "id": "script:gui.set_fill_angle",
+      "stableId": 1932260719,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_yanchor",
+      "id": "script:gui.set_yanchor",
+      "stableId": 2042797604,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_size_mode",
+      "id": "script:gui.set_size_mode",
+      "stableId": 2104597123,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_adjust_mode",
+      "id": "script:gui.set_adjust_mode",
+      "stableId": 2124339589,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_flipbook_playback_rate",
+      "id": "script:gui.set_flipbook_playback_rate",
+      "stableId": 2274625155,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_alpha",
+      "id": "script:gui.set_alpha",
+      "stableId": 2749898006,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_clipping_visible",
+      "id": "script:gui.set_clipping_visible",
+      "stableId": 2765276089,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_screen_position",
+      "id": "script:gui.set_screen_position",
+      "stableId": 2837486932,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_inherit_alpha",
+      "id": "script:gui.set_inherit_alpha",
+      "stableId": 2930785382,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_xanchor",
+      "id": "script:gui.set_xanchor",
+      "stableId": 2994148867,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_flipbook_cursor",
+      "id": "script:gui.set_flipbook_cursor",
+      "stableId": 3158379927,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_perimeter_vertices",
+      "id": "script:gui.set_perimeter_vertices",
+      "stableId": 3222725677,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_font",
+      "id": "script:gui.set_font",
+      "stableId": 3446342703,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_visible",
+      "id": "script:gui.set_visible",
+      "stableId": 3757373152,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_rotation",
+      "id": "script:gui.set_rotation",
+      "stableId": 3759172468,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Quaternion"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_slice9",
+      "id": "script:gui.set_slice9",
+      "stableId": 3771988895,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_euler",
+      "id": "script:gui.set_euler",
+      "stableId": 3920485847,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_scale",
+      "id": "script:gui.set_scale",
+      "stableId": 3923373356,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Vector3"
+        ],
+        [
+          "Node",
+          "Vector4"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_layer",
+      "id": "script:gui.set_layer",
+      "stableId": 3974957251,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_parent",
+      "id": "script:gui.set_parent",
+      "stableId": 3975981566,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node"
+        ],
+        [
+          "Node",
+          "Node"
+        ],
+        [
+          "Node",
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_pivot",
+      "id": "script:gui.set_pivot",
+      "stableId": 3991574614,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_line_break",
+      "id": "script:gui.set_line_break",
+      "stableId": 4102050116,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "Boolean"
+        ]
+      ],
+      "resultCodec": "None"
+    },
+    {
+      "key": "planned:gui-node-setter:script:gui.set_material",
+      "id": "script:gui.set_material",
+      "stableId": 4118133459,
+      "state": "planned-only",
+      "reason": "A generated native captured-Lua route exists, but each setter still requires a context-valid fixture value and semantic assertion before packaged-engine execution.",
+      "context": "active-gui-scene",
+      "target": "arm64-macos-dynamic-hermes",
+      "implementedCallShapes": [
+        [
+          "Node",
+          "String"
+        ],
+        [
+          "Node",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None"
+    }
+  ]
+}

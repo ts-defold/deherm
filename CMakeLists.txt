@@ -25,22 +25,96 @@ set(HERMES_BUILD_SHARED_JSI OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(upstream/hermes hermes EXCLUDE_FROM_ALL)
 
+option(DEHERM_SANITIZE "Instrument deherm host tests with ASan and UBSan" OFF)
+if(DEHERM_SANITIZE)
+  if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    message(FATAL_ERROR "DEHERM_SANITIZE requires Clang or GCC")
+  endif()
+  add_compile_options(-fsanitize=address,undefined -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+
+if(APPLE)
+  set(DEFOLD_DMSDK_TIME_SOURCE upstream/defold/engine/dlib/src/dlib/time_apple.cpp)
+  set(DEFOLD_DMSDK_MUTEX_SOURCE upstream/defold/engine/dlib/src/dlib/mutex_posix.cpp)
+elseif(WIN32)
+  set(DEFOLD_DMSDK_TIME_SOURCE upstream/defold/engine/dlib/src/dlib/time_win32.cpp)
+  set(DEFOLD_DMSDK_MUTEX_SOURCE upstream/defold/engine/dlib/src/dlib/mutex_win32.cpp)
+else()
+  set(DEFOLD_DMSDK_TIME_SOURCE upstream/defold/engine/dlib/src/dlib/time_posix.cpp)
+  set(DEFOLD_DMSDK_MUTEX_SOURCE upstream/defold/engine/dlib/src/dlib/mutex_posix.cpp)
+endif()
+
 add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/capi.cpp
   defold/defold_hermes/src/callback_registry.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp
   defold/defold_hermes/src/generated_jsi.cpp
   defold/defold_hermes/src/lua_bridge_core.cpp
   defold/defold_hermes/src/runtime.cpp
+  defold/defold_hermes/src/script_bridge_capi.cpp
+  defold/defold_hermes/src/script_jsi_bridge.cpp
+  upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp
+  upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp
+  ${DEFOLD_DMSDK_TIME_SOURCE}
 )
 target_compile_features(defold-hermes-runtime PUBLIC cxx_std_17)
 target_include_directories(defold-hermes-runtime PUBLIC
   defold/defold_hermes/include
+  upstream/defold/engine/dlib/src
 )
 target_link_libraries(defold-hermes-runtime PUBLIC hermesvm_a)
 
 add_executable(defold-hermes-runner native/runner.cpp)
 target_compile_features(defold-hermes-runner PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-runner PRIVATE defold-hermes-runtime)
+
+find_program(DEFOLD_HERMES_NODE_EXECUTABLE node REQUIRED)
+set(DEFOLD_HERMES_STATIC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/static-hermes")
+set(DEFOLD_HERMES_STATIC_FFI_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-ffi.c")
+set(DEFOLD_HERMES_STATIC_APP_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-app.c")
+set(DEFOLD_HERMES_STATIC_VMATH_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-vmath.c")
+add_custom_command(
+  OUTPUT "${DEFOLD_HERMES_STATIC_FFI_C}" "${DEFOLD_HERMES_STATIC_APP_C}" "${DEFOLD_HERMES_STATIC_VMATH_C}"
+  COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-hermes.mjs"
+    --shermes "$<TARGET_FILE:shermes>"
+    --output-dir "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}"
+  DEPENDS
+    shermes
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-hermes.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/ffi.js"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/script-vmath.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/typed-app.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/dist/sample.js"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  VERBATIM
+)
+set_source_files_properties(
+  "${DEFOLD_HERMES_STATIC_FFI_C}"
+  "${DEFOLD_HERMES_STATIC_APP_C}"
+  "${DEFOLD_HERMES_STATIC_VMATH_C}"
+  PROPERTIES GENERATED TRUE
+)
+add_executable(defold-hermes-static-runner
+  native/static_runner.cpp
+  defold/defold_hermes/src/generated_static_hermes_vmath.cpp
+  "${DEFOLD_HERMES_STATIC_FFI_C}"
+  "${DEFOLD_HERMES_STATIC_APP_C}"
+  "${DEFOLD_HERMES_STATIC_VMATH_C}"
+)
+target_compile_features(defold-hermes-static-runner PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-static-runner PRIVATE
+  defold/defold_hermes/include
+)
+target_link_libraries(defold-hermes-static-runner PRIVATE defold-hermes-runtime)
 
 add_executable(defold-hermes-binding-arena-test native/binding_arena_test.cpp)
 target_compile_features(defold-hermes-binding-arena-test PRIVATE cxx_std_17)
@@ -57,6 +131,14 @@ endif()
 # its stack behavior and allocator profile are tested without requiring a full
 # engine link. Shipping extensions resolve these symbols from Defold itself.
 set(DEFOLD_LUA_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/upstream/defold/engine/lua/src/lua")
+set(DEFOLD_VECTORMATH_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/vectormath/include")
+if(NOT EXISTS "${DEFOLD_VECTORMATH_INCLUDE_DIR}/dmsdk/vectormath/cpp/vectormath_aos.h")
+  file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/vectormath")
+  file(ARCHIVE_EXTRACT
+    INPUT "${CMAKE_CURRENT_SOURCE_DIR}/upstream/defold/packages/vectormathlibrary-r1649-common.tar.gz"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/generated/vectormath"
+  )
+endif()
 set(DEFOLD_LUA_SOURCES
   lapi.c lcode.c ldebug.c ldo.c ldump.c lfunc.c lgc.c llex.c lmem.c
   lobject.c lopcodes.c lparser.c lstate.c lstring.c ltable.c ltm.c
@@ -73,18 +155,32 @@ target_include_directories(defold-lua-test PUBLIC
 )
 
 add_library(defold-hermes-lua-bridge STATIC
+  native/defold_test_log_support.cpp
   defold/defold_hermes/src/lua_bridge_core.cpp
   defold/defold_hermes/src/lua_bridge.cpp
   defold/defold_hermes/src/generated_lua_bridge.cpp
   defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp
+  defold/defold_hermes/src/generated_script_fixed_tuples.cpp
+  defold/defold_hermes/src/generated_script_value_bindings.cpp
   defold/defold_hermes/src/scalar_lua_dispatch.cpp
+  defold/defold_hermes/src/script_scalar_lua_adapter.cpp
+  upstream/defold/engine/dlib/src/dlib/array.cpp
+  upstream/defold/engine/dlib/src/dlib/dalloca.cpp
+  upstream/defold/engine/dlib/src/dlib/hash.cpp
+  upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp
+  upstream/defold/engine/dlib/src/dlib/dstrings.cpp
+  ${DEFOLD_DMSDK_MUTEX_SOURCE}
 )
 target_compile_features(defold-hermes-lua-bridge PUBLIC cxx_std_17)
 target_include_directories(defold-hermes-lua-bridge PUBLIC
   defold/defold_hermes/include
+  ${DEFOLD_VECTORMATH_INCLUDE_DIR}
+  upstream/defold/engine/dlib/src
   upstream/defold/engine/lua/src
 )
 target_link_libraries(defold-hermes-lua-bridge PUBLIC defold-lua-test)
+
+target_link_libraries(defold-hermes-static-runner PRIVATE defold-hermes-lua-bridge)
 
 add_executable(defold-hermes-lua-bridge-test native/lua_bridge_test.cpp)
 target_compile_features(defold-hermes-lua-bridge-test PRIVATE cxx_std_17)
@@ -99,9 +195,43 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 endif()
 target_link_libraries(defold-hermes-scalar-lua-dispatch-test PRIVATE defold-hermes-lua-bridge)
 
-add_executable(defold-hermes-lua-hermes-e2e native/lua_hermes_e2e.cpp)
+add_executable(defold-hermes-script-value-binding-test native/script_value_binding_test.cpp)
+target_compile_features(defold-hermes-script-value-binding-test PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-value-binding-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
+target_link_libraries(defold-hermes-script-value-binding-test PRIVATE defold-hermes-lua-bridge)
+
+add_executable(defold-hermes-script-bridge-capi-test
+  native/script_bridge_capi_test.cpp
+  defold/defold_hermes/src/script_bridge_capi.cpp
+)
+target_compile_features(defold-hermes-script-bridge-capi-test PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-bridge-capi-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
+target_link_libraries(defold-hermes-script-bridge-capi-test PRIVATE defold-hermes-lua-bridge)
+
+add_executable(defold-hermes-lua-hermes-e2e
+  native/lua_hermes_e2e.cpp
+  native/defold_script_value_test_support.cpp
+)
 target_compile_features(defold-hermes-lua-hermes-e2e PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-lua-hermes-e2e PRIVATE
+  defold-hermes-runtime
+  defold-hermes-lua-bridge
+)
+
+add_executable(defold-hermes-script-api-hermes-e2e
+  native/script_api_hermes_e2e.cpp
+  native/defold_script_value_test_support.cpp
+)
+target_compile_features(defold-hermes-script-api-hermes-e2e PRIVATE cxx_std_17)
+target_link_libraries(defold-hermes-script-api-hermes-e2e PRIVATE
   defold-hermes-runtime
   defold-hermes-lua-bridge
 )

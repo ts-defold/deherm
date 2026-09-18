@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "strictProfile": "fail-on-untyped-or-missing",
+    "compatProfile": "explicit-untyped-aot-islands",
+    "installation": "reachable-only",
+    "browser": "prefer-host",
+    "native": "prefer-hermes-then-defold-host"
+  },
+  "features": [
+    { "id": "Promise", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "Map", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "Set", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "WeakMap", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "WeakSet", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "WeakRef", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "probe" },
+    { "id": "FinalizationRegistry", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "probe" },
+    { "id": "BigInt", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "Proxy", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "Reflect", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "Symbol", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "probe" },
+    { "id": "ArrayBuffer", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "TypedArray", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+    { "id": "DataView", "category": "engine", "native": "hermes", "static": "hermes", "html5": "browser", "action": "none" },
+
+    { "id": "global", "category": "bootstrap", "native": "alias-globalThis", "static": "alias-globalThis", "html5": "alias-globalThis", "action": "polyfill" },
+    { "id": "process.env.NODE_ENV", "category": "build-time", "native": "bundler-constant", "static": "bundler-constant", "html5": "bundler-constant", "action": "transform" },
+    { "id": "console", "category": "host", "native": "defold-log", "static": "defold-log-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "performance.now", "category": "host", "native": "dmTime", "static": "dmTime-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "queueMicrotask", "category": "scheduler", "native": "hermes-job-queue", "static": "hermes-job-queue", "html5": "browser", "action": "polyfill" },
+    { "id": "setImmediate", "category": "scheduler", "native": "defold-frame-queue", "static": "defold-frame-queue-c-abi", "html5": "message-channel", "action": "polyfill" },
+    { "id": "clearImmediate", "category": "scheduler", "native": "defold-frame-queue", "static": "defold-frame-queue-c-abi", "html5": "message-channel", "action": "polyfill" },
+    { "id": "setTimeout", "category": "scheduler", "native": "defold-timer", "static": "defold-timer-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "clearTimeout", "category": "scheduler", "native": "defold-timer", "static": "defold-timer-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "setInterval", "category": "scheduler", "native": "defold-timer", "static": "defold-timer-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "clearInterval", "category": "scheduler", "native": "defold-timer", "static": "defold-timer-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "requestAnimationFrame", "category": "scheduler", "native": "defold-frame", "static": "defold-frame-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "cancelAnimationFrame", "category": "scheduler", "native": "defold-frame", "static": "defold-frame-c-abi", "html5": "browser", "action": "polyfill" },
+
+    { "id": "TextEncoder", "category": "encoding", "native": "generated-utf8", "static": "generated-utf8-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "TextDecoder", "category": "encoding", "native": "generated-utf8", "static": "generated-utf8-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "URL", "category": "web", "native": "selected-js-polyfill", "static": "selected-typed-polyfill", "html5": "browser", "action": "polyfill" },
+    { "id": "URLSearchParams", "category": "web", "native": "selected-js-polyfill", "static": "selected-typed-polyfill", "html5": "browser", "action": "polyfill" },
+    { "id": "AbortController", "category": "web", "native": "deherm-host", "static": "deherm-host-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "fetch", "category": "web", "native": "defold-http", "static": "defold-http-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "WebSocket", "category": "web", "native": "extension-or-defold-api", "static": "extension-c-abi", "html5": "browser", "action": "optional" },
+    { "id": "crypto.getRandomValues", "category": "security", "native": "platform-csprng", "static": "platform-csprng-c-abi", "html5": "browser", "action": "polyfill" },
+    { "id": "structuredClone", "category": "web", "native": "schema-codec", "static": "schema-codec", "html5": "browser", "action": "optional" },
+    { "id": "Intl", "category": "internationalization", "native": "disabled-by-default", "static": "disabled-by-default", "html5": "browser", "action": "optional" },
+
+    { "id": "eval", "category": "dynamic-code", "native": "development-only", "static": "unsupported", "html5": "browser-policy", "action": "reject-strict" },
+    { "id": "Function.constructor", "category": "dynamic-code", "native": "development-only", "static": "unsupported", "html5": "browser-policy", "action": "reject-strict" },
+    { "id": "node-builtins", "category": "node", "native": "unsupported", "static": "unsupported", "html5": "unsupported", "action": "reject" }
+  ]
+}

@@ -1,12 +1,12 @@
 node_modules/
 build/
 dist/
-defold/defold_hermes_app/
+defold/deherm/
 defold/defold_hermes/include/hermes/
 defold/defold_hermes/include/jsi/
 defold/defold_hermes/lib/arm64-osx/
 defold/.internal/
-.defold-hermes/
+.deherm/
 .DS_Store
 .env
 .idea/

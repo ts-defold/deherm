@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "platform": "arm64-macos",
+  "generator": {
+    "package": "@ts-defold/deherm",
+    "version": "0.0.0"
+  },
+  "inputs": {
+    "scriptIrSha256": "a5603ef4b7c2ef94a5503693cc5692cc4f0e165d11a4ee8b44453093eef33f89",
+    "dmsdkIrSha256": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87"
+  }
+}

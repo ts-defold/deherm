@@ -7,26 +7,113 @@
 #include <dmsdk/dlib/log.h>
 #include <dmsdk/dlib/time.h>
 #include <dmsdk/extension/extension.hpp>
+#include <dmsdk/gameobject/gameobject.h>
+#include <dmsdk/gamesys/script.h>
 #include <dmsdk/resource/resource.hpp>
 #include <dmsdk/script/script.h>
 
+#include <defold_hermes/active_game_object_context.hpp>
 #include <defold_hermes/generated_lua_bridge.hpp>
+#include <defold_hermes/bundle_resource.hpp>
 #include <defold_hermes/lua_capi.hpp>
+#include <defold_hermes/script_bridge_capi.hpp>
+#include <defold_hermes/script_scalar_lua_adapter.hpp>
 
 #include <cstdlib>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 #if !defined(DM_PLATFORM_HTML5)
 #include <defold_hermes/runtime.hpp>
 #endif
 
+extern "C" void DehermBundleResource();
+
 namespace {
 
-const char* kDefaultAppPath = "/defold_hermes_app/app.js";
-uint64_t gPreviousFrameTime = 0;
+const char* kDefaultAppPath = "/deherm/app.dehermc";
+uint64_t gBundleGeneration = 0;
+uint64_t gRejectedBundleGeneration = 0;
+uint64_t gPendingRejectedBundleGeneration = 0;
 bool gApplicationInitialized = false;
+bool gLoggedFirstExtensionUpdate = false;
+dmResource::HFactory gResourceFactory = nullptr;
+void* gBundleResource = nullptr;
+std::string gBundlePath;
 std::unique_ptr<defold_hermes::lua_bridge::LuaBridge> gLuaBridge;
+std::unique_ptr<defold_hermes::lua_bridge::scalar::ScriptAdapter> gScriptBridge;
+
+struct BootstrapAttachment {
+  dmGameObject::HCollection collection = nullptr;
+  dmhash_t identifier = 0;
+  uint32_t instanceGeneration = 0;
+  uint32_t attachmentGeneration = 0;
+  bool live = false;
+};
+
+BootstrapAttachment gBootstrapAttachment;
+
+bool IsBootstrapAttachmentLive(
+    void* owner,
+    uint32_t slot,
+    uint32_t generation) noexcept {
+  const auto* attachment = static_cast<const BootstrapAttachment*>(owner);
+  return slot == 0 && attachment && attachment->live &&
+      attachment->attachmentGeneration == generation;
+}
+
+bool BuildBootstrapContext(defold_hermes::game_object::ActiveContext* out) {
+  if (!out || !gBootstrapAttachment.live || !gBootstrapAttachment.collection) return false;
+  dmGameObject::HInstance instance = dmGameObject::GetInstanceFromIdentifier(
+      gBootstrapAttachment.collection, gBootstrapAttachment.identifier);
+  if (!instance || dmGameObject::GetGeneration(instance) != gBootstrapAttachment.instanceGeneration) {
+    return false;
+  }
+  out->instance = instance;
+  out->collection = gBootstrapAttachment.collection;
+  out->identifier = gBootstrapAttachment.identifier;
+  out->instanceGeneration = gBootstrapAttachment.instanceGeneration;
+  out->attachment = {
+    &gBootstrapAttachment,
+    0,
+    gBootstrapAttachment.attachmentGeneration,
+    IsBootstrapAttachmentLive
+  };
+  return true;
+}
+
+uint32_t TerminalGetGeneration(void*, void* instance) noexcept {
+  return dmGameObject::GetGeneration(static_cast<dmGameObject::HInstance>(instance));
+}
+
+void* TerminalGetCollection(void*, void* instance) noexcept {
+  return dmGameObject::GetCollection(static_cast<dmGameObject::HInstance>(instance));
+}
+
+uint64_t TerminalGetIdentifier(void*, void* instance) noexcept {
+  return dmGameObject::GetIdentifier(static_cast<dmGameObject::HInstance>(instance));
+}
+
+void TerminalGetPosition(void*, void* instance, float* xyz) noexcept {
+  const dmVMath::Point3 value = dmGameObject::GetPosition(
+      static_cast<dmGameObject::HInstance>(instance));
+  xyz[0] = value.getX();
+  xyz[1] = value.getY();
+  xyz[2] = value.getZ();
+}
+
+void TerminalSetPosition(void*, void* instance, const float* xyz) noexcept {
+  dmGameObject::SetPosition(
+      static_cast<dmGameObject::HInstance>(instance),
+      dmVMath::Point3(xyz[0], xyz[1], xyz[2]));
+}
+
+void TerminalSetRotation(void*, void* instance, const float* xyzw) noexcept {
+  dmGameObject::SetRotation(
+      static_cast<dmGameObject::HInstance>(instance),
+      dmVMath::Quat(xyzw[0], xyzw[1], xyzw[2], xyzw[3]));
+}
 
 #if defined(DM_PLATFORM_HTML5)
 
@@ -78,6 +165,154 @@ DefoldHost gHost;
 std::unique_ptr<defold_hermes::Runtime> gRuntime;
 
 #endif
+
+void InvalidateBootstrapAttachment() noexcept {
+  gBootstrapAttachment.live = false;
+  ++gBootstrapAttachment.attachmentGeneration;
+  if (gBootstrapAttachment.attachmentGeneration == 0) ++gBootstrapAttachment.attachmentGeneration;
+  gBootstrapAttachment.collection = nullptr;
+  gBootstrapAttachment.identifier = 0;
+  gBootstrapAttachment.instanceGeneration = 0;
+}
+
+void DetachCapturedLuaInstances() noexcept {
+  if (gScriptBridge) gScriptBridge->detachInstance();
+  if (gLuaBridge) gLuaBridge->detachInstance();
+}
+
+void FinalizeAttachedApplication(const char* phase) noexcept {
+  if (!gApplicationInitialized) return;
+#if !defined(DM_PLATFORM_HTML5)
+  try {
+#endif
+    defold_hermes::game_object::ActiveContext context;
+    if (!BuildBootstrapContext(&context)) {
+      dmLogWarning("Skipping TypeScript finalization during %s because its attachment is stale", phase);
+    } else {
+      defold_hermes::game_object::Scope scope(context);
+      if (!scope.entered()) {
+        dmLogWarning("Skipping TypeScript finalization during %s because the context stack is exhausted", phase);
+      } else {
+#if defined(DM_PLATFORM_HTML5)
+        defoldHermesWebFinalize();
+#else
+        if (gRuntime) gRuntime->finalize();
+#endif
+      }
+    }
+#if !defined(DM_PLATFORM_HTML5)
+  } catch (const std::exception& error) {
+    dmLogError("TypeScript finalization during %s failed: %s", phase, error.what());
+  }
+#endif
+  gApplicationInitialized = false;
+}
+
+bool ReadBundle(defold_hermes::bundle_resource::View* view) {
+  return gBundleResource && defold_hermes::bundle_resource::view(gBundleResource, view);
+}
+
+bool ActivateBundle(bool initial) {
+  defold_hermes::bundle_resource::View bundle{};
+  if (!ReadBundle(&bundle)) {
+    dmLogError("Unable to read typed TypeScript bundle resource '%s'", gBundlePath.c_str());
+    return false;
+  }
+  if (!initial && (bundle.generation == gBundleGeneration ||
+                   bundle.generation == gRejectedBundleGeneration)) {
+    return true;
+  }
+
+#if defined(DM_PLATFORM_HTML5)
+  if (!initial) {
+    gRejectedBundleGeneration = bundle.generation;
+    dmLogWarning(
+        "Browser bundle generation %llu is staged but browser-host activation is not implemented",
+        static_cast<unsigned long long>(bundle.generation));
+    return false;
+  }
+  defoldHermesWebLoad(bundle.data, bundle.size);
+#else
+  std::unique_ptr<defold_hermes::Runtime> candidate;
+  bool candidateRejected = false;
+  std::string candidateDiagnostic;
+  try {
+    candidate = std::make_unique<defold_hermes::Runtime>(gHost);
+    candidate->load(
+        std::string(bundle.data, bundle.size),
+        std::string("deherm://") + gBundlePath);
+    if (gApplicationInitialized) {
+      defold_hermes::game_object::ActiveContext context;
+      if (!BuildBootstrapContext(&context)) {
+        throw std::runtime_error("Bootstrap game-object attachment is stale during reload");
+      }
+      defold_hermes::game_object::Scope scope(context);
+      if (!scope.entered()) throw std::runtime_error("Game-object context stack is exhausted during reload");
+      candidate->init();
+    }
+  } catch (const std::exception& error) {
+    // A jsi::JSError retains values owned by its Hermes runtime. Keep the
+    // candidate alive until the exception object has been destroyed at the end
+    // of this catch block, then discard the candidate below.
+    candidateRejected = true;
+    candidateDiagnostic = error.what();
+  }
+  if (candidateRejected) {
+    candidate.reset();
+    gRejectedBundleGeneration = bundle.generation;
+    if (!initial && gRuntime && gApplicationInitialized) {
+      gPendingRejectedBundleGeneration = bundle.generation;
+    }
+    dmLogError(
+        "TypeScript bundle generation %llu was rejected: %s",
+        static_cast<unsigned long long>(bundle.generation),
+        candidateDiagnostic.c_str());
+    return false;
+  }
+
+  if (gRuntime && gApplicationInitialized) {
+    try {
+      defold_hermes::game_object::ActiveContext context;
+      if (!BuildBootstrapContext(&context)) {
+        throw std::runtime_error("Bootstrap game-object attachment is stale during reload finalization");
+      }
+      defold_hermes::game_object::Scope scope(context);
+      if (!scope.entered()) throw std::runtime_error("Game-object context stack is exhausted during reload finalization");
+      gRuntime->finalize();
+    } catch (const std::exception& error) {
+      dmLogWarning("Previous TypeScript generation finalizer failed: %s", error.what());
+    }
+  }
+  gRuntime = std::move(candidate);
+#endif
+
+  gBundleGeneration = bundle.generation;
+  gRejectedBundleGeneration = 0;
+  dmLogInfo(
+      "%s TypeScript bundle generation %llu from '%s'",
+      initial ? "Loaded" : "Activated",
+      static_cast<unsigned long long>(bundle.generation),
+      gBundlePath.c_str());
+  return true;
+}
+
+bool EnsureBundleLoaded() {
+  if (gBundleResource) return true;
+  if (!gResourceFactory || gBundlePath.empty()) return false;
+  const auto result = dmResource::Get(
+      gResourceFactory, gBundlePath.c_str(), &gBundleResource);
+  if (result != dmResource::RESULT_OK) {
+    dmLogError(
+        "Unable to load typed TypeScript bundle '%s' (resource error %d)",
+        gBundlePath.c_str(), result);
+    gBundleResource = nullptr;
+    return false;
+  }
+  if (ActivateBundle(true)) return true;
+  dmResource::Release(gResourceFactory, gBundleResource);
+  gBundleResource = nullptr;
+  return false;
+}
 
 int DefoldRegistryRef(lua_State* state) {
   return dmScript::Ref(state, LUA_REGISTRYINDEX);
@@ -158,11 +393,25 @@ bool LuaTimerTrigger(uint32_t handle, bool* out) {
 
 bool StartApplication() {
   if (gApplicationInitialized) return true;
+  // Extension Initialize runs before Defold registers custom resource types.
+  // Script init/attachment runs after the factory is ready, so typed bundle
+  // acquisition and the first Hermes generation belong here.
+  if (!EnsureBundleLoaded()) return false;
 #if defined(DM_PLATFORM_HTML5)
+  defold_hermes::game_object::ActiveContext context;
+  if (!BuildBootstrapContext(&context)) return false;
+  defold_hermes::game_object::Scope scope(context);
+  if (!scope.entered()) return false;
   defoldHermesWebInit();
 #else
   try {
     if (!gRuntime) return false;
+    defold_hermes::game_object::ActiveContext context;
+    if (!BuildBootstrapContext(&context)) {
+      throw std::runtime_error("Bootstrap game-object attachment is stale during init");
+    }
+    defold_hermes::game_object::Scope scope(context);
+    if (!scope.entered()) throw std::runtime_error("Game-object context stack is exhausted during init");
     gRuntime->init();
   } catch (const std::exception& error) {
     dmLogError("TypeScript application initialization failed: %s", error.what());
@@ -175,19 +424,95 @@ bool StartApplication() {
 
 int AttachLuaInstance(lua_State* state) {
   luaL_checkany(state, 1);
+  dmGameObject::HInstance instance = dmScript::CheckGOInstance(state);
+  if (gBootstrapAttachment.live) {
+    const bool sameAttachment =
+        gBootstrapAttachment.collection == dmGameObject::GetCollection(instance) &&
+        gBootstrapAttachment.identifier == dmGameObject::GetIdentifier(instance) &&
+        gBootstrapAttachment.instanceGeneration == dmGameObject::GetGeneration(instance);
+    if (!sameAttachment) {
+      return luaL_error(state, "A different TypeScript bootstrap instance is already attached");
+    }
+    lua_pushboolean(state, 1);
+    return 1;
+  }
   if (!gLuaBridge || !gLuaBridge->captureInstance(1)) {
     return luaL_error(
         state, "Unable to capture Defold instance: %s",
         gLuaBridge ? gLuaBridge->lastError() : "bridge unavailable");
   }
-  if (!StartApplication()) return luaL_error(state, "Unable to initialize TypeScript application");
+  if (!gScriptBridge || !gScriptBridge->captureInstance(1)) {
+    return luaL_error(
+        state, "Unable to capture Defold script bridge instance: %s",
+        gScriptBridge ? gScriptBridge->lastError() : "bridge unavailable");
+  }
+  InvalidateBootstrapAttachment();
+  gBootstrapAttachment.collection = dmGameObject::GetCollection(instance);
+  gBootstrapAttachment.identifier = dmGameObject::GetIdentifier(instance);
+  gBootstrapAttachment.instanceGeneration = dmGameObject::GetGeneration(instance);
+  gBootstrapAttachment.live = true;
+  if (!StartApplication()) {
+    DetachCapturedLuaInstances();
+    InvalidateBootstrapAttachment();
+    return luaL_error(state, "Unable to initialize TypeScript application");
+  }
+  dmLogInfo("TypeScript application initialized after script instance attachment");
   lua_pushboolean(state, 1);
   return 1;
+}
+
+int DetachLuaInstance(lua_State* state) {
+  dmGameObject::HInstance instance = dmScript::CheckGOInstance(state);
+  if (gBootstrapAttachment.live &&
+      gBootstrapAttachment.collection == dmGameObject::GetCollection(instance) &&
+      gBootstrapAttachment.identifier == dmGameObject::GetIdentifier(instance) &&
+      gBootstrapAttachment.instanceGeneration == dmGameObject::GetGeneration(instance)) {
+    FinalizeAttachedApplication("script detach");
+    DetachCapturedLuaInstances();
+    InvalidateBootstrapAttachment();
+  }
+  return 0;
+}
+
+int UpdateLuaInstance(lua_State* state) {
+  dmGameObject::HInstance instance = dmScript::CheckGOInstance(state);
+  const double dt = luaL_checknumber(state, 2);
+  if (!gApplicationInitialized || !gBootstrapAttachment.live ||
+      gBootstrapAttachment.collection != dmGameObject::GetCollection(instance) ||
+      gBootstrapAttachment.identifier != dmGameObject::GetIdentifier(instance) ||
+      gBootstrapAttachment.instanceGeneration != dmGameObject::GetGeneration(instance)) {
+    return luaL_error(state, "TypeScript update called without the active bootstrap attachment");
+  }
+  defold_hermes::game_object::ActiveContext context;
+  if (!BuildBootstrapContext(&context)) {
+    return luaL_error(state, "Bootstrap game-object attachment is stale during update");
+  }
+  defold_hermes::game_object::Scope scope(context);
+  if (!scope.entered()) return luaL_error(state, "Game-object context stack is exhausted during update");
+#if defined(DM_PLATFORM_HTML5)
+  defoldHermesWebUpdate(dt);
+#else
+  try {
+    if (gRuntime) gRuntime->update(dt);
+  } catch (const std::exception& error) {
+    return luaL_error(state, "TypeScript update failed: %s", error.what());
+  }
+#endif
+  if (gPendingRejectedBundleGeneration != 0) {
+    dmLogInfo(
+        "TypeScript bundle generation %llu remained active after rejecting generation %llu",
+        static_cast<unsigned long long>(gBundleGeneration),
+        static_cast<unsigned long long>(gPendingRejectedBundleGeneration));
+    gPendingRejectedBundleGeneration = 0;
+  }
+  return 0;
 }
 
 void RegisterLuaBootstrap(lua_State* state) {
   const luaL_Reg functions[] = {
     {"attach", AttachLuaInstance},
+    {"detach", DetachLuaInstance},
+    {"update", UpdateLuaInstance},
     {nullptr, nullptr}
   };
   luaL_register(state, "defold_hermes", functions);
@@ -198,14 +523,8 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   const char* appPath = dmConfigFile::GetString(
       params->m_ConfigFile, "defold_hermes.app", kDefaultAppPath);
 
-  void* bytes = nullptr;
-  uint32_t size = 0;
-  const auto result = dmResource::GetRaw(
-      params->m_ResourceFactory, appPath, &bytes, &size);
-  if (result != dmResource::RESULT_OK) {
-    dmLogError("Unable to load TypeScript bundle '%s' (resource error %d)", appPath, result);
-    return dmExtension::RESULT_INIT_ERROR;
-  }
+  gResourceFactory = params->m_ResourceFactory;
+  gBundlePath = appPath;
 
   gLuaBridge = std::make_unique<defold_hermes::lua_bridge::LuaBridge>(64 * 1024, 4096);
   const defold_hermes::lua_bridge::RegistryApi registryApi = {
@@ -219,78 +538,113 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   };
   if (!defold_hermes::lua_bridge::generated::initialize(
           *gLuaBridge, params->m_L, registryApi, instanceApi)) {
-    free(bytes);
     dmLogError("Unable to initialize Lua compatibility bridge: %s", gLuaBridge->lastError());
     gLuaBridge.reset();
+    gResourceFactory = nullptr;
+    gBundlePath.clear();
     return dmExtension::RESULT_INIT_ERROR;
   }
   gLuaBridge->installCallbackApi({nullptr, InvokeTypeScriptCallback, ReleaseTypeScriptCallback});
+  gScriptBridge = std::make_unique<defold_hermes::lua_bridge::scalar::ScriptAdapter>();
+  const defold_hermes::lua_bridge::scalar::InstanceApi scalarInstanceApi = {
+    dmScript::GetInstance,
+    dmScript::SetInstance
+  };
+  if (!gScriptBridge->initialize(params->m_L, scalarInstanceApi)) {
+    dmLogError("Unable to initialize generated Defold script bridge: %s", gScriptBridge->lastError());
+    gLuaBridge->shutdown();
+    gLuaBridge.reset();
+    gScriptBridge.reset();
+    gResourceFactory = nullptr;
+    gBundlePath.clear();
+    return dmExtension::RESULT_INIT_ERROR;
+  }
+  defold_hermes::installScriptBridgeApi(gScriptBridge->api());
+  const defold_hermes::game_object::TerminalApi gameObjectApi = {
+    nullptr,
+    TerminalGetGeneration,
+    TerminalGetCollection,
+    TerminalGetIdentifier,
+    TerminalGetPosition,
+    TerminalSetPosition,
+    TerminalSetRotation
+  };
+  if (!defold_hermes::game_object::installTerminalApi(gameObjectApi)) {
+    dmLogError("Unable to install generated game-object terminal API");
+    defold_hermes::uninstallScriptBridgeApi();
+    gScriptBridge->shutdown();
+    gScriptBridge.reset();
+    gLuaBridge->shutdown();
+    gLuaBridge.reset();
+    gResourceFactory = nullptr;
+    gBundlePath.clear();
+    return dmExtension::RESULT_INIT_ERROR;
+  }
   RegisterLuaBootstrap(params->m_L);
   defold_hermes::installLuaTimerCapi(LuaTimerDelay, LuaTimerCancel, LuaTimerTrigger);
 
-#if defined(DM_PLATFORM_HTML5)
-  defoldHermesWebLoad(static_cast<const char*>(bytes), size);
-#else
-  try {
-    gRuntime = std::make_unique<defold_hermes::Runtime>(gHost);
-    gRuntime->load(
-        std::string(static_cast<const char*>(bytes), size),
-        std::string("defold-hermes://") + appPath);
-  } catch (const std::exception& error) {
-    free(bytes);
-    dmLogError("TypeScript application initialization failed: %s", error.what());
-    defold_hermes::uninstallLuaTimerCapi();
-    if (gLuaBridge) gLuaBridge->shutdown();
-    gLuaBridge.reset();
-    gRuntime.reset();
-    return dmExtension::RESULT_INIT_ERROR;
-  }
-#endif
-
-  free(bytes);
-  gPreviousFrameTime = dmTime::GetMonotonicTime();
-  dmLogInfo("Loaded TypeScript application '%s'; waiting for script instance attachment", appPath);
+  dmLogInfo("TypeScript bundle is waiting for script instance attachment");
   return dmExtension::RESULT_OK;
 }
 
 dmExtension::Result UpdateExtension(dmExtension::Params*) {
-  const uint64_t now = dmTime::GetMonotonicTime();
-  const double dt = static_cast<double>(now - gPreviousFrameTime) / 1000000.0;
-  gPreviousFrameTime = now;
-#if defined(DM_PLATFORM_HTML5)
-  if (gApplicationInitialized) defoldHermesWebUpdate(dt);
-#else
-  try {
-    if (gRuntime && gApplicationInitialized) gRuntime->update(dt);
-  } catch (const std::exception& error) {
-    dmLogError("TypeScript update failed: %s", error.what());
-    return dmExtension::RESULT_INIT_ERROR;
+  if (!gLoggedFirstExtensionUpdate) {
+    dmLogInfo("Extension update entered (application initialized: %s)",
+        gApplicationInitialized ? "true" : "false");
+    gLoggedFirstExtensionUpdate = true;
   }
-#endif
+  if (gBundleResource) ActivateBundle(false);
   return dmExtension::RESULT_OK;
 }
 
-dmExtension::Result FinalizeExtension(dmExtension::Params*) {
-#if defined(DM_PLATFORM_HTML5)
-  if (gApplicationInitialized) defoldHermesWebFinalize();
-#else
-  try {
-    if (gRuntime && gApplicationInitialized) gRuntime->finalize();
-  } catch (const std::exception& error) {
-    dmLogError("TypeScript finalization failed: %s", error.what());
+void OnEventExtension(dmExtension::Params*, const dmExtension::Event* event) {
+  if (event && event->m_Event == EXTENSION_EVENT_ID_ENGINE_DELETE) {
+    FinalizeAttachedApplication("engine delete event");
+    DetachCapturedLuaInstances();
+    InvalidateBootstrapAttachment();
   }
-#endif
-  gApplicationInitialized = false;
+}
+
+dmExtension::Result FinalizeExtension(dmExtension::Params*) {
+  FinalizeAttachedApplication("extension finalize");
+  DetachCapturedLuaInstances();
+  gLoggedFirstExtensionUpdate = false;
+  InvalidateBootstrapAttachment();
+  defold_hermes::game_object::uninstallTerminalApi();
   defold_hermes::uninstallLuaTimerCapi();
+  defold_hermes::uninstallScriptBridgeApi();
+  if (gScriptBridge) gScriptBridge->shutdown();
+  gScriptBridge.reset();
   if (gLuaBridge) gLuaBridge->shutdown();
   gLuaBridge.reset();
 #if !defined(DM_PLATFORM_HTML5)
   gRuntime.reset();
 #endif
+  if (gResourceFactory && gBundleResource) {
+    dmResource::Release(gResourceFactory, gBundleResource);
+  }
+  gBundleResource = nullptr;
+  gResourceFactory = nullptr;
+  gBundlePath.clear();
+  gBundleGeneration = 0;
+  gRejectedBundleGeneration = 0;
+  gPendingRejectedBundleGeneration = 0;
   return dmExtension::RESULT_OK;
 }
 
 dmExtension::Result AppInitializeExtension(dmExtension::AppParams*) {
+  // Native extension resource descriptors are not retained by Defold's linker
+  // merely because DM_DECLARE_RESOURCE_TYPE emitted a registration function.
+  // Referencing it from the app lifecycle both retains the object and installs
+  // the descriptor before the engine creates and populates its resource factory.
+  // AppInitialize runs again when Defold reboots the engine in-process, while
+  // the resource creator descriptor list is process-global and append-only.
+  // Registering the same static descriptor twice links it to itself.
+  static bool bundleResourceDescriptorRegistered = false;
+  if (!bundleResourceDescriptorRegistered) {
+    DehermBundleResource();
+    bundleResourceDescriptorRegistered = true;
+  }
   return dmExtension::RESULT_OK;
 }
 
@@ -312,6 +666,6 @@ DM_DECLARE_EXTENSION(
     AppFinalizeExtension,
     InitializeExtension,
     UpdateExtension,
-    0,
+    OnEventExtension,
     FinalizeExtension)
 }  // namespace deherm_registration

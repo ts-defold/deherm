@@ -8,8 +8,12 @@
 
 namespace defold_hermes {
 
-CallbackRegistry::CallbackRegistry(facebook::jsi::Runtime& runtime, uint32_t capacity)
+CallbackRegistry::CallbackRegistry(
+    facebook::jsi::Runtime& runtime,
+    uint32_t capacity,
+    uint32_t runtimeId)
     : runtime_(runtime),
+      runtimeId_(runtimeId),
       handles_(capacity),
       functions_(capacity ? new std::optional<facebook::jsi::Function>[capacity] : nullptr) {}
 
@@ -19,7 +23,7 @@ CallbackRegistry::~CallbackRegistry() {
 
 lua_bridge::Handle CallbackRegistry::acquire(facebook::jsi::Function function) {
   const lua_bridge::Handle handle = handles_.acquire(
-      kRuntime, kTimerCallbackType, this, 0);
+      runtimeId_, kTimerCallbackType, this, 0);
   if (!handle) {
     std::snprintf(error_, sizeof(error_), "Hermes callback pool is exhausted");
     return {};

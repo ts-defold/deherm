@@ -1,21 +1,32 @@
 #include <defold_hermes/runtime.hpp>
 #include <defold_hermes/callback_registry.hpp>
 #include <defold_hermes/generated_jsi.hpp>
+#include <defold_hermes/script_jsi_bridge.hpp>
 
 #if !defined(DM_PLATFORM_HTML5)
 
 #include <memory>
+#include <atomic>
 #include <stdexcept>
 #include <utility>
 
 #include <hermes/hermes.h>
 #include <jsi/jsi.h>
+#include <jsi/hermes-interfaces.h>
 
 namespace jsi = facebook::jsi;
 
 namespace defold_hermes {
 
 namespace {
+
+std::atomic<uint32_t> gNextRuntimeId{1};
+
+uint32_t acquireRuntimeId() {
+  uint32_t id = gNextRuntimeId.fetch_add(1, std::memory_order_relaxed);
+  if (id == 0) id = gNextRuntimeId.fetch_add(1, std::memory_order_relaxed);
+  return id;
+}
 
 std::string asString(jsi::Runtime& runtime, const jsi::Value& value) {
   return value.toString(runtime).utf8(runtime);
@@ -27,7 +38,8 @@ class Runtime::Impl {
  public:
   explicit Impl(Host& host)
       : host_(host), runtime_(facebook::hermes::makeHermesRuntime()) {
-    callbacks_ = std::make_unique<CallbackRegistry>(*runtime_, 4096);
+    callbacks_ = std::make_unique<CallbackRegistry>(
+        *runtime_, 4096, acquireRuntimeId());
     installHost();
   }
 
@@ -36,6 +48,27 @@ class Runtime::Impl {
 
     auto buffer = std::make_shared<jsi::StringBuffer>(source);
     runtime_->evaluateJavaScript(buffer, sourceUrl);
+    captureApplication();
+  }
+
+  void loadStatic(
+      const StaticUnitCreator* unitCreators,
+      size_t unitCount,
+      const std::string&) {
+    if (app_) throw std::runtime_error("A Defold Hermes application is already loaded");
+    if (!unitCreators || unitCount == 0) {
+      throw std::invalid_argument("Static Hermes application requires at least one unit");
+    }
+    auto* hermes = jsi::castInterface<facebook::hermes::IHermes>(runtime_.get());
+    if (!hermes) throw std::runtime_error("Hermes runtime does not expose the Static Hermes interface");
+    for (size_t index = 0; index < unitCount; ++index) {
+      if (!unitCreators[index]) throw std::invalid_argument("Static Hermes unit creator is null");
+      hermes->evaluateSHUnit(unitCreators[index]);
+    }
+    captureApplication();
+  }
+
+  void captureApplication() {
     auto value = runtime_->global().getProperty(*runtime_, "__defoldAppV1");
     if (!value.isObject()) throw jsi::JSError(*runtime_, "Application did not register");
     app_ = std::make_unique<jsi::Object>(value.asObject(*runtime_));
@@ -116,6 +149,7 @@ class Runtime::Impl {
     installGeneratedModules(*runtime_, modules, *callbacks_);
     runtime_->global().setProperty(
         *runtime_, "__defoldModulesV1", std::move(modules));
+    installScriptJsiBridge(*runtime_);
   }
 
   void callOptional(
@@ -153,6 +187,12 @@ Runtime::Runtime(Host& host) : impl_(std::make_unique<Impl>(host)) {}
 Runtime::~Runtime() = default;
 void Runtime::load(const std::string& source, const std::string& sourceUrl) {
   impl_->load(source, sourceUrl);
+}
+void Runtime::loadStatic(
+    const StaticUnitCreator* unitCreators,
+    size_t unitCount,
+    const std::string& sourceUrl) {
+  impl_->loadStatic(unitCreators, unitCount, sourceUrl);
 }
 void Runtime::init() { impl_->init(); }
 void Runtime::update(double dt) { impl_->update(dt); }

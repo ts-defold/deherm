@@ -1,0 +1,3249 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "The exact non-Matrix4 pending defold-value routes whose pinned IR contains a URL/address parameter",
+  "coverageClaim": "Classification and codec-foundation evidence only. These routes remain planned and are not executable until generated Lua/JS routing installs a ScriptUrlArena and proves target-specific calls.",
+  "allocationClaim": "The generated URL sidecar is fixed-capacity inline storage with deterministic exhaustion and no heap fallback. This does not claim that the called Defold engine operation is allocation-free.",
+  "routeCount": 70,
+  "urlParameterCount": 73,
+  "moduleCounts": {
+    "camera": 19,
+    "collectionfactory": 3,
+    "factory": 3,
+    "go": 15,
+    "label": 2,
+    "model": 5,
+    "particlefx": 2,
+    "physics": 11,
+    "sound": 3,
+    "sprite": 3,
+    "tilemap": 4
+  },
+  "rawUrlParameterTypeCounts": {
+    "string|hash|url": 54,
+    "url|number|nil": 19
+  },
+  "disjointCensus": {
+    "classifiedDefoldValue": 127,
+    "preexistingExecutableNonMatrix": 17,
+    "baselineFrontier": 110,
+    "currentPendingDefoldValue": 96,
+    "promotedMatrix4": 14,
+    "remainingMatrix4": 6,
+    "urlAddressPending": 70,
+    "binaryStringRemainder": 2,
+    "currentCodecRemainder": 18
+  },
+  "representationPolicy": {
+    "fullUrl": "three exact uint64 components (socket, path, fragment) plus zero/preserved reserved lane in a generation-checked ScriptUrlArena slot",
+    "stringShorthand": "distinct string value resolved by Defold against captured Lua caller context",
+    "hashShorthand": "distinct hash value resolved by Defold as default-socket path with zero fragment",
+    "collapsedLegacyUrl": "fail-closed: ScriptHandleKind::kUrl with no sidecar slot is never interpreted as a full URL"
+  },
+  "inputEvidence": {
+    "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "scriptApiAccountingSha256": "412f1ccbbab9751653488d71e60d705eb84dbb35079874280d2440fad97b93fa",
+    "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
+    "classificationOverrideSha256": "0c3ba6a422af7d35da2364c1365afd1238168149960c81c88ba2bfe29243c76a",
+    "defoldSources": [
+      {
+        "id": "dm-message-url-layout",
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/message.h",
+        "sha256": "43e902a798cee4ac4f8f2b839c756678963506aa025a272ef1cf010fb2c014c5"
+      },
+      {
+        "id": "dm-script-public-url-api",
+        "path": "upstream/defold/engine/script/src/dmsdk/script/script.h",
+        "sha256": "99d1dbf413a1ae84dcd3e6071628d50ba7d8177e0a1813bf2882ecbee15b7a9e"
+      },
+      {
+        "id": "dm-script-url-resolution",
+        "path": "upstream/defold/engine/script/src/script_msg.cpp",
+        "sha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2"
+      }
+    ],
+    "aggregateInputSha256": "308008a636bcabf87cfc9c3288a27dc9e1fe90b7c601b940bfb00f9f42cad0ce"
+  },
+  "rows": [
+    {
+      "id": "script:camera.get_aspect_ratio",
+      "stableId": 4150761990,
+      "rawName": "camera.get_aspect_ratio",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_aspect_ratio",
+      "source": "doc/camera.lua",
+      "line": 50,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_auto_aspect_ratio",
+      "stableId": 815384074,
+      "rawName": "camera.get_auto_aspect_ratio",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_auto_aspect_ratio",
+      "source": "doc/camera.lua",
+      "line": 59,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_enabled",
+      "stableId": 3707335843,
+      "rawName": "camera.get_enabled",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_enabled",
+      "source": "doc/camera.lua",
+      "line": 83,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_far_z",
+      "stableId": 4055682442,
+      "rawName": "camera.get_far_z",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_far_z",
+      "source": "doc/camera.lua",
+      "line": 90,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_fov",
+      "stableId": 1655100321,
+      "rawName": "camera.get_fov",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_fov",
+      "source": "doc/camera.lua",
+      "line": 97,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_near_z",
+      "stableId": 94225445,
+      "rawName": "camera.get_near_z",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_near_z",
+      "source": "doc/camera.lua",
+      "line": 104,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_orthographic_auto_zoom",
+      "stableId": 333496520,
+      "rawName": "camera.get_orthographic_auto_zoom",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_orthographic_auto_zoom",
+      "source": "doc/camera.lua",
+      "line": 112,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_orthographic_mode",
+      "stableId": 780726310,
+      "rawName": "camera.get_orthographic_mode",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_orthographic_mode",
+      "source": "doc/camera.lua",
+      "line": 119,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_orthographic_zoom",
+      "stableId": 1514123934,
+      "rawName": "camera.get_orthographic_zoom",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_orthographic_zoom",
+      "source": "doc/camera.lua",
+      "line": 127,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.screen_to_world",
+      "stableId": 4212113566,
+      "rawName": "camera.screen_to_world",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "screen_to_world",
+      "source": "doc/camera.lua",
+      "line": 168,
+      "urlParameters": [
+        {
+          "index": 1,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.screen_xy_to_world",
+      "stableId": 4124133706,
+      "rawName": "camera.screen_xy_to_world",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "screen_xy_to_world",
+      "source": "doc/camera.lua",
+      "line": 193,
+      "urlParameters": [
+        {
+          "index": 2,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_aspect_ratio",
+      "stableId": 2940707570,
+      "rawName": "camera.set_aspect_ratio",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "set_aspect_ratio",
+      "source": "doc/camera.lua",
+      "line": 202,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_auto_aspect_ratio",
+      "stableId": 3812610558,
+      "rawName": "camera.set_auto_aspect_ratio",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "set_auto_aspect_ratio",
+      "source": "doc/camera.lua",
+      "line": 211,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_far_z",
+      "stableId": 2081791798,
+      "rawName": "camera.set_far_z",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "set_far_z",
+      "source": "doc/camera.lua",
+      "line": 218,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_fov",
+      "stableId": 2734551893,
+      "rawName": "camera.set_fov",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "set_fov",
+      "source": "doc/camera.lua",
+      "line": 225,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_near_z",
+      "stableId": 2620899633,
+      "rawName": "camera.set_near_z",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "set_near_z",
+      "source": "doc/camera.lua",
+      "line": 232,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_orthographic_mode",
+      "stableId": 2873442090,
+      "rawName": "camera.set_orthographic_mode",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "set_orthographic_mode",
+      "source": "doc/camera.lua",
+      "line": 239,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_orthographic_zoom",
+      "stableId": 294035082,
+      "rawName": "camera.set_orthographic_zoom",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "set_orthographic_zoom",
+      "source": "doc/camera.lua",
+      "line": 247,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:camera.world_to_screen",
+      "stableId": 3205603148,
+      "rawName": "camera.world_to_screen",
+      "modulePath": [
+        "camera"
+      ],
+      "member": "world_to_screen",
+      "source": "doc/camera.lua",
+      "line": 269,
+      "urlParameters": [
+        {
+          "index": 1,
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "forms": [
+            "full-url",
+            "numeric-camera-id",
+            "nil-default"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:collectionfactory.get_status",
+      "stableId": 4238240607,
+      "rawName": "collectionfactory.get_status",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "get_status",
+      "source": "doc/collectionfactory.lua",
+      "line": 119,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:collectionfactory.set_prototype",
+      "stableId": 3724333493,
+      "rawName": "collectionfactory.set_prototype",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "set_prototype",
+      "source": "doc/collectionfactory.lua",
+      "line": 154,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:collectionfactory.unload",
+      "stableId": 1613326455,
+      "rawName": "collectionfactory.unload",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "unload",
+      "source": "doc/collectionfactory.lua",
+      "line": 170,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:factory.get_status",
+      "stableId": 3501057803,
+      "rawName": "factory.get_status",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "get_status",
+      "source": "doc/factory.lua",
+      "line": 93,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:factory.set_prototype",
+      "stableId": 3506659009,
+      "rawName": "factory.set_prototype",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "set_prototype",
+      "source": "doc/factory.lua",
+      "line": 127,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:factory.unload",
+      "stableId": 826508291,
+      "rawName": "factory.unload",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "unload",
+      "source": "doc/factory.lua",
+      "line": 143,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.cancel_animations",
+      "stableId": 1183026732,
+      "rawName": "go.cancel_animations",
+      "modulePath": [
+        "go"
+      ],
+      "member": "cancel_animations",
+      "source": "doc/go.lua",
+      "line": 401,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.exists",
+      "stableId": 1311027776,
+      "rawName": "go.exists",
+      "modulePath": [
+        "go"
+      ],
+      "member": "exists",
+      "source": "doc/go.lua",
+      "line": 464,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_parent",
+      "stableId": 3138865481,
+      "rawName": "go.get_parent",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_parent",
+      "source": "doc/go.lua",
+      "line": 580,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_rotation",
+      "stableId": 384109339,
+      "rawName": "go.get_rotation",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_rotation",
+      "source": "doc/go.lua",
+      "line": 622,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_scale",
+      "stableId": 2771038861,
+      "rawName": "go.get_scale",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_scale",
+      "source": "doc/go.lua",
+      "line": 643,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_scale_uniform",
+      "stableId": 3159049394,
+      "rawName": "go.get_scale_uniform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_scale_uniform",
+      "source": "doc/go.lua",
+      "line": 664,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_position",
+      "stableId": 2533378019,
+      "rawName": "go.get_world_position",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_position",
+      "source": "doc/go.lua",
+      "line": 687,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_rotation",
+      "stableId": 2823544550,
+      "rawName": "go.get_world_rotation",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_rotation",
+      "source": "doc/go.lua",
+      "line": 710,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_scale",
+      "stableId": 457161058,
+      "rawName": "go.get_world_scale",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_scale",
+      "source": "doc/go.lua",
+      "line": 735,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_scale_uniform",
+      "stableId": 1055817377,
+      "rawName": "go.get_world_scale_uniform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_scale_uniform",
+      "source": "doc/go.lua",
+      "line": 758,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.set_parent",
+      "stableId": 593473189,
+      "rawName": "go.set_parent",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_parent",
+      "source": "doc/go.lua",
+      "line": 920,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        },
+        {
+          "index": 1,
+          "name": "parent_id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.set_scale",
+      "stableId": 2172419017,
+      "rawName": "go.set_scale",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_scale",
+      "source": "doc/go.lua",
+      "line": 991,
+      "urlParameters": [
+        {
+          "index": 1,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.set_scale_xy",
+      "stableId": 3492879989,
+      "rawName": "go.set_scale_xy",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_scale_xy",
+      "source": "doc/go.lua",
+      "line": 1016,
+      "urlParameters": [
+        {
+          "index": 1,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.update_world_transform",
+      "stableId": 16978861,
+      "rawName": "go.update_world_transform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "update_world_transform",
+      "source": "doc/go.lua",
+      "line": 1043,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:go.world_to_local_position",
+      "stableId": 2492984466,
+      "rawName": "go.world_to_local_position",
+      "modulePath": [
+        "go"
+      ],
+      "member": "world_to_local_position",
+      "source": "doc/go.lua",
+      "line": 1061,
+      "urlParameters": [
+        {
+          "index": 1,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:label.get_text",
+      "stableId": 1547809370,
+      "rawName": "label.get_text",
+      "modulePath": [
+        "label"
+      ],
+      "member": "get_text",
+      "source": "doc/label.lua",
+      "line": 58,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:label.set_text",
+      "stableId": 1888249062,
+      "rawName": "label.set_text",
+      "modulePath": [
+        "label"
+      ],
+      "member": "set_text",
+      "source": "doc/label.lua",
+      "line": 78,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:model.cancel",
+      "stableId": 3654418919,
+      "rawName": "model.cancel",
+      "modulePath": [
+        "model"
+      ],
+      "member": "cancel",
+      "source": "doc/model.lua",
+      "line": 20,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:model.get_go",
+      "stableId": 1244796042,
+      "rawName": "model.get_go",
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_go",
+      "source": "doc/model.lua",
+      "line": 79,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:model.get_mesh_enabled",
+      "stableId": 2409536311,
+      "rawName": "model.get_mesh_enabled",
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_mesh_enabled",
+      "source": "doc/model.lua",
+      "line": 111,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        },
+        {
+          "index": 1,
+          "name": "mesh_id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:model.reset_constant",
+      "stableId": 250460089,
+      "rawName": "model.reset_constant",
+      "modulePath": [
+        "model"
+      ],
+      "member": "reset_constant",
+      "source": "doc/model.lua",
+      "line": 182,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:model.set_mesh_enabled",
+      "stableId": 2492040859,
+      "rawName": "model.set_mesh_enabled",
+      "modulePath": [
+        "model"
+      ],
+      "member": "set_mesh_enabled",
+      "source": "doc/model.lua",
+      "line": 220,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        },
+        {
+          "index": 1,
+          "name": "mesh_id",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:particlefx.reset_constant",
+      "stableId": 3569310218,
+      "rawName": "particlefx.reset_constant",
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "reset_constant",
+      "source": "doc/particlefx.lua",
+      "line": 102,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:particlefx.set_constant",
+      "stableId": 3047358751,
+      "rawName": "particlefx.set_constant",
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "set_constant",
+      "source": "doc/particlefx.lua",
+      "line": 129,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.destroy_joint",
+      "stableId": 350770,
+      "rawName": "physics.destroy_joint",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "destroy_joint",
+      "source": "doc/physics.lua",
+      "line": 122,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "collisionobject",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_group",
+      "stableId": 3971564819,
+      "rawName": "physics.get_group",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_group",
+      "source": "doc/physics.lua",
+      "line": 158,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_joint_reaction_force",
+      "stableId": 1120188142,
+      "rawName": "physics.get_joint_reaction_force",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_joint_reaction_force",
+      "source": "doc/physics.lua",
+      "line": 180,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "collisionobject",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_joint_reaction_torque",
+      "stableId": 1431636929,
+      "rawName": "physics.get_joint_reaction_torque",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_joint_reaction_torque",
+      "source": "doc/physics.lua",
+      "line": 191,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "collisionobject",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_maskbit",
+      "stableId": 1870095059,
+      "rawName": "physics.get_maskbit",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_maskbit",
+      "source": "doc/physics.lua",
+      "line": 210,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_group",
+      "stableId": 3028485791,
+      "rawName": "physics.set_group",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_group",
+      "source": "doc/physics.lua",
+      "line": 429,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_hflip",
+      "stableId": 2879664679,
+      "rawName": "physics.set_hflip",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_hflip",
+      "source": "doc/physics.lua",
+      "line": 445,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_maskbit",
+      "stableId": 3160984935,
+      "rawName": "physics.set_maskbit",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_maskbit",
+      "source": "doc/physics.lua",
+      "line": 473,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_vflip",
+      "stableId": 4109527981,
+      "rawName": "physics.set_vflip",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_vflip",
+      "source": "doc/physics.lua",
+      "line": 524,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.update_mass",
+      "stableId": 3925799645,
+      "rawName": "physics.update_mass",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "update_mass",
+      "source": "doc/physics.lua",
+      "line": 539,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "collisionobject",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:physics.wakeup",
+      "stableId": 10300768,
+      "rawName": "physics.wakeup",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "wakeup",
+      "source": "doc/physics.lua",
+      "line": 556,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:sound.pause",
+      "stableId": 1502096075,
+      "rawName": "sound.pause",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "pause",
+      "source": "doc/sound.lua",
+      "line": 196,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:sound.set_gain",
+      "stableId": 4220725117,
+      "rawName": "sound.set_gain",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "set_gain",
+      "source": "doc/sound.lua",
+      "line": 245,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:sound.set_pan",
+      "stableId": 665323993,
+      "rawName": "sound.set_pan",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "set_pan",
+      "source": "doc/sound.lua",
+      "line": 277,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:sprite.reset_constant",
+      "stableId": 4156456045,
+      "rawName": "sprite.reset_constant",
+      "modulePath": [
+        "sprite"
+      ],
+      "member": "reset_constant",
+      "source": "doc/sprite.lua",
+      "line": 74,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:sprite.set_hflip",
+      "stableId": 1703142815,
+      "rawName": "sprite.set_hflip",
+      "modulePath": [
+        "sprite"
+      ],
+      "member": "set_hflip",
+      "source": "doc/sprite.lua",
+      "line": 96,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:sprite.set_vflip",
+      "stableId": 2316635445,
+      "rawName": "sprite.set_vflip",
+      "modulePath": [
+        "sprite"
+      ],
+      "member": "set_vflip",
+      "source": "doc/sprite.lua",
+      "line": 118,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.get_tile",
+      "stableId": 2810309289,
+      "rawName": "tilemap.get_tile",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_tile",
+      "source": "doc/tilemap.lua",
+      "line": 97,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.reset_constant",
+      "stableId": 3635172296,
+      "rawName": "tilemap.reset_constant",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "reset_constant",
+      "source": "doc/tilemap.lua",
+      "line": 173,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.set_tile",
+      "stableId": 530608877,
+      "rawName": "tilemap.set_tile",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "set_tile",
+      "source": "doc/tilemap.lua",
+      "line": 214,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.set_visible",
+      "stableId": 3195961805,
+      "rawName": "tilemap.set_visible",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "set_visible",
+      "source": "doc/tilemap.lua",
+      "line": 229,
+      "urlParameters": [
+        {
+          "index": 0,
+          "name": "url",
+          "rawType": "string|hash|url",
+          "forms": [
+            "string-shorthand",
+            "hash-shorthand",
+            "full-url"
+          ]
+        }
+      ],
+      "urlResults": [],
+      "routing": {
+        "status": "planned",
+        "fullUrl": "ScriptUrlArena token -> exact dmMessage::URL -> dmScript::PushURL",
+        "stringShorthand": "push unchanged Lua string; dmScript::ResolveURL applies captured-instance defaults",
+        "hashShorthand": "push unchanged Lua hash; dmScript::ResolveURL applies default socket and clears fragment",
+        "result": "copy dmMessage::URL into ScriptUrlArena before restoring/popping Lua stack"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+        },
+        "nativeStaticHermes": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+        },
+        "html5BrowserHost": {
+          "status": "planned-codec-foundation",
+          "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+        }
+      }
+    }
+  ]
+}

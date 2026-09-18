@@ -1,0 +1,511 @@
+{
+  "schemaVersion": 1,
+  "descriptorSha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d",
+  "overrideSha256": "efff86d1cc661df66b273ca01acd11e397a60ec6b0852552e6fa17f374a158a7",
+  "descriptorInputSha256": "b565043a742a1f8db1db1631f61de53a059eda973f0f41f4b4d5b9ec0c43d50e",
+  "coverage": {
+    "descriptorBindings": 78,
+    "scopedVmathBindings": 30,
+    "includedBindings": 3,
+    "includedCallShapes": 7,
+    "structuredResultExclusions": 27,
+    "outOfScopeBindings": 48
+  },
+  "abi": {
+    "argumentLayout": "flattened-c-f32-lanes",
+    "resultLayout": "c-f64-scalar",
+    "errorSentinel": "quiet-nan-converted-to-deterministic-wrapper-exception",
+    "reentrant": true,
+    "context": "none"
+  },
+  "failurePolicy": "The native scalar ABI returns quiet NaN for dispatch errors, including the engine-defined vmath.project zero-target error. Every generated sound-typed wrapper detects result !== result and throws a stable route/shape string. This also rejects any otherwise successful operation that produces NaN from infinities; the scalar ABI cannot distinguish those cases without a status aggregate or caller-owned output pointer.",
+  "allocationClaim": "The successful generated C ABI shim and wrapper path uses only scalar parameters, fixed stack arrays, and ScriptCallFrame dispatch; it performs no explicit heap allocation. The exceptional wrapper path is not included in the zero-allocation claim. Engine math implementations may change independently.",
+  "included": [
+    {
+      "id": "script:vmath.length",
+      "stableId": 2370510694,
+      "stableIdHex": "0x8d4b1f66",
+      "operationTemplate": "value-unary",
+      "resultCodec": "Number",
+      "shapes": [
+        {
+          "codecs": [
+            "Vector3"
+          ],
+          "cFunction": "deherm_static_vmath_8d4b1f66_length_vector3",
+          "wrapper": "vmathLengthVector3"
+        },
+        {
+          "codecs": [
+            "Vector4"
+          ],
+          "cFunction": "deherm_static_vmath_8d4b1f66_length_vector4",
+          "wrapper": "vmathLengthVector4"
+        },
+        {
+          "codecs": [
+            "Quaternion"
+          ],
+          "cFunction": "deherm_static_vmath_8d4b1f66_length_quaternion",
+          "wrapper": "vmathLengthQuaternion"
+        }
+      ]
+    },
+    {
+      "id": "script:vmath.project",
+      "stableId": 2686972787,
+      "stableIdHex": "0xa027f373",
+      "operationTemplate": "vmath-fixed-pod",
+      "resultCodec": "Number",
+      "shapes": [
+        {
+          "codecs": [
+            "Vector3",
+            "Vector3"
+          ],
+          "cFunction": "deherm_static_vmath_a027f373_project_vector3_vector3",
+          "wrapper": "vmathProjectVector3Vector3"
+        }
+      ]
+    },
+    {
+      "id": "script:vmath.length_sqr",
+      "stableId": 2981849211,
+      "stableIdHex": "0xb1bb687b",
+      "operationTemplate": "vmath-fixed-pod",
+      "resultCodec": "Number",
+      "shapes": [
+        {
+          "codecs": [
+            "Vector3"
+          ],
+          "cFunction": "deherm_static_vmath_b1bb687b_length_sqr_vector3",
+          "wrapper": "vmathLengthSqrVector3"
+        },
+        {
+          "codecs": [
+            "Vector4"
+          ],
+          "cFunction": "deherm_static_vmath_b1bb687b_length_sqr_vector4",
+          "wrapper": "vmathLengthSqrVector4"
+        },
+        {
+          "codecs": [
+            "Quaternion"
+          ],
+          "cFunction": "deherm_static_vmath_b1bb687b_length_sqr_quaternion",
+          "wrapper": "vmathLengthSqrQuaternion"
+        }
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "script:factory.create",
+      "stableId": 96184340,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_enabled",
+      "stableId": 344287147,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_clipping_inverted",
+      "stableId": 344438576,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.get_node",
+      "stableId": 509983822,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_id",
+      "stableId": 510669267,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_inner_radius",
+      "stableId": 599811265,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat_rotation_y",
+      "stableId": 603084884,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:go.set_position",
+      "stableId": 608141138,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat_rotation_x",
+      "stableId": 619862503,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:gui.set_particlefx",
+      "stableId": 634729758,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat_rotation_z",
+      "stableId": 653417741,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:gui.set_color",
+      "stableId": 681356529,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_outline",
+      "stableId": 852399392,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.matrix4_translation",
+      "stableId": 889923285,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:vmath.matrix4_perspective",
+      "stableId": 1058276904,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:msg.post",
+      "stableId": 1111726479,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.ortho_inv",
+      "stableId": 1292408212,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:vmath.euler_to_quat",
+      "stableId": 1329930197,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:gui.set_size",
+      "stableId": 1335131087,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_leading",
+      "stableId": 1425442548,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat_from_to",
+      "stableId": 1458980654,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:gui.set_position",
+      "stableId": 1474440329,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_text",
+      "stableId": 1480837389,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_shadow",
+      "stableId": 1482532654,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_texture",
+      "stableId": 1539901009,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_clipping_mode",
+      "stableId": 1648551722,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_outer_bounds",
+      "stableId": 1712128015,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.matrix4_axis_angle",
+      "stableId": 1732915491,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:gui.set_tracking",
+      "stableId": 1740794531,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_blend_mode",
+      "stableId": 1874419309,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_fill_angle",
+      "stableId": 1932260719,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_yanchor",
+      "stableId": 2042797604,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:go.set_rotation",
+      "stableId": 2093413559,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_size_mode",
+      "stableId": 2104597123,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_adjust_mode",
+      "stableId": 2124339589,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.matrix4_look_at",
+      "stableId": 2149531511,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:gui.set_flipbook_playback_rate",
+      "stableId": 2274625155,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.matrix4_compose",
+      "stableId": 2501238546,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_y",
+      "stableId": 2509648852,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_x",
+      "stableId": 2526426471,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_z",
+      "stableId": 2559981709,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:gui.set_alpha",
+      "stableId": 2749898006,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat",
+      "stableId": 2756728049,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:gui.set_clipping_visible",
+      "stableId": 2765276089,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.matrix4_orthographic",
+      "stableId": 2797369728,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:gui.set_screen_position",
+      "stableId": 2837486932,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:hash",
+      "stableId": 2845099200,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:go.delete",
+      "stableId": 2920192283,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_inherit_alpha",
+      "stableId": 2930785382,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat_basis",
+      "stableId": 2962238768,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:gui.set_xanchor",
+      "stableId": 2994148867,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.cross",
+      "stableId": 3022880242,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:vmath.matrix4_quat",
+      "stableId": 3063853257,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:gui.set_flipbook_cursor",
+      "stableId": 3158379927,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_perimeter_vertices",
+      "stableId": 3222725677,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat_matrix4",
+      "stableId": 3312627817,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:gui.set_font",
+      "stableId": 3446342703,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.vector3",
+      "stableId": 3491633886,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:vmath.inv",
+      "stableId": 3499206161,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    },
+    {
+      "id": "script:vmath.normalize",
+      "stableId": 3582341977,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "SameDefoldValue"
+    },
+    {
+      "id": "script:vmath.rotate",
+      "stableId": 3691011585,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Vector3"
+    },
+    {
+      "id": "script:gui.set_visible",
+      "stableId": 3757373152,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_rotation",
+      "stableId": 3759172468,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_slice9",
+      "stableId": 3771988895,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:go.get_position",
+      "stableId": 3918772974,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_euler",
+      "stableId": 3920485847,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_scale",
+      "stableId": 3923373356,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_layer",
+      "stableId": 3974957251,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_parent",
+      "stableId": 3975981566,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_pivot",
+      "stableId": 3991574614,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_line_break",
+      "stableId": 4102050116,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:gui.set_material",
+      "stableId": 4118133459,
+      "reason": "out-of-scope-non-vmath"
+    },
+    {
+      "id": "script:vmath.quat_axis_angle",
+      "stableId": 4121318819,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:vmath.conj",
+      "stableId": 4233115420,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Quaternion"
+    },
+    {
+      "id": "script:vmath.matrix4_frustum",
+      "stableId": 4245225016,
+      "reason": "static-hermes-ffi-has-no-allocation-free-aggregate-return",
+      "resultCodec": "Matrix4"
+    }
+  ],
+  "generatedSha256": {
+    "header": "4e12dcef4a347428f5468a682fca4bb02d58657bbf5df44d7f53c31850a2cdb4",
+    "source": "b50d90aa5b8e66ba73dbee3179c8fc400364567be96743817a432692833f3080",
+    "typescript": "44cd5f29eaf49e8bd735f7a1005ed185d684eb58c59a5b4a3dc65bc3a8726336"
+  }
+}

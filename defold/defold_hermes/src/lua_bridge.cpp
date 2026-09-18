@@ -126,6 +126,14 @@ bool LuaBridge::captureInstance(int index) {
   return true;
 }
 
+void LuaBridge::detachInstance() {
+  if (state_ && registryApi_.unref &&
+      instanceRef_ != LUA_NOREF && instanceRef_ != LUA_REFNIL) {
+    registryApi_.unref(state_, instanceRef_);
+  }
+  instanceRef_ = LUA_NOREF;
+}
+
 void LuaBridge::setError(const char* message) {
   std::snprintf(error_, sizeof(error_), "%s", message ? message : "unknown Lua bridge error");
 }

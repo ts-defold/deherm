@@ -17,9 +17,13 @@ await new Promise((resolve, reject) => {
 
 let nextId = 1;
 const pending = new Map();
+const eventWaiters = new Map();
 const events = [];
+let captureRuntimeEvents = false;
 let sawInit = false;
 let sawGeneratedCall = false;
+let sawScriptProbe = false;
+let sawHashProbe = false;
 let sawUpdate = false;
 socket.addEventListener("message", ({ data }) => {
   const message = JSON.parse(data);
@@ -31,6 +35,12 @@ socket.addEventListener("message", ({ data }) => {
     else continuation.resolve(message.result);
     return;
   }
+  const waiters = eventWaiters.get(message.method);
+  if (waiters?.length) {
+    eventWaiters.delete(message.method);
+    for (const resolve of waiters) resolve(message.params);
+  }
+  if (!captureRuntimeEvents) return;
   if (message.method === "Runtime.consoleAPICalled") {
     const event = {
       kind: "console",
@@ -40,6 +50,8 @@ socket.addEventListener("message", ({ data }) => {
     const rendered = event.values.join(" ");
     sawInit ||= rendered.includes("init:browser");
     sawGeneratedCall ||= rendered.includes("module:42");
+    sawScriptProbe ||= rendered.includes("script-api:bit.lshift.number:256");
+    sawHashProbe ||= rendered.includes("script-value:builtins.hash.my_hash:ok");
     if (rendered.includes("update:")) {
       if (sawUpdate) return;
       sawUpdate = true;
@@ -64,6 +76,19 @@ function send(method, params = {}) {
   return result;
 }
 
+function waitForEvent(method, timeoutMs = 15_000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`Timed out waiting for CDP event ${method}`)), timeoutMs);
+    const wrapped = (params) => {
+      clearTimeout(timer);
+      resolve(params);
+    };
+    const waiters = eventWaiters.get(method) ?? [];
+    waiters.push(wrapped);
+    eventWaiters.set(method, waiters);
+  });
+}
+
 async function evaluate(expression) {
   const result = await send("Runtime.evaluate", {
     expression,
@@ -74,10 +99,21 @@ async function evaluate(expression) {
   return result.result.value;
 }
 
+await send("Page.enable");
 await send("Runtime.enable");
 await send("Log.enable");
-await send("Page.enable");
+const contextCleared = waitForEvent("Runtime.executionContextsCleared");
+const pageLoaded = waitForEvent("Page.loadEventFired");
 await send("Page.reload", { ignoreCache: true });
+await contextCleared;
+events.length = 0;
+sawInit = false;
+sawGeneratedCall = false;
+sawScriptProbe = false;
+sawHashProbe = false;
+sawUpdate = false;
+captureRuntimeEvents = true;
+await pageLoaded;
 
 const deadline = Date.now() + 15_000;
 let state;
@@ -88,12 +124,13 @@ while (Date.now() < deadline) {
     appRegistered: Boolean(globalThis.__defoldAppV1),
     hostRuntime: globalThis.__defoldHostV1?.runtime ?? null,
     modules: Object.keys(globalThis.__defoldModulesV1 ?? {}).sort(),
+    scriptBridgeInstalled: typeof globalThis.__defoldScriptBridgeV1?.call === "function",
     canvas: (() => {
       const value = document.querySelector("canvas");
       return value ? { width: value.width, height: value.height } : null;
     })()
   })`);
-  if (state.engineStarted && state.appRegistered && sawInit && sawGeneratedCall && sawUpdate) break;
+  if (state.engineStarted && state.appRegistered && state.scriptBridgeInstalled && sawInit && sawGeneratedCall && sawScriptProbe && sawHashProbe && sawUpdate) break;
   await new Promise((resolve) => setTimeout(resolve, 100));
 }
 
@@ -110,9 +147,12 @@ const evidence = JSON.stringify({ state, events: diagnosticEvents });
 assert.equal(state?.engineStarted, true, `Defold Emscripten runtime did not start: ${evidence}`);
 assert.equal(state?.appRegistered, true, `TypeScript application did not register: ${evidence}`);
 assert.equal(state?.hostRuntime, "browser", "Application did not use the browser host adapter");
-assert.deepEqual(state?.modules, ["ExampleMath", "Timer"]);
+assert.deepEqual(state?.modules, ["DmSdkScalar", "ExampleMath", "Timer"]);
+assert.equal(state?.scriptBridgeInstalled, true, "Generated browser script bridge was not installed");
 assert.equal(sawInit, true, "Defold did not invoke the TypeScript init lifecycle");
 assert.equal(sawGeneratedCall, true, "Generated ExampleMath binding did not return 42 from Wasm");
+assert.equal(sawScriptProbe, true, "Generated Defold script binding did not execute through the browser bridge");
+assert.equal(sawHashProbe, true, "Generated hash binding did not cross the browser/Wasm C ABI");
 assert.equal(sawUpdate, true, "Defold did not invoke the TypeScript update lifecycle");
 const fatalEvents = relevantEvents.filter((event) =>
   event.kind === "exception"

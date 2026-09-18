@@ -30,13 +30,14 @@ def include_roots() -> list[Path]:
 
 
 def compile_source(source: Path, platform: str) -> None:
+    platform_flags = ["-fno-exceptions", "-fno-rtti"] if platform == "HTML5" else ["-fexceptions"]
     command = [
         "clang++",
         "-std=c++17",
         "-fsyntax-only",
         "-Werror",
         "-Wno-deprecated-declarations",
-        "-fexceptions",
+        *platform_flags,
         "-DLUA_API=",
         f"-DDM_PLATFORM_{platform}=1",
         *(f"-I{path}" for path in include_roots()),
@@ -53,18 +54,24 @@ def main() -> None:
     ensure_support_headers()
     generated_dmsdk = sorted((EXTENSION / "src").glob("generated_dmsdk_scalar_*.cpp"))
     common = [
+        EXTENSION / "src" / "bundle_resource.cpp",
         EXTENSION / "src" / "capi.cpp",
         EXTENSION / "src" / "callback_registry.cpp",
         EXTENSION / "src" / "extension.cpp",
         EXTENSION / "src" / "generated_jsi.cpp",
         EXTENSION / "src" / "generated_lua_bridge.cpp",
         EXTENSION / "src" / "generated_scalar_lua_descriptors.cpp",
+        EXTENSION / "src" / "generated_script_value_bindings.cpp",
+        EXTENSION / "src" / "generated_script_fixed_tuples.cpp",
+        EXTENSION / "src" / "lua_value_registry.cpp",
         EXTENSION / "src" / "scalar_lua_dispatch.cpp",
+        EXTENSION / "src" / "script_bridge_capi.cpp",
+        EXTENSION / "src" / "script_scalar_lua_adapter.cpp",
         *generated_dmsdk,
         EXTENSION / "src" / "lua_bridge.cpp",
         EXTENSION / "src" / "lua_bridge_core.cpp",
     ]
-    native = [*common, EXTENSION / "src" / "runtime.cpp"]
+    native = [*common, EXTENSION / "src" / "runtime.cpp", EXTENSION / "src" / "script_jsi_bridge.cpp"]
     for source in native:
         compile_source(source, "OSX")
     for source in common:

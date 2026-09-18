@@ -16,7 +16,8 @@ trap cleanup EXIT INT TERM
 
 if ! curl --silent --fail --max-time 1 http://localhost:9010/actuator/health >/dev/null; then
   mkdir -p "$(dirname "$log_file")"
-  "$repo_root/scripts/extender-local.sh" foreground >"$log_file" 2>&1 &
+  "$repo_root/scripts/extender-local.sh" prepare
+  "$repo_root/scripts/extender-local.sh" foreground-prepared >"$log_file" 2>&1 &
   extender_pid=$!
   for _ in {1..60}; do
     if curl --silent --fail --max-time 1 http://localhost:9010/actuator/health >/dev/null; then

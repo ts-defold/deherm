@@ -2,10 +2,11 @@
 import type { DefoldAddress, DefoldHash, DefoldUrl } from "../../address";
 
 declare const opaqueBrand: unique symbol;
+declare const defoldValueBrand: unique symbol;
 export type DefoldOpaque<Name extends string> = { readonly [opaqueBrand]: Name };
-export type Vector3 = Readonly<{ x: number; y: number; z: number }>;
-export type Vector4 = Readonly<{ x: number; y: number; z: number; w: number }>;
-export type Quaternion = Readonly<{ x: number; y: number; z: number; w: number }>;
+export type Vector3 = Readonly<{ x: number; y: number; z: number; readonly [defoldValueBrand]: "vector3" }>;
+export type Vector4 = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: "vector4" }>;
+export type Quaternion = Readonly<{ x: number; y: number; z: number; w: number; readonly [defoldValueBrand]: "quaternion" }>;
 export type Matrix4 = readonly [number, number, number, number, number, number, number, number, number, number, number, number, number, number, number, number];
 
 export type B2dBodyB2Enum = number & DefoldOpaque<"defold_enum.b2d.body.B2">;
@@ -10776,7 +10777,7 @@ export interface BitApi {
    * @returns s hexadecimal string
    */
   readonly tohex: {
-    (x: number, n: number): string;
+    (x: number, n?: number): string;
   };
 }
 

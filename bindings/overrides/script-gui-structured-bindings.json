@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "irSource": "doc/gui.lua",
+  "source": "engine/gui/src/gui_script.cpp",
+  "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4",
+  "ownership": "GUI nodes cross JavaScript as generational handles to Lua registry roots. Finalization queues release; stale, cross-runtime, and exhausted handles fail closed. Setter storage and allocation behavior remains owned by each pinned Defold Lua implementation.",
+  "families": [
+    {
+      "id": "gui-node-setters",
+      "selector": {
+        "modulePath": ["gui"],
+        "memberPrefix": "set_",
+        "firstParameterType": "node",
+        "resultCount": 0,
+        "excludedIds": ["script:gui.set_text"],
+        "expectedRouteCount": 39,
+        "typeCodecs": {
+          "node": "Node",
+          "number": "Number",
+          "boolean": "Boolean",
+          "string": "String",
+          "hash": "Hash",
+          "vector3": "Vector3",
+          "vector4": "Vector4",
+          "quaternion": "Quaternion",
+          "gui.ADJUST": "Number",
+          "gui.ANCHOR": "Number",
+          "gui.BLEND": "Number",
+          "gui.CLIPPING_MODE": "Number",
+          "gui.PIEBOUNDS": "Number",
+          "gui.PIVOT": "Number",
+          "gui.SIZE_MODE": "Number"
+        }
+      },
+      "operation": {
+        "template": "gui-node-setter",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "argumentPolicy": "pinned-ir-all-call-shapes",
+          "allocationPolicy": "engine-defined-per-member"
+        }
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "id": "script:gui.get_node",
+      "sourceSymbol": "LuaGetNode",
+      "sourceOperation": ["GuiScriptInstance_Check(L)", "GetNodeById(scene, id)", "lua_newuserdata(L, sizeof(NodeProxy))"],
+      "operation": {
+        "template": "gui-node-lookup",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "notFound": "error"
+        }
+      },
+      "callShapes": [["String"], ["Hash"]],
+      "implementedCallShapes": [["String"]],
+      "resultCodec": "Node"
+    },
+    {
+      "id": "script:gui.set_text",
+      "sourceSymbol": "LuaSetText",
+      "sourceOperation": ["luaL_checkstring(L, 2)", "strdup(text)"],
+      "operation": {
+        "template": "gui-node-text-set",
+        "parameters": {
+          "backend": "captured-lua",
+          "context": "active-gui-scene",
+          "handlePolicy": "generational-registry-ref",
+          "numberFormat": "lua-5.1-%.14g"
+        }
+      },
+      "callShapes": [["Node", "String"], ["Node", "Number"]],
+      "implementedCallShapes": [["Node", "String"], ["Node", "Number"]],
+      "resultCodec": "None"
+    }
+  ]
+}

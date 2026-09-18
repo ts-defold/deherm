@@ -1,35 +1,76 @@
 import path from "node:path";
 
+import { compileConformanceHarness, generateConformanceHarness, readConformanceReport } from "./conformance.mjs";
 import { inspectDefoldProject } from "./project.mjs";
 import { writeGeneratedProject } from "./generate.mjs";
 
-const help = `defold-hermes <command> [options]
+const help = `deherm <command> [options]
 
 Commands:
   doctor       Validate the project and report discoverable extension APIs
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
+  dev          Run the incremental compiler, watcher, reload coordinator, and Rezi console
+  conformance generate  Generate exhaustive API compile/runtime fixtures and a disposition plan
+  conformance compile   Compile a generated shard and emit per-binding observations
+  conformance report    Merge generated plans with independently captured observations
 
 Options:
   --project <path>   Defold project directory or game.project
-  --out-dir <path>   Generated directory relative to the project (default: .defold-hermes)
+  --out-dir <path>   Generated directory relative to the project (default: .deherm)
   --defold-sdk <sha> Exact Defold engine SHA expected by generated API inputs
+  --output <path>    Conformance harness output directory
+  --plan <path>      Conformance plan used by the report command
+  --observation <path>  Observation JSON to merge; may be repeated
+  --surface <name>   all, script, or dmsdk (default: all)
+  --target <name>    Conformance runtime target (default: source dmSDK platform)
+  --context <names>  Comma-separated available contexts; may be repeated
+  --entry <path>     TypeScript game entry point for dev
+  --watch <path>     Source tree watched by dev (default: entry directory)
+  --build-dir <path> Compiled Defold resource root served to targets
+  --resource <path>  Generated typed bundle resource (default: /deherm/app.dehermc)
+  --target <url>     For dev, a Defold engine service URL; may be repeated
+  --once             Build one development generation and exit
+  --headless         Use line-oriented output instead of the Rezi console
+  --no-ttsc          Disable ttsc transforms for a diagnostic dev build
+  --shard <i/n>      Stable zero-based shard selection (default: 0/1)
+  --strict           Fail a report unless every required selected stage passed
   --json             Print machine-readable JSON
   -h, --help         Show this help
 `;
 
-function parseArguments(argv) {
-  const options = { command: "doctor", json: false };
+export function parseArguments(argv) {
+  const options = { command: "doctor", json: false, observations: [], contexts: [], targets: [] };
   const args = [...argv];
   if (args[0] && !args[0].startsWith("-")) options.command = args.shift();
+  if (options.command === "conformance" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
   while (args.length) {
     const value = args.shift();
     if (value === "--json") options.json = true;
+    else if (value === "--strict") options.strict = true;
+    else if (value === "--once") options.once = true;
+    else if (value === "--headless") options.headless = true;
+    else if (value === "--no-ttsc") options.useTtsc = false;
     else if (value === "-h" || value === "--help") options.help = true;
     else if (value === "--project") options.project = args.shift();
     else if (value === "--out-dir") options.outDir = args.shift();
     else if (value === "--defold-sdk") options.defoldSdk = args.shift();
+    else if (value === "--output") options.output = args.shift();
+    else if (value === "--plan") options.plan = args.shift();
+    else if (value === "--observation") options.observations.push(args.shift());
+    else if (value === "--surface") options.surface = args.shift();
+    else if (value === "--target" && options.command === "dev") options.targets.push(args.shift());
+    else if (value === "--target") options.target = args.shift();
+    else if (value === "--context") options.contexts.push(...args.shift().split(",").map((item) => item.trim()).filter(Boolean));
+    else if (value === "--shard") options.shard = args.shift();
+    else if (value === "--entry") options.entry = args.shift();
+    else if (value === "--watch") options.watchRoot = args.shift();
+    else if (value === "--build-dir") options.buildDir = args.shift();
+    else if (value === "--resource") options.resourcePath = args.shift();
     else throw new Error(`Unknown option: ${value}`);
+  }
+  if (options.command === "dev" && !options.json && options.headless === undefined && (!process.stdin.isTTY || !process.stdout.isTTY)) {
+    options.headless = true;
   }
   return options;
 }
@@ -51,6 +92,74 @@ export async function run(argv = process.argv.slice(2)) {
     console.log(help);
     return 0;
   }
+  if (options.command === "conformance") {
+    if (options.action === "generate") {
+      const output = await generateConformanceHarness({
+        output: options.output,
+        surface: options.surface,
+        target: options.target,
+        contexts: options.contexts,
+        shard: options.shard
+      });
+      const summary = {
+        root: output.root,
+        planId: output.plan.planId,
+        target: output.plan.target,
+        contexts: output.plan.contexts,
+        shard: output.plan.shard,
+        selectedCaseCount: output.plan.selectedCaseCount,
+        summary: output.plan.summary,
+        files: output.files
+      };
+      if (options.json) console.log(JSON.stringify(summary, null, 2));
+      else {
+        console.log(`Generated ${summary.selectedCaseCount} conformance case(s) in ${path.relative(process.cwd(), output.root) || "."}`);
+        console.log(`Plan ${summary.planId}; target ${summary.target}; shard ${summary.shard.index}/${summary.shard.count}`);
+        console.log(`Compile ${summary.summary.compile["compile-only"] ?? 0}; linked ${summary.summary.link.linked ?? 0}; executable ${summary.summary.runtime.executable ?? 0}; runtime-skipped ${summary.summary.runtime["skipped-with-reason"] ?? 0}`);
+      }
+      return 0;
+    }
+    if (options.action === "compile") {
+      if (!options.plan) throw new Error("conformance compile requires --plan <path>");
+      const result = await compileConformanceHarness(options.plan, options.output);
+      const summary = {
+        output: result.output,
+        passed: result.passed,
+        status: result.status,
+        caseCount: result.observation.results.length
+      };
+      if (options.json) console.log(JSON.stringify(summary, null, 2));
+      else console.log(`${result.passed ? "ok" : "!!"} compiled ${summary.caseCount} conformance case(s); observation ${path.relative(process.cwd(), result.output)}`);
+      if (!result.passed && result.stderr) console.error(result.stderr.trim());
+      if (!result.passed && result.stdout) console.error(result.stdout.trim());
+      return result.passed ? 0 : 1;
+    }
+    if (options.action === "report") {
+      if (!options.plan) throw new Error("conformance report requires --plan <path>");
+      const report = await readConformanceReport(options.plan, options.observations);
+      if (options.output) {
+        const { mkdir, writeFile } = await import("node:fs/promises");
+        await mkdir(path.dirname(path.resolve(options.output)), { recursive: true });
+        await writeFile(path.resolve(options.output), `${JSON.stringify(report, null, 2)}\n`);
+      }
+      if (options.json || !options.output) console.log(JSON.stringify(report, null, 2));
+      else {
+        console.log(`Conformance report ${report.planId}: ${report.observationCount} observed stage(s), ${report.caseCount} case(s)`);
+        console.log(`Compile passed ${report.summary.compile.passed ?? 0}; link passed ${report.summary.link.passed ?? 0}; runtime passed ${report.summary.runtime.passed ?? 0}; semantic passed ${report.summary.semantic.passed ?? 0}`);
+        console.log(`${report.strictPass ? "ok" : "!!"} strict gate: ${report.strictFailures.length} missing or failed required stage(s)`);
+      }
+      return options.strict && !report.strictPass ? 1 : 0;
+    }
+    throw new Error(`Unknown conformance action: ${options.action ?? "<missing>"}; expected generate, compile, or report`);
+  }
+  if (options.command === "dev") {
+    // Keep doctor/generate/conformance usable without loading the heavier dev
+    // compiler and terminal stack. This also keeps `deherm --help` portable.
+    const { runDevSession } = await import("./dev/session.mjs");
+    const snapshot = await runDevSession(options);
+    if (options.once && options.json) console.log(JSON.stringify({ schemaVersion: 1, snapshot }, null, 2));
+    return snapshot.phase === "failed" ? 1 : 0;
+  }
   const inventory = await inspectDefoldProject({ project: options.project });
   if (options.command === "extensions") {
     if (options.json) console.log(JSON.stringify(inventory, null, 2));
@@ -64,8 +173,8 @@ export async function run(argv = process.argv.slice(2)) {
     else {
       console.log(`Generated extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
       console.log(`Pinned Defold API: ${output.defoldRevision}`);
-      if (output.created.tsconfig) console.log("Created tsconfig.json extending tsconfig.defold-hermes.json");
-      else console.log("Kept existing tsconfig.json; extend tsconfig.defold-hermes.json from your project config");
+      if (output.created.tsconfig) console.log("Created tsconfig.json extending tsconfig.deherm.json");
+      else console.log("Kept existing tsconfig.json; extend tsconfig.deherm.json from your project config");
     }
     return inventory.diagnostics.some(({ severity }) => severity === "error") ? 1 : 0;
   }

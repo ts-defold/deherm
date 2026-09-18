@@ -6,6 +6,7 @@ import {
   hexBindingId as hex32,
   stableBindingId as fnv1a32
 } from "./lib/binding-identity.mjs";
+import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
 
 const root = new URL("../", import.meta.url);
 const patternsUrl = new URL("bindings/generated/defold-script-binding-patterns.json", root);
@@ -13,41 +14,6 @@ const irUrl = new URL("bindings/generated/defold-script-api-ir.json", root);
 const reportUrl = new URL("bindings/generated/defold-script-scalar-dispatch.json", root);
 const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp", root);
 const sourceUrl = new URL("defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp", root);
-
-// Source-validated exceptions to the imported reference metadata. Keep these
-// narrow, evidenced, and visible in the generated report rather than silently
-// teaching heuristics to guess intent from prose.
-const semanticOverrides = new Map([
-  ["script:bit.tohex", {
-    parameterOptional: { n: true },
-    evidence: {
-      source: "engine/script/src/bitop/bitop.c",
-      line: 128,
-      claim: "The second argument is optional and defaults to 8.",
-      observed: "lua_isnone(L, 2) ? 8 : (SBits)barg(L, 2)"
-    }
-  }]
-]);
-
-async function validateSemanticOverrides() {
-  const validated = new Map();
-  for (const [id, override] of semanticOverrides) {
-    const sourceUrl = new URL(`upstream/defold/${override.evidence.source}`, root);
-    const contents = await readFile(sourceUrl, "utf8");
-    const line = contents.split(/\r?\n/)[override.evidence.line - 1] ?? "";
-    if (!line.includes(override.evidence.observed)) {
-      throw new Error(`Semantic override evidence is stale for ${id} at ${override.evidence.source}:${override.evidence.line}`);
-    }
-    validated.set(id, {
-      ...override,
-      evidence: {
-        ...override.evidence,
-        sourceSha256: createHash("sha256").update(contents).digest("hex")
-      }
-    });
-  }
-  return validated;
-}
 
 function pascal(value) {
   return value.split(/[^A-Za-z0-9]+/).filter(Boolean)
@@ -137,7 +103,7 @@ function makeOutputs(patternsText, irText, validatedOverrides) {
         maximumArgumentCount: parameters.length,
         result,
         semanticOverride: override?.evidence ?? null,
-        executableStatus: "descriptor-generated; engine-context execution not claimed"
+        executableStatus: "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
       };
     })
     .sort((left, right) => left.stableId - right.stableId);
@@ -162,7 +128,7 @@ function makeOutputs(patternsText, irText, validatedOverrides) {
     defoldRevision: ir.defoldRevision,
     inputSha256: inputHash,
     stableIdAlgorithm: "FNV-1a 32-bit over canonical script:<module>.<member> id; collisions fail generation",
-    coverageClaim: "Descriptors for all 90 scalar-classified functions; only the generic codec and mock representatives are executable in this slice.",
+    coverageClaim: "Stable-ID runtime dispatch is installed for all 90 scalar-classified functions; representative mock execution is proven, but per-function real-engine conformance is not claimed.",
     allocationClaim: "Generated tables and native dispatch use fixed storage. Lua may allocate while interning new strings, formatting errors, or inside called engine functions.",
     bindingCount: bindings.length,
     argumentCodecCount: argumentsFlat.length,
@@ -191,7 +157,7 @@ async function main(argv = process.argv.slice(2)) {
     readFile(patternsUrl, "utf8"),
     readFile(irUrl, "utf8")
   ]);
-  const validatedOverrides = await validateSemanticOverrides();
+  const validatedOverrides = await loadScriptSemanticOverrides(root);
   const outputs = makeOutputs(patternsText, irText, validatedOverrides);
   const targets = [
     [reportUrl, outputs.report],

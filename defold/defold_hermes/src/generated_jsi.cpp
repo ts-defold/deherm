@@ -3,6 +3,7 @@
 
 #if !defined(DM_PLATFORM_HTML5)
 #include <defold_hermes/callback_registry.hpp>
+#include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>
 #include <defold_hermes/generated_modules.h>
 
 #include <cmath>
@@ -141,6 +142,7 @@ void installGeneratedModules(jsi::Runtime& runtime, jsi::Object& modules, Callba
   timer.setProperty(runtime, "trigger", std::move(timer_trigger));
   modules.setProperty(runtime, "Timer", std::move(timer));
 
+  installDmSdkScalarModule(runtime, modules);
 }
 
 }  // namespace defold_hermes

@@ -76,6 +76,11 @@ arguments=(
 
 case "$action" in
   build)
+    # The checked-in runtime workflow launches dmengine from build/bob. Without
+    # --archive Bob updates loose custom resources but can leave an older
+    # game.arcd in place; dmengine then preferentially loads that stale archive.
+    # Always refresh the archive so runtime evidence corresponds to this build.
+    arguments+=(--archive)
     commands=(resolve build)
     ;;
   bundle)

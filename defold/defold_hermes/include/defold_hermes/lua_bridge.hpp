@@ -98,6 +98,7 @@ class LuaBridge {
   void shutdown();
 
   bool captureInstance(int index);
+  void detachInstance();
   void installCallbackApi(CallbackApi api) { callbackApi_ = api; }
   bool trackTimerCallback(uint32_t timer, Handle callback, bool repeating);
   bool releaseTimerCallback(uint32_t timer);

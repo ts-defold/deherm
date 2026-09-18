@@ -7,10 +7,15 @@ height = 640
 
 [project]
 title = Defold Hermes Spike
-custom_resources = /defold_hermes_app
+custom_resources = /deherm
 
 [library]
-include_dirs = defold_hermes defold_hermes_app
+include_dirs = defold_hermes
 
 [defold_hermes]
-app = /defold_hermes_app/app.js
+app = /deherm/app.dehermc
+
+[deherm_conformance]
+boolean = 1
+integer = 37
+number = 12.5

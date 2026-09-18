@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceIr": "bindings/generated/defold-sdk-ir.json",
   "sourceClassification": "bindings/generated/defold-dmsdk-binding-patterns.json",
@@ -9,28 +9,43 @@
     "integerWidths": "stdint fixed-width types",
     "boolean": "uint8_t, canonical 0 or 1",
     "allocation": "thunks are direct calls and contain no allocation or ownership transfer",
+    "dispatch": "dense uint16_t IDs, stack-only fixed-width slots, no name lookup on the hot path",
+    "javascript64Bit": "native Hermes uses the pinned JSI BigInt uint64_t API; browser uint64_t adapters remain disabled until the Defold Emscripten Wasm BigInt ABI is validated",
     "exceptions": "no exception translation; reviewed declarations are non-throwing Defold C/C++ APIs by contract, but the C++ type system does not encode noexcept"
   },
   "coverage": {
     "reviewed": 31,
     "generated": 26,
     "objectCompileCovered": 26,
-    "hostSourceLinkCovered": 25,
-    "hostBehaviorCovered": 25,
+    "hostSourceLinkCovered": 26,
+    "hostBehaviorCovered": 26,
     "blocked": 5,
     "policyBlocked": 4,
     "sourceBlocked": 1,
-    "packagedLibraryLinked": 0,
+    "packagedLibraryLinked": 26,
+    "dispatchReferenceCovered": 26,
+    "hostExecutableRetained": 26,
+    "extensionFinalBinaryRetained": 26,
+    "nativeTypeScriptAdapterGenerated": 26,
+    "nativeHermesRuntimeSmokeTested": 2,
+    "browserTypeScriptAdapterGenerated": 16,
+    "browserAdapterBehaviorTested": 16,
     "allTargetConformant": 0
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h",
+    "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js",
     "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp",
     "defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp",
     "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp",
     "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
     "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp"
+    "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+    "packages/sdk/src/generated/dmsdk/scalar.ts"
   ],
   "declarations": [
     {
@@ -38,6 +53,7 @@
       "symbol": "EndianSwap16",
       "nativeSignature": "uint16_t (uint16_t)",
       "wrapper": "deherm_dmsdk_endian_swap16_u16",
+      "bindingId": 0,
       "cAbiSignature": "uint16_t deherm_dmsdk_endian_swap16_u16(uint16_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -61,7 +77,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -82,6 +100,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -90,6 +118,7 @@
       "symbol": "EndianSwap32",
       "nativeSignature": "uint32_t (uint32_t)",
       "wrapper": "deherm_dmsdk_endian_swap32_u32",
+      "bindingId": 1,
       "cAbiSignature": "uint32_t deherm_dmsdk_endian_swap32_u32(uint32_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -113,7 +142,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -134,6 +165,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -142,6 +183,7 @@
       "symbol": "EndianSwap64",
       "nativeSignature": "uint64_t (uint64_t)",
       "wrapper": "deherm_dmsdk_endian_swap64_u64",
+      "bindingId": 2,
       "cAbiSignature": "uint64_t deherm_dmsdk_endian_swap64_u64(uint64_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -163,9 +205,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -186,6 +230,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -194,6 +248,7 @@
       "symbol": "EndianToHost16",
       "nativeSignature": "uint16_t (uint16_t)",
       "wrapper": "deherm_dmsdk_endian_to_host16_u16",
+      "bindingId": 3,
       "cAbiSignature": "uint16_t deherm_dmsdk_endian_to_host16_u16(uint16_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -217,7 +272,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -238,6 +295,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -246,6 +313,7 @@
       "symbol": "EndianToHost32",
       "nativeSignature": "uint32_t (uint32_t)",
       "wrapper": "deherm_dmsdk_endian_to_host32_u32",
+      "bindingId": 4,
       "cAbiSignature": "uint32_t deherm_dmsdk_endian_to_host32_u32(uint32_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -269,7 +337,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -290,6 +360,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -298,6 +378,7 @@
       "symbol": "EndianToHost64",
       "nativeSignature": "uint64_t (uint64_t)",
       "wrapper": "deherm_dmsdk_endian_to_host64_u64",
+      "bindingId": 5,
       "cAbiSignature": "uint64_t deherm_dmsdk_endian_to_host64_u64(uint64_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -319,9 +400,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -342,6 +425,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -350,6 +443,7 @@
       "symbol": "EndianToNetwork16",
       "nativeSignature": "uint16_t (uint16_t)",
       "wrapper": "deherm_dmsdk_endian_to_network16_u16",
+      "bindingId": 6,
       "cAbiSignature": "uint16_t deherm_dmsdk_endian_to_network16_u16(uint16_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -373,7 +467,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -394,6 +490,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -402,6 +508,7 @@
       "symbol": "EndianToNetwork32",
       "nativeSignature": "uint32_t (uint32_t)",
       "wrapper": "deherm_dmsdk_endian_to_network32_u32",
+      "bindingId": 7,
       "cAbiSignature": "uint32_t deherm_dmsdk_endian_to_network32_u32(uint32_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -425,7 +532,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -446,6 +555,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -454,6 +573,7 @@
       "symbol": "EndianToNetwork64",
       "nativeSignature": "uint64_t (uint64_t)",
       "wrapper": "deherm_dmsdk_endian_to_network64_u64",
+      "bindingId": 8,
       "cAbiSignature": "uint64_t deherm_dmsdk_endian_to_network64_u64(uint64_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -475,9 +595,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -498,6 +620,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -546,6 +678,14 @@
           "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
         },
         "conformant": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "retained": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "typescriptCallable": {
           "status": "blocked-on-generation",
           "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
         }
@@ -598,6 +738,14 @@
         "conformant": {
           "status": "blocked-on-generation",
           "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "retained": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "typescriptCallable": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
         }
       }
     },
@@ -606,6 +754,7 @@
       "symbol": "ProfileIsInitialized",
       "nativeSignature": "bool ()",
       "wrapper": "deherm_dmsdk_profile_is_initialized_v",
+      "bindingId": 9,
       "cAbiSignature": "uint8_t deherm_dmsdk_profile_is_initialized_v(void);",
       "module": "profile",
       "headerEvidence": {
@@ -634,7 +783,9 @@
         "boolRepresentation": "uint8_t canonicalized to 0 or 1",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -647,14 +798,24 @@
           "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
         },
         "linked": {
-          "status": "not-yet-tested",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
-          "note": "Requires the corresponding packaged Defold native library and engine lifecycle."
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
         },
         "conformant": {
-          "status": "not-yet-tested",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
-          "note": "The thunk is syntax-compiled only; runtime behavior is not claimed."
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -663,6 +824,7 @@
       "symbol": "dmEndian::ByteSwap",
       "nativeSignature": "uint16_t (uint16_t)",
       "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u16",
+      "bindingId": 10,
       "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_byte_swap_u16(uint16_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -686,7 +848,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -707,6 +871,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -715,6 +889,7 @@
       "symbol": "dmEndian::ByteSwap",
       "nativeSignature": "uint32_t (uint32_t)",
       "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u32",
+      "bindingId": 11,
       "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_byte_swap_u32(uint32_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -738,7 +913,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -759,6 +936,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -767,6 +954,7 @@
       "symbol": "dmEndian::ByteSwap",
       "nativeSignature": "uint64_t (uint64_t)",
       "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u64",
+      "bindingId": 12,
       "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_byte_swap_u64(uint64_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -788,9 +976,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -811,6 +1001,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -819,6 +1019,7 @@
       "symbol": "dmEndian::ToHost",
       "nativeSignature": "uint32_t (uint32_t)",
       "wrapper": "deherm_dmsdk_dm_endian_to_host_u32",
+      "bindingId": 13,
       "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_to_host_u32(uint32_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -842,7 +1043,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -863,6 +1066,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -871,6 +1084,7 @@
       "symbol": "dmEndian::ToHost",
       "nativeSignature": "uint64_t (uint64_t)",
       "wrapper": "deherm_dmsdk_dm_endian_to_host_u64",
+      "bindingId": 14,
       "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_to_host_u64(uint64_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -892,9 +1106,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -915,6 +1131,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -923,6 +1149,7 @@
       "symbol": "dmEndian::ToHost",
       "nativeSignature": "uint16_t (uint16_t)",
       "wrapper": "deherm_dmsdk_dm_endian_to_host_u16",
+      "bindingId": 15,
       "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_to_host_u16(uint16_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -946,7 +1173,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -967,6 +1196,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -975,6 +1214,7 @@
       "symbol": "dmEndian::ToNetwork",
       "nativeSignature": "uint64_t (uint64_t)",
       "wrapper": "deherm_dmsdk_dm_endian_to_network_u64",
+      "bindingId": 16,
       "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_to_network_u64(uint64_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -996,9 +1236,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -1019,6 +1261,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -1027,6 +1279,7 @@
       "symbol": "dmEndian::ToNetwork",
       "nativeSignature": "uint16_t (uint16_t)",
       "wrapper": "deherm_dmsdk_dm_endian_to_network_u16",
+      "bindingId": 17,
       "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_to_network_u16(uint16_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -1050,7 +1303,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -1071,6 +1326,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -1079,6 +1344,7 @@
       "symbol": "dmEndian::ToNetwork",
       "nativeSignature": "uint32_t (uint32_t)",
       "wrapper": "deherm_dmsdk_dm_endian_to_network_u32",
+      "bindingId": 18,
       "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_to_network_u32(uint32_t x);",
       "module": "endian",
       "headerEvidence": {
@@ -1102,7 +1368,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -1123,6 +1391,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -1166,6 +1444,14 @@
           "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h"
         },
         "conformant": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h"
+        },
+        "retained": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h"
+        },
+        "typescriptCallable": {
           "status": "blocked-on-generation",
           "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h"
         }
@@ -1212,6 +1498,14 @@
         "conformant": {
           "status": "blocked-on-generation",
           "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+        },
+        "retained": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+        },
+        "typescriptCallable": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
         }
       }
     },
@@ -1256,6 +1550,14 @@
         "conformant": {
           "status": "blocked-on-generation",
           "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+        },
+        "retained": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+        },
+        "typescriptCallable": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
         }
       }
     },
@@ -1264,6 +1566,7 @@
       "symbol": "dmTime::GetMonotonicTime",
       "nativeSignature": "uint64_t ()",
       "wrapper": "deherm_dmsdk_dm_time_get_monotonic_time_v",
+      "bindingId": 19,
       "cAbiSignature": "uint64_t deherm_dmsdk_dm_time_get_monotonic_time_v(void);",
       "module": "time",
       "headerEvidence": {
@@ -1296,9 +1599,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -1319,6 +1624,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -1327,6 +1642,7 @@
       "symbol": "dmTime::GetTime",
       "nativeSignature": "uint64_t ()",
       "wrapper": "deherm_dmsdk_dm_time_get_time_v",
+      "bindingId": 20,
       "cAbiSignature": "uint64_t deherm_dmsdk_dm_time_get_time_v(void);",
       "module": "time",
       "headerEvidence": {
@@ -1359,9 +1675,11 @@
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; JavaScript adapters must preserve all 64 bits (BigInt or split words)",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -1382,6 +1700,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -1390,6 +1718,7 @@
       "symbol": "dmTime::Sleep",
       "nativeSignature": "void (uint32_t)",
       "wrapper": "deherm_dmsdk_dm_time_sleep_u32",
+      "bindingId": 21,
       "cAbiSignature": "void deherm_dmsdk_dm_time_sleep_u32(uint32_t useconds);",
       "module": "time",
       "headerEvidence": {
@@ -1424,7 +1753,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": true
+        "mayBlock": true,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
       },
       "stages": {
         "generated": {
@@ -1445,6 +1776,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     },
@@ -1453,6 +1794,7 @@
       "symbol": "dmTrigLookup::Cos",
       "nativeSignature": "float (float)",
       "wrapper": "deherm_dmsdk_dm_trig_lookup_cos_f32",
+      "bindingId": 22,
       "cAbiSignature": "float deherm_dmsdk_dm_trig_lookup_cos_f32(float radians);",
       "module": "trig",
       "headerEvidence": {
@@ -1475,7 +1817,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -1496,6 +1840,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -1504,6 +1858,7 @@
       "symbol": "dmTrigLookup::Sin",
       "nativeSignature": "float (float)",
       "wrapper": "deherm_dmsdk_dm_trig_lookup_sin_f32",
+      "bindingId": 23,
       "cAbiSignature": "float deherm_dmsdk_dm_trig_lookup_sin_f32(float radians);",
       "module": "trig",
       "headerEvidence": {
@@ -1526,7 +1881,9 @@
         "boolRepresentation": "not-applicable",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -1547,6 +1904,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -1555,6 +1922,7 @@
       "symbol": "dmUtf8::IsBreaking",
       "nativeSignature": "bool (uint32_t)",
       "wrapper": "deherm_dmsdk_dm_utf8_is_breaking_u32",
+      "bindingId": 24,
       "cAbiSignature": "uint8_t deherm_dmsdk_dm_utf8_is_breaking_u32(uint32_t c);",
       "module": "utf8",
       "headerEvidence": {
@@ -1578,7 +1946,9 @@
         "boolRepresentation": "uint8_t canonicalized to 0 or 1",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -1599,6 +1969,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     },
@@ -1607,6 +1987,7 @@
       "symbol": "dmUtf8::IsWhiteSpace",
       "nativeSignature": "bool (uint32_t)",
       "wrapper": "deherm_dmsdk_dm_utf8_is_white_space_u32",
+      "bindingId": 25,
       "cAbiSignature": "uint8_t deherm_dmsdk_dm_utf8_is_white_space_u32(uint32_t c);",
       "module": "utf8",
       "headerEvidence": {
@@ -1630,7 +2011,9 @@
         "boolRepresentation": "uint8_t canonicalized to 0 or 1",
         "uint64Representation": "not-applicable",
         "lifecycleSensitive": false,
-        "mayBlock": false
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
       },
       "stages": {
         "generated": {
@@ -1651,6 +2034,16 @@
           "status": "covered-by-host-behavior-test",
           "evidence": "native/dmsdk_scalar_thunks_test.cpp",
           "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
         }
       }
     }

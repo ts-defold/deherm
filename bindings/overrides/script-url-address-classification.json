@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "coverageClaim": "Classification and codec-foundation evidence only. These routes remain planned and are not executable until generated Lua/JS routing installs a ScriptUrlArena and proves target-specific calls.",
+  "allocationClaim": "The generated URL sidecar is fixed-capacity inline storage with deterministic exhaustion and no heap fallback. This does not claim that the called Defold engine operation is allocation-free.",
+  "expectedCounts": {
+    "total": 70,
+    "urlParameters": 73,
+    "classifiedDefoldValue": 127,
+    "preexistingExecutableNonMatrix": 17,
+    "baselineFrontier": 110,
+    "currentPendingDefoldValue": 96,
+    "matrix4Disjoint": 20,
+    "promotedMatrix4": 14,
+    "remainingMatrix4": 6,
+    "binaryStringRemainder": 2,
+    "currentCodecRemainder": 18,
+    "modules": {
+      "camera": 19,
+      "collectionfactory": 3,
+      "factory": 3,
+      "go": 15,
+      "label": 2,
+      "model": 5,
+      "particlefx": 2,
+      "physics": 11,
+      "sound": 3,
+      "sprite": 3,
+      "tilemap": 4
+    },
+    "rawUrlParameterTypes": {
+      "string|hash|url": 54,
+      "url|number|nil": 19
+    }
+  },
+  "binaryStringRemainderIds": [
+    "script:gui.set_texture_data",
+    "script:resource.set_sound"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "dm-message-url-layout",
+      "source": "engine/dlib/src/dmsdk/dlib/message.h",
+      "sha256": "43e902a798cee4ac4f8f2b839c756678963506aa025a272ef1cf010fb2c014c5",
+      "anchors": [
+        "typedef dmhash_t HSocket;",
+        "struct URL",
+        "HSocket     m_Socket;",
+        "dmhash_t    _reserved;",
+        "dmhash_t    m_Path;",
+        "dmhash_t    m_Fragment;"
+      ]
+    },
+    {
+      "id": "dm-script-url-resolution",
+      "source": "engine/script/src/script_msg.cpp",
+      "sha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2",
+      "anchors": [
+        "void PushURL(lua_State* L, const dmMessage::URL& url)",
+        "dmMessage::Result ResolveURL(lua_State* L, const char* url, dmMessage::URL* out_url, dmMessage::URL* default_url)",
+        "if (dmScript::IsURL(L, index))",
+        "else if (url != 0)",
+        "dmhash_t* phash = dmScript::ToHash(L, index);"
+      ]
+    },
+    {
+      "id": "dm-script-public-url-api",
+      "source": "engine/script/src/dmsdk/script/script.h",
+      "sha256": "99d1dbf413a1ae84dcd3e6071628d50ba7d8177e0a1813bf2882ecbee15b7a9e",
+      "anchors": [
+        "void PushURL(lua_State* L, const dmMessage::URL& url);",
+        "int ResolveURL(lua_State* L, int index, dmMessage::URL* out_url, dmMessage::URL* out_default_url);"
+      ]
+    }
+  ],
+  "targetSupport": {
+    "nativeDynamicHermes": {
+      "status": "planned-codec-foundation",
+      "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+    },
+    "nativeStaticHermes": {
+      "status": "planned-codec-foundation",
+      "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+    },
+    "html5BrowserHost": {
+      "status": "planned-codec-foundation",
+      "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+    }
+  }
+}

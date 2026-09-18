@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "b5db8cd3d4957d750122a7d4ecf513482edbf7aa085bac604520a1b7de9fb330",
+  "inputSha256": "6aba5c1a4221b5f4936ae02473101f9356e6d77376ab6777302eb46559f5347c",
   "stableIdAlgorithm": "FNV-1a 32-bit over canonical script:<module>.<member> id; collisions fail generation",
-  "coverageClaim": "Descriptors for all 90 scalar-classified functions; only the generic codec and mock representatives are executable in this slice.",
+  "coverageClaim": "Stable-ID runtime dispatch is installed for all 90 scalar-classified functions; representative mock execution is proven, but per-function real-engine conformance is not claimed.",
   "allocationClaim": "Generated tables and native dispatch use fixed storage. Lua may allocate while interning new strings, formatting errors, or inside called engine functions.",
   "bindingCount": 90,
   "argumentCodecCount": 102,
@@ -41,7 +41,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.set_connectivity_host",
@@ -68,7 +68,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.disable_state",
@@ -95,7 +95,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.dump_frame",
@@ -115,7 +115,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_config_boolean",
@@ -148,7 +148,7 @@
         "rawType": "boolean"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.get_height",
@@ -168,7 +168,7 @@
         "rawType": "integer"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.reboot",
@@ -225,7 +225,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:zlib.deflate",
@@ -252,7 +252,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.exit",
@@ -279,7 +279,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:html5.run",
@@ -306,7 +306,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.scope_begin",
@@ -333,7 +333,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.lshift",
@@ -366,7 +366,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.tobit",
@@ -393,7 +393,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.set_render_enable",
@@ -420,7 +420,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_connectivity",
@@ -440,7 +440,7 @@
         "rawType": "sys.NETWORK"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_blend_equation_separate",
@@ -473,7 +473,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.get_window_height",
@@ -493,7 +493,7 @@
         "rawType": "integer"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.enable_ui",
@@ -520,7 +520,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_polygon_offset",
@@ -553,7 +553,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:socket.sleep",
@@ -580,7 +580,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sound.is_phone_call_active",
@@ -600,7 +600,7 @@
         "rawType": "boolean"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.set_mouse_lock",
@@ -627,7 +627,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:socket.gettime",
@@ -647,7 +647,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.hide_keyboard",
@@ -667,7 +667,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.get_dim_mode",
@@ -687,7 +687,7 @@
         "rawType": "window.DIMMING"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.bswap",
@@ -714,7 +714,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.set_user_field",
@@ -747,7 +747,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.arshift",
@@ -780,7 +780,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.get_signum",
@@ -807,7 +807,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_config_int",
@@ -840,7 +840,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:socket.dns.gethostname",
@@ -860,7 +860,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_color_mask",
@@ -905,7 +905,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.exists",
@@ -932,7 +932,7 @@
         "rawType": "boolean"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.get_memory_usage",
@@ -952,7 +952,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_stencil_op",
@@ -991,7 +991,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.rshift",
@@ -1024,7 +1024,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.set_vsync_swap_interval",
@@ -1051,7 +1051,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_config_number",
@@ -1084,7 +1084,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_stencil_func",
@@ -1123,7 +1123,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_depth_func",
@@ -1150,7 +1150,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.set_size",
@@ -1183,7 +1183,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.set_safe_area_mode",
@@ -1210,7 +1210,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.get_height",
@@ -1230,7 +1230,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sound.is_music_playing",
@@ -1250,7 +1250,7 @@
         "rawType": "boolean"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.get_width",
@@ -1270,7 +1270,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.reset_nodes",
@@ -1290,7 +1290,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.load_previous",
@@ -1310,7 +1310,7 @@
         "rawType": "number|nil"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.write_dump",
@@ -1330,7 +1330,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.get_display_scale",
@@ -1350,7 +1350,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.get_window_width",
@@ -1370,7 +1370,7 @@
         "rawType": "integer"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_viewport",
@@ -1415,7 +1415,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.set_ui_mode",
@@ -1442,7 +1442,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.get_sys_field",
@@ -1475,7 +1475,7 @@
         "rawType": "string|nil"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.recorded_frame_count",
@@ -1495,7 +1495,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.set_file_path",
@@ -1522,7 +1522,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.disable_material",
@@ -1542,7 +1542,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_depth_mask",
@@ -1569,7 +1569,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.set_dim_mode",
@@ -1596,7 +1596,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.tohex",
@@ -1635,7 +1635,7 @@
         "observed": "lua_isnone(L, 2) ? 8 : (SBits)barg(L, 2)",
         "sourceSha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb"
       },
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.show_keyboard",
@@ -1668,7 +1668,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:liveupdate.is_built_with_excluded_files",
@@ -1688,7 +1688,7 @@
         "rawType": "boolean"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.set_position",
@@ -1721,7 +1721,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_stencil_mask",
@@ -1748,7 +1748,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_config_string",
@@ -1781,7 +1781,7 @@
         "rawType": "string|nil"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.set_engine_throttle",
@@ -1814,7 +1814,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_host_path",
@@ -1841,7 +1841,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.get_width",
@@ -1861,7 +1861,7 @@
         "rawType": "integer"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.enable",
@@ -1888,7 +1888,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.set_update_frequency",
@@ -1915,7 +1915,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.set_ui_vsync_wait_visible",
@@ -1942,7 +1942,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.enable_state",
@@ -1969,7 +1969,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.scope_end",
@@ -1989,7 +1989,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_blend_func_separate",
@@ -2034,7 +2034,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.get_extra_data",
@@ -2061,7 +2061,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.get_user_field",
@@ -2094,7 +2094,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.set_ui_view_mode",
@@ -2121,7 +2121,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:zlib.inflate",
@@ -2148,7 +2148,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_save_file",
@@ -2181,7 +2181,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.ror",
@@ -2214,7 +2214,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.set_title",
@@ -2241,7 +2241,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.set_render_order",
@@ -2268,7 +2268,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.rol",
@@ -2301,7 +2301,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:bit.bnot",
@@ -2328,7 +2328,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:render.set_cull_face",
@@ -2355,7 +2355,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:gui.reset_keyboard",
@@ -2375,7 +2375,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:crash.release",
@@ -2402,7 +2402,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.log_text",
@@ -2429,7 +2429,7 @@
         "rawType": null
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:profiler.get_cpu_usage",
@@ -2449,7 +2449,7 @@
         "rawType": "number"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:sys.get_application_path",
@@ -2469,7 +2469,7 @@
         "rawType": "string"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     },
     {
       "id": "script:window.get_mouse_lock",
@@ -2489,7 +2489,7 @@
         "rawType": "boolean"
       },
       "semanticOverride": null,
-      "executableStatus": "descriptor-generated; engine-context execution not claimed"
+      "executableStatus": "stable-ID runtime dispatch enabled; per-function engine-context conformance not claimed"
     }
   ]
 }

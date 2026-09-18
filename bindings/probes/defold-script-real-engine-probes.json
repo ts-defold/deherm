@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "target": "arm64-macos",
+  "probes": [
+    {
+      "key": "bit.tohex.explicit-width",
+      "id": "script:bit.tohex",
+      "arguments": [33, 4],
+      "expectation": { "kind": "equal", "value": "0021" }
+    },
+    {
+      "key": "bit.tohex.default-width",
+      "id": "script:bit.tohex",
+      "arguments": [33],
+      "expectation": { "kind": "equal", "value": "00000021" }
+    },
+    {
+      "key": "bit.lshift.number",
+      "id": "script:bit.lshift",
+      "arguments": [1, 8],
+      "expectation": { "kind": "equal", "value": 256 }
+    },
+    {
+      "key": "sys.get_config_string.present",
+      "id": "script:sys.get_config_string",
+      "arguments": ["project.title", "<missing>"],
+      "expectation": { "kind": "equal", "value": "Defold Hermes Spike" }
+    },
+    {
+      "key": "sys.get_config_string.nullable",
+      "id": "script:sys.get_config_string",
+      "arguments": ["deherm_conformance.missing"],
+      "expectation": { "kind": "equal", "value": null }
+    },
+    {
+      "key": "sys.get_config_boolean",
+      "id": "script:sys.get_config_boolean",
+      "arguments": ["deherm_conformance.boolean", false],
+      "expectation": { "kind": "equal", "value": true }
+    },
+    {
+      "key": "sys.get_config_int",
+      "id": "script:sys.get_config_int",
+      "arguments": ["deherm_conformance.integer", -1],
+      "expectation": { "kind": "equal", "value": 37 }
+    },
+    {
+      "key": "sys.get_config_number",
+      "id": "script:sys.get_config_number",
+      "arguments": ["deherm_conformance.number", -1],
+      "expectation": { "kind": "equal", "value": 12.5 }
+    },
+    {
+      "key": "sys.get_connectivity.integer-enum",
+      "id": "script:sys.get_connectivity",
+      "arguments": [],
+      "expectation": { "kind": "integer-range", "minimum": 0, "maximum": 2 }
+    },
+    {
+      "key": "sys.get_application_path",
+      "id": "script:sys.get_application_path",
+      "arguments": [],
+      "expectation": { "kind": "non-empty-string" }
+    },
+    {
+      "key": "sys.get_save_file",
+      "id": "script:sys.get_save_file",
+      "arguments": ["deherm-conformance", "deherm-proof.bin"],
+      "expectation": { "kind": "string-suffix", "suffix": "deherm-proof.bin" }
+    },
+    {
+      "key": "sys.exists.false",
+      "id": "script:sys.exists",
+      "arguments": ["/__deherm_conformance_missing__/never.exists"],
+      "expectation": { "kind": "equal", "value": false }
+    },
+    {
+      "key": "profiler.scope_begin.void",
+      "id": "script:profiler.scope_begin",
+      "arguments": ["deherm-script-api-proof"],
+      "expectation": { "kind": "undefined" }
+    },
+    {
+      "key": "profiler.scope_end.void",
+      "id": "script:profiler.scope_end",
+      "arguments": [],
+      "expectation": { "kind": "undefined" }
+    }
+  ]
+}

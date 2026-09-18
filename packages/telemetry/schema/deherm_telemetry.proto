@@ -1,0 +1,88 @@
+syntax = "proto2";
+
+package deherm.telemetry;
+
+option java_package = "org.tsdefold.deherm.telemetry";
+option java_outer_classname = "DehermTelemetry";
+
+enum ActivationState {
+  ACTIVATION_STATE_UNSPECIFIED = 0;
+  ACTIVATION_STAGED = 1;
+  ACTIVATION_VALIDATING = 2;
+  ACTIVATION_COMMITTED = 3;
+  ACTIVATION_REJECTED = 4;
+  ACTIVATION_ROLLED_BACK = 5;
+  ACTIVATION_RETIRED = 6;
+}
+
+enum LogLevel {
+  LOG_LEVEL_TRACE = 0;
+  LOG_LEVEL_DEBUG = 1;
+  LOG_LEVEL_INFO = 2;
+  LOG_LEVEL_WARN = 3;
+  LOG_LEVEL_ERROR = 4;
+  LOG_LEVEL_FATAL = 5;
+}
+
+message StringEntry {
+  optional uint32 id = 1;
+  optional bytes utf8 = 2;
+  reserved 16 to 31;
+}
+
+message CounterSample {
+  optional uint64 timestamp_us = 1;
+  optional uint32 metric_id = 2;
+  optional sint64 value = 3;
+  optional uint32 target_id = 4;
+  optional uint32 component_type_id = 5;
+  optional uint64 component_instance_id = 6;
+  reserved 16 to 31;
+}
+
+message SpanSample {
+  optional uint64 timestamp_us = 1;
+  optional uint32 span_id = 2;
+  optional uint64 duration_us = 3;
+  optional uint32 target_id = 4;
+  optional uint32 component_type_id = 5;
+  optional uint64 component_instance_id = 6;
+  optional uint32 status_id = 7;
+  reserved 16 to 31;
+}
+
+message ActivationEvent {
+  optional uint64 timestamp_us = 1;
+  optional uint64 build_generation = 2;
+  optional uint64 runtime_generation = 3;
+  optional ActivationState state = 4;
+  optional bytes content_digest = 5;
+  optional uint32 resource_version = 6;
+  optional uint64 duration_us = 7;
+  optional uint32 reason_string_id = 8;
+  reserved 16 to 31;
+}
+
+message LogEvent {
+  optional uint64 timestamp_us = 1;
+  optional LogLevel level = 2;
+  optional uint32 source_string_id = 3;
+  optional uint32 message_string_id = 4;
+  optional uint64 runtime_generation = 5;
+  reserved 16 to 31;
+}
+
+message TelemetryBatch {
+  optional uint32 schema_version = 1;
+  optional fixed64 session_id = 2;
+  optional uint64 sequence = 3;
+  optional uint64 runtime_generation = 4;
+  optional uint32 intern_generation = 5;
+  optional uint64 dropped_records = 6 [default = 0];
+  repeated StringEntry strings = 7;
+  repeated CounterSample counters = 8;
+  repeated SpanSample spans = 9;
+  repeated ActivationEvent activations = 10;
+  repeated LogEvent logs = 11;
+  reserved 16 to 31;
+}

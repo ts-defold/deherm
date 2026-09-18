@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "scope": "Pinned Lua registration evidence and execution context for mechanically selected fixed tuples",
+  "expectedRouteCount": 24,
+  "expectedBucketCounts": {
+    "fixed-scalar-tuple": 17,
+    "fixed-value-tuple": 7
+  },
+  "sources": [
+    { "modulePrefix": "bullet3d.collision_object", "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp", "sha256": "c90f5f10b5b2ccbeb5f77ec3cf986d1dfe36a93eb2a0f79ce9e858e7f35aaf2b", "context": "Global" },
+    { "modulePrefix": "bullet3d.constraint", "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp", "sha256": "5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7", "context": "Global" },
+    { "modulePrefix": "bullet3d.rigid_body", "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp", "sha256": "7fe92ecb9e32332bd612aabaf3e1276f5e78bb83e17cd08667116ab3c1928e1b", "context": "Global" },
+    { "modulePrefix": "bullet3d.shape", "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp", "sha256": "c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285", "context": "Global" },
+    { "modulePrefix": "collectionproxy", "path": "engine/gamesys/src/gamesys/scripts/script_collectionproxy.cpp", "sha256": "5b8ddb008d2895a95d8be0dda1ee88a3e00e154545766234acfc3d944ec0477a", "context": "ScriptInstance" },
+    { "modulePrefix": "gui", "path": "engine/gui/src/gui_script.cpp", "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4", "context": "GuiScriptInstance" },
+    { "modulePrefix": "sound", "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp", "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053", "context": "ScriptInstance" },
+    { "modulePrefix": "tilemap", "path": "engine/gamesys/src/gamesys/scripts/script_tilemap.cpp", "sha256": "2bdf30bc2919fdd76f010910ad5c7876d30efeb3bcdfee10234729f63f4a5cd8", "context": "ScriptInstance" },
+    { "modulePrefix": "vmath", "path": "engine/script/src/script_vmath.cpp", "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2", "context": "Global" },
+    { "modulePrefix": "window", "path": "engine/gamesys/src/gamesys/scripts/script_window.cpp", "sha256": "03b4962f55c626f2b73ebe978035be93215eb6e0ef91802bf8c8f12c81c2544b", "context": "Global" }
+  ]
+}
