@@ -15,7 +15,7 @@
     "valueTailBindingsSha256": "dfbfa544eae9456ec1d51f7c08d51ab28f03e4a471eeb98dc661a0ecfa639c36",
     "overloadDispatchSha256": "e0f7f0cde94e9225294a8018240d325dd164790a9ea875b5e152d6d02dee5d80",
     "universalValuePolicySha256": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
-    "universalValueSelectionSha256": "d359a39dd19c4825dcd37a93695bb6ce7a69609f7561488a0dd44a1aaf11f496",
+    "universalValueSelectionSha256": "d1ae36d2bb0191e000790c3eae1958df1ff5d0aa41ea2893115ad27143d96775",
     "valueDefinitions": [
       {
         "definitionPath": "packages/bindings/overrides/script-defold-value-bindings.json",
@@ -76,7 +76,7 @@
         "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
       }
     ],
-    "aggregateInputSha256": "d614d568c59bb2aebe082c7570d9a143bc667825b595d93f48642690010f93e5"
+    "aggregateInputSha256": "8e416d601f35ec9f78d7157d22ad2eb232e38b017e0be3055f16a3564c1c118e"
   },
   "functionCount": 926,
   "categoryCounts": {

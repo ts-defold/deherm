@@ -79,6 +79,16 @@ Ambiguous `number` declarations are rejected. Strings, arrays, structs in
 calls, 64-bit identifiers, and ownership-bearing objects are not silently
 boxed; each needs an explicit lowering and lifetime rule.
 
+Defold's own value types are the first such lowering. `vector3`, `vector4`,
+`quaternion`, `matrix4`, `hash`, and `url` are transparent fixed-layout records,
+so the generator owns their element counts, widths, and ordering as ABI and
+derives every one of them from the pinned dmSDK headers rather than declaring
+them. Modelling them as opaque handles was rejected: it would leave every vmath
+operation boxed and make the tier pointless. Engine-owned values such as
+`node`, `buffer_data`, and `render_target` stay opaque and fail closed until the
+retained-handle transport exists. See
+[Transparent Defold value transport](../research/transparent-defold-value-transport.md).
+
 # Emscripten memory contract
 
 HTML5 uses raw Wasm exports and the generated memory schema. Fixed-layout POD

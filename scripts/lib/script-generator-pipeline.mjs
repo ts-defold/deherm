@@ -15,6 +15,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-defold-value-tail.mjs",
   "scripts/generate-script-overload-dispatch.mjs",
   "scripts/generate-script-table-record-bindings.mjs",
+  "scripts/generate-defold-value-layouts.mjs",
   "scripts/generate-script-universal-value-bindings.mjs",
   "scripts/generate-script-copied-value-record-blockers.mjs",
   "scripts/generate-script-opaque-record-blockers.mjs",
@@ -55,6 +56,7 @@ export const scriptPinnedInputs = Object.freeze([
   "packages/bindings/overrides/script-dynamic-value-bindings.json",
   "packages/bindings/overrides/script-overload-dispatch.json",
   "packages/bindings/overrides/script-table-record-bindings.json",
+  "packages/bindings/overrides/defold-value-layouts.json",
   "packages/bindings/overrides/script-universal-value-bindings.json",
   "packages/bindings/overrides/script-copied-value-record-blockers.json",
   "packages/bindings/overrides/script-opaque-record-blockers.json",
@@ -120,6 +122,8 @@ export const generatedScriptArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_script_table_record_bindings.hpp",
   "defold/defold_hermes/src/generated_script_table_record_bindings.cpp",
   "packages/sdk/src/generated/script/table-record-bindings.ts",
+  "packages/bindings/generated/defold-value-layouts.json",
+  "defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h",
   "packages/bindings/generated/defold-script-universal-value-bindings.json",
   "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",
   "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
@@ -181,6 +185,7 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-real-engine-matrix.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-route-availability-profiles.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-projection-ir.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-defold-value-layouts.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-universal-value-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" })
 ]);

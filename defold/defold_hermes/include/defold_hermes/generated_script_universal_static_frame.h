@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#include <defold_hermes/generated_defold_value_layout.h>
+
 // Project builds may tune these bounds without regenerating the API catalog.
 // They affect only the Static Hermes scratch pool, not the portable wire ABI.
 #ifndef DEHERM_SCRIPT_STATIC_FRAME_REENTRANCY
@@ -31,6 +33,10 @@ uint32_t deherm_script_static_push_string(DehermScriptUniversalStaticFrame* fram
 uint8_t deherm_script_static_write_string_byte(DehermScriptUniversalStaticFrame* frame, uint32_t value_index, uint32_t byte_offset, uint8_t value);
 uint32_t deherm_script_static_push_handle(DehermScriptUniversalStaticFrame* frame, uint8_t kind, uint8_t semantic_kind, uint32_t runtime, uint32_t payload_low, uint32_t payload_high);
 uint32_t deherm_script_static_push_defold_value(DehermScriptUniversalStaticFrame* frame, uint8_t kind, float x, float y, float z, float w);
+// Column-major dmVMath::Matrix4 elements copied into the caller-owned float arena.
+uint32_t deherm_script_static_push_matrix4(DehermScriptUniversalStaticFrame* frame, float e0, float e1, float e2, float e3, float e4, float e5, float e6, float e7, float e8, float e9, float e10, float e11, float e12, float e13, float e14, float e15);
+// Exact dmMessage::URL lanes copied into the caller-owned URL arena as uint32 halves.
+uint32_t deherm_script_static_push_url(DehermScriptUniversalStaticFrame* frame, uint32_t socket_low, uint32_t socket_high, uint32_t reserved_low, uint32_t reserved_high, uint32_t path_low, uint32_t path_high, uint32_t fragment_low, uint32_t fragment_high);
 uint32_t deherm_script_static_push_table(DehermScriptUniversalStaticFrame* frame, uint8_t kind, uint32_t length);
 uint8_t deherm_script_static_set_entry(DehermScriptUniversalStaticFrame* frame, uint32_t table_index, uint32_t entry, uint32_t key_index, uint32_t value_index);
 uint8_t deherm_script_static_set_argument(DehermScriptUniversalStaticFrame* frame, uint32_t slot, uint32_t value_index);
@@ -48,6 +54,9 @@ uint32_t deherm_script_static_value_payload_high(const DehermScriptUniversalStat
 uint32_t deherm_script_static_value_runtime(const DehermScriptUniversalStaticFrame* frame, uint32_t value_index);
 void deherm_script_static_release_handle(uint8_t kind, uint32_t runtime, uint32_t payload_low, uint32_t payload_high);
 float deherm_script_static_value_lane(const DehermScriptUniversalStaticFrame* frame, uint32_t value_index, uint32_t lane);
+float deherm_script_static_value_element(const DehermScriptUniversalStaticFrame* frame, uint32_t value_index, uint32_t element);
+uint32_t deherm_script_static_value_url_low(const DehermScriptUniversalStaticFrame* frame, uint32_t value_index, uint32_t lane);
+uint32_t deherm_script_static_value_url_high(const DehermScriptUniversalStaticFrame* frame, uint32_t value_index, uint32_t lane);
 char* deherm_script_static_value_string(DehermScriptUniversalStaticFrame* frame, uint32_t value_index);
 uint32_t deherm_script_static_entry_key(const DehermScriptUniversalStaticFrame* frame, uint32_t table_index, uint32_t entry);
 uint32_t deherm_script_static_entry_value(const DehermScriptUniversalStaticFrame* frame, uint32_t table_index, uint32_t entry);

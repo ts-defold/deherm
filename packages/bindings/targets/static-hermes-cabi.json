@@ -15,11 +15,24 @@
     "extern-c",
     "caller-owned-out-storage",
     "bounded-scratch",
-    "bigint-u64"
+    "bigint-u64",
+    "transparent-defold-value-records"
   ],
   "unsupportedValueKinds": [
     "dynamic",
     "unknown",
     "variadic"
-  ]
+  ],
+  "transparentValueTransports": [
+    "float-lanes",
+    "float-arena",
+    "u64-scalar",
+    "u64-lane-quad"
+  ],
+  "opaqueShapeKinds": [
+    "callback",
+    "handle"
+  ],
+  "defoldValueLayoutSource": "packages/bindings/generated/defold-value-layouts.json",
+  "valueTransportNote": "Defold value records cross as transparent fixed-layout copies whose element counts and ordering come from the pinned dmSDK layout report. Engine-owned values and Lua closures fail closed until the retained-handle and closure transports exist."
 }

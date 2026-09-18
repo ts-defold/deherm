@@ -71,6 +71,15 @@ async function sourceEvidencePaths(repositoryRoot) {
       }
       continue;
     }
+    if (inputPath.endsWith("defold-value-layouts.json")) {
+      for (const source of Object.values(value.sources ?? {})) {
+        const relative = confinedRelativePath(source, `${inputPath}.sources`);
+        assert(relative.startsWith("upstream/defold/"),
+          `${inputPath}.sources must address the pinned Defold checkout`);
+        result.add(relative);
+      }
+      continue;
+    }
     if (inputPath.endsWith("script-borrowed-handle-classification.json")) {
       for (const evidence of value.sourceEvidence ?? []) {
         result.add(`upstream/defold/${confinedRelativePath(evidence.source, `${inputPath}.sourceEvidence.source`)}`);
@@ -215,7 +224,7 @@ async function walkFiles(root, relative = "") {
 export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultRepositoryRoot) {
   const candidates = new Set();
   for (const file of await walkFiles(path.join(repositoryRoot, "packages/bindings/generated"))) {
-    if (/^(?:defold-script-|defold-static-hermes-|war-battles-script-)/.test(file)) {
+    if (/^(?:defold-script-|defold-static-hermes-|defold-value-layouts|war-battles-script-)/.test(file)) {
       candidates.add(`packages/bindings/generated/${file}`);
     }
   }
@@ -223,7 +232,7 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
     candidates.add(`packages/sdk/src/generated/script/${file}`);
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "defold/defold_hermes/include/defold_hermes"))) {
-    if (/^generated_(?:script_|scalar_lua_|static_hermes_)/.test(file)) {
+    if (/^generated_(?:script_|scalar_lua_|static_hermes_|defold_value_)/.test(file)) {
       candidates.add(`defold/defold_hermes/include/defold_hermes/${file}`);
     }
   }
