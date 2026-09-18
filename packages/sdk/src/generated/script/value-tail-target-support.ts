@@ -43,10 +43,10 @@ export const scriptValueTailRoutes = [
   {
     "id": "script:render.set_compute",
     "stableId": "0x40eb9c88",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
+    "disposition": "blocked",
+    "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": null
+    "blocker": "render-script-instance-attachment-unavailable"
   },
   {
     "id": "script:physics.get_gravity",
@@ -83,18 +83,18 @@ export const scriptValueTailRoutes = [
   {
     "id": "script:render.set_view",
     "stableId": "0x76c885da",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
+    "disposition": "blocked",
+    "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": null
+    "blocker": "render-script-instance-attachment-unavailable"
   },
   {
     "id": "script:render.set_projection",
     "stableId": "0x7cd73e7a",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
+    "disposition": "blocked",
+    "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": null
+    "blocker": "render-script-instance-attachment-unavailable"
   },
   {
     "id": "script:go.world_to_local_transform",
@@ -139,18 +139,18 @@ export const scriptValueTailRoutes = [
   {
     "id": "script:gui.delete_texture",
     "stableId": "0xa02d7488",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
+    "disposition": "blocked",
+    "family": "requires-gui-script-instance",
     "resultCodec": "None",
-    "blocker": null
+    "blocker": "gui-script-instance-attachment-unavailable"
   },
   {
     "id": "script:gui.get_layout",
     "stableId": "0xb47092ac",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
-    "resultCodec": "Hash",
-    "blocker": null
+    "disposition": "blocked",
+    "family": "requires-gui-script-instance",
+    "resultCodec": "None",
+    "blocker": "gui-script-instance-attachment-unavailable"
   },
   {
     "id": "script:sound.get_group_gain",
@@ -179,18 +179,18 @@ export const scriptValueTailRoutes = [
   {
     "id": "script:render.enable_material",
     "stableId": "0xe0605b67",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
+    "disposition": "blocked",
+    "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": null
+    "blocker": "render-script-instance-attachment-unavailable"
   },
   {
     "id": "script:gui.get_font_resource",
     "stableId": "0xf13f5ce8",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
-    "resultCodec": "Hash",
-    "blocker": null
+    "disposition": "blocked",
+    "family": "requires-gui-script-instance",
+    "resultCodec": "None",
+    "blocker": "gui-script-instance-attachment-unavailable"
   },
   {
     "id": "script:gui.set_texture_data",
@@ -203,15 +203,15 @@ export const scriptValueTailRoutes = [
   {
     "id": "script:gui.set_layout",
     "stableId": "0xfc717758",
-    "disposition": "candidate",
-    "family": "captured-lua-exact-codec",
-    "resultCodec": "Boolean",
-    "blocker": null
+    "disposition": "blocked",
+    "family": "requires-gui-script-instance",
+    "resultCodec": "None",
+    "blocker": "gui-script-instance-attachment-unavailable"
   }
 ] as const;
 export const scriptValueTailTargetSupport = {
-  "nativeDynamicHermes": "candidate-metadata-and-fail-closed-dispatch-only",
-  "nativeStaticHermes": "not-integrated",
+  "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+  "nativeStaticHermes": "not-integrated-fail-closed",
   "html5BrowserHost": "not-executable-no-provider"
 } as const;
 export function assertScriptValueTailTargetSupport(stableId: number, target: string | undefined): void {

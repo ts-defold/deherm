@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "base64-span-v1",
+  "family": "arena-backed-spans",
+  "candidateSelector": {
+    "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+    "symbolPrefix": "dmCrypt::Base64",
+    "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+    "rationale": "The public dmSDK contract provides an explicit in/out destination capacity and a zero-capacity size-query protocol. The generated runtime retains only synchronous caller-owned byte spans."
+  },
+  "entries": {
+    "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161": { "status": "emit", "mode": "encode", "evidence": [{ "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 115, "text": "     * @param dst_len[in,out]   [type:uint32_t*] In: The length of the destination in bytes. Out: The length of the encoded string." }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 117, "text": "     * @note                    Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len" }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 120, "text": "    bool Base64Encode(const uint8_t* src, uint32_t src_len, uint8_t* dst, uint32_t* dst_len);" }] },
+    "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162": { "status": "emit", "mode": "decode", "requirePaddedInput": true, "evidence": [{ "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 128, "text": "     * @param dst_len[in,out]   [type:uint32_t*] In: The length of the destination in bytes. Out: The length of the decoded string." }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 130, "text": "     * @note                    Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len" }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 133, "text": "    bool Base64Decode(const uint8_t* src, uint32_t src_len, uint8_t* dst, uint32_t* dst_len);" }] }
+  }
+}

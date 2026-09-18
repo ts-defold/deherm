@@ -1,0 +1,235 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "astc-probe-v1",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "bindings/generated/defold-sdk-ir.json",
+    "shapes": "bindings/generated/defold-dmsdk-abi-shapes.json",
+    "policy": "bindings/overrides/dmsdk-astc-probe-bindings.json"
+  },
+  "sourceHashes": {
+    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+    "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
+    "policy": "0b9ad9f3d7a22709254de8f9f6d603f1e9506e12c94e1e7db2cc0f4b5faca0cd",
+    "headers": {
+      "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h": "cd1d701fd48d98dab9c5794ed0b96d278ba3dfb79ceb295ba0aa017d74728419",
+      "upstream/defold/engine/dlib/src/dlib/image.cpp": "4d1e6532b053eaa26689dc0df4b02da28c604042e50d30d14109c9bdf6280733"
+    }
+  },
+  "policy": {
+    "candidateSelector": {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+      "symbolPrefix": "dmImage::GetAstc",
+      "shape": "scalar:bool(in:opaque-pointer,value:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)",
+      "rationale": "These are synchronous ASTC-header parsers over a bounded byte span, returning only three fixed-width scalar outputs."
+    },
+    "cAbi": "bounded uint8_t input span and caller-owned fixed three-u32 result",
+    "ownership": "input is synchronously borrowed; only scalar results return",
+    "safety": "generated preflight rejects null input and spans shorter than the pinned native 16-byte ASTC header minimum",
+    "allocation": "no generated or pinned image parser allocation",
+    "jsi": "not-generated pending typed-array lifetime and installer policy",
+    "html5": "not-claimed pending target compile/link matrix"
+  },
+  "coverage": {
+    "baselineRuntimePending": 1361,
+    "discovered": 2,
+    "emitted": 2,
+    "policyBlocked": 0,
+    "hostBehaviorVerified": 2,
+    "remainingWithoutGeneratedAdapters": 1320
+  },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe.h": "9411f1f04d414e389b9a075bf22267e9ecd15e21561fbc2a74d878b6b71a7490",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe_runtime.h": "f4ba53c214e353ab2874419d715ccc494e974c46754b9dc4c8be369d22b62f89",
+    "defold/defold_hermes/src/generated_dmsdk_astc_probe_image.cpp": "515910ac313d6eb99d1cf1f13834277c980d9660f00b70a142c23d186e8e0852",
+    "defold/defold_hermes/src/generated_dmsdk_astc_probe_runtime.cpp": "b82d72e70080bde33600d9f3c79e281894e683924351a00ee96c4f0ef8ac0c16"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe_runtime.h",
+    "defold/defold_hermes/src/generated_dmsdk_astc_probe_image.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_astc_probe_runtime.cpp"
+  ],
+  "declarations": [
+    {
+      "id": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
+      "symbol": "dmImage::GetAstcBlockSize",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+      "line": 133,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:bool(in:opaque-pointer,value:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)",
+      "result": {
+        "role": "scalar:bool",
+        "direction": "value",
+        "nativeType": "bool"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "mem",
+          "role": "opaque-pointer",
+          "direction": "in",
+          "nativeType": "const void *"
+        },
+        {
+          "position": 1,
+          "name": "memsize",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        },
+        {
+          "position": 2,
+          "name": "width",
+          "role": "pointer:scalar:u32",
+          "direction": "inout",
+          "nativeType": "uint32_t *"
+        },
+        {
+          "position": 3,
+          "name": "height",
+          "role": "pointer:scalar:u32",
+          "direction": "inout",
+          "nativeType": "uint32_t *"
+        },
+        {
+          "position": 4,
+          "name": "depth",
+          "role": "pointer:scalar:u32",
+          "direction": "inout",
+          "nativeType": "uint32_t *"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 0,
+      "mode": "block-size",
+      "evidence": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+          "line": 127,
+          "text": "     * @param memsize [type: uint32_t] the length of the memory blob"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+          "line": 133,
+          "text": "    bool GetAstcBlockSize(const void* mem, uint32_t memsize, uint32_t* width, uint32_t* height, uint32_t* depth);"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+          "line": 227,
+          "text": "        if (memsize < 16)"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size",
+      "stages": {
+        "generated": "complete",
+        "compiled": "pinned-source-object-test",
+        "linked": "pinned-source-host-link-test",
+        "runtime": "pinned-source-host-behavior-test",
+        "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+      }
+    },
+    {
+      "id": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
+      "symbol": "dmImage::GetAstcDimensions",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+      "line": 145,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:bool(in:opaque-pointer,value:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)",
+      "result": {
+        "role": "scalar:bool",
+        "direction": "value",
+        "nativeType": "bool"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "mem",
+          "role": "opaque-pointer",
+          "direction": "in",
+          "nativeType": "const void *"
+        },
+        {
+          "position": 1,
+          "name": "memsize",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        },
+        {
+          "position": 2,
+          "name": "width",
+          "role": "pointer:scalar:u32",
+          "direction": "inout",
+          "nativeType": "uint32_t *"
+        },
+        {
+          "position": 3,
+          "name": "height",
+          "role": "pointer:scalar:u32",
+          "direction": "inout",
+          "nativeType": "uint32_t *"
+        },
+        {
+          "position": 4,
+          "name": "depth",
+          "role": "pointer:scalar:u32",
+          "direction": "inout",
+          "nativeType": "uint32_t *"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 1,
+      "mode": "dimensions",
+      "evidence": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+          "line": 139,
+          "text": "     * @param memsize [type: uint32_t] the length of the memory blob"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+          "line": 145,
+          "text": "    bool GetAstcDimensions(const void* mem, uint32_t memsize, uint32_t* width, uint32_t* height, uint32_t* depth);"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dlib/image.cpp",
+          "line": 227,
+          "text": "        if (memsize < 16)"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions",
+      "stages": {
+        "generated": "complete",
+        "compiled": "pinned-source-object-test",
+        "linked": "pinned-source-host-link-test",
+        "runtime": "pinned-source-host-behavior-test",
+        "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+      }
+    }
+  ]
+}

@@ -39,6 +39,11 @@ test("dmSDK generator pipeline has one deterministic ownership registry", () => 
     "scripts/generate-dmsdk-abi-shapes.mjs",
     "scripts/generate-dmsdk-named-scalar-bindings.mjs",
     "scripts/generate-dmsdk-enum-value-bindings.mjs",
+    "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+    "scripts/generate-dmsdk-base64-span-bindings.mjs",
+    "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+    "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+    "scripts/generate-dmsdk-arena-span-blockers.mjs",
   ]);
   for (const step of dmSdkGenerationSteps) {
     assert.equal(step.runtime, "node");

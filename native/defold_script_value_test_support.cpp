@@ -1,4 +1,5 @@
 #include <dmsdk/dlib/vmath.h>
+#include <dmsdk/dlib/message.h>
 #include <dlib/hash.h>
 
 extern "C" {
@@ -33,15 +34,41 @@ void PushQuat(lua_State* state, const dmVMath::Quat& value) {
   *static_cast<dmVMath::Quat*>(lua_newuserdata(state, sizeof(dmVMath::Quat))) = value;
 }
 
+void PushMatrix4(lua_State* state, const dmVMath::Matrix4& value) {
+  *static_cast<dmVMath::Matrix4*>(lua_newuserdata(state, sizeof(dmVMath::Matrix4))) = value;
+}
+
+void PushURL(lua_State* state, const dmMessage::URL& value) {
+  *static_cast<dmMessage::URL*>(lua_newuserdata(state, sizeof(dmMessage::URL))) = value;
+}
+
 dmVMath::Vector3* ToVector3(lua_State* state, int index) {
   return lua_isuserdata(state, index)
       ? static_cast<dmVMath::Vector3*>(lua_touserdata(state, index))
       : nullptr;
 }
 
+dmVMath::Vector4* ToVector4(lua_State* state, int index) {
+  return lua_isuserdata(state, index)
+      ? static_cast<dmVMath::Vector4*>(lua_touserdata(state, index))
+      : nullptr;
+}
+
 dmVMath::Quat* ToQuat(lua_State* state, int index) {
   return lua_isuserdata(state, index)
       ? static_cast<dmVMath::Quat*>(lua_touserdata(state, index))
+      : nullptr;
+}
+
+dmVMath::Matrix4* ToMatrix4(lua_State* state, int index) {
+  return lua_isuserdata(state, index)
+      ? static_cast<dmVMath::Matrix4*>(lua_touserdata(state, index))
+      : nullptr;
+}
+
+dmMessage::URL* ToURL(lua_State* state, int index) {
+  return lua_isuserdata(state, index)
+      ? static_cast<dmMessage::URL*>(lua_touserdata(state, index))
       : nullptr;
 }
 

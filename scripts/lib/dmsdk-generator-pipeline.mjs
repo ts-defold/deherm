@@ -8,6 +8,11 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-abi-shapes.mjs",
   "scripts/generate-dmsdk-named-scalar-bindings.mjs",
   "scripts/generate-dmsdk-enum-value-bindings.mjs",
+  "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+  "scripts/generate-dmsdk-base64-span-bindings.mjs",
+  "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+  "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+  "scripts/generate-dmsdk-arena-span-blockers.mjs",
   "scripts/generate-dmsdk-runtime.mjs",
   "scripts/lib/dmsdk-generator-pipeline.mjs"
 ]);
@@ -16,7 +21,12 @@ export const dmSdkPinnedInputs = Object.freeze([
   "upstream.lock",
   "bindings/generated/defold-sdk-ir.json",
   "bindings/overrides/dmsdk-enum-value-bindings.json",
-  "bindings/overrides/dmsdk-named-scalar-policies.json"
+  "bindings/overrides/dmsdk-named-scalar-policies.json",
+  "bindings/overrides/dmsdk-fixed-digest-bindings.json",
+  "bindings/overrides/dmsdk-base64-span-bindings.json",
+  "bindings/overrides/dmsdk-astc-probe-bindings.json",
+  "bindings/overrides/dmsdk-xtea-span-bindings.json",
+  "bindings/overrides/dmsdk-arena-span-blockers.json"
 ]);
 
 export const generatedDmSdkArtifacts = Object.freeze([
@@ -53,7 +63,28 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_runtime.h",
   "defold/defold_hermes/src/generated_dmsdk_named_scalar_jsi.cpp",
   "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp",
-  "packages/sdk/src/generated/dmsdk/named-scalar.ts"
+  "packages/sdk/src/generated/dmsdk/named-scalar.ts",
+  "bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_fixed_digest.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
+  "defold/defold_hermes/src/generated_dmsdk_fixed_digest_crypt.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_fixed_digest_runtime.cpp",
+  "bindings/generated/defold-dmsdk-base64-span-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span_runtime.h",
+  "defold/defold_hermes/src/generated_dmsdk_base64_span_crypt.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp",
+  "bindings/generated/defold-dmsdk-astc-probe-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe_runtime.h",
+  "defold/defold_hermes/src/generated_dmsdk_astc_probe_image.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_astc_probe_runtime.cpp",
+  "bindings/generated/defold-dmsdk-xtea-span-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span_runtime.h",
+  "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp",
+  "bindings/generated/defold-dmsdk-arena-span-blockers.json"
 ]);
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.
@@ -62,5 +93,10 @@ export const dmSdkGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-scalar-thunks.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-abi-shapes.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-named-scalar-bindings.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-enum-value-bindings.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-enum-value-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-fixed-digest-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-base64-span-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-astc-probe-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-xtea-span-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-arena-span-blockers.mjs" })
 ]);

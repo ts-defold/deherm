@@ -26,6 +26,10 @@ const scalarImplementationEvidence = Object.freeze([
   "upstream/defold/engine/dlib/src/dlib/time_posix.cpp",
   "upstream/defold/engine/dlib/src/dlib/time_win32.cpp",
   "upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp",
+  "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+  "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+  "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+  "upstream/defold/engine/dlib/src/dlib/image.cpp",
   "upstream/defold/engine/graphics/src/graphics.cpp"
 ]);
 
@@ -121,17 +125,17 @@ async function walk(root, relative = "") {
 export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositoryRootDefault) {
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "bindings/generated"))) {
-    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings)\.json$/.test(file)) {
+    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|arena-span-blockers)\.json$/.test(file)) {
       result.add(`bindings/generated/${file}`);
     }
   }
   for (const file of await walk(path.join(repositoryRoot, "defold/defold_hermes/include/defold_hermes"))) {
-    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar)/.test(file)) {
+    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span)/.test(file)) {
       result.add(`defold/defold_hermes/include/defold_hermes/${file}`);
     }
   }
   for (const file of await walk(path.join(repositoryRoot, "defold/defold_hermes/src"))) {
-    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar)/.test(file)) {
+    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span)/.test(file)) {
       result.add(`defold/defold_hermes/src/${file}`);
     }
   }
@@ -181,12 +185,17 @@ async function compareArtifacts(cleanRoot, repositoryRoot) {
 
 async function validateReports(root) {
   const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
-  const [patterns, scalar, shapes, enumValue, namedScalar] = await Promise.all([
+  const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, arenaSpan] = await Promise.all([
     load("bindings/generated/defold-dmsdk-binding-patterns.json"),
     load("bindings/generated/defold-dmsdk-scalar-thunks.json"),
     load("bindings/generated/defold-dmsdk-abi-shapes.json"),
     load("bindings/generated/defold-dmsdk-enum-value-bindings.json"),
-    load("bindings/generated/defold-dmsdk-named-scalar-bindings.json")
+    load("bindings/generated/defold-dmsdk-named-scalar-bindings.json"),
+    load("bindings/generated/defold-dmsdk-fixed-digest-bindings.json"),
+    load("bindings/generated/defold-dmsdk-base64-span-bindings.json"),
+    load("bindings/generated/defold-dmsdk-astc-probe-bindings.json"),
+    load("bindings/generated/defold-dmsdk-xtea-span-bindings.json"),
+    load("bindings/generated/defold-dmsdk-arena-span-blockers.json")
   ]);
   assert(patterns.coverage.runtimePendingCount === 1361 && patterns.coverage.classifiedCount === 1361,
     "dmSDK classifier did not account for all 1,361 runtime-pending declarations");
@@ -201,22 +210,98 @@ async function validateReports(root) {
   assert(namedScalar.coverage.reviewed === 21 && namedScalar.coverage.generated === 0 &&
     namedScalar.coverage.policyBlocked === 21,
   "named-scalar report does not have the pinned 0/21 policy disposition");
+  assert(fixedDigest.coverage.discovered === 4 && fixedDigest.coverage.emitted === 4 &&
+    fixedDigest.coverage.policyBlocked === 0 && fixedDigest.coverage.remainingWithoutGeneratedAdapters === 1324,
+  "fixed-digest report does not have the pinned 4/4 disposition or 1,324 remainder");
+  assert(base64Span.coverage.discovered === 2 && base64Span.coverage.emitted === 2 &&
+    base64Span.coverage.policyBlocked === 0 && base64Span.coverage.remainingWithoutGeneratedAdapters === 1322,
+  "base64-span report does not have the pinned 2/2 disposition or 1,322 remainder");
+  assert(astcProbe.coverage.discovered === 2 && astcProbe.coverage.emitted === 2 &&
+    astcProbe.coverage.policyBlocked === 0 && astcProbe.coverage.remainingWithoutGeneratedAdapters === 1320,
+  "ASTC-probe report does not have the pinned 2/2 disposition or 1,320 remainder");
+  assert(xteaSpan.coverage.discovered === 2 && xteaSpan.coverage.emitted === 2 &&
+    xteaSpan.coverage.policyBlocked === 0 && xteaSpan.coverage.remainingWithoutGeneratedAdapters === 1318,
+  "XTEA-span report does not have the pinned 2/2 disposition or 1,318 remainder");
+  assert(arenaSpan.coverage.arenaSpanCensus === 79 && arenaSpan.coverage.coveredByPriorWaves === 10 &&
+    arenaSpan.coverage.blocked === 69 && arenaSpan.coverage.executableAdaptersEmitted === 0 &&
+    arenaSpan.coverage.overlap === 0 && arenaSpan.coverage.unaccounted === 0,
+  "arena-span blocker report does not have the pinned complete 10 generated + 69 blocked partition");
   const scalarIds = new Set(scalar.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const enumIds = new Set(enumValue.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
-  assert(scalarIds.size === 26 && enumIds.size === 7, "generated dmSDK IDs are not unique within a family");
+  const fixedDigestIds = new Set(fixedDigest.declarations.map(({ id }) => id));
+  const base64SpanIds = new Set(base64Span.declarations.map(({ id }) => id));
+  const astcProbeIds = new Set(astcProbe.declarations.map(({ id }) => id));
+  const xteaSpanIds = new Set(xteaSpan.declarations.map(({ id }) => id));
+  assert(scalarIds.size === 26 && enumIds.size === 7 && fixedDigestIds.size === 4 && base64SpanIds.size === 2 && astcProbeIds.size === 2 && xteaSpanIds.size === 2,
+    "generated dmSDK IDs are not unique within a family");
   for (const id of enumIds) assert(!scalarIds.has(id), `dmSDK generator families overlap at ${id}`);
+  for (const id of fixedDigestIds) {
+    assert(!scalarIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!enumIds.has(id), `dmSDK generator families overlap at ${id}`);
+  }
+  for (const id of base64SpanIds) {
+    assert(!scalarIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!enumIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!fixedDigestIds.has(id), `dmSDK generator families overlap at ${id}`);
+  }
+  for (const id of astcProbeIds) {
+    assert(!scalarIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!enumIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!fixedDigestIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!base64SpanIds.has(id), `dmSDK generator families overlap at ${id}`);
+  }
+  for (const id of xteaSpanIds) {
+    assert(!scalarIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!enumIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!fixedDigestIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!base64SpanIds.has(id), `dmSDK generator families overlap at ${id}`);
+    assert(!astcProbeIds.has(id), `dmSDK generator families overlap at ${id}`);
+  }
+  const priorArenaIds = new Set([...fixedDigestIds, ...base64SpanIds, ...astcProbeIds, ...xteaSpanIds]);
+  const reportedPriorArenaIds = new Set(arenaSpan.coveredByPriorWaves.map(({ id }) => id));
+  const blockedArenaIds = new Set(arenaSpan.declarations.map(({ id }) => id));
+  const censusArenaIds = new Set(shapes.rows.filter(({ tranche }) => tranche === "arena-backed-spans").map(({ id }) => id));
+  assert(priorArenaIds.size === 10 && reportedPriorArenaIds.size === 10 && blockedArenaIds.size === 69,
+    "arena-span partition contains duplicate IDs");
+  assert([...priorArenaIds].every((id) => reportedPriorArenaIds.has(id)),
+    "arena-span prior-wave ledger does not exactly match generated families");
+  assert([...priorArenaIds].every((id) => !blockedArenaIds.has(id)),
+    "arena-span prior-wave and blocker ledgers overlap");
+  assert([...censusArenaIds].every((id) => priorArenaIds.has(id) || blockedArenaIds.has(id)) &&
+    priorArenaIds.size + blockedArenaIds.size === censusArenaIds.size,
+  "arena-span ledger does not completely partition the ABI-shape census");
   const scalarOwned = generatedDmSdkArtifacts.filter((entry) => scalar.artifacts.includes(entry));
   const enumOwned = generatedDmSdkArtifacts.filter((entry) => enumValue.artifacts.includes(entry));
+  const fixedDigestOwned = generatedDmSdkArtifacts.filter((entry) => fixedDigest.artifacts.includes(entry));
+  const base64SpanOwned = generatedDmSdkArtifacts.filter((entry) => base64Span.artifacts.includes(entry));
+  const astcProbeOwned = generatedDmSdkArtifacts.filter((entry) => astcProbe.artifacts.includes(entry));
+  const xteaSpanOwned = generatedDmSdkArtifacts.filter((entry) => xteaSpan.artifacts.includes(entry));
   assert(scalarOwned.length === scalar.artifacts.length, "scalar report names an artifact absent from registry ownership");
   assert(enumOwned.length === enumValue.artifacts.length, "enum report names an artifact absent from registry ownership");
+  assert(fixedDigestOwned.length === fixedDigest.artifacts.length,
+    "fixed-digest report names an artifact absent from registry ownership");
+  assert(base64SpanOwned.length === base64Span.artifacts.length,
+    "base64-span report names an artifact absent from registry ownership");
+  assert(astcProbeOwned.length === astcProbe.artifacts.length,
+    "ASTC-probe report names an artifact absent from registry ownership");
+  assert(xteaSpanOwned.length === xteaSpan.artifacts.length,
+    "XTEA-span report names an artifact absent from registry ownership");
   return {
     runtimePendingCount: patterns.coverage.runtimePendingCount,
     scalarGeneratedCount: scalar.coverage.generated,
     enumGeneratedCount: enumValue.coverage.emitted,
+    fixedDigestGeneratedCount: fixedDigest.coverage.emitted,
+    base64SpanGeneratedCount: base64Span.coverage.emitted,
+    astcProbeGeneratedCount: astcProbe.coverage.emitted,
+    xteaSpanGeneratedCount: xteaSpan.coverage.emitted,
+    arenaSpanCensusCount: arenaSpan.coverage.arenaSpanCensus,
+    arenaSpanPriorWaveCount: arenaSpan.coverage.coveredByPriorWaves,
+    arenaSpanBlockedCount: arenaSpan.coverage.blocked,
+    arenaSpanExecutableCount: arenaSpan.coverage.executableAdaptersEmitted,
     namedScalarReviewedCount: namedScalar.coverage.reviewed,
     namedScalarGeneratedCount: namedScalar.coverage.generated,
     namedScalarBlockedCount: namedScalar.coverage.policyBlocked,
-    remainingWithoutGeneratedAdapters: enumValue.coverage.remainingWithoutGeneratedAdapters,
+    remainingWithoutGeneratedAdapters: xteaSpan.coverage.remainingWithoutGeneratedAdapters,
     uniqueShapeCount: shapes.coverage.uniqueShapes,
     trancheCount: shapes.coverage.tranches,
     defoldRevision: shapes.defoldRevision
@@ -268,8 +353,9 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown argument: ${unknown[0]}`);
   const report = await runDmSdkCleanRoomRegeneration({ keep: process.argv.includes("--keep") });
   console.log(`Clean-room regeneration verified ${report.runtimePendingCount} dmSDK declarations across ${report.artifactCount} byte-identical artifacts.`);
-  console.log(`Generated adapters: ${report.scalarGeneratedCount} scalar + ${report.enumGeneratedCount} enum-value; ${report.remainingWithoutGeneratedAdapters} remain.`);
+  console.log(`Generated adapters: ${report.scalarGeneratedCount} scalar + ${report.enumGeneratedCount} enum-value + ${report.fixedDigestGeneratedCount} fixed-digest + ${report.base64SpanGeneratedCount} base64-span + ${report.astcProbeGeneratedCount} ASTC-probe + ${report.xteaSpanGeneratedCount} XTEA-span; ${report.remainingWithoutGeneratedAdapters} remain.`);
   console.log(`Named-scalar policy: ${report.namedScalarGeneratedCount}/${report.namedScalarReviewedCount} generated; ${report.namedScalarBlockedCount} blocked.`);
+  console.log(`Arena-span ledger: ${report.arenaSpanPriorWaveCount}/${report.arenaSpanCensusCount} covered by prior waves; ${report.arenaSpanBlockedCount} blocked; ${report.arenaSpanExecutableCount} adapters emitted by the ledger.`);
   console.log(`ABI census: ${report.uniqueShapeCount} shapes across ${report.trancheCount} tranches.`);
   console.log(`Pinned input fingerprint: ${report.aggregateInputSha256}`);
   if (report.cleanRoot) console.log(`Clean room retained at ${report.cleanRoot}`);

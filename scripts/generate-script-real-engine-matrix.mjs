@@ -11,6 +11,8 @@ const inputUrls = {
   valueRoutes: new URL("bindings/generated/defold-script-value-bindings.json", root),
   tupleRoutes: new URL("bindings/generated/defold-script-fixed-tuples.json", root),
   urlRoutes: new URL("bindings/generated/defold-script-url-address-classification.json", root),
+  valueTailRoutes: new URL("bindings/generated/defold-script-value-tail-bindings.json", root),
+  overloadRoutes: new URL("bindings/generated/defold-script-overload-dispatch.json", root),
   scalarProbes: new URL("bindings/generated/defold-script-real-engine-probes.json", root),
   valueProbes: new URL("bindings/generated/defold-script-value-real-engine-probes.json", root),
   tupleProbes: new URL("bindings/generated/defold-script-fixed-tuple-probes.json", root)
@@ -88,7 +90,7 @@ function validateSetups(manifest) {
   return setups;
 }
 
-function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes) {
+function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailRoutes, overloadRoutes) {
   const rows = [
     ...scalarRoutes.bindings.map((binding) => ({
       id: binding.id,
@@ -122,6 +124,22 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes) {
       routeKind: "url-address",
       source: binding.source,
       line: binding.line
+    })),
+    ...valueTailRoutes.bindings.filter(({ disposition }) => disposition === "candidate").map((binding) => ({
+      id: binding.id,
+      stableId: binding.stableId,
+      rawName: binding.id.slice("script:".length),
+      routeKind: "captured-lua-value-tail",
+      source: binding.sourcePath,
+      line: 0
+    })),
+    ...overloadRoutes.bindings.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate).map((binding) => ({
+      id: binding.id,
+      stableId: binding.stableId,
+      rawName: binding.id.slice("script:".length),
+      routeKind: "captured-lua-overload",
+      source: binding.sourceEvidence.path,
+      line: 0
     }))
   ].sort((left, right) => compareText(left.id, right.id));
   const ids = new Set();
@@ -284,6 +302,8 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   const valueRoutes = JSON.parse(texts.valueRoutes);
   const tupleRoutes = JSON.parse(texts.tupleRoutes);
   const urlRoutes = JSON.parse(texts.urlRoutes);
+  const valueTailRoutes = JSON.parse(texts.valueTailRoutes);
+  const overloadRoutes = JSON.parse(texts.overloadRoutes);
   const scalarProbes = JSON.parse(texts.scalarProbes);
   const valueProbes = JSON.parse(texts.valueProbes);
   const tupleProbes = JSON.parse(texts.tupleProbes);
@@ -297,13 +317,15 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   if (scalarRoutes.defoldRevision !== valueRoutes.defoldRevision ||
       scalarRoutes.defoldRevision !== tupleRoutes.defoldRevision ||
       scalarRoutes.defoldRevision !== urlRoutes.defoldRevision ||
+      scalarRoutes.defoldRevision !== valueTailRoutes.defoldRevision ||
+      scalarRoutes.defoldRevision !== overloadRoutes.defoldRevision ||
       scalarRoutes.defoldRevision !== scalarProbes.defoldRevision ||
       scalarRoutes.defoldRevision !== valueProbes.defoldRevision) {
     throw new Error("All matrix inputs must use the same Defold revision");
   }
   const setups = validateSetups(manifest);
   if (!setups.has(manifest.policy.defaultSetupId)) throw new Error(`Unknown default setup ${manifest.policy.defaultSetupId}`);
-  const routes = routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes);
+  const routes = routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailRoutes, overloadRoutes);
   const routeById = new Map(routes.map((route) => [route.id, route]));
   const scenarios = importedScenarios(manifest, setups, scalarProbes, valueProbes, routeById);
   applyOverrides(manifest, setups, routeById, scenarios);
@@ -367,6 +389,7 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   const inputSha256 = createHash("sha256")
     .update(texts.manifest).update("\0").update(texts.scalarRoutes).update("\0").update(texts.valueRoutes)
     .update("\0").update(texts.tupleRoutes).update("\0").update(texts.urlRoutes)
+    .update("\0").update(texts.valueTailRoutes).update("\0").update(texts.overloadRoutes)
     .update("\0").update(texts.scalarProbes)
     .update("\0").update(texts.valueProbes).update("\0").update(texts.tupleProbes).digest("hex");
   return {

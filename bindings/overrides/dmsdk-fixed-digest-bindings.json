@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "fixed-digest-v1",
+  "family": "arena-backed-spans",
+  "candidateSelector": {
+    "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+    "symbolPrefix": "dmCrypt::Hash",
+    "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+    "rationale": "A context-free byte span is read once and written to a fixed-size digest specified in the pinned header. No native pointer, handle, callback, record, allocator, or engine context crosses the ABI."
+  },
+  "entries": {
+    "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160": { "status": "emit", "digestBytes": 16, "evidence": { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 108, "text": "    void HashMd5(const uint8_t* buf, uint32_t buflen, uint8_t* digest);       // output is 16 bytes" } },
+    "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157": { "status": "emit", "digestBytes": 20, "evidence": { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 84, "text": "    void HashSha1(const uint8_t* buf, uint32_t buflen, uint8_t* digest);      // output is 20 bytes" } },
+    "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158": { "status": "emit", "digestBytes": 32, "evidence": { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 92, "text": "    void HashSha256(const uint8_t* buf, uint32_t buflen, uint8_t* digest);    // output is 32 bytes" } },
+    "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159": { "status": "emit", "digestBytes": 64, "evidence": { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 100, "text": "    void HashSha512(const uint8_t* buf, uint32_t buflen, uint8_t* digest);    // output is 64 bytes" } }
+  }
+}

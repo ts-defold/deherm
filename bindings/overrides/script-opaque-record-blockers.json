@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "scope": "Reviewed ownership blockers for opaque/nested lua-table routes",
+  "expectedRouteCount": 2,
+  "sources": [
+    { "key": "render", "path": "engine/render/src/render/render_script.cpp", "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e" }
+  ],
+  "routes": [
+    {
+      "id": "script:render.draw",
+      "source": "render",
+      "anchors": ["int RenderScript_Draw(lua_State* L)", "RenderScriptPredicate_Check(L, 1)", "RenderScriptConstantBuffer_Check(L, -1)", "// we need to pass ownership to the command queue", "InsertDrawCommand(i, predicate, constant_buffer, frustum_options, sort_order)"],
+      "blocker": "borrowed-predicate-and-owned-command-queue-frustum"
+    },
+    {
+      "id": "script:render.dispatch_compute",
+      "source": "render",
+      "anchors": ["static int RenderScript_Dispatch(lua_State* L)", "RenderScriptInstance_Check(L)", "RenderScriptConstantBuffer_Check(L, -1)", "InsertDispatchComputeCommand(i, p_x, p_y, p_z, constant_buffer)"],
+      "blocker": "borrowed-constant-buffer-and-render-command-context"
+    }
+  ]
+}

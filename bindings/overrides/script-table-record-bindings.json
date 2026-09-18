@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "scope": "Reviewed first-wave fixed-record candidates from the accounting-pending lua-table ledger",
+  "expectedPendingLuaTableRouteCount": 148,
+  "expectedCandidateCount": 3,
+  "expectedBlockerCounts": {
+    "copied-defold-value-record": 9,
+    "dynamic-recursive-values": 5,
+    "handle-or-callback-crossing": 39,
+    "opaque-or-nested-record": 2,
+    "reviewed-semantic-record": 6,
+    "tagged-table-union": 3,
+    "target-context-or-platform-state-record": 6,
+    "unbounded-typed-map": 15,
+    "unbounded-typed-sequence": 60
+  },
+  "sources": [
+    {
+      "key": "script-image",
+      "path": "engine/gamesys/src/gamesys/scripts/script_image.cpp",
+      "sha256": "0ef39bda9de2db39ec59f97ffb04d916b522b80bd1a51a3cfdc8d07f23f0d281"
+    },
+    {
+      "key": "script-box2d-v3",
+      "path": "engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+      "sha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95"
+    },
+    {
+      "key": "script-bullet3d",
+      "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
+      "sha256": "50c51d3d802eaa495eb7c66ffc87b1e9deb31ec7126001c44652c8f5cefd8996"
+    }
+  ],
+  "routes": [
+    {
+      "id": "script:image.get_astc_header",
+      "source": "script-image",
+      "recordType": "image.astc_header",
+      "sourceAnchors": [
+        "int Image_GetAstcHeader(lua_State* L)",
+        "return luaL_error(L, \"Data is not a valid .astc file\");",
+        "lua_setfield(L, -2, \"block_size_z\");",
+        "{\"get_astc_header\", Image_GetAstcHeader}"
+      ],
+      "reason": "A caller-owned byte string is decoded into one finite, six-integer output record. Although the documentation IR permits nil, the pinned implementation raises a Lua error for invalid data, so this descriptor accepts the successful record result only. The route does not consume a Defold resource or cross handles, callbacks, recursive values, maps, or sequences."
+    },
+    {
+      "id": "script:b2d.get_version",
+      "source": "script-box2d-v3",
+      "recordType": "b2d.version_info",
+      "sourceAnchors": [
+        "void PushBox2DVersion(lua_State* L)",
+        "lua_setfield(L, -2, \"version\");",
+        "lua_setfield(L, -2, \"major\");",
+        "lua_setfield(L, -2, \"middle\");",
+        "lua_setfield(L, -2, \"minor\");"
+      ],
+      "reason": "The active Box2D backend emits one four-field scalar version record with no input, resource lookup, handles, callbacks, recursive values, maps, or sequences."
+    },
+    {
+      "id": "script:bullet3d.get_version",
+      "source": "script-bullet3d",
+      "recordType": "bullet3d.version_info",
+      "sourceAnchors": [
+        "static int Bullet3D_GetVersion(lua_State* L)",
+        "lua_setfield(L, -2, \"version\");",
+        "lua_setfield(L, -2, \"number\");",
+        "lua_setfield(L, -2, \"major\");",
+        "lua_setfield(L, -2, \"minor\");",
+        "{ \"get_version\", Bullet3D_GetVersion }"
+      ],
+      "reason": "The Bullet version helper emits one four-field scalar version record with no input, resource lookup, handles, callbacks, recursive values, maps, or sequences."
+    }
+  ]
+}

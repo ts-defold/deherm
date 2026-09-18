@@ -75,8 +75,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 1238853489,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   },
@@ -105,8 +105,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 1848085754,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   },
@@ -115,8 +115,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 2116175008,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   },
@@ -125,8 +125,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 2532589649,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   },
@@ -145,8 +145,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 2708084985,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   },
@@ -165,8 +165,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 3033910890,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   },
@@ -175,8 +175,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 3541966743,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   },
@@ -195,8 +195,8 @@ export const scriptOverloadDispatchTargetSupport = [
     "stableId": 4026227879,
     "generatedFamilyExecutableCandidate": true,
     "targetSupport": {
-      "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
-      "nativeStaticHermes": "planned-generated-adapter",
+      "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+      "nativeStaticHermes": "not-integrated-fail-closed",
       "html5BrowserHost": "not-executable-no-generated-provider"
     }
   }

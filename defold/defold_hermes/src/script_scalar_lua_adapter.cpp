@@ -1,5 +1,6 @@
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
 #include <defold_hermes/generated_script_value_bindings.hpp>
+#include <defold_hermes/script_matrix4_arena.hpp>
 #include <defold_hermes/script_url_arena.hpp>
 
 #include <dmsdk/dlib/hash.h>
@@ -17,10 +18,12 @@ dmhash_t* ToHash(lua_State* state, int index);
 void PushVector3(lua_State* state, const dmVMath::Vector3& value);
 void PushVector4(lua_State* state, const dmVMath::Vector4& value);
 void PushQuat(lua_State* state, const dmVMath::Quat& value);
+void PushMatrix4(lua_State* state, const dmVMath::Matrix4& value);
 void PushURL(lua_State* state, const dmMessage::URL& value);
 dmVMath::Vector3* ToVector3(lua_State* state, int index);
 dmVMath::Vector4* ToVector4(lua_State* state, int index);
 dmVMath::Quat* ToQuat(lua_State* state, int index);
+dmVMath::Matrix4* ToMatrix4(lua_State* state, int index);
 dmMessage::URL* ToURL(lua_State* state, int index);
 }  // namespace dmScript
 
@@ -75,6 +78,8 @@ ScriptAdapter::ScriptAdapter() noexcept : luaHandles_(kLuaHandleCapacity) {
   structuredLuaApi_ = {this, StructuredInvokeThunk};
   fixedTupleLuaApi_ = {this, FixedTupleInvokeThunk};
   urlLuaApi_ = {this, UrlInvokeThunk};
+  valueTailLuaApi_ = {this, ValueTailInvokeThunk};
+  overloadLuaApi_ = {this, OverloadInvokeThunk};
 }
 
 bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi) noexcept {
@@ -87,6 +92,8 @@ bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi) noexce
   structuredFunctionRefs_.fill(LUA_NOREF);
   fixedTupleFunctionRefs_.fill(LUA_NOREF);
   urlFunctionRefs_.fill(LUA_NOREF);
+  valueTailFunctionRefs_.fill(LUA_NOREF);
+  overloadFunctionRefs_.fill(LUA_NOREF);
   return true;
 }
 
@@ -105,6 +112,14 @@ void ScriptAdapter::shutdown() noexcept {
       reference = LUA_NOREF;
     }
     for (int& reference : urlFunctionRefs_) {
+      if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+      reference = LUA_NOREF;
+    }
+    for (int& reference : valueTailFunctionRefs_) {
+      if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+      reference = LUA_NOREF;
+    }
+    for (int& reference : overloadFunctionRefs_) {
       if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
       reference = LUA_NOREF;
     }
@@ -201,6 +216,16 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
       frame, adapterError_, sizeof(adapterError_), &urlLuaApi_);
   if (urlStatus == url_binding::DispatchStatus::kSuccess) return true;
   if (urlStatus == url_binding::DispatchStatus::kError) return false;
+
+  const auto valueTailStatus = value_tail::dispatch(
+      frame, adapterError_, sizeof(adapterError_), &valueTailLuaApi_);
+  if (valueTailStatus == value_tail::DispatchStatus::kSuccess) return true;
+  if (valueTailStatus == value_tail::DispatchStatus::kError) return false;
+
+  const auto overloadStatus = overload_dispatch::dispatch(
+      frame, adapterError_, sizeof(adapterError_), &overloadLuaApi_);
+  if (overloadStatus == overload_dispatch::DispatchStatus::kSuccess) return true;
+  if (overloadStatus == overload_dispatch::DispatchStatus::kError) return false;
 
   size_t denseIndex = 0;
   if (!findDenseIndex(frame->stableId, &denseIndex)) {
@@ -420,6 +445,24 @@ bool ScriptAdapter::pushStructuredValue(
       if (value.defoldKind == ScriptDefoldValueKind::kQuaternion) {
         dmScript::PushQuat(state_, dmVMath::Quat(
             value.defoldValue[0], value.defoldValue[1], value.defoldValue[2], value.defoldValue[3]));
+        return true;
+      }
+      if (value.defoldKind == ScriptDefoldValueKind::kMatrix4) {
+        if (!frame || !frame->matrix4Arena) {
+          return fail("Matrix4 frame arena is unavailable");
+        }
+        const float* elements = frame->matrix4Arena->resolve(value);
+        if (!elements) {
+          return fail("Matrix4 token is stale or belongs to another frame arena");
+        }
+        for (size_t index = 0; index < 16; ++index) {
+          if (std::isnan(elements[index])) return fail("Matrix4 input rejects NaN components");
+        }
+        dmScript::PushMatrix4(state_, dmVMath::Matrix4(
+            dmVMath::Vector4(elements[0], elements[1], elements[2], elements[3]),
+            dmVMath::Vector4(elements[4], elements[5], elements[6], elements[7]),
+            dmVMath::Vector4(elements[8], elements[9], elements[10], elements[11]),
+            dmVMath::Vector4(elements[12], elements[13], elements[14], elements[15])));
         return true;
       }
       return fail("Structured Lua Defold value kind is unsupported");
@@ -754,6 +797,273 @@ url_binding::DispatchStatus ScriptAdapter::invokeUrl(
     ok = fail(message ? message : "URL Lua call failed without an error string");
   }
   if (ok) ok = readUrlResult(operation.resultCodec, frame);
+  lua_settop(state_, baseTop + 1);
+  instanceApi_.set(state_);
+  lua_settop(state_, baseTop);
+  if (!ok) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  adapterError_[0] = '\0';
+  return Status::kSuccess;
+}
+
+value_tail::DispatchStatus ScriptAdapter::ValueTailInvokeThunk(
+    void* context,
+    const value_tail::Route& route,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  return static_cast<ScriptAdapter*>(context)->invokeValueTail(
+      route, frame, error, errorCapacity);
+}
+
+bool ScriptAdapter::bindValueTail(const value_tail::Route& route) noexcept {
+  if (!state_ || route.candidateIndex >= valueTailFunctionRefs_.size()) {
+    return fail("Defold value-tail operation index is invalid");
+  }
+  int& reference = valueTailFunctionRefs_[route.candidateIndex];
+  if (reference != LUA_NOREF && reference != LUA_REFNIL) return true;
+  const int baseTop = lua_gettop(state_);
+  if (std::strcmp(route.modulePath, "builtins") == 0) {
+    lua_getglobal(state_, route.member);
+  } else {
+    lua_getglobal(state_, route.modulePath);
+    if (lua_istable(state_, -1)) {
+      lua_getfield(state_, -1, route.member);
+      lua_remove(state_, -2);
+    }
+  }
+  if (!lua_isfunction(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("Defold value-tail Lua function is unavailable");
+  }
+  reference = luaL_ref(state_, LUA_REGISTRYINDEX);
+  lua_settop(state_, baseTop);
+  return reference != LUA_NOREF && reference != LUA_REFNIL;
+}
+
+bool ScriptAdapter::readValueTailResult(
+    value_tail::Codec codec,
+    ScriptCallFrame* frame) noexcept {
+  using Codec = value_tail::Codec;
+  if (codec == Codec::kNone) return true;
+  if (!frame->results || frame->resultCapacity < 1) {
+    return fail("Defold value-tail result storage is exhausted");
+  }
+  ScriptValue& output = frame->results[0];
+  output = {};
+  if (codec == Codec::kBoolean) {
+    if (lua_type(state_, -1) != LUA_TBOOLEAN) return fail("Defold value-tail result is not boolean");
+    output.tag = ScriptValueTag::kBoolean;
+    output.number = lua_toboolean(state_, -1) ? 1.0 : 0.0;
+  } else if (codec == Codec::kNumber) {
+    if (lua_type(state_, -1) != LUA_TNUMBER) return fail("Defold value-tail result is not numeric");
+    output.tag = ScriptValueTag::kNumber;
+    output.number = lua_tonumber(state_, -1);
+  } else if (codec == Codec::kString) {
+    if (lua_type(state_, -1) != LUA_TSTRING) return fail("Defold value-tail result is not a string");
+    size_t length = 0;
+    const char* data = lua_tolstring(state_, -1, &length);
+    if (!frame->stringScratch || length > frame->stringScratchCapacity - frame->stringScratchUsed) {
+      return fail("Defold value-tail string scratch is exhausted");
+    }
+    char* destination = frame->stringScratch + frame->stringScratchUsed;
+    if (length) std::memcpy(destination, data, length);
+    output.tag = ScriptValueTag::kString;
+    output.data = destination;
+    output.length = static_cast<uint32_t>(length);
+    frame->stringScratchUsed += static_cast<uint32_t>(length);
+  } else if (codec == Codec::kHash) {
+    dmhash_t* hash = dmScript::ToHash(state_, -1);
+    if (!hash) return fail("Defold value-tail result is not a hash");
+    output.tag = ScriptValueTag::kHandle;
+    output.handleKind = ScriptHandleKind::kHash;
+    output.payload = *hash;
+  } else if (codec == Codec::kVector3) {
+    dmVMath::Vector3* value = dmScript::ToVector3(state_, -1);
+    if (!value) return fail("Defold value-tail result is not vector3");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kVector3;
+    output.defoldValue[0] = value->getX();
+    output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ();
+  } else if (codec == Codec::kMatrix4) {
+    dmVMath::Matrix4* value = dmScript::ToMatrix4(state_, -1);
+    if (!value || !frame->matrix4Arena) {
+      return fail("Defold value-tail Matrix4 result has no frame arena");
+    }
+    alignas(16) float elements[16];
+    for (size_t column = 0; column < 4; ++column) {
+      for (size_t row = 0; row < 4; ++row) {
+        elements[column * 4 + row] = value->getElem(column, row);
+      }
+    }
+    if (!frame->matrix4Arena->store(elements, &output)) {
+      return fail("Defold value-tail Matrix4 frame arena is exhausted");
+    }
+  } else {
+    return fail("Defold value-tail result codec is unsupported");
+  }
+  frame->resultCount = 1;
+  return true;
+}
+
+value_tail::DispatchStatus ScriptAdapter::invokeValueTail(
+    const value_tail::Route& route,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  using Status = value_tail::DispatchStatus;
+  if (!state_ || !frame || !bindValueTail(route)) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
+      instanceRef_ == LUA_REFNIL || !hasActiveContext_ ||
+      activeContext_ != value_binding::StructuredLuaContext::kScriptInstance) {
+    writeError(error, errorCapacity, "Defold value-tail call requires a captured game-object script instance");
+    return Status::kError;
+  }
+  const int baseTop = lua_gettop(state_);
+  instanceApi_.get(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
+  instanceApi_.set(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX, valueTailFunctionRefs_[route.candidateIndex]);
+  bool ok = true;
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
+  }
+  const int resultCount = route.resultCodec == value_tail::Codec::kNone ? 0 : 1;
+  if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), resultCount, 0) != 0) {
+    const char* message = lua_tostring(state_, -1);
+    ok = fail(message ? message : "Defold value-tail Lua call failed without an error string");
+  }
+  if (ok) ok = readValueTailResult(route.resultCodec, frame);
+  lua_settop(state_, baseTop + 1);
+  instanceApi_.set(state_);
+  lua_settop(state_, baseTop);
+  if (!ok) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  adapterError_[0] = '\0';
+  return Status::kSuccess;
+}
+
+overload_dispatch::DispatchStatus ScriptAdapter::OverloadInvokeThunk(
+    void* context,
+    const overload_dispatch::Operation& operation,
+    const overload_dispatch::Shape& shape,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  return static_cast<ScriptAdapter*>(context)->invokeOverload(
+      operation, shape, frame, error, errorCapacity);
+}
+
+bool ScriptAdapter::bindOverload(
+    const overload_dispatch::Operation& operation) noexcept {
+  if (!state_ || operation.index >= overloadFunctionRefs_.size()) {
+    return fail("Overload-dispatch operation index is invalid");
+  }
+  int& reference = overloadFunctionRefs_[operation.index];
+  if (reference != LUA_NOREF && reference != LUA_REFNIL) return true;
+  const int baseTop = lua_gettop(state_);
+  lua_getglobal(state_, operation.modulePath);
+  if (lua_istable(state_, -1)) {
+    lua_getfield(state_, -1, operation.member);
+    lua_remove(state_, -2);
+  }
+  if (!lua_isfunction(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("Overload-dispatch Lua function is unavailable");
+  }
+  reference = luaL_ref(state_, LUA_REGISTRYINDEX);
+  lua_settop(state_, baseTop);
+  return reference != LUA_NOREF && reference != LUA_REFNIL;
+}
+
+bool ScriptAdapter::readOverloadResult(
+    uint16_t codec,
+    ScriptCallFrame* frame) noexcept {
+  if (!frame->results || frame->resultCapacity < 1) {
+    return fail("Overload-dispatch result storage is exhausted");
+  }
+  ScriptValue& output = frame->results[0];
+  output = {};
+  if (codec == overload_dispatch::kNumber) {
+    if (lua_type(state_, -1) != LUA_TNUMBER) return fail("Overload-dispatch result is not numeric");
+    output.tag = ScriptValueTag::kNumber;
+    output.number = lua_tonumber(state_, -1);
+  } else if (codec == overload_dispatch::kVector3) {
+    dmVMath::Vector3* value = dmScript::ToVector3(state_, -1);
+    if (!value) return fail("Overload-dispatch result is not vector3");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kVector3;
+    output.defoldValue[0] = value->getX(); output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ();
+  } else if (codec == overload_dispatch::kVector4) {
+    dmVMath::Vector4* value = dmScript::ToVector4(state_, -1);
+    if (!value) return fail("Overload-dispatch result is not vector4");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kVector4;
+    output.defoldValue[0] = value->getX(); output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ(); output.defoldValue[3] = value->getW();
+  } else if (codec == overload_dispatch::kQuaternion) {
+    dmVMath::Quat* value = dmScript::ToQuat(state_, -1);
+    if (!value) return fail("Overload-dispatch result is not quaternion");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kQuaternion;
+    output.defoldValue[0] = value->getX(); output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ(); output.defoldValue[3] = value->getW();
+  } else if (codec == overload_dispatch::kMatrix4) {
+    dmVMath::Matrix4* value = dmScript::ToMatrix4(state_, -1);
+    if (!value || !frame->matrix4Arena) return fail("Overload-dispatch Matrix4 result has no frame arena");
+    alignas(16) float elements[16];
+    for (size_t column = 0; column < 4; ++column) {
+      for (size_t row = 0; row < 4; ++row) elements[column * 4 + row] = value->getElem(column, row);
+    }
+    if (!frame->matrix4Arena->store(elements, &output)) {
+      return fail("Overload-dispatch Matrix4 frame arena is exhausted");
+    }
+  } else {
+    return fail("Overload-dispatch result codec is unsupported");
+  }
+  frame->resultCount = 1;
+  return true;
+}
+
+overload_dispatch::DispatchStatus ScriptAdapter::invokeOverload(
+    const overload_dispatch::Operation& operation,
+    const overload_dispatch::Shape& shape,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  using Status = overload_dispatch::DispatchStatus;
+  if (!state_ || !frame || !bindOverload(operation)) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
+      instanceRef_ == LUA_REFNIL || !hasActiveContext_) {
+    writeError(error, errorCapacity, "Overload-dispatch call requires a captured script instance");
+    return Status::kError;
+  }
+  const int baseTop = lua_gettop(state_);
+  instanceApi_.get(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
+  instanceApi_.set(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX, overloadFunctionRefs_[operation.index]);
+  bool ok = true;
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
+  }
+  if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), 1, 0) != 0) {
+    const char* message = lua_tostring(state_, -1);
+    ok = fail(message ? message : "Overload-dispatch Lua call failed without an error string");
+  }
+  if (ok) ok = readOverloadResult(shape.resultMask, frame);
   lua_settop(state_, baseTop + 1);
   instanceApi_.set(state_);
   lua_settop(state_, baseTop);

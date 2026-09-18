@@ -1,4 +1,4 @@
-import { bit, builtins, render, sys, vmath, window } from "../../packages/sdk/src/generated/script/index";
+import { bit, builtins, render, sound, sys, vmath, window } from "../../packages/sdk/src/generated/script/index";
 
 declare global {
   var __defoldAppV1: { init(): void } | undefined;
@@ -22,6 +22,8 @@ globalThis.__defoldAppV1 = {
       "info",
       `vmath:${vector.x}:${vmath.length(vector)}:${normalized.x.toFixed(6)}:${normalized.y.toFixed(6)}:${rotation.z.toFixed(6)}:${quaternion.w}`,
     );
+    globalThis.__defoldHostV1.log("info", `overload-dot:${vmath.dot(vector, vector)}`);
+    globalThis.__defoldHostV1.log("info", `value-tail-gain:${sound.getGroupGain("music")}`);
     const normalizedZero = vmath.normalize(vmath.vector3());
     let rejectedNaN = false;
     try {

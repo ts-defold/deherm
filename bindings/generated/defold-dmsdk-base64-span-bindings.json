@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "base64-span-v1",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "bindings/generated/defold-sdk-ir.json",
+    "shapes": "bindings/generated/defold-dmsdk-abi-shapes.json",
+    "policy": "bindings/overrides/dmsdk-base64-span-bindings.json"
+  },
+  "sourceHashes": {
+    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+    "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
+    "policy": "1960a7ec2ff9bf619781db8f806703d982af1840f261b34253efa95a240227f1",
+    "headers": {
+      "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h": "ae6dce231e90fbde3642399b52ed2299b3c8488632492b811af7a2dd38eff560"
+    }
+  },
+  "policy": {
+    "candidateSelector": {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+      "symbolPrefix": "dmCrypt::Base64",
+      "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+      "rationale": "The public dmSDK contract provides an explicit in/out destination capacity and a zero-capacity size-query protocol. The generated runtime retains only synchronous caller-owned byte spans."
+    },
+    "cAbi": "const uint8_t* plus uint32_t input length; caller-owned uint8_t* plus explicit uint32_t capacity/output length",
+    "ownership": "both spans are borrowed only for the synchronous call; no pointer escapes",
+    "decode": "strict padded Base64 syntax is validated before calling the platform decoder",
+    "query": "zero output capacity preserves the documented size-query protocol but does not claim input validity",
+    "allocation": "generated glue has no heap primitive; the warmed harness observes zero C++ operator new calls, while native and Objective-C allocations are unmeasured",
+    "jsi": "not-generated pending typed-array lifetime and installer policy",
+    "html5": "not-claimed pending target compile/link matrix"
+  },
+  "coverage": {
+    "baselineRuntimePending": 1361,
+    "discovered": 2,
+    "emitted": 2,
+    "policyBlocked": 0,
+    "hostBehaviorVerified": 2,
+    "remainingWithoutGeneratedAdapters": 1322
+  },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span_runtime.h": "44e79f513d5a7133e243ad40341bdf69793201e2447a0a76ad387509d7092c8f",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h": "85762f2c7471fc0b3ecaecafe6eb2226083186e8c82033499ecf4dceeb60ab18",
+    "defold/defold_hermes/src/generated_dmsdk_base64_span_crypt.cpp": "192e84dec0f93139334f3b42addbafd7331abaa9068b031d1e70d523679d5861",
+    "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp": "1bd742fec714444570d9ebcc1470931e258efecb4e1d2a99332517ed6e2dd4a6"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span_runtime.h",
+    "defold/defold_hermes/src/generated_dmsdk_base64_span_crypt.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp"
+  ],
+  "declarations": [
+    {
+      "id": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
+      "symbol": "dmCrypt::Base64Decode",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+      "line": 133,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+      "result": {
+        "role": "scalar:bool",
+        "direction": "value",
+        "nativeType": "bool"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "src",
+          "role": "pointer:scalar:u8",
+          "direction": "in",
+          "nativeType": "const uint8_t *"
+        },
+        {
+          "position": 1,
+          "name": "src_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        },
+        {
+          "position": 2,
+          "name": "dst",
+          "role": "pointer:scalar:u8",
+          "direction": "out",
+          "nativeType": "uint8_t *"
+        },
+        {
+          "position": 3,
+          "name": "dst_len",
+          "role": "pointer:scalar:u32",
+          "direction": "out",
+          "nativeType": "uint32_t *"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 0,
+      "mode": "decode",
+      "requirePaddedInput": true,
+      "evidence": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 128,
+          "text": "     * @param dst_len[in,out]   [type:uint32_t*] In: The length of the destination in bytes. Out: The length of the decoded string."
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 130,
+          "text": "     * @note                    Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 133,
+          "text": "    bool Base64Decode(const uint8_t* src, uint32_t src_len, uint8_t* dst, uint32_t* dst_len);"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_base64_span_dm_crypt_base64_decode",
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-behavior-test",
+        "allocation": "100000-warmed-canonical-dispatch-zero-cpp-operator-new"
+      }
+    },
+    {
+      "id": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
+      "symbol": "dmCrypt::Base64Encode",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+      "line": 120,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+      "result": {
+        "role": "scalar:bool",
+        "direction": "value",
+        "nativeType": "bool"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "src",
+          "role": "pointer:scalar:u8",
+          "direction": "in",
+          "nativeType": "const uint8_t *"
+        },
+        {
+          "position": 1,
+          "name": "src_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        },
+        {
+          "position": 2,
+          "name": "dst",
+          "role": "pointer:scalar:u8",
+          "direction": "out",
+          "nativeType": "uint8_t *"
+        },
+        {
+          "position": 3,
+          "name": "dst_len",
+          "role": "pointer:scalar:u32",
+          "direction": "out",
+          "nativeType": "uint32_t *"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 1,
+      "mode": "encode",
+      "requirePaddedInput": false,
+      "evidence": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 115,
+          "text": "     * @param dst_len[in,out]   [type:uint32_t*] In: The length of the destination in bytes. Out: The length of the encoded string."
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 117,
+          "text": "     * @note                    Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 120,
+          "text": "    bool Base64Encode(const uint8_t* src, uint32_t src_len, uint8_t* dst, uint32_t* dst_len);"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_base64_span_dm_crypt_base64_encode",
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-behavior-test",
+        "allocation": "100000-warmed-canonical-dispatch-zero-cpp-operator-new"
+      }
+    }
+  ]
+}

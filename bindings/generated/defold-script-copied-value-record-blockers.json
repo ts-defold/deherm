@@ -1,0 +1,362 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "All copied-Defold-value records blocked by the table-record frontier",
+  "routeCount": 9,
+  "candidateCount": 0,
+  "executableCount": 0,
+  "blockerCounts": {
+    "captured-component-context": 3,
+    "component-resource-url-resolution": 1,
+    "font-resource-and-hash-resolution": 1,
+    "physics-world-and-sparse-variant-record": 1,
+    "physics-world-and-variant-record": 2,
+    "render-context-and-camera-url": 1
+  },
+  "coverageClaim": "No generated runtime is emitted: every route requires captured engine/component/resource/render context or a sparse, discriminator-dependent record schema. A future wave must install exact value, URL/hash, target-context, and sparse-field codecs before promoting any route.",
+  "inputEvidence": {
+    "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
+    "tableRecordFrontierSha256": "c0b5a3062a0a04d0ea6d5fa0a41aafc71ffbcf0f84a89b5d28e9d4431c43f3d1",
+    "reviewedPolicySha256": "cc7988e1de66c6e8ca36caf06fbc46232790c89806dd918accf4260a4694319f",
+    "defoldSources": [
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_model.cpp",
+        "sha256": "db2a545e938bb057f0e61a1952c8b7816740a6666f87db37653d31778a7d3765"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_particlefx.cpp",
+        "sha256": "24196c82809ab89c82e04b2a0a3978d8e0424a7b2a7763774ab61b362150f9f5"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+        "sha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+        "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+        "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_tilemap.cpp",
+        "sha256": "2bdf30bc2919fdd76f010910ad5c7876d30efeb3bcdfee10234729f63f4a5cd8"
+      },
+      {
+        "path": "upstream/defold/engine/render/src/render/render_script.cpp",
+        "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e"
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": "script:model.get_aabb",
+      "stableId": 621943862,
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_aabb",
+      "parameters": [
+        {
+          "name": "url",
+          "rawType": "string|hash|url",
+          "optional": false
+        }
+      ],
+      "returns": [
+        "model.aabb"
+      ],
+      "blocker": "component-resource-url-resolution",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_model.cpp",
+      "sourceSha256": "db2a545e938bb057f0e61a1952c8b7816740a6666f87db37653d31778a7d3765",
+      "anchors": [
+        "static int LuaModelComp_GetAabb(lua_State* L)",
+        "GetComponentFromLua(L, 1, collection, MODEL_EXT",
+        "dmScript::PushVector3(L, min)"
+      ]
+    },
+    {
+      "id": "script:sound.stop",
+      "stableId": 851439019,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "stop",
+      "parameters": [
+        {
+          "name": "url",
+          "rawType": "string|hash|url",
+          "optional": false
+        },
+        {
+          "name": "stop_properties",
+          "rawType": "sound.stop_properties",
+          "optional": true
+        }
+      ],
+      "returns": [],
+      "blocker": "captured-component-context",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "sourceSha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053",
+      "anchors": [
+        "static int Sound_Stop(lua_State* L)",
+        "CheckGoInstance(L)",
+        "dmScript::ResolveURL(L, 1, &receiver, &sender)"
+      ]
+    },
+    {
+      "id": "script:physics.get_joint_properties",
+      "stableId": 2390276224,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_joint_properties",
+      "parameters": [
+        {
+          "name": "collisionobject",
+          "rawType": "string|hash|url",
+          "optional": false
+        },
+        {
+          "name": "joint_id",
+          "rawType": "string|hash",
+          "optional": false
+        }
+      ],
+      "returns": [
+        "physics.joint_properties_info"
+      ],
+      "blocker": "physics-world-and-sparse-variant-record",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "sourceSha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379",
+      "anchors": [
+        "static int Physics_GetJointProperties(lua_State* L)",
+        "switch (joint_type)",
+        "dmScript::PushVector3"
+      ]
+    },
+    {
+      "id": "script:resource.get_text_metrics",
+      "stableId": 2409976854,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_text_metrics",
+      "parameters": [
+        {
+          "name": "url",
+          "rawType": "hash",
+          "optional": false
+        },
+        {
+          "name": "text",
+          "rawType": "string",
+          "optional": false
+        },
+        {
+          "name": "options",
+          "rawType": "resource.text_metrics_options",
+          "optional": true
+        }
+      ],
+      "returns": [
+        "resource.text_metrics"
+      ],
+      "blocker": "font-resource-and-hash-resolution",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "sourceSha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e",
+      "anchors": [
+        "static int GetTextMetrics(lua_State* L)",
+        "CheckResource(L, g_ResourceModule.m_Factory, path_hash, \"fontc\")",
+        "PushTextMetricsTable(L, &metrics)"
+      ]
+    },
+    {
+      "id": "script:physics.create_joint",
+      "stableId": 2781780682,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "create_joint",
+      "parameters": [
+        {
+          "name": "joint_type",
+          "rawType": "physics.JOINT_TYPE",
+          "optional": false
+        },
+        {
+          "name": "collisionobject_a",
+          "rawType": "string|hash|url",
+          "optional": false
+        },
+        {
+          "name": "joint_id",
+          "rawType": "string|hash",
+          "optional": false
+        },
+        {
+          "name": "position_a",
+          "rawType": "vector3",
+          "optional": false
+        },
+        {
+          "name": "collisionobject_b",
+          "rawType": "string|hash|url",
+          "optional": false
+        },
+        {
+          "name": "position_b",
+          "rawType": "vector3",
+          "optional": false
+        },
+        {
+          "name": "properties",
+          "rawType": "physics.joint_properties",
+          "optional": true
+        }
+      ],
+      "returns": [],
+      "blocker": "physics-world-and-variant-record",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "sourceSha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379",
+      "anchors": [
+        "static int Physics_CreateJoint(lua_State* L)",
+        "GetCollisionObject(L, 2, collection",
+        "UnpackConnectJointParams(L, type, 7, params)"
+      ]
+    },
+    {
+      "id": "script:particlefx.stop",
+      "stableId": 3044283654,
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "stop",
+      "parameters": [
+        {
+          "name": "url",
+          "rawType": "string|hash|url",
+          "optional": false
+        },
+        {
+          "name": "options",
+          "rawType": "particlefx.stop_options",
+          "optional": true
+        }
+      ],
+      "returns": [],
+      "blocker": "captured-component-context",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_particlefx.cpp",
+      "sourceSha256": "24196c82809ab89c82e04b2a0a3978d8e0424a7b2a7763774ab61b362150f9f5",
+      "anchors": [
+        "int ParticleFX_Stop(lua_State* L)",
+        "CheckGoInstance(L)",
+        "dmScript::ResolveURL(L, 1, &receiver, &sender)"
+      ]
+    },
+    {
+      "id": "script:physics.set_joint_properties",
+      "stableId": 3377735404,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_joint_properties",
+      "parameters": [
+        {
+          "name": "collisionobject",
+          "rawType": "string|hash|url",
+          "optional": false
+        },
+        {
+          "name": "joint_id",
+          "rawType": "string|hash",
+          "optional": false
+        },
+        {
+          "name": "properties",
+          "rawType": "physics.joint_properties",
+          "optional": false
+        }
+      ],
+      "returns": [],
+      "blocker": "physics-world-and-variant-record",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "sourceSha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379",
+      "anchors": [
+        "static int Physics_SetJointProperties(lua_State* L)",
+        "UnpackConnectJointParams"
+      ]
+    },
+    {
+      "id": "script:tilemap.get_tile_info",
+      "stableId": 3858575418,
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_tile_info",
+      "parameters": [
+        {
+          "name": "url",
+          "rawType": "string|hash|url",
+          "optional": false
+        },
+        {
+          "name": "layer",
+          "rawType": "string|hash",
+          "optional": false
+        },
+        {
+          "name": "x",
+          "rawType": "integer",
+          "optional": false
+        },
+        {
+          "name": "y",
+          "rawType": "integer",
+          "optional": false
+        }
+      ],
+      "returns": [
+        "{ index:integer, h_flip:boolean, v_flip:boolean, rotate_90:boolean }"
+      ],
+      "blocker": "captured-component-context",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_tilemap.cpp",
+      "sourceSha256": "2bdf30bc2919fdd76f010910ad5c7876d30efeb3bcdfee10234729f63f4a5cd8",
+      "anchors": [
+        "static int TileMap_GetTileInfo(lua_State* L)",
+        "return TileMap_Get(L, true);"
+      ]
+    },
+    {
+      "id": "script:render.set_camera",
+      "stableId": 4056267072,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_camera",
+      "parameters": [
+        {
+          "name": "camera",
+          "rawType": "url|number|nil",
+          "optional": true
+        },
+        {
+          "name": "options",
+          "rawType": "render.camera_options",
+          "optional": true
+        }
+      ],
+      "returns": [],
+      "blocker": "render-context-and-camera-url",
+      "source": "upstream/defold/engine/render/src/render/render_script.cpp",
+      "sourceSha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e",
+      "anchors": [
+        "static int RenderScript_SetCamera(lua_State* L)",
+        "RenderScriptInstance_Check(L)",
+        "CheckRenderCamera(L, 1, i->m_RenderContext)"
+      ]
+    }
+  ]
+}

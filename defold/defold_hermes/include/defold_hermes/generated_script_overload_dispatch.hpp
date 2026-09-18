@@ -12,6 +12,7 @@ struct Operation { uint16_t index; uint32_t stableId; const char* canonicalId; c
 struct Shape { uint16_t argumentOffset; uint8_t argumentCount; uint16_t resultMask; };
 struct LuaApi { void* context = nullptr; DispatchStatus (*invoke)(void*, const Operation&, const Shape&, ScriptCallFrame*, char*, size_t) noexcept = nullptr; };
 inline constexpr size_t kBindingCount = 8;
+const Operation* operations() noexcept;
 const Operation* find(uint32_t stableId) noexcept;
 const Shape* shapes() noexcept;
 const uint16_t* argumentCodecs() noexcept;

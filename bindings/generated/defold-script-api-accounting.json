@@ -12,6 +12,8 @@
     "valueBindingsSha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d",
     "fixedTupleBindingsSha256": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
     "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
+    "valueTailBindingsSha256": "dfbfa544eae9456ec1d51f7c08d51ab28f03e4a471eeb98dc661a0ecfa639c36",
+    "overloadDispatchSha256": "5e25801a812355c4f5341bc653ea5a0720a8729f2433bd6960dfa7fabbb4e5ed",
     "valueDefinitions": [
       {
         "definitionPath": "bindings/overrides/script-defold-value-bindings.json",
@@ -72,22 +74,22 @@
         "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
       }
     ],
-    "aggregateInputSha256": "f994e66eae3d45ee2930aa17f3e9deec77c31c4fc6de18f5b6733602b1944837"
+    "aggregateInputSha256": "bed469f5b6ea9ab6b4d6551a7ab705c65c63d8bc0e79bb76c329fa042291060f"
   },
   "functionCount": 926,
   "categoryCounts": {
-    "executable-stable-id": 262,
+    "executable-stable-id": 286,
     "separate-module": 3,
-    "pending": 661
+    "pending": 637
   },
   "pendingByLoweringFamily": {
     "borrowed-handle": 415,
     "callback-lifecycle": 25,
-    "defold-value": 26,
+    "defold-value": 10,
     "dynamic-values": 14,
     "lua-table": 148,
     "multi-result": 13,
-    "overload-dispatch": 20
+    "overload-dispatch": 12
   },
   "rows": [
     {
@@ -7125,14 +7127,28 @@
       "member": "get_projection",
       "source": "doc/camera.lua",
       "line": 134,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 2326768707,
+        "callShapes": [
+          [],
+          [
+            "Url"
+          ],
+          [
+            "Number"
+          ],
+          [
+            "Nil"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "Matrix4",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -7142,14 +7158,28 @@
       "member": "get_view",
       "source": "doc/camera.lua",
       "line": 141,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 986113063,
+        "callShapes": [
+          [],
+          [
+            "Url"
+          ],
+          [
+            "Number"
+          ],
+          [
+            "Nil"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "Matrix4",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -8096,14 +8126,34 @@
       "member": "add_font",
       "source": "doc/font.lua",
       "line": 29,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 638454056,
+        "callShapes": [
+          [
+            "String",
+            "String"
+          ],
+          [
+            "String",
+            "Hash"
+          ],
+          [
+            "Hash",
+            "String"
+          ],
+          [
+            "Hash",
+            "Hash"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "None",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -8148,14 +8198,34 @@
       "member": "remove_font",
       "source": "doc/font.lua",
       "line": 69,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 2369627843,
+        "callShapes": [
+          [
+            "String",
+            "String"
+          ],
+          [
+            "String",
+            "Hash"
+          ],
+          [
+            "Hash",
+            "String"
+          ],
+          [
+            "Hash",
+            "Hash"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "None",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -8165,14 +8235,28 @@
       "member": "set_style",
       "source": "doc/font.lua",
       "line": 99,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 2283853637,
+        "callShapes": [
+          [
+            "String",
+            "String",
+            "String"
+          ],
+          [
+            "Hash",
+            "String",
+            "String"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "None",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -8330,12 +8414,22 @@
       "member": "get_id",
       "source": "doc/go.lua",
       "line": 559,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 1477563324,
+        "callShapes": [
+          [],
+          [
+            "String"
+          ]
+        ],
+        "resultCodec": "Hash",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -8605,14 +8699,28 @@
       "member": "get_world_transform",
       "source": "doc/go.lua",
       "line": 780,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 1495634860,
+        "callShapes": [
+          [],
+          [
+            "String"
+          ],
+          [
+            "Hash"
+          ],
+          [
+            "Url"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "Matrix4",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -8873,14 +8981,30 @@
       "member": "world_to_local_transform",
       "source": "doc/go.lua",
       "line": 1079,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 2265777619,
+        "callShapes": [
+          [
+            "Matrix4",
+            "String"
+          ],
+          [
+            "Matrix4",
+            "Hash"
+          ],
+          [
+            "Matrix4",
+            "Url"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "Matrix4",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -11356,12 +11480,21 @@
       "member": "hash_to_hex",
       "source": "doc/builtins.lua",
       "line": 46,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 754452606,
+        "callShapes": [
+          [
+            "Hash"
+          ]
+        ],
+        "resultCodec": "String",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -12275,12 +12408,19 @@
       "member": "get_gravity",
       "source": "doc/physics.lua",
       "line": 142,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 1242286766,
+        "callShapes": [
+          []
+        ],
+        "resultCodec": "Vector3",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -12489,12 +12629,21 @@
       "member": "set_gravity",
       "source": "doc/physics.lua",
       "line": 412,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 1277170138,
+        "callShapes": [
+          [
+            "Vector3"
+          ]
+        ],
+        "resultCodec": "None",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -13711,14 +13860,24 @@
       "member": "release",
       "source": "doc/resource.lua",
       "line": 690,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:hash|string"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 366027815,
+        "callShapes": [
+          [
+            "Hash"
+          ],
+          [
+            "String"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "None",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -13794,14 +13953,26 @@
       "member": "set_sound",
       "source": "doc/resource.lua",
       "line": 866,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:hash|string"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 3353499114,
+        "callShapes": [
+          [
+            "Hash",
+            "String"
+          ],
+          [
+            "String",
+            "String"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "None",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -14124,14 +14295,24 @@
       "member": "get_group_gain",
       "source": "doc/sound.lua",
       "line": 31,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 3299788677,
+        "callShapes": [
+          [
+            "String"
+          ],
+          [
+            "Hash"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "Number",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -14141,14 +14322,24 @@
       "member": "get_group_name",
       "source": "doc/sound.lua",
       "line": 54,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 2520029065,
+        "callShapes": [
+          [
+            "String"
+          ],
+          [
+            "Hash"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "String",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -14305,14 +14496,26 @@
       "member": "set_group_gain",
       "source": "doc/sound.lua",
       "line": 260,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-value-tail-dispatch",
+        "stableId": 497116905,
+        "callShapes": [
+          [
+            "String",
+            "Number"
+          ],
+          [
+            "Hash",
+            "Number"
+          ]
         ],
-        "unresolvedTypes": []
+        "resultCodec": "None",
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-provider"
+        }
       }
     },
     {
@@ -15223,15 +15426,41 @@
       "member": "clamp",
       "source": "doc/vmath.lua",
       "line": 66,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "generic-runtime-dispatch",
-          "generic-runtime-tag"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 2532589649,
+        "callShapes": [
+          {
+            "arguments": [
+              "Number",
+              "Number",
+              "Number"
+            ],
+            "resultCodec": "Number"
+          },
+          {
+            "arguments": [
+              "Vector3",
+              "Vector3",
+              "Vector3"
+            ],
+            "resultCodec": "Vector3"
+          },
+          {
+            "arguments": [
+              "Vector4",
+              "Vector4",
+              "Vector4"
+            ],
+            "resultCodec": "Vector4"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {
@@ -15291,15 +15520,31 @@
       "member": "dot",
       "source": "doc/vmath.lua",
       "line": 134,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "generic-runtime-dispatch",
-          "generic-runtime-tag"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 2708084985,
+        "callShapes": [
+          {
+            "arguments": [
+              "Vector3",
+              "Vector3"
+            ],
+            "resultCodec": "Number"
+          },
+          {
+            "arguments": [
+              "Vector4",
+              "Vector4"
+            ],
+            "resultCodec": "Number"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {
@@ -15454,16 +15699,49 @@
       "member": "lerp",
       "source": "doc/vmath.lua",
       "line": 282,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "documented-overload-conformance",
-          "generic-runtime-dispatch",
-          "generic-runtime-tag"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 4026227879,
+        "callShapes": [
+          {
+            "arguments": [
+              "Number",
+              "Vector3",
+              "Vector3"
+            ],
+            "resultCodec": "Vector3"
+          },
+          {
+            "arguments": [
+              "Number",
+              "Vector4",
+              "Vector4"
+            ],
+            "resultCodec": "Vector4"
+          },
+          {
+            "arguments": [
+              "Number",
+              "Quaternion",
+              "Quaternion"
+            ],
+            "resultCodec": "Quaternion"
+          },
+          {
+            "arguments": [
+              "Number",
+              "Number",
+              "Number"
+            ],
+            "resultCodec": "Number"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {
@@ -15473,14 +15751,27 @@
       "member": "matrix4",
       "source": "doc/vmath.lua",
       "line": 310,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "documented-overload-conformance"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 1238853489,
+        "callShapes": [
+          {
+            "arguments": [],
+            "resultCodec": "Matrix4"
+          },
+          {
+            "arguments": [
+              "Matrix4"
+            ],
+            "resultCodec": "Matrix4"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {
@@ -15776,14 +16067,37 @@
       "member": "matrix4_scale",
       "source": "doc/vmath.lua",
       "line": 536,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "documented-overload-conformance"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 2116175008,
+        "callShapes": [
+          {
+            "arguments": [
+              "Vector3"
+            ],
+            "resultCodec": "Matrix4"
+          },
+          {
+            "arguments": [
+              "Number"
+            ],
+            "resultCodec": "Matrix4"
+          },
+          {
+            "arguments": [
+              "Number",
+              "Number",
+              "Number"
+            ],
+            "resultCodec": "Matrix4"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {
@@ -15823,15 +16137,31 @@
       "member": "mul_per_elem",
       "source": "doc/vmath.lua",
       "line": 571,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "generic-runtime-dispatch",
-          "generic-runtime-tag"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 1848085754,
+        "callShapes": [
+          {
+            "arguments": [
+              "Vector3",
+              "Vector3"
+            ],
+            "resultCodec": "Vector3"
+          },
+          {
+            "arguments": [
+              "Vector4",
+              "Vector4"
+            ],
+            "resultCodec": "Vector4"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {
@@ -16179,16 +16509,41 @@
       "member": "slerp",
       "source": "doc/vmath.lua",
       "line": 884,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "documented-overload-conformance",
-          "generic-runtime-dispatch",
-          "generic-runtime-tag"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 3033910890,
+        "callShapes": [
+          {
+            "arguments": [
+              "Number",
+              "Vector3",
+              "Vector3"
+            ],
+            "resultCodec": "Vector3"
+          },
+          {
+            "arguments": [
+              "Number",
+              "Vector4",
+              "Vector4"
+            ],
+            "resultCodec": "Vector4"
+          },
+          {
+            "arguments": [
+              "Number",
+              "Quaternion",
+              "Quaternion"
+            ],
+            "resultCodec": "Quaternion"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {
@@ -16254,14 +16609,42 @@
       "member": "vector4",
       "source": "doc/vmath.lua",
       "line": 989,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "overload-dispatch",
-        "traits": [
-          "documented-overload-conformance"
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "captured-lua-overload-dispatch",
+        "stableId": 3541966743,
+        "callShapes": [
+          {
+            "arguments": [],
+            "resultCodec": "Vector4"
+          },
+          {
+            "arguments": [
+              "Number"
+            ],
+            "resultCodec": "Vector4"
+          },
+          {
+            "arguments": [
+              "Vector4"
+            ],
+            "resultCodec": "Vector4"
+          },
+          {
+            "arguments": [
+              "Number",
+              "Number",
+              "Number",
+              "Number"
+            ],
+            "resultCodec": "Vector4"
+          }
         ],
-        "unresolvedTypes": []
+        "targetSupport": {
+          "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+          "nativeStaticHermes": "not-integrated-fail-closed",
+          "html5BrowserHost": "not-executable-no-generated-provider"
+        }
       }
     },
     {

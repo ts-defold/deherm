@@ -2,29 +2,29 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "63275780e22d460c22461fe9b861e46ab9684aba83e6907bb860996e477f30f3",
+  "inputSha256": "36710fbd80881a8bbff9189ac33ed7468b30a12278c549e9116387b9a48b5fdd",
   "evidencePolicy": "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
-  "coverageClaim": "All 262 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
-  "routeCount": 262,
-  "scenarioCount": 264,
+  "coverageClaim": "All 286 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
+  "routeCount": 286,
+  "scenarioCount": 288,
   "instrumentedScenarioCount": 34,
-  "plannedScenarioCount": 230,
+  "plannedScenarioCount": 254,
   "instrumentedRouteCount": 32,
-  "plannedOnlyRouteCount": 230,
+  "plannedOnlyRouteCount": 254,
   "setupCount": 4,
   "observationCount": 1,
   "stageSummary": {
     "compile": {
       "verifiedRouteCount": 0,
-      "unverifiedRouteCount": 262
+      "unverifiedRouteCount": 286
     },
     "link": {
       "verifiedRouteCount": 0,
-      "unverifiedRouteCount": 262
+      "unverifiedRouteCount": 286
     },
     "runtime": {
       "verifiedRouteCount": 32,
-      "unverifiedRouteCount": 230
+      "unverifiedRouteCount": 254
     }
   },
   "setups": [
@@ -333,6 +333,20 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:camera.get_projection",
+      "routeId": "script:camera.get_projection",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_view",
+      "routeId": "script:camera.get_view",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:camera.screen_to_world",
       "routeId": "script:camera.screen_to_world",
       "state": "planned",
@@ -531,6 +545,27 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:font.add_font",
+      "routeId": "script:font.add_font",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:font.remove_font",
+      "routeId": "script:font.remove_font",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:font.set_style",
+      "routeId": "script:font.set_style",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:go.cancel_animations",
       "routeId": "script:go.cancel_animations",
       "state": "planned",
@@ -556,6 +591,13 @@
     {
       "key": "planned:script:go.exists",
       "routeId": "script:go.exists",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_id",
+      "routeId": "script:go.get_id",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -637,6 +679,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:go.get_world_transform",
+      "routeId": "script:go.get_world_transform",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:go.set_parent",
       "routeId": "script:go.set_parent",
       "state": "planned",
@@ -697,6 +746,13 @@
     {
       "key": "planned:script:go.world_to_local_position",
       "routeId": "script:go.world_to_local_position",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.world_to_local_transform",
+      "routeId": "script:go.world_to_local_transform",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -1092,6 +1148,13 @@
       }
     },
     {
+      "key": "planned:script:hash_to_hex",
+      "routeId": "script:hash_to_hex",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:html5.run",
       "routeId": "script:html5.run",
       "state": "planned",
@@ -1192,6 +1255,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:physics.get_gravity",
+      "routeId": "script:physics.get_gravity",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:physics.get_group",
       "routeId": "script:physics.get_group",
       "state": "planned",
@@ -1215,6 +1285,13 @@
     {
       "key": "planned:script:physics.get_maskbit",
       "routeId": "script:physics.get_maskbit",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.set_gravity",
+      "routeId": "script:physics.set_gravity",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -1493,6 +1570,20 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:resource.release",
+      "routeId": "script:resource.release",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:resource.set_sound",
+      "routeId": "script:resource.set_sound",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:socket.dns.gethostname",
       "routeId": "script:socket.dns.gethostname",
       "state": "planned",
@@ -1509,6 +1600,20 @@
     {
       "key": "planned:script:socket.sleep",
       "routeId": "script:socket.sleep",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sound.get_group_gain",
+      "routeId": "script:sound.get_group_gain",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sound.get_group_name",
+      "routeId": "script:sound.get_group_name",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -1551,6 +1656,13 @@
     {
       "key": "planned:script:sound.set_gain",
       "routeId": "script:sound.set_gain",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sound.set_group_gain",
+      "routeId": "script:sound.set_group_gain",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -1810,6 +1922,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:vmath.clamp",
+      "routeId": "script:vmath.clamp",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "value:vmath-fixed-pod.conj",
       "routeId": "script:vmath.conj",
       "state": "instrumented",
@@ -1849,6 +1968,13 @@
         ],
         "tolerance": 0
       }
+    },
+    {
+      "key": "planned:script:vmath.dot",
+      "routeId": "script:vmath.dot",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "value:vmath-fixed-pod.euler-to-quat",
@@ -1936,6 +2062,20 @@
         "value": 25,
         "tolerance": 0
       }
+    },
+    {
+      "key": "planned:script:vmath.lerp",
+      "routeId": "script:vmath.lerp",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:vmath.matrix4",
+      "routeId": "script:vmath.matrix4",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "value:vmath-matrix4.axis-angle",
@@ -2278,6 +2418,13 @@
       "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle."
     },
     {
+      "key": "planned:script:vmath.matrix4_scale",
+      "routeId": "script:vmath.matrix4_scale",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "value:vmath-matrix4.translation",
       "routeId": "script:vmath.matrix4_translation",
       "state": "planned",
@@ -2310,6 +2457,13 @@
         "tolerance": 0
       },
       "reason": "Awaiting fresh packaged-engine Matrix4 probe bundle."
+    },
+    {
+      "key": "planned:script:vmath.mul_per_elem",
+      "routeId": "script:vmath.mul_per_elem",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "value:vmath.normalize.vector3",
@@ -2578,6 +2732,13 @@
       }
     },
     {
+      "key": "planned:script:vmath.slerp",
+      "routeId": "script:vmath.slerp",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "value:vmath.vector3.zero",
       "routeId": "script:vmath.vector3",
       "state": "instrumented",
@@ -2596,6 +2757,13 @@
         ],
         "tolerance": 0
       }
+    },
+    {
+      "key": "planned:script:vmath.vector4",
+      "routeId": "script:vmath.vector4",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "planned:script:window.get_dim_mode",
@@ -3671,6 +3839,58 @@
       }
     },
     {
+      "id": "script:camera.get_projection",
+      "stableId": 2326768707,
+      "rawName": "camera.get_projection",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/render/src/render/render_script_camera.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:camera.get_projection"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_view",
+      "stableId": 986113063,
+      "rawName": "camera.get_view",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/render/src/render/render_script_camera.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:camera.get_view"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:camera.screen_to_world",
       "stableId": 4212113566,
       "rawName": "camera.screen_to_world",
@@ -4374,6 +4594,84 @@
       }
     },
     {
+      "id": "script:font.add_font",
+      "stableId": 638454056,
+      "rawName": "font.add_font",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:font.add_font"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:font.remove_font",
+      "stableId": 2369627843,
+      "rawName": "font.remove_font",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:font.remove_font"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:font.set_style",
+      "stableId": 2283853637,
+      "rawName": "font.set_style",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:font.set_style"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:go.cancel_animations",
       "stableId": 1183026732,
       "rawName": "go.cancel_animations",
@@ -4434,6 +4732,32 @@
       "line": 464,
       "scenarios": [
         "planned:script:go.exists"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_id",
+      "stableId": 1477563324,
+      "rawName": "go.get_id",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:go.get_id"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -4688,6 +5012,32 @@
       }
     },
     {
+      "id": "script:go.get_world_transform",
+      "stableId": 1495634860,
+      "rawName": "go.get_world_transform",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:go.get_world_transform"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:go.set_parent",
       "stableId": 593473189,
       "rawName": "go.set_parent",
@@ -4856,6 +5206,32 @@
       "line": 1061,
       "scenarios": [
         "planned:script:go.world_to_local_position"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.world_to_local_transform",
+      "stableId": 2265777619,
+      "rawName": "go.world_to_local_transform",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:go.world_to_local_transform"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -6230,6 +6606,32 @@
       }
     },
     {
+      "id": "script:hash_to_hex",
+      "stableId": 754452606,
+      "rawName": "hash_to_hex",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/script/src/script_hash.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:hash_to_hex"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:html5.run",
       "stableId": 475687915,
       "rawName": "html5.run",
@@ -6568,6 +6970,32 @@
       }
     },
     {
+      "id": "script:physics.get_gravity",
+      "stableId": 1242286766,
+      "rawName": "physics.get_gravity",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:physics.get_gravity"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:physics.get_group",
       "stableId": 3971564819,
       "rawName": "physics.get_group",
@@ -6654,6 +7082,32 @@
       "line": 210,
       "scenarios": [
         "planned:script:physics.get_maskbit"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_gravity",
+      "stableId": 1277170138,
+      "rawName": "physics.set_gravity",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:physics.set_gravity"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -7638,6 +8092,58 @@
       }
     },
     {
+      "id": "script:resource.release",
+      "stableId": 366027815,
+      "rawName": "resource.release",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:resource.release"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:resource.set_sound",
+      "stableId": 3353499114,
+      "rawName": "resource.set_sound",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:resource.set_sound"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:socket.dns.gethostname",
       "stableId": 1367399751,
       "rawName": "socket.dns.gethostname",
@@ -7698,6 +8204,58 @@
       "line": 235,
       "scenarios": [
         "planned:script:socket.sleep"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sound.get_group_gain",
+      "stableId": 3299788677,
+      "rawName": "sound.get_group_gain",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:sound.get_group_gain"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sound.get_group_name",
+      "stableId": 2520029065,
+      "rawName": "sound.get_group_name",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:sound.get_group_name"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -7856,6 +8414,32 @@
       "line": 245,
       "scenarios": [
         "planned:script:sound.set_gain"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sound.set_group_gain",
+      "stableId": 497116905,
+      "rawName": "sound.set_group_gain",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:sound.set_group_gain"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -8542,6 +9126,32 @@
       }
     },
     {
+      "id": "script:vmath.clamp",
+      "stableId": 2532589649,
+      "rawName": "vmath.clamp",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.clamp"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:vmath.conj",
       "stableId": 4233115420,
       "rawName": "vmath.conj",
@@ -8594,6 +9204,32 @@
           "observationIds": [
             "native-defold-runtime-2026-09-18-vmath-pod"
           ]
+        }
+      }
+    },
+    {
+      "id": "script:vmath.dot",
+      "stableId": 2708084985,
+      "rawName": "vmath.dot",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.dot"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
         }
       }
     },
@@ -8704,6 +9340,58 @@
           "observationIds": [
             "native-defold-runtime-2026-09-18-vmath-pod"
           ]
+        }
+      }
+    },
+    {
+      "id": "script:vmath.lerp",
+      "stableId": 4026227879,
+      "rawName": "vmath.lerp",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.lerp"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:vmath.matrix4",
+      "stableId": 1238853489,
+      "rawName": "vmath.matrix4",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.matrix4"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
         }
       }
     },
@@ -8968,6 +9656,32 @@
       }
     },
     {
+      "id": "script:vmath.matrix4_scale",
+      "stableId": 2116175008,
+      "rawName": "vmath.matrix4_scale",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.matrix4_scale"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:vmath.matrix4_translation",
       "stableId": 889923285,
       "rawName": "vmath.matrix4_translation",
@@ -8976,6 +9690,32 @@
       "line": 553,
       "scenarios": [
         "value:vmath-matrix4.translation"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:vmath.mul_per_elem",
+      "stableId": 1848085754,
+      "rawName": "vmath.mul_per_elem",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.mul_per_elem"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -9353,6 +10093,32 @@
       }
     },
     {
+      "id": "script:vmath.slerp",
+      "stableId": 3033910890,
+      "rawName": "vmath.slerp",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.slerp"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:vmath.vector3",
       "stableId": 3491633886,
       "rawName": "vmath.vector3",
@@ -9377,6 +10143,32 @@
           "observationIds": [
             "native-defold-runtime-2026-09-18-vmath-pod"
           ]
+        }
+      }
+    },
+    {
+      "id": "script:vmath.vector4",
+      "stableId": 3541966743,
+      "rawName": "vmath.vector4",
+      "routeKind": "captured-lua-overload",
+      "source": "upstream/defold/engine/script/src/script_vmath.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:vmath.vector4"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
         }
       }
     },

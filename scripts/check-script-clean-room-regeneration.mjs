@@ -106,6 +106,24 @@ async function sourceEvidencePaths(repositoryRoot) {
       }
       continue;
     }
+    if (inputPath.endsWith("script-table-record-bindings.json")) {
+      for (const evidence of value.sources ?? []) {
+        result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sources.path`)}`);
+      }
+      continue;
+    }
+    if (inputPath.endsWith("script-copied-value-record-blockers.json")) {
+      for (const evidence of value.sources ?? []) {
+        result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sources.path`)}`);
+      }
+      continue;
+    }
+    if (inputPath.endsWith("script-opaque-record-blockers.json")) {
+      for (const evidence of value.sources ?? []) {
+        result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sources.path`)}`);
+      }
+      continue;
+    }
     if (inputPath.endsWith("script-url-address-classification.json")) {
       for (const evidence of value.sourceEvidence ?? []) {
         result.add(`upstream/defold/${confinedRelativePath(evidence.source, `${inputPath}.sourceEvidence.source`)}`);
@@ -256,14 +274,16 @@ function ids(rows, label) {
 
 async function validateRouteProvenance(cleanRoot) {
   const load = async (relativePath) => JSON.parse(await readFile(path.join(cleanRoot, relativePath), "utf8"));
-  const [inventory, ir, accounting, scalar, value, tuple, url] = await Promise.all([
+  const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload] = await Promise.all([
     load("bindings/generated/defold-script-api-inventory.json"),
     load("bindings/generated/defold-script-api-ir.json"),
     load("bindings/generated/defold-script-api-accounting.json"),
     load("bindings/generated/defold-script-scalar-dispatch.json"),
     load("bindings/generated/defold-script-value-bindings.json"),
     load("bindings/generated/defold-script-fixed-tuples.json"),
-    load("bindings/generated/defold-script-url-address-classification.json")
+    load("bindings/generated/defold-script-url-address-classification.json"),
+    load("bindings/generated/defold-script-value-tail-bindings.json"),
+    load("bindings/generated/defold-script-overload-dispatch.json")
   ]);
   assert(inventory.countsByKind?.function === 926, `Pinned inventory contains ${inventory.countsByKind?.function} functions, expected 926`);
   assert(ir.counts?.functions === 926, `Clean IR contains ${ir.counts?.functions} functions, expected 926`);
@@ -282,7 +302,9 @@ async function validateRouteProvenance(cleanRoot) {
     ...ids(scalar.bindings, "scalar routes"),
     ...ids(value.bindings, "value routes"),
     ...ids(tuple.bindings, "fixed tuple routes"),
-    ...ids(url.rows, "URL routes")
+    ...ids(url.rows, "URL routes"),
+    ...ids(valueTail.bindings.filter(({ disposition }) => disposition === "candidate"), "value-tail routes"),
+    ...ids(overload.bindings.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate), "overload routes")
   ];
   assert(new Set(executableIds).size === executableIds.length, "Executable route generators overlap");
   for (const id of executableIds) assert(irIds.has(id), `Generated executable route is absent from pinned IR: ${id}`);
@@ -305,6 +327,8 @@ async function validateRouteProvenance(cleanRoot) {
     valueRouteCount: value.bindingCount,
     fixedTupleRouteCount: tuple.bindingCount,
     urlRouteCount: url.routeCount,
+    valueTailRouteCount: valueTail.candidateCount,
+    overloadRouteCount: overload.generatedFamilyCandidateCount,
     defoldRevision: ir.defoldRevision
   };
 }
@@ -364,7 +388,7 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown argument: ${unknown[0]}`);
   const report = await runScriptCleanRoomRegeneration({ keep: process.argv.includes("--keep") });
   console.log(`Clean-room regeneration verified ${report.routeCount} script routes across ${report.artifactCount} byte-identical artifacts.`);
-  console.log(`Executable generated routes: ${report.executableRouteCount} (${report.scalarRouteCount} scalar, ${report.valueRouteCount} value, ${report.fixedTupleRouteCount} fixed tuple, ${report.urlRouteCount} URL/address).`);
+  console.log(`Executable generated routes: ${report.executableRouteCount} (${report.scalarRouteCount} scalar, ${report.valueRouteCount} value, ${report.fixedTupleRouteCount} fixed tuple, ${report.urlRouteCount} URL/address, ${report.valueTailRouteCount} value-tail, ${report.overloadRouteCount} overload).`);
   console.log(`Pinned input fingerprint: ${report.aggregateInputSha256}`);
   if (report.cleanRoot) console.log(`Clean room retained at ${report.cleanRoot}`);
 }

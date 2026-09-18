@@ -98,6 +98,7 @@ uint16_t valueMask(const ScriptValue& value) noexcept {
 }
 bool matches(const Shape& shape,const ScriptCallFrame& frame) noexcept { if(frame.argumentCount!=shape.argumentCount||(frame.argumentCount&&!frame.arguments))return false;for(uint32_t index=0;index<frame.argumentCount;++index)if(!(valueMask(frame.arguments[index])&kArgumentCodecs[shape.argumentOffset+index]))return false;return true; }
 }
+const Operation* operations() noexcept{return kOperations;}
 const Operation* find(uint32_t stableId) noexcept { size_t first=0,count=kBindingCount;while(count){const size_t step=count/2,index=first+step;if(kOperations[index].stableId<stableId){first=index+1;count-=step+1;}else count=step;}return first<kBindingCount&&kOperations[first].stableId==stableId?&kOperations[first]:nullptr;}
 const Shape* shapes() noexcept{return kShapes;}
 const uint16_t* argumentCodecs() noexcept{return kArgumentCodecs;}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "astc-probe-v1",
+  "family": "arena-backed-spans",
+  "candidateSelector": { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h", "symbolPrefix": "dmImage::GetAstc", "shape": "scalar:bool(in:opaque-pointer,value:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)", "rationale": "These are synchronous ASTC-header parsers over a bounded byte span, returning only three fixed-width scalar outputs." },
+  "entries": {
+    "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349": { "status": "emit", "mode": "block-size", "evidence": [{ "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h", "line": 127, "text": "     * @param memsize [type: uint32_t] the length of the memory blob" }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h", "line": 133, "text": "    bool GetAstcBlockSize(const void* mem, uint32_t memsize, uint32_t* width, uint32_t* height, uint32_t* depth);" }, { "header": "upstream/defold/engine/dlib/src/dlib/image.cpp", "line": 227, "text": "        if (memsize < 16)" }] },
+    "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350": { "status": "emit", "mode": "dimensions", "evidence": [{ "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h", "line": 139, "text": "     * @param memsize [type: uint32_t] the length of the memory blob" }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h", "line": 145, "text": "    bool GetAstcDimensions(const void* mem, uint32_t memsize, uint32_t* width, uint32_t* height, uint32_t* depth);" }, { "header": "upstream/defold/engine/dlib/src/dlib/image.cpp", "line": 227, "text": "        if (memsize < 16)" }] }
+  }
+}

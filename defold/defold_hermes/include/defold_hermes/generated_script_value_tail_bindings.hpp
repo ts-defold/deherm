@@ -12,7 +12,12 @@ enum class Disposition : uint8_t { kCandidate, kBlocked };
 struct Route { uint16_t index; uint16_t candidateIndex; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; const char* sourcePath; const char* sourceSymbol; Disposition disposition; Codec resultCodec; const char* blocker; };
 struct LuaApi { void* context = nullptr; DispatchStatus (*invoke)(void*, const Route&, ScriptCallFrame*, char*, size_t) noexcept = nullptr; };
 inline constexpr size_t kRouteCount = 26;
-inline constexpr size_t kCandidateCount = 24;
+inline constexpr size_t kCandidateCount = 16;
+const Route* routes() noexcept;
+const uint16_t* candidateRouteOffsets() noexcept;
+const uint16_t* shapeArgumentOffsets() noexcept;
+const uint8_t* shapeArgumentCounts() noexcept;
+const Codec* argumentCodecs() noexcept;
 const Route* find(uint32_t stableId) noexcept;
 DispatchStatus dispatch(ScriptCallFrame*, char*, size_t, const LuaApi*) noexcept;
 }  // namespace defold_hermes::value_tail

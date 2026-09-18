@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "scope": "Reviewed blockers for the copied-Defold-value record frontier",
+  "expectedRouteCount": 9,
+  "expectedCandidateCount": 0,
+  "sources": [
+    { "key": "model", "path": "engine/gamesys/src/gamesys/scripts/script_model.cpp", "sha256": "db2a545e938bb057f0e61a1952c8b7816740a6666f87db37653d31778a7d3765" },
+    { "key": "resource", "path": "engine/gamesys/src/gamesys/scripts/script_resource.cpp", "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e" },
+    { "key": "particlefx", "path": "engine/gamesys/src/gamesys/scripts/script_particlefx.cpp", "sha256": "24196c82809ab89c82e04b2a0a3978d8e0424a7b2a7763774ab61b362150f9f5" },
+    { "key": "physics", "path": "engine/gamesys/src/gamesys/scripts/script_physics.cpp", "sha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379" },
+    { "key": "sound", "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp", "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053" },
+    { "key": "tilemap", "path": "engine/gamesys/src/gamesys/scripts/script_tilemap.cpp", "sha256": "2bdf30bc2919fdd76f010910ad5c7876d30efeb3bcdfee10234729f63f4a5cd8" },
+    { "key": "render", "path": "engine/render/src/render/render_script.cpp", "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e" }
+  ],
+  "routes": [
+    { "id": "script:model.get_aabb", "source": "model", "anchors": ["static int LuaModelComp_GetAabb(lua_State* L)", "GetComponentFromLua(L, 1, collection, MODEL_EXT", "dmScript::PushVector3(L, min)"], "blocker": "component-resource-url-resolution" },
+    { "id": "script:particlefx.stop", "source": "particlefx", "anchors": ["int ParticleFX_Stop(lua_State* L)", "CheckGoInstance(L)", "dmScript::ResolveURL(L, 1, &receiver, &sender)"], "blocker": "captured-component-context" },
+    { "id": "script:physics.create_joint", "source": "physics", "anchors": ["static int Physics_CreateJoint(lua_State* L)", "GetCollisionObject(L, 2, collection", "UnpackConnectJointParams(L, type, 7, params)"], "blocker": "physics-world-and-variant-record" },
+    { "id": "script:physics.get_joint_properties", "source": "physics", "anchors": ["static int Physics_GetJointProperties(lua_State* L)", "switch (joint_type)", "dmScript::PushVector3"], "blocker": "physics-world-and-sparse-variant-record" },
+    { "id": "script:physics.set_joint_properties", "source": "physics", "anchors": ["static int Physics_SetJointProperties(lua_State* L)", "UnpackConnectJointParams"], "blocker": "physics-world-and-variant-record" },
+    { "id": "script:render.set_camera", "source": "render", "anchors": ["static int RenderScript_SetCamera(lua_State* L)", "RenderScriptInstance_Check(L)", "CheckRenderCamera(L, 1, i->m_RenderContext)"], "blocker": "render-context-and-camera-url" },
+    { "id": "script:resource.get_text_metrics", "source": "resource", "anchors": ["static int GetTextMetrics(lua_State* L)", "CheckResource(L, g_ResourceModule.m_Factory, path_hash, \"fontc\")", "PushTextMetricsTable(L, &metrics)"], "blocker": "font-resource-and-hash-resolution" },
+    { "id": "script:sound.stop", "source": "sound", "anchors": ["static int Sound_Stop(lua_State* L)", "CheckGoInstance(L)", "dmScript::ResolveURL(L, 1, &receiver, &sender)"], "blocker": "captured-component-context" },
+    { "id": "script:tilemap.get_tile_info", "source": "tilemap", "anchors": ["static int TileMap_GetTileInfo(lua_State* L)", "return TileMap_Get(L, true);"], "blocker": "captured-component-context" }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "xtea-span-v1",
+  "family": "arena-backed-spans",
+  "candidateSelector": { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "symbols": ["dmCrypt::Decrypt", "dmCrypt::Encrypt"], "shape": "enum:dmCrypt::Result(value:enum:dmCrypt::Algorithm,inout:pointer:scalar:u8,value:scalar:u32,in:pointer:scalar:u8,value:scalar:u32)" },
+  "entries": {
+    "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156": { "status": "emit", "evidence": [{ "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 40, "text": "        ALGORITHM_XTEA" }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 76, "text": "    Result Decrypt(Algorithm algo, uint8_t* data, uint32_t datalen, const uint8_t* key, uint32_t keylen);" }, { "header": "upstream/defold/engine/dlib/src/dlib/crypt.cpp", "line": 44, "text": "        assert(keylen <= 16);" }] },
+    "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155": { "status": "emit", "evidence": [{ "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 40, "text": "        ALGORITHM_XTEA" }, { "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h", "line": 65, "text": "    Result Encrypt(Algorithm algo, uint8_t* data, uint32_t datalen, const uint8_t* key, uint32_t keylen);" }, { "header": "upstream/defold/engine/dlib/src/dlib/crypt.cpp", "line": 44, "text": "        assert(keylen <= 16);" }] }
+  }
+}

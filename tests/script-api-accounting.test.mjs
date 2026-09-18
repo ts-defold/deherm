@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -49,6 +50,8 @@ async function inputs() {
     valueText: await text("bindings/generated/defold-script-value-bindings.json"),
     tupleText: await text("bindings/generated/defold-script-fixed-tuples.json"),
     urlText: await text("bindings/generated/defold-script-url-address-classification.json"),
+    valueTailText: await text("bindings/generated/defold-script-value-tail-bindings.json"),
+    overloadText: await text("bindings/generated/defold-script-overload-dispatch.json"),
     urlOverrideText,
     urlSourceTexts,
     valueDefinitions
@@ -68,21 +71,21 @@ function replaceJson(input, mutate) {
 test("accounts for all 926 APIs in one and only one category", () => {
   assert.equal(generated.functionCount, 926);
   assert.deepEqual(generated.categoryCounts, {
-    "executable-stable-id": 262,
+    "executable-stable-id": 286,
     "separate-module": 3,
-    pending: 661
+    pending: 637
   });
   assert.deepEqual(generated.pendingByLoweringFamily, {
     "borrowed-handle": 415,
     "callback-lifecycle": 25,
-    "defold-value": 26,
+    "defold-value": 10,
     "dynamic-values": 14,
     "lua-table": 148,
     "multi-result": 13,
-    "overload-dispatch": 20
+    "overload-dispatch": 12
   });
   assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 926);
-  assert.equal(generated.rows.filter(({ category }) => category === "pending").length, 661);
+  assert.equal(generated.rows.filter(({ category }) => category === "pending").length, 637);
   assert.ok(generated.rows.filter(({ category }) => category === "pending")
     .every(({ reason }) => reason.code && reason.loweringFamily));
   assert.deepEqual(checked, generated);
@@ -94,6 +97,8 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "native-value-dispatch").length, 78);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "fixed-tuple-lua-dispatch").length, 24);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "url-lua-dispatch").length, 70);
+  assert.equal(executable.filter(({ evidence }) => evidence.generator === "captured-lua-value-tail-dispatch").length, 16);
+  assert.equal(executable.filter(({ evidence }) => evidence.generator === "captured-lua-overload-dispatch").length, 8);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "gui-node-setters").length, 39);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-fixed-pod").length, 11);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-matrix4").length, 14);
@@ -111,6 +116,9 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
 test("is invariant to harmless generated-family row ordering", () => {
   const reordered = structuredClone(sourceInputs);
   reordered.urlText = replaceJson(reordered.urlText, (value) => value.rows.reverse());
+  reordered.valueTailText = replaceJson(reordered.valueTailText, (value) => {
+    value.inputEvidence.urlBindingsSha256 = createHash("sha256").update(reordered.urlText).digest("hex");
+  });
   const result = generateScriptApiAccounting(reordered);
   assert.deepEqual(result.rows, generated.rows);
   assert.deepEqual(result.categoryCounts, generated.categoryCounts);
@@ -127,7 +135,7 @@ test("rejects duplicate, omitted, overlapping, and stale route evidence", () => 
     value.bindingCount -= 1;
   });
   assert.throws(() => generateScriptApiAccounting(omitted),
-    /generated route count differs from reviewed family metadata|does not match reviewed value definitions/);
+    /value-tail bindings are stale|generated route count differs from reviewed family metadata|does not match reviewed value definitions/);
 
   const overlapping = structuredClone(sourceInputs);
   const valueRow = JSON.parse(overlapping.valueText).bindings[0];
@@ -163,7 +171,7 @@ test("rejects duplicate, omitted, overlapping, and stale route evidence", () => 
     report.rows[0].resultCodec = "Quaternion";
   });
   assert.throws(() => generateScriptApiAccounting(malformedUrl),
-    /URL binding report semantics are stale against pinned inputs/);
+    /value-tail bindings are stale|URL binding report semantics are stale against pinned inputs/);
 });
 
 test("rejects stale reviewed Defold source evidence", () => {

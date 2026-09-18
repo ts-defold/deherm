@@ -3,7 +3,9 @@
 #include <defold_hermes/scalar_lua_dispatch.hpp>
 #include <defold_hermes/generated_script_value_bindings.hpp>
 #include <defold_hermes/generated_script_fixed_tuples.hpp>
+#include <defold_hermes/generated_script_overload_dispatch.hpp>
 #include <defold_hermes/generated_script_url_bindings.hpp>
+#include <defold_hermes/generated_script_value_tail_bindings.hpp>
 #include <defold_hermes/lua_bridge_core.hpp>
 #include <defold_hermes/script_bridge_capi.hpp>
 
@@ -57,6 +59,19 @@ class ScriptAdapter {
       ScriptCallFrame* frame,
       char* error,
       size_t errorCapacity) noexcept;
+  static value_tail::DispatchStatus ValueTailInvokeThunk(
+      void* context,
+      const value_tail::Route& route,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  static overload_dispatch::DispatchStatus OverloadInvokeThunk(
+      void* context,
+      const overload_dispatch::Operation& operation,
+      const overload_dispatch::Shape& shape,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
   url_binding::DispatchStatus invokeUrl(
       const url_binding::Operation& operation,
       ScriptCallFrame* frame,
@@ -64,6 +79,21 @@ class ScriptAdapter {
       size_t errorCapacity) noexcept;
   bool bindUrl(const url_binding::Operation& operation) noexcept;
   bool readUrlResult(url_binding::ResultCodec codec, ScriptCallFrame* frame) noexcept;
+  value_tail::DispatchStatus invokeValueTail(
+      const value_tail::Route& route,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  bool bindValueTail(const value_tail::Route& route) noexcept;
+  bool readValueTailResult(value_tail::Codec codec, ScriptCallFrame* frame) noexcept;
+  overload_dispatch::DispatchStatus invokeOverload(
+      const overload_dispatch::Operation& operation,
+      const overload_dispatch::Shape& shape,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  bool bindOverload(const overload_dispatch::Operation& operation) noexcept;
+  bool readOverloadResult(uint16_t codec, ScriptCallFrame* frame) noexcept;
   fixed_tuple::DispatchStatus invokeFixedTuple(
       const fixed_tuple::Operation& operation,
       const uint16_t* resultCodecs,
@@ -102,10 +132,14 @@ class ScriptAdapter {
   std::array<int, value_binding::kStructuredLuaOperationCount> structuredFunctionRefs_{};
   std::array<int, fixed_tuple::kBindingCount> fixedTupleFunctionRefs_{};
   std::array<int, url_binding::kBindingCount> urlFunctionRefs_{};
+  std::array<int, value_tail::kCandidateCount> valueTailFunctionRefs_{};
+  std::array<int, overload_dispatch::kBindingCount> overloadFunctionRefs_{};
   ::defold_hermes::lua_bridge::HandlePool luaHandles_;
   value_binding::StructuredLuaApi structuredLuaApi_{};
   fixed_tuple::LuaApi fixedTupleLuaApi_{};
   url_binding::LuaApi urlLuaApi_{};
+  value_tail::LuaApi valueTailLuaApi_{};
+  overload_dispatch::LuaApi overloadLuaApi_{};
   char adapterError_[384]{};
 };
 

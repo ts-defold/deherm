@@ -2,18 +2,19 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "the complete remaining defold-value tail after the generated native value-binding wave",
-  "coverageClaim": "Candidate routes have deterministic, source-pinned descriptors and exact ABI shape/result validation only. They are not executable until a captured-Lua adapter that preserves the listed Defold value codecs and active engine context is installed. Blocked routes have no generated adapter.",
-  "allocationClaim": "Descriptor lookup and validation use static sorted tables and caller-owned ScriptCallFrame storage. The future captured-Lua adapter must cache its Lua function references and use fixed-capacity stack/scratch; this generator makes no allocation or packaged-engine-execution claim.",
+  "coverageClaim": "The 16 game-object-script candidates are installed in the shared native-dynamic ScriptAdapter/JSI router with source-pinned descriptors, exact ABI shape/result validation, and an exact script-instance context check. Real Defold Lua 5.1 tests reach every candidate descriptor, and a local Bob/Extender arm64-osx bundle links the generated extension. Four GUI-script and four render-script routes remain blocked until the extension can attach those exact instance types. This does not claim packaged-engine semantic execution for each candidate.",
+  "allocationClaim": "Descriptor lookup, cached Lua references, and caller-owned ScriptCallFrame/arena storage avoid C++ heap allocation on the measured warmed path. The zero-allocation observation covers C++ operator new only; Lua, Hermes, and engine-internal allocators are outside that claim.",
   "targetSupport": {
-    "nativeDynamicHermes": "candidate-metadata-and-fail-closed-dispatch-only",
-    "nativeStaticHermes": "not-integrated",
+    "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+    "nativeStaticHermes": "not-integrated-fail-closed",
     "html5BrowserHost": "not-executable-no-provider"
   },
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "accountingSha256": "be876236e0a9f6daa0026425ad9640f5ee70dc81bcaca6ba1eb96c6b1b5bf2c5",
-    "reviewedPolicySha256": "8750a9e5d4593566bf62cbcf2736d22b7cea3116398824c5f75e8be8112165a4",
+    "valueBindingsSha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d",
+    "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
+    "reviewedPolicySha256": "b848598673c04f43c9b516c8450a3e0f2411baa58cf106102c22e0395866f99b",
     "defoldSources": [
       {
         "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
@@ -58,11 +59,13 @@
     ]
   },
   "routeCount": 26,
-  "candidateCount": 24,
-  "blockedCount": 2,
+  "candidateCount": 16,
+  "blockedCount": 10,
   "blockerCounts": {
+    "gui-script-instance-attachment-unavailable": 4,
     "image-type-union-codec": 1,
-    "named-enum-domain-codec": 1
+    "named-enum-domain-codec": 1,
+    "render-script-instance-attachment-unavailable": 4
   },
   "bindings": [
     {
@@ -76,6 +79,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "ReleaseResource",
       "sourceAnchor": "{\"release\",                 ReleaseResource}",
       "callShapes": [
@@ -100,6 +104,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Sound_SetGroupGain",
       "sourceAnchor": "{\"set_group_gain\", Sound_SetGroupGain}",
       "callShapes": [
@@ -126,6 +131,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "AddFont",
       "sourceAnchor": "{\"add_font\", AddFont}",
       "callShapes": [
@@ -160,6 +166,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "HashToHex",
       "sourceAnchor": "lua_pushcfunction(L, HashToHex);\n        lua_setglobal(L, \"hash_to_hex\")",
       "callShapes": [
@@ -181,6 +188,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "RenderScriptCamera_GetView",
       "sourceAnchor": "{\"get_view\",                RenderScriptCamera_GetView}",
       "callShapes": [
@@ -206,25 +214,16 @@
       ],
       "member": "set_compute",
       "sourcePath": "engine/render/src/render/render_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-render-script-instance",
+      "backend": null,
+      "requiredContext": "render-script-instance",
       "sourceSymbol": "RenderScript_SetCompute",
       "sourceAnchor": "{\"set_compute\",                     RenderScript_SetCompute}",
-      "callShapes": [
-        [],
-        [
-          "String"
-        ],
-        [
-          "Hash"
-        ],
-        [
-          "Nil"
-        ]
-      ],
+      "callShapes": [],
       "resultCodec": "None",
-      "blocker": null
+      "blocker": "render-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions call RenderScriptInstance_Check and require the active instance installed by a .render_script. The extension currently captures only a game-object .script instance, so the shared router must fail closed until a render-script attachment path exists."
     },
     {
       "id": "script:physics.get_gravity",
@@ -237,6 +236,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Physics_GetGravity",
       "sourceAnchor": "{\"get_gravity\",     Physics_GetGravity}",
       "callShapes": [
@@ -256,6 +256,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Physics_SetGravity",
       "sourceAnchor": "{\"set_gravity\",     Physics_SetGravity}",
       "callShapes": [
@@ -277,6 +278,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Script_GetId",
       "sourceAnchor": "{\"get_id\",                  Script_GetId}",
       "callShapes": [
@@ -299,6 +301,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Script_GetWorldTransform",
       "sourceAnchor": "{\"get_world_transform\",     Script_GetWorldTransform}",
       "callShapes": [
@@ -324,18 +327,16 @@
       ],
       "member": "set_view",
       "sourcePath": "engine/render/src/render/render_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-render-script-instance",
+      "backend": null,
+      "requiredContext": "render-script-instance",
       "sourceSymbol": "RenderScript_SetView",
       "sourceAnchor": "{\"set_view\",                        RenderScript_SetView}",
-      "callShapes": [
-        [
-          "Matrix4"
-        ]
-      ],
+      "callShapes": [],
       "resultCodec": "None",
-      "blocker": null
+      "blocker": "render-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions call RenderScriptInstance_Check and require the active instance installed by a .render_script. The extension currently captures only a game-object .script instance, so the shared router must fail closed until a render-script attachment path exists."
     },
     {
       "id": "script:render.set_projection",
@@ -345,18 +346,16 @@
       ],
       "member": "set_projection",
       "sourcePath": "engine/render/src/render/render_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-render-script-instance",
+      "backend": null,
+      "requiredContext": "render-script-instance",
       "sourceSymbol": "RenderScript_SetProjection",
       "sourceAnchor": "{\"set_projection\",                  RenderScript_SetProjection}",
-      "callShapes": [
-        [
-          "Matrix4"
-        ]
-      ],
+      "callShapes": [],
       "resultCodec": "None",
-      "blocker": null
+      "blocker": "render-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions call RenderScriptInstance_Check and require the active instance installed by a .render_script. The extension currently captures only a game-object .script instance, so the shared router must fail closed until a render-script attachment path exists."
     },
     {
       "id": "script:go.world_to_local_transform",
@@ -369,6 +368,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Script_WorldToLocalTransfrom",
       "sourceAnchor": "{\"world_to_local_transform\",Script_WorldToLocalTransfrom}",
       "callShapes": [
@@ -399,6 +399,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "SetStyle",
       "sourceAnchor": "{\"set_style\", SetStyle}",
       "callShapes": [
@@ -427,6 +428,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "RenderScriptCamera_GetProjection",
       "sourceAnchor": "{\"get_projection\",          RenderScriptCamera_GetProjection}",
       "callShapes": [
@@ -455,6 +457,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "RemoveFont",
       "sourceAnchor": "{\"remove_font\", RemoveFont}",
       "callShapes": [
@@ -489,6 +492,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Sound_GetGroupName",
       "sourceAnchor": "{\"get_group_name\", Sound_GetGroupName}",
       "callShapes": [
@@ -510,21 +514,16 @@
       ],
       "member": "delete_texture",
       "sourcePath": "engine/gui/src/gui_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-gui-script-instance",
+      "backend": null,
+      "requiredContext": "gui-script-instance",
       "sourceSymbol": "LuaDeleteTexture",
       "sourceAnchor": "{\"delete_texture\",  LuaDeleteTexture}",
-      "callShapes": [
-        [
-          "String"
-        ],
-        [
-          "Hash"
-        ]
-      ],
+      "callShapes": [],
       "resultCodec": "None",
-      "blocker": null
+      "blocker": "gui-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions validate Defold's current instance as a GUI script instance. The extension currently captures only a game-object .script instance, so compiling and linking the Lua call is insufficient evidence that it can execute."
     },
     {
       "id": "script:gui.get_layout",
@@ -534,16 +533,16 @@
       ],
       "member": "get_layout",
       "sourcePath": "engine/gui/src/gui_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-gui-script-instance",
+      "backend": null,
+      "requiredContext": "gui-script-instance",
       "sourceSymbol": "LuaGetLayout",
       "sourceAnchor": "{\"get_layout\",        LuaGetLayout}",
-      "callShapes": [
-        []
-      ],
-      "resultCodec": "Hash",
-      "blocker": null
+      "callShapes": [],
+      "resultCodec": "None",
+      "blocker": "gui-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions validate Defold's current instance as a GUI script instance. The extension currently captures only a game-object .script instance, so compiling and linking the Lua call is insufficient evidence that it can execute."
     },
     {
       "id": "script:sound.get_group_gain",
@@ -556,6 +555,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "Sound_GetGroupGain",
       "sourceAnchor": "{\"get_group_gain\", Sound_GetGroupGain}",
       "callShapes": [
@@ -580,6 +580,7 @@
       "disposition": "candidate",
       "family": "captured-lua-exact-codec",
       "backend": "captured-lua-exact-call",
+      "requiredContext": "script-instance",
       "sourceSymbol": "SetSound",
       "sourceAnchor": "{\"set_sound\",               SetSound}",
       "callShapes": [
@@ -606,6 +607,7 @@
       "disposition": "blocked",
       "family": "unsafe-named-enum-result-codec",
       "backend": null,
+      "requiredContext": "script-instance",
       "sourceSymbol": "dmLiveUpdate::Resource_RemoveMount",
       "sourceAnchor": "{\"remove_mount\",                    dmLiveUpdate::Resource_RemoveMount}",
       "callShapes": [],
@@ -621,21 +623,16 @@
       ],
       "member": "enable_material",
       "sourcePath": "engine/render/src/render/render_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-render-script-instance",
+      "backend": null,
+      "requiredContext": "render-script-instance",
       "sourceSymbol": "RenderScript_EnableMaterial",
       "sourceAnchor": "{\"enable_material\",                 RenderScript_EnableMaterial}",
-      "callShapes": [
-        [
-          "String"
-        ],
-        [
-          "Hash"
-        ]
-      ],
+      "callShapes": [],
       "resultCodec": "None",
-      "blocker": null
+      "blocker": "render-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions call RenderScriptInstance_Check and require the active instance installed by a .render_script. The extension currently captures only a game-object .script instance, so the shared router must fail closed until a render-script attachment path exists."
     },
     {
       "id": "script:gui.get_font_resource",
@@ -645,21 +642,16 @@
       ],
       "member": "get_font_resource",
       "sourcePath": "engine/gui/src/gui_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-gui-script-instance",
+      "backend": null,
+      "requiredContext": "gui-script-instance",
       "sourceSymbol": "LuaGetFontResource",
       "sourceAnchor": "{\"get_font_resource\", LuaGetFontResource}",
-      "callShapes": [
-        [
-          "Hash"
-        ],
-        [
-          "String"
-        ]
-      ],
-      "resultCodec": "Hash",
-      "blocker": null
+      "callShapes": [],
+      "resultCodec": "None",
+      "blocker": "gui-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions validate Defold's current instance as a GUI script instance. The extension currently captures only a game-object .script instance, so compiling and linking the Lua call is insufficient evidence that it can execute."
     },
     {
       "id": "script:gui.set_texture_data",
@@ -672,6 +664,7 @@
       "disposition": "blocked",
       "family": "unsafe-image-type-codec",
       "backend": null,
+      "requiredContext": "gui-script-instance",
       "sourceSymbol": "LuaSetTextureData",
       "sourceAnchor": "{\"set_texture_data\",LuaSetTextureData}",
       "callShapes": [],
@@ -687,21 +680,16 @@
       ],
       "member": "set_layout",
       "sourcePath": "engine/gui/src/gui_script.cpp",
-      "disposition": "candidate",
-      "family": "captured-lua-exact-codec",
-      "backend": "captured-lua-exact-call",
+      "disposition": "blocked",
+      "family": "requires-gui-script-instance",
+      "backend": null,
+      "requiredContext": "gui-script-instance",
       "sourceSymbol": "LuaSetLayout",
       "sourceAnchor": "{\"set_layout\",        LuaSetLayout}",
-      "callShapes": [
-        [
-          "String"
-        ],
-        [
-          "Hash"
-        ]
-      ],
-      "resultCodec": "Boolean",
-      "blocker": null
+      "callShapes": [],
+      "resultCodec": "None",
+      "blocker": "gui-script-instance-attachment-unavailable",
+      "blockerDetail": "These functions validate Defold's current instance as a GUI script instance. The extension currently captures only a game-object .script instance, so compiling and linking the Lua call is insufficient evidence that it can execute."
     }
   ]
 }

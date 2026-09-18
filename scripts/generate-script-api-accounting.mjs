@@ -17,7 +17,9 @@ const inputUrls = {
   scalar: new URL("bindings/generated/defold-script-scalar-dispatch.json", root),
   value: new URL("bindings/generated/defold-script-value-bindings.json", root),
   tuple: new URL("bindings/generated/defold-script-fixed-tuples.json", root),
-  url: new URL("bindings/generated/defold-script-url-address-classification.json", root)
+  url: new URL("bindings/generated/defold-script-url-address-classification.json", root),
+  valueTail: new URL("bindings/generated/defold-script-value-tail-bindings.json", root),
+  overload: new URL("bindings/generated/defold-script-overload-dispatch.json", root)
 };
 const valueDefinitionUrls = [
   new URL("bindings/overrides/script-defold-value-bindings.json", root),
@@ -250,8 +252,10 @@ export function generateScriptApiAccounting(inputs) {
   const scalar = parse(inputs.scalarText, "scalar dispatch report");
   const value = parse(inputs.valueText, "value binding report");
   const url = parse(inputs.urlText, "URL binding report");
+  const valueTail = parse(inputs.valueTailText, "value-tail binding report");
+  const overload = parse(inputs.overloadText, "overload-dispatch report");
 
-  const revisions = [inventory, patterns, descriptors, scalar, value, url].map((artifact) => artifact.defoldRevision);
+  const revisions = [inventory, patterns, descriptors, scalar, value, url, valueTail, overload].map((artifact) => artifact.defoldRevision);
   assert(revisions.every((revision) => revision === ir.defoldRevision), "script generator Defold revisions differ");
   assert(ir.counts?.functions === ir.functions.length, "script IR function count is stale");
   const functionById = uniqueMap(ir.functions, "script IR");
@@ -272,6 +276,15 @@ export function generateScriptApiAccounting(inputs) {
     "URL bindings are stale against script IR");
   assert(url.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText),
     "URL bindings are stale against binding patterns");
+  assert(valueTail.inputEvidence?.scriptIrSha256 === sha256(inputs.irText) &&
+    valueTail.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText) &&
+    valueTail.inputEvidence?.valueBindingsSha256 === sha256(inputs.valueText) &&
+    valueTail.inputEvidence?.urlBindingsSha256 === sha256(inputs.urlText),
+  "value-tail bindings are stale against their generated inputs");
+  assert(overload.inputEvidence?.scriptIrSha256 === sha256(inputs.irText) &&
+    overload.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText) &&
+    overload.inputEvidence?.alreadyOwnedReportSha256 === sha256(inputs.valueText),
+  "overload-dispatch bindings are stale against their generated inputs");
   const expectedUrl = generateScriptUrlAddressClassification({
     irText: inputs.irText,
     patternsText: inputs.patternsText,
@@ -330,6 +343,34 @@ export function generateScriptApiAccounting(inputs) {
       row.targetSupport?.nativeDynamicHermes?.status === "generated-executable",
     `${id}: URL route lacks generated native-dynamic disposition`);
   }
+  const valueTailCandidates = valueTail.bindings.filter(({ disposition }) => disposition === "candidate");
+  const valueTailById = uniqueMap(valueTailCandidates, "value-tail binding report candidates");
+  assert(valueTail.routeCount === valueTail.bindings.length &&
+    valueTail.candidateCount === valueTailCandidates.length && valueTail.candidateCount === 16,
+  "value-tail binding census is stale");
+  for (const [id, row] of valueTailById) {
+    assert(patternById.get(id)?.loweringFamily === "defold-value",
+      `${id}: generated value-tail route is not a defold-value descriptor`);
+    assert(!scalarById.has(id) && !valueById.has(id) && !tupleById.has(id) && !urlById.has(id),
+      `${id}: generated value-tail route overlaps another executable generator`);
+    assert(row.backend === "captured-lua-exact-call" && valueTail.targetSupport?.nativeDynamicHermes === "generated-executable-shared-script-adapter",
+      `${id}: value-tail route lacks generated native-dynamic disposition`);
+    assert(row.requiredContext === "script-instance",
+      `${id}: value-tail route lacks the supported game-object script context`);
+  }
+  const overloadCandidates = overload.bindings.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate);
+  const overloadById = uniqueMap(overloadCandidates, "overload-dispatch report candidates");
+  assert(overload.routeCount === overload.bindings.length &&
+    overload.generatedFamilyCandidateCount === overloadCandidates.length && overload.generatedFamilyCandidateCount === 8,
+  "overload-dispatch binding census is stale");
+  for (const [id, row] of overloadById) {
+    assert(patternById.get(id)?.loweringFamily === "overload-dispatch",
+      `${id}: generated overload route is not an overload-dispatch descriptor`);
+    assert(!scalarById.has(id) && !valueById.has(id) && !tupleById.has(id) && !urlById.has(id) && !valueTailById.has(id),
+      `${id}: generated overload route overlaps another executable generator`);
+    assert(row.targetSupport?.nativeDynamicHermes === "generated-executable-shared-script-adapter",
+      `${id}: overload route lacks generated native-dynamic disposition`);
+  }
 
   const executableById = new Map();
   const stableIdOwners = new Map();
@@ -337,7 +378,9 @@ export function generateScriptApiAccounting(inputs) {
     ["scalar-lua-dispatch", scalar.bindings],
     ["native-value-dispatch", value.bindings],
     ["fixed-tuple-lua-dispatch", tuple.bindings],
-    ["url-lua-dispatch", url.rows]
+    ["url-lua-dispatch", url.rows],
+    ["captured-lua-value-tail-dispatch", valueTailCandidates],
+    ["captured-lua-overload-dispatch", overloadCandidates]
   ]) {
     for (const row of rows) {
       const expectedStableId = stableBindingId(row.id);
@@ -361,6 +404,15 @@ export function generateScriptApiAccounting(inputs) {
         ...(generator === "url-lua-dispatch" ? {
           requiredArgumentCount: row.requiredArgumentCount,
           maximumArgumentCount: row.maximumArgumentCount,
+          targetSupport: row.targetSupport
+        } : {}),
+        ...(generator === "captured-lua-value-tail-dispatch" ? {
+          callShapes: row.callShapes,
+          resultCodec: row.resultCodec,
+          targetSupport: valueTail.targetSupport
+        } : {}),
+        ...(generator === "captured-lua-overload-dispatch" ? {
+          callShapes: row.callShapes,
           targetSupport: row.targetSupport
         } : {})
       });
@@ -430,7 +482,9 @@ export function generateScriptApiAccounting(inputs) {
     scalarDispatchSha256: sha256(inputs.scalarText),
     valueBindingsSha256: sha256(inputs.valueText),
     fixedTupleBindingsSha256: sha256(inputs.tupleText),
-    urlBindingsSha256: sha256(inputs.urlText)
+    urlBindingsSha256: sha256(inputs.urlText),
+    valueTailBindingsSha256: sha256(inputs.valueTailText),
+    overloadDispatchSha256: sha256(inputs.overloadText)
   };
   const aggregateInputSha256 = sha256([
     ...Object.entries(sourceHashes).map(([name, hash]) => `${name}\0${hash}`),
@@ -494,6 +548,8 @@ async function loadInputs() {
     valueText: texts.value,
     tupleText: texts.tuple,
     urlText: texts.url,
+    valueTailText: texts.valueTail,
+    overloadText: texts.overload,
     urlOverrideText,
     urlSourceTexts,
     valueDefinitions

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "expectedRouteCount": 26,
-  "expectedCandidateCount": 24,
+  "expectedCandidateCount": 16,
   "codecVocabulary": ["Nil", "Boolean", "Number", "String", "Hash", "Url", "Vector3", "Matrix4", "None"],
   "sources": [
     { "key": "camera", "path": "engine/render/src/render/render_script_camera.cpp", "sha256": "d8af6b188f58110bd8c2e85238f86a9f4ad29dde6eff1a81a880b4137d8512bf" },
@@ -20,22 +20,44 @@
       "id": "captured-lua-exact-codec",
       "disposition": "candidate",
       "backend": "captured-lua-exact-call",
-      "expectedRouteCount": 24,
+      "requiredContext": "script-instance",
+      "expectedRouteCount": 16,
       "sourceRoutes": [
         { "source": "camera", "ids": ["script:camera.get_projection", "script:camera.get_view"] },
         { "source": "font", "ids": ["script:font.add_font", "script:font.remove_font", "script:font.set_style"] },
         { "source": "go", "ids": ["script:go.get_id", "script:go.get_world_transform", "script:go.world_to_local_transform"] },
-        { "source": "gui", "ids": ["script:gui.delete_texture", "script:gui.get_font_resource", "script:gui.get_layout", "script:gui.set_layout"] },
         { "source": "hash", "registration": "lua-global", "ids": ["script:hash_to_hex"] },
         { "source": "physics", "ids": ["script:physics.get_gravity", "script:physics.set_gravity"] },
-        { "source": "render", "ids": ["script:render.enable_material", "script:render.set_compute", "script:render.set_projection", "script:render.set_view"] },
         { "source": "resource", "ids": ["script:resource.release", "script:resource.set_sound"] },
         { "source": "sound", "ids": ["script:sound.get_group_gain", "script:sound.get_group_name", "script:sound.set_group_gain"] }
       ]
     },
     {
+      "id": "requires-gui-script-instance",
+      "disposition": "blocked",
+      "requiredContext": "gui-script-instance",
+      "blocker": "gui-script-instance-attachment-unavailable",
+      "detail": "These functions validate Defold's current instance as a GUI script instance. The extension currently captures only a game-object .script instance, so compiling and linking the Lua call is insufficient evidence that it can execute.",
+      "expectedRouteCount": 4,
+      "sourceRoutes": [
+        { "source": "gui", "ids": ["script:gui.delete_texture", "script:gui.get_font_resource", "script:gui.get_layout", "script:gui.set_layout"] }
+      ]
+    },
+    {
+      "id": "requires-render-script-instance",
+      "disposition": "blocked",
+      "requiredContext": "render-script-instance",
+      "blocker": "render-script-instance-attachment-unavailable",
+      "detail": "These functions call RenderScriptInstance_Check and require the active instance installed by a .render_script. The extension currently captures only a game-object .script instance, so the shared router must fail closed until a render-script attachment path exists.",
+      "expectedRouteCount": 4,
+      "sourceRoutes": [
+        { "source": "render", "ids": ["script:render.enable_material", "script:render.set_compute", "script:render.set_projection", "script:render.set_view"] }
+      ]
+    },
+    {
       "id": "unsafe-image-type-codec",
       "disposition": "blocked",
+      "requiredContext": "gui-script-instance",
       "blocker": "image-type-union-codec",
       "detail": "gui.set_texture_data accepts string|image.TYPE. The current ABI has no reviewed representation or enum-domain validation for image.TYPE, so exposing only the string arm would silently narrow the documented route.",
       "expectedRouteCount": 1,
@@ -46,6 +68,7 @@
     {
       "id": "unsafe-named-enum-result-codec",
       "disposition": "blocked",
+      "requiredContext": "script-instance",
       "blocker": "named-enum-domain-codec",
       "detail": "liveupdate.remove_mount returns liveupdate.LIVEUPDATE. A number tag alone does not validate Defold's named-enum domain, so no arbitrary numeric result may cross this route until the pinned enum domain is generated and checked.",
       "expectedRouteCount": 1,

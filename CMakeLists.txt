@@ -164,7 +164,9 @@ add_library(defold-hermes-lua-bridge STATIC
   defold/defold_hermes/src/generated_lua_bridge.cpp
   defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp
   defold/defold_hermes/src/generated_script_fixed_tuples.cpp
+  defold/defold_hermes/src/generated_script_overload_dispatch.cpp
   defold/defold_hermes/src/generated_script_value_bindings.cpp
+  defold/defold_hermes/src/generated_script_value_tail_bindings.cpp
   defold/defold_hermes/src/generated_script_url_bindings.cpp
   defold/defold_hermes/src/scalar_lua_dispatch.cpp
   defold/defold_hermes/src/script_scalar_lua_adapter.cpp
@@ -296,6 +298,33 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     -Wall -Wextra -Werror -pedantic
   )
 endif()
+
+add_executable(defold-hermes-script-table-record-binding-test
+  native/script_table_record_binding_test.cpp
+  defold/defold_hermes/src/generated_script_table_record_bindings.cpp
+)
+target_compile_features(defold-hermes-script-table-record-binding-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-table-record-binding-test PRIVATE
+  defold/defold_hermes/include
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-table-record-binding-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
+
+add_executable(defold-hermes-script-captured-lua-router-test
+  native/script_captured_lua_router_test.cpp
+)
+target_compile_features(defold-hermes-script-captured-lua-router-test PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-captured-lua-router-test PRIVATE
+    -Wall -Wextra -Werror -Wno-zero-length-array -pedantic
+  )
+endif()
+target_link_libraries(defold-hermes-script-captured-lua-router-test PRIVATE
+  defold-hermes-lua-bridge
+)
 
 add_executable(defold-hermes-script-bridge-capi-test
   native/script_bridge_capi_test.cpp

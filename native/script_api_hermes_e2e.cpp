@@ -2,6 +2,8 @@
 #include <defold_hermes/script_bridge_capi.hpp>
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
 
+#include <dmsdk/dlib/vmath.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -75,6 +77,22 @@ int SetTitle(lua_State* state) {
   return 0;
 }
 
+int GetGroupGain(lua_State* state) {
+  CheckInstance(state);
+  if (std::string(luaL_checkstring(state, 1)) != "music") return luaL_error(state, "wrong sound group");
+  lua_pushnumber(state, 0.75);
+  return 1;
+}
+
+int Dot(lua_State* state) {
+  CheckInstance(state);
+  auto* left = static_cast<dmVMath::Vector3*>(lua_touserdata(state, 1));
+  auto* right = static_cast<dmVMath::Vector3*>(lua_touserdata(state, 2));
+  if (!left || !right) return luaL_error(state, "dot expected vector3 userdata");
+  lua_pushnumber(state, left->getX() * right->getX() + left->getY() * right->getY() + left->getZ() * right->getZ());
+  return 1;
+}
+
 void Register(lua_State* state, const char* module, const luaL_Reg* functions) {
   luaL_register(state, module, functions);
   lua_pop(state, 1);
@@ -106,10 +124,14 @@ int main(int argc, char** argv) {
   const luaL_Reg render[] = {{"get_width", GetWidth}, {nullptr, nullptr}};
   const luaL_Reg bit[] = {{"tohex", ToHex}, {nullptr, nullptr}};
   const luaL_Reg window[] = {{"set_title", SetTitle}, {nullptr, nullptr}};
+  const luaL_Reg sound[] = {{"get_group_gain", GetGroupGain}, {nullptr, nullptr}};
+  const luaL_Reg vmath[] = {{"dot", Dot}, {nullptr, nullptr}};
   Register(state, "sys", sys);
   Register(state, "render", render);
   Register(state, "bit", bit);
   Register(state, "window", window);
+  Register(state, "sound", sound);
+  Register(state, "vmath", vmath);
 
   scalar::ScriptAdapter adapter;
   if (!adapter.initialize(state, {GetInstance, SetInstance})) Fail(adapter.lastError());
@@ -124,22 +146,24 @@ int main(int argc, char** argv) {
   runtime.load(source.str(), "defold-hermes://script-api-e2e.js");
   runtime.init();
 
-  if (host.transcript.size() != 7) Fail("unexpected TypeScript transcript size");
+  if (host.transcript.size() != 9) Fail("unexpected TypeScript transcript size");
   if (host.transcript[0] != "info:values:42:128:00ff:true") Fail("scalar values did not cross the full bridge");
   if (host.transcript[1] != "info:vmath:3:5:0.600000:0.800000:1.000000:4") Fail("Defold values did not cross the full Hermes bridge");
-  if (host.transcript[2] != "info:vmath-nan-rejected:true") Fail("NaN Defold value input was not rejected through Hermes");
-  if (host.transcript[3] != "info:hash:bigint:true") Fail("hash POD handle did not cross the full Hermes bridge");
-  if (host.transcript[4].find("not executable yet") == std::string::npos &&
-      host.transcript[4].find("not in the executable scalar family") == std::string::npos &&
-      host.transcript[4].find("handles, tables, and callbacks are not executable yet") == std::string::npos &&
-      host.transcript[4].find("no generated kind tag") == std::string::npos) {
+  if (host.transcript[2] != "info:overload-dot:25") Fail("overload route did not cross dynamic Hermes and Lua");
+  if (host.transcript[3] != "info:value-tail-gain:0.75") Fail("value-tail route did not cross dynamic Hermes and Lua");
+  if (host.transcript[4] != "info:vmath-nan-rejected:true") Fail("NaN Defold value input was not rejected through Hermes");
+  if (host.transcript[5] != "info:hash:bigint:true") Fail("hash POD handle did not cross the full Hermes bridge");
+  if (host.transcript[6].find("not executable yet") == std::string::npos &&
+      host.transcript[6].find("not in the executable scalar family") == std::string::npos &&
+      host.transcript[6].find("handles, tables, and callbacks are not executable yet") == std::string::npos &&
+      host.transcript[6].find("no generated kind tag") == std::string::npos) {
     Fail("unsupported family was not explicit");
   }
-  if (host.transcript[5].find("forced config error") == std::string::npos) Fail("Lua error was not propagated");
-  if (host.transcript[6] != "info:after-error:36") Fail("dispatch did not recover after Lua error");
+  if (host.transcript[7].find("forced config error") == std::string::npos) Fail("Lua error was not propagated");
+  if (host.transcript[8] != "info:after-error:36") Fail("dispatch did not recover after Lua error");
   if (gCurrentInstance != 7) Fail("Defold script instance was not restored");
   if (lua_gettop(state) != baseTop) Fail("Lua stack was not restored");
-  if (gObservedCalls != 7) Fail("unexpected number of Lua calls");
+  if (gObservedCalls != 9) Fail("unexpected number of Lua calls");
   if (gTitle != "deherm") Fail("void scalar call did not execute");
 
   runtime.finalize();

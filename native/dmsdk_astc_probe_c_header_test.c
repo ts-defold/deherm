@@ -1,0 +1,2 @@
+#include <defold_hermes/generated_dmsdk_astc_probe.h>
+int main(void) { const uint8_t astc[16]={0x13,0xAB,0xA1,0x5C,8,6,1,128,0,0,64,0,0,1,0,0}; DehermDmSdkAstcProbeResult result={0}; if(deherm_dmsdk_astc_probe_dm_image_get_astc_block_size(astc,16,0)!=0)return 1; return deherm_dmsdk_astc_probe_dm_image_get_astc_block_size(astc,16,&result)==1 && result.width==8 && result.height==6 && result.depth==1 ? 0 : 2; }

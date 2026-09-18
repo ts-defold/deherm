@@ -33,7 +33,7 @@ test("overload-dispatch generator derives the exact disjoint classifier remainde
     { arguments: ["Number", "Number", "Number"], resultCodec: "Number" }
   ]);
   assert.equal(report.bindings.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate)
-    .every(({ targetSupport }) => targetSupport.nativeDynamicHermes === "candidate-awaits-shared-router-integration"), true);
+    .every(({ targetSupport }) => targetSupport.nativeDynamicHermes === "generated-executable-shared-script-adapter"), true);
 });
 
 test("generated overload dispatcher fails closed before a backend sees an invalid frame", async () => {
@@ -47,7 +47,7 @@ test("generated overload dispatcher fails closed before a backend sees an invali
   assert.match(source, /Overload-dispatch Lua result does not match the reviewed call shape/);
   assert.match(source, /frame->resultCount=0/);
   assert.doesNotMatch(source, /\bnew\b|malloc|realloc|std::vector|unordered_map/);
-  assert.match(target, /candidate-awaits-shared-router-integration/);
+  assert.match(target, /generated-executable-shared-script-adapter/);
   assert.match(target, /blocked-box2d-world-handle-and-multi-result-codecs/);
 });
 
