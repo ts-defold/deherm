@@ -23,7 +23,7 @@
     "runtime:packaged": "node integration/check-packaged-runtime.mjs",
     "runtime:packaged:record": "node integration/check-packaged-runtime.mjs --record-evidence",
     "runtime:packaged:check": "node integration/check-packaged-runtime.mjs --check-evidence",
-    "dev": "deherm dev --project defold --entry defold/main/battle.gui.ts --watch defold"
+    "dev": "deherm dev --project defold --entry defold/main/player.script.ts --watch defold"
   },
   "dependencies": {
     "@ts-defold/deherm": "workspace:*"

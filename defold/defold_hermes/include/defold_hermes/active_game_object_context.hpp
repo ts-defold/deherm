@@ -45,6 +45,17 @@ struct ResolvedCurrent {
   void* instance = nullptr;
 };
 
+/**
+ * Resolves the game object that owns the script component currently dispatching
+ * on a Lua state. A component callback must publish its own instance before the
+ * generated current-instance thunks run; keeping this a function pointer over an
+ * opaque state keeps the header independent of engine and Lua layouts.
+ */
+struct CurrentInstanceApi {
+  void* userData = nullptr;
+  bool (*build)(void* userData, void* luaState, ActiveContext* out) noexcept = nullptr;
+};
+
 inline constexpr size_t kMaximumContextDepth = 32;
 
 namespace detail {
@@ -56,6 +67,7 @@ struct ContextStack {
 inline thread_local ContextStack contextStack;
 inline TerminalApi terminalApi;
 inline bool terminalApiInstalled = false;
+inline CurrentInstanceApi currentInstanceApi;
 
 inline bool fail(char* error, size_t capacity, const char* message) noexcept {
   if (error && capacity) std::snprintf(error, capacity, "%s", message);
@@ -76,6 +88,23 @@ inline bool installTerminalApi(const TerminalApi& api) noexcept {
 inline void uninstallTerminalApi() noexcept {
   detail::terminalApi = {};
   detail::terminalApiInstalled = false;
+}
+
+inline bool installCurrentInstanceApi(const CurrentInstanceApi& api) noexcept {
+  if (!api.build) return false;
+  detail::currentInstanceApi = api;
+  return true;
+}
+
+inline void uninstallCurrentInstanceApi() noexcept { detail::currentInstanceApi = {}; }
+
+/** Build the call-scoped context for the component dispatching on `luaState`. */
+inline bool buildCurrentInstanceContext(void* luaState, ActiveContext* out) noexcept {
+  if (!out) return false;
+  *out = {};
+  const CurrentInstanceApi& api = detail::currentInstanceApi;
+  if (!api.build) return false;
+  return api.build(api.userData, luaState, out);
 }
 
 inline uint32_t activeDepth() noexcept { return detail::contextStack.depth; }

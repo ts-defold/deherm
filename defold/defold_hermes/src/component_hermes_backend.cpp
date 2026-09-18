@@ -1,4 +1,5 @@
 #include <defold_hermes/component_hermes_backend.hpp>
+#include <defold_hermes/active_game_object_context.hpp>
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
 
 #if !defined(DM_PLATFORM_HTML5)
@@ -11,6 +12,7 @@
 #include <cstdio>
 #include <cstring>
 #include <exception>
+#include <optional>
 #include <stdexcept>
 
 namespace dmScript {
@@ -256,7 +258,10 @@ bool HermesBackend::Attach(void* opaque, const AttachRequest& request, Component
       const uint8_t codec = static_cast<uint8_t>(lua_tointeger(request.state, -1));
       lua_pop(request.state, 1);
       lua_pushvalue(request.state, -1);
-      lua_rawget(request.state, request.selfIndex);
+      // Defold hands a script/GUI component its `self` as userdata whose
+      // metatable resolves editor properties, so a raw table read both misses
+      // every declared property and is undefined for a non-table value.
+      lua_gettable(request.state, request.selfIndex);
       Value value{}; const bool encoded = encodeLeaf(request.state, -1, codec, &value); lua_pop(request.state, 3);
       if (!encoded) throw std::runtime_error("Component editor property does not match its generated codec");
       runtime->setComponentProperty(handle, name, value);
@@ -271,6 +276,23 @@ bool HermesBackend::Dispatch(void* opaque, const DispatchRequest& request, bool*
     char* error, size_t capacity) noexcept {
   auto* backend = static_cast<HermesBackend*>(opaque); Runtime* runtime = backend->runtime();
   if (!runtime) { fail(error, capacity, "Hermes component runtime is unavailable"); return false; }
+  // Generated current-instance thunks (`go.get_position` and friends) resolve
+  // against the innermost active game-object context. A dispatching script
+  // component must therefore publish its own instance for the whole callback,
+  // otherwise every current-instance call fails closed with no active context.
+  std::optional<game_object::Scope> instanceScope;
+  if (request.context == ContextKind::kGameObject) {
+    game_object::ActiveContext instanceContext{};
+    if (!game_object::buildCurrentInstanceContext(request.state, &instanceContext)) {
+      fail(error, capacity, "Component dispatch could not resolve its current game object");
+      return false;
+    }
+    instanceScope.emplace(instanceContext);
+    if (!instanceScope->entered()) {
+      fail(error, capacity, "Game-object context stack is exhausted during component dispatch");
+      return false;
+    }
+  }
   auto* adapter = backend->adapter();
   if (backend->adapterProvider_ &&
       (!adapter || !adapter->pushComponentContext(adapterContext(request.context)))) {

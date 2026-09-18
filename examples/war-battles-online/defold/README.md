@@ -1,47 +1,64 @@
-# War Battles Online Ultimate — Defold project
+# War Battles — Defold project
 
-This is the visible Defold frontend for the deterministic 32-player simulation.
-The authored entry point is `main/battle.gui.ts`; the public `deherm generate`
-command owns `main/battle.gui_script`. Do not edit that proxy.
+This is a port of the Defold **War Battles** tutorial to déherm TypeScript
+components. Gameplay entities are ordinary Defold game objects with sprite,
+factory, and collision-object components; the only GUI is a single score node.
 
-The scene uses fixed, editor-authored pools rather than runtime node creation:
+| Resource | Contents |
+| --- | --- |
+| `main/main.collection` | level, player, GUI, and four tanks |
+| `main/level.go` | `/main/tutorial-map.tilemap` over `/assets/map.png` |
+| `main/player.go` | sprite, rocket factory, `/main/player.script` |
+| `main/rocket.go` | `/main/rocket.script`, sprite, kinematic collision, group `rockets`, mask `tanks` |
+| `main/tank.go` | sprite, kinematic collision, group `tanks`, mask `rockets` |
+| `main/ui.gui` | one `score` text node driven by `/main/ui.gui_script` |
+| `input/game.input_binding` | arrow keys plus space mapped to `up`, `down`, `left`, `right`, `fire` |
 
-- 32 tank bodies and 32 independently aimed turrets;
-- 160 projectile nodes, with deterministic culling when the authoritative pool
-  contains more visible projectiles;
-- a player-following camera projection over the bounded arena;
-- a HUD with health, score, credits, team counts, round, tick, and projectile
-  count; and
-- a deterministic restart loop after local defeat, plus manual restart.
+The authored sources are `main/player.script.ts`, `main/rocket.script.ts`, and
+`main/ui.gui.ts`. The public `deherm generate` command owns the sibling
+`.script` and `.gui_script` proxies; do not edit them.
 
 Controls:
 
 | Keys | Action |
 | --- | --- |
-| W/A/S/D | Move and aim |
-| Space | Fire |
-| Z/X/C | Buy damage/mobility/armor upgrades |
-| R | Restart the match |
+| Arrow keys | Move |
+| Space | Fire a rocket in the last movement direction |
 
-From the repository root, dogfood the public CLI entry point with:
+## Art substitutions
+
+The tutorial's own sprite sheet is not vendored here. `main/tutorial-sprites.atlas`
+maps the tutorial's four animations onto the closest art in `assets/`:
+
+| Animation | Source | Note |
+| --- | --- | --- |
+| `player-down` | `assets/units/infantry/down` | 22x22 walk cycle, art faces screen-down |
+| `rocket` | `assets/buildings/turret-rocket` | horizontally flipped so frame zero points along +x |
+| `explosion` | `assets/fx/explosion` | nine frames, `PLAYBACK_ONCE_FORWARD`, 122x71 — much larger than the tutorial's |
+| `tank-down` | `assets/units/tank/down` | 48x48 idle |
+
+Because the infantry art faces down rather than along +x, `player.script.ts`
+adds a quarter turn to the tutorial's single `go.set_rotation` call rather than
+introducing per-direction flipbooks.
+
+## Scripted demonstration shot
+
+`main/main.collection` sets the player's `demo` script property to `1.0`. One
+second after `init` the player moves right for one second and fires one rocket,
+so a launch exercises the whole factory/physics/message chain without a human at
+the keyboard. Set the property to `0` to disable it; player input is unaffected
+once the shot has been taken.
+
+## Building
 
 ```sh
-node examples/war-battles-online/integration/sync-defold-sources.mjs
+pnpm package:defold
 node bin/deherm.mjs generate --project examples/war-battles-online/defold
-node bin/deherm.mjs typecheck --project examples/war-battles-online/defold
-node bin/deherm.mjs verify-generated --project examples/war-battles-online/defold
 node bin/deherm.mjs dev \
   --project examples/war-battles-online/defold \
-  --entry examples/war-battles-online/defold/main/battle.gui.ts \
+  --entry examples/war-battles-online/defold/main/player.script.ts \
   --watch examples/war-battles-online/defold \
-  --once --headless --no-ttsc
-```
-
-The project exposes the repository extension through its example-local
-`defold_hermes` dependency link. Consequently a full native build requires the
-pinned local Extender:
-
-```sh
+  --once --headless --no-launch
 /opt/homebrew/opt/openjdk@25/bin/java -jar build/tooling/bob.jar \
   --root examples/war-battles-online/defold \
   --output build/default \
@@ -51,24 +68,12 @@ pinned local Extender:
   resolve build
 ```
 
-Bob's debug upload inspection proves that this layout contributes the extension
-manifest, sources, headers, and arm64 Hermes archive. The earlier resource-only
-build proves that the collection, game object, GUI, font, input, and generated
-Lua proxy compile, but used a vanilla engine because the dependency was absent.
-The current custom engine has now executed the generated GUI proxy, loaded the
-bundle in Dynamic Hermes, completed the TypeScript `init`, first render, and
-first update/render, and remained free of rejected diagnostics for a bounded
-1.5-second window. Re-run
-and record that artifact-bound proof from the example package with:
+The project exposes the repository extension through its example-local
+`defold_hermes` dependency link, so a full native build requires the pinned
+local Extender (`pnpm extender:status`). Never use a remote build server.
 
-```sh
-pnpm runtime:packaged
-pnpm runtime:packaged:record
-pnpm runtime:packaged:check
-```
+Run the built game with `pnpm play` from the example package.
 
-The narrower generated component capability report still records
-`runtimeConformant: false`; this example observation does not promote every
-component context, lifecycle, runtime target, or API. See
-[PLAYABLE-BLOCKERS.md](./PLAYABLE-BLOCKERS.md) for the exact proven boundary and
-remaining blockers.
+See [PLAYABLE-BLOCKERS.md](./PLAYABLE-BLOCKERS.md) for the exact observed
+boundary and the remaining blockers, and [reference/README.md](./reference/README.md)
+for the retained presentation mockup.

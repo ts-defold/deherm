@@ -7,14 +7,14 @@
     :open-tabs [
       [
         [
-          "/main/battle.gui"
+          "/main/main.collection"
           :scene
         ]
       ]
     ]
     :recent-files [
       [
-        "/main/battle.gui"
+        "/main/main.collection"
         :scene
       ]
     ]

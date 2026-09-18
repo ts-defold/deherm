@@ -1,118 +1,103 @@
 # Playable attachment evidence and remaining blockers
 
-The visual slice, deterministic match, public-CLI generation, four-context
-typecheck, generated-state verification, headless development build, Bob
-resource compilation, and scoped packaged-engine execution now pass.
+The example is now a port of the Defold War Battles tutorial rather than the
+GUI-only presentation mockup. Gameplay runs as Defold game objects with sprite,
+factory, and collision-object components; the GUI is one score text node. The
+mockup is retained, unbuilt, under [`reference/`](./reference/README.md).
+
+## Observed packaged-engine run
+
+A custom arm64-macOS engine built through the pinned local Extender was launched
+from `build/default` on 2026-09-18. Defold 1.14.0 loaded the archive, created
+the Vulkan device, sound device, and the Box2D v2.2.1 physics context, detected
+the exact runtime profile, loaded bundle generation 1, and emitted the complete
+game-owned marker sequence with no `ERROR:`, `FATAL:`, `RESULT_SCRIPT_ERROR`,
+`stack traceback:`, bundle-rejection, or component-runtime diagnostic:
+
+```text
+INFO:DEFOLD_HERMES: war-battles:ui-init
+INFO:DEFOLD_HERMES: war-battles:player-init:560.0:360.0
+INFO:DEFOLD_HERMES: war-battles:rocket-init:1.00:0.00
+INFO:DEFOLD_HERMES: war-battles:player-fire:560.0:360.0:1.00:0.00
+INFO:DEFOLD_HERMES: war-battles:rocket-hit
+INFO:DEFOLD_HERMES: war-battles:score:100
+INFO:DEFOLD_HERMES: war-battles:player-moved:739.9:360.0
+INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done
+```
+
+That sequence is the whole tutorial loop:
+
+* a `.gui.ts` component resolved `gui.get_node("score")` and wrote it;
+* a `.script.ts` component read its own position through `go.get_position`;
+* `factory.create` spawned `/main/rocket.go` with a typed `dir` vector3
+  property, and the spawned component observed exactly `(1, 0, 0)`;
+* Defold physics delivered `collision_response` from the `rockets` group to the
+  `tanks` group and the rocket deleted the reported `other_id`;
+* `msg.post("/gui#ui", "add_score", { score: 100 })` crossed from a game-object
+  component to a GUI-scene component and the score node was rewritten;
+* `msg.post("#sprite", "play_animation", …)` played the once-forward explosion
+  and Defold returned `animation_done` to the rocket, which deleted itself;
+* `go.set_position` advanced the player 179.9 px over the one-second scripted
+  move, so the frame loop, not just `init`, drives engine state.
+
+Not observed in engine output, and therefore not claimed:
+
+* pixel output. No screenshot or frame capture was taken. The tilemap, atlases,
+  fonts, sprites, and GUI scene all compiled and loaded without a resource or
+  component diagnostic, but "it renders correctly" is unverified.
+* keyboard input. `on_input` is wired to arrow keys plus space, and the same
+  `dispatchInput` path is exercised by the retained reference component, but no
+  key event was injected into this port.
+
+## Provider defects fixed to reach this point
+
+Two defects in the packaged component provider were exposed the first time a
+real game-object component was attached; both are fixed in
+`defold/defold_hermes`:
+
+1. `component_hermes_backend.cpp` read editor properties off the component
+   `self` with `lua_rawget`. Defold hands a script or GUI component a *userdata*
+   `self` whose metatable resolves declared properties, so the raw read both
+   missed every property and crashed LuaJIT. It now uses `lua_gettable`.
+2. Generated current-instance thunks (`go.get_position`, `go.set_position`,
+   `go.set_rotation`) resolve against the innermost active game-object context,
+   which was only ever pushed by the legacy bootstrap attachment. Every such
+   call from a component failed closed with `No active game-object context`.
+   `active_game_object_context.hpp` now carries an installable
+   `CurrentInstanceApi`; `extension.cpp` installs a resolver that borrows the
+   game object Defold is currently dispatching, and the component backend
+   publishes it for the duration of a game-object dispatch.
 
 ## Component runtime gate
 
-`main/battle.gui_script` is generated with component ID
-`deherm.component/v1/4e16dd70f081489323a1c2caab6c2042c4cd5286d8fe8af207dd4c031b987712`
-and context `gui-scene`. It requires the `_deherm_` Lua module to provide:
-
-```text
-attachComponent(self, componentId, schemaFingerprint, context, properties)
-dispatchLifecycle(self, componentId, lifecycle, ...)
-dispatchInput(self, componentId, actionId, action)
-detachComponent(self, componentId)
-```
-
 The generated global manifest still reports
 `state: native-dynamic-hermes-harness-executable` and
-`runtimeConformant: false`. The generation-only API readiness gate also keeps
-`gameplayExecutionObserved: false`. Neither file is runtime evidence and neither
-is promoted from this one example run.
+`runtimeConformant: false`, and the generation-only API readiness gate still
+reports `gameplayExecutionObserved: false`. One example run does not promote
+every component context, lifecycle, runtime target, or API.
 
-The first pinned Bob arm64-macOS bundle was also launched on 2026-09-18. Defold
-1.14.0 loaded the archive, initialized Vulkan, sound, and physics, then stopped
-the GUI component at the generated proxy boundary with the exact diagnostic:
+The dependency link is intentionally a monorepo development layout. A standalone
+distribution must replace it with a versioned Defold library archive whose root
+exports `defold_hermes`.
 
-```text
-main/battle.gui_script:18: attempt to index global '_deherm_' (a nil value)
-Error when initializing gui component: RESULT_SCRIPT_ERROR.
-```
+## Recorded and outstanding evidence
 
-That executable was the 7,993,552-byte vanilla engine. Its build said
-`Downloading 0 archives`, and neither `nm` nor `strings` found a deherm
-registration/provider marker. The example had not exposed the native extension
-directory to Bob.
+`integration/packaged-runtime-evidence.mjs` now requires the tutorial markers
+above, and `../evidence/packaged-runtime-arm64-macos.json` was re-recorded
+against this build: `pnpm runtime:packaged`, `runtime:packaged:record`,
+`runtime:packaged:check`, and `runtime:packaged --check-sources` all pass, and
+the process still terminates on SIGTERM with no rejected diagnostic.
 
-The example now exposes the monorepo extension through the local
-`defold_hermes` dependency link, exports it from `[library]`, and sets
-`script.shared_state = 1` so a generated GUI proxy participates in the Lua
-state where a native provider is registered. Bob's `--debug-ne-upload` archive
-contains `defold_hermes/ext.manifest`, `src/extension.cpp`, and the packaged
-`lib/arm64-osx/libhermes.a`; Bob therefore selects a custom-engine build rather
-than silently emitting another vanilla executable.
-
-A fresh custom engine was subsequently built through the pinned local Extender.
-The fail-closed harness launched it from `defold/build/default`, observed Defold
-1.14.0, exact profile detection, bundle generation 1, and the game-owned marker
-`war-battles-runtime:gui-init-rendered:32:160`, then observed another 1.5 seconds
-and required `war-battles-runtime:first-update-rendered:32:160` without
-error/fatal/script/traceback/bundle/component-runtime diagnostics. The first
-marker occurs after TypeScript `init` resolves the fixed GUI pools, performs the
-first render, and posts input focus; the second follows the first update/render.
-The harness then sent SIGTERM and verified the actual process result
-`exitCode: null, signal: SIGTERM`. Exact extension/project source inputs,
-engine/archive/compiled-project/bundle outputs, and a canonical transcript
-digest are stored in
-`../evidence/packaged-runtime-arm64-macos.json` without a timestamp.
-
-The dependency link is intentionally a monorepo development layout. A
-standalone distribution must replace it with a versioned Defold library archive
-whose root exports `defold_hermes`, then put that archive URL in
-`project.dependencies#N`; merely retaining `[library].include_dirs` does not
-download or vendor an extension.
-
-## Required GUI routes
-
-The example deliberately uses only predeclared GUI nodes. The current lowering
-plan marks every route below as an existing generated entry selecting the
-Dynamic Hermes backend. There is no remaining stable-ID lowering blocker in the
-authored gameplay surface. The calls below execute during the observed TypeScript
-initialization and first render through the packaged GUI-scene provider:
-
-| Stable API ID | TypeScript signature used here |
-| --- | --- |
-| `script:gui.get_node` / `0x1e65bc4e` | `gui.getNode(id: string \| DefoldHash): Node` |
-| `script:gui.set_position` / `0x57e22c89` | `gui.setPosition(node: Node, position: Vector3 \| Vector4): void` |
-| `script:gui.set_enabled` / `0x148567ab` | `gui.setEnabled(node: Node, enabled: boolean): void` |
-| `script:gui.set_color` / `0x289cacf1` | `gui.setColor(node: Node, color: Vector3 \| Vector4): void` |
-| `script:gui.set_size` / `0x4f947bcf` | `gui.setSize(node: Node, size: Vector3 \| Vector4): void` |
-| `script:gui.set_text` / `0x5843c90d` | `gui.setText(node: Node, text: string \| number): void` |
-| `script:gui.set_euler` / `0xe9adddd7` | `gui.setEuler(node: Node, rotation: Vector3 \| Vector4): void` |
-| `script:msg.post` / `0x4243998f` | `msg.post(receiver, messageId, message?): void` |
-
-Two value constructors are also needed by every visual update:
-
-| Stable API ID | Signature |
-| --- | --- |
-| `script:vmath.vector3` / `0xd01e1ade` | `vmath.vector3(x?: number, y?: number, z?: number): Vector3` |
-| `script:vmath.vector4` / `0xd31e1f97` | `vmath.vector4(x?: number, y?: number, z?: number, w?: number): Vector4` |
-
-The same plan selects Dynamic Hermes for those constructors and for
-`script:hash`/`0xa994c4c0`; their use precedes the observed marker. This proves
-the exact War Battles path, not every overload or API input shape.
-
-## Optional routes intentionally avoided
-
-Runtime GUI allocation is unnecessary for this slice. These routes are now
-generated Dynamic Hermes entries but are not called:
-
-| Stable API ID | Signature |
-| --- | --- |
-| `script:gui.new_box_node` / `0xfdb31d1e` | `gui.newBoxNode(position, size): Node` |
-| `script:gui.new_text_node` / `0x2d7bdf44` | `gui.newTextNode(position, text): Node` |
-
-The fixed scene pool is retained as a deterministic, bounded presentation
-choice rather than a lowering workaround. It does not remove the component/GUI
-provider requirement above.
+`../evidence/bundle-size.json` is stale, but for reasons outside this port: the
+measured entry only moved from `main/battle.gui.ts` to `reference/battle.gui.ts`,
+while the recorded source byte and file counts changed with an unrelated
+in-flight SDK regeneration. Re-record it with `pnpm bundle:size:update` once that
+lands.
 
 ## Online boundary
 
-This scene currently runs the authoritative simulation locally with 31 bots.
 No Defold WebTransport client is attached. Browser WebTransport, Deno, Quinn,
 Colyseus H3, WebRTC, and WebSocket adapters remain behind the existing typed
-transport boundary and retain their documented protocol labels. Offline bot
-play is not presented as network evidence.
+transport boundary. The deterministic 32-player simulation in `core/` is no
+longer driven by the built Defold project; it is retained for the headless
+match, bundle-size measurement, and the `reference/` presentation scene.

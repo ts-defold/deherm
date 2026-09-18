@@ -1,4 +1,4 @@
-script: "/main/battle.gui_script"
+script: "/reference/battle.gui_script"
 fonts {
   name: "system_font"
   font: "/main/tutorial-text.font"

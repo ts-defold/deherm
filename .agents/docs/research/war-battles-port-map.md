@@ -270,3 +270,28 @@ hash, or value-wrapper churn.
 These are port gates, not reasons to hand-write per-game bridge functions. A
 War Battles fix belongs in generator patterns or reusable runtime families and
 must improve the global conformance ledger.
+
+# Port status
+
+`examples/war-battles-online/defold` now implements this baseline as Defold game
+objects: `main/level.go` (tilemap), `main/player.go` (sprite, rocket factory,
+`main/player.script`), `main/rocket.go` (script, sprite, kinematic collision,
+group `rockets`, mask `tanks`), `main/tank.go` (group `tanks`, mask `rockets`),
+and `main/ui.gui` with one `score` text node. The authored sources are
+`main/player.script.ts`, `main/rocket.script.ts`, and `main/ui.gui.ts`; the
+`.gui_script` context the blocking-gaps list called absent is now a first-class
+generated proxy kind and runs in a packaged engine.
+
+Deviations from the pinned reference, all deliberate:
+
+* the tutorial's own sprite sheet is not vendored, so the four animations map
+  onto the closest art in `assets/` and the player rotation carries a quarter
+  turn for the screen-down infantry art;
+* `main/main.collection` sets a `demo` script property so one launch drives the
+  whole factory/physics/message chain without a human at the keyboard;
+* the `"use math"` operator transform is still absent, so the port uses explicit
+  generated `vmath` operations as this note requires.
+
+Slices 1 through 6 are observed together in one packaged arm64-macOS run rather
+than as separate fixtures; the deterministic differential trace, the allocation
+budgets, and the Static Hermes and browser-host repeats remain open.

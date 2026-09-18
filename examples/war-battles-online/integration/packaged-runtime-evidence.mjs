@@ -7,8 +7,13 @@ export const REQUIRED_MARKERS = Object.freeze([
   "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
   "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
   "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
-  "INFO:DEFOLD_HERMES: war-battles-runtime:gui-init-rendered:32:160",
-  "INFO:DEFOLD_HERMES: war-battles-runtime:first-update-rendered:32:160",
+  "INFO:DEFOLD_HERMES: war-battles:ui-init",
+  "INFO:DEFOLD_HERMES: war-battles:player-init:560.0:360.0",
+  "INFO:DEFOLD_HERMES: war-battles:player-fire:560.0:360.0:1.00:0.00",
+  "INFO:DEFOLD_HERMES: war-battles:rocket-init:1.00:0.00",
+  "INFO:DEFOLD_HERMES: war-battles:rocket-hit",
+  "INFO:DEFOLD_HERMES: war-battles:score:100",
+  "INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done",
   "INFO:DEFOLD_HERMES: Extension update entered (application initialized: false)",
 ]);
 

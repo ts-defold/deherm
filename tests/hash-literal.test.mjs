@@ -96,7 +96,7 @@ test("War Battles compiles literals through the real incremental ttsc/esbuild pi
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-hash-bundle-"));
   const output = path.join(temporary, "battle.js");
   const compiler = await createIncrementalCompiler({
-    entryPoint: path.join(root, "examples/war-battles-online/defold/main/battle.gui.ts"),
+    entryPoint: path.join(root, "examples/war-battles-online/defold/reference/battle.gui.ts"),
     outputFile: output,
     tsconfig: path.join(root, "examples/war-battles-online/defold/tsconfig.deherm.gui.json"),
     sourcemap: false,
