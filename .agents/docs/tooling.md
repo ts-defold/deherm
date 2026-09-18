@@ -60,6 +60,9 @@ ordinary edit loop.
 | Build/bundle the HTML5 game | `pnpm bob:web:build`; `pnpm bob:web:bundle` | Uses pinned emsdk 4.0.6 through local Extender |
 | Verify a running HTML5 bundle | `pnpm test:html5:runtime` | Reload-synchronized CDP lifecycle and binding proof |
 | Reuse a running local Extender | `pnpm bob:build`; `pnpm bob:bundle` | Local port 9010 is the default |
+| Measure binding-transport cost | `pnpm bench:transports` | Raw Lua, lua-stack, c-abi-native, typed-native, all uninstrumented |
+| Measure with telemetry on | `pnpm bench:transports:profiled` | Same binary with `DEHERM_PROFILE=ON`; also drains the telemetry ring |
+| Prove the telemetry compiles out | `pnpm test:profile-compile-out` | Builds both ways and reads the artifacts with `nm` and `strings` |
 
 `build:release-plan` emits canonical route glue under
 `build/profiles/release/canonical/<target>/`. For a native Dynamic-Hermes
@@ -71,6 +74,13 @@ and browser/Wasm currently produce reject-all registries plus
 `requirements.json`; those files are blocker evidence, not executable binding
 claims. Existing Lua-family implementation objects remain coarse-grained and
 are not yet proven dead-stripped.
+
+`DEHERM_PROFILE` is a build-time CMake option, OFF by default, that turns on
+generated timing spans at every binding transport boundary and a bounded
+allocation-free producer ring for the samples. It is independent of `NDEBUG`, so
+a Release build can be benchmarked; Defold's own `DM_PROFILE` is unconditionally
+null under `NDEBUG` and cannot be. Measured figures and their evidence boundary
+are in `.agents/docs/research/transport-overhead-measurement.md`.
 
 The strongest local verification is one command:
 

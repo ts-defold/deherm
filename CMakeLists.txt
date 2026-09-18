@@ -34,6 +34,43 @@ if(DEHERM_SANITIZE)
   add_link_options(-fsanitize=address,undefined)
 endif()
 
+# ---------------------------------------------------------------------------
+# Compile-time-switched transport telemetry.
+#
+# OFF by default. When it is off, `deherm_profile.hpp` expands every macro to
+# nothing, the generated identity tables are inside `#if defined(DEHERM_PROFILE)`
+# blocks, and no telemetry translation unit is added to any target, so no field,
+# branch, storage, symbol, or string survives. `pnpm test:profile-compile-out`
+# proves that from the linked artifacts.
+#
+# Deliberately independent of NDEBUG. Defold's own DM_PROFILE is unconditionally
+# null under NDEBUG (upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:112),
+# so it cannot answer "what does this transport cost in a release build";
+# DEHERM_PROFILE can be enabled in a Release configuration for exactly that.
+# ---------------------------------------------------------------------------
+option(DEHERM_PROFILE "Emit deherm binding-transport telemetry spans" OFF)
+set(DEHERM_PROFILE_RING_CAPACITY "8192" CACHE STRING
+  "Producer ring capacity in 32-byte telemetry records (power of two)")
+
+set(DEHERM_PROFILE_LIBRARIES "")
+if(DEHERM_PROFILE)
+  add_library(deherm-profile STATIC defold/defold_hermes/src/deherm_profile.cpp)
+  target_compile_features(deherm-profile PUBLIC cxx_std_17)
+  target_include_directories(deherm-profile PUBLIC
+    defold/defold_hermes/include
+    upstream/defold/engine/dlib/src
+  )
+  # PUBLIC so every consumer of the telemetry library compiles its own
+  # instrumented translation units with the identical switch state. A mixed
+  # state would silently produce half-instrumented binaries.
+  target_compile_definitions(deherm-profile PUBLIC
+    DEHERM_PROFILE=1
+    DEHERM_PROFILE_DMPROFILE=1
+    DEHERM_PROFILE_RING_CAPACITY=${DEHERM_PROFILE_RING_CAPACITY}
+  )
+  set(DEHERM_PROFILE_LIBRARIES deherm-profile)
+endif()
+
 if(APPLE)
   set(DEFOLD_DMSDK_TIME_SOURCE upstream/defold/engine/dlib/src/dlib/time_apple.cpp)
   set(DEFOLD_DMSDK_MUTEX_SOURCE upstream/defold/engine/dlib/src/dlib/mutex_posix.cpp)
@@ -44,6 +81,15 @@ else()
   set(DEFOLD_DMSDK_TIME_SOURCE upstream/defold/engine/dlib/src/dlib/time_posix.cpp)
   set(DEFOLD_DMSDK_MUTEX_SOURCE upstream/defold/engine/dlib/src/dlib/mutex_posix.cpp)
 endif()
+
+# Defold's null profiler backend. Kept in its own archive so every deherm
+# library resolves ProfileScopeBegin/End from one place; linking two archives
+# that each carried a copy would be an ODR hazard for targets that use both.
+add_library(defold-dmsdk-profile-null STATIC
+  upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp)
+target_compile_features(defold-dmsdk-profile-null PUBLIC cxx_std_17)
+target_include_directories(defold-dmsdk-profile-null PUBLIC
+  upstream/defold/engine/dlib/src)
 
 add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/capi.cpp
@@ -70,7 +116,6 @@ add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/script_bridge_capi.cpp
   defold/defold_hermes/src/script_jsi_bridge.cpp
   native/dmsdk_enum_runtime_stubs.cpp
-  upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp
   upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp
   ${DEFOLD_DMSDK_TIME_SOURCE}
 )
@@ -79,7 +124,8 @@ target_include_directories(defold-hermes-runtime PUBLIC
   defold/defold_hermes/include
   upstream/defold/engine/dlib/src
 )
-target_link_libraries(defold-hermes-runtime PUBLIC hermesvm_a)
+target_link_libraries(defold-hermes-runtime PUBLIC hermesvm_a
+  defold-dmsdk-profile-null ${DEHERM_PROFILE_LIBRARIES})
 
 # Optional release-only canonical reachability projection. The generated file
 # is authenticated by scripts/generate-release-build.mjs before it is written;
@@ -234,7 +280,8 @@ target_include_directories(defold-hermes-lua-bridge PUBLIC
   upstream/defold/engine/dlib/src
   upstream/defold/engine/lua/src
 )
-target_link_libraries(defold-hermes-lua-bridge PUBLIC defold-lua-test)
+target_link_libraries(defold-hermes-lua-bridge PUBLIC defold-lua-test
+  defold-dmsdk-profile-null ${DEHERM_PROFILE_LIBRARIES})
 
 target_link_libraries(defold-hermes-static-runner PRIVATE defold-hermes-lua-bridge)
 
@@ -423,6 +470,25 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
   )
 endif()
 target_link_libraries(defold-hermes-script-handle-router-test PRIVATE
+  defold-hermes-lua-bridge
+)
+
+# Transport benchmark. Measures the same route across raw Lua, the generated
+# lua-stack transport, the c-abi-native transport, and the typed-native extern_c
+# transport. Builds with DEHERM_PROFILE off and on; running it both ways also
+# measures what the instrumentation itself costs.
+add_executable(defold-hermes-transport-profile-benchmark
+  native/transport_profile_benchmark.cpp
+  defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp
+  defold/defold_hermes/src/script_bridge_capi.cpp
+)
+target_compile_features(defold-hermes-transport-profile-benchmark PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-transport-profile-benchmark PRIVATE
+    -Wall -Wextra -Werror -Wno-zero-length-array
+  )
+endif()
+target_link_libraries(defold-hermes-transport-profile-benchmark PRIVATE
   defold-hermes-lua-bridge
 )
 

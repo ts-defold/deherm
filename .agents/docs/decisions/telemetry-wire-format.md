@@ -50,6 +50,15 @@ separate records joined by a bounded correlation id:
 | span end | span id | correlation id | status id |
 | activation | state | build generation | runtime generation |
 | log | level | source string id | message string id |
+| transport span | route stable id | elapsed nanoseconds | transport \| shape<<8 \| status<<24 |
+
+The `transport span` kind is the binding-boundary leaf. A crossing is far
+shorter than the microsecond `timestamp_us` can express, so its duration travels
+in `value_a` in nanoseconds and the record stands alone: one record and one
+clock pair per crossing rather than a correlated begin/end pair. `timestamp_us`
+keeps its declared meaning and is derived from the entry clock read, not a third
+one. Producers of this kind are generated, never hand written, and are removed
+entirely by the `DEHERM_PROFILE` compile switch described below.
 
 Instance ids and content digests are attached off-path from bounded side tables
 keyed by the correlation id; they are never added to the producer record. If a
@@ -67,6 +76,24 @@ future field range. This lets newer controllers read older batches and permits
 fields to be retired without making every historical producer populate them.
 Durations use 64-bit microseconds so long captures do not overflow after about
 71 minutes.
+
+# Compile-time switch for binding transports
+
+Binding-transport instrumentation is governed by `DEHERM_PROFILE`, a CMake
+option that is OFF by default and, when off, removes every field, branch,
+storage byte, symbol, and cold string it would otherwise contribute. It follows
+the discipline of Defold's own `DM_PROFILE`
+(`upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:112`) but is deliberately
+independent of `NDEBUG`, because Defold's profiler is unconditionally null in a
+release build and therefore cannot measure a shipping configuration. Spans are
+also emitted into `DM_PROFILE_DYN` wherever a profiler exists to receive them.
+
+`pnpm test:profile-compile-out` proves the removal from the linked artifacts
+with `nm` and `strings`, and asserts the same markers are present with the
+switch on so the proof cannot pass vacuously. Measured overhead with the switch
+on is 26-31 ns per span; see
+`../research/transport-overhead-measurement.md` for the figures and their
+evidence boundary.
 
 # Transport mapping
 

@@ -164,6 +164,26 @@ function cppString(value) {
   return JSON.stringify(String(value));
 }
 
+// Telemetry contract shapes. Cost has to be attributable per contract, not only
+// per route, so every route interns the exact codec signature it crosses with.
+// The token is derived from the same generated codecs the transport uses, so it
+// cannot drift from the call it describes.
+const codecBitNames = Object.freeze(Object.entries(codecBits)
+  .sort(([, left], [, right]) => left - right)
+  .map(([name, bit]) => [bit, name]));
+
+function codecShapeToken(codec) {
+  if (codec.semanticKind) return `handle:${codec.semanticKind}`;
+  const names = codecBitNames.filter(([bit]) => (codec.mask & bit) !== 0).map(([, name]) => name);
+  return names.length ? names.join("|") : "none";
+}
+
+function contractShapeToken(arguments_, results) {
+  const left = arguments_.map(codecShapeToken).join(",");
+  const right = results.map(codecShapeToken).join(",");
+  return `(${left})->(${right})`;
+}
+
 function renderHeader(report) {
   const kindCases = report.handleKinds.map(({ enumName, numericId }) => `  k${enumName} = ${numericId},`).join("\n");
   return `#pragma once
@@ -171,6 +191,7 @@ function renderHeader(report) {
 #include <cstddef>
 #include <cstdint>
 #include <array>
+#include <defold_hermes/deherm_profile.hpp>
 #include <defold_hermes/lua_value_registry.hpp>
 #include <defold_hermes/scalar_lua_dispatch.hpp>
 #include <defold_hermes/script_bridge_capi.hpp>
@@ -281,6 +302,19 @@ RuntimeProfileDetectionStatus detectRuntimeProfile(lua_State* state, RuntimeProf
     char* error, size_t errorCapacity) noexcept;
 const Route* find(uint32_t stableId) noexcept;
 
+#if DEHERM_PROFILE_ENABLED
+/** Generated telemetry identity for the lua-stack transport. Declared only when
+ *  DEHERM_PROFILE is on; with the switch off neither the declarations nor the
+ *  tables behind them exist. */
+inline constexpr uint16_t kContractShapeCount = ${report.contractShapeCount};
+/** Dense contract-shape id for a route, indexed by Route::index. */
+uint16_t profileContractShape(uint16_t routeIndex) noexcept;
+/** Cold dmProfile scope name for a route, indexed by Route::index. */
+const char* profileRouteName(uint16_t routeIndex) noexcept;
+/** Cold contract-shape token, indexed by the dense shape id. */
+const char* profileContractShapeName(uint16_t shapeId) noexcept;
+#endif
+
 /** One fixed-capacity captured-Lua executor shared by every emitted handle route. */
 class CapturedLuaRouter {
  public:
@@ -380,6 +414,10 @@ function renderSource(report) {
   const runtimeProfiles = report.runtimeProfiles.map((profile) =>
     `  {${profile.index}, ${profile.mask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`).join("\n");
   const stableOrder = [...report.routes].sort((left, right) => left.stableId - right.stableId).map(({ index }) => index);
+  const profileShapes = report.routes.map((route) => `  ${route.contractShapeIndex},`).join("\n");
+  const profileNames = report.routes.map((route) =>
+    `  ${cppString(`deherm.lua-stack.${route.modulePath.join(".")}.${route.member}`)},`).join("\n");
+  const profileShapeNames = report.contractShapes.map((token) => `  ${cppString(token)},`).join("\n");
   return `#include <defold_hermes/generated_script_handle_lowering.hpp>
 #include <defold_hermes/script_url_arena.hpp>
 #include <dmsdk/dlib/hash.h>
@@ -519,6 +557,27 @@ static_assert(sizeof(kKinds) / sizeof(kKinds[0]) == kHandleKindCount);
 static_assert(sizeof(kRoutes) / sizeof(kRoutes[0]) == kRouteCount);
 static_assert(sizeof(kRuntimeProfiles) / sizeof(kRuntimeProfiles[0]) == kRuntimeProfileCount);
 
+#if DEHERM_PROFILE_ENABLED
+// Generated telemetry identity for the lua-stack transport. These tables exist
+// only when DEHERM_PROFILE is on; with the switch off the preprocessor removes
+// them, so no storage and no cold strings reach the object file.
+constexpr uint16_t kRouteContractShapes[] = {
+${profileShapes}
+};
+
+constexpr const char* kRouteProfileNames[] = {
+${profileNames}
+};
+
+constexpr const char* kContractShapeNames[] = {
+${profileShapeNames}
+};
+
+static_assert(sizeof(kRouteContractShapes) / sizeof(kRouteContractShapes[0]) == kRouteCount);
+static_assert(sizeof(kRouteProfileNames) / sizeof(kRouteProfileNames[0]) == kRouteCount);
+static_assert(sizeof(kContractShapeNames) / sizeof(kContractShapeNames[0]) == kContractShapeCount);
+#endif
+
 }  // namespace
 
 const HandleKind* handleKinds() noexcept { return kKinds; }
@@ -588,6 +647,20 @@ const Route* find(uint32_t stableId) noexcept {
     if (route.stableId < stableId) { first = position + 1; count -= step + 1; } else count = step; }
   return first < kRouteCount && kRoutes[kStableOrder[first]].stableId == stableId ? &kRoutes[kStableOrder[first]] : nullptr;
 }
+
+#if DEHERM_PROFILE_ENABLED
+uint16_t profileContractShape(uint16_t routeIndex) noexcept {
+  return routeIndex < kRouteCount ? kRouteContractShapes[routeIndex] : UINT16_C(0);
+}
+
+const char* profileRouteName(uint16_t routeIndex) noexcept {
+  return routeIndex < kRouteCount ? kRouteProfileNames[routeIndex] : "deherm.lua-stack.unknown";
+}
+
+const char* profileContractShapeName(uint16_t shapeId) noexcept {
+  return shapeId < kContractShapeCount ? kContractShapeNames[shapeId] : "unknown";
+}
+#endif
 
 struct CapturedLuaRouter::DispatchContext {
   CapturedLuaRouter* router;
@@ -825,20 +898,26 @@ bool CapturedLuaRouter::dispatchUnsafe(DispatchContext& context) noexcept {
 bool CapturedLuaRouter::dispatch(ScriptCallFrame* frame, char* error, size_t capacity) noexcept {
   if (!frame) { fail(error,capacity,"handle call frame is null"); return false; } frame->resultCount=0;
   const Route* route=find(frame->stableId); if(!route) { fail(error,capacity,"handle route is missing");return false; }
-  if(route->nativeDynamicHermes!=Disposition::kCapturedLuaRouterHarnessProvenJsiUnverified){fail(error,capacity,"handle route is blocked for this context");return false;}
-  if(!activeProfile_||!routeAvailableInProfile(*route,*activeProfile_)){fail(error,capacity,"handle route is unavailable in the active runtime profile");return false;}
-  if(frame->argumentCount!=route->argumentCount||(frame->argumentCount&&!frame->arguments)){fail(error,capacity,"handle argument count mismatch");return false;}
-  if(route->resultCount&&(!frame->results||frame->resultCapacity<route->resultCount)){fail(error,capacity,"handle result storage is exhausted");return false;}
-  if(!state_||!registry_)return false;
+  // Transport boundary for JS -> JSI -> C ABI -> Lua -> engine. The span covers
+  // every crossing cost: argument codecs, the protected instance save/restore,
+  // lua_call, and result codecs. It deliberately excludes the null-frame check
+  // and the O(log n) route lookup above it, which precede the crossing.
+  DEHERM_PROFILE_TRANSPORT_SCOPE(DEHERM_PROFILE_TRANSPORT_LUA_STACK, route->stableId,
+      kRouteContractShapes[route->index], kRouteProfileNames[route->index]);
+  if(route->nativeDynamicHermes!=Disposition::kCapturedLuaRouterHarnessProvenJsiUnverified){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route is blocked for this context");return false;}
+  if(!activeProfile_||!routeAvailableInProfile(*route,*activeProfile_)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route is unavailable in the active runtime profile");return false;}
+  if(frame->argumentCount!=route->argumentCount||(frame->argumentCount&&!frame->arguments)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle argument count mismatch");return false;}
+  if(route->resultCount&&(!frame->results||frame->resultCapacity<route->resultCount)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle result storage is exhausted");return false;}
+  if(!state_||!registry_){DEHERM_PROFILE_SCOPE_FAILED();return false;}
   const bool scoped=route->context==Context::kGameObjectInstance;
-  if(scoped&&(!instanceApi_.get||!instanceApi_.set||instanceRef_==LUA_NOREF||instanceRef_==LUA_REFNIL)){fail(error,capacity,"handle route requires a captured game-object instance");return false;}
+  if(scoped&&(!instanceApi_.get||!instanceApi_.set||instanceRef_==LUA_NOREF||instanceRef_==LUA_REFNIL)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route requires a captured game-object instance");return false;}
   const int top=lua_gettop(state_); const uint32_t stringMark=frame->stringScratchUsed; const uint32_t tableMark=frame->tableScratchUsed;
   InstanceContext instanceContext{this,LUA_NOREF,false}; bool ok=true;
   if(scoped){const int captureStatus=lua_cpcall(state_,ProtectedCaptureCurrentInstance,&instanceContext);if(captureStatus!=0){fail(error,capacity,lua_type(state_,-1)==LUA_TSTRING?lua_tostring(state_,-1):"capturing current Lua instance failed");ok=false;}lua_settop(state_,top);if(ok&&!instanceContext.ok){fail(error,capacity,"capturing current Lua instance failed");ok=false;}}
   DispatchContext dispatchContext{this,route,frame,error,capacity,false};
   if(ok){const int dispatchStatus=lua_cpcall(state_,ProtectedDispatch,&dispatchContext);if(dispatchStatus!=0){fail(error,capacity,lua_type(state_,-1)==LUA_TSTRING?lua_tostring(state_,-1):"protected handle dispatch failed");ok=false;}else ok=dispatchContext.ok;lua_settop(state_,top);}
   if(scoped&&instanceContext.reference!=LUA_NOREF&&instanceContext.reference!=LUA_REFNIL){instanceContext.ok=false;const int restoreStatus=lua_cpcall(state_,ProtectedRestoreCurrentInstance,&instanceContext);if(restoreStatus!=0||!instanceContext.ok){fail(error,capacity,lua_type(state_,-1)==LUA_TSTRING?lua_tostring(state_,-1):"restoring current Lua instance failed");ok=false;}lua_settop(state_,top);}
-  lua_settop(state_,top);if(!ok){frame->resultCount=0;frame->stringScratchUsed=stringMark;frame->tableScratchUsed=tableMark;}return ok;
+  lua_settop(state_,top);if(!ok){DEHERM_PROFILE_SCOPE_FAILED();frame->resultCount=0;frame->stringScratchUsed=stringMark;frame->tableScratchUsed=tableMark;}return ok;
 }
 
 }  // namespace defold_hermes::script_handle_lowering
@@ -996,6 +1075,7 @@ export function generateScriptHandleLowering(textInputs) {
       index,
       id: row.id,
       stableId: row.stableId,
+      contractShape: contractShapeToken(arguments_, results),
       modulePath: row.modulePath,
       member: row.member,
       operationClass: classified.operationClass,
@@ -1046,6 +1126,12 @@ export function generateScriptHandleLowering(textInputs) {
       }
     };
   });
+
+  const contractShapes = [...new Set(routes.map(({ contractShape }) => contractShape))]
+    .sort(compareCodeUnits);
+  const contractShapeIndexByToken = new Map(contractShapes.map((token, index) => [token, index]));
+  for (const route of routes) route.contractShapeIndex = contractShapeIndexByToken.get(route.contractShape);
+  if (contractShapes.length > 0xFFFF) throw new Error("telemetry contract shape ids exceed the packed field");
 
   const operationClassCounts = countBy(routes, ({ operationClass }) => operationClass);
   const contextCounts = countBy(routes, ({ context }) => context);
@@ -1124,6 +1210,8 @@ export function generateScriptHandleLowering(textInputs) {
     handleKindCount: handleKinds.length,
     handleKinds,
     kindById,
+    contractShapeCount: contractShapes.length,
+    contractShapes,
     argumentCodecCount: argumentCodecs.length,
     resultCodecCount: resultCodecs.length,
     argumentCodecs,

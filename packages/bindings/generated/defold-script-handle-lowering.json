@@ -343,6 +343,160 @@
       "enumName": "RenderConstantBuffer"
     }
   ],
+  "contractShapeCount": 151,
+  "contractShapes": [
+    "()->(handle:box2d-world)",
+    "()->(handle:bullet-world)",
+    "()->(handle:render-constant-buffer)",
+    "(handle:box2d-body)->()",
+    "(handle:box2d-body)->(boolean)",
+    "(handle:box2d-body)->(handle:box2d-body)",
+    "(handle:box2d-body)->(handle:box2d-world)",
+    "(handle:box2d-body)->(hash)",
+    "(handle:box2d-body)->(integer)",
+    "(handle:box2d-body)->(nil|string)",
+    "(handle:box2d-body)->(number)",
+    "(handle:box2d-body)->(vector3)",
+    "(handle:box2d-body,boolean)->()",
+    "(handle:box2d-body,hash)->()",
+    "(handle:box2d-body,integer)->()",
+    "(handle:box2d-body,integer)->(boolean)",
+    "(handle:box2d-body,integer)->(integer)",
+    "(handle:box2d-body,integer)->(number)",
+    "(handle:box2d-body,integer,boolean)->()",
+    "(handle:box2d-body,integer,number)->()",
+    "(handle:box2d-body,integer,number,boolean)->()",
+    "(handle:box2d-body,integer,vector3)->(boolean)",
+    "(handle:box2d-body,number)->()",
+    "(handle:box2d-body,string)->()",
+    "(handle:box2d-body,vector3)->()",
+    "(handle:box2d-body,vector3)->(vector3)",
+    "(handle:box2d-body,vector3,number)->()",
+    "(handle:box2d-body,vector3,number,number)->()",
+    "(handle:box2d-body,vector3,vector3)->()",
+    "(handle:box2d-chain)->()",
+    "(handle:box2d-chain)->(boolean)",
+    "(handle:box2d-chain)->(handle:box2d-world)",
+    "(handle:box2d-chain)->(integer)",
+    "(handle:box2d-chain)->(number)",
+    "(handle:box2d-chain,integer)->()",
+    "(handle:box2d-chain,number)->()",
+    "(handle:box2d-joint)->()",
+    "(handle:box2d-joint)->(boolean)",
+    "(handle:box2d-joint)->(handle:box2d-body)",
+    "(handle:box2d-joint)->(handle:box2d-joint)",
+    "(handle:box2d-joint)->(handle:box2d-world)",
+    "(handle:box2d-joint)->(integer)",
+    "(handle:box2d-joint)->(number)",
+    "(handle:box2d-joint)->(vector3)",
+    "(handle:box2d-joint,boolean)->()",
+    "(handle:box2d-joint,number)->()",
+    "(handle:box2d-joint,number,number)->()",
+    "(handle:box2d-joint,vector3)->()",
+    "(handle:box2d-shape)->(boolean)",
+    "(handle:box2d-shape)->(handle:box2d-body)",
+    "(handle:box2d-shape)->(handle:box2d-chain)",
+    "(handle:box2d-shape)->(handle:box2d-world)",
+    "(handle:box2d-shape)->(integer)",
+    "(handle:box2d-shape,boolean)->()",
+    "(handle:box2d-shape,integer)->()",
+    "(handle:box2d-shape,vector3)->(vector3)",
+    "(handle:box2d-world)->()",
+    "(handle:box2d-world)->(boolean)",
+    "(handle:box2d-world)->(integer)",
+    "(handle:box2d-world)->(number)",
+    "(handle:box2d-world)->(vector3)",
+    "(handle:box2d-world,boolean)->()",
+    "(handle:box2d-world,number)->()",
+    "(handle:box2d-world,number,number)->()",
+    "(handle:box2d-world,number,number,number)->()",
+    "(handle:box2d-world,vector3)->()",
+    "(handle:buffer-data,hash)->(string)",
+    "(handle:buffer-data,number,handle:buffer-data,number,number)->()",
+    "(handle:buffer-data,string|hash)->(handle:buffer-stream)",
+    "(handle:buffer-stream,number,handle:buffer-stream,number,number)->()",
+    "(handle:bullet-constraint)->()",
+    "(handle:bullet-constraint)->(boolean)",
+    "(handle:bullet-constraint)->(handle:bullet-object)",
+    "(handle:bullet-constraint)->(handle:bullet-world)",
+    "(handle:bullet-constraint)->(integer)",
+    "(handle:bullet-constraint)->(number)",
+    "(handle:bullet-constraint)->(string)",
+    "(handle:bullet-constraint,boolean)->()",
+    "(handle:bullet-constraint,boolean,number,number)->()",
+    "(handle:bullet-constraint,integer)->(boolean)",
+    "(handle:bullet-constraint,integer)->(number)",
+    "(handle:bullet-constraint,integer)->(vector3)",
+    "(handle:bullet-constraint,integer,boolean)->()",
+    "(handle:bullet-constraint,integer,boolean,number,number,nil|number)->()",
+    "(handle:bullet-constraint,integer,number)->()",
+    "(handle:bullet-constraint,integer,number,number)->()",
+    "(handle:bullet-constraint,nil|integer,nil|number)->()",
+    "(handle:bullet-constraint,number,number)->()",
+    "(handle:bullet-constraint,number,number,nil|number,nil|number)->()",
+    "(handle:bullet-constraint,number,number,number,nil|number,nil|number,nil|number)->()",
+    "(handle:bullet-constraint,number,number,number,number)->()",
+    "(handle:bullet-constraint,quaternion,nil|boolean)->()",
+    "(handle:bullet-constraint,string,boolean,number,number)->()",
+    "(handle:bullet-constraint,vector3)->()",
+    "(handle:bullet-constraint,vector3,quaternion)->()",
+    "(handle:bullet-constraint,vector3,vector3)->()",
+    "(handle:bullet-object)->()",
+    "(handle:bullet-object)->(boolean)",
+    "(handle:bullet-object)->(handle:bullet-world)",
+    "(handle:bullet-object)->(integer)",
+    "(handle:bullet-object)->(number)",
+    "(handle:bullet-object)->(quaternion)",
+    "(handle:bullet-object)->(vector3)",
+    "(handle:bullet-object,boolean)->()",
+    "(handle:bullet-object,integer)->()",
+    "(handle:bullet-object,integer)->(boolean)",
+    "(handle:bullet-object,integer)->(handle:bullet-shape)",
+    "(handle:bullet-object,number)->()",
+    "(handle:bullet-object,number,number)->()",
+    "(handle:bullet-object,number,vector3)->()",
+    "(handle:bullet-object,quaternion)->()",
+    "(handle:bullet-object,vector3)->()",
+    "(handle:bullet-object,vector3)->(vector3)",
+    "(handle:bullet-object,vector3,quaternion)->()",
+    "(handle:bullet-object,vector3,vector3)->()",
+    "(handle:bullet-shape)->(boolean)",
+    "(handle:bullet-shape)->(handle:bullet-object)",
+    "(handle:bullet-shape)->(integer)",
+    "(handle:bullet-shape,vector3,quaternion)->()",
+    "(handle:bullet-world)->(boolean)",
+    "(handle:bullet-world)->(integer)",
+    "(handle:bullet-world)->(vector3)",
+    "(handle:bullet-world,vector3)->()",
+    "(handle:graphics-render-target)->()",
+    "(handle:graphics-render-target,integer)->(integer)",
+    "(handle:graphics-render-target,integer,integer)->()",
+    "(handle:graphics-texture)->()",
+    "(handle:gui-node)->()",
+    "(handle:gui-node)->(boolean)",
+    "(handle:gui-node)->(handle:gui-node)",
+    "(handle:gui-node)->(hash)",
+    "(handle:gui-node)->(integer)",
+    "(handle:gui-node)->(number)",
+    "(handle:gui-node)->(quaternion)",
+    "(handle:gui-node)->(string)",
+    "(handle:gui-node)->(vector3)",
+    "(handle:gui-node)->(vector4)",
+    "(handle:gui-node,boolean)->(boolean)",
+    "(handle:gui-node,handle:gui-node)->()",
+    "(handle:gui-node,nil|string|hash)->()",
+    "(handle:gui-node,number,number)->(boolean)",
+    "(handle:gui-node,vector3)->(vector3)",
+    "(number|string|hash,handle:graphics-texture,integer)->()",
+    "(string)->(handle:buffer-data)",
+    "(string|hash)->(handle:buffer-data)",
+    "(string|hash,handle:buffer-data)->()",
+    "(string|hash|url)->(handle:box2d-body)",
+    "(string|hash|url)->(handle:bullet-object)",
+    "(vector3|vector4,string)->(handle:gui-node)",
+    "(vector3|vector4,string|hash)->(handle:gui-node)",
+    "(vector3|vector4,vector3)->(handle:gui-node)"
+  ],
   "argumentCodecCount": 645,
   "resultCodecCount": 253,
   "argumentCodecs": [
@@ -4026,6 +4180,7 @@
       "index": 0,
       "id": "script:b2d.body.apply_angular_impulse",
       "stableId": 726881113,
+      "contractShape": "(handle:box2d-body,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4104,12 +4259,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 22
     },
     {
       "index": 1,
       "id": "script:b2d.body.apply_force",
       "stableId": 2962062296,
+      "contractShape": "(handle:box2d-body,vector3,vector3)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4188,12 +4345,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 28
     },
     {
       "index": 2,
       "id": "script:b2d.body.apply_force_to_center",
       "stableId": 3039406416,
+      "contractShape": "(handle:box2d-body,vector3)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4272,12 +4431,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 24
     },
     {
       "index": 3,
       "id": "script:b2d.body.apply_linear_impulse",
       "stableId": 4170155344,
+      "contractShape": "(handle:box2d-body,vector3,vector3)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4356,12 +4517,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 28
     },
     {
       "index": 4,
       "id": "script:b2d.body.apply_linear_impulse_to_center",
       "stableId": 1504032840,
+      "contractShape": "(handle:box2d-body,vector3)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4434,12 +4597,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 24
     },
     {
       "index": 5,
       "id": "script:b2d.body.apply_torque",
       "stableId": 761672151,
+      "contractShape": "(handle:box2d-body,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4518,12 +4683,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 22
     },
     {
       "index": 6,
       "id": "script:b2d.body.destroy_fixture",
       "stableId": 203543744,
+      "contractShape": "(handle:box2d-body,integer)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4596,12 +4763,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 14
     },
     {
       "index": 7,
       "id": "script:b2d.body.destroy_shape",
       "stableId": 1886957296,
+      "contractShape": "(handle:box2d-body,integer)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4674,12 +4843,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 14
     },
     {
       "index": 8,
       "id": "script:b2d.body.dump",
       "stableId": 775015646,
+      "contractShape": "(handle:box2d-body)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4752,12 +4923,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 3
     },
     {
       "index": 9,
       "id": "script:b2d.body.enable_contact_events",
       "stableId": 3417435032,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4830,12 +5003,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 10,
       "id": "script:b2d.body.enable_hit_events",
       "stableId": 1756693907,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4908,12 +5083,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 11,
       "id": "script:b2d.body.enable_sleep",
       "stableId": 3138438891,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -4986,12 +5163,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 12,
       "id": "script:b2d.body.get_angle",
       "stableId": 165698188,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -5070,12 +5249,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 13,
       "id": "script:b2d.body.get_angular_damping",
       "stableId": 3599094944,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -5154,12 +5335,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 14,
       "id": "script:b2d.body.get_angular_velocity",
       "stableId": 3833370693,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -5238,12 +5421,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 15,
       "id": "script:b2d.body.get_force",
       "stableId": 1437207392,
+      "contractShape": "(handle:box2d-body)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -5322,12 +5507,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 11
     },
     {
       "index": 16,
       "id": "script:b2d.body.get_gravity_scale",
       "stableId": 1493593008,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -5406,12 +5593,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 17,
       "id": "script:b2d.body.get_inertia",
       "stableId": 2158714333,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -5490,12 +5679,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 18,
       "id": "script:b2d.body.get_linear_damping",
       "stableId": 4027002921,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -5574,12 +5765,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 19,
       "id": "script:b2d.body.get_linear_velocity",
       "stableId": 2588459910,
+      "contractShape": "(handle:box2d-body)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -5658,12 +5851,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 11
     },
     {
       "index": 20,
       "id": "script:b2d.body.get_linear_velocity_from_local_point",
       "stableId": 3451721402,
+      "contractShape": "(handle:box2d-body,vector3)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -5742,12 +5937,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 25
     },
     {
       "index": 21,
       "id": "script:b2d.body.get_linear_velocity_from_world_point",
       "stableId": 2305883589,
+      "contractShape": "(handle:box2d-body,vector3)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -5826,12 +6023,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 25
     },
     {
       "index": 22,
       "id": "script:b2d.body.get_local_center",
       "stableId": 829974432,
+      "contractShape": "(handle:box2d-body)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -5910,12 +6109,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 11
     },
     {
       "index": 23,
       "id": "script:b2d.body.get_local_center_of_mass",
       "stableId": 4053048873,
+      "contractShape": "(handle:box2d-body)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -5988,12 +6189,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 11
     },
     {
       "index": 24,
       "id": "script:b2d.body.get_local_point",
       "stableId": 2341357133,
+      "contractShape": "(handle:box2d-body,vector3)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -6072,12 +6275,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 25
     },
     {
       "index": 25,
       "id": "script:b2d.body.get_local_vector",
       "stableId": 1514018830,
+      "contractShape": "(handle:box2d-body,vector3)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -6156,12 +6361,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 25
     },
     {
       "index": 26,
       "id": "script:b2d.body.get_mass",
       "stableId": 275202805,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -6240,12 +6447,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 27,
       "id": "script:b2d.body.get_name",
       "stableId": 1246427194,
+      "contractShape": "(handle:box2d-body)->(nil|string)",
       "modulePath": [
         "b2d",
         "body"
@@ -6318,12 +6527,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 9
     },
     {
       "index": 28,
       "id": "script:b2d.body.get_next",
       "stableId": 1887140972,
+      "contractShape": "(handle:box2d-body)->(handle:box2d-body)",
       "modulePath": [
         "b2d",
         "body"
@@ -6398,12 +6609,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 5
     },
     {
       "index": 29,
       "id": "script:b2d.body.get_position",
       "stableId": 1505246598,
+      "contractShape": "(handle:box2d-body)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -6482,12 +6695,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 11
     },
     {
       "index": 30,
       "id": "script:b2d.body.get_rotational_inertia",
       "stableId": 4257505987,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -6560,12 +6775,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 31,
       "id": "script:b2d.body.get_sleep_threshold",
       "stableId": 1335620596,
+      "contractShape": "(handle:box2d-body)->(number)",
       "modulePath": [
         "b2d",
         "body"
@@ -6638,12 +6855,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 10
     },
     {
       "index": 32,
       "id": "script:b2d.body.get_type",
       "stableId": 4261927433,
+      "contractShape": "(handle:box2d-body)->(integer)",
       "modulePath": [
         "b2d",
         "body"
@@ -6722,12 +6941,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 8
     },
     {
       "index": 33,
       "id": "script:b2d.body.get_user_data",
       "stableId": 366616171,
+      "contractShape": "(handle:box2d-body)->(hash)",
       "modulePath": [
         "b2d",
         "body"
@@ -6795,12 +7016,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 7
     },
     {
       "index": 34,
       "id": "script:b2d.body.get_world",
       "stableId": 3271172727,
+      "contractShape": "(handle:box2d-body)->(handle:box2d-world)",
       "modulePath": [
         "b2d",
         "body"
@@ -6881,12 +7104,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 6
     },
     {
       "index": 35,
       "id": "script:b2d.body.get_world_center",
       "stableId": 209676193,
+      "contractShape": "(handle:box2d-body)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -6965,12 +7190,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 11
     },
     {
       "index": 36,
       "id": "script:b2d.body.get_world_center_of_mass",
       "stableId": 1293500276,
+      "contractShape": "(handle:box2d-body)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -7043,12 +7270,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 11
     },
     {
       "index": 37,
       "id": "script:b2d.body.get_world_point",
       "stableId": 3042755438,
+      "contractShape": "(handle:box2d-body,vector3)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -7127,12 +7356,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 25
     },
     {
       "index": 38,
       "id": "script:b2d.body.get_world_vector",
       "stableId": 3363163511,
+      "contractShape": "(handle:box2d-body,vector3)->(vector3)",
       "modulePath": [
         "b2d",
         "body"
@@ -7211,12 +7442,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 25
     },
     {
       "index": 39,
       "id": "script:b2d.body.is_active",
       "stableId": 3359264919,
+      "contractShape": "(handle:box2d-body)->(boolean)",
       "modulePath": [
         "b2d",
         "body"
@@ -7295,12 +7528,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 4
     },
     {
       "index": 40,
       "id": "script:b2d.body.is_awake",
       "stableId": 2936687572,
+      "contractShape": "(handle:box2d-body)->(boolean)",
       "modulePath": [
         "b2d",
         "body"
@@ -7379,12 +7614,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 4
     },
     {
       "index": 41,
       "id": "script:b2d.body.is_bullet",
       "stableId": 1788367281,
+      "contractShape": "(handle:box2d-body)->(boolean)",
       "modulePath": [
         "b2d",
         "body"
@@ -7463,12 +7700,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 4
     },
     {
       "index": 42,
       "id": "script:b2d.body.is_fixed_rotation",
       "stableId": 1888837992,
+      "contractShape": "(handle:box2d-body)->(boolean)",
       "modulePath": [
         "b2d",
         "body"
@@ -7547,12 +7786,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 4
     },
     {
       "index": 43,
       "id": "script:b2d.body.is_sleeping_allowed",
       "stableId": 1222264979,
+      "contractShape": "(handle:box2d-body)->(boolean)",
       "modulePath": [
         "b2d",
         "body"
@@ -7631,12 +7872,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 4
     },
     {
       "index": 44,
       "id": "script:b2d.body.is_sleeping_enabled",
       "stableId": 814806862,
+      "contractShape": "(handle:box2d-body)->(boolean)",
       "modulePath": [
         "b2d",
         "body"
@@ -7709,12 +7952,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 4
     },
     {
       "index": 45,
       "id": "script:b2d.body.is_valid",
       "stableId": 3797032313,
+      "contractShape": "(handle:box2d-body)->(boolean)",
       "modulePath": [
         "b2d",
         "body"
@@ -7787,12 +8032,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 4
     },
     {
       "index": 46,
       "id": "script:b2d.body.reset_mass_data",
       "stableId": 3269475957,
+      "contractShape": "(handle:box2d-body)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -7871,12 +8118,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 3
     },
     {
       "index": 47,
       "id": "script:b2d.body.set_active",
       "stableId": 3548885551,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -7955,12 +8204,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 48,
       "id": "script:b2d.body.set_angular_damping",
       "stableId": 2094621188,
+      "contractShape": "(handle:box2d-body,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8039,12 +8290,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 22
     },
     {
       "index": 49,
       "id": "script:b2d.body.set_angular_velocity",
       "stableId": 2666237193,
+      "contractShape": "(handle:box2d-body,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8123,12 +8376,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 22
     },
     {
       "index": 50,
       "id": "script:b2d.body.set_awake",
       "stableId": 1252612060,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8207,12 +8462,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 51,
       "id": "script:b2d.body.set_bullet",
       "stableId": 3802578041,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8291,12 +8548,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 52,
       "id": "script:b2d.body.set_fixed_rotation",
       "stableId": 4208282272,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8375,12 +8634,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 53,
       "id": "script:b2d.body.set_gravity_scale",
       "stableId": 3316588812,
+      "contractShape": "(handle:box2d-body,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8459,12 +8720,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 22
     },
     {
       "index": 54,
       "id": "script:b2d.body.set_linear_damping",
       "stableId": 2758787485,
+      "contractShape": "(handle:box2d-body,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8543,12 +8806,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 22
     },
     {
       "index": 55,
       "id": "script:b2d.body.set_linear_velocity",
       "stableId": 391829082,
+      "contractShape": "(handle:box2d-body,vector3)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8627,12 +8892,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 24
     },
     {
       "index": 56,
       "id": "script:b2d.body.set_name",
       "stableId": 2352869094,
+      "contractShape": "(handle:box2d-body,string)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8705,12 +8972,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 23
     },
     {
       "index": 57,
       "id": "script:b2d.body.set_sleep_threshold",
       "stableId": 1761419560,
+      "contractShape": "(handle:box2d-body,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8783,12 +9052,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 22
     },
     {
       "index": 58,
       "id": "script:b2d.body.set_sleeping_allowed",
       "stableId": 2544504459,
+      "contractShape": "(handle:box2d-body,boolean)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8867,12 +9138,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 12
     },
     {
       "index": 59,
       "id": "script:b2d.body.set_target_transform",
       "stableId": 1878493291,
+      "contractShape": "(handle:box2d-body,vector3,number,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -8945,12 +9218,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 27
     },
     {
       "index": 60,
       "id": "script:b2d.body.set_transform",
       "stableId": 1115022875,
+      "contractShape": "(handle:box2d-body,vector3,number)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -9029,12 +9304,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 26
     },
     {
       "index": 61,
       "id": "script:b2d.body.set_type",
       "stableId": 1345069645,
+      "contractShape": "(handle:box2d-body,integer)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -9113,12 +9390,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 14
     },
     {
       "index": 62,
       "id": "script:b2d.body.set_user_data",
       "stableId": 2241017567,
+      "contractShape": "(handle:box2d-body,hash)->()",
       "modulePath": [
         "b2d",
         "body"
@@ -9186,12 +9465,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 13
     },
     {
       "index": 63,
       "id": "script:b2d.chain.destroy",
       "stableId": 469246619,
+      "contractShape": "(handle:box2d-chain)->()",
       "modulePath": [
         "b2d",
         "chain"
@@ -9264,12 +9545,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 29
     },
     {
       "index": 64,
       "id": "script:b2d.chain.from_shape",
       "stableId": 2813724309,
+      "contractShape": "(handle:box2d-shape)->(handle:box2d-chain)",
       "modulePath": [
         "b2d",
         "chain"
@@ -9344,12 +9627,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 50
     },
     {
       "index": 65,
       "id": "script:b2d.chain.get_friction",
       "stableId": 180453284,
+      "contractShape": "(handle:box2d-chain)->(number)",
       "modulePath": [
         "b2d",
         "chain"
@@ -9422,12 +9707,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 33
     },
     {
       "index": 66,
       "id": "script:b2d.chain.get_material",
       "stableId": 2336375595,
+      "contractShape": "(handle:box2d-chain)->(integer)",
       "modulePath": [
         "b2d",
         "chain"
@@ -9500,12 +9787,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 32
     },
     {
       "index": 67,
       "id": "script:b2d.chain.get_restitution",
       "stableId": 1981767718,
+      "contractShape": "(handle:box2d-chain)->(number)",
       "modulePath": [
         "b2d",
         "chain"
@@ -9578,12 +9867,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 33
     },
     {
       "index": 68,
       "id": "script:b2d.chain.get_segment_count",
       "stableId": 3555473695,
+      "contractShape": "(handle:box2d-chain)->(integer)",
       "modulePath": [
         "b2d",
         "chain"
@@ -9656,12 +9947,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 32
     },
     {
       "index": 69,
       "id": "script:b2d.chain.get_world",
       "stableId": 1117101178,
+      "contractShape": "(handle:box2d-chain)->(handle:box2d-world)",
       "modulePath": [
         "b2d",
         "chain"
@@ -9736,12 +10029,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 31
     },
     {
       "index": 70,
       "id": "script:b2d.chain.is_valid",
       "stableId": 2301892650,
+      "contractShape": "(handle:box2d-chain)->(boolean)",
       "modulePath": [
         "b2d",
         "chain"
@@ -9814,12 +10109,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 30
     },
     {
       "index": 71,
       "id": "script:b2d.chain.set_friction",
       "stableId": 3819138744,
+      "contractShape": "(handle:box2d-chain,number)->()",
       "modulePath": [
         "b2d",
         "chain"
@@ -9892,12 +10189,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 35
     },
     {
       "index": 72,
       "id": "script:b2d.chain.set_material",
       "stableId": 2384789823,
+      "contractShape": "(handle:box2d-chain,integer)->()",
       "modulePath": [
         "b2d",
         "chain"
@@ -9970,12 +10269,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 34
     },
     {
       "index": 73,
       "id": "script:b2d.chain.set_restitution",
       "stableId": 867459882,
+      "contractShape": "(handle:box2d-chain,number)->()",
       "modulePath": [
         "b2d",
         "chain"
@@ -10048,12 +10349,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 35
     },
     {
       "index": 74,
       "id": "script:b2d.fixture.get_density",
       "stableId": 2277077666,
+      "contractShape": "(handle:box2d-body,integer)->(number)",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10126,12 +10429,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 17
     },
     {
       "index": 75,
       "id": "script:b2d.fixture.get_friction",
       "stableId": 2870775508,
+      "contractShape": "(handle:box2d-body,integer)->(number)",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10204,12 +10509,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 17
     },
     {
       "index": 76,
       "id": "script:b2d.fixture.get_restitution",
       "stableId": 109722038,
+      "contractShape": "(handle:box2d-body,integer)->(number)",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10282,12 +10589,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 17
     },
     {
       "index": 77,
       "id": "script:b2d.fixture.get_type",
       "stableId": 1310385622,
+      "contractShape": "(handle:box2d-body,integer)->(integer)",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10360,12 +10669,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 16
     },
     {
       "index": 78,
       "id": "script:b2d.fixture.is_sensor",
       "stableId": 673579190,
+      "contractShape": "(handle:box2d-body,integer)->(boolean)",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10438,12 +10749,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 15
     },
     {
       "index": 79,
       "id": "script:b2d.fixture.refilter",
       "stableId": 2058062780,
+      "contractShape": "(handle:box2d-body,integer,boolean)->()",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10516,12 +10829,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 18
     },
     {
       "index": 80,
       "id": "script:b2d.fixture.set_density",
       "stableId": 1362948782,
+      "contractShape": "(handle:box2d-body,integer,number,boolean)->()",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10594,12 +10909,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 20
     },
     {
       "index": 81,
       "id": "script:b2d.fixture.set_friction",
       "stableId": 2716170248,
+      "contractShape": "(handle:box2d-body,integer,number)->()",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10672,12 +10989,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 19
     },
     {
       "index": 82,
       "id": "script:b2d.fixture.set_restitution",
       "stableId": 3849104602,
+      "contractShape": "(handle:box2d-body,integer,number)->()",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10750,12 +11069,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 19
     },
     {
       "index": 83,
       "id": "script:b2d.fixture.set_sensor",
       "stableId": 2944376556,
+      "contractShape": "(handle:box2d-body,integer,boolean)->()",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10828,12 +11149,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 18
     },
     {
       "index": 84,
       "id": "script:b2d.fixture.test_point",
       "stableId": 216040350,
+      "contractShape": "(handle:box2d-body,integer,vector3)->(boolean)",
       "modulePath": [
         "b2d",
         "fixture"
@@ -10906,12 +11229,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 21
     },
     {
       "index": 85,
       "id": "script:b2d.get_body",
       "stableId": 1348712235,
+      "contractShape": "(string|hash|url)->(handle:box2d-body)",
       "modulePath": [
         "b2d"
       ],
@@ -10989,12 +11314,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 146
     },
     {
       "index": 86,
       "id": "script:b2d.get_world",
       "stableId": 3600623753,
+      "contractShape": "()->(handle:box2d-world)",
       "modulePath": [
         "b2d"
       ],
@@ -11072,12 +11399,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 0
     },
     {
       "index": 87,
       "id": "script:b2d.joint.destroy",
       "stableId": 4156305370,
+      "contractShape": "(handle:box2d-joint)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -11156,12 +11485,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 36
     },
     {
       "index": 88,
       "id": "script:b2d.joint.enable_limit",
       "stableId": 1468180163,
+      "contractShape": "(handle:box2d-joint,boolean)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -11240,12 +11571,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 44
     },
     {
       "index": 89,
       "id": "script:b2d.joint.enable_motor",
       "stableId": 501836777,
+      "contractShape": "(handle:box2d-joint,boolean)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -11324,12 +11657,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 44
     },
     {
       "index": 90,
       "id": "script:b2d.joint.enable_spring",
       "stableId": 112322221,
+      "contractShape": "(handle:box2d-joint,boolean)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -11402,12 +11737,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 44
     },
     {
       "index": 91,
       "id": "script:b2d.joint.get_anchor_a",
       "stableId": 428788652,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -11486,12 +11823,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 92,
       "id": "script:b2d.joint.get_anchor_b",
       "stableId": 479121509,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -11570,12 +11909,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 93,
       "id": "script:b2d.joint.get_angular_damping_ratio",
       "stableId": 496555604,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -11648,12 +11989,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 94,
       "id": "script:b2d.joint.get_angular_hertz",
       "stableId": 1825309259,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -11726,12 +12069,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 95,
       "id": "script:b2d.joint.get_angular_offset",
       "stableId": 279418569,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -11804,12 +12149,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 96,
       "id": "script:b2d.joint.get_body_a",
       "stableId": 76897113,
+      "contractShape": "(handle:box2d-joint)->(handle:box2d-body)",
       "modulePath": [
         "b2d",
         "joint"
@@ -11890,12 +12237,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 38
     },
     {
       "index": 97,
       "id": "script:b2d.joint.get_body_b",
       "stableId": 26564256,
+      "contractShape": "(handle:box2d-joint)->(handle:box2d-body)",
       "modulePath": [
         "b2d",
         "joint"
@@ -11976,12 +12325,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 38
     },
     {
       "index": 98,
       "id": "script:b2d.joint.get_collide_connected",
       "stableId": 2700128697,
+      "contractShape": "(handle:box2d-joint)->(boolean)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12060,12 +12411,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 37
     },
     {
       "index": 99,
       "id": "script:b2d.joint.get_correction_factor",
       "stableId": 269684289,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12138,12 +12491,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 100,
       "id": "script:b2d.joint.get_current_length",
       "stableId": 1858724003,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12216,12 +12571,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 101,
       "id": "script:b2d.joint.get_damping_ratio",
       "stableId": 3755540409,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12300,12 +12657,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 102,
       "id": "script:b2d.joint.get_frequency",
       "stableId": 1394715861,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12384,12 +12743,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 103,
       "id": "script:b2d.joint.get_ground_anchor_a",
       "stableId": 2831073086,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12462,12 +12823,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 104,
       "id": "script:b2d.joint.get_ground_anchor_b",
       "stableId": 2814295467,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12540,12 +12903,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 105,
       "id": "script:b2d.joint.get_hertz",
       "stableId": 251838610,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12624,12 +12989,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 106,
       "id": "script:b2d.joint.get_joint1",
       "stableId": 1578643662,
+      "contractShape": "(handle:box2d-joint)->(handle:box2d-joint)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12704,12 +13071,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 39
     },
     {
       "index": 107,
       "id": "script:b2d.joint.get_joint2",
       "stableId": 1561866043,
+      "contractShape": "(handle:box2d-joint)->(handle:box2d-joint)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12784,12 +13153,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 39
     },
     {
       "index": 108,
       "id": "script:b2d.joint.get_joint_angle",
       "stableId": 830127879,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12868,12 +13239,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 109,
       "id": "script:b2d.joint.get_joint_speed",
       "stableId": 3189910327,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -12952,12 +13325,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 110,
       "id": "script:b2d.joint.get_joint_translation",
       "stableId": 767596551,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13036,12 +13411,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 111,
       "id": "script:b2d.joint.get_length",
       "stableId": 3398271393,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13120,12 +13497,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 112,
       "id": "script:b2d.joint.get_length_a",
       "stableId": 486091873,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13198,12 +13577,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 113,
       "id": "script:b2d.joint.get_length_b",
       "stableId": 435759016,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13276,12 +13657,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 114,
       "id": "script:b2d.joint.get_limit_state",
       "stableId": 2232191910,
+      "contractShape": "(handle:box2d-joint)->(integer)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13354,12 +13737,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 41
     },
     {
       "index": 115,
       "id": "script:b2d.joint.get_linear_damping_ratio",
       "stableId": 1640780473,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13432,12 +13817,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 116,
       "id": "script:b2d.joint.get_linear_hertz",
       "stableId": 4056593298,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13510,12 +13897,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 117,
       "id": "script:b2d.joint.get_linear_offset",
       "stableId": 700729222,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13588,12 +13977,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 118,
       "id": "script:b2d.joint.get_local_anchor_a",
       "stableId": 3797283836,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13672,12 +14063,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 119,
       "id": "script:b2d.joint.get_local_anchor_b",
       "stableId": 3847616693,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13756,12 +14149,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 120,
       "id": "script:b2d.joint.get_local_axis_a",
       "stableId": 3553552188,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13834,12 +14229,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 121,
       "id": "script:b2d.joint.get_lower_limit",
       "stableId": 2292242662,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -13918,12 +14315,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 122,
       "id": "script:b2d.joint.get_max_force",
       "stableId": 3779646909,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14002,12 +14401,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 123,
       "id": "script:b2d.joint.get_max_length",
       "stableId": 4084330850,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14086,12 +14487,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 124,
       "id": "script:b2d.joint.get_max_motor_force",
       "stableId": 2596629563,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14170,12 +14573,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 125,
       "id": "script:b2d.joint.get_max_motor_torque",
       "stableId": 1658584934,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14254,12 +14659,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 126,
       "id": "script:b2d.joint.get_max_torque",
       "stableId": 1148546556,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14338,12 +14745,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 127,
       "id": "script:b2d.joint.get_min_length",
       "stableId": 4268770728,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14416,12 +14825,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 128,
       "id": "script:b2d.joint.get_motor_speed",
       "stableId": 190087790,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14500,12 +14911,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 129,
       "id": "script:b2d.joint.get_mouse_target",
       "stableId": 1530375664,
+      "contractShape": "(handle:box2d-joint)->(vector3)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14584,12 +14997,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 43
     },
     {
       "index": 130,
       "id": "script:b2d.joint.get_ratio",
       "stableId": 1474552496,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14662,12 +15077,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 131,
       "id": "script:b2d.joint.get_reference_angle",
       "stableId": 1831975898,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14746,12 +15163,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 132,
       "id": "script:b2d.joint.get_spring_damping_ratio",
       "stableId": 3823101053,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14830,12 +15249,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 133,
       "id": "script:b2d.joint.get_spring_hertz",
       "stableId": 3983520750,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14908,12 +15329,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 134,
       "id": "script:b2d.joint.get_type",
       "stableId": 350183953,
+      "contractShape": "(handle:box2d-joint)->(integer)",
       "modulePath": [
         "b2d",
         "joint"
@@ -14992,12 +15415,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 41
     },
     {
       "index": 135,
       "id": "script:b2d.joint.get_upper_limit",
       "stableId": 2252539607,
+      "contractShape": "(handle:box2d-joint)->(number)",
       "modulePath": [
         "b2d",
         "joint"
@@ -15076,12 +15501,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 42
     },
     {
       "index": 136,
       "id": "script:b2d.joint.get_world",
       "stableId": 1990790943,
+      "contractShape": "(handle:box2d-joint)->(handle:box2d-world)",
       "modulePath": [
         "b2d",
         "joint"
@@ -15156,12 +15583,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 40
     },
     {
       "index": 137,
       "id": "script:b2d.joint.is_active",
       "stableId": 4243840735,
+      "contractShape": "(handle:box2d-joint)->(boolean)",
       "modulePath": [
         "b2d",
         "joint"
@@ -15234,12 +15663,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 37
     },
     {
       "index": 138,
       "id": "script:b2d.joint.is_limit_enabled",
       "stableId": 4236847242,
+      "contractShape": "(handle:box2d-joint)->(boolean)",
       "modulePath": [
         "b2d",
         "joint"
@@ -15318,12 +15749,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 37
     },
     {
       "index": 139,
       "id": "script:b2d.joint.is_motor_enabled",
       "stableId": 1647569116,
+      "contractShape": "(handle:box2d-joint)->(boolean)",
       "modulePath": [
         "b2d",
         "joint"
@@ -15402,12 +15835,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 37
     },
     {
       "index": 140,
       "id": "script:b2d.joint.is_spring_enabled",
       "stableId": 2998717522,
+      "contractShape": "(handle:box2d-joint)->(boolean)",
       "modulePath": [
         "b2d",
         "joint"
@@ -15480,12 +15915,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 37
     },
     {
       "index": 141,
       "id": "script:b2d.joint.is_valid",
       "stableId": 1599150497,
+      "contractShape": "(handle:box2d-joint)->(boolean)",
       "modulePath": [
         "b2d",
         "joint"
@@ -15558,12 +15995,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 37
     },
     {
       "index": 142,
       "id": "script:b2d.joint.set_angular_damping_ratio",
       "stableId": 4293186976,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -15636,12 +16075,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 143,
       "id": "script:b2d.joint.set_angular_hertz",
       "stableId": 3205101343,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -15714,12 +16155,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 144,
       "id": "script:b2d.joint.set_angular_offset",
       "stableId": 329503869,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -15792,12 +16235,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 145,
       "id": "script:b2d.joint.set_collide_connected",
       "stableId": 2656088301,
+      "contractShape": "(handle:box2d-joint,boolean)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -15870,12 +16315,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 44
     },
     {
       "index": 146,
       "id": "script:b2d.joint.set_correction_factor",
       "stableId": 3987266405,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -15948,12 +16395,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 147,
       "id": "script:b2d.joint.set_damping_ratio",
       "stableId": 2177123021,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16032,12 +16481,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 148,
       "id": "script:b2d.joint.set_frequency",
       "stableId": 2930290441,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16116,12 +16567,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 149,
       "id": "script:b2d.joint.set_hertz",
       "stableId": 1284819038,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16200,12 +16653,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 150,
       "id": "script:b2d.joint.set_length",
       "stableId": 944619485,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16284,12 +16739,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 151,
       "id": "script:b2d.joint.set_length_range",
       "stableId": 1206835539,
+      "contractShape": "(handle:box2d-joint,number,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16362,12 +16819,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 46
     },
     {
       "index": 152,
       "id": "script:b2d.joint.set_limits",
       "stableId": 4151782493,
+      "contractShape": "(handle:box2d-joint,number,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16446,12 +16905,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 46
     },
     {
       "index": 153,
       "id": "script:b2d.joint.set_linear_damping_ratio",
       "stableId": 2826649109,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16524,12 +16985,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 154,
       "id": "script:b2d.joint.set_linear_hertz",
       "stableId": 2235591910,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16602,12 +17065,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 155,
       "id": "script:b2d.joint.set_linear_offset",
       "stableId": 1876944410,
+      "contractShape": "(handle:box2d-joint,vector3)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16680,12 +17145,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 47
     },
     {
       "index": 156,
       "id": "script:b2d.joint.set_max_force",
       "stableId": 543146849,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16764,12 +17231,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 157,
       "id": "script:b2d.joint.set_max_length",
       "stableId": 3734354910,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16848,12 +17317,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 158,
       "id": "script:b2d.joint.set_max_motor_force",
       "stableId": 1298519223,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -16932,12 +17403,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 159,
       "id": "script:b2d.joint.set_max_motor_torque",
       "stableId": 3534238178,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17016,12 +17489,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 160,
       "id": "script:b2d.joint.set_max_torque",
       "stableId": 1781959424,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17100,12 +17575,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 161,
       "id": "script:b2d.joint.set_min_length",
       "stableId": 288336972,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17178,12 +17655,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 162,
       "id": "script:b2d.joint.set_motor_speed",
       "stableId": 2599386826,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17262,12 +17741,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 163,
       "id": "script:b2d.joint.set_mouse_target",
       "stableId": 2226678396,
+      "contractShape": "(handle:box2d-joint,vector3)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17346,12 +17827,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 47
     },
     {
       "index": 164,
       "id": "script:b2d.joint.set_ratio",
       "stableId": 2922516844,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17424,12 +17907,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 165,
       "id": "script:b2d.joint.set_reference_angle",
       "stableId": 1986143646,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17502,12 +17987,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 166,
       "id": "script:b2d.joint.set_spring_damping_ratio",
       "stableId": 1701854609,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17586,12 +18073,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 167,
       "id": "script:b2d.joint.set_spring_hertz",
       "stableId": 4171464106,
+      "contractShape": "(handle:box2d-joint,number)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17664,12 +18153,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 45
     },
     {
       "index": 168,
       "id": "script:b2d.joint.wake_bodies",
       "stableId": 1338862049,
+      "contractShape": "(handle:box2d-joint)->()",
       "modulePath": [
         "b2d",
         "joint"
@@ -17742,12 +18233,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 36
     },
     {
       "index": 169,
       "id": "script:b2d.shape.are_contact_events_enabled",
       "stableId": 3217929986,
+      "contractShape": "(handle:box2d-shape)->(boolean)",
       "modulePath": [
         "b2d",
         "shape"
@@ -17820,12 +18313,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 48
     },
     {
       "index": 170,
       "id": "script:b2d.shape.are_hit_events_enabled",
       "stableId": 834096625,
+      "contractShape": "(handle:box2d-shape)->(boolean)",
       "modulePath": [
         "b2d",
         "shape"
@@ -17898,12 +18393,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 48
     },
     {
       "index": 171,
       "id": "script:b2d.shape.are_pre_solve_events_enabled",
       "stableId": 3741389297,
+      "contractShape": "(handle:box2d-shape)->(boolean)",
       "modulePath": [
         "b2d",
         "shape"
@@ -17976,12 +18473,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 48
     },
     {
       "index": 172,
       "id": "script:b2d.shape.are_sensor_events_enabled",
       "stableId": 2311969276,
+      "contractShape": "(handle:box2d-shape)->(boolean)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18054,12 +18553,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 48
     },
     {
       "index": 173,
       "id": "script:b2d.shape.enable_contact_events",
       "stableId": 610292833,
+      "contractShape": "(handle:box2d-shape,boolean)->()",
       "modulePath": [
         "b2d",
         "shape"
@@ -18132,12 +18633,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 53
     },
     {
       "index": 174,
       "id": "script:b2d.shape.enable_hit_events",
       "stableId": 945131398,
+      "contractShape": "(handle:box2d-shape,boolean)->()",
       "modulePath": [
         "b2d",
         "shape"
@@ -18210,12 +18713,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 53
     },
     {
       "index": 175,
       "id": "script:b2d.shape.enable_pre_solve_events",
       "stableId": 1486378210,
+      "contractShape": "(handle:box2d-shape,boolean)->()",
       "modulePath": [
         "b2d",
         "shape"
@@ -18288,12 +18793,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 53
     },
     {
       "index": 176,
       "id": "script:b2d.shape.enable_sensor_events",
       "stableId": 1203246873,
+      "contractShape": "(handle:box2d-shape,boolean)->()",
       "modulePath": [
         "b2d",
         "shape"
@@ -18366,12 +18873,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 53
     },
     {
       "index": 177,
       "id": "script:b2d.shape.get_body",
       "stableId": 2944082506,
+      "contractShape": "(handle:box2d-shape)->(handle:box2d-body)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18446,12 +18955,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 49
     },
     {
       "index": 178,
       "id": "script:b2d.shape.get_closest_point",
       "stableId": 3839784544,
+      "contractShape": "(handle:box2d-shape,vector3)->(vector3)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18524,12 +19035,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 55
     },
     {
       "index": 179,
       "id": "script:b2d.shape.get_contact_capacity",
       "stableId": 4016957215,
+      "contractShape": "(handle:box2d-shape)->(integer)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18602,12 +19115,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 52
     },
     {
       "index": 180,
       "id": "script:b2d.shape.get_material",
       "stableId": 3295889835,
+      "contractShape": "(handle:box2d-shape)->(integer)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18680,12 +19195,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 52
     },
     {
       "index": 181,
       "id": "script:b2d.shape.get_sensor_capacity",
       "stableId": 1923506897,
+      "contractShape": "(handle:box2d-shape)->(integer)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18758,12 +19275,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 52
     },
     {
       "index": 182,
       "id": "script:b2d.shape.get_world",
       "stableId": 1138630650,
+      "contractShape": "(handle:box2d-shape)->(handle:box2d-world)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18838,12 +19357,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 51
     },
     {
       "index": 183,
       "id": "script:b2d.shape.is_valid",
       "stableId": 889829034,
+      "contractShape": "(handle:box2d-shape)->(boolean)",
       "modulePath": [
         "b2d",
         "shape"
@@ -18916,12 +19437,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 48
     },
     {
       "index": 184,
       "id": "script:b2d.shape.set_material",
       "stableId": 3344304063,
+      "contractShape": "(handle:box2d-shape,integer)->()",
       "modulePath": [
         "b2d",
         "shape"
@@ -18994,12 +19517,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 54
     },
     {
       "index": 185,
       "id": "script:b2d.world.enable_continuous",
       "stableId": 2271330915,
+      "contractShape": "(handle:box2d-world,boolean)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -19072,12 +19597,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 61
     },
     {
       "index": 186,
       "id": "script:b2d.world.enable_sleeping",
       "stableId": 776923317,
+      "contractShape": "(handle:box2d-world,boolean)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -19150,12 +19677,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 61
     },
     {
       "index": 187,
       "id": "script:b2d.world.enable_speculative",
       "stableId": 3194126675,
+      "contractShape": "(handle:box2d-world,boolean)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -19228,12 +19757,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 61
     },
     {
       "index": 188,
       "id": "script:b2d.world.enable_warm_starting",
       "stableId": 3941511170,
+      "contractShape": "(handle:box2d-world,boolean)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -19306,12 +19837,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 61
     },
     {
       "index": 189,
       "id": "script:b2d.world.get_awake_body_count",
       "stableId": 3991436541,
+      "contractShape": "(handle:box2d-world)->(integer)",
       "modulePath": [
         "b2d",
         "world"
@@ -19384,12 +19917,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 58
     },
     {
       "index": 190,
       "id": "script:b2d.world.get_gravity",
       "stableId": 2025739993,
+      "contractShape": "(handle:box2d-world)->(vector3)",
       "modulePath": [
         "b2d",
         "world"
@@ -19462,12 +19997,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 60
     },
     {
       "index": 191,
       "id": "script:b2d.world.get_hit_event_threshold",
       "stableId": 2744346245,
+      "contractShape": "(handle:box2d-world)->(number)",
       "modulePath": [
         "b2d",
         "world"
@@ -19540,12 +20077,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 59
     },
     {
       "index": 192,
       "id": "script:b2d.world.get_maximum_linear_speed",
       "stableId": 1242298027,
+      "contractShape": "(handle:box2d-world)->(number)",
       "modulePath": [
         "b2d",
         "world"
@@ -19618,12 +20157,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 59
     },
     {
       "index": 193,
       "id": "script:b2d.world.get_restitution_threshold",
       "stableId": 2004760327,
+      "contractShape": "(handle:box2d-world)->(number)",
       "modulePath": [
         "b2d",
         "world"
@@ -19696,12 +20237,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 59
     },
     {
       "index": 194,
       "id": "script:b2d.world.is_continuous_enabled",
       "stableId": 512807196,
+      "contractShape": "(handle:box2d-world)->(boolean)",
       "modulePath": [
         "b2d",
         "world"
@@ -19774,12 +20317,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 57
     },
     {
       "index": 195,
       "id": "script:b2d.world.is_locked",
       "stableId": 2426035187,
+      "contractShape": "(handle:box2d-world)->(boolean)",
       "modulePath": [
         "b2d",
         "world"
@@ -19852,12 +20397,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 57
     },
     {
       "index": 196,
       "id": "script:b2d.world.is_sleeping_enabled",
       "stableId": 853436726,
+      "contractShape": "(handle:box2d-world)->(boolean)",
       "modulePath": [
         "b2d",
         "world"
@@ -19930,12 +20477,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 57
     },
     {
       "index": 197,
       "id": "script:b2d.world.is_valid",
       "stableId": 3723945041,
+      "contractShape": "(handle:box2d-world)->(boolean)",
       "modulePath": [
         "b2d",
         "world"
@@ -20008,12 +20557,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 57
     },
     {
       "index": 198,
       "id": "script:b2d.world.is_warm_starting_enabled",
       "stableId": 1037676287,
+      "contractShape": "(handle:box2d-world)->(boolean)",
       "modulePath": [
         "b2d",
         "world"
@@ -20086,12 +20637,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 57
     },
     {
       "index": 199,
       "id": "script:b2d.world.rebuild_static_tree",
       "stableId": 553052175,
+      "contractShape": "(handle:box2d-world)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -20164,12 +20717,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 56
     },
     {
       "index": 200,
       "id": "script:b2d.world.set_contact_tuning",
       "stableId": 607955565,
+      "contractShape": "(handle:box2d-world,number,number,number)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -20242,12 +20797,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 64
     },
     {
       "index": 201,
       "id": "script:b2d.world.set_gravity",
       "stableId": 284154525,
+      "contractShape": "(handle:box2d-world,vector3)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -20320,12 +20877,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 65
     },
     {
       "index": 202,
       "id": "script:b2d.world.set_hit_event_threshold",
       "stableId": 1227412505,
+      "contractShape": "(handle:box2d-world,number)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -20398,12 +20957,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 62
     },
     {
       "index": 203,
       "id": "script:b2d.world.set_joint_tuning",
       "stableId": 884160809,
+      "contractShape": "(handle:box2d-world,number,number)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -20476,12 +21037,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 63
     },
     {
       "index": 204,
       "id": "script:b2d.world.set_maximum_linear_speed",
       "stableId": 1538520927,
+      "contractShape": "(handle:box2d-world,number)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -20554,12 +21117,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 62
     },
     {
       "index": 205,
       "id": "script:b2d.world.set_restitution_threshold",
       "stableId": 156004587,
+      "contractShape": "(handle:box2d-world,number)->()",
       "modulePath": [
         "b2d",
         "world"
@@ -20632,12 +21197,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 62
     },
     {
       "index": 206,
       "id": "script:buffer.copy_buffer",
       "stableId": 248365108,
+      "contractShape": "(handle:buffer-data,number,handle:buffer-data,number,number)->()",
       "modulePath": [
         "buffer"
       ],
@@ -20717,12 +21284,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 67
     },
     {
       "index": 207,
       "id": "script:buffer.copy_stream",
       "stableId": 2241911666,
+      "contractShape": "(handle:buffer-stream,number,handle:buffer-stream,number,number)->()",
       "modulePath": [
         "buffer"
       ],
@@ -20802,12 +21371,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 69
     },
     {
       "index": 208,
       "id": "script:buffer.get_bytes",
       "stableId": 886402628,
+      "contractShape": "(handle:buffer-data,hash)->(string)",
       "modulePath": [
         "buffer"
       ],
@@ -20887,12 +21458,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 66
     },
     {
       "index": 209,
       "id": "script:buffer.get_stream",
       "stableId": 3111756709,
+      "contractShape": "(handle:buffer-data,string|hash)->(handle:buffer-stream)",
       "modulePath": [
         "buffer"
       ],
@@ -20974,12 +21547,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 68
     },
     {
       "index": 210,
       "id": "script:bullet3d.collision_object.activate",
       "stableId": 3024397388,
+      "contractShape": "(handle:bullet-object,boolean)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21054,12 +21629,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 103
     },
     {
       "index": 211,
       "id": "script:bullet3d.collision_object.force_activation_state",
       "stableId": 3632824611,
+      "contractShape": "(handle:bullet-object,integer)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21134,12 +21711,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 104
     },
     {
       "index": 212,
       "id": "script:bullet3d.collision_object.get_activation_state",
       "stableId": 3989547642,
+      "contractShape": "(handle:bullet-object)->(integer)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21214,12 +21793,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 99
     },
     {
       "index": 213,
       "id": "script:bullet3d.collision_object.get_ccd_motion_threshold",
       "stableId": 1113126993,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21294,12 +21875,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 214,
       "id": "script:bullet3d.collision_object.get_ccd_swept_sphere_radius",
       "stableId": 551560955,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21374,12 +21957,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 215,
       "id": "script:bullet3d.collision_object.get_collision_filter_group",
       "stableId": 84341599,
+      "contractShape": "(handle:bullet-object)->(integer)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21454,12 +22039,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 99
     },
     {
       "index": 216,
       "id": "script:bullet3d.collision_object.get_collision_filter_mask",
       "stableId": 3319614396,
+      "contractShape": "(handle:bullet-object)->(integer)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21534,12 +22121,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 99
     },
     {
       "index": 217,
       "id": "script:bullet3d.collision_object.get_collision_flags",
       "stableId": 2203492448,
+      "contractShape": "(handle:bullet-object)->(integer)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21614,12 +22203,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 99
     },
     {
       "index": 218,
       "id": "script:bullet3d.collision_object.get_contact_processing_threshold",
       "stableId": 2518924678,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21694,12 +22285,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 219,
       "id": "script:bullet3d.collision_object.get_deactivation_time",
       "stableId": 1557579929,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21774,12 +22367,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 220,
       "id": "script:bullet3d.collision_object.get_friction",
       "stableId": 1617568870,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21854,12 +22449,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 221,
       "id": "script:bullet3d.collision_object.get_internal_type",
       "stableId": 1290785334,
+      "contractShape": "(handle:bullet-object)->(integer)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -21934,12 +22531,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 99
     },
     {
       "index": 222,
       "id": "script:bullet3d.collision_object.get_position",
       "stableId": 3615172423,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22014,12 +22613,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 223,
       "id": "script:bullet3d.collision_object.get_restitution",
       "stableId": 4095848016,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22094,12 +22695,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 224,
       "id": "script:bullet3d.collision_object.get_rotation",
       "stableId": 3522006770,
+      "contractShape": "(handle:bullet-object)->(quaternion)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22174,12 +22777,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 101
     },
     {
       "index": 225,
       "id": "script:bullet3d.collision_object.get_shape",
       "stableId": 463523689,
+      "contractShape": "(handle:bullet-object,integer)->(handle:bullet-shape)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22256,12 +22861,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 106
     },
     {
       "index": 226,
       "id": "script:bullet3d.collision_object.get_shape_count",
       "stableId": 3936603817,
+      "contractShape": "(handle:bullet-object)->(integer)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22336,12 +22943,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 99
     },
     {
       "index": 227,
       "id": "script:bullet3d.collision_object.has_collision_flag",
       "stableId": 2534203119,
+      "contractShape": "(handle:bullet-object,integer)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22416,12 +23025,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 105
     },
     {
       "index": 228,
       "id": "script:bullet3d.collision_object.has_contact_response",
       "stableId": 334944506,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22496,12 +23107,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 229,
       "id": "script:bullet3d.collision_object.is_active",
       "stableId": 4093906604,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22576,12 +23189,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 230,
       "id": "script:bullet3d.collision_object.is_awake",
       "stableId": 1043138825,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22656,12 +23271,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 231,
       "id": "script:bullet3d.collision_object.is_ghost_object",
       "stableId": 4172283649,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22736,12 +23353,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 232,
       "id": "script:bullet3d.collision_object.is_kinematic",
       "stableId": 3402468551,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22816,12 +23435,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 233,
       "id": "script:bullet3d.collision_object.is_rigid_body",
       "stableId": 1736938494,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22896,12 +23517,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 234,
       "id": "script:bullet3d.collision_object.is_static",
       "stableId": 2139660584,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -22976,12 +23599,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 235,
       "id": "script:bullet3d.collision_object.is_static_or_kinematic",
       "stableId": 1573718186,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23056,12 +23681,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 236,
       "id": "script:bullet3d.collision_object.is_valid",
       "stableId": 1778479724,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23136,12 +23763,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 237,
       "id": "script:bullet3d.collision_object.set_activation_state",
       "stableId": 1374213814,
+      "contractShape": "(handle:bullet-object,integer)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23216,12 +23845,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 104
     },
     {
       "index": 238,
       "id": "script:bullet3d.collision_object.set_awake",
       "stableId": 3516473115,
+      "contractShape": "(handle:bullet-object,boolean)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23296,12 +23927,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 103
     },
     {
       "index": 239,
       "id": "script:bullet3d.collision_object.set_ccd_motion_threshold",
       "stableId": 4013471357,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23376,12 +24009,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 240,
       "id": "script:bullet3d.collision_object.set_ccd_swept_sphere_radius",
       "stableId": 249155039,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23456,12 +24091,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 241,
       "id": "script:bullet3d.collision_object.set_contact_processing_threshold",
       "stableId": 1840003570,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23536,12 +24173,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 242,
       "id": "script:bullet3d.collision_object.set_deactivation_time",
       "stableId": 2161861693,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23616,12 +24255,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 243,
       "id": "script:bullet3d.collision_object.set_friction",
       "stableId": 425242410,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23696,12 +24337,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 244,
       "id": "script:bullet3d.collision_object.set_position",
       "stableId": 569013771,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23776,12 +24419,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 245,
       "id": "script:bullet3d.collision_object.set_restitution",
       "stableId": 2573689764,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23856,12 +24501,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 246,
       "id": "script:bullet3d.collision_object.set_rotation",
       "stableId": 3342099614,
+      "contractShape": "(handle:bullet-object,quaternion)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23936,12 +24583,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 110
     },
     {
       "index": 247,
       "id": "script:bullet3d.collision_object.set_world_transform",
       "stableId": 3397216655,
+      "contractShape": "(handle:bullet-object,vector3,quaternion)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -24016,12 +24665,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 113
     },
     {
       "index": 248,
       "id": "script:bullet3d.constraint.destroy",
       "stableId": 3471585260,
+      "contractShape": "(handle:bullet-constraint)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24096,12 +24747,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 70
     },
     {
       "index": 249,
       "id": "script:bullet3d.constraint.enable_cone_twist_motor",
       "stableId": 859718991,
+      "contractShape": "(handle:bullet-constraint,boolean)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24176,12 +24829,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 77
     },
     {
       "index": 250,
       "id": "script:bullet3d.constraint.enable_spring",
       "stableId": 325437063,
+      "contractShape": "(handle:bullet-constraint,integer,boolean)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24256,12 +24911,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 82
     },
     {
       "index": 251,
       "id": "script:bullet3d.constraint.get_6dof_angle",
       "stableId": 3744239228,
+      "contractShape": "(handle:bullet-constraint,integer)->(number)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24336,12 +24993,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 80
     },
     {
       "index": 252,
       "id": "script:bullet3d.constraint.get_6dof_axis",
       "stableId": 454405456,
+      "contractShape": "(handle:bullet-constraint,integer)->(vector3)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24416,12 +25075,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 81
     },
     {
       "index": 253,
       "id": "script:bullet3d.constraint.get_6dof_position",
       "stableId": 4183269174,
+      "contractShape": "(handle:bullet-constraint,integer)->(number)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24496,12 +25157,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 80
     },
     {
       "index": 254,
       "id": "script:bullet3d.constraint.get_body_a",
       "stableId": 2420295687,
+      "contractShape": "(handle:bullet-constraint)->(handle:bullet-object)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24578,12 +25241,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 72
     },
     {
       "index": 255,
       "id": "script:bullet3d.constraint.get_body_b",
       "stableId": 2437073306,
+      "contractShape": "(handle:bullet-constraint)->(handle:bullet-object)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24660,12 +25325,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 72
     },
     {
       "index": 256,
       "id": "script:bullet3d.constraint.get_collide_connected",
       "stableId": 555544111,
+      "contractShape": "(handle:bullet-constraint)->(boolean)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24740,12 +25407,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 71
     },
     {
       "index": 257,
       "id": "script:bullet3d.constraint.get_hinge_angle",
       "stableId": 3580906706,
+      "contractShape": "(handle:bullet-constraint)->(number)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24820,12 +25489,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 75
     },
     {
       "index": 258,
       "id": "script:bullet3d.constraint.get_slider_position",
       "stableId": 2033501892,
+      "contractShape": "(handle:bullet-constraint)->(number)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24900,12 +25571,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 75
     },
     {
       "index": 259,
       "id": "script:bullet3d.constraint.get_twist_angle",
       "stableId": 1756909110,
+      "contractShape": "(handle:bullet-constraint)->(number)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -24980,12 +25653,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 75
     },
     {
       "index": 260,
       "id": "script:bullet3d.constraint.get_type",
       "stableId": 353606235,
+      "contractShape": "(handle:bullet-constraint)->(integer)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25060,12 +25735,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 74
     },
     {
       "index": 261,
       "id": "script:bullet3d.constraint.get_type_name",
       "stableId": 3552548231,
+      "contractShape": "(handle:bullet-constraint)->(string)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25140,12 +25817,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 76
     },
     {
       "index": 262,
       "id": "script:bullet3d.constraint.get_use_linear_reference_frame_a",
       "stableId": 2489081210,
+      "contractShape": "(handle:bullet-constraint)->(boolean)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25220,12 +25899,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 71
     },
     {
       "index": 263,
       "id": "script:bullet3d.constraint.get_world",
       "stableId": 1391478857,
+      "contractShape": "(handle:bullet-constraint)->(handle:bullet-world)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25302,12 +25983,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 73
     },
     {
       "index": 264,
       "id": "script:bullet3d.constraint.is_active",
       "stableId": 2866304309,
+      "contractShape": "(handle:bullet-constraint)->(boolean)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25382,12 +26065,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 71
     },
     {
       "index": 265,
       "id": "script:bullet3d.constraint.is_angular_only",
       "stableId": 1630645178,
+      "contractShape": "(handle:bullet-constraint)->(boolean)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25462,12 +26147,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 71
     },
     {
       "index": 266,
       "id": "script:bullet3d.constraint.is_limited",
       "stableId": 2498795079,
+      "contractShape": "(handle:bullet-constraint,integer)->(boolean)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25542,12 +26229,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 79
     },
     {
       "index": 267,
       "id": "script:bullet3d.constraint.is_past_swing_limit",
       "stableId": 1018022142,
+      "contractShape": "(handle:bullet-constraint)->(boolean)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25622,12 +26311,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 71
     },
     {
       "index": 268,
       "id": "script:bullet3d.constraint.is_valid",
       "stableId": 537048135,
+      "contractShape": "(handle:bullet-constraint)->(boolean)",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25702,12 +26393,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 71
     },
     {
       "index": 269,
       "id": "script:bullet3d.constraint.set_6dof_motor",
       "stableId": 1289175282,
+      "contractShape": "(handle:bullet-constraint,integer,boolean,number,number,nil|number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25782,12 +26475,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 83
     },
     {
       "index": 270,
       "id": "script:bullet3d.constraint.set_angular_only",
       "stableId": 733217526,
+      "contractShape": "(handle:bullet-constraint,boolean)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25862,12 +26557,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 77
     },
     {
       "index": 271,
       "id": "script:bullet3d.constraint.set_cone_twist_limits",
       "stableId": 4131644821,
+      "contractShape": "(handle:bullet-constraint,number,number,number,nil|number,nil|number,nil|number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -25942,12 +26639,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 89
     },
     {
       "index": 272,
       "id": "script:bullet3d.constraint.set_cone_twist_motor_target",
       "stableId": 2740088618,
+      "contractShape": "(handle:bullet-constraint,quaternion,nil|boolean)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26022,12 +26721,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 91
     },
     {
       "index": 273,
       "id": "script:bullet3d.constraint.set_frame_a",
       "stableId": 2961401384,
+      "contractShape": "(handle:bullet-constraint,vector3,quaternion)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26102,12 +26803,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 94
     },
     {
       "index": 274,
       "id": "script:bullet3d.constraint.set_frame_b",
       "stableId": 3011734241,
+      "contractShape": "(handle:bullet-constraint,vector3,quaternion)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26182,12 +26885,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 94
     },
     {
       "index": 275,
       "id": "script:bullet3d.constraint.set_hinge_axis",
       "stableId": 4157397330,
+      "contractShape": "(handle:bullet-constraint,vector3)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26262,12 +26967,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 93
     },
     {
       "index": 276,
       "id": "script:bullet3d.constraint.set_hinge_limits",
       "stableId": 1148448451,
+      "contractShape": "(handle:bullet-constraint,number,number,nil|number,nil|number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26342,12 +27049,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 88
     },
     {
       "index": 277,
       "id": "script:bullet3d.constraint.set_hinge_motor",
       "stableId": 628648916,
+      "contractShape": "(handle:bullet-constraint,boolean,number,number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26422,12 +27131,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 78
     },
     {
       "index": 278,
       "id": "script:bullet3d.constraint.set_hinge_motor_target",
       "stableId": 343784836,
+      "contractShape": "(handle:bullet-constraint,number,number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26502,12 +27213,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 87
     },
     {
       "index": 279,
       "id": "script:bullet3d.constraint.set_limit",
       "stableId": 3660754354,
+      "contractShape": "(handle:bullet-constraint,integer,number,number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26582,12 +27295,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 85
     },
     {
       "index": 280,
       "id": "script:bullet3d.constraint.set_pivots",
       "stableId": 3035905514,
+      "contractShape": "(handle:bullet-constraint,vector3,vector3)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26662,12 +27377,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 95
     },
     {
       "index": 281,
       "id": "script:bullet3d.constraint.set_slider_limits",
       "stableId": 418897303,
+      "contractShape": "(handle:bullet-constraint,number,number,number,number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26742,12 +27459,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 90
     },
     {
       "index": 282,
       "id": "script:bullet3d.constraint.set_slider_motor",
       "stableId": 1640036184,
+      "contractShape": "(handle:bullet-constraint,string,boolean,number,number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26822,12 +27541,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 92
     },
     {
       "index": 283,
       "id": "script:bullet3d.constraint.set_spring_damping",
       "stableId": 130334759,
+      "contractShape": "(handle:bullet-constraint,integer,number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26902,12 +27623,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 84
     },
     {
       "index": 284,
       "id": "script:bullet3d.constraint.set_spring_equilibrium_point",
       "stableId": 1284306316,
+      "contractShape": "(handle:bullet-constraint,nil|integer,nil|number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -26982,12 +27705,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 86
     },
     {
       "index": 285,
       "id": "script:bullet3d.constraint.set_spring_stiffness",
       "stableId": 161657368,
+      "contractShape": "(handle:bullet-constraint,integer,number)->()",
       "modulePath": [
         "bullet3d",
         "constraint"
@@ -27062,12 +27787,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 84
     },
     {
       "index": 286,
       "id": "script:bullet3d.get_collision_object",
       "stableId": 4240041128,
+      "contractShape": "(string|hash|url)->(handle:bullet-object)",
       "modulePath": [
         "bullet3d"
       ],
@@ -27141,12 +27868,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 147
     },
     {
       "index": 287,
       "id": "script:bullet3d.get_rigid_body",
       "stableId": 986235210,
+      "contractShape": "(string|hash|url)->(handle:bullet-object)",
       "modulePath": [
         "bullet3d"
       ],
@@ -27220,12 +27949,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 147
     },
     {
       "index": 288,
       "id": "script:bullet3d.get_world",
       "stableId": 1630000402,
+      "contractShape": "()->(handle:bullet-world)",
       "modulePath": [
         "bullet3d"
       ],
@@ -27299,12 +28030,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 1
     },
     {
       "index": 289,
       "id": "script:bullet3d.rigid_body.apply_central_force",
       "stableId": 1847318583,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27379,12 +28112,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 290,
       "id": "script:bullet3d.rigid_body.apply_central_impulse",
       "stableId": 3774839951,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27459,12 +28194,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 291,
       "id": "script:bullet3d.rigid_body.apply_force",
       "stableId": 196611809,
+      "contractShape": "(handle:bullet-object,vector3,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27539,12 +28276,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 114
     },
     {
       "index": 292,
       "id": "script:bullet3d.rigid_body.apply_force_at_relative_position",
       "stableId": 1886699882,
+      "contractShape": "(handle:bullet-object,vector3,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27619,12 +28358,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 114
     },
     {
       "index": 293,
       "id": "script:bullet3d.rigid_body.apply_impulse",
       "stableId": 63674733,
+      "contractShape": "(handle:bullet-object,vector3,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27699,12 +28440,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 114
     },
     {
       "index": 294,
       "id": "script:bullet3d.rigid_body.apply_linear_impulse",
       "stableId": 3408853959,
+      "contractShape": "(handle:bullet-object,vector3,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27779,12 +28522,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 114
     },
     {
       "index": 295,
       "id": "script:bullet3d.rigid_body.apply_torque",
       "stableId": 1714775424,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27859,12 +28604,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 296,
       "id": "script:bullet3d.rigid_body.apply_torque_impulse",
       "stableId": 3128444252,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -27939,12 +28686,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 297,
       "id": "script:bullet3d.rigid_body.clear_forces",
       "stableId": 2715712589,
+      "contractShape": "(handle:bullet-object)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28019,12 +28768,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 96
     },
     {
       "index": 298,
       "id": "script:bullet3d.rigid_body.get_angular_damping",
       "stableId": 136055525,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28099,12 +28850,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 299,
       "id": "script:bullet3d.rigid_body.get_angular_factor",
       "stableId": 1037639542,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28179,12 +28932,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 300,
       "id": "script:bullet3d.rigid_body.get_angular_sleeping_threshold",
       "stableId": 2798035104,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28259,12 +29014,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 301,
       "id": "script:bullet3d.rigid_body.get_angular_velocity",
       "stableId": 1877680226,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28339,12 +29096,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 302,
       "id": "script:bullet3d.rigid_body.get_center_of_mass_position",
       "stableId": 3306885988,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28419,12 +29178,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 303,
       "id": "script:bullet3d.rigid_body.get_flags",
       "stableId": 65880957,
+      "contractShape": "(handle:bullet-object)->(integer)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28499,12 +29260,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 99
     },
     {
       "index": 304,
       "id": "script:bullet3d.rigid_body.get_gravity",
       "stableId": 4107412328,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28579,12 +29342,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 305,
       "id": "script:bullet3d.rigid_body.get_inverse_mass",
       "stableId": 92274755,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28659,12 +29424,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 306,
       "id": "script:bullet3d.rigid_body.get_linear_damping",
       "stableId": 161836674,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28739,12 +29506,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 307,
       "id": "script:bullet3d.rigid_body.get_linear_factor",
       "stableId": 227921183,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28819,12 +29588,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 308,
       "id": "script:bullet3d.rigid_body.get_linear_sleeping_threshold",
       "stableId": 1554278229,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28899,12 +29670,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 309,
       "id": "script:bullet3d.rigid_body.get_linear_velocity",
       "stableId": 1859883727,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -28979,12 +29752,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 310,
       "id": "script:bullet3d.rigid_body.get_linear_velocity_from_local_point",
       "stableId": 1697160681,
+      "contractShape": "(handle:bullet-object,vector3)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29059,12 +29834,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 112
     },
     {
       "index": 311,
       "id": "script:bullet3d.rigid_body.get_linear_velocity_from_world_point",
       "stableId": 2555262514,
+      "contractShape": "(handle:bullet-object,vector3)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29139,12 +29916,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 112
     },
     {
       "index": 312,
       "id": "script:bullet3d.rigid_body.get_local_inertia",
       "stableId": 4138655148,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29219,12 +29998,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 313,
       "id": "script:bullet3d.rigid_body.get_mass",
       "stableId": 2497237442,
+      "contractShape": "(handle:bullet-object)->(number)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29299,12 +30080,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 100
     },
     {
       "index": 314,
       "id": "script:bullet3d.rigid_body.get_total_force",
       "stableId": 516724008,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29379,12 +30162,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 315,
       "id": "script:bullet3d.rigid_body.get_total_torque",
       "stableId": 4032025831,
+      "contractShape": "(handle:bullet-object)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29459,12 +30244,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 102
     },
     {
       "index": 316,
       "id": "script:bullet3d.rigid_body.get_velocity_in_local_point",
       "stableId": 453695800,
+      "contractShape": "(handle:bullet-object,vector3)->(vector3)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29539,12 +30326,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 112
     },
     {
       "index": 317,
       "id": "script:bullet3d.rigid_body.get_world",
       "stableId": 3815014814,
+      "contractShape": "(handle:bullet-object)->(handle:bullet-world)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29621,12 +30410,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 98
     },
     {
       "index": 318,
       "id": "script:bullet3d.rigid_body.has_flag",
       "stableId": 3174044920,
+      "contractShape": "(handle:bullet-object,integer)->(boolean)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29701,12 +30492,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 105
     },
     {
       "index": 319,
       "id": "script:bullet3d.rigid_body.is_valid",
       "stableId": 3451743606,
+      "contractShape": "(handle:bullet-object)->(boolean)",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29781,12 +30574,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 97
     },
     {
       "index": 320,
       "id": "script:bullet3d.rigid_body.set_angular_damping",
       "stableId": 2907872337,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29861,12 +30656,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 321,
       "id": "script:bullet3d.rigid_body.set_angular_factor",
       "stableId": 1829494690,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -29941,12 +30738,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 322,
       "id": "script:bullet3d.rigid_body.set_angular_velocity",
       "stableId": 1682504750,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30021,12 +30820,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 323,
       "id": "script:bullet3d.rigid_body.set_damping",
       "stableId": 3888079176,
+      "contractShape": "(handle:bullet-object,number,number)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30101,12 +30902,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 108
     },
     {
       "index": 324,
       "id": "script:bullet3d.rigid_body.set_flags",
       "stableId": 3840802073,
+      "contractShape": "(handle:bullet-object,integer)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30181,12 +30984,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 104
     },
     {
       "index": 325,
       "id": "script:bullet3d.rigid_body.set_gravity",
       "stableId": 3901430372,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30261,12 +31066,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 326,
       "id": "script:bullet3d.rigid_body.set_linear_damping",
       "stableId": 3773886542,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30341,12 +31148,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 327,
       "id": "script:bullet3d.rigid_body.set_linear_factor",
       "stableId": 1380030491,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30421,12 +31230,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 328,
       "id": "script:bullet3d.rigid_body.set_linear_velocity",
       "stableId": 1244171291,
+      "contractShape": "(handle:bullet-object,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30501,12 +31312,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 111
     },
     {
       "index": 329,
       "id": "script:bullet3d.rigid_body.set_mass",
       "stableId": 2411304838,
+      "contractShape": "(handle:bullet-object,number)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30581,12 +31394,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 107
     },
     {
       "index": 330,
       "id": "script:bullet3d.rigid_body.set_mass_properties",
       "stableId": 2968941778,
+      "contractShape": "(handle:bullet-object,number,vector3)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30661,12 +31476,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 109
     },
     {
       "index": 331,
       "id": "script:bullet3d.rigid_body.set_sleeping_thresholds",
       "stableId": 1010176288,
+      "contractShape": "(handle:bullet-object,number,number)->()",
       "modulePath": [
         "bullet3d",
         "rigid_body"
@@ -30741,12 +31558,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 108
     },
     {
       "index": 332,
       "id": "script:bullet3d.shape.get_collision_object",
       "stableId": 3986175953,
+      "contractShape": "(handle:bullet-shape)->(handle:bullet-object)",
       "modulePath": [
         "bullet3d",
         "shape"
@@ -30823,12 +31642,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 116
     },
     {
       "index": 333,
       "id": "script:bullet3d.shape.get_index",
       "stableId": 2512948821,
+      "contractShape": "(handle:bullet-shape)->(integer)",
       "modulePath": [
         "bullet3d",
         "shape"
@@ -30903,12 +31724,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 117
     },
     {
       "index": 334,
       "id": "script:bullet3d.shape.get_type",
       "stableId": 3481559031,
+      "contractShape": "(handle:bullet-shape)->(integer)",
       "modulePath": [
         "bullet3d",
         "shape"
@@ -30983,12 +31806,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 117
     },
     {
       "index": 335,
       "id": "script:bullet3d.shape.is_valid",
       "stableId": 1810895539,
+      "contractShape": "(handle:bullet-shape)->(boolean)",
       "modulePath": [
         "bullet3d",
         "shape"
@@ -31063,12 +31888,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 115
     },
     {
       "index": 336,
       "id": "script:bullet3d.shape.set_local_transform",
       "stableId": 972753009,
+      "contractShape": "(handle:bullet-shape,vector3,quaternion)->()",
       "modulePath": [
         "bullet3d",
         "shape"
@@ -31143,12 +31970,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 118
     },
     {
       "index": 337,
       "id": "script:bullet3d.world.get_collision_object_count",
       "stableId": 3056503702,
+      "contractShape": "(handle:bullet-world)->(integer)",
       "modulePath": [
         "bullet3d",
         "world"
@@ -31223,12 +32052,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 120
     },
     {
       "index": 338,
       "id": "script:bullet3d.world.get_gravity",
       "stableId": 2585594286,
+      "contractShape": "(handle:bullet-world)->(vector3)",
       "modulePath": [
         "bullet3d",
         "world"
@@ -31303,12 +32134,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 121
     },
     {
       "index": 339,
       "id": "script:bullet3d.world.is_valid",
       "stableId": 696282104,
+      "contractShape": "(handle:bullet-world)->(boolean)",
       "modulePath": [
         "bullet3d",
         "world"
@@ -31383,12 +32216,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 119
     },
     {
       "index": 340,
       "id": "script:bullet3d.world.set_gravity",
       "stableId": 2620477658,
+      "contractShape": "(handle:bullet-world,vector3)->()",
       "modulePath": [
         "bullet3d",
         "world"
@@ -31463,12 +32298,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 122
     },
     {
       "index": 341,
       "id": "script:gui.cancel_animations",
       "stableId": 4228476809,
+      "contractShape": "(handle:gui-node,nil|string|hash)->()",
       "modulePath": [
         "gui"
       ],
@@ -31534,12 +32371,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 139
     },
     {
       "index": 342,
       "id": "script:gui.cancel_flipbook",
       "stableId": 884883204,
+      "contractShape": "(handle:gui-node)->()",
       "modulePath": [
         "gui"
       ],
@@ -31605,12 +32444,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 127
     },
     {
       "index": 343,
       "id": "script:gui.clone",
       "stableId": 1520695164,
+      "contractShape": "(handle:gui-node)->(handle:gui-node)",
       "modulePath": [
         "gui"
       ],
@@ -31678,12 +32519,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 129
     },
     {
       "index": 344,
       "id": "script:gui.delete_node",
       "stableId": 39559745,
+      "contractShape": "(handle:gui-node)->()",
       "modulePath": [
         "gui"
       ],
@@ -31749,12 +32592,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 127
     },
     {
       "index": 345,
       "id": "script:gui.get_adjust_mode",
       "stableId": 3034962065,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -31820,12 +32665,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 346,
       "id": "script:gui.get_alpha",
       "stableId": 1980130538,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -31891,12 +32738,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 347,
       "id": "script:gui.get_blend_mode",
       "stableId": 2569911913,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -31962,12 +32811,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 348,
       "id": "script:gui.get_clipping_inverted",
       "stableId": 2704515948,
+      "contractShape": "(handle:gui-node)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -32033,12 +32884,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 128
     },
     {
       "index": 349,
       "id": "script:gui.get_clipping_mode",
       "stableId": 2151763318,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -32104,12 +32957,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 350,
       "id": "script:gui.get_clipping_visible",
       "stableId": 3393387365,
+      "contractShape": "(handle:gui-node)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -32175,12 +33030,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 128
     },
     {
       "index": 351,
       "id": "script:gui.get_color",
       "stableId": 2904403717,
+      "contractShape": "(handle:gui-node)->(vector4)",
       "modulePath": [
         "gui"
       ],
@@ -32246,12 +33103,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 136
     },
     {
       "index": 352,
       "id": "script:gui.get_euler",
       "stableId": 1987751891,
+      "contractShape": "(handle:gui-node)->(vector3)",
       "modulePath": [
         "gui"
       ],
@@ -32317,12 +33176,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 135
     },
     {
       "index": 353,
       "id": "script:gui.get_fill_angle",
       "stableId": 1481858659,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -32388,12 +33249,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 354,
       "id": "script:gui.get_flipbook",
       "stableId": 3311502564,
+      "contractShape": "(handle:gui-node)->(hash)",
       "modulePath": [
         "gui"
       ],
@@ -32459,12 +33322,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 130
     },
     {
       "index": 355,
       "id": "script:gui.get_flipbook_cursor",
       "stableId": 3781097035,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -32530,12 +33395,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 356,
       "id": "script:gui.get_flipbook_playback_rate",
       "stableId": 3400892719,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -32601,12 +33468,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 357,
       "id": "script:gui.get_font",
       "stableId": 2524172963,
+      "contractShape": "(handle:gui-node)->(hash)",
       "modulePath": [
         "gui"
       ],
@@ -32672,12 +33541,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 130
     },
     {
       "index": 358,
       "id": "script:gui.get_id",
       "stableId": 226439103,
+      "contractShape": "(handle:gui-node)->(hash)",
       "modulePath": [
         "gui"
       ],
@@ -32743,12 +33614,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 130
     },
     {
       "index": 359,
       "id": "script:gui.get_index",
       "stableId": 2475985606,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -32814,12 +33687,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 360,
       "id": "script:gui.get_inherit_alpha",
       "stableId": 4271738474,
+      "contractShape": "(handle:gui-node)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -32885,12 +33760,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 128
     },
     {
       "index": 361,
       "id": "script:gui.get_inner_radius",
       "stableId": 1417724085,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -32956,12 +33833,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 362,
       "id": "script:gui.get_layer",
       "stableId": 721158367,
+      "contractShape": "(handle:gui-node)->(hash)",
       "modulePath": [
         "gui"
       ],
@@ -33027,12 +33906,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 130
     },
     {
       "index": 363,
       "id": "script:gui.get_leading",
       "stableId": 3835778536,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -33098,12 +33979,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 364,
       "id": "script:gui.get_line_break",
       "stableId": 3451930080,
+      "contractShape": "(handle:gui-node)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -33169,12 +34052,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 128
     },
     {
       "index": 365,
       "id": "script:gui.get_material",
       "stableId": 3389488615,
+      "contractShape": "(handle:gui-node)->(hash)",
       "modulePath": [
         "gui"
       ],
@@ -33240,12 +34125,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 130
     },
     {
       "index": 366,
       "id": "script:gui.get_outer_bounds",
       "stableId": 1380414043,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -33311,12 +34198,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 367,
       "id": "script:gui.get_outline",
       "stableId": 3513030284,
+      "contractShape": "(handle:gui-node)->(vector4)",
       "modulePath": [
         "gui"
       ],
@@ -33382,12 +34271,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 136
     },
     {
       "index": 368,
       "id": "script:gui.get_parent",
       "stableId": 3125128426,
+      "contractShape": "(handle:gui-node)->(handle:gui-node)",
       "modulePath": [
         "gui"
       ],
@@ -33455,12 +34346,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 129
     },
     {
       "index": 369,
       "id": "script:gui.get_particlefx",
       "stableId": 2186140978,
+      "contractShape": "(handle:gui-node)->(hash)",
       "modulePath": [
         "gui"
       ],
@@ -33526,12 +34419,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 130
     },
     {
       "index": 370,
       "id": "script:gui.get_perimeter_vertices",
       "stableId": 1209433937,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -33597,12 +34492,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 371,
       "id": "script:gui.get_pivot",
       "stableId": 2503216970,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -33668,12 +34565,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 372,
       "id": "script:gui.get_position",
       "stableId": 3489078413,
+      "contractShape": "(handle:gui-node)->(vector3)",
       "modulePath": [
         "gui"
       ],
@@ -33739,12 +34638,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 135
     },
     {
       "index": 373,
       "id": "script:gui.get_rotation",
       "stableId": 863879680,
+      "contractShape": "(handle:gui-node)->(quaternion)",
       "modulePath": [
         "gui"
       ],
@@ -33810,12 +34711,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 133
     },
     {
       "index": 374,
       "id": "script:gui.get_scale",
       "stableId": 1671879400,
+      "contractShape": "(handle:gui-node)->(vector3)",
       "modulePath": [
         "gui"
       ],
@@ -33881,12 +34784,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 135
     },
     {
       "index": 375,
       "id": "script:gui.get_screen_position",
       "stableId": 262446896,
+      "contractShape": "(handle:gui-node)->(vector3)",
       "modulePath": [
         "gui"
       ],
@@ -33952,12 +34857,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 135
     },
     {
       "index": 376,
       "id": "script:gui.get_shadow",
       "stableId": 1077816394,
+      "contractShape": "(handle:gui-node)->(vector4)",
       "modulePath": [
         "gui"
       ],
@@ -34023,12 +34930,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 136
     },
     {
       "index": 377,
       "id": "script:gui.get_size",
       "stableId": 2019469243,
+      "contractShape": "(handle:gui-node)->(vector3)",
       "modulePath": [
         "gui"
       ],
@@ -34094,12 +35003,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 135
     },
     {
       "index": 378,
       "id": "script:gui.get_size_mode",
       "stableId": 3855360143,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -34165,12 +35076,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 379,
       "id": "script:gui.get_slice9",
       "stableId": 1576625571,
+      "contractShape": "(handle:gui-node)->(vector4)",
       "modulePath": [
         "gui"
       ],
@@ -34236,12 +35149,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 136
     },
     {
       "index": 380,
       "id": "script:gui.get_text",
       "stableId": 1599701945,
+      "contractShape": "(handle:gui-node)->(string)",
       "modulePath": [
         "gui"
       ],
@@ -34307,12 +35222,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 134
     },
     {
       "index": 381,
       "id": "script:gui.get_texture",
       "stableId": 1764006405,
+      "contractShape": "(handle:gui-node)->(hash)",
       "modulePath": [
         "gui"
       ],
@@ -34378,12 +35295,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 130
     },
     {
       "index": 382,
       "id": "script:gui.get_tracking",
       "stableId": 2870007327,
+      "contractShape": "(handle:gui-node)->(number)",
       "modulePath": [
         "gui"
       ],
@@ -34449,12 +35368,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 132
     },
     {
       "index": 383,
       "id": "script:gui.get_visible",
       "stableId": 3634888820,
+      "contractShape": "(handle:gui-node)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -34520,12 +35441,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 128
     },
     {
       "index": 384,
       "id": "script:gui.get_xanchor",
       "stableId": 2738230127,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -34591,12 +35514,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 385,
       "id": "script:gui.get_yanchor",
       "stableId": 4222232448,
+      "contractShape": "(handle:gui-node)->(integer)",
       "modulePath": [
         "gui"
       ],
@@ -34662,12 +35587,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 131
     },
     {
       "index": 386,
       "id": "script:gui.is_enabled",
       "stableId": 689995381,
+      "contractShape": "(handle:gui-node,boolean)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -34733,12 +35660,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 137
     },
     {
       "index": 387,
       "id": "script:gui.move_above",
       "stableId": 3407589104,
+      "contractShape": "(handle:gui-node,handle:gui-node)->()",
       "modulePath": [
         "gui"
       ],
@@ -34804,12 +35733,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 138
     },
     {
       "index": 388,
       "id": "script:gui.move_below",
       "stableId": 2381037776,
+      "contractShape": "(handle:gui-node,handle:gui-node)->()",
       "modulePath": [
         "gui"
       ],
@@ -34875,12 +35806,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 138
     },
     {
       "index": 389,
       "id": "script:gui.new_box_node",
       "stableId": 4256374046,
+      "contractShape": "(vector3|vector4,vector3)->(handle:gui-node)",
       "modulePath": [
         "gui"
       ],
@@ -34946,12 +35879,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 150
     },
     {
       "index": 390,
       "id": "script:gui.new_particlefx_node",
       "stableId": 2603122601,
+      "contractShape": "(vector3|vector4,string|hash)->(handle:gui-node)",
       "modulePath": [
         "gui"
       ],
@@ -35017,12 +35952,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 149
     },
     {
       "index": 391,
       "id": "script:gui.new_pie_node",
       "stableId": 2624398591,
+      "contractShape": "(vector3|vector4,vector3)->(handle:gui-node)",
       "modulePath": [
         "gui"
       ],
@@ -35088,12 +36025,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 150
     },
     {
       "index": 392,
       "id": "script:gui.new_text_node",
       "stableId": 763092804,
+      "contractShape": "(vector3|vector4,string)->(handle:gui-node)",
       "modulePath": [
         "gui"
       ],
@@ -35159,12 +36098,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 148
     },
     {
       "index": 393,
       "id": "script:gui.pick_node",
       "stableId": 642239255,
+      "contractShape": "(handle:gui-node,number,number)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -35230,12 +36171,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 140
     },
     {
       "index": 394,
       "id": "script:gui.reset_material",
       "stableId": 3266845946,
+      "contractShape": "(handle:gui-node)->()",
       "modulePath": [
         "gui"
       ],
@@ -35301,12 +36244,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 127
     },
     {
       "index": 395,
       "id": "script:gui.screen_to_local",
       "stableId": 2583888125,
+      "contractShape": "(handle:gui-node,vector3)->(vector3)",
       "modulePath": [
         "gui"
       ],
@@ -35372,12 +36317,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 141
     },
     {
       "index": 396,
       "id": "script:render.constant_buffer",
       "stableId": 747345077,
+      "contractShape": "()->(handle:render-constant-buffer)",
       "modulePath": [
         "render"
       ],
@@ -35443,12 +36390,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 2
     },
     {
       "index": 397,
       "id": "script:render.delete_render_target",
       "stableId": 1966474874,
+      "contractShape": "(handle:graphics-render-target)->()",
       "modulePath": [
         "render"
       ],
@@ -35514,12 +36463,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 123
     },
     {
       "index": 398,
       "id": "script:render.disable_texture",
       "stableId": 2525269590,
+      "contractShape": "(handle:graphics-texture)->()",
       "modulePath": [
         "render"
       ],
@@ -35585,12 +36536,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 126
     },
     {
       "index": 399,
       "id": "script:render.enable_texture",
       "stableId": 97040005,
+      "contractShape": "(number|string|hash,handle:graphics-texture,integer)->()",
       "modulePath": [
         "render"
       ],
@@ -35656,12 +36609,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 142
     },
     {
       "index": 400,
       "id": "script:render.get_render_target_height",
       "stableId": 4039286113,
+      "contractShape": "(handle:graphics-render-target,integer)->(integer)",
       "modulePath": [
         "render"
       ],
@@ -35727,12 +36682,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 124
     },
     {
       "index": 401,
       "id": "script:render.get_render_target_width",
       "stableId": 3723698286,
+      "contractShape": "(handle:graphics-render-target,integer)->(integer)",
       "modulePath": [
         "render"
       ],
@@ -35798,12 +36755,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 124
     },
     {
       "index": 402,
       "id": "script:render.set_render_target_size",
       "stableId": 1091762951,
+      "contractShape": "(handle:graphics-render-target,integer,integer)->()",
       "modulePath": [
         "render"
       ],
@@ -35869,12 +36828,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 125
     },
     {
       "index": 403,
       "id": "script:resource.get_buffer",
       "stableId": 4087860613,
+      "contractShape": "(string|hash)->(handle:buffer-data)",
       "modulePath": [
         "resource"
       ],
@@ -35954,12 +36915,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 144
     },
     {
       "index": 404,
       "id": "script:resource.load",
       "stableId": 306454494,
+      "contractShape": "(string)->(handle:buffer-data)",
       "modulePath": [
         "resource"
       ],
@@ -36039,12 +37002,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 143
     },
     {
       "index": 405,
       "id": "script:resource.set",
       "stableId": 1254740582,
+      "contractShape": "(string|hash,handle:buffer-data)->()",
       "modulePath": [
         "resource"
       ],
@@ -36124,12 +37089,14 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 145
     },
     {
       "index": 406,
       "id": "script:sys.load_buffer",
       "stableId": 667618348,
+      "contractShape": "(string)->(handle:buffer-data)",
       "modulePath": [
         "sys"
       ],
@@ -36209,7 +37176,8 @@
         "nativeStaticHermes": "unverified",
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
-      }
+      },
+      "contractShapeIndex": 143
     }
   ],
   "semanticPolicyHoles": {
@@ -36220,7 +37188,7 @@
     "profileSymbolUnavailable": 2
   },
   "generated": {
-    "report": "{\"routeCount\":407,\"hash\":\"4fecfa0a5881fbbafba7a1986c91054cac1d7deb8abcbdee0273bf378b52bac6\"}",
+    "report": "{\"routeCount\":407,\"hash\":\"03ebbc19a091271341a6dfde06845df9076238d9d2668a229b5423bfe8584f15\"}",
     "artifacts": [
       "packages/bindings/generated/defold-script-handle-lowering.json",
       "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",

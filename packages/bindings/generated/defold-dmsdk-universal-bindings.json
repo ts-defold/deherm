@@ -5,11 +5,11 @@
     "projection": "052a5bb57b3c247abc5e0810321ed19b1cddb886b6ecc2d4348b96f44bf5e1bf",
     "sdkIr": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
     "specialized": {
-      "borrowedHandle": "6e956062424f9a3307549427b15f29f5c4f3d5888175f6095c976fcc44b9222e",
+      "borrowedHandle": "8a57760db790ca430ec40329b2874a3b008b324a0724660bf95404fe95d5fc95",
       "scratchScalarOut": "8ab118df450c4062b17c183b59974de0c3b8e683b59e9c8df7fb26793f0f2824",
       "cstringValue": "60e03716f6e074c8cb30acbdfcfe635315e2f41da04ea7d9451c124f3a52a78c"
     },
-    "aggregate": "b9b38d28ed93f90a7fa65399b8578832c942b28c726e0c72e73390e2c4dd1849",
+    "aggregate": "a9d80bd82a521bd76d54ad21503f018535c7d5630f0ab8612f2ee478dcd83b0c",
     "catalog": "fe9bb1eb459215f9537e55ae5bdc3e52938435a08970958e98ac59188a89d6ef"
   },
   "coverage": {

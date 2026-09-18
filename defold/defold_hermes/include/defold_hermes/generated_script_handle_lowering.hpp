@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <array>
+#include <defold_hermes/deherm_profile.hpp>
 #include <defold_hermes/lua_value_registry.hpp>
 #include <defold_hermes/scalar_lua_dispatch.hpp>
 #include <defold_hermes/script_bridge_capi.hpp>
@@ -126,6 +127,19 @@ bool routeAvailableInProfile(const Route& route, const RuntimeProfile& profile) 
 RuntimeProfileDetectionStatus detectRuntimeProfile(lua_State* state, RuntimeProfileDetection* output,
     char* error, size_t errorCapacity) noexcept;
 const Route* find(uint32_t stableId) noexcept;
+
+#if DEHERM_PROFILE_ENABLED
+/** Generated telemetry identity for the lua-stack transport. Declared only when
+ *  DEHERM_PROFILE is on; with the switch off neither the declarations nor the
+ *  tables behind them exist. */
+inline constexpr uint16_t kContractShapeCount = 151;
+/** Dense contract-shape id for a route, indexed by Route::index. */
+uint16_t profileContractShape(uint16_t routeIndex) noexcept;
+/** Cold dmProfile scope name for a route, indexed by Route::index. */
+const char* profileRouteName(uint16_t routeIndex) noexcept;
+/** Cold contract-shape token, indexed by the dense shape id. */
+const char* profileContractShapeName(uint16_t shapeId) noexcept;
+#endif
 
 /** One fixed-capacity captured-Lua executor shared by every emitted handle route. */
 class CapturedLuaRouter {

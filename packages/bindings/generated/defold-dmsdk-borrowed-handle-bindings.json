@@ -216,7 +216,7 @@
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle.h": "08ddb61aab3b171e59d3a7b80d700f40435bd12c5c60b4c5169be4b35c0d57ce",
     "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js": "479bd9127d253089baa129ccc4cce663a5747833d072d816d3acd0ed5f14b3cf",
     "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp": "77d5d21ea2042f031f072b5d193775a80bbcffa832c4081f87890114bc9055cc",
-    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp": "d49774041304992b7f01467dff57062a8fc20626b1dcf6cff5639dc67a55d39b",
+    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp": "8f2b99dae7f151ccb67dc0c7394b05dbd518ef754f6a6e5efb2d55b7a2ee09dc",
     "native/generated_dmsdk_borrowed_handle_header_audit.cpp": "27403e989a50fd50ac8a6a23c51900a304db0ba8c266c823e5fac3f27e972fa1",
     "packages/sdk/src/generated/dmsdk/borrowed-handle.ts": "a95b9833a9be14a8768625449bc3689fc3dcd4ccd52272ff4b04aad6639985ef",
     "packages/static-hermes/src/generated/dmsdk-borrowed-handle.ts": "0b78c09dda1b47099b29088274beaba9458296c08b55efbb11db44755e9f001d"
