@@ -14,9 +14,9 @@ full generated Defold compatibility. TS-to-Lua remains a migration and
 fallback target, not a requirement for the new runtime.
 
 This repository is an architecture spike. Start with the
-[knowledge base](knowledge/index.md), especially the
-[implementation plan](knowledge/plan.md) and
-[runtime strategy](knowledge/decisions/runtime-strategy.md).
+[knowledge base](.agents/docs/index.md), especially the
+[implementation plan](.agents/docs/plan.md) and
+[runtime strategy](.agents/docs/decisions/runtime-strategy.md).
 
 The working developer experience is:
 
@@ -85,7 +85,7 @@ then stores it as the typed `/deherm/app.dehermc` resource in the game archive. 
 automatically links the generated module adapter and hand-written host library under the extension's `lib/web`
 directory as Emscripten JavaScript libraries. The HTML5 extension loads the
 archived application and runs it in the browser VM; no Hermes library is added
-to the default web build. See the [HTML5 bundle decision](knowledge/decisions/html5-bundle-and-static-wasm.md)
+to the default web build. See the [HTML5 bundle decision](.agents/docs/decisions/html5-bundle-and-static-wasm.md)
 for the production loader, development reload, and optional Static Hermes AOT
 profile.
 
@@ -114,7 +114,7 @@ schema. One fast code-generation pass emits:
 
 There is no Embind, JSON marshalling, reflection, or generic native dispatcher
 on the scalar call path. Read the binding rationale and next type-lowering
-steps in [the binding compiler decision](knowledge/decisions/binding-compiler.md).
+steps in [the binding compiler decision](.agents/docs/decisions/binding-compiler.md).
 
 Coverage is tracked against two upstream truths. `npm run
 generate:sdk-inventory` runs Clang across every public dmSDK header; `npm run

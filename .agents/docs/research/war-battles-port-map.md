@@ -116,7 +116,7 @@ rocket. The GUI updates the `score` node.
 The executable TSDefold reference directly requires 15 generated Defold API
 functions, `Math.atan2`, vector arithmetic lowering, four address forms, six
 message contracts, and five input hashes. The complete machine-readable list is
-[`knowledge/data/war-battles-api-usage.json`](../data/war-battles-api-usage.json).
+[`.agents/docs/data/war-battles-api-usage.json`](../data/war-battles-api-usage.json).
 
 | Family | Required calls | Deherm consequence |
 | --- | --- | --- |

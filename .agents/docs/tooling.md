@@ -57,6 +57,17 @@ ordinary edit loop.
 | Verify a running HTML5 bundle | `npm run test:html5:runtime` | Reload-synchronized CDP lifecycle and binding proof |
 | Reuse a running local Extender | `npm run bob:build`; `npm run bob:bundle` | Local port 9010 is the default |
 
+`build:release-plan` emits canonical route glue under
+`build/profiles/release/canonical/<target>/`. For a native Dynamic-Hermes
+consumer, configure CMake with
+`-DDEHERM_CANONICAL_RELEASE_DIR=<absolute release root>/canonical/dynamicHermesJsi`.
+The generated `sources.cmake` is then linked into `defold-hermes-runtime`, and
+the JSI bridge rejects routes absent from the release registry. Static-Hermes
+and browser/Wasm currently produce reject-all registries plus
+`requirements.json`; those files are blocker evidence, not executable binding
+claims. Existing Lua-family implementation objects remain coarse-grained and
+are not yet proven dead-stripped.
+
 The strongest local verification is one command:
 
 ```sh
@@ -117,6 +128,7 @@ The npm package now exposes project inspection and generation:
 npx deherm doctor
 npx deherm extensions
 npx deherm generate
+npx deherm typecheck
 npx deherm verify-generated
 ```
 
@@ -131,24 +143,46 @@ the command and options.
 .deherm/bindings.ir.json      normalized symbol/type/lowering IR
 .deherm/extensions.d.ts       extension interfaces
 .deherm/ir/**                 pinned complete API inputs and lowering plan
+.deherm/ir/binding-lowering-plan.sentinel.json  plan/generator authority
 .deherm/sdk/**                executable TypeScript compatibility SDK
+.deherm/sdk/contexts/**       context-filtered SDK entrypoints
+.deherm/script-contexts.json  generated 926-route context projection
 .deherm/manifest.json         package/input/profile identities
 deherm.lock                   project-side copy of the generation contract
-tsconfig.deherm.json          TS 7 + future ttsc transform configuration
+tsconfig.deherm.base.json     shared TS 7 + future ttsc configuration
+tsconfig.deherm.shared.json   ordinary context-free `*.ts`
+tsconfig.deherm.game-object.json  game-object `*.script.ts`
+tsconfig.deherm.gui.json      GUI `*.gui.ts`
+tsconfig.deherm.render.json   render `*.render.ts`
+tsconfig.deherm.json          solution referencing all four contexts
 tsconfig.json                        created only when the project has none
 .vscode/extensions.json              created only when absent
 .vscode/settings.json                created only when absent
 ```
 
-Existing root `tsconfig.json` and VS Code files are never overwritten. The
-generated ttsc plugin entry is disabled until the Defold transform package is
-implemented; this keeps the scaffold type-checkable today while fixing the
-future configuration contract.
+Existing root `tsconfig.json` and VS Code files are never overwritten. Run
+`npx deherm typecheck` regardless of an existing root configuration: it invokes
+the generated solution with the package's local TypeScript compiler and checks
+all four source contexts. `gui.*` is absent outside `*.gui.ts`; `render.*` is
+absent outside `*.render.ts`; known game-object-only members are removed from
+the other entrypoints. The 347 routes whose canonical context contract remains
+unresolved are explicitly recorded as provisional and remain visible pending
+semantic resolution. The generated ttsc plugin entry remains disabled until
+the déherm transform package is implemented.
 
-Normal generation uses keyed sentinels and skips unchanged output. Run
-`npx deherm verify-generated --project <project>` when an exact integrity audit
-is wanted: it hashes all copied IR inputs, validates the canonical lowering
-plan, binds them to the installed package, and checks the manifest/lock pair.
+Generation is a keyed ensure: unchanged project inventory, Defold/profile
+authority, generator implementation, and output location return without
+rewriting generated files. It does not hash every output on this fast path.
+Use `npx deherm generate --force` to replace disposable generated output, and
+`npx deherm verify-generated --project <project>` for the exact integrity audit.
+`typecheck` runs that audit first, so stale schema-v2 plan, generator sentinel,
+manifest/lock, context entrypoint, or generated config state fails before `tsc`.
+
+The four generated projects use project-wide suffix discovery (`**/*.ts`) with
+dependency, build, and distribution caches excluded. This covers components
+outside `src/`. The boundary check rejects package-root SDK imports, generated
+SDK deep imports, normalized path aliases, cross-context files, and the same
+bypasses hidden behind a shared re-export.
 
 The next commands will orchestrate the internal build graph:
 
@@ -179,12 +213,16 @@ The proposed convention keeps the two compilation semantics explicit:
 
 ```text
 src/**/*.script.ts  Authored TypeScript game-object components; proxies generated beside them
+src/**/*.gui.ts     Authored GUI components; `.gui_script` proxies generated beside them
+src/**/*.render.ts  Authored render components; `.render_script` proxies generated beside them
+src/**/*.ts         Context-free shared modules; no instance-exclusive APIs
 src/hermes/         TypeScript modules bundled for Hermes or the browser VM
 src/lua/            Optional TS-to-Lua migration/fallback sources
 src/shared/         Pure shared TypeScript with target-safe dependencies
 ```
 
-Application code imports the idiomatic generated SDK. Low-level, complete
+Application code imports the context-filtered SDK as `@deherm/project`.
+Low-level, complete
 dmSDK access is available from a separate raw namespace so pointer ownership,
 thread restrictions, and lifetime contracts remain visible rather than being
 made deceptively ergonomic.

@@ -405,7 +405,7 @@ zero after `lifecycle:update:1` and `final:ok`. The observed routes were
 `rotate`.
 
 The successful transcript is retained at
-`knowledge/data/native-defold-runtime.log`, SHA-256
+`.agents/docs/data/native-defold-runtime.log`, SHA-256
 `f52a4571d78860c5d86e64e018e703e4e6c8b797ffc36fc969e3146a1835261b`.
 The real-engine matrix validates that artifact against both current scalar and
 value probe-set fingerprints and exact scenario markers. It promotes exactly

@@ -14,9 +14,11 @@ sources:
 
 # Decision
 
-The authored component resource is `*.script.ts`. The first production backend
-generates a sibling Defold `*.script` proxy whose only job is to bind an
-ordinary game-object component to the TypeScript component instance.
+The authored game-object component resource is `*.script.ts`. GUI and render
+components use the parallel `*.gui.ts` and `*.render.ts` conventions. The first
+production backend generates sibling Defold `.script`, `.gui_script`, and
+`.render_script` proxies whose only job is to bind the correct Defold execution
+context to the TypeScript component instance.
 Application authors attach the generated resource exactly as they attach any
 other Defold script. They write no proxy Lua and no gameplay Lua.
 
@@ -57,16 +59,23 @@ function-based. The semantic requirements do not change:
 
 # Generated artifacts
 
-For each `*.script.ts` entry, generation emits:
+For each context-suffixed entry, generation emits:
 
 1. a component manifest with the module id, schema fingerprint, lifecycle
    capabilities, property codecs, and target availability;
-2. a minimal sibling `.script` proxy containing generated
-   `go.property(...)` declarations and lifecycle forwarding calls;
+2. a minimal sibling proxy of the matching Defold resource kind with lifecycle
+   forwarding; only `.script` proxies may contain generated `go.property(...)`
+   declarations;
 3. a bundled TypeScript module-registration record;
 4. native and browser dispatch metadata keyed by stable component type id;
 5. compile-time TypeScript types for the component's `self`, properties,
    messages, inputs, and spawned-property overrides.
+
+Render scripts expose no `final` or `on_input` callback in the pinned Defold
+function table. The generator rejects those hooks in `*.render.ts`, emits no
+fake finalizer, and records teardown as requiring an unimplemented render
+attachment provider. GUI and game-object contexts support all six ordinary
+lifecycle callbacks.
 
 The native/browser registration records and manifests live below
 `.deherm/generated/` and are safe to delete and regenerate. The proxy is
@@ -83,13 +92,20 @@ associate the two resources, but the build does not depend on it.
 
 # Runtime model
 
+This section is the required model, not current runtime evidence. The generated
+capability gate presently reports zero executable component-proxy methods and
+fails all six Lua entry points closed until the model below exists.
+
 Instance identity is a 64-bit logical value represented as index plus
 generation. Dense SoA storage tracks the native/Lua instance reference,
 TypeScript root, component type, lifecycle mask, and state flags. Destruction
 increments the generation before a slot is reused, making stale queued events
 fail closed.
 
-The proxy forwards create/init, update, final, message, input, and reload. Hot
+Game-object and GUI proxies forward create/init, update, final, message, input,
+and reload. Render proxies forward init, update, message, and reload; their
+provider owns teardown because Defold supplies no render-script final callback.
+Hot
 paths enqueue fixed-layout events into bounded per-world buffers; a single
 bridge entry drains a dense batch into Hermes. Initialization and calls that
 must synchronously return a Defold result can use a direct path. No normal-frame

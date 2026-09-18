@@ -6,6 +6,9 @@
   "gameplayExecutionObserved": false,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "inputs": {
+    ".agents/docs/data/war-battles-api-usage.json": {
+      "sha256": "6a24b142feccda910554aad48bafd5dabd786e75ed1c217e79611cbf04420366"
+    },
     "bindings/generated/defold-script-api-ir.json": {
       "sha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049"
     },
@@ -15,17 +18,14 @@
     "bindings/generated/defold-script-value-bindings.json": {
       "sha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d"
     },
-    "knowledge/data/war-battles-api-usage.json": {
-      "sha256": "6a24b142feccda910554aad48bafd5dabd786e75ed1c217e79611cbf04420366"
-    },
     "tests/fixtures/war-battles/.deherm/generated/components/manifest.json": {
-      "sha256": "ed2fc1a11400d37db041951eb40d53a8124a2df03585a56f94def118e9edb77c"
+      "sha256": "29ff5d0cc14597862f2e1dc8b3e77b602acda6222bad2178b91fab70d069c59f"
     },
     "tests/fixtures/war-battles/src/scripts/player.script.ts": {
       "sha256": "ebe603655cc163487603907b687e6a38ad1a0d1c3b629f638cd12e4529414c4e"
     },
     "tests/fixtures/war-battles/src/scripts/rocket.script": {
-      "sha256": "a8ebdf62bd0469a75d3980e6be6f42f41782ba2b81c64b20a0574edbdc1d96da"
+      "sha256": "5c26614cb43887cbe88b94e7684bfcc95addd2f5162767b466827bfd1b43ff7d"
     },
     "tests/fixtures/war-battles/src/scripts/rocket.script.ts": {
       "sha256": "2b3ac7ca02cf112460e816c9244528806ead7cee14af3fc570f3b461530a3767"

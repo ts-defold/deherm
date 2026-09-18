@@ -27,6 +27,7 @@ okf_version: "0.2"
 * [Delivery model](decisions/delivery-model.md) - What ships as a Defold library/native extension and what would require a fork.
 * [Project extension discovery](decisions/project-extension-discovery.md) - How the npm CLI discovers local and resolved extensions and decides which binding route is safe.
 * [TypeScript game-object components](decisions/typescript-components.md) - Generated `.script` proxies now, with a compatible native component backend later.
+* [TypeScript execution contexts](decisions/typescript-execution-contexts.md) - `.script.ts`, `.gui.ts`, `.render.ts`, and shared `.ts` drive generated proxies, types, VS Code diagnostics, and runtime attachment checks.
 * [Development loop and debugging](decisions/development-loop-and-debugging.md) - ttsc-only transforms, generation-safe hot reload, Hermes CDP, VS Code, and profiling.
 * [Math and shader language tools](decisions/math-and-shader-language-tools.md) - Directive-scoped operator syntax, math IR, backend selection, TypeGPU, and VS Code semantics.
 * [Upstream contribution policy](upstream-contributions.md) - Evidence and quality gates for focused Static Hermes and Defold pull requests.
@@ -39,8 +40,10 @@ okf_version: "0.2"
 * [C# precedent](research/csharp-precedent.md) - How Defold implemented experimental C# extensions and what to copy.
 * [dmSDK coverage](research/sdk-coverage.md) - Generated, declaration-level coverage of every public dmSDK header.
 * [dmSDK ABI generator wave](research/dmsdk-abi-generator-wave.md) - Exact ABI-shape census, scalar and enum-value adapters, and isolated clean-room regeneration.
+* [dmSDK scalar out-parameter wave](research/dmsdk-scratch-scalar-out-wave.md) - Complete 79-row structural partition, seven provider-gated scalar outputs, and exact evidence boundaries.
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.
 * [Canonical lowering plan](research/canonical-lowering-plan.md) - All 2,287 API units across five backends, interned marshalling programs, semantic policies, and final-build reachability.
+* [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Exact positional Lua tuple ABI, public reachability limits, and unpromoted engine evidence.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.
 * [TypeGPU shader lane](research/typegpu-shader-lane.md) - Build-time TypeGPU authoring, Defold shader adaptation, typed material bindings, and validation gates.

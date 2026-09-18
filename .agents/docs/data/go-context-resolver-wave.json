@@ -29,8 +29,8 @@
     "scriptIr": "bindings/generated/defold-script-api-ir.json",
     "bindingPatterns": "bindings/generated/defold-script-binding-patterns.json",
     "bindingDescriptors": "bindings/generated/defold-script-binding-descriptors.json",
-    "warBattlesUsage": "knowledge/data/war-battles-api-usage.json",
-    "warBattlesGate": "knowledge/data/war-battles-runtime-gate.json",
+    "warBattlesUsage": ".agents/docs/data/war-battles-api-usage.json",
+    "warBattlesGate": ".agents/docs/data/war-battles-runtime-gate.json",
     "sourceVerification": {
       "gitCommand": "git -C upstream/defold rev-parse HEAD",
       "observedRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05"
