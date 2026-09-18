@@ -22,6 +22,38 @@ No LLM, network model, or human code generation is part of that command. An
 agent may help develop, audit, and improve the compiler. Its output cannot be a
 required build input and cannot substitute for a deterministic rule.
 
+# The generator is the product, not its output
+
+No TypeScript, no binding source, and no type declaration is shipped. Users
+receive generators, and every artifact they consume is produced on their own
+machine from their own project, their own Defold revision, and their own
+third-party extensions.
+
+That inverts where correctness has to live. A defect in a generated file is a
+defect in one project; a defect in a generator reaches every project that runs
+it, against inputs this repository has never seen. Concretely:
+
+* **Unknown input is the normal case.** Extension `.script_api` files and native
+  sources are written by third parties who follow the format loosely. Real
+  examples already found: optionality spelled `map_id[optional]` rather than
+  `optional: true`, a call signature declared with `parameters:` but no
+  `type: function`, and a one-entry `returns:` sequence. A generator that only
+  handles the shapes in this repository's fixtures is not finished.
+* **Unparseable input must block, never degrade.** Emitting `any`, `unknown`, or
+  a guessed signature ships a wrong type to a user who has no way to know it is
+  wrong. An input the generator cannot decide is a machine-readable blocker with
+  a site and a reason, surfaced at generation time.
+* **Documentation is not authority.** Reference docs and `.script_api` describe
+  intent; the Lua C registration and the C function body are what the engine
+  actually exposes. Where they disagree, source wins and the disagreement is
+  reported rather than silently resolved.
+* **Crashing is a product failure.** A generator that throws on a malformed
+  third-party extension has broken that user's build. Malformed input is an
+  expected condition with a diagnostic, not an exception.
+* **Determinism is a user-facing property.** Generated output is cached,
+  committed, and diffed by users. Identical inputs must produce identical bytes
+  on their machine, not only in this repository.
+
 # Inputs and pipeline
 
 The generator resolves and content-addresses:
