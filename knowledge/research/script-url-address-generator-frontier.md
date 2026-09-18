@@ -1,36 +1,32 @@
 ---
 type: Research
 title: Generated URL and address frontier
-description: Exact pending route census and allocation-free composite Defold URL codec foundation.
+description: Generated native-dynamic routing for 70 Defold URL/address APIs with exact four-lane storage.
 tags: [research, generated, bindings, url, abi, memory]
 status: active
 ---
 
 # Generated URL/address frontier
 
-Status: codec foundation and planned-route classification, not executable-route evidence.
+Status: generated and native-harness executable on dynamic Hermes; packaged-engine probes remain unverified.
 
 The generator at `scripts/generate-script-url-address-classification.mjs` derives
-the URL/address frontier from the pinned script IR, API accounting ledger, and
-binding-pattern report. It does not carry a hand-authored route list. It rejects
-revision, input hash, route count, module count, raw type, source hash, source
-anchor, and disjoint-partition drift.
+the URL/address frontier from the pinned script IR, binding-pattern report, and
+reviewed override. It deliberately runs before API accounting so accounting can
+consume its output without a two-pass cycle. It rejects revision, input hash,
+route count, module count, raw type, source hash, source anchor, codec, and
+disjoint-partition drift.
 
-The binding-pattern classifier contains 127 `defold-value` routes. Seventeen
-non-Matrix routes were already executable before this frontier census; removing
-that source-pinned set reconstructs the 110-route baseline frontier. Its exact
-partition is:
+The binding-pattern classifier contains 127 `defold-value` routes. Its
+accounting-independent partition is:
 
-- 20 Matrix4 routes owned by the separate Matrix4 generator wave;
-- 70 URL/address routes owned by this classifier;
+- 20 Matrix4 routes owned by the Matrix4 generator;
+- 73 URL-bearing candidates;
+- 3 URL-bearing current-instance routes already owned by direct native bindings
+  (`go.get_position`, `go.set_position`, `go.set_rotation`);
+- 70 URL/address routes owned by this generator;
 - 2 binary-string routes (`gui.set_texture_data`, `resource.set_sound`);
-- 18 routes expressible with the current scalar/hash/vector codecs.
-
-The current accounting ledger has promoted 14 of the 20 Matrix4 routes, so the
-current pending partition is exactly 96 routes: 6 Matrix4 + 70 URL/address + 2
-binary-string + 18 current-codec routes. The generated report records both the
-110-route baseline frontier and this current 96-route state without conflating
-historical classification with executable coverage.
+- 32 other non-Matrix, non-URL routes.
 
 The 70 URL routes span camera 19, collectionfactory 3, factory 3, go 15,
 label 2, model 5, particlefx 2, physics 11, sound 3, sprite 3, and tilemap 4.
@@ -50,7 +46,10 @@ three of them. A `kUrl` with no valid sidecar slot therefore fails closed.
 `ScriptUrlArena` is fixed-capacity inline storage. Its token checks the runtime,
 index, generation, and exact slot pointer. Nested frames rewind safely; rewound,
 cross-arena, cross-runtime, and pre-runtime-reset tokens are rejected. Capacity
-exhaustion is deterministic and there is no heap fallback.
+exhaustion is deterministic and there is no heap fallback. The JSI object is
+explicitly branded with `__dehermUrlV1: true`; arbitrary objects with
+similarly named bigint properties are not accepted. Encode and decode preserve
+the nonzero reserved lane as well as socket, path, and fragment.
 
 ## Required generated Lua route
 
@@ -63,10 +62,17 @@ The three accepted address forms must stay distinct until the Lua boundary:
 3. A hash remains a Lua hash so Defold supplies the default socket, uses the
    hash as path, and clears the fragment.
 
-If a route returns a URL, generated glue must copy all URL lanes into the
-sidecar before restoring or popping the Lua stack. The native codec test proves
-that copy-before-pop ownership behavior using the pinned `dmMessage::URL` type.
+The generator emits one sorted stable-ID descriptor table, positional codec
+masks, and one reusable captured-Lua invoker. No route has a hand-written C++
+body. The native harness calls all 70 generated descriptors through real Lua
+5.1 stack operations, validates exact four-lane URL bits, separately exercises
+string and hash shorthand, rejects stale/cross-arena/collapsed URL tokens, and
+observes zero C++ `new` calls across 1,024 warmed calls. It also proves a
+nonzero reserved lane survives copy-before-pop and copy-for-push.
 
-No target is marked executable by this wave. Dynamic Hermes, Static Hermes,
-and the HTML5 browser host remain `planned-codec-foundation` until their
-generated frame routing and real-engine probes exist.
+Dynamic Hermes is `generated-executable`, but the 70 packaged-Defold scenarios
+are still unverified. Static Hermes, the flat Wasm C ABI, and the HTML5 browser
+host remain `fail-closed-unverified` for structured URLs because their current
+ABI has only one `u64` payload lane. String/hash shorthand may traverse that
+ABI, but the target is not marked executable until all four lanes are carried
+without JavaScript `number` coercion.

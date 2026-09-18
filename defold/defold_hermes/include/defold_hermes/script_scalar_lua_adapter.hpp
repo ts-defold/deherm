@@ -3,6 +3,7 @@
 #include <defold_hermes/scalar_lua_dispatch.hpp>
 #include <defold_hermes/generated_script_value_bindings.hpp>
 #include <defold_hermes/generated_script_fixed_tuples.hpp>
+#include <defold_hermes/generated_script_url_bindings.hpp>
 #include <defold_hermes/lua_bridge_core.hpp>
 #include <defold_hermes/script_bridge_capi.hpp>
 
@@ -49,6 +50,20 @@ class ScriptAdapter {
       ScriptCallFrame* frame,
       char* error,
       size_t errorCapacity) noexcept;
+  static url_binding::DispatchStatus UrlInvokeThunk(
+      void* context,
+      const url_binding::Operation& operation,
+      const uint16_t* argumentCodecs,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  url_binding::DispatchStatus invokeUrl(
+      const url_binding::Operation& operation,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  bool bindUrl(const url_binding::Operation& operation) noexcept;
+  bool readUrlResult(url_binding::ResultCodec codec, ScriptCallFrame* frame) noexcept;
   fixed_tuple::DispatchStatus invokeFixedTuple(
       const fixed_tuple::Operation& operation,
       const uint16_t* resultCodecs,
@@ -65,7 +80,10 @@ class ScriptAdapter {
       size_t errorCapacity) noexcept;
   bool bindStructured(const value_binding::StructuredLuaOperation& operation) noexcept;
   bool captureContext(int stackIndex, value_binding::StructuredLuaContext context) noexcept;
-  bool pushStructuredValue(const ScriptValue& value, uint32_t depth = 0) noexcept;
+  bool pushStructuredValue(
+      const ScriptValue& value,
+      ScriptCallFrame* frame = nullptr,
+      uint32_t depth = 0) noexcept;
   bool readStructuredResult(
       value_binding::StructuredLuaResultCodec codec,
       ScriptCallFrame* frame) noexcept;
@@ -83,9 +101,11 @@ class ScriptAdapter {
   bool hasActiveContext_ = false;
   std::array<int, value_binding::kStructuredLuaOperationCount> structuredFunctionRefs_{};
   std::array<int, fixed_tuple::kBindingCount> fixedTupleFunctionRefs_{};
+  std::array<int, url_binding::kBindingCount> urlFunctionRefs_{};
   ::defold_hermes::lua_bridge::HandlePool luaHandles_;
   value_binding::StructuredLuaApi structuredLuaApi_{};
   fixed_tuple::LuaApi fixedTupleLuaApi_{};
+  url_binding::LuaApi urlLuaApi_{};
   char adapterError_[384]{};
 };
 

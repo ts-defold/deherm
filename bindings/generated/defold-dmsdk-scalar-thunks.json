@@ -20,8 +20,8 @@
     "hostSourceLinkCovered": 26,
     "hostBehaviorCovered": 26,
     "blocked": 5,
-    "policyBlocked": 4,
-    "sourceBlocked": 1,
+    "policyBlocked": 5,
+    "sourceBlocked": 0,
     "packagedLibraryLinked": 26,
     "dispatchReferenceCovered": 26,
     "hostExecutableRetained": 26,
@@ -30,7 +30,28 @@
     "nativeHermesRuntimeSmokeTested": 2,
     "browserTypeScriptAdapterGenerated": 16,
     "browserAdapterBehaviorTested": 16,
+    "warmedDispatchIterations": 100000,
+    "warmedDispatchObservedCppAllocations": 0,
     "allTargetConformant": 0
+  },
+  "sourceHashes": {
+    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+    "classification": "db34de697fc30b34f4ba0cbd9cce3ff5277dfd774a5aaae26ecdde3b2d439cc8"
+  },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp": "ede715873076d67eb68d0a6fe98bc162113b441700c0a304c731ab55f00ef19e",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h": "ca019f01d58f2bff58ba6f67ad08427eb45223f5e1be4c315b8dc0a9a62511ed",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h": "958882e0c1959784b024a721aafb1c2a6dc2c1daa90a070254150ab072f747a8",
+    "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js": "92e7ee5530ec8501df6876d493f489ed33d940ea831cd68e0e9b24c811df6109",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp": "da4f3e3a68f207e5dc4ed9f1777bf6aa04f12897dd27605ba0a3502be0a022a4",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp": "23df6416e5c8f1d05bd9173f4addca0700d4a737127f821d7b0e14f8fff07661",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp": "976544ddd524ccd4ed0855dc2956d755f80211effa0fc5b6b2274524aa88d573",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp": "d42e024fea3c92fab45a97bfdea5f69c1ec699ab62ef22f87c4f708c02d29f5b",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp": "b1904060ad09fa821d68e4c50718bd38e19e357f143163ffc5ed20a43c6f37af",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp": "fcc6475a9ef57f3e926fc61e96c7de9da76b064cdf558b085b5fb8fcea877ded",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp": "cbf591f30ec27d99a0599e447d71dca1ddce2dce9cc39935dc2a22fcaa9a1885",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp": "b20513006455899531e6e447cc70669883d2296cd8edc46faa0a3dc469f67143",
+    "packages/sdk/src/generated/dmsdk/scalar.ts": "8c12e875b9d6cc1998a937e68b5eeea40f83bb54e0c0fcf76f494b2ae1ef5267"
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h",
@@ -661,6 +682,7 @@
       "emitted": false,
       "blocker": {
         "blocker": "Process-global profiler teardown is owned by the Defold engine lifecycle.",
+        "category": "engine-lifecycle",
         "policy": "lifecycle-capability-required"
       },
       "stages": {
@@ -719,6 +741,7 @@
       "emitted": false,
       "blocker": {
         "blocker": "Process-global profiler initialization is owned by the Defold engine lifecycle.",
+        "category": "engine-lifecycle",
         "policy": "lifecycle-capability-required"
       },
       "stages": {
@@ -1421,23 +1444,56 @@
           "line": 1878,
           "text": "void Finalize()",
           "sha256": "452da12536a6fc2b9c25db8a9091dd919705f7ed01ca8bf9045a9e3572c1516b"
+        },
+        {
+          "path": "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include/dmsdk/graphics/graphics.h",
+          "line": 1759,
+          "text": "void Finalize();",
+          "sha256": "10bc2e302a8515ff0636f2cb8bdbece5a63bbd32ee0c10333e57986049ca382b"
+        },
+        {
+          "path": "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/include/graphics/graphics_ddf.h",
+          "line": 27,
+          "text": "namespace dmGraphics",
+          "sha256": "9746e168f5623e9a5fcc0b0fc6230bc96461219ab640b29efe76c0cdefc7baf5"
+        },
+        {
+          "path": "upstream/defold/engine/graphics/src/graphics.cpp",
+          "line": 1878,
+          "text": "void Finalize()",
+          "sha256": "452da12536a6fc2b9c25db8a9091dd919705f7ed01ca8bf9045a9e3572c1516b"
         }
       ],
       "emitted": false,
       "blocker": {
-        "blocker": "The pinned source-tree header includes <graphics/graphics_ddf.h>, but that generated SDK header is absent from the checkout.",
-        "missingDependency": "graphics/graphics_ddf.h",
-        "checkedPath": "upstream/defold/engine/graphics/src/graphics/graphics_ddf.h"
+        "blocker": "Process-global graphics teardown is owned by the Defold engine lifecycle.",
+        "category": "engine-lifecycle",
+        "policy": "lifecycle-capability-required",
+        "auditEvidence": [
+          [
+            "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include/dmsdk/graphics/graphics.h",
+            "void Finalize();"
+          ],
+          [
+            "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/include/graphics/graphics_ddf.h",
+            "namespace dmGraphics"
+          ],
+          [
+            "upstream/defold/engine/graphics/src/graphics.cpp",
+            "void Finalize()"
+          ]
+        ]
       },
       "stages": {
         "generated": {
-          "status": "blocked",
+          "status": "blocked-by-policy",
           "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-          "note": "The pinned source-tree header includes <graphics/graphics_ddf.h>, but that generated SDK header is absent from the checkout."
+          "note": "Process-global graphics teardown is owned by the Defold engine lifecycle."
         },
         "compiled": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h"
+          "status": "header-compiled-policy-blocked",
+          "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+          "note": "The complete pinned packaged-SDK header, including generated graphics_ddf.h, compiles. This disproves the earlier missing-header claim; only lifecycle policy blocks exposure."
         },
         "linked": {
           "status": "blocked-on-generation",
@@ -1479,6 +1535,7 @@
       "emitted": false,
       "blocker": {
         "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+        "category": "engine-lifecycle",
         "policy": "lifecycle-capability-required"
       },
       "stages": {
@@ -1531,6 +1588,7 @@
       "emitted": false,
       "blocker": {
         "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+        "category": "engine-lifecycle",
         "policy": "lifecycle-capability-required"
       },
       "stages": {

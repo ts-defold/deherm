@@ -4,8 +4,10 @@
 
 #include <defold_hermes/script_bridge_capi.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
+#include <defold_hermes/script_url_arena.hpp>
 
 #include <array>
+#include <atomic>
 #include <cmath>
 #include <cstdint>
 #include <limits>
@@ -23,6 +25,15 @@ constexpr size_t kMaximumTableEntries = 16;
 constexpr size_t kStringScratchCapacity = 64 * 1024;
 constexpr size_t kMaximumReentrantDepth = 16;
 constexpr const char* kDefoldValueKindProperty = "__dehermValueKind";
+constexpr const char* kDefoldUrlProperty = "__dehermUrlV1";
+
+std::atomic<uint32_t> gNextUrlRuntimeToken{1};
+
+uint32_t nextUrlRuntimeToken() noexcept {
+  uint32_t token = gNextUrlRuntimeToken.fetch_add(1, std::memory_order_relaxed);
+  if (token == 0) token = gNextUrlRuntimeToken.fetch_add(1, std::memory_order_relaxed);
+  return token;
+}
 
 struct ScratchSlot {
   std::array<ScriptValue, kMaximumArguments> arguments{};
@@ -32,23 +43,39 @@ struct ScratchSlot {
   std::array<std::array<std::string, kMaximumTableEntries * 2>, kMaximumArguments> tableStrings{};
   std::array<char, kStringScratchCapacity> outputStrings{};
   ScriptMatrix4Arena matrix4Arena{};
+  ScriptUrlArena<> urlArena{};
 };
 
 struct Scratch {
   std::array<ScratchSlot, kMaximumReentrantDepth> slots{};
   size_t depth = 0;
+
+  Scratch() noexcept {
+    const uint32_t token = nextUrlRuntimeToken();
+    for (auto& slot : slots) slot.urlArena.resetRuntime(token);
+  }
 };
 
 class ScratchFrame {
  public:
   explicit ScratchFrame(Scratch& scratch) : scratch_(scratch) {
-    if (scratch_.depth < scratch_.slots.size()) slot_ = &scratch_.slots[scratch_.depth++];
+    if (scratch_.depth < scratch_.slots.size()) {
+      slot_ = &scratch_.slots[scratch_.depth++];
+      urlMark_ = slot_->urlArena.mark();
+    }
   }
-  ~ScratchFrame() { if (slot_) { slot_->matrix4Arena.rewind(0); --scratch_.depth; } }
+  ~ScratchFrame() {
+    if (slot_) {
+      slot_->matrix4Arena.rewind(0);
+      slot_->urlArena.rewind(urlMark_);
+      --scratch_.depth;
+    }
+  }
   ScratchSlot* get() noexcept { return slot_; }
  private:
   Scratch& scratch_;
   ScratchSlot* slot_ = nullptr;
+  ScriptUrlArena<>::Mark urlMark_{};
 };
 
 uint32_t stableId(jsi::Runtime& runtime, const jsi::Value& value) {
@@ -154,12 +181,36 @@ void encode(
     std::string& string,
     std::array<ScriptTableEntry, kMaximumTableEntries>& tableEntries,
     std::array<std::string, kMaximumTableEntries * 2>& tableStrings,
-    ScriptMatrix4Arena& matrix4Arena) {
+    ScriptMatrix4Arena& matrix4Arena,
+    ScriptUrlArena<>& urlArena) {
   if (!value.isObject()) {
     encodeLeaf(runtime, value, output, string);
     return;
   }
   auto object = value.asObject(runtime);
+  const auto urlKindValue = object.getProperty(runtime, kDefoldUrlProperty);
+  if (urlKindValue.isBool() && urlKindValue.getBool()) {
+    const auto socketValue = object.getProperty(runtime, "socket");
+    const auto reservedValue = object.getProperty(runtime, "reserved");
+    const auto pathValue = object.getProperty(runtime, "path");
+    const auto fragmentValue = object.getProperty(runtime, "fragment");
+    auto exactLane = [&](const jsi::Value& lane, const char* name) -> uint64_t {
+      if (!lane.isBigInt()) {
+        throw jsi::JSError(runtime, std::string("Defold URL ") + name + " must be an unsigned 64-bit bigint");
+      }
+      auto bigint = lane.getBigInt(runtime);
+      if (!bigint.isUint64(runtime)) {
+        throw jsi::JSError(runtime, std::string("Defold URL ") + name + " must be an unsigned 64-bit bigint");
+      }
+      return bigint.getUint64(runtime);
+    };
+    const ScriptResolvedUrl url{
+      exactLane(socketValue, "socket"), exactLane(reservedValue, "reserved"),
+      exactLane(pathValue, "path"), exactLane(fragmentValue, "fragment")
+    };
+    if (!urlArena.store(url, &output)) throw jsi::JSError(runtime, "Defold URL frame arena is exhausted");
+    return;
+  }
   if (object.isArray(runtime)) {
     auto array = object.asArray(runtime);
     if (array.size(runtime) == 16) {
@@ -236,7 +287,11 @@ void encode(
   output.data = tableEntries.data();
 }
 
-jsi::Value decode(jsi::Runtime& runtime, const ScriptValue& value, const ScriptMatrix4Arena& matrix4Arena) {
+jsi::Value decode(
+    jsi::Runtime& runtime,
+    const ScriptValue& value,
+    const ScriptMatrix4Arena& matrix4Arena,
+    const ScriptUrlArena<>& urlArena) {
   switch (value.tag) {
     case ScriptValueTag::kUndefined: return jsi::Value::undefined();
     case ScriptValueTag::kNull: return jsi::Value(nullptr);
@@ -255,6 +310,19 @@ jsi::Value decode(jsi::Runtime& runtime, const ScriptValue& value, const ScriptM
             runtime,
             std::make_shared<ScriptHandleHostObject>(
                 value.handleKind, value.length, value.payload));
+      }
+      if (value.handleKind == ScriptHandleKind::kUrl) {
+        ScriptResolvedUrl url{};
+        if (!urlArena.resolve(value, urlArena.runtimeToken(), &url)) {
+          throw jsi::JSError(runtime, "Defold script bridge returned a stale URL token");
+        }
+        jsi::Object object(runtime);
+        object.setProperty(runtime, "socket", jsi::BigInt::fromUint64(runtime, url.socket));
+        object.setProperty(runtime, "reserved", jsi::BigInt::fromUint64(runtime, url.reserved));
+        object.setProperty(runtime, "path", jsi::BigInt::fromUint64(runtime, url.path));
+        object.setProperty(runtime, "fragment", jsi::BigInt::fromUint64(runtime, url.fragment));
+        object.setProperty(runtime, kDefoldUrlProperty, true);
+        return object;
       }
       throw jsi::JSError(runtime, "Defold script bridge returned an unknown handle kind");
     case ScriptValueTag::kDefoldValue: {
@@ -322,7 +390,8 @@ void installScriptJsiBridge(jsi::Runtime& runtime) {
               slot->inputStrings[index],
               slot->tableEntries[index],
               slot->tableStrings[index],
-              slot->matrix4Arena);
+              slot->matrix4Arena,
+              slot->urlArena);
         }
         ScriptCallFrame frame;
         frame.stableId = id;
@@ -333,12 +402,15 @@ void installScriptJsiBridge(jsi::Runtime& runtime) {
         frame.stringScratch = slot->outputStrings.data();
         frame.stringScratchCapacity = static_cast<uint32_t>(slot->outputStrings.size());
         frame.matrix4Arena = &slot->matrix4Arena;
+        frame.urlArena = &slot->urlArena;
         if (!dispatchScriptCall(&frame)) throw jsi::JSError(runtime, scriptBridgeLastError());
         if (frame.resultCount == 0) return jsi::Value::undefined();
-        if (frame.resultCount == 1) return decode(runtime, frame.results[0], slot->matrix4Arena);
+        if (frame.resultCount == 1) return decode(
+            runtime, frame.results[0], slot->matrix4Arena, slot->urlArena);
         jsi::Array results(runtime, frame.resultCount);
         for (size_t index = 0; index < frame.resultCount; ++index) {
-          results.setValueAtIndex(runtime, index, decode(runtime, frame.results[index], slot->matrix4Arena));
+          results.setValueAtIndex(runtime, index, decode(
+              runtime, frame.results[index], slot->matrix4Arena, slot->urlArena));
         }
         return results;
       });

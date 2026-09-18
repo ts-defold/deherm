@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "expectedRouteCount": 26,
+  "expectedCandidateCount": 24,
+  "codecVocabulary": ["Nil", "Boolean", "Number", "String", "Hash", "Url", "Vector3", "Matrix4", "None"],
+  "sources": [
+    { "key": "camera", "path": "engine/render/src/render/render_script_camera.cpp", "sha256": "d8af6b188f58110bd8c2e85238f86a9f4ad29dde6eff1a81a880b4137d8512bf" },
+    { "key": "font", "path": "engine/gamesys/src/gamesys/scripts/script_font.cpp", "sha256": "cae8b39b15ef1c230903626e9ffa8519c071bf077af371e35ae96303abd9e1da" },
+    { "key": "go", "path": "engine/gameobject/src/gameobject/gameobject_script.cpp", "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74" },
+    { "key": "gui", "path": "engine/gui/src/gui_script.cpp", "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4" },
+    { "key": "hash", "path": "engine/script/src/script_hash.cpp", "sha256": "0d76c65543191cc9866615ba37109e77f430a216c98dedf474d4f546f9f9ed10" },
+    { "key": "liveupdate", "path": "engine/liveupdate/src/script_liveupdate.cpp", "sha256": "c22228e16c8e8b9bf987c3a9d85854b3ea8a26e45f2a1d0bd1ec0dd701c97663" },
+    { "key": "physics", "path": "engine/gamesys/src/gamesys/scripts/script_physics.cpp", "sha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379" },
+    { "key": "render", "path": "engine/render/src/render/render_script.cpp", "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e" },
+    { "key": "resource", "path": "engine/gamesys/src/gamesys/scripts/script_resource.cpp", "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e" },
+    { "key": "sound", "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp", "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053" }
+  ],
+  "families": [
+    {
+      "id": "captured-lua-exact-codec",
+      "disposition": "candidate",
+      "backend": "captured-lua-exact-call",
+      "expectedRouteCount": 24,
+      "sourceRoutes": [
+        { "source": "camera", "ids": ["script:camera.get_projection", "script:camera.get_view"] },
+        { "source": "font", "ids": ["script:font.add_font", "script:font.remove_font", "script:font.set_style"] },
+        { "source": "go", "ids": ["script:go.get_id", "script:go.get_world_transform", "script:go.world_to_local_transform"] },
+        { "source": "gui", "ids": ["script:gui.delete_texture", "script:gui.get_font_resource", "script:gui.get_layout", "script:gui.set_layout"] },
+        { "source": "hash", "registration": "lua-global", "ids": ["script:hash_to_hex"] },
+        { "source": "physics", "ids": ["script:physics.get_gravity", "script:physics.set_gravity"] },
+        { "source": "render", "ids": ["script:render.enable_material", "script:render.set_compute", "script:render.set_projection", "script:render.set_view"] },
+        { "source": "resource", "ids": ["script:resource.release", "script:resource.set_sound"] },
+        { "source": "sound", "ids": ["script:sound.get_group_gain", "script:sound.get_group_name", "script:sound.set_group_gain"] }
+      ]
+    },
+    {
+      "id": "unsafe-image-type-codec",
+      "disposition": "blocked",
+      "blocker": "image-type-union-codec",
+      "detail": "gui.set_texture_data accepts string|image.TYPE. The current ABI has no reviewed representation or enum-domain validation for image.TYPE, so exposing only the string arm would silently narrow the documented route.",
+      "expectedRouteCount": 1,
+      "sourceRoutes": [
+        { "source": "gui", "ids": ["script:gui.set_texture_data"] }
+      ]
+    },
+    {
+      "id": "unsafe-named-enum-result-codec",
+      "disposition": "blocked",
+      "blocker": "named-enum-domain-codec",
+      "detail": "liveupdate.remove_mount returns liveupdate.LIVEUPDATE. A number tag alone does not validate Defold's named-enum domain, so no arbitrary numeric result may cross this route until the pinned enum domain is generated and checked.",
+      "expectedRouteCount": 1,
+      "sourceRoutes": [
+        { "source": "liveupdate", "ids": ["script:liveupdate.remove_mount"] }
+      ]
+    }
+  ]
+}

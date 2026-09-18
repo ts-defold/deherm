@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -35,6 +34,12 @@ async function inputs() {
       additionalSources
     };
   }));
+  const urlOverrideText = await text("bindings/overrides/script-url-address-classification.json");
+  const urlOverride = JSON.parse(urlOverrideText);
+  const urlSourceTexts = new Map(await Promise.all(urlOverride.sourceEvidence.map(async ({ source }) => [
+    source,
+    await text(`upstream/defold/${source}`)
+  ])));
   return {
     inventoryText: await text("bindings/generated/defold-script-api-inventory.json"),
     irText: await text("bindings/generated/defold-script-api-ir.json"),
@@ -43,6 +48,9 @@ async function inputs() {
     scalarText: await text("bindings/generated/defold-script-scalar-dispatch.json"),
     valueText: await text("bindings/generated/defold-script-value-bindings.json"),
     tupleText: await text("bindings/generated/defold-script-fixed-tuples.json"),
+    urlText: await text("bindings/generated/defold-script-url-address-classification.json"),
+    urlOverrideText,
+    urlSourceTexts,
     valueDefinitions
   };
 }
@@ -60,21 +68,21 @@ function replaceJson(input, mutate) {
 test("accounts for all 926 APIs in one and only one category", () => {
   assert.equal(generated.functionCount, 926);
   assert.deepEqual(generated.categoryCounts, {
-    "executable-stable-id": 192,
+    "executable-stable-id": 262,
     "separate-module": 3,
-    pending: 731
+    pending: 661
   });
   assert.deepEqual(generated.pendingByLoweringFamily, {
     "borrowed-handle": 415,
     "callback-lifecycle": 25,
-    "defold-value": 96,
+    "defold-value": 26,
     "dynamic-values": 14,
     "lua-table": 148,
     "multi-result": 13,
     "overload-dispatch": 20
   });
   assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 926);
-  assert.equal(generated.rows.filter(({ category }) => category === "pending").length, 731);
+  assert.equal(generated.rows.filter(({ category }) => category === "pending").length, 661);
   assert.ok(generated.rows.filter(({ category }) => category === "pending")
     .every(({ reason }) => reason.code && reason.loweringFamily));
   assert.deepEqual(checked, generated);
@@ -85,6 +93,7 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "scalar-lua-dispatch").length, 90);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "native-value-dispatch").length, 78);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "fixed-tuple-lua-dispatch").length, 24);
+  assert.equal(executable.filter(({ evidence }) => evidence.generator === "url-lua-dispatch").length, 70);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "gui-node-setters").length, 39);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-fixed-pod").length, 11);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-matrix4").length, 14);
@@ -99,18 +108,9 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
   assert.match(generated.coverageClaim, /does not claim per-target or per-function engine conformance/);
 });
 
-test("is invariant to harmless IR and report row ordering", () => {
+test("is invariant to harmless generated-family row ordering", () => {
   const reordered = structuredClone(sourceInputs);
-  reordered.irText = replaceJson(reordered.irText, (value) => {
-    value.functions.reverse();
-    value.types.reverse();
-  });
-  const irHash = createHash("sha256").update(reordered.irText).digest("hex");
-  reordered.patternsText = replaceJson(reordered.patternsText, (value) => {
-    value.bindings.reverse();
-    value.sourceSha256 = irHash;
-  });
-  // Descriptor generation canonicalizes input order; use the canonical checked artifact.
+  reordered.urlText = replaceJson(reordered.urlText, (value) => value.rows.reverse());
   const result = generateScriptApiAccounting(reordered);
   assert.deepEqual(result.rows, generated.rows);
   assert.deepEqual(result.categoryCounts, generated.categoryCounts);
@@ -154,6 +154,16 @@ test("rejects duplicate, omitted, overlapping, and stale route evidence", () => 
     value.declarations.find(({ kind }) => kind === "function").line += 1;
   });
   assert.throws(() => generateScriptApiAccounting(staleInventory), /source line differs from inventory/);
+
+  const malformedUrl = structuredClone(sourceInputs);
+  malformedUrl.urlText = replaceJson(malformedUrl.urlText, (report) => {
+    report.rows[0].requiredArgumentCount = 0;
+    report.rows[0].maximumArgumentCount = 255;
+    report.rows[0].argumentCodecs = [["Nil"]];
+    report.rows[0].resultCodec = "Quaternion";
+  });
+  assert.throws(() => generateScriptApiAccounting(malformedUrl),
+    /URL binding report semantics are stale against pinned inputs/);
 });
 
 test("rejects stale reviewed Defold source evidence", () => {

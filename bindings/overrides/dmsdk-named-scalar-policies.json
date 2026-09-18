@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "2026-09-18.1",
+  "rules": [
+    {
+      "id": "engine-context-capability-required",
+      "status": "blocked",
+      "reason": "The declaration reaches engine-owned mutable or teardown-sensitive global state. The generated scalar ABI has no main-thread or engine-lifecycle capability.",
+      "symbols": [
+        "dmGameObject::CreateInstanceId",
+        "dmSound::IsGroupMuted"
+      ],
+      "evidence": [
+        ["upstream/defold/engine/gameobject/src/gameobject/gameobject.cpp", "static uint32_t index = 0;"],
+        ["upstream/defold/engine/sound/src/sound.cpp", "if (!g_SoundSystem)"]
+      ]
+    },
+    {
+      "id": "thread-ownership-capability-required",
+      "status": "blocked",
+      "reason": "Thread and TLS tokens have OS ownership, validity, blocking, and detach/join ordering requirements that cannot be represented by an unowned scalar token.",
+      "symbols": [
+        "dmThread::AllocTls",
+        "dmThread::Detach",
+        "dmThread::FreeTls",
+        "dmThread::GetCurrentThread",
+        "dmThread::Join"
+      ],
+      "evidence": [
+        ["upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h", "thread specified by thread must be joinable"],
+        ["upstream/defold/engine/dlib/src/dlib/thread_posix.cpp", "pthread_key_delete"]
+      ]
+    },
+    {
+      "id": "profile-property-provenance-required",
+      "status": "blocked",
+      "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof.",
+      "symbols": [
+        "ProfilePropertyAddBool",
+        "ProfilePropertyAddF32",
+        "ProfilePropertyAddF64",
+        "ProfilePropertyAddS32",
+        "ProfilePropertyAddS64",
+        "ProfilePropertyAddU32",
+        "ProfilePropertyAddU64",
+        "ProfilePropertySetBool",
+        "ProfilePropertySetF32",
+        "ProfilePropertySetF64",
+        "ProfilePropertySetS32",
+        "ProfilePropertySetS64",
+        "ProfilePropertySetU32",
+        "ProfilePropertySetU64"
+      ],
+      "evidence": [
+        ["upstream/defold/engine/dlib/src/dlib/profile/profile.cpp", "assert(prop->m_Idx == (IDX));"],
+        ["upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h", "ProfileIdx ProfileRegisterProperty"]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "The classifier's overload-dispatch family, excluding the three routes already owned by the generated Defold-value adapter.",
+  "alreadyOwned": {
+    "report": "bindings/generated/defold-script-value-bindings.json",
+    "ids": ["script:vmath.normalize", "script:vmath.quat", "script:vmath.vector3"]
+  },
+  "expected": { "classifiedRouteCount": 23, "selectedRouteCount": 20, "candidateCount": 8 },
+  "sources": [
+    { "key": "box2d-body", "path": "engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_body_v2.cpp", "sha256": "b53c8f37670a3d32525445d7b58a9f979b7a7146175afcf8b517ff6613a43296" },
+    { "key": "box2d-joint", "path": "engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_joint_v2.cpp", "sha256": "2405c3ee080a993e7e0809fc8943a6370ce52f2b1197c4cfb8831fd6ec8ec97d" },
+    { "key": "box2d-world", "path": "engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_world_v2.cpp", "sha256": "2ab67f62213558bdc749114edf8a09d7a089dbe033e8761c60aa15d63b617bc5" },
+    { "key": "script-msg", "path": "engine/script/src/script_msg.cpp", "sha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2" },
+    { "key": "render", "path": "engine/render/src/render/render_script.cpp", "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e" },
+    { "key": "vmath", "path": "engine/script/src/script_vmath.cpp", "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2" }
+  ],
+  "routes": {
+    "script:b2d.body.create_fixture": { "source": "box2d-body", "anchor": "{\"create_fixture\", Body_CreateFixture}", "strategy": "blocked", "blocker": "box2d-handle-and-structured-fixture-codecs" },
+    "script:b2d.joint.get_motor_force": { "source": "box2d-joint", "anchor": "{\"get_motor_force\", Joint_GetMotorForce}", "strategy": "blocked", "blocker": "box2d-joint-handle-codec" },
+    "script:b2d.joint.get_motor_torque": { "source": "box2d-joint", "anchor": "{\"get_motor_torque\", Joint_GetMotorTorque}", "strategy": "blocked", "blocker": "box2d-joint-handle-codec" },
+    "script:b2d.joint.get_reaction_force": { "source": "box2d-joint", "anchor": "{\"get_reaction_force\", Joint_GetReactionForce}", "strategy": "blocked", "blocker": "box2d-joint-handle-codec" },
+    "script:b2d.joint.get_reaction_torque": { "source": "box2d-joint", "anchor": "{\"get_reaction_torque\", Joint_GetReactionTorque}", "strategy": "blocked", "blocker": "box2d-joint-handle-codec" },
+    "script:b2d.world.cast_ray": { "source": "box2d-world", "anchor": "{\"cast_ray\", World_CastRay}", "strategy": "blocked", "blocker": "box2d-world-handle-and-multi-result-codecs" },
+    "script:b2d.world.cast_ray_closest": { "source": "box2d-world", "anchor": "{\"cast_ray_closest\", World_CastRayClosest}", "strategy": "blocked", "blocker": "box2d-world-handle-and-structured-result-codecs" },
+    "script:b2d.world.cast_shape": { "source": "box2d-world", "anchor": "{\"cast_shape\", World_CastShape}", "strategy": "blocked", "blocker": "box2d-world-handle-and-multi-result-codecs" },
+    "script:b2d.world.overlap_aabb": { "source": "box2d-world", "anchor": "{\"overlap_aabb\", World_OverlapAABB}", "strategy": "blocked", "blocker": "box2d-world-handle-and-multi-result-codecs" },
+    "script:b2d.world.overlap_shape": { "source": "box2d-world", "anchor": "{\"overlap_shape\", World_OverlapShape}", "strategy": "blocked", "blocker": "box2d-world-handle-and-multi-result-codecs" },
+    "script:msg.url": { "source": "script-msg", "anchor": "{SCRIPT_TYPE_NAME_URL, URL_new}", "strategy": "blocked", "blocker": "captured-instance-url-construction-context" },
+    "script:render.render_target": { "source": "render", "anchor": "{\"render_target\",                   RenderScript_RenderTarget}", "strategy": "blocked", "blocker": "render-target-table-and-resource-lifetime-codecs" },
+    "script:vmath.clamp": { "source": "vmath", "anchor": "{\"clamp\", Vector_Clamp}", "strategy": "generated-defold-value-dispatch" },
+    "script:vmath.dot": { "source": "vmath", "anchor": "{\"dot\", Dot}", "strategy": "generated-defold-value-dispatch" },
+    "script:vmath.lerp": { "source": "vmath", "anchor": "{\"lerp\", Lerp}", "strategy": "generated-defold-value-dispatch" },
+    "script:vmath.matrix4": { "source": "vmath", "anchor": "{SCRIPT_TYPE_NAME_MATRIX4, Matrix4_new}", "strategy": "generated-defold-value-dispatch" },
+    "script:vmath.matrix4_scale": { "source": "vmath", "anchor": "{\"matrix4_scale\", Matrix4_Scale}", "strategy": "generated-defold-value-dispatch" },
+    "script:vmath.mul_per_elem": { "source": "vmath", "anchor": "{\"mul_per_elem\", MulPerElem}", "strategy": "generated-defold-value-dispatch" },
+    "script:vmath.slerp": { "source": "vmath", "anchor": "{\"slerp\", Slerp}", "strategy": "generated-defold-value-dispatch" },
+    "script:vmath.vector4": { "source": "vmath", "anchor": "{SCRIPT_TYPE_NAME_VECTOR4, Vector4_new}", "strategy": "generated-defold-value-dispatch" }
+  }
+}

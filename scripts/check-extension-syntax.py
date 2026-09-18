@@ -23,6 +23,9 @@ def ensure_support_headers() -> None:
 
 def include_roots() -> list[Path]:
     roots = {path.parent for path in ENGINE.glob("**/dmsdk") if path.is_dir()}
+    for packaged_sdk in (ROOT / "upstream" / "extender" / "server" / "app" / "sdk").glob("*/defoldsdk"):
+        roots.add(packaged_sdk / "include")
+        roots.add(packaged_sdk / "sdk" / "include")
     roots.add(ENGINE / "sdk" / "src")
     roots.add(EXTENSION / "include")
     roots.add(CHECK_SDK / "include")
@@ -52,17 +55,22 @@ def compile_source(source: Path, platform: str) -> None:
 
 def main() -> None:
     ensure_support_headers()
-    generated_dmsdk = sorted((EXTENSION / "src").glob("generated_dmsdk_scalar_*.cpp"))
+    generated_dmsdk = sorted((EXTENSION / "src").glob("generated_dmsdk_*.cpp"))
     common = [
         EXTENSION / "src" / "bundle_resource.cpp",
         EXTENSION / "src" / "capi.cpp",
         EXTENSION / "src" / "callback_registry.cpp",
+        EXTENSION / "src" / "callback_lifecycle_registry.cpp",
         EXTENSION / "src" / "extension.cpp",
         EXTENSION / "src" / "generated_jsi.cpp",
         EXTENSION / "src" / "generated_lua_bridge.cpp",
         EXTENSION / "src" / "generated_scalar_lua_descriptors.cpp",
         EXTENSION / "src" / "generated_script_value_bindings.cpp",
         EXTENSION / "src" / "generated_script_fixed_tuples.cpp",
+        EXTENSION / "src" / "generated_script_callback_lifecycle.cpp",
+        EXTENSION / "src" / "generated_script_url_bindings.cpp",
+        EXTENSION / "src" / "generated_script_value_tail_bindings.cpp",
+        EXTENSION / "src" / "generated_script_overload_dispatch.cpp",
         EXTENSION / "src" / "lua_value_registry.cpp",
         EXTENSION / "src" / "scalar_lua_dispatch.cpp",
         EXTENSION / "src" / "script_bridge_capi.cpp",

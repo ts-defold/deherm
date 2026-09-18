@@ -1,6 +1,5 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -14,7 +13,6 @@ import {
 const root = new URL("../", import.meta.url);
 const sourceInputs = await loadScriptUrlAddressInputs();
 const generated = generateScriptUrlAddressClassification(sourceInputs);
-const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 test("classifies the exact 70-route URL/address frontier without overlapping Matrix4", async () => {
   assert.equal(generated.routeCount, 70);
@@ -38,19 +36,20 @@ test("classifies the exact 70-route URL/address frontier without overlapping Mat
   });
   assert.deepEqual(generated.disjointCensus, {
     classifiedDefoldValue: 127,
-    preexistingExecutableNonMatrix: 17,
-    baselineFrontier: 110,
-    currentPendingDefoldValue: 96,
-    promotedMatrix4: 14,
-    remainingMatrix4: 6,
-    urlAddressPending: 70,
+    matrix4Disjoint: 20,
+    urlCandidates: 73,
+    excludedPreexistingUrl: 3,
+    urlAddressRoutes: 70,
+    nonMatrixNonUrl: 34,
     binaryStringRemainder: 2,
-    currentCodecRemainder: 18
+    otherNonMatrixNonUrl: 32
   });
   assert.ok(generated.rows.every(({ routing, targetSupport }) =>
-    routing.status === "planned" &&
-    Object.values(targetSupport).every(({ status }) => status === "planned-codec-foundation")));
-  assert.match(generated.coverageClaim, /not executable/);
+    routing.status === "generated-native-dynamic" &&
+    targetSupport.nativeDynamicHermes.status === "generated-executable" &&
+    targetSupport.nativeStaticHermes.status === "fail-closed-unverified" &&
+    targetSupport.html5BrowserHost.status === "fail-closed-unverified"));
+  assert.match(generated.coverageClaim, /generated stable-ID descriptors/);
 });
 
 test("keeps full URLs distinct from context-sensitive string and hash shorthand", () => {
@@ -58,31 +57,40 @@ test("keeps full URLs distinct from context-sensitive string and hash shorthand"
   assert.deepEqual(camera.urlParameters[0].forms, ["full-url", "numeric-camera-id", "nil-default"]);
   const physics = generated.rows.find(({ id }) => id === "script:physics.set_group");
   assert.deepEqual(physics.urlParameters[0].forms, ["string-shorthand", "hash-shorthand", "full-url"]);
-  assert.match(generated.representationPolicy.fullUrl, /three exact uint64/);
+  assert.match(generated.representationPolicy.fullUrl, /four exact uint64 lanes/);
   assert.match(generated.representationPolicy.stringShorthand, /captured Lua caller context/);
   assert.match(generated.representationPolicy.collapsedLegacyUrl, /fail-closed/);
 });
 
 test("fails closed on route, shape, partition, and pinned-source drift", () => {
   const routeDrift = structuredClone(sourceInputs);
-  const accounting = JSON.parse(routeDrift.accountingText);
-  accounting.rows.find(({ id }) => id === "script:physics.set_group").reason.loweringFamily = "lua-table";
-  routeDrift.accountingText = `${JSON.stringify(accounting, null, 2)}\n`;
+  const patternsForRoute = JSON.parse(routeDrift.patternsText);
+  patternsForRoute.bindings.find(({ id }) => id === "script:physics.set_group").loweringFamily = "lua-table";
+  routeDrift.patternsText = `${JSON.stringify(patternsForRoute, null, 2)}\n`;
   assert.throws(() => generateScriptUrlAddressClassification(routeDrift), /census drifted|route count drifted/);
 
   const shapeDrift = structuredClone(sourceInputs);
   const ir = JSON.parse(shapeDrift.irText);
   ir.functions.find(({ id }) => id === "script:physics.set_group").parameters[0].rawType = "url|string";
   shapeDrift.irText = `${JSON.stringify(ir, null, 2)}\n`;
-  const accountingForShape = JSON.parse(shapeDrift.accountingText);
-  accountingForShape.inputEvidence.scriptIrSha256 = sha256(shapeDrift.irText);
-  shapeDrift.accountingText = `${JSON.stringify(accountingForShape, null, 2)}\n`;
   assert.throws(() => generateScriptUrlAddressClassification(shapeDrift), /binding-pattern shapes differ/);
 
   const sourceDrift = structuredClone(sourceInputs);
   const [sourcePath, sourceText] = sourceDrift.sourceTexts.entries().next().value;
   sourceDrift.sourceTexts.set(sourcePath, `${sourceText}\n// drift\n`);
   assert.throws(() => generateScriptUrlAddressClassification(sourceDrift), /source hash is stale/);
+});
+
+test("generated runtime uses explicit URL branding and preserves the nonzero reserved lane", async () => {
+  const [jsi, address] = await Promise.all([
+    readFile(new URL("../defold/defold_hermes/src/script_jsi_bridge.cpp", import.meta.url), "utf8"),
+    readFile(new URL("../packages/sdk/src/address.ts", import.meta.url), "utf8")
+  ]);
+  assert.match(jsi, /kDefoldUrlProperty = "__dehermUrlV1"/);
+  assert.match(jsi, /"reserved".*url\.reserved/s);
+  assert.match(jsi, /setProperty\(runtime, kDefoldUrlProperty, true\)/);
+  assert.match(address, /readonly __dehermUrlV1: true/);
+  assert.match(address, /readonly reserved: DefoldHash/);
 });
 
 test("regenerates the classification byte-identically in a temporary output", async () => {

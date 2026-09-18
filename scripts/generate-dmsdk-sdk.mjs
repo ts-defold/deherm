@@ -380,5 +380,8 @@ ir.typeSurfaceUnresolvedCount = ir.unresolvedTypes.length;
 await output(irPath, JSON.stringify(ir, null, 2));
 await output(path.join(generatedRoot, "types.ts"), typesSource);
 await output(path.join(generatedRoot, "runtime.ts"), runtimeSource);
-await output(path.join(generatedRoot, "index.ts"), `${banner}\nexport * from "./types";\nexport * from "./runtime";\n`);
+await output(
+  path.join(generatedRoot, "index.ts"),
+  `${banner}\nexport * from "./types";\nexport * from "./runtime";\nexport * from "./scalar";\nexport * from "./enum-value";\n`
+);
 console.log(`${check ? "checked" : "generated"} ${ir.declarationCount} dmSDK declarations, ${Object.keys(inventory.countsByKind).length} kinds, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);

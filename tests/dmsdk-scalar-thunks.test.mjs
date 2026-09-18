@@ -38,8 +38,8 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
     hostSourceLinkCovered: 26,
     hostBehaviorCovered: 26,
     blocked: 5,
-    policyBlocked: 4,
-    sourceBlocked: 1,
+    policyBlocked: 5,
+    sourceBlocked: 0,
     packagedLibraryLinked: 26,
     dispatchReferenceCovered: 26,
     hostExecutableRetained: 26,
@@ -48,6 +48,8 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
     nativeHermesRuntimeSmokeTested: 2,
     browserTypeScriptAdapterGenerated: 16,
     browserAdapterBehaviorTested: 16,
+    warmedDispatchIterations: 100000,
+    warmedDispatchObservedCppAllocations: 0,
     allTargetConformant: 0,
   });
   assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 31);
@@ -62,10 +64,12 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
   }
   const graphics = report.declarations.find(({ symbol }) => symbol === "dmGraphics::Finalize");
   assert.equal(graphics.emitted, false);
-  assert.equal(graphics.blocker.missingDependency, "graphics/graphics_ddf.h");
-  assert.equal(graphics.blocker.checkedPath, "upstream/defold/engine/graphics/src/graphics/graphics_ddf.h");
+  assert.equal(graphics.blocker.policy, "lifecycle-capability-required");
+  assert.equal(graphics.blocker.category, "engine-lifecycle");
+  assert.equal(graphics.stages.compiled.status, "header-compiled-policy-blocked");
+  assert.ok(graphics.definitionEvidence.some(({ path }) => path.endsWith("/include/graphics/graphics_ddf.h")));
   const unsafeLifecycle = new Set([
-    "dmLog::LogFinalize", "dmLogFinalize", "ProfileInitialize", "ProfileFinalize"
+    "dmGraphics::Finalize", "dmLog::LogFinalize", "dmLogFinalize", "ProfileInitialize", "ProfileFinalize"
   ]);
   for (const declaration of report.declarations.filter(({ symbol }) => unsafeLifecycle.has(symbol))) {
     assert.equal(declaration.emitted, false);
@@ -76,6 +80,32 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"), "utf8");
   assert.doesNotMatch(publicHeader, /(?:log_finalize|profile_initialize|profile_finalize)/);
   assert.equal(report.declarations.filter(({ stages }) => stages.linked.status === "not-yet-tested").length, 0);
+  assert.match(report.sourceHashes.ir, /^[a-f0-9]{64}$/);
+  assert.match(report.sourceHashes.classification, /^[a-f0-9]{64}$/);
+  assert.equal(Object.keys(report.artifactHashes).length, report.artifacts.length);
+  for (const digest of Object.values(report.artifactHashes)) assert.match(digest, /^[a-f0-9]{64}$/);
+});
+
+test("all lifecycle blockers compile from the complete pinned packaged SDK without being executed", async () => {
+  const sdkRoot = join(repositoryRoot,
+    "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+  const outputDirectory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-blocker-audit-"));
+  try {
+    const object = join(outputDirectory, "blockers.o");
+    run(compiler, [
+      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+      "-isystem", join(sdkRoot, "sdk/include"),
+      "-isystem", join(sdkRoot, "include"),
+      "-c", "native/dmsdk_scalar_blocker_audit.cpp", "-o", object,
+    ]);
+    const symbols = run("nm", ["-u", object]);
+    for (const leaf of ["dmGraphics8Finalize", "dmLog11LogFinalize", "dmLogFinalize", "ProfileInitialize", "ProfileFinalize"]) {
+      assert.match(symbols, new RegExp(leaf), `${leaf} signature reference is absent`);
+    }
+  } finally {
+    await rm(outputDirectory, { recursive: true, force: true });
+  }
 });
 
 test("every emitted module compiles to an object against pinned Defold headers", async () => {

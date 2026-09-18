@@ -3,6 +3,7 @@
 #include <defold_hermes/script_matrix4_arena.hpp>
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
 #include <dlib/hash.h>
+#include <dmsdk/dlib/message.h>
 #include <dmsdk/dlib/vmath.h>
 
 extern "C" {
@@ -50,6 +51,15 @@ dmVMath::Vector3* ToVector3(lua_State* state, int index) {
 }
 dmVMath::Quat* ToQuat(lua_State* state, int index) {
   return lua_isuserdata(state, index) ? static_cast<dmVMath::Quat*>(lua_touserdata(state, index)) : nullptr;
+}
+dmVMath::Vector4* ToVector4(lua_State* state, int index) {
+  return lua_isuserdata(state, index) ? static_cast<dmVMath::Vector4*>(lua_touserdata(state, index)) : nullptr;
+}
+void PushURL(lua_State* state, const dmMessage::URL& value) {
+  *static_cast<dmMessage::URL*>(lua_newuserdata(state, sizeof(dmMessage::URL))) = value;
+}
+dmMessage::URL* ToURL(lua_State* state, int index) {
+  return lua_isuserdata(state, index) ? static_cast<dmMessage::URL*>(lua_touserdata(state, index)) : nullptr;
 }
 }  // namespace dmScript
 

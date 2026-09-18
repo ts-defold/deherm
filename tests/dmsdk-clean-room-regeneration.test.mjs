@@ -1,0 +1,35 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import {
+  assertGeneratedDmSdkArtifactInventory,
+  runDmSdkCleanRoomRegeneration
+} from "../scripts/check-dmsdk-clean-room-regeneration.mjs";
+import { generatedDmSdkArtifacts } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
+
+test("dmSDK artifact ownership rejects hand-authored generated output", () => {
+  assert.throws(
+    () => assertGeneratedDmSdkArtifactInventory([
+      ...generatedDmSdkArtifacts,
+      "bindings/generated/defold-dmsdk-hand-authored-binding.json"
+    ]),
+    /Unexpected \(possibly hand-authored\): bindings\/generated\/defold-dmsdk-hand-authored-binding\.json/
+  );
+});
+
+test("all generated dmSDK runtime artifacts regenerate byte-for-byte from pinned inputs", async () => {
+  const report = await runDmSdkCleanRoomRegeneration();
+  assert.equal(report.runtimePendingCount, 1361);
+  assert.equal(report.scalarGeneratedCount, 26);
+  assert.equal(report.enumGeneratedCount, 7);
+  assert.equal(report.namedScalarReviewedCount, 21);
+  assert.equal(report.namedScalarGeneratedCount, 0);
+  assert.equal(report.namedScalarBlockedCount, 21);
+  assert.equal(report.remainingWithoutGeneratedAdapters, 1328);
+  assert.equal(report.uniqueShapeCount, 881);
+  assert.equal(report.trancheCount, 15);
+  assert.equal(report.artifactCount, generatedDmSdkArtifacts.length);
+  assert.equal(Object.keys(report.artifactSha256).length, generatedDmSdkArtifacts.length);
+  assert.match(report.aggregateInputSha256, /^[0-9a-f]{64}$/);
+  assert.equal(report.groundTruth.defoldRevision, report.defoldRevision);
+});

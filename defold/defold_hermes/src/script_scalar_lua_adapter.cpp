@@ -1,7 +1,9 @@
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
 #include <defold_hermes/generated_script_value_bindings.hpp>
+#include <defold_hermes/script_url_arena.hpp>
 
 #include <dmsdk/dlib/hash.h>
+#include <dmsdk/dlib/message.h>
 #include <dmsdk/dlib/vmath.h>
 
 #include <cmath>
@@ -15,8 +17,11 @@ dmhash_t* ToHash(lua_State* state, int index);
 void PushVector3(lua_State* state, const dmVMath::Vector3& value);
 void PushVector4(lua_State* state, const dmVMath::Vector4& value);
 void PushQuat(lua_State* state, const dmVMath::Quat& value);
+void PushURL(lua_State* state, const dmMessage::URL& value);
 dmVMath::Vector3* ToVector3(lua_State* state, int index);
+dmVMath::Vector4* ToVector4(lua_State* state, int index);
 dmVMath::Quat* ToQuat(lua_State* state, int index);
+dmMessage::URL* ToURL(lua_State* state, int index);
 }  // namespace dmScript
 
 namespace defold_hermes::lua_bridge::scalar {
@@ -69,6 +74,7 @@ ScriptAdapter::ScriptAdapter() noexcept : luaHandles_(kLuaHandleCapacity) {
   fixedTupleFunctionRefs_.fill(LUA_NOREF);
   structuredLuaApi_ = {this, StructuredInvokeThunk};
   fixedTupleLuaApi_ = {this, FixedTupleInvokeThunk};
+  urlLuaApi_ = {this, UrlInvokeThunk};
 }
 
 bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi) noexcept {
@@ -80,6 +86,7 @@ bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi) noexce
   if (++runtimeGeneration_ == 0) ++runtimeGeneration_;
   structuredFunctionRefs_.fill(LUA_NOREF);
   fixedTupleFunctionRefs_.fill(LUA_NOREF);
+  urlFunctionRefs_.fill(LUA_NOREF);
   return true;
 }
 
@@ -94,6 +101,10 @@ void ScriptAdapter::shutdown() noexcept {
       reference = LUA_NOREF;
     }
     for (int& reference : fixedTupleFunctionRefs_) {
+      if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+      reference = LUA_NOREF;
+    }
+    for (int& reference : urlFunctionRefs_) {
       if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
       reference = LUA_NOREF;
     }
@@ -185,6 +196,11 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
       frame, adapterError_, sizeof(adapterError_), &fixedTupleLuaApi_);
   if (tupleStatus == fixed_tuple::DispatchStatus::kSuccess) return true;
   if (tupleStatus == fixed_tuple::DispatchStatus::kError) return false;
+
+  const auto urlStatus = url_binding::dispatch(
+      frame, adapterError_, sizeof(adapterError_), &urlLuaApi_);
+  if (urlStatus == url_binding::DispatchStatus::kSuccess) return true;
+  if (urlStatus == url_binding::DispatchStatus::kError) return false;
 
   size_t denseIndex = 0;
   if (!findDenseIndex(frame->stableId, &denseIndex)) {
@@ -341,7 +357,10 @@ bool ScriptAdapter::bindStructured(
   return reference != LUA_NOREF && reference != LUA_REFNIL;
 }
 
-bool ScriptAdapter::pushStructuredValue(const ScriptValue& value, uint32_t depth) noexcept {
+bool ScriptAdapter::pushStructuredValue(
+    const ScriptValue& value,
+    ScriptCallFrame* frame,
+    uint32_t depth) noexcept {
   switch (value.tag) {
     case ScriptValueTag::kUndefined:
     case ScriptValueTag::kNull:
@@ -364,6 +383,15 @@ bool ScriptAdapter::pushStructuredValue(const ScriptValue& value, uint32_t depth
     case ScriptValueTag::kHandle:
       if (value.handleKind == ScriptHandleKind::kHash) {
         dmScript::PushHash(state_, value.payload);
+        return true;
+      }
+      if (value.handleKind == ScriptHandleKind::kUrl) {
+        dmMessage::URL url{};
+        if (!frame || !frame->urlArena || !frame->urlArena->copyForPushUrl(
+                value, frame->urlArena->runtimeToken(), &url)) {
+          return fail("Structured Lua URL token is stale or belongs to another frame arena");
+        }
+        dmScript::PushURL(state_, url);
         return true;
       }
       if (value.handleKind == ScriptHandleKind::kGuiNode || value.handleKind == ScriptHandleKind::kLuaUserdata) {
@@ -403,8 +431,8 @@ bool ScriptAdapter::pushStructuredValue(const ScriptValue& value, uint32_t depth
       lua_createtable(state_, 0, static_cast<int>(value.length));
       const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
       for (uint32_t index = 0; index < value.length; ++index) {
-        if (!pushStructuredValue(entries[index].key, depth + 1) ||
-            !pushStructuredValue(entries[index].value, depth + 1)) return false;
+        if (!pushStructuredValue(entries[index].key, frame, depth + 1) ||
+            !pushStructuredValue(entries[index].value, frame, depth + 1)) return false;
         lua_settable(state_, -3);
       }
       return true;
@@ -522,7 +550,7 @@ fixed_tuple::DispatchStatus ScriptAdapter::invokeFixedTuple(
   const int baseTop=lua_gettop(state_);
   if(scoped){instanceApi_.get(state_);lua_rawgeti(state_,LUA_REGISTRYINDEX,instanceRef_);instanceApi_.set(state_);}
   const int callBase=lua_gettop(state_); lua_rawgeti(state_,LUA_REGISTRYINDEX,fixedTupleFunctionRefs_[operation.index]);
-  bool ok=true; for(uint32_t index=0;index<frame->argumentCount;++index) if(!pushStructuredValue(frame->arguments[index])){ok=false;break;}
+  bool ok=true; for(uint32_t index=0;index<frame->argumentCount;++index) if(!pushStructuredValue(frame->arguments[index],frame)){ok=false;break;}
   if(ok&&lua_pcall(state_,static_cast<int>(frame->argumentCount),LUA_MULTRET,0)!=0){const char* message=lua_tostring(state_,-1);ok=fail(message?message:"Fixed tuple Lua call failed without an error string");}
   const int actual=ok?lua_gettop(state_)-callBase:0;
   if(ok&&actual!=operation.resultCount) ok=fail("Fixed tuple Lua result count does not match exact descriptor");
@@ -564,7 +592,7 @@ value_binding::DispatchStatus ScriptAdapter::invokeStructured(
   lua_rawgeti(state_, LUA_REGISTRYINDEX, structuredFunctionRefs_[operation.index]);
   bool ok = true;
   for (uint32_t index = 0; index < frame->argumentCount; ++index) {
-    if (!pushStructuredValue(frame->arguments[index])) { ok = false; break; }
+    if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
   }
   const int resultCount = operation.resultCodec == value_binding::StructuredLuaResultCodec::kNone ? 0 : 1;
   if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), resultCount, 0) != 0) {
@@ -581,6 +609,160 @@ value_binding::DispatchStatus ScriptAdapter::invokeStructured(
   }
   adapterError_[0] = '\0';
   return value_binding::DispatchStatus::kSuccess;
+}
+
+url_binding::DispatchStatus ScriptAdapter::UrlInvokeThunk(
+    void* context,
+    const url_binding::Operation& operation,
+    const uint16_t*,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  return static_cast<ScriptAdapter*>(context)->invokeUrl(
+      operation, frame, error, errorCapacity);
+}
+
+bool ScriptAdapter::bindUrl(const url_binding::Operation& operation) noexcept {
+  if (!state_ || operation.index >= urlFunctionRefs_.size()) {
+    return fail("URL Lua operation index is invalid");
+  }
+  int& reference = urlFunctionRefs_[operation.index];
+  if (reference != LUA_NOREF && reference != LUA_REFNIL) return true;
+  const int baseTop = lua_gettop(state_);
+  lua_getglobal(state_, operation.module);
+  if (!lua_istable(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("URL Lua module is unavailable");
+  }
+  lua_getfield(state_, -1, operation.member);
+  if (!lua_isfunction(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("URL Lua function is unavailable");
+  }
+  reference = luaL_ref(state_, LUA_REGISTRYINDEX);
+  lua_settop(state_, baseTop);
+  return reference != LUA_NOREF && reference != LUA_REFNIL;
+}
+
+bool ScriptAdapter::readUrlResult(
+    url_binding::ResultCodec codec,
+    ScriptCallFrame* frame) noexcept {
+  using Codec = url_binding::ResultCodec;
+  if (codec == Codec::kNone) return true;
+  if (!frame->results || frame->resultCapacity < 1) {
+    return fail("URL Lua result storage is exhausted");
+  }
+  ScriptValue& output = frame->results[0];
+  output = {};
+  if (codec == Codec::kHashOrNil && lua_isnil(state_, -1)) {
+    output.tag = ScriptValueTag::kNull;
+  } else if (codec == Codec::kNil) {
+    if (!lua_isnil(state_, -1)) return fail("URL Lua result is not nil");
+    output.tag = ScriptValueTag::kNull;
+  } else if (codec == Codec::kBoolean) {
+    if (lua_type(state_, -1) != LUA_TBOOLEAN) return fail("URL Lua result is not boolean");
+    output.tag = ScriptValueTag::kBoolean;
+    output.number = lua_toboolean(state_, -1) ? 1.0 : 0.0;
+  } else if (codec == Codec::kInteger || codec == Codec::kNumber) {
+    if (lua_type(state_, -1) != LUA_TNUMBER) return fail("URL Lua result is not numeric");
+    const double number = lua_tonumber(state_, -1);
+    if (codec == Codec::kInteger && (!std::isfinite(number) || std::trunc(number) != number)) {
+      return fail("URL Lua integer result is not exact");
+    }
+    output.tag = ScriptValueTag::kNumber;
+    output.number = number;
+  } else if (codec == Codec::kString) {
+    if (lua_type(state_, -1) != LUA_TSTRING) return fail("URL Lua result is not a string");
+    size_t length = 0;
+    const char* data = lua_tolstring(state_, -1, &length);
+    if (!frame->stringScratch || length > frame->stringScratchCapacity - frame->stringScratchUsed) {
+      return fail("URL Lua string scratch is exhausted");
+    }
+    char* destination = frame->stringScratch + frame->stringScratchUsed;
+    if (length) std::memcpy(destination, data, length);
+    output.tag = ScriptValueTag::kString;
+    output.data = destination;
+    output.length = static_cast<uint32_t>(length);
+    frame->stringScratchUsed += static_cast<uint32_t>(length);
+  } else if (codec == Codec::kHash || codec == Codec::kHashOrNil) {
+    dmhash_t* hash = dmScript::ToHash(state_, -1);
+    if (!hash) return fail("URL Lua result is not a hash");
+    output.tag = ScriptValueTag::kHandle;
+    output.handleKind = ScriptHandleKind::kHash;
+    output.payload = *hash;
+  } else if (codec == Codec::kUrl) {
+    dmMessage::URL* url = dmScript::ToURL(state_, -1);
+    if (!url || !frame->urlArena || !frame->urlArena->copyBeforeLuaPop(*url, &output)) {
+      return fail("URL Lua result cannot be copied into the frame arena");
+    }
+  } else if (codec == Codec::kVector3) {
+    dmVMath::Vector3* value = dmScript::ToVector3(state_, -1);
+    if (!value) return fail("URL Lua result is not vector3");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kVector3;
+    output.defoldValue[0] = value->getX(); output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ();
+  } else if (codec == Codec::kVector4) {
+    dmVMath::Vector4* value = dmScript::ToVector4(state_, -1);
+    if (!value) return fail("URL Lua result is not vector4");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kVector4;
+    output.defoldValue[0] = value->getX(); output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ(); output.defoldValue[3] = value->getW();
+  } else if (codec == Codec::kQuaternion) {
+    dmVMath::Quat* value = dmScript::ToQuat(state_, -1);
+    if (!value) return fail("URL Lua result is not quaternion");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kQuaternion;
+    output.defoldValue[0] = value->getX(); output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ(); output.defoldValue[3] = value->getW();
+  } else {
+    return fail("URL Lua result codec is unsupported");
+  }
+  frame->resultCount = 1;
+  return true;
+}
+
+url_binding::DispatchStatus ScriptAdapter::invokeUrl(
+    const url_binding::Operation& operation,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  using Status = url_binding::DispatchStatus;
+  if (!state_ || !frame || !bindUrl(operation)) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
+      instanceRef_ == LUA_REFNIL || !hasActiveContext_ ||
+      activeContext_ != value_binding::StructuredLuaContext::kScriptInstance) {
+    writeError(error, errorCapacity, "URL Lua call requires a captured game-object script instance");
+    return Status::kError;
+  }
+  const int baseTop = lua_gettop(state_);
+  instanceApi_.get(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
+  instanceApi_.set(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX, urlFunctionRefs_[operation.index]);
+  bool ok = true;
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
+  }
+  const int resultCount = operation.resultCodec == url_binding::ResultCodec::kNone ? 0 : 1;
+  if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), resultCount, 0) != 0) {
+    const char* message = lua_tostring(state_, -1);
+    ok = fail(message ? message : "URL Lua call failed without an error string");
+  }
+  if (ok) ok = readUrlResult(operation.resultCodec, frame);
+  lua_settop(state_, baseTop + 1);
+  instanceApi_.set(state_);
+  lua_settop(state_, baseTop);
+  if (!ok) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  adapterError_[0] = '\0';
+  return Status::kSuccess;
 }
 
 void ScriptAdapter::drainReleasedHandles() noexcept {

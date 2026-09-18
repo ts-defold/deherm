@@ -38,6 +38,7 @@ okf_version: "0.2"
 * [Spike results](research/spike-results.md) - Commands, observed results, and remaining verification boundary.
 * [C# precedent](research/csharp-precedent.md) - How Defold implemented experimental C# extensions and what to copy.
 * [dmSDK coverage](research/sdk-coverage.md) - Generated, declaration-level coverage of every public dmSDK header.
+* [dmSDK ABI generator wave](research/dmsdk-abi-generator-wave.md) - Exact ABI-shape census, scalar and enum-value adapters, and isolated clean-room regeneration.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Exact positional Lua tuple ABI, public reachability limits, and unpromoted engine evidence.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.
 * [TypeGPU shader lane](research/typegpu-shader-lane.md) - Build-time TypeGPU authoring, Defold shader adaptation, typed material bindings, and validation gates.
@@ -47,6 +48,8 @@ okf_version: "0.2"
 * [Local Extender runtime evidence](research/local-extender-runtime-evidence.md) - Pinned macOS arm64 Bob/Extender build, bundle, runtime transcript, reproduced failures, and proof boundaries.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Generated exact-arity Lua tuple descriptors, copied result semantics, reachability, and proof boundary.
 * [Generated URL and address frontier](research/script-url-address-generator-frontier.md) - Exact 70-route census and composite four-lane Defold URL arena foundation.
+* [Generated callback lifecycle frontier](research/script-callback-lifecycle.md) - Source-pinned callback lifetime metadata and fixed-capacity ownership semantics for all 25 callback routes.
+* [Script value-tail and overload waves](research/script-tail-generator-waves.md) - Exact candidate/blocker partitions and fail-closed dispatch tables for the remaining value and overload routes.
 * [Hot reload and development control plane](research/hot-reload-and-dev-tui.md) - Verified Defold resource reload semantics, remote-target flow, generation-safe Hermes swapping, and the staged Rezi operator console.
 * [Binding compiler cookbook](examples/binding-cookbook.md) - Concrete source-to-IR-to-TypeScript examples for reviewing the public API.
 * [Risks and unknowns](risks.md) - Technical risks that the spike must retire.

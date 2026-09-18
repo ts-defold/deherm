@@ -108,7 +108,7 @@ int main() {
 
   dmMessage::URL luaResult;
   luaResult.m_Socket = 0xffffffffffffffffULL;
-  luaResult._reserved = 0;
+  luaResult._reserved = 0x13579bdf2468ace0ULL;
   luaResult.m_Path = 0x8000000000000001ULL;
   luaResult.m_Fragment = 0xabcdef0123456789ULL;
   ScriptUrlArena<2> resultArena(12);
@@ -117,7 +117,8 @@ int main() {
   luaResult = dmMessage::URL{};
   dmMessage::URL pushed;
   expect(resultArena.copyForPushUrl(copied, 12, &pushed), "PushURL copy failed");
-  expect(pushed.m_Socket == 0xffffffffffffffffULL && pushed.m_Path == 0x8000000000000001ULL &&
+  expect(pushed.m_Socket == 0xffffffffffffffffULL && pushed._reserved == 0x13579bdf2468ace0ULL &&
+    pushed.m_Path == 0x8000000000000001ULL &&
     pushed.m_Fragment == 0xabcdef0123456789ULL, "copy-before-pop did not own exact URL bits");
 
   expect(resultArena.resetRuntime(13), "runtime reset failed");

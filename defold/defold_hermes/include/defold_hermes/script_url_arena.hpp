@@ -75,6 +75,7 @@ class ScriptUrlArena {
     Mark mark_{};
   };
 
+  ScriptUrlArena() noexcept = default;
   explicit ScriptUrlArena(uint32_t runtimeToken) noexcept : runtimeToken_(runtimeToken) {}
   ScriptUrlArena(const ScriptUrlArena&) = delete;
   ScriptUrlArena& operator=(const ScriptUrlArena&) = delete;

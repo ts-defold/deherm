@@ -2,9 +2,36 @@
 #include <defold_hermes/generated_dmsdk_scalar_runtime.h>
 
 #include <cmath>
+#include <atomic>
 #include <cstdint>
+#include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <new>
+
+namespace
+{
+    std::atomic<bool> g_CountAllocations(false);
+    std::atomic<uint64_t> g_AllocationCount(0);
+}
+
+void* operator new(std::size_t size)
+{
+    if (g_CountAllocations.load(std::memory_order_relaxed))
+        g_AllocationCount.fetch_add(1, std::memory_order_relaxed);
+    if (void* result = std::malloc(size)) return result;
+    throw std::bad_alloc();
+}
+
+void* operator new[](std::size_t size)
+{
+    return ::operator new(size);
+}
+
+void operator delete(void* pointer) noexcept { std::free(pointer); }
+void operator delete[](void* pointer) noexcept { std::free(pointer); }
+void operator delete(void* pointer, std::size_t) noexcept { std::free(pointer); }
+void operator delete[](void* pointer, std::size_t) noexcept { std::free(pointer); }
 
 namespace
 {
@@ -64,6 +91,22 @@ int main()
     uint64_t ignored = 0;
     CHECK(deherm_dmsdk_scalar_dispatch(UINT16_C(26), nullptr, 0, &ignored) ==
           DEHERM_DMSDK_SCALAR_UNKNOWN_ID);
+
+    // The generated dispatch hot path is stack-only. Warm it first so any
+    // process/runtime one-time work cannot be mistaken for glue allocation.
+    uint64_t allocationArguments[DEHERM_DMSDK_SCALAR_MAX_ARGUMENTS] = { UINT32_C(0x12345678) };
+    CHECK(deherm_dmsdk_scalar_dispatch(UINT16_C(1), allocationArguments, 1, &ignored) ==
+          DEHERM_DMSDK_SCALAR_OK);
+    g_AllocationCount.store(0, std::memory_order_relaxed);
+    g_CountAllocations.store(true, std::memory_order_relaxed);
+    for (uint32_t iteration = 0; iteration < UINT32_C(100000); ++iteration)
+    {
+        if (deherm_dmsdk_scalar_dispatch(UINT16_C(1), allocationArguments, 1, &ignored) !=
+            DEHERM_DMSDK_SCALAR_OK)
+            ++g_Failures;
+    }
+    g_CountAllocations.store(false, std::memory_order_relaxed);
+    CHECK(g_AllocationCount.load(std::memory_order_relaxed) == UINT64_C(0));
 
     CHECK(deherm_dmsdk_endian_swap16_u16(UINT16_C(0x1234)) == UINT16_C(0x3412));
     CHECK(deherm_dmsdk_endian_swap32_u32(UINT32_C(0x12345678)) == UINT32_C(0x78563412));

@@ -3,6 +3,7 @@
 
 #if !defined(DM_PLATFORM_HTML5)
 #include <defold_hermes/callback_registry.hpp>
+#include <defold_hermes/generated_dmsdk_enum_value_jsi.hpp>
 #include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>
 #include <defold_hermes/generated_modules.h>
 
@@ -143,6 +144,7 @@ void installGeneratedModules(jsi::Runtime& runtime, jsi::Object& modules, Callba
   modules.setProperty(runtime, "Timer", std::move(timer));
 
   installDmSdkScalarModule(runtime, modules);
+  installDmSdkEnumValueModule(runtime, modules);
 }
 
 }  // namespace defold_hermes

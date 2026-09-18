@@ -1,0 +1,386 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "All routes classified as dynamic-values by the pinned script binding classifier",
+  "inputEvidence": {
+    "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
+    "reviewedOverridesSha256": "4fb0ed1ef477c93b10f3b47c7cdd46cb3d041594468544dea0113ed154fe390e"
+  },
+  "routeCount": 14,
+  "generatedFamilyCandidateCount": 11,
+  "blockedCount": 3,
+  "maximumArgumentCount": 32,
+  "allocationPolicy": "Generated dispatch uses sorted static descriptors and caller-owned ScriptCallFrame storage. The exact Lua backend must cache function references and use fixed-capacity stack/scratch; there is no heap fallback in generated glue.",
+  "evidencePolicy": "Source hashes and implementation anchors prove what was reviewed. Focused native tests prove the generated ABI and compile Defold's exact Lua BitOp implementation; socket.skip uses a source-equivalent local C function and types.* use local type-identity stand-ins, so neither is claimed semantically engine-proven. No route enters global executable accounting until the shared ScriptAdapter/JSI router is integrated, and no packaged-engine or browser execution is claimed.",
+  "blockerCounts": {
+    "recursive-json-value-policy": 2,
+    "recursive-log-side-effect-policy": 1
+  },
+  "bindings": [
+    {
+      "id": "script:bit.bor",
+      "stableId": "0x0892398e",
+      "modulePath": [
+        "bit"
+      ],
+      "member": "bor",
+      "strategy": "exact-lua-call",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "resultMode": "number",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/bitop/bitop.c",
+        "sha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb",
+        "anchor": "BIT_OP\\(bit_bor,\\s*\\|=\\)"
+      },
+      "focusedNativeEvidence": "observed-exact-upstream-bitop-implementation",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:types.is_hash",
+      "stableId": "0x206a89ba",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_hash",
+      "strategy": "exact-lua-type-query",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "resultMode": "boolean",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/script_types.cpp",
+        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
+        "anchor": "\\{\\s*\"is_hash\",\\s*Types_IsHash\\s*\\}"
+      },
+      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:json.decode",
+      "stableId": "0x5c3e0e2e",
+      "modulePath": [
+        "json"
+      ],
+      "member": "decode",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "minimumArguments": null,
+      "maximumArguments": null,
+      "resultMode": null,
+      "blocker": "recursive-json-value-policy",
+      "blockerDetail": "Decoded arrays, objects, json.null, cycles, depth, entry limits, and table ownership require the bounded recursive-value schema before this route can preserve engine semantics.",
+      "sourceEvidence": {
+        "path": "engine/script/src/script_json.cpp",
+        "sha256": "a4ed92cdb7af30b282321841c39e98d7887f40971e69b544a31bf2fb837102a5",
+        "anchor": "\\{\\s*\"decode\",\\s*Json_Decode\\s*\\}"
+      },
+      "focusedNativeEvidence": "not-applicable-blocked",
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-recursive-json-value-policy",
+        "nativeStaticHermes": "blocked-recursive-json-value-policy",
+        "html5BrowserHost": "blocked-recursive-json-value-policy"
+      }
+    },
+    {
+      "id": "script:bit.band",
+      "stableId": "0x7872f480",
+      "modulePath": [
+        "bit"
+      ],
+      "member": "band",
+      "strategy": "exact-lua-call",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "resultMode": "number",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/bitop/bitop.c",
+        "sha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb",
+        "anchor": "BIT_OP\\(bit_band,\\s*&=\\)"
+      },
+      "focusedNativeEvidence": "observed-exact-upstream-bitop-implementation",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:bit.bxor",
+      "stableId": "0x948f508c",
+      "modulePath": [
+        "bit"
+      ],
+      "member": "bxor",
+      "strategy": "exact-lua-call",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "resultMode": "number",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/bitop/bitop.c",
+        "sha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb",
+        "anchor": "BIT_OP\\(bit_bxor,\\s*\\^=\\)"
+      },
+      "focusedNativeEvidence": "observed-exact-upstream-bitop-implementation",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:types.is_matrix4",
+      "stableId": "0x9acd4145",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_matrix4",
+      "strategy": "exact-lua-type-query",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "resultMode": "boolean",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/script_types.cpp",
+        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
+        "anchor": "\\{\\s*\"is_matrix4\",\\s*Types_IsMatrix4\\s*\\}"
+      },
+      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:socket.skip",
+      "stableId": "0x9b0d4932",
+      "modulePath": [
+        "socket"
+      ],
+      "member": "skip",
+      "strategy": "exact-lua-call",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 1,
+      "maximumArguments": 32,
+      "resultMode": "variable-values",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/luasocket/luasocket.c",
+        "sha256": "0d6632d082e1790e2175d1aff21a8b22a8870e0bd4f66ba0337e65d188782c3f",
+        "anchor": "int ret = lua_gettop\\(L\\) - amount - 1;\\s*return ret >= 0 \\? ret : 0;"
+      },
+      "focusedNativeEvidence": "observed-transport-with-source-equivalent-test-function",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:pprint",
+      "stableId": "0xb1751627",
+      "modulePath": [
+        "builtins"
+      ],
+      "member": "pprint",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "minimumArguments": null,
+      "maximumArguments": null,
+      "resultMode": null,
+      "blocker": "recursive-log-side-effect-policy",
+      "blockerDetail": "The engine formatter recursively traverses tables, detects cycles, invokes tostring, truncates into a fixed log buffer, and emits through dmLog; no equivalent bounded graph/log adapter exists yet.",
+      "sourceEvidence": {
+        "path": "engine/script/src/script.cpp",
+        "sha256": "461ec16d3d835919070e45febe1a141fe36c2f4851b9f6511952f5c1bffc60a4",
+        "anchor": "int LuaPPrint\\(lua_State\\* L\\)"
+      },
+      "focusedNativeEvidence": "not-applicable-blocked",
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-recursive-log-side-effect-policy",
+        "nativeStaticHermes": "blocked-recursive-log-side-effect-policy",
+        "html5BrowserHost": "blocked-recursive-log-side-effect-policy"
+      }
+    },
+    {
+      "id": "script:json.encode",
+      "stableId": "0xb1cde886",
+      "modulePath": [
+        "json"
+      ],
+      "member": "encode",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "minimumArguments": null,
+      "maximumArguments": null,
+      "resultMode": null,
+      "blocker": "recursive-json-value-policy",
+      "blockerDetail": "Encoding arbitrary Lua/JavaScript graphs plus Defold's option table and null sentinel cannot use a scalar or shallow-value codec soundly.",
+      "sourceEvidence": {
+        "path": "engine/script/src/script_json.cpp",
+        "sha256": "a4ed92cdb7af30b282321841c39e98d7887f40971e69b544a31bf2fb837102a5",
+        "anchor": "\\{\\s*\"encode\",\\s*Json_Encode\\s*\\}"
+      },
+      "focusedNativeEvidence": "not-applicable-blocked",
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-recursive-json-value-policy",
+        "nativeStaticHermes": "blocked-recursive-json-value-policy",
+        "html5BrowserHost": "blocked-recursive-json-value-policy"
+      }
+    },
+    {
+      "id": "script:types.is_quat",
+      "stableId": "0xc6f91f35",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_quat",
+      "strategy": "exact-lua-type-query",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "resultMode": "boolean",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/script_types.cpp",
+        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
+        "anchor": "\\{\\s*\"is_quat\",\\s*Types_IsQuat\\s*\\}"
+      },
+      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:types.is_vector",
+      "stableId": "0xc8496cbd",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_vector",
+      "strategy": "exact-lua-type-query",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "resultMode": "boolean",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/script_types.cpp",
+        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
+        "anchor": "\\{\\s*\"is_vector\",\\s*Types_IsVector\\s*\\}"
+      },
+      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:types.is_vector4",
+      "stableId": "0xd495dbab",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_vector4",
+      "strategy": "exact-lua-type-query",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "resultMode": "boolean",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/script_types.cpp",
+        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
+        "anchor": "\\{\\s*\"is_vector4\",\\s*Types_IsVector4\\s*\\}"
+      },
+      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:types.is_vector3",
+      "stableId": "0xd995e38a",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_vector3",
+      "strategy": "exact-lua-type-query",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "resultMode": "boolean",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/script_types.cpp",
+        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
+        "anchor": "\\{\\s*\"is_vector3\",\\s*Types_IsVector3\\s*\\}"
+      },
+      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:types.is_url",
+      "stableId": "0xfaf3e587",
+      "modulePath": [
+        "types"
+      ],
+      "member": "is_url",
+      "strategy": "exact-lua-type-query",
+      "generatedFamilyExecutableCandidate": true,
+      "minimumArguments": 0,
+      "maximumArguments": 32,
+      "resultMode": "boolean",
+      "blocker": null,
+      "blockerDetail": null,
+      "sourceEvidence": {
+        "path": "engine/script/src/script_types.cpp",
+        "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2",
+        "anchor": "\\{\\s*\"is_url\",\\s*Types_IsUrl\\s*\\}"
+      },
+      "focusedNativeEvidence": "observed-transport-with-local-type-identity-stand-ins",
+      "targetSupport": {
+        "nativeDynamicHermes": "candidate-awaits-shared-router-integration",
+        "nativeStaticHermes": "planned-generated-adapter",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    }
+  ]
+}

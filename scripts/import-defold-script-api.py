@@ -141,28 +141,15 @@ The enriched per-symbol ledger is
 ## Executable coverage audit
 
 Generation covers all 926 functions and all 410 named types, including TSDoc
-and 1398 class fields. Runtime execution is a different ledger:
+and 1398 class fields. This inventory intentionally does not embed mutable
+runtime counts. `bindings/generated/defold-script-api-accounting.json` is the
+SHA-bound, exact partition of generated stable-ID routes, separate-module
+routes, and pending lowerings. `bindings/generated/defold-script-real-engine-matrix.json`
+independently records compile, link, and observed packaged-engine evidence.
 
-| Stage | Functions |
-| --- | ---: |
-| TypeScript signatures and ergonomic wrappers generated | 926 |
-| Executable through the separate Timer native-module proof | 3 |
-| Executable through the generated Lua-shaped SDK façade | 0 |
-| Pending runtime lowerings | 923 |
-
-The three proven operations are `timer.delay`, `timer.cancel`, and
-`timer.trigger`; they run native Hermes -> JSI -> C ABI -> Lua and have browser
-counterparts. The lower-case generated SDK still terminates at an uninstalled
-`DefoldScriptBridge`, so it must not claim those three calls until the bridge
-installer connects them.
-
-The 923 pending descriptors comprise 456 borrowed-handle, 151 Lua-table, 127
-Defold-value, 90 scalar, 37 multi-result, 25 callback-lifecycle, 23 overload,
-and 14 dynamic-value primary families. The scalar dispatcher is an
-allocation-free codec prototype over 90 descriptors; eight representative
-descriptors execute against mocks, but none is installed in an engine context
-or exposed through JSI yet. This distinction keeps declaration coverage from
-being mistaken for executable SDK compatibility.
+A generated signature, a generated transport route, and an engine-observed
+semantic call are three different states. Consumers must not infer the latter
+from this declaration inventory.
 """
 
 

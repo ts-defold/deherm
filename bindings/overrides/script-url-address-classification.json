@@ -1,20 +1,17 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "coverageClaim": "Classification and codec-foundation evidence only. These routes remain planned and are not executable until generated Lua/JS routing installs a ScriptUrlArena and proves target-specific calls.",
-  "allocationClaim": "The generated URL sidecar is fixed-capacity inline storage with deterministic exhaustion and no heap fallback. This does not claim that the called Defold engine operation is allocation-free.",
+  "coverageClaim": "All selected routes have generated stable-ID descriptors and one reusable captured-Lua lowering on native dynamic Hermes. Static Hermes, the flat C ABI, and HTML5 remain fail-closed for full structured URLs until their ABIs carry all four exact uint64 lanes.",
+  "allocationClaim": "The generated URL sidecar and warmed native bridge path use fixed-capacity inline storage with deterministic exhaustion and no bridge-owned heap fallback. This does not claim that Lua, JSI object construction, or the called Defold engine operation is allocation-free.",
   "expectedCounts": {
     "total": 70,
     "urlParameters": 73,
     "classifiedDefoldValue": 127,
-    "preexistingExecutableNonMatrix": 17,
-    "baselineFrontier": 110,
-    "currentPendingDefoldValue": 96,
     "matrix4Disjoint": 20,
-    "promotedMatrix4": 14,
-    "remainingMatrix4": 6,
+    "urlCandidates": 73,
+    "excludedPreexistingUrl": 3,
+    "nonMatrixNonUrl": 34,
     "binaryStringRemainder": 2,
-    "currentCodecRemainder": 18,
     "modules": {
       "camera": 19,
       "collectionfactory": 3,
@@ -33,6 +30,11 @@
       "url|number|nil": 19
     }
   },
+  "excludedPreexistingUrlIds": [
+    "script:go.get_position",
+    "script:go.set_position",
+    "script:go.set_rotation"
+  ],
   "binaryStringRemainderIds": [
     "script:gui.set_texture_data",
     "script:resource.set_sound"
@@ -75,16 +77,16 @@
   ],
   "targetSupport": {
     "nativeDynamicHermes": {
-      "status": "planned-codec-foundation",
-      "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand for dmScript::ResolveURL."
+      "status": "generated-executable",
+      "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
     },
     "nativeStaticHermes": {
-      "status": "planned-codec-foundation",
-      "requiredRoute": "A generated C ABI must pass the three exact 64-bit URL components into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+      "status": "fail-closed-unverified",
+      "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
     },
     "html5BrowserHost": {
-      "status": "planned-codec-foundation",
-      "requiredRoute": "Browser glue must use an explicit three-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+      "status": "fail-closed-unverified",
+      "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
     }
   }
 }

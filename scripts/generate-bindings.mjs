@@ -391,6 +391,7 @@ function generateJsiSource(schema) {
     "",
     "#if !defined(DM_PLATFORM_HTML5)",
     "#include <defold_hermes/callback_registry.hpp>",
+    "#include <defold_hermes/generated_dmsdk_enum_value_jsi.hpp>",
     "#include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>",
     "#include <defold_hermes/generated_modules.h>",
     "",
@@ -468,7 +469,16 @@ function generateJsiSource(schema) {
     }
     lines.push(`  modules.setProperty(runtime, "${module.name}", std::move(${snake(module.name)}));`, "");
   }
-  lines.push("  installDmSdkScalarModule(runtime, modules);", "}", "", "}  // namespace defold_hermes", "", "#endif  // !DM_PLATFORM_HTML5", "");
+  lines.push(
+    "  installDmSdkScalarModule(runtime, modules);",
+    "  installDmSdkEnumValueModule(runtime, modules);",
+    "}",
+    "",
+    "}  // namespace defold_hermes",
+    "",
+    "#endif  // !DM_PLATFORM_HTML5",
+    ""
+  );
   return lines.join("\n");
 }
 

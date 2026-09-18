@@ -1,7 +1,9 @@
 import {
   address,
+  defoldUrl,
   relativeAddress,
-  type DefoldAddress
+  type DefoldAddress,
+  type DefoldHash
 } from "./address";
 
 const accepted: DefoldAddress[] = [
@@ -28,3 +30,7 @@ relativeAddress("player#sprite");
 
 void accepted;
 void invalidBareAddress;
+
+const exactUrl = defoldUrl(1n as DefoldHash, 2n as DefoldHash, 3n as DefoldHash,
+  0x13579bdf2468ace0n as DefoldHash);
+void exactUrl.reserved;

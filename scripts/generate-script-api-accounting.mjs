@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
 import { generateScriptBindingDescriptors } from "./generate-script-binding-descriptors.mjs";
+import { generateScriptUrlAddressClassification } from "./generate-script-url-address-classification.mjs";
 
 const root = new URL("../", import.meta.url);
 const inputUrls = {
@@ -15,7 +16,8 @@ const inputUrls = {
   descriptors: new URL("bindings/generated/defold-script-binding-descriptors.json", root),
   scalar: new URL("bindings/generated/defold-script-scalar-dispatch.json", root),
   value: new URL("bindings/generated/defold-script-value-bindings.json", root),
-  tuple: new URL("bindings/generated/defold-script-fixed-tuples.json", root)
+  tuple: new URL("bindings/generated/defold-script-fixed-tuples.json", root),
+  url: new URL("bindings/generated/defold-script-url-address-classification.json", root)
 };
 const valueDefinitionUrls = [
   new URL("bindings/overrides/script-defold-value-bindings.json", root),
@@ -25,6 +27,7 @@ const valueDefinitionUrls = [
   new URL("bindings/overrides/script-factory-structured-bindings.json", root),
   new URL("bindings/overrides/script-gui-structured-bindings.json", root)
 ];
+const urlOverrideUrl = new URL("bindings/overrides/script-url-address-classification.json", root);
 const outputUrl = new URL("bindings/generated/defold-script-api-accounting.json", root);
 
 function assert(condition, message) {
@@ -59,6 +62,13 @@ function uniqueMap(rows, label) {
 
 function sameJson(left, right) {
   return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function canonicalUrlReport(report) {
+  return {
+    ...report,
+    rows: [...report.rows].sort((left, right) => compareText(left.id, right.id))
+  };
 }
 
 function escapeRegex(value) {
@@ -239,8 +249,9 @@ export function generateScriptApiAccounting(inputs) {
   const descriptors = parse(inputs.descriptorsText, "binding descriptors");
   const scalar = parse(inputs.scalarText, "scalar dispatch report");
   const value = parse(inputs.valueText, "value binding report");
+  const url = parse(inputs.urlText, "URL binding report");
 
-  const revisions = [inventory, patterns, descriptors, scalar, value].map((artifact) => artifact.defoldRevision);
+  const revisions = [inventory, patterns, descriptors, scalar, value, url].map((artifact) => artifact.defoldRevision);
   assert(revisions.every((revision) => revision === ir.defoldRevision), "script generator Defold revisions differ");
   assert(ir.counts?.functions === ir.functions.length, "script IR function count is stale");
   const functionById = uniqueMap(ir.functions, "script IR");
@@ -257,6 +268,18 @@ export function generateScriptApiAccounting(inputs) {
   }
 
   assert(patterns.sourceSha256 === sha256(inputs.irText), "binding patterns are stale against script IR");
+  assert(url.inputEvidence?.scriptIrSha256 === sha256(inputs.irText),
+    "URL bindings are stale against script IR");
+  assert(url.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText),
+    "URL bindings are stale against binding patterns");
+  const expectedUrl = generateScriptUrlAddressClassification({
+    irText: inputs.irText,
+    patternsText: inputs.patternsText,
+    overrideText: inputs.urlOverrideText,
+    sourceTexts: inputs.urlSourceTexts
+  });
+  assert(sameJson(canonicalUrlReport(url), canonicalUrlReport(expectedUrl)),
+    "URL binding report semantics are stale against pinned inputs");
   const patternById = uniqueMap(patterns.bindings, "binding patterns");
   assert(patterns.classifiedFunctionCount === patterns.bindings.length, "binding pattern count is stale");
   assert(patterns.pendingFunctionCount === patterns.bindings.length, "binding patterns do not classify every runtime-pending function");
@@ -296,10 +319,26 @@ export function generateScriptApiAccounting(inputs) {
     assert(patternById.has(id), `${id}: executable tuple route is not a runtime-pending descriptor`);
     assert(!scalarById.has(id) && !valueById.has(id), `${id}: executable tuple route overlaps another generator`);
   }
+  const urlById = uniqueMap(url.rows, "URL binding report");
+  assert(url.routeCount === url.rows.length, "URL binding routeCount is stale");
+  for (const [id, row] of urlById) {
+    assert(patternById.get(id)?.loweringFamily === "defold-value",
+      `${id}: generated URL route is not a defold-value descriptor`);
+    assert(!scalarById.has(id) && !valueById.has(id) && !tupleById.has(id),
+      `${id}: generated URL route overlaps another executable generator`);
+    assert(row.routing?.status === "generated-native-dynamic" &&
+      row.targetSupport?.nativeDynamicHermes?.status === "generated-executable",
+    `${id}: URL route lacks generated native-dynamic disposition`);
+  }
 
   const executableById = new Map();
   const stableIdOwners = new Map();
-  for (const [generator, rows] of [["scalar-lua-dispatch", scalar.bindings], ["native-value-dispatch", value.bindings], ["fixed-tuple-lua-dispatch", tuple.bindings]]) {
+  for (const [generator, rows] of [
+    ["scalar-lua-dispatch", scalar.bindings],
+    ["native-value-dispatch", value.bindings],
+    ["fixed-tuple-lua-dispatch", tuple.bindings],
+    ["url-lua-dispatch", url.rows]
+  ]) {
     for (const row of rows) {
       const expectedStableId = stableBindingId(row.id);
       const routeStableId = typeof row.stableId === "string" ? Number.parseInt(row.stableId) : row.stableId;
@@ -318,6 +357,11 @@ export function generateScriptApiAccounting(inputs) {
         ...(generator === "fixed-tuple-lua-dispatch" ? {
           resultCount: row.results.length,
           publicTypeScriptFixture: row.targetSupport.publicTypeScriptFixture
+        } : {}),
+        ...(generator === "url-lua-dispatch" ? {
+          requiredArgumentCount: row.requiredArgumentCount,
+          maximumArgumentCount: row.maximumArgumentCount,
+          targetSupport: row.targetSupport
         } : {})
       });
     }
@@ -385,7 +429,8 @@ export function generateScriptApiAccounting(inputs) {
     bindingDescriptorsSha256: sha256(inputs.descriptorsText),
     scalarDispatchSha256: sha256(inputs.scalarText),
     valueBindingsSha256: sha256(inputs.valueText),
-    fixedTupleBindingsSha256: sha256(inputs.tupleText)
+    fixedTupleBindingsSha256: sha256(inputs.tupleText),
+    urlBindingsSha256: sha256(inputs.urlText)
   };
   const aggregateInputSha256 = sha256([
     ...Object.entries(sourceHashes).map(([name, hash]) => `${name}\0${hash}`),
@@ -434,6 +479,12 @@ async function loadInputs() {
       additionalSources
     };
   }));
+  const urlOverrideText = await readFile(urlOverrideUrl, "utf8");
+  const urlOverride = parse(urlOverrideText, urlOverrideUrl.pathname);
+  const urlSourceTexts = new Map(await Promise.all(urlOverride.sourceEvidence.map(async ({ source }) => [
+    source,
+    await readFile(new URL(`upstream/defold/${source}`, root), "utf8")
+  ])));
   return {
     inventoryText: texts.inventory,
     irText: texts.ir,
@@ -442,6 +493,9 @@ async function loadInputs() {
     scalarText: texts.scalar,
     valueText: texts.value,
     tupleText: texts.tuple,
+    urlText: texts.url,
+    urlOverrideText,
+    urlSourceTexts,
     valueDefinitions
   };
 }

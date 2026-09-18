@@ -10,6 +10,7 @@ const inputUrls = {
   scalarRoutes: new URL("bindings/generated/defold-script-scalar-dispatch.json", root),
   valueRoutes: new URL("bindings/generated/defold-script-value-bindings.json", root),
   tupleRoutes: new URL("bindings/generated/defold-script-fixed-tuples.json", root),
+  urlRoutes: new URL("bindings/generated/defold-script-url-address-classification.json", root),
   scalarProbes: new URL("bindings/generated/defold-script-real-engine-probes.json", root),
   valueProbes: new URL("bindings/generated/defold-script-value-real-engine-probes.json", root),
   tupleProbes: new URL("bindings/generated/defold-script-fixed-tuple-probes.json", root)
@@ -87,7 +88,7 @@ function validateSetups(manifest) {
   return setups;
 }
 
-function routeRows(scalarRoutes, valueRoutes, tupleRoutes) {
+function routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes) {
   const rows = [
     ...scalarRoutes.bindings.map((binding) => ({
       id: binding.id,
@@ -113,6 +114,14 @@ function routeRows(scalarRoutes, valueRoutes, tupleRoutes) {
       source: binding.sourceEvidence.path,
       line: 0,
       publicTypeScriptFixture: binding.targetSupport.publicTypeScriptFixture
+    })),
+    ...urlRoutes.rows.map((binding) => ({
+      id: binding.id,
+      stableId: binding.stableId,
+      rawName: binding.rawName,
+      routeKind: "url-address",
+      source: binding.source,
+      line: binding.line
     }))
   ].sort((left, right) => compareText(left.id, right.id));
   const ids = new Set();
@@ -274,6 +283,7 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   const scalarRoutes = JSON.parse(texts.scalarRoutes);
   const valueRoutes = JSON.parse(texts.valueRoutes);
   const tupleRoutes = JSON.parse(texts.tupleRoutes);
+  const urlRoutes = JSON.parse(texts.urlRoutes);
   const scalarProbes = JSON.parse(texts.scalarProbes);
   const valueProbes = JSON.parse(texts.valueProbes);
   const tupleProbes = JSON.parse(texts.tupleProbes);
@@ -284,12 +294,16 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   assertNonEmpty(manifest.policy.defaultSetupId, "policy.defaultSetupId");
   if (JSON.stringify(manifest.policy.requiredEvidenceStages) !== JSON.stringify(stages)) throw new Error("requiredEvidenceStages must be compile, link, runtime");
   if (manifest.policy.runtimeRequiresExactScenarioMarker !== true) throw new Error("runtimeRequiresExactScenarioMarker must be true");
-  if (scalarRoutes.defoldRevision !== valueRoutes.defoldRevision || scalarRoutes.defoldRevision !== scalarProbes.defoldRevision || scalarRoutes.defoldRevision !== valueProbes.defoldRevision) {
+  if (scalarRoutes.defoldRevision !== valueRoutes.defoldRevision ||
+      scalarRoutes.defoldRevision !== tupleRoutes.defoldRevision ||
+      scalarRoutes.defoldRevision !== urlRoutes.defoldRevision ||
+      scalarRoutes.defoldRevision !== scalarProbes.defoldRevision ||
+      scalarRoutes.defoldRevision !== valueProbes.defoldRevision) {
     throw new Error("All matrix inputs must use the same Defold revision");
   }
   const setups = validateSetups(manifest);
   if (!setups.has(manifest.policy.defaultSetupId)) throw new Error(`Unknown default setup ${manifest.policy.defaultSetupId}`);
-  const routes = routeRows(scalarRoutes, valueRoutes, tupleRoutes);
+  const routes = routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes);
   const routeById = new Map(routes.map((route) => [route.id, route]));
   const scenarios = importedScenarios(manifest, setups, scalarProbes, valueProbes, routeById);
   applyOverrides(manifest, setups, routeById, scenarios);
@@ -352,7 +366,8 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   }]));
   const inputSha256 = createHash("sha256")
     .update(texts.manifest).update("\0").update(texts.scalarRoutes).update("\0").update(texts.valueRoutes)
-    .update("\0").update(texts.tupleRoutes).update("\0").update(texts.scalarProbes)
+    .update("\0").update(texts.tupleRoutes).update("\0").update(texts.urlRoutes)
+    .update("\0").update(texts.scalarProbes)
     .update("\0").update(texts.valueProbes).update("\0").update(texts.tupleProbes).digest("hex");
   return {
     schemaVersion: 1,

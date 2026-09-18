@@ -62,6 +62,7 @@ struct ScriptTableEntry {
 };
 
 struct ScriptMatrix4Arena;
+template <uint32_t Capacity> class ScriptUrlArena;
 
 struct ScriptCallFrame {
   uint32_t stableId = 0;
@@ -75,6 +76,8 @@ struct ScriptCallFrame {
   uint32_t stringScratchUsed = 0;
   /** Optional fixed-capacity sidecar for canonical column-major Matrix4 values. */
   ScriptMatrix4Arena* matrix4Arena = nullptr;
+  /** Optional fixed-capacity sidecar for exact four-lane dmMessage::URL values. */
+  ScriptUrlArena<32>* urlArena = nullptr;
 };
 
 struct ScriptBridgeApi {

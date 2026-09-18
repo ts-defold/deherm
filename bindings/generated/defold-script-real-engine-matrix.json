@@ -2,29 +2,29 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "5ef0a8c6bcd73b742497dc0c28dfa3cb8089f18d56ab137837f70c0b614a8e2c",
+  "inputSha256": "63275780e22d460c22461fe9b861e46ab9684aba83e6907bb860996e477f30f3",
   "evidencePolicy": "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
-  "coverageClaim": "All 192 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
-  "routeCount": 192,
-  "scenarioCount": 194,
+  "coverageClaim": "All 262 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
+  "routeCount": 262,
+  "scenarioCount": 264,
   "instrumentedScenarioCount": 34,
-  "plannedScenarioCount": 160,
+  "plannedScenarioCount": 230,
   "instrumentedRouteCount": 32,
-  "plannedOnlyRouteCount": 160,
+  "plannedOnlyRouteCount": 230,
   "setupCount": 4,
   "observationCount": 1,
   "stageSummary": {
     "compile": {
       "verifiedRouteCount": 0,
-      "unverifiedRouteCount": 192
+      "unverifiedRouteCount": 262
     },
     "link": {
       "verifiedRouteCount": 0,
-      "unverifiedRouteCount": 192
+      "unverifiedRouteCount": 262
     },
     "runtime": {
       "verifiedRouteCount": 32,
-      "unverifiedRouteCount": 160
+      "unverifiedRouteCount": 230
     }
   },
   "setups": [
@@ -270,6 +270,160 @@
       "reason": "Generated tuple lowering awaits its public TypeScript borrowed-handle producer."
     },
     {
+      "key": "planned:script:camera.get_aspect_ratio",
+      "routeId": "script:camera.get_aspect_ratio",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_auto_aspect_ratio",
+      "routeId": "script:camera.get_auto_aspect_ratio",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_enabled",
+      "routeId": "script:camera.get_enabled",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_far_z",
+      "routeId": "script:camera.get_far_z",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_fov",
+      "routeId": "script:camera.get_fov",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_near_z",
+      "routeId": "script:camera.get_near_z",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_orthographic_auto_zoom",
+      "routeId": "script:camera.get_orthographic_auto_zoom",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_orthographic_mode",
+      "routeId": "script:camera.get_orthographic_mode",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.get_orthographic_zoom",
+      "routeId": "script:camera.get_orthographic_zoom",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.screen_to_world",
+      "routeId": "script:camera.screen_to_world",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.screen_xy_to_world",
+      "routeId": "script:camera.screen_xy_to_world",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.set_aspect_ratio",
+      "routeId": "script:camera.set_aspect_ratio",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.set_auto_aspect_ratio",
+      "routeId": "script:camera.set_auto_aspect_ratio",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.set_far_z",
+      "routeId": "script:camera.set_far_z",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.set_fov",
+      "routeId": "script:camera.set_fov",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.set_near_z",
+      "routeId": "script:camera.set_near_z",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.set_orthographic_mode",
+      "routeId": "script:camera.set_orthographic_mode",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.set_orthographic_zoom",
+      "routeId": "script:camera.set_orthographic_zoom",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:camera.world_to_screen",
+      "routeId": "script:camera.world_to_screen",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:collectionfactory.get_status",
+      "routeId": "script:collectionfactory.get_status",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:collectionfactory.set_prototype",
+      "routeId": "script:collectionfactory.set_prototype",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:collectionfactory.unload",
+      "routeId": "script:collectionfactory.unload",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "tuple:fixed-tuple.collectionproxy.set_collection",
       "routeId": "script:collectionproxy.set_collection",
       "state": "planned",
@@ -356,6 +510,34 @@
       "reason": "Requires a real #probe_factory component plus child-init and parent-context assertions."
     },
     {
+      "key": "planned:script:factory.get_status",
+      "routeId": "script:factory.get_status",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:factory.set_prototype",
+      "routeId": "script:factory.set_prototype",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:factory.unload",
+      "routeId": "script:factory.unload",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.cancel_animations",
+      "routeId": "script:go.cancel_animations",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "value:go.delete.factory-probe",
       "routeId": "script:go.delete",
       "state": "planned",
@@ -370,6 +552,20 @@
         "marker": "DEBUG:SCRIPT: script-value:go.delete.factory-probe:ok"
       },
       "reason": "Requires a real factory fixture and before/after end-of-frame deletion assertions."
+    },
+    {
+      "key": "planned:script:go.exists",
+      "routeId": "script:go.exists",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_parent",
+      "routeId": "script:go.get_parent",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "value:go.get_position.current",
@@ -390,6 +586,62 @@
         ],
         "tolerance": 0
       }
+    },
+    {
+      "key": "planned:script:go.get_rotation",
+      "routeId": "script:go.get_rotation",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_scale",
+      "routeId": "script:go.get_scale",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_scale_uniform",
+      "routeId": "script:go.get_scale_uniform",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_world_position",
+      "routeId": "script:go.get_world_position",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_world_rotation",
+      "routeId": "script:go.get_world_rotation",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_world_scale",
+      "routeId": "script:go.get_world_scale",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.get_world_scale_uniform",
+      "routeId": "script:go.get_world_scale_uniform",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.set_parent",
+      "routeId": "script:go.set_parent",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "value:go.set_position.current",
@@ -420,6 +672,34 @@
         "kind": "deferredLua",
         "marker": "DEBUG:SCRIPT: script-value:go.set_rotation.current:ok"
       }
+    },
+    {
+      "key": "planned:script:go.set_scale",
+      "routeId": "script:go.set_scale",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.set_scale_xy",
+      "routeId": "script:go.set_scale_xy",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.update_world_transform",
+      "routeId": "script:go.update_world_transform",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:go.world_to_local_position",
+      "routeId": "script:go.world_to_local_position",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "planned:script:gui.get_height",
@@ -819,8 +1099,57 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:label.get_text",
+      "routeId": "script:label.get_text",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:label.set_text",
+      "routeId": "script:label.set_text",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:liveupdate.is_built_with_excluded_files",
       "routeId": "script:liveupdate.is_built_with_excluded_files",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:model.cancel",
+      "routeId": "script:model.cancel",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:model.get_go",
+      "routeId": "script:model.get_go",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:model.get_mesh_enabled",
+      "routeId": "script:model.get_mesh_enabled",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:model.reset_constant",
+      "routeId": "script:model.reset_constant",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:model.set_mesh_enabled",
+      "routeId": "script:model.set_mesh_enabled",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -840,6 +1169,97 @@
         "marker": "DEBUG:SCRIPT: script-value:msg.post.current-object:ok"
       },
       "reason": "Requires the generated message receiver fixture and delivery assertion harness."
+    },
+    {
+      "key": "planned:script:particlefx.reset_constant",
+      "routeId": "script:particlefx.reset_constant",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:particlefx.set_constant",
+      "routeId": "script:particlefx.set_constant",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.destroy_joint",
+      "routeId": "script:physics.destroy_joint",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.get_group",
+      "routeId": "script:physics.get_group",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.get_joint_reaction_force",
+      "routeId": "script:physics.get_joint_reaction_force",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.get_joint_reaction_torque",
+      "routeId": "script:physics.get_joint_reaction_torque",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.get_maskbit",
+      "routeId": "script:physics.get_maskbit",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.set_group",
+      "routeId": "script:physics.set_group",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.set_hflip",
+      "routeId": "script:physics.set_hflip",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.set_maskbit",
+      "routeId": "script:physics.set_maskbit",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.set_vflip",
+      "routeId": "script:physics.set_vflip",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.update_mass",
+      "routeId": "script:physics.update_mass",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:physics.wakeup",
+      "routeId": "script:physics.wakeup",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "planned:script:profiler.dump_frame",
@@ -1122,6 +1542,48 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:sound.pause",
+      "routeId": "script:sound.pause",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sound.set_gain",
+      "routeId": "script:sound.set_gain",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sound.set_pan",
+      "routeId": "script:sound.set_pan",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sprite.reset_constant",
+      "routeId": "script:sprite.reset_constant",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sprite.set_hflip",
+      "routeId": "script:sprite.set_hflip",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:sprite.set_vflip",
+      "routeId": "script:sprite.set_vflip",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "scalar:sys.exists.false",
       "routeId": "script:sys.exists",
       "state": "instrumented",
@@ -1318,6 +1780,34 @@
       "state": "planned",
       "setupId": "bootstrap-script-instance",
       "reason": "Generated tuple lowering has no observed packaged-engine marker yet."
+    },
+    {
+      "key": "planned:script:tilemap.get_tile",
+      "routeId": "script:tilemap.get_tile",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:tilemap.reset_constant",
+      "routeId": "script:tilemap.reset_constant",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:tilemap.set_tile",
+      "routeId": "script:tilemap.set_tile",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:tilemap.set_visible",
+      "routeId": "script:tilemap.set_visible",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
       "key": "value:vmath-fixed-pod.conj",
@@ -2947,6 +3437,578 @@
       }
     },
     {
+      "id": "script:camera.get_aspect_ratio",
+      "stableId": 4150761990,
+      "rawName": "camera.get_aspect_ratio",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 50,
+      "scenarios": [
+        "planned:script:camera.get_aspect_ratio"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_auto_aspect_ratio",
+      "stableId": 815384074,
+      "rawName": "camera.get_auto_aspect_ratio",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 59,
+      "scenarios": [
+        "planned:script:camera.get_auto_aspect_ratio"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_enabled",
+      "stableId": 3707335843,
+      "rawName": "camera.get_enabled",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 83,
+      "scenarios": [
+        "planned:script:camera.get_enabled"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_far_z",
+      "stableId": 4055682442,
+      "rawName": "camera.get_far_z",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 90,
+      "scenarios": [
+        "planned:script:camera.get_far_z"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_fov",
+      "stableId": 1655100321,
+      "rawName": "camera.get_fov",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 97,
+      "scenarios": [
+        "planned:script:camera.get_fov"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_near_z",
+      "stableId": 94225445,
+      "rawName": "camera.get_near_z",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 104,
+      "scenarios": [
+        "planned:script:camera.get_near_z"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_orthographic_auto_zoom",
+      "stableId": 333496520,
+      "rawName": "camera.get_orthographic_auto_zoom",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 112,
+      "scenarios": [
+        "planned:script:camera.get_orthographic_auto_zoom"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_orthographic_mode",
+      "stableId": 780726310,
+      "rawName": "camera.get_orthographic_mode",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 119,
+      "scenarios": [
+        "planned:script:camera.get_orthographic_mode"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.get_orthographic_zoom",
+      "stableId": 1514123934,
+      "rawName": "camera.get_orthographic_zoom",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 127,
+      "scenarios": [
+        "planned:script:camera.get_orthographic_zoom"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.screen_to_world",
+      "stableId": 4212113566,
+      "rawName": "camera.screen_to_world",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 168,
+      "scenarios": [
+        "planned:script:camera.screen_to_world"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.screen_xy_to_world",
+      "stableId": 4124133706,
+      "rawName": "camera.screen_xy_to_world",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 193,
+      "scenarios": [
+        "planned:script:camera.screen_xy_to_world"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_aspect_ratio",
+      "stableId": 2940707570,
+      "rawName": "camera.set_aspect_ratio",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 202,
+      "scenarios": [
+        "planned:script:camera.set_aspect_ratio"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_auto_aspect_ratio",
+      "stableId": 3812610558,
+      "rawName": "camera.set_auto_aspect_ratio",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 211,
+      "scenarios": [
+        "planned:script:camera.set_auto_aspect_ratio"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_far_z",
+      "stableId": 2081791798,
+      "rawName": "camera.set_far_z",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 218,
+      "scenarios": [
+        "planned:script:camera.set_far_z"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_fov",
+      "stableId": 2734551893,
+      "rawName": "camera.set_fov",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 225,
+      "scenarios": [
+        "planned:script:camera.set_fov"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_near_z",
+      "stableId": 2620899633,
+      "rawName": "camera.set_near_z",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 232,
+      "scenarios": [
+        "planned:script:camera.set_near_z"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_orthographic_mode",
+      "stableId": 2873442090,
+      "rawName": "camera.set_orthographic_mode",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 239,
+      "scenarios": [
+        "planned:script:camera.set_orthographic_mode"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.set_orthographic_zoom",
+      "stableId": 294035082,
+      "rawName": "camera.set_orthographic_zoom",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 247,
+      "scenarios": [
+        "planned:script:camera.set_orthographic_zoom"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:camera.world_to_screen",
+      "stableId": 3205603148,
+      "rawName": "camera.world_to_screen",
+      "routeKind": "url-address",
+      "source": "doc/camera.lua",
+      "line": 269,
+      "scenarios": [
+        "planned:script:camera.world_to_screen"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:collectionfactory.get_status",
+      "stableId": 4238240607,
+      "rawName": "collectionfactory.get_status",
+      "routeKind": "url-address",
+      "source": "doc/collectionfactory.lua",
+      "line": 119,
+      "scenarios": [
+        "planned:script:collectionfactory.get_status"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:collectionfactory.set_prototype",
+      "stableId": 3724333493,
+      "rawName": "collectionfactory.set_prototype",
+      "routeKind": "url-address",
+      "source": "doc/collectionfactory.lua",
+      "line": 154,
+      "scenarios": [
+        "planned:script:collectionfactory.set_prototype"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:collectionfactory.unload",
+      "stableId": 1613326455,
+      "rawName": "collectionfactory.unload",
+      "routeKind": "url-address",
+      "source": "doc/collectionfactory.lua",
+      "line": 170,
+      "scenarios": [
+        "planned:script:collectionfactory.unload"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:collectionproxy.set_collection",
       "stableId": 803274747,
       "rawName": "collectionproxy.set_collection",
@@ -3234,6 +4296,110 @@
       }
     },
     {
+      "id": "script:factory.get_status",
+      "stableId": 3501057803,
+      "rawName": "factory.get_status",
+      "routeKind": "url-address",
+      "source": "doc/factory.lua",
+      "line": 93,
+      "scenarios": [
+        "planned:script:factory.get_status"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:factory.set_prototype",
+      "stableId": 3506659009,
+      "rawName": "factory.set_prototype",
+      "routeKind": "url-address",
+      "source": "doc/factory.lua",
+      "line": 127,
+      "scenarios": [
+        "planned:script:factory.set_prototype"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:factory.unload",
+      "stableId": 826508291,
+      "rawName": "factory.unload",
+      "routeKind": "url-address",
+      "source": "doc/factory.lua",
+      "line": 143,
+      "scenarios": [
+        "planned:script:factory.unload"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.cancel_animations",
+      "stableId": 1183026732,
+      "rawName": "go.cancel_animations",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 401,
+      "scenarios": [
+        "planned:script:go.cancel_animations"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:go.delete",
       "stableId": 2920192283,
       "rawName": "go.delete",
@@ -3242,6 +4408,58 @@
       "line": 442,
       "scenarios": [
         "value:go.delete.factory-probe"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.exists",
+      "stableId": 1311027776,
+      "rawName": "go.exists",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 464,
+      "scenarios": [
+        "planned:script:go.exists"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_parent",
+      "stableId": 3138865481,
+      "rawName": "go.get_parent",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 580,
+      "scenarios": [
+        "planned:script:go.get_parent"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -3284,6 +4502,214 @@
           "observationIds": [
             "native-defold-runtime-2026-09-18-vmath-pod"
           ]
+        }
+      }
+    },
+    {
+      "id": "script:go.get_rotation",
+      "stableId": 384109339,
+      "rawName": "go.get_rotation",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 622,
+      "scenarios": [
+        "planned:script:go.get_rotation"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_scale",
+      "stableId": 2771038861,
+      "rawName": "go.get_scale",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 643,
+      "scenarios": [
+        "planned:script:go.get_scale"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_scale_uniform",
+      "stableId": 3159049394,
+      "rawName": "go.get_scale_uniform",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 664,
+      "scenarios": [
+        "planned:script:go.get_scale_uniform"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_position",
+      "stableId": 2533378019,
+      "rawName": "go.get_world_position",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 687,
+      "scenarios": [
+        "planned:script:go.get_world_position"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_rotation",
+      "stableId": 2823544550,
+      "rawName": "go.get_world_rotation",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 710,
+      "scenarios": [
+        "planned:script:go.get_world_rotation"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_scale",
+      "stableId": 457161058,
+      "rawName": "go.get_world_scale",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 735,
+      "scenarios": [
+        "planned:script:go.get_world_scale"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.get_world_scale_uniform",
+      "stableId": 1055817377,
+      "rawName": "go.get_world_scale_uniform",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 758,
+      "scenarios": [
+        "planned:script:go.get_world_scale_uniform"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.set_parent",
+      "stableId": 593473189,
+      "rawName": "go.set_parent",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 920,
+      "scenarios": [
+        "planned:script:go.set_parent"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
         }
       }
     },
@@ -3340,6 +4766,110 @@
           "observationIds": [
             "native-defold-runtime-2026-09-18-vmath-pod"
           ]
+        }
+      }
+    },
+    {
+      "id": "script:go.set_scale",
+      "stableId": 2172419017,
+      "rawName": "go.set_scale",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 991,
+      "scenarios": [
+        "planned:script:go.set_scale"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.set_scale_xy",
+      "stableId": 3492879989,
+      "rawName": "go.set_scale_xy",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 1016,
+      "scenarios": [
+        "planned:script:go.set_scale_xy"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.update_world_transform",
+      "stableId": 16978861,
+      "rawName": "go.update_world_transform",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 1043,
+      "scenarios": [
+        "planned:script:go.update_world_transform"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:go.world_to_local_position",
+      "stableId": 2492984466,
+      "rawName": "go.world_to_local_position",
+      "routeKind": "url-address",
+      "source": "doc/go.lua",
+      "line": 1061,
+      "scenarios": [
+        "planned:script:go.world_to_local_position"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
         }
       }
     },
@@ -4726,6 +6256,58 @@
       }
     },
     {
+      "id": "script:label.get_text",
+      "stableId": 1547809370,
+      "rawName": "label.get_text",
+      "routeKind": "url-address",
+      "source": "doc/label.lua",
+      "line": 58,
+      "scenarios": [
+        "planned:script:label.get_text"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:label.set_text",
+      "stableId": 1888249062,
+      "rawName": "label.set_text",
+      "routeKind": "url-address",
+      "source": "doc/label.lua",
+      "line": 78,
+      "scenarios": [
+        "planned:script:label.set_text"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:liveupdate.is_built_with_excluded_files",
       "stableId": 2617193436,
       "rawName": "liveupdate.is_built_with_excluded_files",
@@ -4752,6 +6334,136 @@
       }
     },
     {
+      "id": "script:model.cancel",
+      "stableId": 3654418919,
+      "rawName": "model.cancel",
+      "routeKind": "url-address",
+      "source": "doc/model.lua",
+      "line": 20,
+      "scenarios": [
+        "planned:script:model.cancel"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:model.get_go",
+      "stableId": 1244796042,
+      "rawName": "model.get_go",
+      "routeKind": "url-address",
+      "source": "doc/model.lua",
+      "line": 79,
+      "scenarios": [
+        "planned:script:model.get_go"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:model.get_mesh_enabled",
+      "stableId": 2409536311,
+      "rawName": "model.get_mesh_enabled",
+      "routeKind": "url-address",
+      "source": "doc/model.lua",
+      "line": 111,
+      "scenarios": [
+        "planned:script:model.get_mesh_enabled"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:model.reset_constant",
+      "stableId": 250460089,
+      "rawName": "model.reset_constant",
+      "routeKind": "url-address",
+      "source": "doc/model.lua",
+      "line": 182,
+      "scenarios": [
+        "planned:script:model.reset_constant"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:model.set_mesh_enabled",
+      "stableId": 2492040859,
+      "rawName": "model.set_mesh_enabled",
+      "routeKind": "url-address",
+      "source": "doc/model.lua",
+      "line": 220,
+      "scenarios": [
+        "planned:script:model.set_mesh_enabled"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:msg.post",
       "stableId": 1111726479,
       "rawName": "msg.post",
@@ -4760,6 +6472,344 @@
       "line": 46,
       "scenarios": [
         "value:msg.post.current-object"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:particlefx.reset_constant",
+      "stableId": 3569310218,
+      "rawName": "particlefx.reset_constant",
+      "routeKind": "url-address",
+      "source": "doc/particlefx.lua",
+      "line": 102,
+      "scenarios": [
+        "planned:script:particlefx.reset_constant"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:particlefx.set_constant",
+      "stableId": 3047358751,
+      "rawName": "particlefx.set_constant",
+      "routeKind": "url-address",
+      "source": "doc/particlefx.lua",
+      "line": 129,
+      "scenarios": [
+        "planned:script:particlefx.set_constant"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.destroy_joint",
+      "stableId": 350770,
+      "rawName": "physics.destroy_joint",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 122,
+      "scenarios": [
+        "planned:script:physics.destroy_joint"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_group",
+      "stableId": 3971564819,
+      "rawName": "physics.get_group",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 158,
+      "scenarios": [
+        "planned:script:physics.get_group"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_joint_reaction_force",
+      "stableId": 1120188142,
+      "rawName": "physics.get_joint_reaction_force",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 180,
+      "scenarios": [
+        "planned:script:physics.get_joint_reaction_force"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_joint_reaction_torque",
+      "stableId": 1431636929,
+      "rawName": "physics.get_joint_reaction_torque",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 191,
+      "scenarios": [
+        "planned:script:physics.get_joint_reaction_torque"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.get_maskbit",
+      "stableId": 1870095059,
+      "rawName": "physics.get_maskbit",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 210,
+      "scenarios": [
+        "planned:script:physics.get_maskbit"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_group",
+      "stableId": 3028485791,
+      "rawName": "physics.set_group",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 429,
+      "scenarios": [
+        "planned:script:physics.set_group"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_hflip",
+      "stableId": 2879664679,
+      "rawName": "physics.set_hflip",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 445,
+      "scenarios": [
+        "planned:script:physics.set_hflip"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_maskbit",
+      "stableId": 3160984935,
+      "rawName": "physics.set_maskbit",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 473,
+      "scenarios": [
+        "planned:script:physics.set_maskbit"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.set_vflip",
+      "stableId": 4109527981,
+      "rawName": "physics.set_vflip",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 524,
+      "scenarios": [
+        "planned:script:physics.set_vflip"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.update_mass",
+      "stableId": 3925799645,
+      "rawName": "physics.update_mass",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 539,
+      "scenarios": [
+        "planned:script:physics.update_mass"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:physics.wakeup",
+      "stableId": 10300768,
+      "rawName": "physics.wakeup",
+      "routeKind": "url-address",
+      "source": "doc/physics.lua",
+      "line": 556,
+      "scenarios": [
+        "planned:script:physics.wakeup"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -5772,6 +7822,162 @@
       }
     },
     {
+      "id": "script:sound.pause",
+      "stableId": 1502096075,
+      "rawName": "sound.pause",
+      "routeKind": "url-address",
+      "source": "doc/sound.lua",
+      "line": 196,
+      "scenarios": [
+        "planned:script:sound.pause"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sound.set_gain",
+      "stableId": 4220725117,
+      "rawName": "sound.set_gain",
+      "routeKind": "url-address",
+      "source": "doc/sound.lua",
+      "line": 245,
+      "scenarios": [
+        "planned:script:sound.set_gain"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sound.set_pan",
+      "stableId": 665323993,
+      "rawName": "sound.set_pan",
+      "routeKind": "url-address",
+      "source": "doc/sound.lua",
+      "line": 277,
+      "scenarios": [
+        "planned:script:sound.set_pan"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sprite.reset_constant",
+      "stableId": 4156456045,
+      "rawName": "sprite.reset_constant",
+      "routeKind": "url-address",
+      "source": "doc/sprite.lua",
+      "line": 74,
+      "scenarios": [
+        "planned:script:sprite.reset_constant"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sprite.set_hflip",
+      "stableId": 1703142815,
+      "rawName": "sprite.set_hflip",
+      "routeKind": "url-address",
+      "source": "doc/sprite.lua",
+      "line": 96,
+      "scenarios": [
+        "planned:script:sprite.set_hflip"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:sprite.set_vflip",
+      "stableId": 2316635445,
+      "rawName": "sprite.set_vflip",
+      "routeKind": "url-address",
+      "source": "doc/sprite.lua",
+      "line": 118,
+      "scenarios": [
+        "planned:script:sprite.set_vflip"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:sys.exists",
       "stableId": 1421868765,
       "rawName": "sys.exists",
@@ -6214,6 +8420,110 @@
       "publicTypeScriptFixture": "reachable",
       "scenarios": [
         "tuple:fixed-tuple.tilemap.get_bounds"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.get_tile",
+      "stableId": 2810309289,
+      "rawName": "tilemap.get_tile",
+      "routeKind": "url-address",
+      "source": "doc/tilemap.lua",
+      "line": 97,
+      "scenarios": [
+        "planned:script:tilemap.get_tile"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.reset_constant",
+      "stableId": 3635172296,
+      "rawName": "tilemap.reset_constant",
+      "routeKind": "url-address",
+      "source": "doc/tilemap.lua",
+      "line": 173,
+      "scenarios": [
+        "planned:script:tilemap.reset_constant"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.set_tile",
+      "stableId": 530608877,
+      "rawName": "tilemap.set_tile",
+      "routeKind": "url-address",
+      "source": "doc/tilemap.lua",
+      "line": 214,
+      "scenarios": [
+        "planned:script:tilemap.set_tile"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:tilemap.set_visible",
+      "stableId": 3195961805,
+      "rawName": "tilemap.set_visible",
+      "routeKind": "url-address",
+      "source": "doc/tilemap.lua",
+      "line": 229,
+      "scenarios": [
+        "planned:script:tilemap.set_visible"
       ],
       "scenarioState": "planned",
       "evidence": {

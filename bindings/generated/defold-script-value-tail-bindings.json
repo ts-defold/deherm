@@ -1,0 +1,707 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "the complete remaining defold-value tail after the generated native value-binding wave",
+  "coverageClaim": "Candidate routes have deterministic, source-pinned descriptors and exact ABI shape/result validation only. They are not executable until a captured-Lua adapter that preserves the listed Defold value codecs and active engine context is installed. Blocked routes have no generated adapter.",
+  "allocationClaim": "Descriptor lookup and validation use static sorted tables and caller-owned ScriptCallFrame storage. The future captured-Lua adapter must cache its Lua function references and use fixed-capacity stack/scratch; this generator makes no allocation or packaged-engine-execution claim.",
+  "targetSupport": {
+    "nativeDynamicHermes": "candidate-metadata-and-fail-closed-dispatch-only",
+    "nativeStaticHermes": "not-integrated",
+    "html5BrowserHost": "not-executable-no-provider"
+  },
+  "inputEvidence": {
+    "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
+    "accountingSha256": "be876236e0a9f6daa0026425ad9640f5ee70dc81bcaca6ba1eb96c6b1b5bf2c5",
+    "reviewedPolicySha256": "8750a9e5d4593566bf62cbcf2736d22b7cea3116398824c5f75e8be8112165a4",
+    "defoldSources": [
+      {
+        "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
+        "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_font.cpp",
+        "sha256": "cae8b39b15ef1c230903626e9ffa8519c071bf077af371e35ae96303abd9e1da"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+        "sha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+        "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+        "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053"
+      },
+      {
+        "path": "upstream/defold/engine/gui/src/gui_script.cpp",
+        "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
+      },
+      {
+        "path": "upstream/defold/engine/liveupdate/src/script_liveupdate.cpp",
+        "sha256": "c22228e16c8e8b9bf987c3a9d85854b3ea8a26e45f2a1d0bd1ec0dd701c97663"
+      },
+      {
+        "path": "upstream/defold/engine/render/src/render/render_script.cpp",
+        "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e"
+      },
+      {
+        "path": "upstream/defold/engine/render/src/render/render_script_camera.cpp",
+        "sha256": "d8af6b188f58110bd8c2e85238f86a9f4ad29dde6eff1a81a880b4137d8512bf"
+      },
+      {
+        "path": "upstream/defold/engine/script/src/script_hash.cpp",
+        "sha256": "0d76c65543191cc9866615ba37109e77f430a216c98dedf474d4f546f9f9ed10"
+      }
+    ]
+  },
+  "routeCount": 26,
+  "candidateCount": 24,
+  "blockedCount": 2,
+  "blockerCounts": {
+    "image-type-union-codec": 1,
+    "named-enum-domain-codec": 1
+  },
+  "bindings": [
+    {
+      "id": "script:resource.release",
+      "stableId": 366027815,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "release",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "ReleaseResource",
+      "sourceAnchor": "{\"release\",                 ReleaseResource}",
+      "callShapes": [
+        [
+          "Hash"
+        ],
+        [
+          "String"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:sound.set_group_gain",
+      "stableId": 497116905,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "set_group_gain",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Sound_SetGroupGain",
+      "sourceAnchor": "{\"set_group_gain\", Sound_SetGroupGain}",
+      "callShapes": [
+        [
+          "String",
+          "Number"
+        ],
+        [
+          "Hash",
+          "Number"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:font.add_font",
+      "stableId": 638454056,
+      "modulePath": [
+        "font"
+      ],
+      "member": "add_font",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "AddFont",
+      "sourceAnchor": "{\"add_font\", AddFont}",
+      "callShapes": [
+        [
+          "String",
+          "String"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Hash",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:hash_to_hex",
+      "stableId": 754452606,
+      "modulePath": [
+        "builtins"
+      ],
+      "member": "hash_to_hex",
+      "sourcePath": "engine/script/src/script_hash.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "HashToHex",
+      "sourceAnchor": "lua_pushcfunction(L, HashToHex);\n        lua_setglobal(L, \"hash_to_hex\")",
+      "callShapes": [
+        [
+          "Hash"
+        ]
+      ],
+      "resultCodec": "String",
+      "blocker": null
+    },
+    {
+      "id": "script:camera.get_view",
+      "stableId": 986113063,
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_view",
+      "sourcePath": "engine/render/src/render/render_script_camera.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "RenderScriptCamera_GetView",
+      "sourceAnchor": "{\"get_view\",                RenderScriptCamera_GetView}",
+      "callShapes": [
+        [],
+        [
+          "Url"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Nil"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "blocker": null
+    },
+    {
+      "id": "script:render.set_compute",
+      "stableId": 1089182856,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_compute",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "RenderScript_SetCompute",
+      "sourceAnchor": "{\"set_compute\",                     RenderScript_SetCompute}",
+      "callShapes": [
+        [],
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Nil"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:physics.get_gravity",
+      "stableId": 1242286766,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_gravity",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Physics_GetGravity",
+      "sourceAnchor": "{\"get_gravity\",     Physics_GetGravity}",
+      "callShapes": [
+        []
+      ],
+      "resultCodec": "Vector3",
+      "blocker": null
+    },
+    {
+      "id": "script:physics.set_gravity",
+      "stableId": 1277170138,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_gravity",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Physics_SetGravity",
+      "sourceAnchor": "{\"set_gravity\",     Physics_SetGravity}",
+      "callShapes": [
+        [
+          "Vector3"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:go.get_id",
+      "stableId": 1477563324,
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_id",
+      "sourcePath": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Script_GetId",
+      "sourceAnchor": "{\"get_id\",                  Script_GetId}",
+      "callShapes": [
+        [],
+        [
+          "String"
+        ]
+      ],
+      "resultCodec": "Hash",
+      "blocker": null
+    },
+    {
+      "id": "script:go.get_world_transform",
+      "stableId": 1495634860,
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_transform",
+      "sourcePath": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Script_GetWorldTransform",
+      "sourceAnchor": "{\"get_world_transform\",     Script_GetWorldTransform}",
+      "callShapes": [
+        [],
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Url"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "blocker": null
+    },
+    {
+      "id": "script:render.set_view",
+      "stableId": 1992852954,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_view",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "RenderScript_SetView",
+      "sourceAnchor": "{\"set_view\",                        RenderScript_SetView}",
+      "callShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:render.set_projection",
+      "stableId": 2094481018,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_projection",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "RenderScript_SetProjection",
+      "sourceAnchor": "{\"set_projection\",                  RenderScript_SetProjection}",
+      "callShapes": [
+        [
+          "Matrix4"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:go.world_to_local_transform",
+      "stableId": 2265777619,
+      "modulePath": [
+        "go"
+      ],
+      "member": "world_to_local_transform",
+      "sourcePath": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Script_WorldToLocalTransfrom",
+      "sourceAnchor": "{\"world_to_local_transform\",Script_WorldToLocalTransfrom}",
+      "callShapes": [
+        [
+          "Matrix4",
+          "String"
+        ],
+        [
+          "Matrix4",
+          "Hash"
+        ],
+        [
+          "Matrix4",
+          "Url"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "blocker": null
+    },
+    {
+      "id": "script:font.set_style",
+      "stableId": 2283853637,
+      "modulePath": [
+        "font"
+      ],
+      "member": "set_style",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "SetStyle",
+      "sourceAnchor": "{\"set_style\", SetStyle}",
+      "callShapes": [
+        [
+          "String",
+          "String",
+          "String"
+        ],
+        [
+          "Hash",
+          "String",
+          "String"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:camera.get_projection",
+      "stableId": 2326768707,
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_projection",
+      "sourcePath": "engine/render/src/render/render_script_camera.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "RenderScriptCamera_GetProjection",
+      "sourceAnchor": "{\"get_projection\",          RenderScriptCamera_GetProjection}",
+      "callShapes": [
+        [],
+        [
+          "Url"
+        ],
+        [
+          "Number"
+        ],
+        [
+          "Nil"
+        ]
+      ],
+      "resultCodec": "Matrix4",
+      "blocker": null
+    },
+    {
+      "id": "script:font.remove_font",
+      "stableId": 2369627843,
+      "modulePath": [
+        "font"
+      ],
+      "member": "remove_font",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "RemoveFont",
+      "sourceAnchor": "{\"remove_font\", RemoveFont}",
+      "callShapes": [
+        [
+          "String",
+          "String"
+        ],
+        [
+          "String",
+          "Hash"
+        ],
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "Hash",
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:sound.get_group_name",
+      "stableId": 2520029065,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_group_name",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Sound_GetGroupName",
+      "sourceAnchor": "{\"get_group_name\", Sound_GetGroupName}",
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ],
+      "resultCodec": "String",
+      "blocker": null
+    },
+    {
+      "id": "script:gui.delete_texture",
+      "stableId": 2687333512,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "delete_texture",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "LuaDeleteTexture",
+      "sourceAnchor": "{\"delete_texture\",  LuaDeleteTexture}",
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:gui.get_layout",
+      "stableId": 3027276460,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_layout",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "LuaGetLayout",
+      "sourceAnchor": "{\"get_layout\",        LuaGetLayout}",
+      "callShapes": [
+        []
+      ],
+      "resultCodec": "Hash",
+      "blocker": null
+    },
+    {
+      "id": "script:sound.get_group_gain",
+      "stableId": 3299788677,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_group_gain",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "Sound_GetGroupGain",
+      "sourceAnchor": "{\"get_group_gain\", Sound_GetGroupGain}",
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ],
+      "resultCodec": "Number",
+      "blocker": null
+    },
+    {
+      "id": "script:resource.set_sound",
+      "stableId": 3353499114,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_sound",
+      "sourcePath": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "SetSound",
+      "sourceAnchor": "{\"set_sound\",               SetSound}",
+      "callShapes": [
+        [
+          "Hash",
+          "String"
+        ],
+        [
+          "String",
+          "String"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:liveupdate.remove_mount",
+      "stableId": 3486747409,
+      "modulePath": [
+        "liveupdate"
+      ],
+      "member": "remove_mount",
+      "sourcePath": "engine/liveupdate/src/script_liveupdate.cpp",
+      "disposition": "blocked",
+      "family": "unsafe-named-enum-result-codec",
+      "backend": null,
+      "sourceSymbol": "dmLiveUpdate::Resource_RemoveMount",
+      "sourceAnchor": "{\"remove_mount\",                    dmLiveUpdate::Resource_RemoveMount}",
+      "callShapes": [],
+      "resultCodec": "None",
+      "blocker": "named-enum-domain-codec",
+      "blockerDetail": "liveupdate.remove_mount returns liveupdate.LIVEUPDATE. A number tag alone does not validate Defold's named-enum domain, so no arbitrary numeric result may cross this route until the pinned enum domain is generated and checked."
+    },
+    {
+      "id": "script:render.enable_material",
+      "stableId": 3764411239,
+      "modulePath": [
+        "render"
+      ],
+      "member": "enable_material",
+      "sourcePath": "engine/render/src/render/render_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "RenderScript_EnableMaterial",
+      "sourceAnchor": "{\"enable_material\",                 RenderScript_EnableMaterial}",
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ],
+      "resultCodec": "None",
+      "blocker": null
+    },
+    {
+      "id": "script:gui.get_font_resource",
+      "stableId": 4047461608,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_font_resource",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "LuaGetFontResource",
+      "sourceAnchor": "{\"get_font_resource\", LuaGetFontResource}",
+      "callShapes": [
+        [
+          "Hash"
+        ],
+        [
+          "String"
+        ]
+      ],
+      "resultCodec": "Hash",
+      "blocker": null
+    },
+    {
+      "id": "script:gui.set_texture_data",
+      "stableId": 4140093370,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_texture_data",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "disposition": "blocked",
+      "family": "unsafe-image-type-codec",
+      "backend": null,
+      "sourceSymbol": "LuaSetTextureData",
+      "sourceAnchor": "{\"set_texture_data\",LuaSetTextureData}",
+      "callShapes": [],
+      "resultCodec": "None",
+      "blocker": "image-type-union-codec",
+      "blockerDetail": "gui.set_texture_data accepts string|image.TYPE. The current ABI has no reviewed representation or enum-domain validation for image.TYPE, so exposing only the string arm would silently narrow the documented route."
+    },
+    {
+      "id": "script:gui.set_layout",
+      "stableId": 4235294552,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_layout",
+      "sourcePath": "engine/gui/src/gui_script.cpp",
+      "disposition": "candidate",
+      "family": "captured-lua-exact-codec",
+      "backend": "captured-lua-exact-call",
+      "sourceSymbol": "LuaSetLayout",
+      "sourceAnchor": "{\"set_layout\",        LuaSetLayout}",
+      "callShapes": [
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ]
+      ],
+      "resultCodec": "Boolean",
+      "blocker": null
+    }
+  ]
+}

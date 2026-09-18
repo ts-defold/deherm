@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -70,29 +70,37 @@ const MODULES = Object.freeze({
   },
 });
 
-const BLOCKED_HEADERS = Object.freeze({
-  "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h": {
-    blocker: "The pinned source-tree header includes <graphics/graphics_ddf.h>, but that generated SDK header is absent from the checkout.",
-    missingDependency: "graphics/graphics_ddf.h",
-    checkedPath: "upstream/defold/engine/graphics/src/graphics/graphics_ddf.h",
-  },
-});
+const PINNED_SDK_ROOT = "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk";
 
 const BLOCKED_SYMBOLS = Object.freeze({
+  "dmGraphics::Finalize": {
+    blocker: "Process-global graphics teardown is owned by the Defold engine lifecycle.",
+    category: "engine-lifecycle",
+    policy: "lifecycle-capability-required",
+    auditEvidence: [
+      [`${PINNED_SDK_ROOT}/sdk/include/dmsdk/graphics/graphics.h`, "void Finalize();"],
+      [`${PINNED_SDK_ROOT}/include/graphics/graphics_ddf.h`, "namespace dmGraphics"],
+      ["upstream/defold/engine/graphics/src/graphics.cpp", "void Finalize()"],
+    ],
+  },
   "dmLog::LogFinalize": {
     blocker: "Process-global logging teardown is not part of the default script-callable ABI.",
+    category: "engine-lifecycle",
     policy: "lifecycle-capability-required",
   },
   dmLogFinalize: {
     blocker: "Process-global logging teardown is not part of the default script-callable ABI.",
+    category: "engine-lifecycle",
     policy: "lifecycle-capability-required",
   },
   ProfileInitialize: {
     blocker: "Process-global profiler initialization is owned by the Defold engine lifecycle.",
+    category: "engine-lifecycle",
     policy: "lifecycle-capability-required",
   },
   ProfileFinalize: {
     blocker: "Process-global profiler teardown is owned by the Defold engine lifecycle.",
+    category: "engine-lifecycle",
     policy: "lifecycle-capability-required",
   },
 });
@@ -377,16 +385,6 @@ function stage(status, evidence, note = undefined) {
   return { status, evidence, ...(note ? { note } : {}) };
 }
 
-async function pathExists(path) {
-  try {
-    await access(path);
-    return true;
-  } catch (error) {
-    if (error?.code === "ENOENT") return false;
-    throw error;
-  }
-}
-
 async function writeOrCheck(outRoot, relativePath, content, check) {
   const path = resolve(outRoot, relativePath);
   if (check) {
@@ -425,47 +423,25 @@ export async function build() {
       definitions.push(await sourceEvidence(path, needle));
     }
 
-    const blocked = BLOCKED_HEADERS[declaration.header];
-    if (blocked) {
-      if (!headerContent.includes(`#include <${blocked.missingDependency}>`)) {
-        throw new Error(`Blocked dependency evidence disappeared from ${declaration.header}: ${blocked.missingDependency}`);
-      }
-      if (await pathExists(resolve(repositoryRoot, blocked.checkedPath))) {
-        throw new Error(`Blocked dependency is now present and must be re-evaluated: ${blocked.checkedPath}`);
-      }
-      reportEntries.push({
-        id: declaration.id,
-        symbol: declaration.name,
-        nativeSignature: declaration.type,
-        headerEvidence,
-        definitionEvidence: definitions,
-        emitted: false,
-        blocker: blocked,
-        stages: {
-          generated: stage("blocked", declaration.header, blocked.blocker),
-          compiled: stage("blocked-on-generation", declaration.header),
-          linked: stage("blocked-on-generation", declaration.header),
-          conformant: stage("blocked-on-generation", declaration.header),
-          retained: stage("blocked-on-generation", declaration.header),
-          typescriptCallable: stage("blocked-on-generation", declaration.header),
-        },
-      });
-      continue;
-    }
-
     const policyBlock = BLOCKED_SYMBOLS[declaration.name];
     if (policyBlock) {
+      const auditEvidence = [];
+      for (const [path, needle] of policyBlock.auditEvidence ?? []) {
+        auditEvidence.push(await sourceEvidence(path, needle));
+      }
       reportEntries.push({
         id: declaration.id,
         symbol: declaration.name,
         nativeSignature: declaration.type,
         headerEvidence,
-        definitionEvidence: definitions,
+        definitionEvidence: [...definitions, ...auditEvidence],
         emitted: false,
         blocker: policyBlock,
         stages: {
           generated: stage("blocked-by-policy", declaration.header, policyBlock.blocker),
-          compiled: stage("blocked-on-generation", declaration.header),
+          compiled: declaration.name === "dmGraphics::Finalize"
+            ? stage("header-compiled-policy-blocked", "native/dmsdk_scalar_blocker_audit.cpp", "The complete pinned packaged-SDK header, including generated graphics_ddf.h, compiles. This disproves the earlier missing-header claim; only lifecycle policy blocks exposure.")
+            : stage("blocked-on-generation", declaration.header),
           linked: stage("blocked-on-generation", declaration.header),
           conformant: stage("blocked-on-generation", declaration.header),
           retained: stage("blocked-on-generation", declaration.header),
@@ -571,8 +547,15 @@ export async function build() {
       nativeHermesRuntimeSmokeTested: 2,
       browserTypeScriptAdapterGenerated: reportEntries.filter(({ policy }) => policy?.browserJsCallable).length,
       browserAdapterBehaviorTested: reportEntries.filter(({ policy }) => policy?.browserJsCallable).length,
+      warmedDispatchIterations: 100000,
+      warmedDispatchObservedCppAllocations: 0,
       allTargetConformant: 0,
     },
+    sourceHashes: {
+      ir: sha256(await readFile(resolve(repositoryRoot, "bindings/generated/defold-sdk-ir.json"))),
+      classification: sha256(await readFile(resolve(repositoryRoot, "bindings/generated/defold-dmsdk-binding-patterns.json"))),
+    },
+    artifactHashes: Object.fromEntries([...artifacts.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([path, content]) => [path, sha256(content)])),
     artifacts: [...artifacts.keys()].sort(),
     declarations: reportEntries,
   };

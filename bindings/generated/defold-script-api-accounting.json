@@ -11,6 +11,7 @@
     "scalarDispatchSha256": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
     "valueBindingsSha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d",
     "fixedTupleBindingsSha256": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
+    "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
     "valueDefinitions": [
       {
         "definitionPath": "bindings/overrides/script-defold-value-bindings.json",
@@ -71,18 +72,18 @@
         "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
       }
     ],
-    "aggregateInputSha256": "fd08707fb3c79070086f64aaf4ae51e6aeae914794fb9a01187e745909db76fd"
+    "aggregateInputSha256": "f994e66eae3d45ee2930aa17f3e9deec77c31c4fc6de18f5b6733602b1944837"
   },
   "functionCount": 926,
   "categoryCounts": {
-    "executable-stable-id": 192,
+    "executable-stable-id": 262,
     "separate-module": 3,
-    "pending": 731
+    "pending": 661
   },
   "pendingByLoweringFamily": {
     "borrowed-handle": 415,
     "callback-lifecycle": 25,
-    "defold-value": 96,
+    "defold-value": 26,
     "dynamic-values": 14,
     "lua-table": 148,
     "multi-result": 13,
@@ -6848,14 +6849,26 @@
       "member": "get_aspect_ratio",
       "source": "doc/camera.lua",
       "line": 50,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4150761990,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6865,14 +6878,26 @@
       "member": "get_auto_aspect_ratio",
       "source": "doc/camera.lua",
       "line": 59,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 815384074,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6897,14 +6922,26 @@
       "member": "get_enabled",
       "source": "doc/camera.lua",
       "line": 83,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3707335843,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6914,14 +6951,26 @@
       "member": "get_far_z",
       "source": "doc/camera.lua",
       "line": 90,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4055682442,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6931,14 +6980,26 @@
       "member": "get_fov",
       "source": "doc/camera.lua",
       "line": 97,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1655100321,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6948,14 +7009,26 @@
       "member": "get_near_z",
       "source": "doc/camera.lua",
       "line": 104,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 94225445,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6965,14 +7038,26 @@
       "member": "get_orthographic_auto_zoom",
       "source": "doc/camera.lua",
       "line": 112,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 333496520,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6982,14 +7067,26 @@
       "member": "get_orthographic_mode",
       "source": "doc/camera.lua",
       "line": 119,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 780726310,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -6999,14 +7096,26 @@
       "member": "get_orthographic_zoom",
       "source": "doc/camera.lua",
       "line": 127,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1514123934,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7050,14 +7159,26 @@
       "member": "screen_to_world",
       "source": "doc/camera.lua",
       "line": 168,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4212113566,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7067,14 +7188,26 @@
       "member": "screen_xy_to_world",
       "source": "doc/camera.lua",
       "line": 193,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4124133706,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 3,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7084,14 +7217,26 @@
       "member": "set_aspect_ratio",
       "source": "doc/camera.lua",
       "line": 202,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2940707570,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7101,14 +7246,26 @@
       "member": "set_auto_aspect_ratio",
       "source": "doc/camera.lua",
       "line": 211,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3812610558,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7118,14 +7275,26 @@
       "member": "set_far_z",
       "source": "doc/camera.lua",
       "line": 218,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2081791798,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7135,14 +7304,26 @@
       "member": "set_fov",
       "source": "doc/camera.lua",
       "line": 225,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2734551893,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7152,14 +7333,26 @@
       "member": "set_near_z",
       "source": "doc/camera.lua",
       "line": 232,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2620899633,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7169,14 +7362,26 @@
       "member": "set_orthographic_mode",
       "source": "doc/camera.lua",
       "line": 239,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2873442090,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7186,14 +7391,26 @@
       "member": "set_orthographic_zoom",
       "source": "doc/camera.lua",
       "line": 247,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 294035082,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7203,14 +7420,26 @@
       "member": "world_to_screen",
       "source": "doc/camera.lua",
       "line": 269,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:url|number|nil"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3205603148,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7238,14 +7467,26 @@
       "member": "get_status",
       "source": "doc/collectionfactory.lua",
       "line": 119,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4238240607,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7273,14 +7514,26 @@
       "member": "set_prototype",
       "source": "doc/collectionfactory.lua",
       "line": 154,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3724333493,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7290,14 +7543,26 @@
       "member": "unload",
       "source": "doc/collectionfactory.lua",
       "line": 170,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1613326455,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7726,14 +7991,26 @@
       "member": "get_status",
       "source": "doc/factory.lua",
       "line": 93,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3501057803,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7761,14 +8038,26 @@
       "member": "set_prototype",
       "source": "doc/factory.lua",
       "line": 127,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3506659009,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7778,14 +8067,26 @@
       "member": "unload",
       "source": "doc/factory.lua",
       "line": 143,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 826508291,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7902,15 +8203,26 @@
       "member": "cancel_animations",
       "source": "doc/go.lua",
       "line": 401,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1183026732,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -7970,14 +8282,26 @@
       "member": "exists",
       "source": "doc/go.lua",
       "line": 464,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1311027776,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8021,14 +8345,26 @@
       "member": "get_parent",
       "source": "doc/go.lua",
       "line": 580,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3138865481,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8066,14 +8402,26 @@
       "member": "get_rotation",
       "source": "doc/go.lua",
       "line": 622,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 384109339,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8083,14 +8431,26 @@
       "member": "get_scale",
       "source": "doc/go.lua",
       "line": 643,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2771038861,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8100,14 +8460,26 @@
       "member": "get_scale_uniform",
       "source": "doc/go.lua",
       "line": 664,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3159049394,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8117,14 +8489,26 @@
       "member": "get_world_position",
       "source": "doc/go.lua",
       "line": 687,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2533378019,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8134,14 +8518,26 @@
       "member": "get_world_rotation",
       "source": "doc/go.lua",
       "line": 710,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2823544550,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8151,14 +8547,26 @@
       "member": "get_world_scale",
       "source": "doc/go.lua",
       "line": 735,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 457161058,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8168,14 +8576,26 @@
       "member": "get_world_scale_uniform",
       "source": "doc/go.lua",
       "line": 758,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1055817377,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8238,14 +8658,26 @@
       "member": "set_parent",
       "source": "doc/go.lua",
       "line": 920,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 593473189,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 3,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8325,15 +8757,26 @@
       "member": "set_scale",
       "source": "doc/go.lua",
       "line": 991,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:number|vector3",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2172419017,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8343,15 +8786,26 @@
       "member": "set_scale_xy",
       "source": "doc/go.lua",
       "line": 1016,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:number|vector3",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3492879989,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8361,14 +8815,26 @@
       "member": "update_world_transform",
       "source": "doc/go.lua",
       "line": 1043,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 16978861,
+        "requiredArgumentCount": 0,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -8378,14 +8844,26 @@
       "member": "world_to_local_position",
       "source": "doc/go.lua",
       "line": 1061,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2492984466,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11040,14 +11518,26 @@
       "member": "get_text",
       "source": "doc/label.lua",
       "line": 58,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1547809370,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11057,14 +11547,26 @@
       "member": "set_text",
       "source": "doc/label.lua",
       "line": 78,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1888249062,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11273,14 +11775,26 @@
       "member": "cancel",
       "source": "doc/model.lua",
       "line": 20,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3654418919,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11324,15 +11838,26 @@
       "member": "get_go",
       "source": "doc/model.lua",
       "line": 79,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1244796042,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11359,14 +11884,26 @@
       "member": "get_mesh_enabled",
       "source": "doc/model.lua",
       "line": 111,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2409536311,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11395,15 +11932,26 @@
       "member": "reset_constant",
       "source": "doc/model.lua",
       "line": 182,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 250460089,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11431,14 +11979,26 @@
       "member": "set_mesh_enabled",
       "source": "doc/model.lua",
       "line": 220,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2492040859,
+        "requiredArgumentCount": 3,
+        "maximumArgumentCount": 3,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11593,15 +12153,26 @@
       "member": "reset_constant",
       "source": "doc/particlefx.lua",
       "line": 102,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3569310218,
+        "requiredArgumentCount": 3,
+        "maximumArgumentCount": 3,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11611,15 +12182,26 @@
       "member": "set_constant",
       "source": "doc/particlefx.lua",
       "line": 129,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3047358751,
+        "requiredArgumentCount": 4,
+        "maximumArgumentCount": 4,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11664,15 +12246,26 @@
       "member": "destroy_joint",
       "source": "doc/physics.lua",
       "line": 122,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 350770,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11697,14 +12290,26 @@
       "member": "get_group",
       "source": "doc/physics.lua",
       "line": 158,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3971564819,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11732,15 +12337,26 @@
       "member": "get_joint_reaction_force",
       "source": "doc/physics.lua",
       "line": 180,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1120188142,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11750,15 +12366,26 @@
       "member": "get_joint_reaction_torque",
       "source": "doc/physics.lua",
       "line": 191,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1431636929,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11768,14 +12395,26 @@
       "member": "get_maskbit",
       "source": "doc/physics.lua",
       "line": 210,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1870095059,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11865,14 +12504,26 @@
       "member": "set_group",
       "source": "doc/physics.lua",
       "line": 429,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3028485791,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11882,14 +12533,26 @@
       "member": "set_hflip",
       "source": "doc/physics.lua",
       "line": 445,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2879664679,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11917,14 +12580,26 @@
       "member": "set_maskbit",
       "source": "doc/physics.lua",
       "line": 473,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3160984935,
+        "requiredArgumentCount": 3,
+        "maximumArgumentCount": 3,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11952,14 +12627,26 @@
       "member": "set_vflip",
       "source": "doc/physics.lua",
       "line": 524,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4109527981,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11969,14 +12656,26 @@
       "member": "update_mass",
       "source": "doc/physics.lua",
       "line": 539,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3925799645,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -11986,14 +12685,26 @@
       "member": "wakeup",
       "source": "doc/physics.lua",
       "line": 556,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 10300768,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 1,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -13518,14 +14229,26 @@
       "member": "pause",
       "source": "doc/sound.lua",
       "line": 196,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1502096075,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -13553,14 +14276,26 @@
       "member": "set_gain",
       "source": "doc/sound.lua",
       "line": 245,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4220725117,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -13587,14 +14322,26 @@
       "member": "set_pan",
       "source": "doc/sound.lua",
       "line": 277,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 665323993,
+        "requiredArgumentCount": 1,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -13640,15 +14387,26 @@
       "member": "reset_constant",
       "source": "doc/sprite.lua",
       "line": 74,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 4156456045,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -13658,14 +14416,26 @@
       "member": "set_hflip",
       "source": "doc/sprite.lua",
       "line": 96,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 1703142815,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -13675,14 +14445,26 @@
       "member": "set_vflip",
       "source": "doc/sprite.lua",
       "line": 118,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2316635445,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -14116,15 +14898,26 @@
       "member": "get_tile",
       "source": "doc/tilemap.lua",
       "line": 97,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 2810309289,
+        "requiredArgumentCount": 4,
+        "maximumArgumentCount": 4,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -14170,15 +14963,26 @@
       "member": "reset_constant",
       "source": "doc/tilemap.lua",
       "line": 173,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3635172296,
+        "requiredArgumentCount": 2,
+        "maximumArgumentCount": 2,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -14188,15 +14992,26 @@
       "member": "set_tile",
       "source": "doc/tilemap.lua",
       "line": 214,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 530608877,
+        "requiredArgumentCount": 5,
+        "maximumArgumentCount": 6,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {
@@ -14206,15 +15021,26 @@
       "member": "set_visible",
       "source": "doc/tilemap.lua",
       "line": 229,
-      "category": "pending",
-      "reason": {
-        "code": "lowering-family-awaits-executable-generator",
-        "loweringFamily": "defold-value",
-        "traits": [
-          "heterogeneous-union:string|hash",
-          "heterogeneous-union:string|hash|url"
-        ],
-        "unresolvedTypes": []
+      "category": "executable-stable-id",
+      "evidence": {
+        "generator": "url-lua-dispatch",
+        "stableId": 3195961805,
+        "requiredArgumentCount": 3,
+        "maximumArgumentCount": 3,
+        "targetSupport": {
+          "nativeDynamicHermes": {
+            "status": "generated-executable",
+            "requiredRoute": "JSI string/hash values stay distinct; structured URL objects use ScriptUrlArena; generated Lua dispatch calls dmScript::PushURL for full URLs and leaves string/hash shorthand unchanged for Defold caller-context resolution."
+          },
+          "nativeStaticHermes": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "A generated C ABI must pass all four exact 64-bit URL lanes into ScriptUrlArena; the current single-u64 kUrl form is rejected."
+          },
+          "html5BrowserHost": {
+            "status": "fail-closed-unverified",
+            "requiredRoute": "Browser glue must use an explicit four-u64 layout and generation-checked frame-local sidecar; no Number coercion or embind object marshaling."
+          }
+        }
       }
     },
     {

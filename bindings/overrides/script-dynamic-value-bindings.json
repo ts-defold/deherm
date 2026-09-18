@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "expectedRouteCount": 14,
+  "expectedCandidateCount": 11,
+  "maximumArgumentCount": 32,
+  "sources": [
+    {
+      "key": "bitop",
+      "path": "engine/script/src/bitop/bitop.c",
+      "sha256": "98b344b9d460859c9bfbfeb640c652242f8b823b5080494f63b381c11da1c5eb"
+    },
+    {
+      "key": "types",
+      "path": "engine/script/src/script_types.cpp",
+      "sha256": "c03d49b6265c9dac0597db5296ef3139c2c47ee334c8e3ad40813726c74cd1d2"
+    },
+    {
+      "key": "json",
+      "path": "engine/script/src/script_json.cpp",
+      "sha256": "a4ed92cdb7af30b282321841c39e98d7887f40971e69b544a31bf2fb837102a5"
+    },
+    {
+      "key": "pprint",
+      "path": "engine/script/src/script.cpp",
+      "sha256": "461ec16d3d835919070e45febe1a141fe36c2f4851b9f6511952f5c1bffc60a4"
+    },
+    {
+      "key": "socket-native",
+      "path": "engine/script/src/luasocket/luasocket.c",
+      "sha256": "0d6632d082e1790e2175d1aff21a8b22a8870e0bd4f66ba0337e65d188782c3f"
+    },
+    {
+      "key": "socket-html5",
+      "path": "engine/script/src/luasocket/luasocket_html5.c",
+      "sha256": "8dabb3f27f0b48040d0bd295b93704f12a8b80e648c4e67568fc2070594fc8ef"
+    }
+  ],
+  "routes": {
+    "script:bit.band": { "strategy": "exact-lua-call", "source": "bitop", "minimumArguments": 1, "resultMode": "number" },
+    "script:bit.bor": { "strategy": "exact-lua-call", "source": "bitop", "minimumArguments": 1, "resultMode": "number" },
+    "script:bit.bxor": { "strategy": "exact-lua-call", "source": "bitop", "minimumArguments": 1, "resultMode": "number" },
+    "script:socket.skip": { "strategy": "exact-lua-call", "source": "socket-native", "minimumArguments": 1, "resultMode": "variable-values" },
+    "script:types.is_hash": { "strategy": "exact-lua-type-query", "source": "types", "minimumArguments": 0, "resultMode": "boolean" },
+    "script:types.is_matrix4": { "strategy": "exact-lua-type-query", "source": "types", "minimumArguments": 0, "resultMode": "boolean" },
+    "script:types.is_quat": { "strategy": "exact-lua-type-query", "source": "types", "minimumArguments": 0, "resultMode": "boolean" },
+    "script:types.is_url": { "strategy": "exact-lua-type-query", "source": "types", "minimumArguments": 0, "resultMode": "boolean" },
+    "script:types.is_vector": { "strategy": "exact-lua-type-query", "source": "types", "minimumArguments": 0, "resultMode": "boolean" },
+    "script:types.is_vector3": { "strategy": "exact-lua-type-query", "source": "types", "minimumArguments": 0, "resultMode": "boolean" },
+    "script:types.is_vector4": { "strategy": "exact-lua-type-query", "source": "types", "minimumArguments": 0, "resultMode": "boolean" },
+    "script:json.decode": {
+      "strategy": "blocked",
+      "source": "json",
+      "blocker": "recursive-json-value-policy",
+      "detail": "Decoded arrays, objects, json.null, cycles, depth, entry limits, and table ownership require the bounded recursive-value schema before this route can preserve engine semantics."
+    },
+    "script:json.encode": {
+      "strategy": "blocked",
+      "source": "json",
+      "blocker": "recursive-json-value-policy",
+      "detail": "Encoding arbitrary Lua/JavaScript graphs plus Defold's option table and null sentinel cannot use a scalar or shallow-value codec soundly."
+    },
+    "script:pprint": {
+      "strategy": "blocked",
+      "source": "pprint",
+      "blocker": "recursive-log-side-effect-policy",
+      "detail": "The engine formatter recursively traverses tables, detects cycles, invokes tostring, truncates into a fixed log buffer, and emits through dmLog; no equivalent bounded graph/log adapter exists yet."
+    }
+  }
+}

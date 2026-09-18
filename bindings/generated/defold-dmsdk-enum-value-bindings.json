@@ -1,0 +1,484 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "bindings/generated/defold-sdk-ir.json",
+    "shapes": "bindings/generated/defold-dmsdk-abi-shapes.json",
+    "scalarReport": "bindings/generated/defold-dmsdk-scalar-thunks.json",
+    "overrides": "bindings/overrides/dmsdk-enum-value-bindings.json"
+  },
+  "sourceHashes": {
+    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+    "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
+    "scalarReport": "dffc13e11e53aa1147f32097f178270cf2b87995734c700cb9eebe99b4b9b6b2",
+    "overrides": "eed3a60e07d0657d54dfee53be4af7e006a93d380f9d25bceb639d1880d76538"
+  },
+  "policy": {
+    "cEnumRepresentation": "int32_t",
+    "enumInputs": "generated exact-domain validation before native call",
+    "uint64": "C uint64_t and native JSI bigint",
+    "allocation": "stack-only fixed slots; no glue allocation or ownership transfer",
+    "html5": "fail-closed until Wasm BigInt and linked-symbol matrix are validated"
+  },
+  "coverage": {
+    "baselineRuntimePending": 1361,
+    "previouslyEmittedScalar": 26,
+    "discovered": 10,
+    "emitted": 7,
+    "blocked": 3,
+    "hostRuntimeVerified": 4,
+    "engineContextPending": 3,
+    "remainingWithoutGeneratedAdapters": 1328
+  },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_jsi.hpp": "807f071eebeb91beac0d028e348ef1d19786f658f34138ed902283df5fb1c185",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h": "f79eb44ddeeb3e5d593956c18ad2c7bafc4118e9be55941c30fa8022687d461d",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value.h": "3f50b4abd81dc78757aa5742b7da6acff4dcb57dc1e423e622ac4dfc495cbe8f",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp": "1dc8c538101a625586394dcfb17f5c104b41d3b34e588a8dd16fa3eaf6183584",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_graphics.cpp": "4519d315ef92afb6ef248528fc1f9626c933f20cf7a65468a4837b6c7cc953c4",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp": "8657ae4ca94bbbc09bbf7e9f590728cce2290bccbcaf0e6d3b2da6cca9fda995",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp": "b157c0a5ad3b2bcc08a61671bcf43152703ff706c2733be7db866cc5b9763b8d",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp": "6da336fbb5b7c23992410f52b57d2ee037d36746c6dfb6b69fe0c6089f20db3f",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_sound.cpp": "78235899a9eb87dae11cfbb5d66a7be6f8cb03b5fd621aa93c9c9f5f2e17c372",
+    "packages/sdk/src/generated/dmsdk/enum-value.ts": "1e819070fc5b7289d5ff12980bd0325cc26535e50e9037dd928ac1fc51523db1"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_jsi.hpp",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_graphics.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_sound.cpp",
+    "packages/sdk/src/generated/dmsdk/enum-value.ts"
+  ],
+  "declarations": [
+    {
+      "id": "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99",
+      "symbol": "dmBuffer::GetSizeForValueType",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h",
+      "line": 363,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "scalar:u32(value:enum:dmBuffer::ValueType)",
+      "result": {
+        "role": "scalar:u32",
+        "direction": "value",
+        "nativeType": "uint32_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "type",
+          "role": "enum:dmBuffer::ValueType",
+          "direction": "value",
+          "nativeType": "dmBuffer::ValueType"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": true,
+      "bindingId": 0,
+      "wrapper": "deherm_dmsdk_enum_dm_buffer_get_size_for_value_type_i32",
+      "enumDomains": {
+        "type": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-runtime-test"
+      }
+    },
+    {
+      "id": "dmsdk:dmGameSystem::CompGuiUnregisterGetPropertyFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h:84:1146",
+      "symbol": "dmGameSystem::CompGuiUnregisterGetPropertyFn",
+      "kind": "function",
+      "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h",
+      "line": 84,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "enum:dmGameObject::Result(value:scalar:u64)",
+      "result": {
+        "role": "enum:dmGameObject::Result",
+        "direction": "value",
+        "nativeType": "dmGameObject::Result"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "property_hash",
+          "role": "scalar:u64",
+          "direction": "value",
+          "nativeType": "dmhash_t"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": false,
+      "blocker": "extension-registry-capability-required",
+      "stages": {
+        "generated": "blocked-by-policy",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      }
+    },
+    {
+      "id": "dmsdk:dmGameSystem::CompGuiUnregisterSetPropertyFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h:77:1145",
+      "symbol": "dmGameSystem::CompGuiUnregisterSetPropertyFn",
+      "kind": "function",
+      "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h",
+      "line": 77,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "enum:dmGameObject::Result(value:scalar:u64)",
+      "result": {
+        "role": "enum:dmGameObject::Result",
+        "direction": "value",
+        "nativeType": "dmGameObject::Result"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "property_hash",
+          "role": "scalar:u64",
+          "direction": "value",
+          "nativeType": "dmhash_t"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": false,
+      "blocker": "extension-registry-capability-required",
+      "stages": {
+        "generated": "blocked-by-policy",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      }
+    },
+    {
+      "id": "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398",
+      "symbol": "dmGraphics::GetInstalledAdapterFamily",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+      "line": 1159,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "enum:dmGraphics::AdapterFamily()",
+      "result": {
+        "role": "enum:dmGraphics::AdapterFamily",
+        "direction": "value",
+        "nativeType": "AdapterFamily"
+      },
+      "parameters": [],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": true,
+      "bindingId": 1,
+      "wrapper": "deherm_dmsdk_enum_dm_graphics_get_installed_adapter_family_v",
+      "enumDomains": {},
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "extension-link-pending",
+        "runtime": "engine-context-pending"
+      }
+    },
+    {
+      "id": "dmsdk:dmGraphics::InstallAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1711:1455",
+      "symbol": "dmGraphics::InstallAdapter",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+      "line": 1711,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "scalar:bool(value:enum:dmGraphics::AdapterFamily)",
+      "result": {
+        "role": "scalar:bool",
+        "direction": "value",
+        "nativeType": "bool"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "family",
+          "role": "enum:dmGraphics::AdapterFamily",
+          "direction": "value",
+          "nativeType": "AdapterFamily"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": false,
+      "blocker": "engine-lifecycle-capability-required",
+      "stages": {
+        "generated": "blocked-by-policy",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      }
+    },
+    {
+      "id": "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397",
+      "symbol": "dmLog::Setlevel",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "line": 339,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "scalar:void(value:enum:LogSeverity)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "severity",
+          "role": "enum:LogSeverity",
+          "direction": "value",
+          "nativeType": "LogSeverity"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": true,
+      "bindingId": 2,
+      "wrapper": "deherm_dmsdk_enum_dm_log_setlevel_i32",
+      "enumDomains": {
+        "severity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-runtime-test"
+      }
+    },
+    {
+      "id": "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391",
+      "symbol": "dmLogGetLevel",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "line": 310,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "enum:LogSeverity()",
+      "result": {
+        "role": "enum:LogSeverity",
+        "direction": "value",
+        "nativeType": "LogSeverity"
+      },
+      "parameters": [],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": true,
+      "bindingId": 3,
+      "wrapper": "deherm_dmsdk_enum_dm_log_get_level_v",
+      "enumDomains": {},
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-runtime-test"
+      }
+    },
+    {
+      "id": "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390",
+      "symbol": "dmLogSetLevel",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "line": 300,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "scalar:void(value:enum:LogSeverity)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "severity",
+          "role": "enum:LogSeverity",
+          "direction": "value",
+          "nativeType": "LogSeverity"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": true,
+      "bindingId": 4,
+      "wrapper": "deherm_dmsdk_enum_dm_log_set_level_i32",
+      "enumDomains": {
+        "severity": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-runtime-test"
+      }
+    },
+    {
+      "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2137",
+      "symbol": "dmSound::SetGroupMute",
+      "kind": "function",
+      "header": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
+      "line": 92,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "enum:dmSound::Result(value:scalar:u64,value:scalar:bool)",
+      "result": {
+        "role": "enum:dmSound::Result",
+        "direction": "value",
+        "nativeType": "Result"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "group",
+          "role": "scalar:u64",
+          "direction": "value",
+          "nativeType": "dmhash_t"
+        },
+        {
+          "position": 1,
+          "name": "mute",
+          "role": "scalar:bool",
+          "direction": "value",
+          "nativeType": "bool"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": true,
+      "bindingId": 5,
+      "wrapper": "deherm_dmsdk_enum_dm_sound_set_group_mute_u64_bool",
+      "enumDomains": {},
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "extension-link-pending",
+        "runtime": "engine-context-pending"
+      }
+    },
+    {
+      "id": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2138",
+      "symbol": "dmSound::ToggleGroupMute",
+      "kind": "function",
+      "header": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
+      "line": 101,
+      "primaryFamily": "enum-handle",
+      "families": [
+        "enum-handle"
+      ],
+      "shape": "enum:dmSound::Result(value:scalar:u64)",
+      "result": {
+        "role": "enum:dmSound::Result",
+        "direction": "value",
+        "nativeType": "Result"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "group",
+          "role": "scalar:u64",
+          "direction": "value",
+          "nativeType": "dmhash_t"
+        }
+      ],
+      "tranche": "next-enum-value-direct",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified"
+      ],
+      "emitted": true,
+      "bindingId": 6,
+      "wrapper": "deherm_dmsdk_enum_dm_sound_toggle_group_mute_u64",
+      "enumDomains": {},
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "extension-link-pending",
+        "runtime": "engine-context-pending"
+      }
+    }
+  ]
+}

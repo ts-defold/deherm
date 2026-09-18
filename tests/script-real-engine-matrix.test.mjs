@@ -12,6 +12,7 @@ const paths = {
   scalarRoutes: "bindings/generated/defold-script-scalar-dispatch.json",
   valueRoutes: "bindings/generated/defold-script-value-bindings.json",
   tupleRoutes: "bindings/generated/defold-script-fixed-tuples.json",
+  urlRoutes: "bindings/generated/defold-script-url-address-classification.json",
   scalarProbes: "bindings/generated/defold-script-real-engine-probes.json",
   valueProbes: "bindings/generated/defold-script-value-real-engine-probes.json",
   tupleProbes: "bindings/generated/defold-script-fixed-tuple-probes.json"
@@ -32,9 +33,11 @@ test("covers every generated executable route and keeps evidence SHA-bound", asy
   const scalarRoutes = JSON.parse(texts.scalarRoutes);
   const valueRoutes = JSON.parse(texts.valueRoutes);
   const tupleRoutes = JSON.parse(texts.tupleRoutes);
+  const urlRoutes = JSON.parse(texts.urlRoutes);
   const importedProbes = [...JSON.parse(texts.scalarProbes).probes, ...JSON.parse(texts.valueProbes).probes];
   const instrumentedProbes = importedProbes.filter(({ state }) => state !== "planned");
-  const expectedRouteCount = scalarRoutes.bindingCount + valueRoutes.bindingCount + tupleRoutes.bindingCount;
+  const expectedRouteCount = scalarRoutes.bindingCount + valueRoutes.bindingCount +
+    tupleRoutes.bindingCount + urlRoutes.routeCount;
   const expectedInstrumentedRouteCount = new Set(instrumentedProbes.map(({ id }) => id)).size;
   const expectedRuntimeVerifiedRouteCount = new Set(JSON.parse(texts.manifest).observations
     .filter(({ stage, result }) => stage === "runtime" && result === "passed")

@@ -9,10 +9,23 @@ export type DefoldHash<Name extends string = string> = bigint & {
 
 /** Parsed Defold URL value with exact-width engine hashes. */
 export interface DefoldUrl {
+  readonly __dehermUrlV1: true;
   readonly socket: DefoldHash;
+  /** Exact Defold ABI lane. Keep it even though engine APIs treat it as reserved. */
+  readonly reserved: DefoldHash;
   readonly path: DefoldHash;
   readonly fragment: DefoldHash;
   readonly [defoldUrlBrand]: true;
+}
+
+/** Construct an explicitly branded, exact-width Defold URL for the native bridge. */
+export function defoldUrl(
+  socket: DefoldHash,
+  path: DefoldHash,
+  fragment: DefoldHash,
+  reserved: DefoldHash = 0n as DefoldHash
+): DefoldUrl {
+  return { __dehermUrlV1: true, socket, reserved, path, fragment } as DefoldUrl;
 }
 
 /** A component on the current or a relative game object. */

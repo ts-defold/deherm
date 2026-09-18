@@ -18,115 +18,16 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { promisify } from "node:util";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import {
+  generatedScriptArtifacts,
+  scriptGenerationSteps,
+  scriptGeneratorSources,
+  scriptPinnedInputs
+} from "./lib/script-generator-pipeline.mjs";
 
 const execFileAsync = promisify(execFile);
 const defaultRepositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-
-const generatorSources = [
-  "scripts/import-defold-script-api.py",
-  "scripts/generate-script-sdk.mjs",
-  "scripts/classify-script-bindings.mjs",
-  "scripts/generate-script-binding-descriptors.mjs",
-  "scripts/generate-scalar-lua-dispatch.mjs",
-  "scripts/generate-script-value-bindings.mjs",
-  "scripts/generate-script-fixed-tuples.mjs",
-  "scripts/generate-static-hermes-vmath.mjs",
-  "scripts/generate-script-real-engine-probes.mjs",
-  "scripts/generate-script-value-real-engine-probes.mjs",
-  "scripts/generate-script-api-accounting.mjs",
-  "scripts/generate-borrowed-handle-classification.mjs",
-  "scripts/generate-script-table-tuple-schemas.mjs",
-  "scripts/generate-script-url-address-classification.mjs",
-  "scripts/generate-script-real-engine-matrix.mjs",
-  "scripts/generate-war-battles-real-engine-probes.mjs",
-  "scripts/lib/binding-identity.mjs",
-  "scripts/lib/script-semantic-overrides.mjs",
-  "packages/cli/src/names.mjs"
-];
-
-const pinnedInputs = [
-  "package.json",
-  "package-lock.json",
-  "upstream.lock",
-  "upstream/ref-doc.zip",
-  "bindings/lua-compat.json",
-  "bindings/overrides/script-api-semantic-overrides.json",
-  "bindings/overrides/script-borrowed-handle-classification.json",
-  "bindings/overrides/script-defold-handle-bindings.json",
-  "bindings/overrides/script-defold-value-bindings.json",
-  "bindings/overrides/script-fixed-tuple-registrations.json",
-  "bindings/overrides/script-factory-structured-bindings.json",
-  "bindings/overrides/script-go-current-instance-bindings.json",
-  "bindings/overrides/script-gui-structured-bindings.json",
-  "bindings/overrides/script-msg-structured-bindings.json",
-  "bindings/overrides/script-table-tuple-schema-overrides.json",
-  "bindings/overrides/script-url-address-classification.json",
-  "bindings/overrides/static-hermes-vmath.json",
-  "bindings/probes/defold-script-real-engine-matrix.json",
-  "bindings/probes/defold-script-real-engine-probes.json",
-  "bindings/probes/defold-script-value-real-engine-probes.json",
-  "bindings/probes/war-battles-script-real-engine-probes.json"
-];
-
-export const generatedScriptArtifacts = Object.freeze([
-  "bindings/generated/defold-script-api-inventory.json",
-  "knowledge/research/script-api-coverage.md",
-  "bindings/generated/defold-script-api-ir.json",
-  "packages/sdk/src/generated/script/types.ts",
-  "packages/sdk/src/generated/script/modules.ts",
-  "packages/sdk/src/generated/script/runtime.ts",
-  "packages/sdk/src/generated/script/index.ts",
-  "bindings/generated/defold-script-binding-patterns.json",
-  "bindings/generated/defold-script-binding-descriptors.json",
-  "defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp",
-  "bindings/generated/defold-script-scalar-dispatch.json",
-  "defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp",
-  "defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp",
-  "bindings/generated/defold-script-value-bindings.json",
-  "defold/defold_hermes/include/defold_hermes/generated_script_value_bindings.hpp",
-  "defold/defold_hermes/src/generated_script_value_bindings.cpp",
-  "packages/sdk/src/generated/script/value-target-support.ts",
-  "bindings/generated/defold-static-hermes-vmath.json",
-  "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
-  "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
-  "packages/static-hermes/src/generated/script-vmath.ts",
-  "bindings/generated/defold-script-fixed-tuples.json",
-  "bindings/generated/defold-script-fixed-tuple-probes.json",
-  "defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp",
-  "defold/defold_hermes/src/generated_script_fixed_tuples.cpp",
-  "packages/sdk/src/generated/script/fixed-tuple-target-support.ts",
-  "bindings/generated/defold-script-real-engine-probes.json",
-  "sample/src/generated/script-real-engine-probes.ts",
-  "bindings/generated/defold-script-value-real-engine-probes.json",
-  "sample/src/generated/script-value-real-engine-probes.ts",
-  "bindings/generated/defold-script-api-accounting.json",
-  "bindings/generated/defold-script-borrowed-handle-classification.json",
-  "bindings/generated/defold-script-table-tuple-schemas.json",
-  "knowledge/research/script-table-tuple-schema-classification.md",
-  "bindings/generated/defold-script-url-address-classification.json",
-  "bindings/generated/defold-script-real-engine-matrix.json",
-  "bindings/generated/war-battles-script-real-engine-probes.json",
-  "sample/src/generated/war-battles-script-real-engine-probes.ts"
-]);
-
-const generationSteps = [
-  ["python3", ["scripts/import-defold-script-api.py"]],
-  [process.execPath, ["scripts/generate-script-sdk.mjs"]],
-  [process.execPath, ["scripts/classify-script-bindings.mjs"]],
-  [process.execPath, ["scripts/generate-script-binding-descriptors.mjs"]],
-  [process.execPath, ["scripts/generate-scalar-lua-dispatch.mjs"]],
-  [process.execPath, ["scripts/generate-script-value-bindings.mjs"]],
-  [process.execPath, ["scripts/generate-static-hermes-vmath.mjs"]],
-  [process.execPath, ["scripts/generate-script-fixed-tuples.mjs"]],
-  [process.execPath, ["scripts/generate-script-real-engine-probes.mjs"]],
-  [process.execPath, ["scripts/generate-script-value-real-engine-probes.mjs"]],
-  [process.execPath, ["scripts/generate-script-api-accounting.mjs"]],
-  [process.execPath, ["scripts/generate-borrowed-handle-classification.mjs"]],
-  [process.execPath, ["scripts/generate-script-table-tuple-schemas.mjs"]],
-  [process.execPath, ["scripts/generate-script-url-address-classification.mjs"]],
-  [process.execPath, ["scripts/generate-script-real-engine-matrix.mjs"]],
-  [process.execPath, ["scripts/generate-war-battles-real-engine-probes.mjs"]]
-];
+export { generatedScriptArtifacts };
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -161,7 +62,7 @@ async function copyRelative(sourceRoot, targetRoot, relativePath) {
 
 async function sourceEvidencePaths(repositoryRoot) {
   const result = new Set();
-  for (const inputPath of pinnedInputs.filter((entry) => entry.startsWith("bindings/overrides/"))) {
+  for (const inputPath of scriptPinnedInputs.filter((entry) => entry.startsWith("bindings/overrides/"))) {
     const value = JSON.parse(await readFile(path.join(repositoryRoot, inputPath), "utf8"));
     if (inputPath.endsWith("script-api-semantic-overrides.json")) {
       for (const override of value.overrides ?? []) {
@@ -175,7 +76,31 @@ async function sourceEvidencePaths(repositoryRoot) {
       }
       continue;
     }
+    if (inputPath.endsWith("script-callback-lifecycle-policies.json")) {
+      for (const evidence of value.sourceEvidence ?? []) {
+        result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sourceEvidence.path`)}`);
+      }
+      continue;
+    }
     if (inputPath.endsWith("script-fixed-tuple-registrations.json")) {
+      for (const evidence of value.sources ?? []) {
+        result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sources.path`)}`);
+      }
+      continue;
+    }
+    if (inputPath.endsWith("script-dynamic-value-bindings.json")) {
+      for (const evidence of value.sources ?? []) {
+        result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sources.path`)}`);
+      }
+      continue;
+    }
+    if (inputPath.endsWith("script-defold-value-tail-bindings.json")) {
+      for (const evidence of value.sources ?? []) {
+        result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sources.path`)}`);
+      }
+      continue;
+    }
+    if (inputPath.endsWith("script-overload-dispatch.json")) {
       for (const evidence of value.sources ?? []) {
         result.add(`upstream/defold/${confinedRelativePath(evidence.path, `${inputPath}.sources.path`)}`);
       }
@@ -331,13 +256,14 @@ function ids(rows, label) {
 
 async function validateRouteProvenance(cleanRoot) {
   const load = async (relativePath) => JSON.parse(await readFile(path.join(cleanRoot, relativePath), "utf8"));
-  const [inventory, ir, accounting, scalar, value, tuple] = await Promise.all([
+  const [inventory, ir, accounting, scalar, value, tuple, url] = await Promise.all([
     load("bindings/generated/defold-script-api-inventory.json"),
     load("bindings/generated/defold-script-api-ir.json"),
     load("bindings/generated/defold-script-api-accounting.json"),
     load("bindings/generated/defold-script-scalar-dispatch.json"),
     load("bindings/generated/defold-script-value-bindings.json"),
-    load("bindings/generated/defold-script-fixed-tuples.json")
+    load("bindings/generated/defold-script-fixed-tuples.json"),
+    load("bindings/generated/defold-script-url-address-classification.json")
   ]);
   assert(inventory.countsByKind?.function === 926, `Pinned inventory contains ${inventory.countsByKind?.function} functions, expected 926`);
   assert(ir.counts?.functions === 926, `Clean IR contains ${ir.counts?.functions} functions, expected 926`);
@@ -352,7 +278,12 @@ async function validateRouteProvenance(cleanRoot) {
   for (const name of inventoryNames) assert(irRawNames.has(name), `Script IR is missing pinned function ${name}`);
   assert(irIds.size === 926 && accountingIds.size === 926, "Full script route ledger must contain exactly 926 unique IDs");
   for (const id of irIds) assert(accountingIds.has(id), `Accounting is missing generated route ${id}`);
-  const executableIds = [...ids(scalar.bindings, "scalar routes"), ...ids(value.bindings, "value routes"), ...ids(tuple.bindings, "fixed tuple routes")];
+  const executableIds = [
+    ...ids(scalar.bindings, "scalar routes"),
+    ...ids(value.bindings, "value routes"),
+    ...ids(tuple.bindings, "fixed tuple routes"),
+    ...ids(url.rows, "URL routes")
+  ];
   assert(new Set(executableIds).size === executableIds.length, "Executable route generators overlap");
   for (const id of executableIds) assert(irIds.has(id), `Generated executable route is absent from pinned IR: ${id}`);
   const modulesSource = await readFile(path.join(cleanRoot, "packages/sdk/src/generated/script/modules.ts"), "utf8");
@@ -373,6 +304,7 @@ async function validateRouteProvenance(cleanRoot) {
     scalarRouteCount: scalar.bindingCount,
     valueRouteCount: value.bindingCount,
     fixedTupleRouteCount: tuple.bindingCount,
+    urlRouteCount: url.routeCount,
     defoldRevision: ir.defoldRevision
   };
 }
@@ -393,7 +325,7 @@ export async function runScriptCleanRoomRegeneration(options = {}) {
   try {
     const evidencePaths = await sourceEvidencePaths(repositoryRoot);
     const pinnedGroundTruth = await validatePinnedGroundTruth(repositoryRoot, evidencePaths);
-    const cleanInputs = [...generatorSources, ...pinnedInputs, ...evidencePaths];
+    const cleanInputs = [...scriptGeneratorSources, ...scriptPinnedInputs, ...evidencePaths];
     for (const relativePath of cleanInputs) await copyRelative(repositoryRoot, cleanRoot, relativePath);
     const locked = JSON.parse(await readFile(path.join(repositoryRoot, "package-lock.json"), "utf8"));
     const installedFflate = JSON.parse(await readFile(path.join(repositoryRoot, "node_modules/fflate/package.json"), "utf8"));
@@ -405,8 +337,9 @@ export async function runScriptCleanRoomRegeneration(options = {}) {
     for (const relativePath of generatedScriptArtifacts) {
       await mkdir(path.dirname(path.join(cleanRoot, relativePath)), { recursive: true });
     }
-    for (const [command, args] of generationSteps) {
-      await execFileAsync(command, args, { cwd: cleanRoot, maxBuffer: 16 * 1024 * 1024 });
+    for (const step of scriptGenerationSteps) {
+      const command = step.runtime === "node" ? process.execPath : step.runtime;
+      await execFileAsync(command, [step.script], { cwd: cleanRoot, maxBuffer: 16 * 1024 * 1024 });
     }
     assertGeneratedArtifactInventory(await discoverGeneratedScriptArtifacts(cleanRoot));
     assertGeneratedArtifactInventory(await discoverGeneratedScriptArtifacts(repositoryRoot));
@@ -431,7 +364,7 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown argument: ${unknown[0]}`);
   const report = await runScriptCleanRoomRegeneration({ keep: process.argv.includes("--keep") });
   console.log(`Clean-room regeneration verified ${report.routeCount} script routes across ${report.artifactCount} byte-identical artifacts.`);
-  console.log(`Executable generated routes: ${report.executableRouteCount} (${report.scalarRouteCount} scalar, ${report.valueRouteCount} value, ${report.fixedTupleRouteCount} fixed tuple).`);
+  console.log(`Executable generated routes: ${report.executableRouteCount} (${report.scalarRouteCount} scalar, ${report.valueRouteCount} value, ${report.fixedTupleRouteCount} fixed tuple, ${report.urlRouteCount} URL/address).`);
   console.log(`Pinned input fingerprint: ${report.aggregateInputSha256}`);
   if (report.cleanRoot) console.log(`Clean room retained at ${report.cleanRoot}`);
 }

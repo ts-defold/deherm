@@ -1,0 +1,832 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "the exact callback-lifecycle family classified from the pinned Defold script IR",
+  "coverageClaim": "generated lifecycle metadata and fixed-capacity registry semantics only; no route-specific engine callback adapter or payload codec is executable",
+  "allocationClaim": "Registry construction allocates fixed storage; retain, invoke, cancel, owner cancellation, and teardown have no heap fallback",
+  "routeCount": 25,
+  "registryEligibleRouteCount": 23,
+  "higherOrderClosureRouteCount": 2,
+  "lifetimeCounts": {
+    "higher-order-closure": 2,
+    "one-shot": 14,
+    "persistent-replaceable": 5,
+    "terminal-event": 4
+  },
+  "threadAffinityCounts": {
+    "browser-main-thread": 1,
+    "engine-job-completion-thread": 1,
+    "engine-message-dispatch-thread": 3,
+    "engine-update-thread": 15,
+    "engine-window-event-thread": 1,
+    "lua-caller-thread": 2,
+    "lua-erroring-thread": 1,
+    "render-script-thread": 1
+  },
+  "targetSupport": {
+    "nativeDynamicHermes": "generated-registry-metadata-only; each route remains blocked until its reviewed engine adapter and payload codecs are implemented",
+    "nativeStaticHermes": "fail-closed-unverified",
+    "html5BrowserHost": "fail-closed-unverified"
+  },
+  "inputEvidence": {
+    "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
+    "policySha256": "da83fd6b1b32c99dfa3621531184b93d494b12c0625237af61f5671893fd4e59",
+    "defoldSources": [
+      {
+        "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
+        "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/components/comp_collection_proxy.cpp",
+        "sha256": "9a614c4fd4a692ab141f483b257d1582105187f1797d03cc4f339d5346fc37c1"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/components/comp_sprite.cpp",
+        "sha256": "2e6d39fe1a3a8127c9ab7c97ed34b2e1ebab739cdbf5f9f95424d034e647c45d"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_world.cpp",
+        "sha256": "a0e72844d9e70b1aa580271e62181edeea39bbc43f8a5d9f81aa20814ad909fc"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_collection_factory.cpp",
+        "sha256": "09196c2b2de4833ddc83ee522612a404228265a16b212304c7121b894856579c"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_collectionproxy.cpp",
+        "sha256": "5b8ddb008d2895a95d8be0dda1ee88a3e00e154545766234acfc3d944ec0477a"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_factory.cpp",
+        "sha256": "df20de4ae9494abf875e71f468b56b732add418c770f745aaeb79d0b0affbfbb"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_font.cpp",
+        "sha256": "cae8b39b15ef1c230903626e9ffa8519c071bf077af371e35ae96303abd9e1da"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_http.cpp",
+        "sha256": "46966d92bb8adec792db80c2c1d42eedca12bebccd07f85d929c537ef458128d"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_model.cpp",
+        "sha256": "db2a545e938bb057f0e61a1952c8b7816740a6666f87db37653d31778a7d3765"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_particlefx.cpp",
+        "sha256": "24196c82809ab89c82e04b2a0a3978d8e0424a7b2a7763774ab61b362150f9f5"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+        "sha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+        "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+        "sha256": "0bc38669c545e66b9a4689a82758c119165adf77e3f093e9415469c94d618053"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sprite.cpp",
+        "sha256": "f3359a8373921ef8d7e38924dd142164e9cccac430548bf7ae35a065f5b177ca"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_sys_gamesys.cpp",
+        "sha256": "fb7496dad015c2d13505dcf60089a4456d7fa68c5a0bc3c0e19b38292931e5b7"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_window.cpp",
+        "sha256": "03b4962f55c626f2b73ebe978035be93215eb6e0ef91802bf8c8f12c81c2544b"
+      },
+      {
+        "path": "upstream/defold/engine/gui/src/gui_script.cpp",
+        "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
+      },
+      {
+        "path": "upstream/defold/engine/liveupdate/src/script_liveupdate.cpp",
+        "sha256": "c22228e16c8e8b9bf987c3a9d85854b3ea8a26e45f2a1d0bd1ec0dd701c97663"
+      },
+      {
+        "path": "upstream/defold/engine/render/src/render/render_script.cpp",
+        "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e"
+      },
+      {
+        "path": "upstream/defold/engine/script/src/luasocket/except.c",
+        "sha256": "0243d84fbbd01cd9c8c437e7d6fa651c9d02cda8ab6bffebfb3eae0db8abe3f6"
+      },
+      {
+        "path": "upstream/defold/engine/script/src/script_html5_js.cpp",
+        "sha256": "42eea1b18a557ce9dd507eff3c1a88ab713d2a5eb3e5b3b1a60190ee3cc61f07"
+      },
+      {
+        "path": "upstream/defold/engine/script/src/script_sys.cpp",
+        "sha256": "2a0e6e118f5efa2080954ee11ee1c0b82461bda2470eb1975f1dfa2eda4db3c4"
+      }
+    ],
+    "aggregateInputSha256": "06407c626916b53cb3fb852d2a780d3777ff516d7564c5dba88166c2667be464"
+  },
+  "routes": [
+    {
+      "id": "script:http.request",
+      "callbackParameter": "callback",
+      "lifetime": "terminal-event",
+      "owner": "http-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-message-dispatch-thread",
+      "completion": "progress responses may repeat; the complete response is terminal",
+      "errorBehavior": "setup failures log and destroy the native request; message post failure can make the requester unreachable",
+      "cancellation": "request teardown or script-instance teardown releases the instance callback reference",
+      "payloadBlockers": [
+        "http.response table codec",
+        "progress/terminal message discriminator",
+        "request cancellation adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_http.cpp",
+          "anchors": [
+            "static int Http_Request",
+            "static HttpCallbackResult ResponseCallback",
+            "HTTP_RESPONSE_EVENT_PROGRESS",
+            "HTTP_RESPONSE_EVENT_COMPLETE"
+          ]
+        }
+      ],
+      "stableId": 125289847,
+      "registryEligible": true
+    },
+    {
+      "id": "script:bullet3d.world.cast_ray_async",
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "bullet-world-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "after the owning Bullet world has completed the queued post-step query",
+      "errorBehavior": "argument/setup errors reject synchronously; callback invocation errors are reported by dmScript::PCall",
+      "cancellation": "world destruction or script-module finalization destroys the pending callback without invocation",
+      "payloadBlockers": [
+        "borrowed Bullet world producer",
+        "bullet3d.world.cast_result[] table codec"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_world.cpp",
+          "anchors": [
+            "static int World_CastRayAsync",
+            "static void DispatchAsyncCastResults",
+            "static void DestroyAsyncCastRequest"
+          ]
+        }
+      ],
+      "stableId": 214949730,
+      "registryEligible": true
+    },
+    {
+      "id": "script:socket.newtry",
+      "callbackParameter": "finalizer",
+      "lifetime": "higher-order-closure",
+      "owner": "returned-lua-closure",
+      "invocationContext": "synchronous-lua-caller",
+      "threadAffinity": "lua-caller-thread",
+      "completion": "returned closure calls finalizer only when its first argument is falsy, then rethrows a wrapped Lua error",
+      "errorBehavior": "Lua varargs and lua_error control flow are part of the observable API",
+      "cancellation": "Lua closure garbage collection releases its upvalue",
+      "payloadBlockers": [
+        "not a retained engine callback",
+        "Lua higher-order closure and varargs semantics"
+      ],
+      "machineBlock": "blocked-higher-order-lua-closure",
+      "evidence": [
+        {
+          "path": "engine/script/src/luasocket/except.c",
+          "anchors": [
+            "static int global_newtry",
+            "static int finalize",
+            "lua_pushcclosure"
+          ]
+        }
+      ],
+      "stableId": 407150266,
+      "registryEligible": false
+    },
+    {
+      "id": "script:collectionproxy.load",
+      "callbackParameter": "callback",
+      "lifetime": "terminal-event",
+      "owner": "collection-proxy-load",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "proxy_ready or proxy_error is terminal; proxy_loading may invoke repeatedly before it",
+      "errorBehavior": "post failure schedules script unref before raising a Lua error",
+      "cancellation": "requester/proxy teardown posts an unref for the retained instance callback",
+      "payloadBlockers": [
+        "URL codec",
+        "collectionproxy.load_data table codec",
+        "terminal message adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_collectionproxy.cpp",
+          "anchors": [
+            "static int CollectionProxy_Load",
+            "dmGameObject::PostScriptUnrefMessage"
+          ]
+        },
+        {
+          "path": "engine/gamesys/src/gamesys/components/comp_collection_proxy.cpp",
+          "anchors": [
+            "proxy_loading",
+            "proxy_ready",
+            "proxy_error",
+            "PostProxyErrorMessageAndUnrefCallback"
+          ]
+        }
+      ],
+      "stableId": 620577334,
+      "registryEligible": true
+    },
+    {
+      "id": "script:sound.play",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "sound-voice",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-message-dispatch-thread",
+      "completion": "sound_done or sound_stopped terminal message",
+      "errorBehavior": "message delivery failure must unref the retained instance function",
+      "cancellation": "manual stop is a terminal callback; component/requester teardown releases callback references",
+      "payloadBlockers": [
+        "URL codec",
+        "sound.play_properties table codec",
+        "sound.play_completion message codec"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_sound.cpp",
+          "anchors": [
+            "static int Sound_Play",
+            "dmScript::RefInInstance",
+            "sound_stopped"
+          ]
+        }
+      ],
+      "stableId": 900417529,
+      "registryEligible": true
+    },
+    {
+      "id": "script:physics.set_event_listener",
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "physics-world",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "persistent batches of physics events",
+      "errorBehavior": "invalid argument type rejects synchronously",
+      "cancellation": "nil, replacement, world teardown, or runtime teardown destroys the prior callback",
+      "payloadBlockers": [
+        "physics.event[] recursive table codec",
+        "physics-world listener adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_physics.cpp",
+          "anchors": [
+            "static int Physics_SetEventListener",
+            "dmScript::DestroyCallback(cbk)",
+            "SetCollisionWorldCallback"
+          ]
+        }
+      ],
+      "stableId": 1107212821,
+      "registryEligible": true
+    },
+    {
+      "id": "script:html5.set_interaction_listener",
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "html5-interaction-singleton",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "browser-main-thread",
+      "completion": "persistent DOM click, keyup, and touchend events",
+      "errorBehavior": "callback creation failure raises a Lua error",
+      "cancellation": "nil, replacement, or HTML5 module finalization removes DOM listeners and destroys the prior callback",
+      "payloadBlockers": [
+        "HTML5-only host hook",
+        "browser callback registry integration"
+      ],
+      "evidence": [
+        {
+          "path": "engine/script/src/script_html5_js.cpp",
+          "anchors": [
+            "static int Html5_SetInteractionListener",
+            "document.removeEventListener",
+            "dmScript::DestroyCallback(g_InteractionCallback)"
+          ]
+        }
+      ],
+      "stableId": 1164539114,
+      "registryEligible": true
+    },
+    {
+      "id": "script:model.play_anim",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "model-animation",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "completed once-playback animation",
+      "errorBehavior": "missing animation destroys callback and context; invocation/setup errors are logged",
+      "cancellation": "cancel or component teardown destroys context without callback invocation",
+      "payloadBlockers": [
+        "URL codec",
+        "model.play_properties table codec",
+        "model completion message codec"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_model.cpp",
+          "anchors": [
+            "static int LuaModelComp_PlayAnim",
+            "static void ScriptModelAnimationCallback",
+            "dmScript::DestroyCallback"
+          ]
+        }
+      ],
+      "stableId": 1281580293,
+      "registryEligible": true
+    },
+    {
+      "id": "script:window.set_listener",
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "window-singleton",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-window-event-thread",
+      "completion": "persistent window events",
+      "errorBehavior": "callback creation failure raises a Lua error",
+      "cancellation": "nil, replacement, window finalization, or runtime teardown destroys the prior callback",
+      "payloadBlockers": [
+        "window.event_data table codec",
+        "window singleton adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_window.cpp",
+          "anchors": [
+            "static int SetListener",
+            "static void RunCallback",
+            "dmScript::DestroyCallback"
+          ]
+        }
+      ],
+      "stableId": 1282520203,
+      "registryEligible": true
+    },
+    {
+      "id": "script:go.animate",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "game-object-property-animation",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "finished one-shot animation; loop playback retains until cancellation/replacement",
+      "errorBehavior": "validation errors reject synchronously; callback errors are reported by dmScript::InvokeCallback",
+      "cancellation": "cancel/replacement/finalization destroys callback without completion invocation",
+      "payloadBlockers": [
+        "URL codec",
+        "property/easing overload dispatch",
+        "Defold value codecs"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gameobject/src/gameobject/gameobject_script.cpp",
+          "anchors": [
+            "int Script_Animate",
+            "static void LuaAnimationStopped",
+            "dmScript::DestroyCallback(cbk)"
+          ]
+        }
+      ],
+      "stableId": 1302980535,
+      "registryEligible": true
+    },
+    {
+      "id": "script:gui.animate",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "gui-node-property-animation",
+      "invocationContext": "captured-gui-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "finished one-shot GUI animation; loop playback retains until cancellation/replacement",
+      "errorBehavior": "validation errors reject synchronously; callback errors are reported by dmScript::InvokeCallback",
+      "cancellation": "cancel/replacement/scene teardown releases node and callback references",
+      "payloadBlockers": [
+        "GUI node handle",
+        "property/easing overload dispatch",
+        "Defold value codecs"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gui/src/gui_script.cpp",
+          "anchors": [
+            "static int LuaAnimate",
+            "static void LuaAnimationComplete",
+            "dmScript::DestroyCallback(cbk)"
+          ]
+        }
+      ],
+      "stableId": 1559320978,
+      "registryEligible": true
+    },
+    {
+      "id": "script:factory.load",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "factory-load",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "factory resource load completion",
+      "errorBehavior": "registration failure unrefs callback, self, and URL before raising a Lua error",
+      "cancellation": "component/instance teardown owns cancellation and release",
+      "payloadBlockers": [
+        "URL argument/result codec",
+        "component load completion adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_factory.cpp",
+          "anchors": [
+            "static int FactoryComp_Load",
+            "CompFactoryLoad",
+            "dmScript::Unref"
+          ]
+        }
+      ],
+      "stableId": 1808015212,
+      "registryEligible": true
+    },
+    {
+      "id": "script:gui.play_flipbook",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "gui-node-flipbook",
+      "invocationContext": "captured-gui-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "flipbook animation completion",
+      "errorBehavior": "invalid animation rejects synchronously",
+      "cancellation": "cancel/replacement/scene teardown releases node and callback references",
+      "payloadBlockers": [
+        "GUI node handle",
+        "play_properties table codec"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gui/src/gui_script.cpp",
+          "anchors": [
+            "static int LuaPlayFlipbook",
+            "static void LuaAnimationComplete",
+            "PlayNodeFlipbookAnim"
+          ]
+        }
+      ],
+      "stableId": 1867420328,
+      "registryEligible": true
+    },
+    {
+      "id": "script:render.set_listener",
+      "callbackParameter": "callback",
+      "lifetime": "persistent-replaceable",
+      "owner": "render-context",
+      "invocationContext": "captured-render-script-instance",
+      "threadAffinity": "render-script-thread",
+      "completion": "persistent render context lost/restored events",
+      "errorBehavior": "invalid argument type rejects synchronously",
+      "cancellation": "nil, replacement, render-context teardown, or runtime teardown destroys the prior callback",
+      "payloadBlockers": [
+        "render-context listener adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/render/src/render/render_script.cpp",
+          "anchors": [
+            "static int RenderScript_SetListener",
+            "dmScript::DestroyCallback(cbk)"
+          ]
+        }
+      ],
+      "stableId": 2106330303,
+      "registryEligible": true
+    },
+    {
+      "id": "script:sprite.play_flipbook",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "sprite-animation",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-message-dispatch-thread",
+      "completion": "flipbook animation completion",
+      "errorBehavior": "message delivery failure/replacement must unref the retained instance function",
+      "cancellation": "replacement/cancel/component teardown posts an unref without completion invocation",
+      "payloadBlockers": [
+        "URL codec",
+        "sprite.play_properties table codec",
+        "sprite animation_done message codec"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_sprite.cpp",
+          "anchors": [
+            "int SpriteComp_PlayFlipBook",
+            "dmScript::RefInInstance"
+          ]
+        },
+        {
+          "path": "engine/gamesys/src/gamesys/components/comp_sprite.cpp",
+          "anchors": [
+            "m_FunctionRef",
+            "PostScriptUnrefMessage"
+          ]
+        }
+      ],
+      "stableId": 2116188218,
+      "registryEligible": true
+    },
+    {
+      "id": "script:socket.protect",
+      "callbackParameter": "func",
+      "lifetime": "higher-order-closure",
+      "owner": "returned-lua-closure",
+      "invocationContext": "synchronous-lua-caller",
+      "threadAffinity": "lua-caller-thread",
+      "completion": "returned closure synchronously forwards varargs/results and converts wrapped errors into nil,error",
+      "errorBehavior": "Lua pcall, LUA_MULTRET, and wrapped-table discrimination are part of the observable API",
+      "cancellation": "Lua closure garbage collection releases its upvalue",
+      "payloadBlockers": [
+        "not a retained engine callback",
+        "Lua higher-order closure, varargs, and multi-result semantics"
+      ],
+      "machineBlock": "blocked-higher-order-lua-closure",
+      "evidence": [
+        {
+          "path": "engine/script/src/luasocket/except.c",
+          "anchors": [
+            "static int global_protect",
+            "static int protected_",
+            "LUA_MULTRET"
+          ]
+        }
+      ],
+      "stableId": 2218837340,
+      "registryEligible": false
+    },
+    {
+      "id": "script:sys.load_buffer_async",
+      "callbackParameter": "status_callback",
+      "lifetime": "one-shot",
+      "owner": "buffer-load-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "worker job reaches finished or an error status, then update dispatches once",
+      "errorBehavior": "callback setup/PCall failure is reported and the request is still destroyed",
+      "cancellation": "module finalization cancels/joins jobs, destroys callbacks, and frees requests",
+      "payloadBlockers": [
+        "buffer handle",
+        "sys.load_buffer_result table codec",
+        "job-to-owner-thread handoff adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_sys_gamesys.cpp",
+          "anchors": [
+            "static int Sys_LoadBufferAsync",
+            "static bool HandleRequestCompleted",
+            "void ScriptSysGameSysFinalize"
+          ]
+        }
+      ],
+      "stableId": 2461929107,
+      "registryEligible": true
+    },
+    {
+      "id": "script:resource.create_texture_async",
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "texture-upload-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "asynchronous texture upload dispatch",
+      "errorBehavior": "callback is optional; request completion destroys it after the invocation attempt",
+      "cancellation": "resource module teardown must release pending requests and callbacks",
+      "payloadBlockers": [
+        "texture_creation_params table codec",
+        "buffer handle",
+        "texture_creation_result table codec",
+        "failure-path callback cleanup audit"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_resource.cpp",
+          "anchors": [
+            "static int CreateTextureAsync",
+            "static void DispatchCompletedRequest",
+            "dmScript::DestroyCallback(request->m_CallbackInfo)"
+          ]
+        }
+      ],
+      "stableId": 2463011221,
+      "registryEligible": true
+    },
+    {
+      "id": "script:sys.set_error_handler",
+      "callbackParameter": "error_handler",
+      "lifetime": "persistent-replaceable",
+      "owner": "lua-runtime-debug-table",
+      "invocationContext": "no-self-error-unwind",
+      "threadAffinity": "lua-erroring-thread",
+      "completion": "persistent runtime error interception",
+      "errorBehavior": "handler runs during Lua error reporting and must not recursively corrupt the active error path",
+      "cancellation": "replacement overwrites the debug-table slot; runtime teardown releases it",
+      "payloadBlockers": [
+        "error-unwind reentrancy policy",
+        "global handler replacement adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/script/src/script_sys.cpp",
+          "anchors": [
+            "static int Sys_SetErrorHandler",
+            "SCRIPT_ERROR_HANDLER_VAR",
+            "lua_setfield"
+          ]
+        }
+      ],
+      "stableId": 2791701985,
+      "registryEligible": true
+    },
+    {
+      "id": "script:particlefx.play",
+      "callbackParameter": "emitter_state_function",
+      "lifetime": "terminal-event",
+      "owner": "particlefx-playback",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "every emitter transition may invoke; last sleeping emitter is terminal",
+      "errorBehavior": "callback creation failure rejects synchronously",
+      "cancellation": "component particle-system teardown owns callback release",
+      "payloadBlockers": [
+        "URL codec",
+        "particle emitter message adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_particlefx.cpp",
+          "anchors": [
+            "int ParticleFX_Play",
+            "EmitterStateChangedCallback",
+            "num_awake_emitters == 0"
+          ]
+        }
+      ],
+      "stableId": 2809933664,
+      "registryEligible": true
+    },
+    {
+      "id": "script:font.prewarm_text",
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "font-prewarm-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "last queued glyph prewarm item finishes",
+      "errorBehavior": "submission failure destroys callback and request context before raising a Lua error",
+      "cancellation": "invalid script callbacks are skipped and destroyed at completion",
+      "payloadBlockers": [
+        "font job completion adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_font.cpp",
+          "anchors": [
+            "static void PrewarmTextCallback",
+            "static int PrewarmText",
+            "dmScript::DestroyCallback(cbk)"
+          ]
+        }
+      ],
+      "stableId": 2848412671,
+      "registryEligible": true
+    },
+    {
+      "id": "script:bullet3d.world.cast_shape_async",
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "bullet-world-request",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "after the owning Bullet world has completed the queued post-step query",
+      "errorBehavior": "argument/setup errors reject synchronously; callback invocation errors are reported by dmScript::PCall",
+      "cancellation": "world destruction or script-module finalization destroys the pending callback without invocation",
+      "payloadBlockers": [
+        "borrowed Bullet world/shape producers",
+        "bullet3d.world.cast_result[] table codec"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_world.cpp",
+          "anchors": [
+            "static int World_CastShapeAsync",
+            "static void DispatchAsyncCastResults",
+            "static void DestroyAsyncCastRequest"
+          ]
+        }
+      ],
+      "stableId": 3637746507,
+      "registryEligible": true
+    },
+    {
+      "id": "script:liveupdate.add_mount",
+      "callbackParameter": "callback",
+      "lifetime": "one-shot",
+      "owner": "liveupdate-add-mount-job",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-job-completion-thread",
+      "completion": "add-mount job completion",
+      "errorBehavior": "submission failure destroys the callback and returns a result code; callback setup failure is logged",
+      "cancellation": "runtime teardown must invalidate and release pending callbacks",
+      "payloadBlockers": [
+        "liveupdate completion adapter",
+        "verify callback dispatch is serialized onto the Hermes owner thread"
+      ],
+      "evidence": [
+        {
+          "path": "engine/liveupdate/src/script_liveupdate.cpp",
+          "anchors": [
+            "static void Callback_AddMount",
+            "static int Resource_AddMount",
+            "dmScript::DestroyCallback(cbk)"
+          ]
+        }
+      ],
+      "stableId": 3865730920,
+      "registryEligible": true
+    },
+    {
+      "id": "script:gui.play_particlefx",
+      "callbackParameter": "emitter_state_function",
+      "lifetime": "terminal-event",
+      "owner": "gui-particlefx-playback",
+      "invocationContext": "captured-gui-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "every emitter transition may invoke; last sleeping emitter is terminal",
+      "errorBehavior": "callback creation or wrong node type rejects synchronously",
+      "cancellation": "particle-system userdata and scene teardown own release",
+      "payloadBlockers": [
+        "GUI node handle",
+        "particle emitter event adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gui/src/gui_script.cpp",
+          "anchors": [
+            "static int LuaParticlefxPlay",
+            "static void EmitterStateChangedCallback",
+            "num_awake_emitters == 0"
+          ]
+        }
+      ],
+      "stableId": 3924164150,
+      "registryEligible": true
+    },
+    {
+      "id": "script:collectionfactory.load",
+      "callbackParameter": "complete_function",
+      "lifetime": "one-shot",
+      "owner": "collection-factory-load",
+      "invocationContext": "captured-script-instance",
+      "threadAffinity": "engine-update-thread",
+      "completion": "factory resource load completion",
+      "errorBehavior": "registration failure unrefs callback, self, and URL before raising a Lua error",
+      "cancellation": "component/instance teardown owns cancellation and release",
+      "payloadBlockers": [
+        "URL argument/result codec",
+        "component load completion adapter"
+      ],
+      "evidence": [
+        {
+          "path": "engine/gamesys/src/gamesys/scripts/script_collection_factory.cpp",
+          "anchors": [
+            "static int CollectionFactoryComp_Load",
+            "CompCollectionFactoryLoad",
+            "dmScript::Unref"
+          ]
+        }
+      ],
+      "stableId": 4139911040,
+      "registryEligible": true
+    }
+  ]
+}

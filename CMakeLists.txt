@@ -48,6 +48,8 @@ endif()
 add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/capi.cpp
   defold/defold_hermes/src/callback_registry.cpp
+  defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp
+  defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp
@@ -61,6 +63,7 @@ add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/runtime.cpp
   defold/defold_hermes/src/script_bridge_capi.cpp
   defold/defold_hermes/src/script_jsi_bridge.cpp
+  native/dmsdk_enum_runtime_stubs.cpp
   upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp
   upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp
   ${DEFOLD_DMSDK_TIME_SOURCE}
@@ -162,6 +165,7 @@ add_library(defold-hermes-lua-bridge STATIC
   defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp
   defold/defold_hermes/src/generated_script_fixed_tuples.cpp
   defold/defold_hermes/src/generated_script_value_bindings.cpp
+  defold/defold_hermes/src/generated_script_url_bindings.cpp
   defold/defold_hermes/src/scalar_lua_dispatch.cpp
   defold/defold_hermes/src/script_scalar_lua_adapter.cpp
   upstream/defold/engine/dlib/src/dlib/array.cpp
@@ -199,10 +203,99 @@ add_executable(defold-hermes-script-value-binding-test native/script_value_bindi
 target_compile_features(defold-hermes-script-value-binding-test PRIVATE cxx_std_17)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
   target_compile_options(defold-hermes-script-value-binding-test PRIVATE
-    -Wall -Wextra -Werror -pedantic
+    -Wall -Wextra -Werror -Wno-zero-length-array -pedantic
   )
 endif()
 target_link_libraries(defold-hermes-script-value-binding-test PRIVATE defold-hermes-lua-bridge)
+
+add_executable(defold-hermes-script-url-binding-test native/script_url_binding_test.cpp)
+target_compile_features(defold-hermes-script-url-binding-test PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-url-binding-test PRIVATE
+    -Wall -Wextra -Werror -Wno-zero-length-array -pedantic
+  )
+endif()
+target_link_libraries(defold-hermes-script-url-binding-test PRIVATE defold-hermes-lua-bridge)
+
+# Candidate-family proof for runtime-tagged/vararg routes. The generated
+# dispatcher is intentionally isolated until it is installed in ScriptAdapter;
+# the harness compiles Defold's pinned BitOp implementation verbatim.
+add_executable(defold-hermes-script-dynamic-value-test
+  native/script_dynamic_value_test.cpp
+  defold/defold_hermes/src/generated_script_dynamic_values.cpp
+  upstream/defold/engine/script/src/bitop/bitop.c
+)
+target_compile_features(defold-hermes-script-dynamic-value-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-dynamic-value-test PRIVATE
+  defold/defold_hermes/include
+  upstream/defold/engine/lua/src
+  upstream/defold/engine/lua/src/lua
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-dynamic-value-test PRIVATE
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Werror;-pedantic>
+  )
+endif()
+target_link_libraries(defold-hermes-script-dynamic-value-test PRIVATE defold-lua-test)
+
+add_executable(defold-hermes-script-callback-lifecycle-test
+  native/script_callback_lifecycle_test.cpp
+  defold/defold_hermes/src/callback_lifecycle_registry.cpp
+  defold/defold_hermes/src/generated_script_callback_lifecycle.cpp
+)
+target_compile_features(defold-hermes-script-callback-lifecycle-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-callback-lifecycle-test PRIVATE
+  defold/defold_hermes/include
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-callback-lifecycle-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
+
+add_executable(defold-hermes-dmsdk-named-scalar-test
+  native/dmsdk_named_scalar_c_header_test.c
+  native/dmsdk_named_scalar_runtime_test.cpp
+  defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp
+)
+target_compile_features(defold-hermes-dmsdk-named-scalar-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-dmsdk-named-scalar-test PRIVATE
+  defold/defold_hermes/include
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-dmsdk-named-scalar-test PRIVATE
+    $<$<COMPILE_LANGUAGE:C>:-Wall;-Wextra;-Werror;-pedantic>
+    $<$<COMPILE_LANGUAGE:CXX>:-Wall;-Wextra;-Werror;-pedantic>
+  )
+endif()
+
+add_executable(defold-hermes-script-value-tail-binding-test
+  native/script_value_tail_binding_test.cpp
+  defold/defold_hermes/src/generated_script_value_tail_bindings.cpp
+)
+target_compile_features(defold-hermes-script-value-tail-binding-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-value-tail-binding-test PRIVATE
+  defold/defold_hermes/include
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-value-tail-binding-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
+
+add_executable(defold-hermes-script-overload-dispatch-test
+  native/script_overload_dispatch_test.cpp
+  defold/defold_hermes/src/generated_script_overload_dispatch.cpp
+)
+target_compile_features(defold-hermes-script-overload-dispatch-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-overload-dispatch-test PRIVATE
+  defold/defold_hermes/include
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-overload-dispatch-test PRIVATE
+    -Wall -Wextra -Werror -pedantic
+  )
+endif()
 
 add_executable(defold-hermes-script-bridge-capi-test
   native/script_bridge_capi_test.cpp

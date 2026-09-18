@@ -1,0 +1,1257 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "2026-09-18.1",
+  "sourceShapeCensus": "bindings/generated/defold-dmsdk-abi-shapes.json",
+  "scope": "The 21 declarations mechanically classified as next-named-scalar-direct. This report does not claim an engine lifecycle, thread, profiler, or sound-context capability.",
+  "coverage": {
+    "reviewed": 21,
+    "generated": 0,
+    "policyBlocked": 21,
+    "signatureCompileCovered": 21,
+    "linked": 0,
+    "behaviorCovered": 0,
+    "warmedDispatchIterations": 100000,
+    "warmedDispatchObservedCppAllocations": 0
+  },
+  "sourceHashes": {
+    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+    "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
+    "policy": "326e11c8855aa6e3a4d565facd25829ccc86ab9ee991a4f63432690bab74e6ec"
+  },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_jsi.hpp": "71f2a07a1600d1e13bd8d4f8f373d7f150e782a1b768596df6944e09d9d8d71d",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_runtime.h": "614da24de63d6629441baf15e2cb0713ea60628ef934744f90ea3c28aba0ccdb",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h": "e615334148d95d3d6c0cda5ca6c3b020bb4f063a261e22c608f3e4849274d532",
+    "defold/defold_hermes/src/generated_dmsdk_named_scalar_jsi.cpp": "c20e9b13ac6a9db12eae5126f0d30bfcce1a41a595c2354a73a4af5aa7bfca74",
+    "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp": "afad2dbbcc5735e1b95d3c2fe227ac4a4b8ff737a73fc12d0261284603e03dc3",
+    "packages/sdk/src/generated/dmsdk/named-scalar.ts": "0842327ac1027cc217c52197e351df2f252bb2a76655d19403075985582b0509"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_jsi.hpp",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_runtime.h",
+    "defold/defold_hermes/src/generated_dmsdk_named_scalar_jsi.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp",
+    "packages/sdk/src/generated/dmsdk/named-scalar.ts"
+  ],
+  "declarations": [
+    {
+      "id": "dmsdk:dmGameObject::CreateInstanceId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:598:1005",
+      "symbol": "dmGameObject::CreateInstanceId",
+      "nativeSignature": "dmhash_t ()",
+      "shape": "scalar:u64()",
+      "emitted": false,
+      "policy": {
+        "id": "engine-context-capability-required",
+        "version": "2026-09-18.1",
+        "reason": "The declaration reaches engine-owned mutable or teardown-sensitive global state. The generated scalar ABI has no main-thread or engine-lifecycle capability."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h",
+        "line": 598,
+        "text": "dmhash_t CreateInstanceId();",
+        "sha256": "701956b449821267f15db3bef2bf83a606c471e2f1b3efc1f9be9809443b0d62"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject.cpp",
+          "line": 1055,
+          "text": "static uint32_t index = 0;",
+          "sha256": "58006705ded458b21b34892b43154e386152c6fa2e0ecf5a613010d85788464e"
+        },
+        {
+          "path": "upstream/defold/engine/sound/src/sound.cpp",
+          "line": 1131,
+          "text": "if (!g_SoundSystem)",
+          "sha256": "2bc31d34bbb51a0fd41552bf2c4e96c063229231d033fcfef8e4047b1f5486d6"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2139",
+      "symbol": "dmSound::IsGroupMuted",
+      "nativeSignature": "bool (dmhash_t)",
+      "shape": "scalar:bool(value:scalar:u64)",
+      "emitted": false,
+      "policy": {
+        "id": "engine-context-capability-required",
+        "version": "2026-09-18.1",
+        "reason": "The declaration reaches engine-owned mutable or teardown-sensitive global state. The generated scalar ABI has no main-thread or engine-lifecycle capability."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
+        "line": 108,
+        "text": "bool IsGroupMuted(dmhash_t group);",
+        "sha256": "8a2ddebd25f8de8ccc54637cef5c0e5908e89616d55137120c1c83a02fb04c17"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject.cpp",
+          "line": 1055,
+          "text": "static uint32_t index = 0;",
+          "sha256": "58006705ded458b21b34892b43154e386152c6fa2e0ecf5a613010d85788464e"
+        },
+        {
+          "path": "upstream/defold/engine/sound/src/sound.cpp",
+          "line": 1131,
+          "text": "if (!g_SoundSystem)",
+          "sha256": "2bc31d34bbb51a0fd41552bf2c4e96c063229231d033fcfef8e4047b1f5486d6"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:dmThread::AllocTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:119:608",
+      "symbol": "dmThread::AllocTls",
+      "nativeSignature": "TlsKey ()",
+      "shape": "scalar:usize()",
+      "emitted": false,
+      "policy": {
+        "id": "thread-ownership-capability-required",
+        "version": "2026-09-18.1",
+        "reason": "Thread and TLS tokens have OS ownership, validity, blocking, and detach/join ordering requirements that cannot be represented by an unowned scalar token."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+        "line": 119,
+        "text": "TlsKey AllocTls();",
+        "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+          "line": 98,
+          "text": "* thread specified by thread must be joinable (see Detach()).",
+          "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/thread_posix.cpp",
+          "line": 144,
+          "text": "int ret = pthread_key_delete(ToNativeTlsKey(key));",
+          "sha256": "888ff6dd1996b209dcce200afe68e8e4e9700d1efb1070a8b38f7103863973ef"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:dmThread::Detach@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:112:607",
+      "symbol": "dmThread::Detach",
+      "nativeSignature": "void (Thread)",
+      "shape": "scalar:void(value:scalar:usize)",
+      "emitted": false,
+      "policy": {
+        "id": "thread-ownership-capability-required",
+        "version": "2026-09-18.1",
+        "reason": "Thread and TLS tokens have OS ownership, validity, blocking, and detach/join ordering requirements that cannot be represented by an unowned scalar token."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+        "line": 98,
+        "text": "* thread specified by thread must be joinable (see Detach()).",
+        "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+          "line": 98,
+          "text": "* thread specified by thread must be joinable (see Detach()).",
+          "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/thread_posix.cpp",
+          "line": 144,
+          "text": "int ret = pthread_key_delete(ToNativeTlsKey(key));",
+          "sha256": "888ff6dd1996b209dcce200afe68e8e4e9700d1efb1070a8b38f7103863973ef"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:dmThread::FreeTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:126:609",
+      "symbol": "dmThread::FreeTls",
+      "nativeSignature": "void (TlsKey)",
+      "shape": "scalar:void(value:scalar:usize)",
+      "emitted": false,
+      "policy": {
+        "id": "thread-ownership-capability-required",
+        "version": "2026-09-18.1",
+        "reason": "Thread and TLS tokens have OS ownership, validity, blocking, and detach/join ordering requirements that cannot be represented by an unowned scalar token."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+        "line": 126,
+        "text": "void FreeTls(TlsKey key);",
+        "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+          "line": 98,
+          "text": "* thread specified by thread must be joinable (see Detach()).",
+          "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/thread_posix.cpp",
+          "line": 144,
+          "text": "int ret = pthread_key_delete(ToNativeTlsKey(key));",
+          "sha256": "888ff6dd1996b209dcce200afe68e8e4e9700d1efb1070a8b38f7103863973ef"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612",
+      "symbol": "dmThread::GetCurrentThread",
+      "nativeSignature": "Thread ()",
+      "shape": "scalar:usize()",
+      "emitted": false,
+      "policy": {
+        "id": "thread-ownership-capability-required",
+        "version": "2026-09-18.1",
+        "reason": "Thread and TLS tokens have OS ownership, validity, blocking, and detach/join ordering requirements that cannot be represented by an unowned scalar token."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+        "line": 148,
+        "text": "Thread GetCurrentThread();",
+        "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+          "line": 98,
+          "text": "* thread specified by thread must be joinable (see Detach()).",
+          "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/thread_posix.cpp",
+          "line": 144,
+          "text": "int ret = pthread_key_delete(ToNativeTlsKey(key));",
+          "sha256": "888ff6dd1996b209dcce200afe68e8e4e9700d1efb1070a8b38f7103863973ef"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:dmThread::Join@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:102:606",
+      "symbol": "dmThread::Join",
+      "nativeSignature": "void (Thread)",
+      "shape": "scalar:void(value:scalar:usize)",
+      "emitted": false,
+      "policy": {
+        "id": "thread-ownership-capability-required",
+        "version": "2026-09-18.1",
+        "reason": "Thread and TLS tokens have OS ownership, validity, blocking, and detach/join ordering requirements that cannot be represented by an unowned scalar token."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+        "line": 86,
+        "text": "*     dmThread::Join(thread);",
+        "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h",
+          "line": 98,
+          "text": "* thread specified by thread must be joinable (see Detach()).",
+          "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/thread_posix.cpp",
+          "line": 144,
+          "text": "int ret = pthread_key_delete(ToNativeTlsKey(key));",
+          "sha256": "888ff6dd1996b209dcce200afe68e8e4e9700d1efb1070a8b38f7103863973ef"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468",
+      "symbol": "ProfilePropertyAddBool",
+      "nativeSignature": "void (ProfileIdx, int)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 166,
+        "text": "void ProfilePropertyAdd##stype(ProfileIdx idx, type v);",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480",
+      "symbol": "ProfilePropertyAddF32",
+      "nativeSignature": "void (ProfileIdx, float)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:f32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 215,
+        "text": "#define DM_PROPERTY_ADD_F32(name, add_value)    ProfilePropertyAddF32(*name##_p, add_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492",
+      "symbol": "ProfilePropertyAddF64",
+      "nativeSignature": "void (ProfileIdx, double)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:f64)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 218,
+        "text": "#define DM_PROPERTY_ADD_F64(name, add_value)    ProfilePropertyAddF64(*name##_p, add_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472",
+      "symbol": "ProfilePropertyAddS32",
+      "nativeSignature": "void (ProfileIdx, int32_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 213,
+        "text": "#define DM_PROPERTY_ADD_S32(name, add_value)    ProfilePropertyAddS32(*name##_p, add_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484",
+      "symbol": "ProfilePropertyAddS64",
+      "nativeSignature": "void (ProfileIdx, int64_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i64)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 216,
+        "text": "#define DM_PROPERTY_ADD_S64(name, add_value)    ProfilePropertyAddS64(*name##_p, add_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476",
+      "symbol": "ProfilePropertyAddU32",
+      "nativeSignature": "void (ProfileIdx, uint32_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:u32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 214,
+        "text": "#define DM_PROPERTY_ADD_U32(name, add_value)    ProfilePropertyAddU32(*name##_p, add_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488",
+      "symbol": "ProfilePropertyAddU64",
+      "nativeSignature": "void (ProfileIdx, uint64_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:u64)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 217,
+        "text": "#define DM_PROPERTY_ADD_U64(name, add_value)    ProfilePropertyAddU64(*name##_p, add_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467",
+      "symbol": "ProfilePropertySetBool",
+      "nativeSignature": "void (ProfileIdx, int)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 204,
+        "text": "#define DM_PROPERTY_SET_BOOL(name, set_value)   ProfilePropertySetBool(*name##_p, set_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479",
+      "symbol": "ProfilePropertySetF32",
+      "nativeSignature": "void (ProfileIdx, float)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:f32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 207,
+        "text": "#define DM_PROPERTY_SET_F32(name, set_value)    ProfilePropertySetF32(*name##_p, set_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491",
+      "symbol": "ProfilePropertySetF64",
+      "nativeSignature": "void (ProfileIdx, double)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:f64)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 210,
+        "text": "#define DM_PROPERTY_SET_F64(name, set_value)    ProfilePropertySetF64(*name##_p, set_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471",
+      "symbol": "ProfilePropertySetS32",
+      "nativeSignature": "void (ProfileIdx, int32_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 205,
+        "text": "#define DM_PROPERTY_SET_S32(name, set_value)    ProfilePropertySetS32(*name##_p, set_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483",
+      "symbol": "ProfilePropertySetS64",
+      "nativeSignature": "void (ProfileIdx, int64_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i64)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 208,
+        "text": "#define DM_PROPERTY_SET_S64(name, set_value)    ProfilePropertySetS64(*name##_p, set_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475",
+      "symbol": "ProfilePropertySetU32",
+      "nativeSignature": "void (ProfileIdx, uint32_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:u32)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 206,
+        "text": "#define DM_PROPERTY_SET_U32(name, set_value)    ProfilePropertySetU32(*name##_p, set_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487",
+      "symbol": "ProfilePropertySetU64",
+      "nativeSignature": "void (ProfileIdx, uint64_t)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:u64)",
+      "emitted": false,
+      "policy": {
+        "id": "profile-property-provenance-required",
+        "version": "2026-09-18.1",
+        "reason": "ProfileIdx must be registered and valid for the active profiler. Passing a raw scalar index can trip the implementation's property assertion and has no lifecycle/provenance proof."
+      },
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 209,
+        "text": "#define DM_PROPERTY_SET_U64(name, set_value)    ProfilePropertySetU64(*name##_p, set_value)",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "policyEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
+          "line": 532,
+          "text": "assert(prop->m_Idx == (IDX));",
+          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "line": 163,
+          "text": "ProfileIdx ProfileRegisterProperty##stype(const char* name, const char* desc, type value, uint32_t flags, ProfileIdx* (*parentfn)()); \\",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "stages": {
+        "generated": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "compiled": {
+          "status": "signature-compiled-not-linked",
+          "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
+        },
+        "linked": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "conformant": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "allocation": {
+          "status": "not-claimed-policy-blocked",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        },
+        "typescriptCallable": {
+          "status": "blocked-by-versioned-policy",
+          "evidence": "bindings/overrides/dmsdk-named-scalar-policies.json"
+        }
+      }
+    }
+  ]
+}

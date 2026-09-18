@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "family": "next-enum-value-direct",
+  "entries": {
+    "dmsdk:dmGameSystem::CompGuiUnregisterGetPropertyFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h:84:1146": {
+      "status": "blocked",
+      "blocker": "extension-registry-capability-required"
+    },
+    "dmsdk:dmGameSystem::CompGuiUnregisterSetPropertyFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h:77:1145": {
+      "status": "blocked",
+      "blocker": "extension-registry-capability-required"
+    },
+    "dmsdk:dmGraphics::InstallAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1711:1455": {
+      "status": "blocked",
+      "blocker": "engine-lifecycle-capability-required"
+    },
+    "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99": { "status": "emit" },
+    "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398": { "status": "emit" },
+    "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397": { "status": "emit" },
+    "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391": { "status": "emit" },
+    "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390": { "status": "emit" },
+    "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2137": { "status": "emit" },
+    "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2138": { "status": "emit" }
+  }
+}
