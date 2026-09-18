@@ -209,7 +209,9 @@ int main() {
   lua_pushlightuserdata(state, gExpectedInstance);
   SetInstance(state);
   scalar::ScriptAdapter adapter;
-  expect(adapter.initialize(state, {GetInstance, SetInstance}), "adapter initialization failed");
+  const auto* runtimeProfile = defold_hermes::script_handle_lowering::findRuntimeProfile("default-legacy-bullet");
+  expect(runtimeProfile && adapter.initialize(state, {GetInstance, SetInstance},
+      defold_hermes::script_handle_lowering::runtimeProfileHandshake(*runtimeProfile)), "adapter initialization failed");
   lua_pushlightuserdata(state, gExpectedInstance);
   expect(adapter.captureInstance(-1), "instance capture failed");
   lua_pop(state, 1);

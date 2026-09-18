@@ -13,6 +13,7 @@
 #include <dmsdk/script/script.h>
 
 #include <defold_hermes/active_game_object_context.hpp>
+#include <defold_hermes/component_proxy_lua_gate.hpp>
 #include <defold_hermes/generated_lua_bridge.hpp>
 #include <defold_hermes/bundle_resource.hpp>
 #include <defold_hermes/lua_capi.hpp>
@@ -25,6 +26,7 @@
 #include <string>
 
 #if !defined(DM_PLATFORM_HTML5)
+#include <defold_hermes/component_hermes_backend.hpp>
 #include <defold_hermes/runtime.hpp>
 #endif
 
@@ -43,6 +45,25 @@ void* gBundleResource = nullptr;
 std::string gBundlePath;
 std::unique_ptr<defold_hermes::lua_bridge::LuaBridge> gLuaBridge;
 std::unique_ptr<defold_hermes::lua_bridge::scalar::ScriptAdapter> gScriptBridge;
+#if !defined(DM_PLATFORM_HTML5)
+std::unique_ptr<defold_hermes::component_proxy::HermesBackend> gComponentHermesBackend;
+#endif
+std::unique_ptr<defold_hermes::component_proxy::LuaRuntime> gComponentLuaRuntime;
+
+enum class ScriptBridgeState : uint8_t { kUninitialized, kProbing, kReady };
+ScriptBridgeState gScriptBridgeState = ScriptBridgeState::kUninitialized;
+
+void ScriptGetInstance(lua_State* state) {
+  dmScript::GetInstance(state);
+}
+
+void ScriptSetInstance(lua_State* state) {
+  if (gScriptBridge && gScriptBridge->componentContextActive()) {
+    lua_pop(state, 1);
+    return;
+  }
+  dmScript::SetInstance(state);
+}
 
 struct BootstrapAttachment {
   dmGameObject::HCollection collection = nullptr;
@@ -164,6 +185,10 @@ class DefoldHost final : public defold_hermes::Host {
 DefoldHost gHost;
 std::unique_ptr<defold_hermes::Runtime> gRuntime;
 
+#endif
+
+#if !defined(DM_PLATFORM_HTML5)
+defold_hermes::Runtime* CurrentComponentRuntime(void*) noexcept { return gRuntime.get(); }
 #endif
 
 void InvalidateBootstrapAttachment() noexcept {
@@ -391,6 +416,57 @@ bool LuaTimerTrigger(uint32_t handle, bool* out) {
   return true;
 }
 
+bool EnsureScriptBridgeReady(lua_State* state) {
+  if (gScriptBridgeState == ScriptBridgeState::kReady) return gScriptBridge != nullptr;
+  if (gScriptBridgeState == ScriptBridgeState::kProbing) {
+    dmLogError("Generated Defold script bridge initialization is already in progress");
+    return false;
+  }
+  gScriptBridgeState = ScriptBridgeState::kProbing;
+  defold_hermes::script_handle_lowering::RuntimeProfileDetection detection{};
+  char detectionError[256]{};
+  const auto status = defold_hermes::script_handle_lowering::detectRuntimeProfile(
+      state, &detection, detectionError, sizeof(detectionError));
+  if (status != defold_hermes::script_handle_lowering::RuntimeProfileDetectionStatus::kMatched ||
+      !detection.profile) {
+    dmLogError("Unable to detect exact Defold runtime profile: %s", detectionError);
+    gScriptBridgeState = ScriptBridgeState::kUninitialized;
+    return false;
+  }
+
+#if !defined(DM_PLATFORM_HTML5)
+  try {
+#endif
+  auto candidate = std::make_unique<defold_hermes::lua_bridge::scalar::ScriptAdapter>();
+  const defold_hermes::lua_bridge::scalar::InstanceApi instanceApi = {
+    ScriptGetInstance,
+    ScriptSetInstance
+  };
+  if (!candidate->initialize(
+          state, instanceApi,
+          defold_hermes::script_handle_lowering::runtimeProfileHandshake(*detection.profile))) {
+    dmLogError("Unable to initialize generated Defold script bridge: %s", candidate->lastError());
+    candidate->shutdown();
+    gScriptBridgeState = ScriptBridgeState::kUninitialized;
+    return false;
+  }
+  defold_hermes::installScriptBridgeApi(candidate->api());
+  gScriptBridge = std::move(candidate);
+  gScriptBridgeState = ScriptBridgeState::kReady;
+  dmLogInfo(
+      "Detected Defold runtime profile '%s' from %u generated Lua symbols",
+      detection.profile->id,
+      static_cast<unsigned>(detection.observedPresent));
+  return true;
+#if !defined(DM_PLATFORM_HTML5)
+  } catch (const std::exception& error) {
+    dmLogError("Generated Defold script bridge allocation failed: %s", error.what());
+    gScriptBridgeState = ScriptBridgeState::kUninitialized;
+    return false;
+  }
+#endif
+}
+
 bool StartApplication() {
   if (gApplicationInitialized) return true;
   // Extension Initialize runs before Defold registers custom resource types.
@@ -435,6 +511,9 @@ int AttachLuaInstance(lua_State* state) {
     }
     lua_pushboolean(state, 1);
     return 1;
+  }
+  if (!EnsureScriptBridgeReady(state)) {
+    return luaL_error(state, "Unable to initialize generated Defold script bridge from the registered Lua API");
   }
   if (!gLuaBridge || !gLuaBridge->captureInstance(1)) {
     return luaL_error(
@@ -519,6 +598,16 @@ void RegisterLuaBootstrap(lua_State* state) {
   lua_pop(state, 1);
 }
 
+#if !defined(DM_PLATFORM_HTML5)
+defold_hermes::lua_bridge::scalar::ScriptAdapter* CurrentComponentScriptAdapter(void*) noexcept {
+  return gScriptBridge.get();
+}
+
+bool EnsureComponentRuntime(void*, lua_State* state) noexcept {
+  return EnsureBundleLoaded() && EnsureScriptBridgeReady(state);
+}
+#endif
+
 dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   const char* appPath = dmConfigFile::GetString(
       params->m_ConfigFile, "defold_hermes.app", kDefaultAppPath);
@@ -545,21 +634,6 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
     return dmExtension::RESULT_INIT_ERROR;
   }
   gLuaBridge->installCallbackApi({nullptr, InvokeTypeScriptCallback, ReleaseTypeScriptCallback});
-  gScriptBridge = std::make_unique<defold_hermes::lua_bridge::scalar::ScriptAdapter>();
-  const defold_hermes::lua_bridge::scalar::InstanceApi scalarInstanceApi = {
-    dmScript::GetInstance,
-    dmScript::SetInstance
-  };
-  if (!gScriptBridge->initialize(params->m_L, scalarInstanceApi)) {
-    dmLogError("Unable to initialize generated Defold script bridge: %s", gScriptBridge->lastError());
-    gLuaBridge->shutdown();
-    gLuaBridge.reset();
-    gScriptBridge.reset();
-    gResourceFactory = nullptr;
-    gBundlePath.clear();
-    return dmExtension::RESULT_INIT_ERROR;
-  }
-  defold_hermes::installScriptBridgeApi(gScriptBridge->api());
   const defold_hermes::game_object::TerminalApi gameObjectApi = {
     nullptr,
     TerminalGetGeneration,
@@ -571,9 +645,6 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   };
   if (!defold_hermes::game_object::installTerminalApi(gameObjectApi)) {
     dmLogError("Unable to install generated game-object terminal API");
-    defold_hermes::uninstallScriptBridgeApi();
-    gScriptBridge->shutdown();
-    gScriptBridge.reset();
     gLuaBridge->shutdown();
     gLuaBridge.reset();
     gResourceFactory = nullptr;
@@ -581,6 +652,19 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
     return dmExtension::RESULT_INIT_ERROR;
   }
   RegisterLuaBootstrap(params->m_L);
+#if defined(DM_PLATFORM_HTML5)
+  defold_hermes::component_proxy::registerUnavailableLuaApi(params->m_L);
+#else
+  gComponentHermesBackend = std::make_unique<defold_hermes::component_proxy::HermesBackend>(
+      nullptr, CurrentComponentRuntime, CurrentComponentScriptAdapter, EnsureComponentRuntime);
+  const defold_hermes::component_proxy::InstanceApi componentInstanceApi = {
+    dmScript::GetInstance,
+    dmScript::SetInstance
+  };
+  gComponentLuaRuntime = std::make_unique<defold_hermes::component_proxy::LuaRuntime>(
+      gComponentHermesBackend->api(), componentInstanceApi);
+  gComponentLuaRuntime->registerLuaApi(params->m_L);
+#endif
   defold_hermes::installLuaTimerCapi(LuaTimerDelay, LuaTimerCancel, LuaTimerTrigger);
 
   dmLogInfo("TypeScript bundle is waiting for script instance attachment");
@@ -613,8 +697,14 @@ dmExtension::Result FinalizeExtension(dmExtension::Params*) {
   defold_hermes::game_object::uninstallTerminalApi();
   defold_hermes::uninstallLuaTimerCapi();
   defold_hermes::uninstallScriptBridgeApi();
+  if (gComponentLuaRuntime) gComponentLuaRuntime->shutdown();
+  gComponentLuaRuntime.reset();
+#if !defined(DM_PLATFORM_HTML5)
+  gComponentHermesBackend.reset();
+#endif
   if (gScriptBridge) gScriptBridge->shutdown();
   gScriptBridge.reset();
+  gScriptBridgeState = ScriptBridgeState::kUninitialized;
   if (gLuaBridge) gLuaBridge->shutdown();
   gLuaBridge.reset();
 #if !defined(DM_PLATFORM_HTML5)

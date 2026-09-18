@@ -29,6 +29,7 @@ export async function createIncrementalCompiler(options) {
   const outputFile = path.resolve(options.outputFile);
   const mirrors = [...new Set((options.mirrors ?? []).map((file) => path.resolve(file)))];
   const resourcePath = normalizeResourcePath(options.resourcePath ?? path.basename(outputFile));
+  const tsconfig = options.tsconfig ? path.resolve(options.tsconfig) : undefined;
   const fingerprintPlaceholder = randomBytes(32).toString("hex");
   if (Object.hasOwn(options.define ?? {}, fingerprintGlobal)) {
     throw new Error(`${fingerprintGlobal} is reserved by the deherm compiler`);
@@ -40,7 +41,8 @@ export async function createIncrementalCompiler(options) {
     format: "iife",
     platform: "neutral",
     target: options.target ?? "es2020",
-    plugins: options.useTtsc === false ? [] : [ttsc()],
+    plugins: options.useTtsc === false ? [] : [ttsc(tsconfig ? { project: tsconfig } : {})],
+    ...(tsconfig ? { tsconfig } : {}),
     define: options.define,
     banner: { js: `var ${fingerprintGlobal} = "${fingerprintPlaceholder}";` },
     sourcemap: options.sourcemap ?? true,

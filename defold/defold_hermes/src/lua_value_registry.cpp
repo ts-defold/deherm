@@ -120,6 +120,7 @@ Handle LuaValueRegistry::capture(int stackIndex,
   slot.reference = reference;
   slot.kind = descriptor.kind;
   slot.policy = descriptor.policy;
+  slot.semanticKind = descriptor.semanticKind;
   slot.state = kLive;
   slot.nextFree = UINT32_MAX;
   ++stats_.live;
@@ -159,8 +160,12 @@ bool LuaValueRegistry::validateHandle(Handle handle,
     ++stats_.policyMismatchFailures;
     return false;
   }
+  if (expected.semanticKind != 0 && expected.semanticKind != slot.semanticKind) {
+    ++stats_.semanticKindMismatchFailures;
+    return false;
+  }
   if (out) {
-    *out = {state_, slot.reference, runtime_, {slot.kind, slot.policy}};
+    *out = {state_, slot.reference, runtime_, {slot.kind, slot.policy, slot.semanticKind}};
   }
   return true;
 }
@@ -265,6 +270,7 @@ void LuaValueRegistry::recycle(uint32_t slotIndex) noexcept {
   slot.reference = LUA_NOREF;
   slot.kind = LuaValueKind::kAny;
   slot.policy = LuaValuePolicy::kAny;
+  slot.semanticKind = 0;
   slot.state = kFree;
   slot.nextFree = freeHead_;
   freeHead_ = slotIndex;
@@ -285,6 +291,23 @@ uint32_t LuaValueRegistry::shutdown() noexcept {
   }
   state_ = nullptr;
   return released;
+}
+
+bool LuaValueRegistry::rebind(lua_State *state, uint32_t runtime,
+                              LuaRegistryApi api) noexcept {
+  shutdown();
+  if (!state || runtime == 0) {
+    ++stats_.invalidArgumentFailures;
+    return false;
+  }
+  state_ = state;
+  runtime_ = runtime;
+  api_ = api;
+  if (!api_.reference)
+    api_.reference = RawReference;
+  if (!api_.unreference)
+    api_.unreference = RawUnreference;
+  return true;
 }
 
 } // namespace defold_hermes::lua_bridge

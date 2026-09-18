@@ -2,11 +2,113 @@
   "schemaVersion": 1,
   "generator": "@ts-defold/deherm component-proxy-generator/v1",
   "componentIdNamespace": "deherm.component/v1",
+  "proxyRuntimeCapability": {
+    "state": "native-dynamic-hermes-harness-executable",
+    "runtimeConformant": false,
+    "luaModule": "defold_hermes",
+    "requiredMethods": [
+      "attachComponent",
+      "dispatchLifecycle",
+      "dispatchMessage",
+      "dispatchInput",
+      "dispatchReload",
+      "detachComponent"
+    ],
+    "evidence": "generated-proxy-contract-native-lua-and-dynamic-hermes-harnesses-packaged-engine-unverified"
+  },
+  "sourceConventions": [
+    {
+      "authoredSuffix": ".script.ts",
+      "canonicalAuthoredSuffix": ".script.ts",
+      "proxySuffix": ".script",
+      "proxyKind": "script",
+      "contextKind": "game-object",
+      "supportsProperties": true,
+      "legacy": false,
+      "supportedLifecycles": [
+        "init",
+        "update",
+        "final",
+        "onMessage",
+        "onInput",
+        "onReload"
+      ],
+      "teardownPolicy": "final-callback-detach"
+    },
+    {
+      "authoredSuffix": ".gui.ts",
+      "canonicalAuthoredSuffix": ".gui.ts",
+      "proxySuffix": ".gui_script",
+      "proxyKind": "gui_script",
+      "contextKind": "gui-scene",
+      "supportsProperties": false,
+      "legacy": false,
+      "supportedLifecycles": [
+        "init",
+        "final",
+        "update",
+        "onMessage",
+        "onInput",
+        "onReload"
+      ],
+      "teardownPolicy": "final-callback-detach",
+      "lifecycleEvidence": "upstream/defold/engine/gui/src/gui.cpp:SCRIPT_FUNCTION_NAMES"
+    },
+    {
+      "authoredSuffix": ".render.ts",
+      "canonicalAuthoredSuffix": ".render.ts",
+      "proxySuffix": ".render_script",
+      "proxyKind": "render_script",
+      "contextKind": "render-instance+graphics",
+      "supportsProperties": false,
+      "legacy": false,
+      "supportedLifecycles": [
+        "init",
+        "update",
+        "onMessage",
+        "onReload"
+      ],
+      "teardownPolicy": "provider-required-unimplemented-no-final-callback",
+      "lifecycleEvidence": "upstream/defold/engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES"
+    },
+    {
+      "authoredSuffix": ".gui_script.ts",
+      "canonicalAuthoredSuffix": ".gui.ts",
+      "proxySuffix": ".gui_script",
+      "proxyKind": "gui_script",
+      "contextKind": "gui-scene",
+      "supportsProperties": false,
+      "legacy": true,
+      "supportedLifecycles": [
+        "init",
+        "final",
+        "update",
+        "onMessage",
+        "onInput",
+        "onReload"
+      ],
+      "teardownPolicy": "final-callback-detach",
+      "lifecycleEvidence": "upstream/defold/engine/gui/src/gui.cpp:SCRIPT_FUNCTION_NAMES"
+    }
+  ],
   "components": [
     {
       "componentId": "deherm.component/v1/bf9d9d8ca59e486805b929b32e188c5c6c8b4fafded4442d26e6ad27f931304b",
       "source": "player.script.ts",
       "proxy": "player.script",
+      "authoredSuffix": ".script.ts",
+      "canonicalAuthoredSuffix": ".script.ts",
+      "proxySuffix": ".script",
+      "legacyAuthoredSuffix": false,
+      "supportedLifecycles": [
+        "init",
+        "update",
+        "final",
+        "onMessage",
+        "onInput",
+        "onReload"
+      ],
+      "teardownPolicy": "final-callback-detach",
       "proxyKind": "script",
       "contextKind": "game-object",
       "sourceSha256": "c5bfaf7b53440054264c93d212626548a67c9ec2c5054f46be5a9be0087eb00d",
@@ -103,6 +205,41 @@
       ],
       "native": {
         "symbol": "deherm_component_bf9d9d8ca59e486805b929b32e188c5c"
+      }
+    },
+    {
+      "componentId": "deherm.component/v1/bba628a1ee23634d353872b113e5c7bf3b52e4de28e2b105a34011aa682b07f1",
+      "source": "render.render.ts",
+      "proxy": "render.render_script",
+      "authoredSuffix": ".render.ts",
+      "canonicalAuthoredSuffix": ".render.ts",
+      "proxySuffix": ".render_script",
+      "legacyAuthoredSuffix": false,
+      "supportedLifecycles": [
+        "init",
+        "update",
+        "onMessage",
+        "onReload"
+      ],
+      "teardownPolicy": "provider-required-unimplemented-no-final-callback",
+      "lifecycleEvidence": "upstream/defold/engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES",
+      "proxyKind": "render_script",
+      "contextKind": "render-instance+graphics",
+      "sourceSha256": "d0341f4f60079963b3c46874e9de951c8788c9fb7d8c95486b20d54251e711c3",
+      "schemaFingerprint": "275beaa7a289e36d9e1dfdf688522e980aaf6da482ff927957d9cf280f842446",
+      "reloadPolicy": "preserve-instance-state",
+      "lifecycleMask": 43,
+      "lifecycles": {
+        "init": true,
+        "update": true,
+        "final": false,
+        "onMessage": true,
+        "onInput": false,
+        "onReload": true
+      },
+      "properties": [],
+      "native": {
+        "symbol": "deherm_component_bba628a1ee23634d353872b113e5c7bf"
       }
     }
   ]

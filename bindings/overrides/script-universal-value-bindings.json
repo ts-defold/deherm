@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "scope": "One bounded, generated value-graph policy shared by every projection-only Lua-table and multi-result route.",
+  "selection": {
+    "accountingCategory": "pending",
+    "loweringFamilies": [
+      "lua-table",
+      "multi-result"
+    ],
+    "excludedContexts": [
+      "component-property-compiler"
+    ],
+    "excludedLoweringFamilies": [
+      "separate-module"
+    ],
+    "callbacks": "reject-from-this-family",
+    "variadics": "bounded-by-global-argument-capacity",
+    "optimizedFamilies": "remain-on-their-specialized-lanes"
+  },
+  "bounds": {
+    "maximumArguments": 32,
+    "maximumDepth": 8,
+    "maximumEntries": 256,
+    "maximumStringBytes": 65536
+  },
+  "tablePolicy": {
+    "arrays": "dense-one-based-lua-sequence",
+    "objects": "own-enumerable-string-keys",
+    "maps": "exact-js-map-keys",
+    "cycles": "reject",
+    "duplicateKeys": "last-write-is-lua-semantics",
+    "unsupportedValues": "reject-before-lua-call"
+  }
+}

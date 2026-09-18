@@ -4,6 +4,14 @@ import { copyFile, mkdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import path from "node:path";
 
+import { ensureBindingLoweringPlan } from "./ensure-binding-lowering-plan.mjs";
+
+await ensureBindingLoweringPlan({ deepCheck: true });
+const canonicalLoweringPlan = JSON.parse(await readFile("bindings/generated/defold-binding-lowering-plan.json", "utf8"));
+if (canonicalLoweringPlan.schemaVersion !== 2) {
+  throw new Error(`JavaScript build requires canonical lowering-plan schema v2, got ${canonicalLoweringPlan.schemaVersion ?? "missing"}`);
+}
+
 const pendingFingerprint = "0".repeat(64);
 
 const result = await build({

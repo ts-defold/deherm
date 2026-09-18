@@ -24,6 +24,29 @@ class Host {
 
 class Runtime {
  public:
+  enum class ComponentContext : uint8_t { kGameObject, kGuiScene, kRender };
+  enum class ComponentValueKind : uint8_t { kNil, kBoolean, kNumber, kString, kHash, kUrl, kVector3, kVector4, kQuaternion };
+  struct ComponentValue {
+    ComponentValueKind kind = ComponentValueKind::kNil;
+    bool boolean = false;
+    double number = 0.0;
+    uint64_t lanes64[4]{};
+    float lanes32[4]{};
+    const char* string = nullptr;
+    uint32_t stringLength = 0;
+  };
+  struct ComponentField { const char* name = nullptr; ComponentValue value{}; };
+  struct ComponentArgument {
+    ComponentValue value{};
+    const ComponentField* fields = nullptr;
+    uint8_t fieldCount = 0;
+  };
+  struct ComponentHandle {
+    uint32_t slot = UINT32_MAX;
+    uint32_t generation = 0;
+    explicit operator bool() const noexcept { return slot != UINT32_MAX; }
+  };
+
   explicit Runtime(Host& host);
   ~Runtime();
 
@@ -44,6 +67,15 @@ class Runtime {
   bool releaseCallback(lua_bridge::Handle callback);
   const char* callbackError() const;
   uint32_t liveCallbacks() const;
+  ComponentHandle attachComponent(const char* componentId, const char* schemaFingerprint,
+      ComponentContext context);
+  void setComponentProperty(ComponentHandle handle, const char* name, const ComponentValue& value);
+  bool dispatchComponent(ComponentHandle handle, const char* lifecycle,
+      const ComponentArgument* arguments, uint8_t argumentCount);
+  void reloadComponent(ComponentHandle handle);
+  void detachComponent(ComponentHandle handle);
+  uint32_t liveComponents() const;
+  uint32_t identity() const noexcept;
 
  private:
   class Impl;

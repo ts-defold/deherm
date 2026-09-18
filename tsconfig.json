@@ -13,5 +13,10 @@
       "@defold-hermes/sdk/*": ["./packages/sdk/src/generated/modules/*"]
     }
   },
-  "include": ["packages/**/*.ts", "sample/**/*.ts", "benchmarks/**/*.ts"]
+  "include": [
+    "packages/**/*.ts",
+    "sample/**/*.ts",
+    "benchmarks/**/*.ts",
+    "examples/war-battles-online/verification/generated/**/*.ts"
+  ]
 }

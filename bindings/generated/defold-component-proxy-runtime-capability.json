@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "generator": "scripts/generate-component-proxy-runtime-capability.mjs",
+  "scope": "Generated component-proxy provider capability and stage-qualified harness evidence; packaged Defold execution is not claimed.",
+  "capabilityState": "native-provider-capability-present",
+  "harnessEvidenceState": "native-lua-and-dynamic-hermes-harness-proven",
+  "runtimeConformant": false,
+  "requiredLuaMethods": [
+    "attachComponent",
+    "dispatchLifecycle",
+    "dispatchMessage",
+    "dispatchInput",
+    "dispatchReload",
+    "detachComponent"
+  ],
+  "providerInstalledMethods": [
+    "attachComponent",
+    "dispatchLifecycle",
+    "dispatchMessage",
+    "dispatchInput",
+    "dispatchReload",
+    "detachComponent"
+  ],
+  "adapterExecutableMethods": [
+    "attachComponent",
+    "dispatchLifecycle",
+    "dispatchMessage",
+    "dispatchInput",
+    "dispatchReload",
+    "detachComponent"
+  ],
+  "packagedDefoldEngineVerifiedMethods": [],
+  "contexts": {
+    "game-object": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+    "gui-scene": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+    "render-instance+graphics": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified"
+  },
+  "blockers": [
+    {
+      "id": "recursive-message-input-codecs",
+      "blocks": [
+        "dispatchMessage",
+        "dispatchInput"
+      ],
+      "observed": "The executable backend supports leaf values and a bounded top-level string-key table, and rejects nested tables.",
+      "minimumCapability": "Bounded recursive record codec with explicit depth, entry, string-byte, cycle, ownership, and unsupported-value policies."
+    }
+  ],
+  "implementedCapabilities": {
+    "compilerRegistry": "deterministic-full-inventory-generated-and-bundled",
+    "componentOnlyBootstrap": "native-runtime-and-lazy-extension-attach-path-implemented",
+    "scriptAdapterContextSelection": "fixed-depth-16-reentrant-stack-no-hot-path-registry-allocation"
+  },
+  "methodDisposition": {
+    "attachComponent": {
+      "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+      "nativeStaticHermes": "fail-closed-no-component-c-abi",
+      "html5BrowserHost": "fail-closed-no-component-provider"
+    },
+    "dispatchLifecycle": {
+      "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+      "nativeStaticHermes": "fail-closed-no-component-c-abi",
+      "html5BrowserHost": "fail-closed-no-component-provider"
+    },
+    "dispatchMessage": {
+      "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+      "nativeStaticHermes": "fail-closed-no-component-c-abi",
+      "html5BrowserHost": "fail-closed-no-component-provider"
+    },
+    "dispatchInput": {
+      "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+      "nativeStaticHermes": "fail-closed-no-component-c-abi",
+      "html5BrowserHost": "fail-closed-no-component-provider"
+    },
+    "dispatchReload": {
+      "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+      "nativeStaticHermes": "fail-closed-no-component-c-abi",
+      "html5BrowserHost": "fail-closed-no-component-provider"
+    },
+    "detachComponent": {
+      "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
+      "nativeStaticHermes": "fail-closed-no-component-c-abi",
+      "html5BrowserHost": "fail-closed-no-component-provider"
+    }
+  },
+  "diagnostic": "deherm component proxies are unavailable on this target: native Lua and dynamic-Hermes harnesses pass, but Static Hermes, browser-host, and packaged-Defold execution remain unverified",
+  "evidence": {
+    "generation": "component generator emits context/property metadata plus a complete import registry; bundling emits exact component usage and a keyed sentinel",
+    "nativeCompile": "component provider and Hermes backend compile in a dedicated native target",
+    "nativeLuaHarness": "all six Lua ABI methods, all three contexts, failure recovery, warmed dispatch, and warmed attach/detach churn with zero Lua allocator calls are tested against pinned Lua 5.1",
+    "dynamicHermesHarness": "Lua-to-Hermes property/lifecycle/message/input/reload/final/detach and runtime-generation rebind execution is tested for all three contexts",
+    "packagedDefoldEngine": "unverified",
+    "staticHermesRuntime": "unverified",
+    "browserRuntime": "unverified"
+  },
+  "provenance": {
+    "proxyGenerator": {
+      "path": "packages/compiler/src/component-proxy-generator.mjs",
+      "sha256": "65d5161ddcb94c6b501ce4dc1fe6d839b6a00c34fd0def6c1e9516c3e991990d"
+    },
+    "componentBundler": {
+      "path": "scripts/build-component-registry.mjs",
+      "sha256": "c6ee585fc977fb7aed5df09a8a0e00b31761d17c8dedc9c2b33619b62f3b161a"
+    },
+    "runtimeHeader": {
+      "path": "defold/defold_hermes/include/defold_hermes/runtime.hpp",
+      "sha256": "cb29ce98feb8c245b03e03086f2dcd04d6257b623197c01a5e6733666d6bb298"
+    },
+    "runtimeSource": {
+      "path": "defold/defold_hermes/src/runtime.cpp",
+      "sha256": "a233a2dd45fd31f3eb7dd9cb5c9d9aa0bbcb627a0c10df837b2344cad6bc036d"
+    },
+    "extensionSource": {
+      "path": "defold/defold_hermes/src/extension.cpp",
+      "sha256": "4ceace847536b1f647ac6d2f8ed2227c3e08b039256ff32a6e6a8eb6b1e02bf6"
+    },
+    "luaProvider": {
+      "path": "defold/defold_hermes/include/defold_hermes/component_proxy_lua_gate.hpp",
+      "sha256": "5dc5a5f77690925439f0cc88529cbe18046483c6e3885f5f43681cb3115cdfd6"
+    },
+    "hermesBackend": {
+      "path": "defold/defold_hermes/src/component_hermes_backend.cpp",
+      "sha256": "f3a1994aca507c430027303a8ca8ec7a3a41d04c82ee72944f7bd574a6623cfd"
+    },
+    "adapterSource": {
+      "path": "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",
+      "sha256": "04d60ee6c175b34ef06ce103ec481ad4a705fe2ecdca94035ab0ede3f9e4b4a4"
+    },
+    "componentSdk": {
+      "path": "packages/sdk/src/component.ts",
+      "sha256": "ea295d09d449f38b4ce85553b441142e3dfe0ee0551dfd7b17f4d4958f25ba0f"
+    },
+    "nativeLuaHarness": {
+      "path": "tests/native/component_proxy_lua_gate/component_proxy_lua_gate_test.cpp",
+      "sha256": "78b0900ee023dab741dfe33aaa288fd62c1ea5041d941abf5e893373464970fd"
+    },
+    "dynamicHermesHarness": {
+      "path": "native/component_runtime_hermes_e2e.cpp",
+      "sha256": "972ae9fb7a88df223edd832d021d0f0feb118588c1cc8cff52398e2f5eb7c56e"
+    }
+  }
+}

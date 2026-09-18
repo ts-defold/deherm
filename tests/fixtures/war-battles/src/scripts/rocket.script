@@ -5,14 +5,20 @@
 -- component-id: deherm.component/v1/a0f848cd12a1c05cb417dfdefcb8f66d4f3a0ad43a6d1f0eb67e3b4a43dd4c44
 -- proxy-kind: script
 -- context-kind: game-object
+-- teardown-policy: final-callback-detach
+-- proxy-runtime: native-dynamic-hermes-harness-executable
 
 go.property("dir", vmath.vector3(0, 0, 0))
 
 local COMPONENT_ID = "deherm.component/v1/a0f848cd12a1c05cb417dfdefcb8f66d4f3a0ad43a6d1f0eb67e3b4a43dd4c44"
 local SCHEMA_FINGERPRINT = "e5b3cd54889eb239d497040f5ed581833c0500851fb3abacdd6ff547989b0c5a"
+local COMPONENT_CONTEXT = "game-object"
+local PROPERTY_SPECIALIZATIONS = {
+    { "dir", 6 },
+}
 
 function init(self)
-    assert(defold_hermes.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT))
+    assert(defold_hermes.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT, COMPONENT_CONTEXT, PROPERTY_SPECIALIZATIONS))
     defold_hermes.dispatchLifecycle(self, COMPONENT_ID, "init")
 end
 

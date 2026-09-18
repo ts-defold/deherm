@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { stableBindingId } from "../../../scripts/lib/binding-identity.mjs";
+import { stableBindingId } from "../../compiler/src/binding-identity.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const packageRequire = createRequire(import.meta.url);

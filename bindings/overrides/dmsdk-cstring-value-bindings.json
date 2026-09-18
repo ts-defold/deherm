@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 2,
+  "expectedCoverage": {"candidates": 20, "generated": 14, "blocked": 6},
+  "scratchCapacity": 65536,
+  "inputContractTokens": {
+    "nullability": ["non-null"],
+    "encoding": ["js-string-utf8-no-embedded-nul"]
+  },
+  "resultContractTokens": {
+    "nullability": ["non-null", "nullable"],
+    "encoding": ["native-null-terminated-bytes-decoded-as-utf8"]
+  },
+  "sourceEvidence": [
+    {
+      "id": "buffer-string-results",
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h",
+      "sha256": "b3d3d513d1db5ad537f552d0de9116e075c87bdb54ec27b61189c8fbb3ea80b9",
+      "anchors": ["const char* GetResultString(Result result);", "const char* GetValueTypeString(ValueType value);"]
+    },
+    {
+      "id": "graphics-texture-literals",
+      "path": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+      "sha256": "10bc2e302a8515ff0636f2cb8bdbece5a63bbd32ee0c10333e57986049ca382b",
+      "anchors": ["const char* GetTextureTypeLiteral(TextureType texture_type);", "const char* GetTextureFormatLiteral(TextureFormat format);"]
+    },
+    {
+      "id": "hash-null-terminated-input",
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "sha256": "242aa8e2cd74382d429830884e8047b8c1db9d5b0782594253e9dcddb396abc5",
+      "anchors": ["DM_DLLEXPORT uint32_t dmHashString32(const char* string);", "DM_DLLEXPORT uint64_t dmHashString64(const char* string);"]
+    },
+    {
+      "id": "resource-extension-cpp",
+      "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+      "sha256": "382d79cd16296229092883822a93a41ae896103923ef05f1901202736cfc50d7",
+      "anchors": ["Pointer to extension string if success (same as buffer), 0 otherwise", "const char* GetExtFromPath(const char* path);"]
+    },
+    {
+      "id": "resource-extension-c",
+      "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
+      "sha256": "c1ea1bbdde3576040d712fe837bd074a35c86090e974a5bef92f51375a097579",
+      "anchors": ["Pointer to extension string if an extension was found, 0 otherwise", "const char* ResourceGetExtFromPath(const char* path);"]
+    },
+    {
+      "id": "socket-result-string",
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h",
+      "sha256": "082e317d15576c42f87bdba8ff47c4b9ce90943fc24df3c00fec922ab16cb400",
+      "anchors": ["const char* ResultToString(Result result);"]
+    },
+    {
+      "id": "case-insensitive-byte-compare",
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+      "sha256": "c31d7f9f6408120e88cd0b3257720ed4cb98e6670ce9ebd15d30adbb3a8896fc",
+      "anchors": ["int dmStrCaseCmp(const char *s1, const char *s2);"]
+    },
+    {
+      "id": "filesystem-path-inputs",
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
+      "sha256": "0a05162524d96d340c46b03470319265f3817aaea34d786c52cc31499a0900f9",
+      "anchors": ["bool Exists(const char* path);", "Result Unlink(const char* path);", "Result Rename(const char* dst_path, const char* src_path);"]
+    },
+    {
+      "id": "utf8-string-input",
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
+      "sha256": "b08d53d589e046eead23616d32d515966b429b661a86504a1b04accd413603fe",
+      "anchors": ["@param str [type: const char*] Utf8 string", "uint32_t StrLen(const char* str);"]
+    }
+  ],
+  "stringContractRules": [
+    {
+      "id": "enum-literal-result-utf8",
+      "declarationIds": [
+        "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
+        "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
+        "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
+        "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
+        "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568"
+      ],
+      "input": null,
+      "result": {"nullability": "non-null", "encoding": "native-null-terminated-bytes-decoded-as-utf8"},
+      "sourceEvidence": ["buffer-string-results", "graphics-texture-literals", "socket-result-string"]
+    },
+    {
+      "id": "hash-input-js-utf8",
+      "declarationIds": [
+        "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
+        "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215"
+      ],
+      "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
+      "result": null,
+      "sourceEvidence": ["hash-null-terminated-input"]
+    },
+    {
+      "id": "resource-extension-cpp-js-utf8",
+      "declarationIds": ["dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1968"],
+      "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
+      "result": {"nullability": "nullable", "encoding": "native-null-terminated-bytes-decoded-as-utf8"},
+      "sourceEvidence": ["resource-extension-cpp"]
+    },
+    {
+      "id": "resource-extension-c-js-utf8",
+      "declarationIds": ["dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1905"],
+      "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
+      "result": {"nullability": "nullable", "encoding": "native-null-terminated-bytes-decoded-as-utf8"},
+      "sourceEvidence": ["resource-extension-c"]
+    },
+    {
+      "id": "case-compare-js-utf8",
+      "declarationIds": ["dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183"],
+      "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
+      "result": null,
+      "sourceEvidence": ["case-insensitive-byte-compare"]
+    },
+    {
+      "id": "filesystem-paths-js-utf8",
+      "declarationIds": [
+        "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
+        "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
+        "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596"
+      ],
+      "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
+      "result": null,
+      "sourceEvidence": ["filesystem-path-inputs"]
+    },
+    {
+      "id": "utf8-length-js-utf8",
+      "declarationIds": ["dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657"],
+      "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
+      "result": null,
+      "sourceEvidence": ["utf8-string-input"]
+    }
+  ],
+  "blockerRules": [
+    {"id": "restricted-string-domain-requires-validator", "symbolPattern": "(?:^|::)GetAdapterFamily$", "sourceEvidence": ["graphics-adapter-runtime-domain"]},
+    {"id": "borrowed-registry-result-has-no-atomic-copy-contract", "symbolPattern": "^dmHashReverseSafe(?:32|64)$", "sourceEvidence": ["hash-borrowed-registry-result"]},
+    {"id": "profiler-logical-context-unresolved", "headerPattern": "/dmsdk/dlib/profile\\.h$", "sourceEvidence": ["profiler-logical-context"]}
+  ],
+  "blockerSourceEvidence": [
+    {"id": "graphics-adapter-runtime-domain", "path": "upstream/defold/engine/graphics/src/graphics.cpp", "contains": "assert(0 && \"Adapter type not supported?\")"},
+    {"id": "hash-borrowed-registry-result", "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h", "contains": "@note Do not store this pointer"},
+    {"id": "profiler-logical-context", "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h", "contains": "ProfileResult ProfileScopeEnd(const char* name, uint64_t name_hash);"}
+  ]
+}

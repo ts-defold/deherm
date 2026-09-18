@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "matrixId": "deherm-full-wave",
+  "description": "Evidence-separated verification matrix for generated bindings, native runtimes, compiler tooling, target projections, the War Battles example, release staging, and repository knowledge.",
+  "rows": [
+    {
+      "id": "script-binding-stack",
+      "title": "Defold script binding stack",
+      "scope": "The complete generated script projection, native Lua routing, and clean-room ownership for all pinned script routes.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "The canonical script lowering plan and its transitive generator inputs are current.", "modes": ["focused", "full"], "commands": [{ "id": "script-plan-deep-check", "executable": "$NODE", "arguments": ["scripts/ensure-binding-lowering-plan.mjs", "--deep-check"], "timeoutMs": 300000 }] },
+        "compile": { "kind": "command", "claim": "Generated native extension sources pass the repository syntax compile gate.", "modes": ["full"], "commands": [{ "id": "extension-syntax", "executable": "python3", "arguments": ["scripts/check-extension-syntax.py"], "timeoutMs": 600000 }] },
+        "link": { "kind": "command", "claim": "The generated handle router links into its dedicated pinned-Lua host executable.", "modes": ["full"], "commands": [{ "id": "handle-router-link", "executable": "$NODE", "arguments": ["--test", "tests/script-handle-router-runtime.test.mjs"], "timeoutMs": 600000 }] },
+        "runtime": { "kind": "command", "claim": "The generated handle routes execute through the pinned Lua host harness; this is not packaged-engine execution.", "modes": ["full"], "commands": [{ "id": "handle-router-runtime", "executable": "$NODE", "arguments": ["--test", "tests/script-handle-router-runtime.test.mjs"], "timeoutMs": 600000 }] },
+        "packaged-engine": { "kind": "declared", "status": "unobserved", "claim": "Packaged-engine route behavior requires SHA-bound real-engine observations.", "reason": "The checked reports retain planned and instrumented scenarios, but the repository does not contain a complete current packaged-engine observation for the whole script surface.", "sources": ["bindings/generated/defold-script-real-engine-matrix.json"] },
+        "sanitizer": { "kind": "declared", "status": "unobserved", "claim": "A whole-script-wave sanitizer run must be recorded independently from host runtime success.", "reason": "Individual native families have sanitizer evidence, but no single existing command proves sanitizer coverage for the entire script stack." },
+        "allocation": { "kind": "command", "claim": "The generated handle router's warmed path retains its explicit zero-allocation assertions.", "modes": ["full"], "commands": [{ "id": "handle-router-allocation", "executable": "$NODE", "arguments": ["--test", "tests/script-handle-router-runtime.test.mjs"], "timeoutMs": 600000 }] },
+        "clean-room": { "kind": "command", "claim": "Every registry-owned generated script artifact regenerates byte-for-byte from pinned inputs.", "modes": ["full"], "commands": [{ "id": "script-clean-room", "executable": "$NODE", "arguments": ["scripts/check-script-clean-room-regeneration.mjs"], "timeoutMs": 600000 }] },
+        "target": { "kind": "declared", "status": "blocked", "claim": "Dynamic Hermes, Static Hermes, and browser target evidence must remain independently qualified.", "reason": "The canonical lowering plan still contains target-specific blocked and pending routes; one host target cannot promote the others.", "sources": ["bindings/generated/defold-binding-lowering-plan.json"] }
+      }
+    },
+    {
+      "id": "dmsdk-binding-stack",
+      "title": "dmSDK structural binding stack",
+      "scope": "All 1,361 pinned dmSDK declarations, including generated scalar, span, C-string, and borrowed-handle structural waves.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "The complete registered dmSDK generator pipeline is current.", "modes": ["focused", "full"], "commands": [{ "id": "dmsdk-pipeline", "executable": "$NODE", "arguments": ["scripts/generate-dmsdk-runtime.mjs", "--check"], "timeoutMs": 300000 }] },
+        "compile": { "kind": "command", "claim": "The borrowed-handle C ABI, JSI source, pinned headers, browser descriptor, and TypeScript projections compile or parse.", "modes": ["focused", "full"], "commands": [{ "id": "dmsdk-target-compile", "executable": "$NODE", "arguments": ["--test", "--test-name-pattern", "C ABI, Dynamic Hermes adapter, browser descriptor, and TypeScript projections compile", "tests/dmsdk-borrowed-handle-bindings.test.mjs"], "timeoutMs": 300000 }] },
+        "link": { "kind": "command", "claim": "The borrowed-handle generic dispatcher links with its deterministic fake provider only.", "modes": ["full"], "commands": [{ "id": "dmsdk-host-link", "executable": "$NODE", "arguments": ["--test", "--test-name-pattern", "fake-provider host bridge links", "tests/dmsdk-borrowed-handle-bindings.test.mjs"], "timeoutMs": 300000 }] },
+        "runtime": { "kind": "command", "claim": "All generated borrowed-handle routes dispatch through a fake provider; this is not a Defold provider.", "modes": ["focused", "full"], "commands": [{ "id": "dmsdk-host-runtime", "executable": "$NODE", "arguments": ["--test", "--test-name-pattern", "fake-provider host bridge links", "tests/dmsdk-borrowed-handle-bindings.test.mjs"], "timeoutMs": 300000 }] },
+        "packaged-engine": { "kind": "declared", "status": "unobserved", "claim": "dmSDK adapters require real provider installation and packaged-engine observation.", "reason": "Generated reports explicitly record zero packaged-engine verifications and no real borrowed-handle provider is installed.", "sources": ["bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"] },
+        "sanitizer": { "kind": "command", "claim": "The fake-provider dispatcher runs under ASan and UBSan.", "modes": ["full"], "commands": [{ "id": "dmsdk-host-sanitizer", "executable": "$NODE", "arguments": ["--test", "--test-name-pattern", "fake-provider host bridge links", "tests/dmsdk-borrowed-handle-bindings.test.mjs"], "timeoutMs": 300000 }] },
+        "allocation": { "kind": "command", "claim": "The warmed generic borrowed-handle dispatcher retains its zero-C++-allocation assertion.", "modes": ["focused", "full"], "commands": [{ "id": "dmsdk-warmed-allocation", "executable": "$NODE", "arguments": ["--test", "--test-name-pattern", "fake-provider host bridge links", "tests/dmsdk-borrowed-handle-bindings.test.mjs"], "timeoutMs": 300000 }] },
+        "clean-room": { "kind": "command", "claim": "All registered dmSDK artifacts regenerate byte-for-byte from pinned inputs.", "modes": ["focused", "full"], "commands": [{ "id": "dmsdk-clean-room", "executable": "$NODE", "arguments": ["scripts/check-dmsdk-clean-room-regeneration.mjs"], "timeoutMs": 600000 }] },
+        "target": { "kind": "command", "claim": "Generated C, Dynamic Hermes, Static Hermes, browser, and TypeScript borrowed-handle projections pass their available compile-time gates.", "modes": ["focused", "full"], "commands": [{ "id": "dmsdk-target-projections", "executable": "$NODE", "arguments": ["--test", "--test-name-pattern", "C ABI, Dynamic Hermes adapter, browser descriptor, and TypeScript projections compile", "tests/dmsdk-borrowed-handle-bindings.test.mjs"], "timeoutMs": 300000 }] }
+      }
+    },
+    {
+      "id": "component-runtime",
+      "title": "Typed component proxy and Hermes runtime",
+      "scope": "Generated .script.ts/.gui.ts/.render.ts proxies, the native Lua ABI gate, and the standalone Dynamic Hermes component harness.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "The component runtime capability report is current and deterministic.", "modes": ["focused", "full"], "commands": [{ "id": "component-capability", "executable": "$NODE", "arguments": ["scripts/generate-component-proxy-runtime-capability.mjs", "--check"], "timeoutMs": 120000 }] },
+        "compile": { "kind": "command", "claim": "The generated native component capability gate compiles against its declared ABI.", "modes": ["focused", "full"], "commands": [{ "id": "component-gate-compile", "executable": "$NODE", "arguments": ["--test", "--test-name-pattern", "generated native gate header compiles", "tests/component-proxy-runtime-capability.test.mjs"], "timeoutMs": 300000 }] },
+        "link": { "kind": "command", "claim": "The standalone component Hermes harness links; this is not a packaged Defold engine.", "modes": ["full"], "commands": [{ "id": "native-configure", "executable": "cmake", "arguments": ["-S", ".", "-B", "build/native", "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release"], "timeoutMs": 600000 }, { "id": "component-runtime-link", "executable": "cmake", "arguments": ["--build", "build/native", "--target", "defold-hermes-component-runtime-e2e", "--parallel"], "timeoutMs": 600000 }] },
+        "runtime": { "kind": "command", "claim": "The standalone Dynamic Hermes/Lua component lifecycle harness executes.", "modes": ["full"], "commands": [{ "id": "component-runtime-execute", "executable": "build/native/defold-hermes-component-runtime-e2e", "arguments": [], "timeoutMs": 300000 }] },
+        "packaged-engine": { "kind": "declared", "status": "unobserved", "claim": "Generated proxies must execute inside an actual packaged Defold engine.", "reason": "The capability report labels the native Dynamic Hermes harness executable while keeping runtimeConformant false.", "sources": ["bindings/generated/defold-component-proxy-runtime-capability.json"] },
+        "sanitizer": { "kind": "command", "claim": "The standalone component runtime is rebuilt and executed with the repository sanitizer option.", "modes": ["full"], "commands": [{ "id": "component-sanitize-configure", "executable": "cmake", "arguments": ["-S", ".", "-B", "build/evidence/component-sanitize", "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Debug", "-DDEHERM_SANITIZE=ON"], "timeoutMs": 600000 }, { "id": "component-sanitize-build", "executable": "cmake", "arguments": ["--build", "build/evidence/component-sanitize", "--target", "defold-hermes-component-runtime-e2e", "--parallel"], "timeoutMs": 600000 }, { "id": "component-sanitize-run", "executable": "build/evidence/component-sanitize/defold-hermes-component-runtime-e2e", "arguments": [], "timeoutMs": 300000 }] },
+        "allocation": { "kind": "declared", "status": "unobserved", "claim": "Component lifecycle allocation behavior requires a dedicated warmed counter.", "reason": "The existing component harness checks roots, stack restoration, and lifecycle counts but does not publish a warmed allocation count." },
+        "clean-room": { "kind": "declared", "status": "unavailable", "claim": "Component proxy output needs a registered whole-family clean-room owner.", "reason": "Deterministic golden and freshness tests exist, but there is no separate component-runtime clean-room orchestrator." },
+        "target": { "kind": "declared", "status": "blocked", "claim": "Component execution must be proven separately for Dynamic Hermes, Static Hermes, and HTML5.", "reason": "Only the standalone native Dynamic Hermes harness is executable; Static Hermes and browser component runtime attachment are not available." }
+      }
+    },
+    {
+      "id": "compiler-projects",
+      "title": "Compiler, CLI, and generated project contexts",
+      "scope": "Project inspection, generated SDK contexts, type checking, and context-specific authoring contracts.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "The War Battles project SDK and component proxies regenerate through the current CLI.", "modes": ["focused", "full"], "commands": [{ "id": "project-generate", "executable": "$NODE", "arguments": ["bin/deherm.mjs", "generate", "--project", "examples/war-battles-online/defold"], "timeoutMs": 300000 }] },
+        "compile": { "kind": "command", "claim": "All generated shared, game-object, GUI, and render TypeScript context projects type-check.", "modes": ["focused", "full"], "commands": [{ "id": "project-typecheck", "executable": "$NODE", "arguments": ["bin/deherm.mjs", "typecheck", "--project", "examples/war-battles-online/defold"], "timeoutMs": 300000 }] },
+        "link": { "kind": "declared", "status": "unavailable", "claim": "TypeScript project type checking does not establish native extension linkage.", "reason": "The CLI context project has no link stage of its own." },
+        "runtime": { "kind": "declared", "status": "unobserved", "claim": "Generated project contexts require a separate runtime consumer.", "reason": "CLI generation and type checking are compile-control-plane evidence only." },
+        "packaged-engine": { "kind": "declared", "status": "unobserved", "claim": "Generated project output must be run by a packaged Defold engine.", "reason": "No CLI command result is accepted as packaged-engine gameplay evidence." },
+        "sanitizer": { "kind": "declared", "status": "unavailable", "claim": "TypeScript-only compiler paths do not have a native sanitizer stage.", "reason": "Sanitizers apply to downstream native runtimes, not the project type checker." },
+        "allocation": { "kind": "declared", "status": "unobserved", "claim": "Compiler allocation behavior needs an explicit benchmark or counter.", "reason": "No existing CLI evidence command publishes warmed allocation counts." },
+        "clean-room": { "kind": "command", "claim": "CLI generation remains deterministic across temporary project fixtures.", "modes": ["full"], "commands": [{ "id": "cli-generation-tests", "executable": "$NODE", "arguments": ["--test", "tests/cli.test.mjs"], "timeoutMs": 600000 }] },
+        "target": { "kind": "command", "claim": "Context-aware SDK projection rejects APIs outside their authored Defold contexts.", "modes": ["full"], "commands": [{ "id": "cli-context-tests", "executable": "$NODE", "arguments": ["--test", "tests/cli.test.mjs"], "timeoutMs": 600000 }] }
+      }
+    },
+    {
+      "id": "static-hermes",
+      "title": "Static Hermes target lane",
+      "scope": "Static Hermes source generation, language checks, native runner linkage, and target-specific execution.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "The generated Static Hermes vmath bridge is current.", "modes": ["full"], "commands": [{ "id": "static-vmath-check", "executable": "$NODE", "arguments": ["scripts/generate-static-hermes-vmath.mjs", "--check"], "timeoutMs": 300000 }] },
+        "compile": { "kind": "command", "claim": "Static Hermes generated sources pass the repository compiler gate.", "modes": ["full"], "commands": [{ "id": "static-compile", "executable": "npm", "arguments": ["run", "check:static-hermes"], "timeoutMs": 900000 }] },
+        "link": { "kind": "command", "claim": "The Static Hermes native runner links from the current generated sources.", "modes": ["full"], "commands": [{ "id": "static-link", "executable": "npm", "arguments": ["run", "test:static-hermes"], "timeoutMs": 900000 }] },
+        "runtime": { "kind": "command", "claim": "The Static Hermes host runner executes its checked fixture.", "modes": ["full"], "commands": [{ "id": "static-runtime", "executable": "npm", "arguments": ["run", "test:static-hermes"], "timeoutMs": 900000 }] },
+        "packaged-engine": { "kind": "declared", "status": "unobserved", "claim": "Static Hermes requires packaged-engine target execution in addition to its host runner.", "reason": "The existing Static Hermes commands run host-side compiler and runner evidence, not a packaged Defold engine." },
+        "sanitizer": { "kind": "declared", "status": "unobserved", "claim": "A Static Hermes sanitizer run must be recorded separately.", "reason": "The existing Static Hermes package commands do not promise an ASan/UBSan configuration." },
+        "allocation": { "kind": "command", "claim": "Generated Static Hermes vmath glue retains its stack-only and float-lane assertions.", "modes": ["full"], "commands": [{ "id": "static-allocation-contract", "executable": "$NODE", "arguments": ["--test", "tests/static-hermes-vmath.test.mjs"], "timeoutMs": 300000 }] },
+        "clean-room": { "kind": "command", "claim": "Static Hermes vmath generation is deterministic and rejects descriptor drift.", "modes": ["full"], "commands": [{ "id": "static-determinism", "executable": "$NODE", "arguments": ["--test", "tests/static-hermes-vmath.test.mjs"], "timeoutMs": 300000 }] },
+        "target": { "kind": "command", "claim": "Static Hermes target-specific generation and language constraints pass their focused tests.", "modes": ["full"], "commands": [{ "id": "static-target-tests", "executable": "$NODE", "arguments": ["--test", "tests/static-hermes-vmath.test.mjs"], "timeoutMs": 300000 }] }
+      }
+    },
+    {
+      "id": "war-battles-online",
+      "title": "War Battles Online example",
+      "scope": "Deterministic 32-player simulation, replay/rollback harness, Defold project projection, and transport capability gates.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "The Defold-local core projection, component proxy, and capability snapshot are current.", "modes": ["focused", "full"], "commands": [{ "id": "war-core-projection", "executable": "$NODE", "arguments": ["examples/war-battles-online/integration/sync-defold-sources.mjs", "--check"] }, { "id": "war-capability-snapshot", "executable": "$NODE", "arguments": ["examples/war-battles-online/integration/generate-capability-snapshot.mjs", "--check"] }] },
+        "compile": { "kind": "command", "claim": "The isolated example and generated Defold project contexts type-check.", "modes": ["focused", "full"], "commands": [{ "id": "war-example-typecheck", "executable": "node_modules/.bin/tsc", "arguments": ["-p", "examples/war-battles-online/tsconfig.json", "--noEmit"], "timeoutMs": 300000 }, { "id": "war-defold-typecheck", "executable": "$NODE", "arguments": ["bin/deherm.mjs", "typecheck", "--project", "examples/war-battles-online/defold"], "timeoutMs": 300000 }] },
+        "link": { "kind": "declared", "status": "blocked", "claim": "The example must link into a packaged Defold engine before being called playable in-engine.", "reason": "The generated component gate is harness-executable but runtimeConformant remains false." },
+        "runtime": { "kind": "command", "claim": "The deterministic core, 32-player soak, rollback, replay, and in-memory transport execute headlessly.", "modes": ["focused", "full"], "commands": [{ "id": "war-headless-tests", "executable": "$NODE", "arguments": ["--test", "examples/war-battles-online/test/core.test.mjs", "examples/war-battles-online/test/integration.test.mjs"], "timeoutMs": 300000 }] },
+        "packaged-engine": { "kind": "declared", "status": "unobserved", "claim": "War Battles gameplay must execute inside a packaged Defold engine.", "reason": "The generated runtime gate records that packaged-engine gameplay execution has not been observed.", "sources": [".agents/docs/data/war-battles-runtime-gate.json"] },
+        "sanitizer": { "kind": "declared", "status": "unavailable", "claim": "The pure TypeScript headless example has no native sanitizer cell.", "reason": "Native sanitizer evidence belongs to the runtime adapters, not the in-memory simulation." },
+        "allocation": { "kind": "declared", "status": "unobserved", "claim": "Simulation allocation behavior needs a measured warmed counter.", "reason": "The current core is allocation-aware and fixed-capacity, but the checked evidence does not publish an allocation count." },
+        "clean-room": { "kind": "command", "claim": "The checked replay, soak, bundle, and Defold projection artifacts reproduce from their commands.", "modes": ["focused", "full"], "commands": [{ "id": "war-reproducibility", "executable": "$NODE", "arguments": ["--test", "examples/war-battles-online/test/integration.test.mjs"], "timeoutMs": 300000 }] },
+        "target": { "kind": "declared", "status": "blocked", "claim": "WebTransport/H3 and native Defold client execution require real target probes.", "reason": "The browser Colyseus H3 handshake and native Defold WebTransport client remain unproven; WebSocket fallback is labelled as WebSocket.", "sources": ["examples/war-battles-online/README.md"] }
+      }
+    },
+    {
+      "id": "release-artifacts",
+      "title": "Release artifact projection",
+      "scope": "Content-addressed release selection and target-specific source projection without claiming final package execution.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "Release selection is keyed, idempotent, and fails closed for targets without canonical authority.", "modes": ["full"], "commands": [{ "id": "release-generation-tests", "executable": "$NODE", "arguments": ["--test", "tests/release-build.test.mjs"], "timeoutMs": 300000 }] },
+        "compile": { "kind": "declared", "status": "blocked", "claim": "Generated release sources require a separate target compile.", "reason": "The release generator emits a source projection and requirements manifest; it does not claim every target compiles." },
+        "link": { "kind": "declared", "status": "blocked", "claim": "Release projection must link through the selected target toolchain.", "reason": "Canonical implementation-object pruning and final target linkage remain outside the generator proof." },
+        "runtime": { "kind": "declared", "status": "unobserved", "claim": "A projected release requires target runtime execution.", "reason": "Idempotent source generation is not runtime evidence." },
+        "packaged-engine": { "kind": "declared", "status": "unobserved", "claim": "Release artifacts require packaged Defold engine execution.", "reason": "No release-generation test is promoted to packaged-engine evidence." },
+        "sanitizer": { "kind": "declared", "status": "unavailable", "claim": "Release source projection has no sanitizer execution stage.", "reason": "Sanitizer evidence belongs to a linked runtime target." },
+        "allocation": { "kind": "declared", "status": "unavailable", "claim": "Release source projection has no warmed runtime allocation stage.", "reason": "Allocation evidence belongs to an executing target." },
+        "clean-room": { "kind": "command", "claim": "Temporary release outputs are keyed and idempotent.", "modes": ["full"], "commands": [{ "id": "release-idempotence", "executable": "$NODE", "arguments": ["--test", "tests/release-build.test.mjs"], "timeoutMs": 300000 }] },
+        "target": { "kind": "declared", "status": "blocked", "claim": "Dynamic Hermes, Static Hermes, and browser release authority remains target-specific.", "reason": "The current release tests explicitly fail closed where canonical emit authority is absent." }
+      }
+    },
+    {
+      "id": "knowledge-contract",
+      "title": "Repository knowledge contract",
+      "scope": "OKF structure for decisions, evidence boundaries, roadmaps, and verification documentation.",
+      "cells": {
+        "generation": { "kind": "command", "claim": "All knowledge files retain the required OKF structure.", "modes": ["focused", "full"], "commands": [{ "id": "okf-structure", "executable": "$NODE", "arguments": [".agents/check-okf.mjs"] }] },
+        "compile": { "kind": "declared", "status": "unavailable", "claim": "Markdown knowledge has no compile stage beyond structural validation.", "reason": "The OKF structure command is recorded under generation/validation." },
+        "link": { "kind": "declared", "status": "unavailable", "claim": "Knowledge artifacts have no native link stage.", "reason": "Not applicable to repository documentation." },
+        "runtime": { "kind": "declared", "status": "unavailable", "claim": "Knowledge artifacts have no runtime stage.", "reason": "Not applicable to repository documentation." },
+        "packaged-engine": { "kind": "declared", "status": "unavailable", "claim": "Knowledge structure cannot establish packaged-engine execution.", "reason": "Documentation records evidence; it is not execution evidence." },
+        "sanitizer": { "kind": "declared", "status": "unavailable", "claim": "Knowledge artifacts have no sanitizer stage.", "reason": "Not applicable to repository documentation." },
+        "allocation": { "kind": "declared", "status": "unavailable", "claim": "Knowledge artifacts have no allocation stage.", "reason": "Not applicable to repository documentation." },
+        "clean-room": { "kind": "declared", "status": "unobserved", "claim": "A separate knowledge clean-room reconstruction would need its own declared source graph.", "reason": "The current OKF gate validates structure but does not regenerate prose." },
+        "target": { "kind": "declared", "status": "unavailable", "claim": "Knowledge structure is target-independent.", "reason": "No target executable is produced." }
+      }
+    }
+  ]
+}

@@ -116,7 +116,7 @@ function validateCompileTimeProperty(manifest, rocketProxy) {
 export async function buildWarBattlesRuntimeGate(repositoryRoot) {
   const root = path.resolve(repositoryRoot);
   const relativePaths = {
-    inventory: "knowledge/data/war-battles-api-usage.json",
+    inventory: ".agents/docs/data/war-battles-api-usage.json",
     ir: "bindings/generated/defold-script-api-ir.json",
     scalarDispatch: "bindings/generated/defold-script-scalar-dispatch.json",
     valueDispatch: "bindings/generated/defold-script-value-bindings.json",

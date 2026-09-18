@@ -57,37 +57,30 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 62,
           "value": 0
         },
         {
           "name": "RESULT_FIELDTYPE_MISMATCH",
-          "line": 63,
           "value": 1
         },
         {
           "name": "RESULT_WIRE_FORMAT_ERROR",
-          "line": 64,
           "value": 2
         },
         {
           "name": "RESULT_IO_ERROR",
-          "line": 65,
           "value": 3
         },
         {
           "name": "RESULT_VERSION_MISMATCH",
-          "line": 66,
           "value": 4
         },
         {
           "name": "RESULT_MISSING_REQUIRED",
-          "line": 67,
           "value": 5
         },
         {
           "name": "RESULT_INTERNAL_ERROR",
-          "line": 68,
           "value": 1000
         }
       ],
@@ -2331,52 +2324,42 @@
       "members": [
         {
           "name": "VALUE_TYPE_UINT8",
-          "line": 67,
           "value": 0
         },
         {
           "name": "VALUE_TYPE_UINT16",
-          "line": 68,
           "value": 1
         },
         {
           "name": "VALUE_TYPE_UINT32",
-          "line": 69,
           "value": 2
         },
         {
           "name": "VALUE_TYPE_UINT64",
-          "line": 70,
           "value": 3
         },
         {
           "name": "VALUE_TYPE_INT8",
-          "line": 71,
           "value": 4
         },
         {
           "name": "VALUE_TYPE_INT16",
-          "line": 72,
           "value": 5
         },
         {
           "name": "VALUE_TYPE_INT32",
-          "line": 73,
           "value": 6
         },
         {
           "name": "VALUE_TYPE_INT64",
-          "line": 74,
           "value": 7
         },
         {
           "name": "VALUE_TYPE_FLOAT32",
-          "line": 75,
           "value": 8
         },
         {
           "name": "MAX_VALUE_TYPE_COUNT",
-          "line": 76,
           "value": 9
         }
       ],
@@ -2399,51 +2382,51 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 100
+          "value": 0
         },
         {
           "name": "RESULT_GUARD_INVALID",
-          "line": 101
+          "value": 1
         },
         {
           "name": "RESULT_ALLOCATION_ERROR",
-          "line": 102
+          "value": 2
         },
         {
           "name": "RESULT_BUFFER_INVALID",
-          "line": 103
+          "value": 3
         },
         {
           "name": "RESULT_BUFFER_SIZE_ERROR",
-          "line": 104
+          "value": 4
         },
         {
           "name": "RESULT_STREAM_SIZE_ERROR",
-          "line": 105
+          "value": 5
         },
         {
           "name": "RESULT_STREAM_MISSING",
-          "line": 106
+          "value": 6
         },
         {
           "name": "RESULT_STREAM_TYPE_MISMATCH",
-          "line": 107
+          "value": 7
         },
         {
           "name": "RESULT_STREAM_COUNT_MISMATCH",
-          "line": 108
+          "value": 8
         },
         {
           "name": "RESULT_STREAM_MISMATCH",
-          "line": 109
+          "value": 9
         },
         {
           "name": "RESULT_METADATA_INVALID",
-          "line": 110
+          "value": 10
         },
         {
           "name": "RESULT_METADATA_MISSING",
-          "line": 111
+          "value": 11
         }
       ],
       "description": "Result enumeration.",
@@ -3774,27 +3757,22 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 66,
           "value": 0
         },
         {
           "name": "RESULT_OUT_OF_RESOURCES",
-          "line": 67,
           "value": -1
         },
         {
           "name": "RESULT_SOCKET_ERROR",
-          "line": 68,
           "value": -2
         },
         {
           "name": "RESULT_HANDSHAKE_FAILED",
-          "line": 69,
           "value": -3
         },
         {
           "name": "RESULT_SHUT_DOWN",
-          "line": 70,
           "value": -4
         }
       ],
@@ -4425,7 +4403,7 @@
       "members": [
         {
           "name": "ALGORITHM_XTEA",
-          "line": 40
+          "value": 0
         }
       ],
       "description": "encryption algorithm enumeration",
@@ -4447,12 +4425,10 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 52,
           "value": 0
         },
         {
           "name": "RESULT_ERROR",
-          "line": 53,
           "value": 1
         }
       ],
@@ -5974,17 +5950,14 @@
       "members": [
         {
           "name": "EVENT_READ",
-          "line": 47,
           "value": 0
         },
         {
           "name": "EVENT_WRITE",
-          "line": 48,
           "value": 1
         },
         {
           "name": "EVENT_ERROR",
-          "line": 49,
           "value": 2
         }
       ],
@@ -7262,12 +7235,10 @@
       "members": [
         {
           "name": "STATE_DEFAULT",
-          "line": 49,
           "value": 0
         },
         {
           "name": "STATE_USER_ALLOCATED",
-          "line": 50,
           "value": 1
         }
       ],
@@ -8372,67 +8343,54 @@
       "members": [
         {
           "name": "HTTP_RESULT_NOT_200_OK",
-          "line": 157,
           "value": 1
         },
         {
           "name": "HTTP_RESULT_OK",
-          "line": 158,
           "value": 0
         },
         {
           "name": "HTTP_RESULT_SOCKET_ERROR",
-          "line": 159,
           "value": -1
         },
         {
           "name": "HTTP_RESULT_HTTP_HEADERS_ERROR",
-          "line": 160,
           "value": -2
         },
         {
           "name": "HTTP_RESULT_INVALID_RESPONSE",
-          "line": 161,
           "value": -3
         },
         {
           "name": "HTTP_RESULT_PARTIAL_CONTENT",
-          "line": 162,
           "value": -4
         },
         {
           "name": "HTTP_RESULT_UNSUPPORTED_TRANSFER_ENCODING",
-          "line": 163,
           "value": -5
         },
         {
           "name": "HTTP_RESULT_INVAL_ERROR",
-          "line": 164,
           "value": -6
         },
         {
           "name": "HTTP_RESULT_UNEXPECTED_EOF",
-          "line": 165,
           "value": -7
         },
         {
           "name": "HTTP_RESULT_IO_ERROR",
-          "line": 166,
           "value": -8
         },
         {
           "name": "HTTP_RESULT_HANDSHAKE_FAILED",
-          "line": 167,
           "value": -9
         },
         {
           "name": "HTTP_RESULT_INVAL",
-          "line": 168,
           "value": -10
         },
         {
           "name": "HTTP_RESULT_UNKNOWN",
-          "line": 169,
           "value": -1000
         }
       ],
@@ -8472,22 +8430,18 @@
       "members": [
         {
           "name": "HTTP_RESPONSE_EVENT_HEADER",
-          "line": 182,
           "value": 0
         },
         {
           "name": "HTTP_RESPONSE_EVENT_DATA",
-          "line": 183,
           "value": 1
         },
         {
           "name": "HTTP_RESPONSE_EVENT_COMPLETE",
-          "line": 184,
           "value": 2
         },
         {
           "name": "HTTP_RESPONSE_EVENT_PROGRESS",
-          "line": 185,
           "value": 3
         }
       ],
@@ -8527,12 +8481,10 @@
       "members": [
         {
           "name": "HTTP_CALLBACK_RESULT_CONTINUE",
-          "line": 197,
           "value": 0
         },
         {
           "name": "HTTP_CALLBACK_RESULT_CANCEL",
-          "line": 198,
           "value": 1
         }
       ],
@@ -9622,17 +9574,14 @@
       "members": [
         {
           "name": "PARSE_RESULT_NEED_MORE_DATA",
-          "line": 41,
           "value": 1
         },
         {
           "name": "PARSE_RESULT_OK",
-          "line": 42,
           "value": 0
         },
         {
           "name": "PARSE_RESULT_SYNTAX_ERROR",
-          "line": 43,
           "value": -1
         }
       ],
@@ -9741,17 +9690,14 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 45,
           "value": 0
         },
         {
           "name": "RESULT_UNSUPPORTED_FORMAT",
-          "line": 46,
           "value": -1
         },
         {
           "name": "RESULT_IMAGE_ERROR",
-          "line": 47,
           "value": -2
         }
       ],
@@ -9774,22 +9720,18 @@
       "members": [
         {
           "name": "TYPE_RGB",
-          "line": 61,
           "value": 0
         },
         {
           "name": "TYPE_RGBA",
-          "line": 62,
           "value": 1
         },
         {
           "name": "TYPE_LUMINANCE",
-          "line": 63,
           "value": 2
         },
         {
           "name": "TYPE_LUMINANCE_ALPHA",
-          "line": 64,
           "value": 3
         }
       ],
@@ -9812,12 +9754,10 @@
       "members": [
         {
           "name": "COMPRESSION_TYPE_NONE",
-          "line": 69,
           "value": 0
         },
         {
           "name": "COMPRESSION_TYPE_ASTC",
-          "line": 70,
           "value": 1
         }
       ],
@@ -10484,37 +10424,30 @@
       "members": [
         {
           "name": "JOBSYSTEM_STATUS_FREE",
-          "line": 72,
           "value": 0
         },
         {
           "name": "JOBSYSTEM_STATUS_CREATED",
-          "line": 73,
           "value": 1
         },
         {
           "name": "JOBSYSTEM_STATUS_QUEUED",
-          "line": 74,
           "value": 2
         },
         {
           "name": "JOBSYSTEM_STATUS_PROCESSING",
-          "line": 75,
           "value": 3
         },
         {
           "name": "JOBSYSTEM_STATUS_FINISHED",
-          "line": 76,
           "value": 4
         },
         {
           "name": "JOBSYSTEM_STATUS_CALLBACK",
-          "line": 77,
           "value": 5
         },
         {
           "name": "JOBSYSTEM_STATUS_CANCELED",
-          "line": 78,
           "value": 6
         }
       ],
@@ -10537,27 +10470,22 @@
       "members": [
         {
           "name": "JOBSYSTEM_RESULT_OK",
-          "line": 92,
           "value": 0
         },
         {
           "name": "JOBSYSTEM_RESULT_ERROR",
-          "line": 93,
           "value": 1
         },
         {
           "name": "JOBSYSTEM_RESULT_INVALID_HANDLE",
-          "line": 94,
           "value": 2
         },
         {
           "name": "JOBSYSTEM_RESULT_CANCELED",
-          "line": 95,
           "value": 3
         },
         {
           "name": "JOBSYSTEM_RESULT_PENDING",
-          "line": 96,
           "value": 4
         }
       ],
@@ -11008,32 +10936,26 @@
       "members": [
         {
           "name": "LOG_SEVERITY_DEBUG",
-          "line": 134,
           "value": 0
         },
         {
           "name": "LOG_SEVERITY_USER_DEBUG",
-          "line": 135,
           "value": 1
         },
         {
           "name": "LOG_SEVERITY_INFO",
-          "line": 136,
           "value": 2
         },
         {
           "name": "LOG_SEVERITY_WARNING",
-          "line": 137,
           "value": 3
         },
         {
           "name": "LOG_SEVERITY_ERROR",
-          "line": 138,
           "value": 4
         },
         {
           "name": "LOG_SEVERITY_FATAL",
-          "line": 139,
           "value": 5
         }
       ],
@@ -11538,17 +11460,14 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 41,
           "value": 0
         },
         {
           "name": "RESULT_INVAL",
-          "line": 42,
           "value": -1
         },
         {
           "name": "RESULT_NOMEM",
-          "line": 43,
           "value": -2
         }
       ],
@@ -11637,37 +11556,30 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 50,
           "value": 0
         },
         {
           "name": "RESULT_SOCKET_EXISTS",
-          "line": 51,
           "value": -1
         },
         {
           "name": "RESULT_SOCKET_NOT_FOUND",
-          "line": 52,
           "value": -2
         },
         {
           "name": "RESULT_SOCKET_OUT_OF_RESOURCES",
-          "line": 53,
           "value": -3
         },
         {
           "name": "RESULT_INVALID_SOCKET_NAME",
-          "line": 54,
           "value": -4
         },
         {
           "name": "RESULT_MALFORMED_URL",
-          "line": 55,
           "value": -5
         },
         {
           "name": "RESULT_NAME_OK_SOCKET_NOT_FOUND",
-          "line": 56,
           "value": -6
         }
       ],
@@ -13116,35 +13028,35 @@
       "members": [
         {
           "name": "PROFILE_PROPERTY_TYPE_GROUP",
-          "line": 55
+          "value": 0
         },
         {
           "name": "PROFILE_PROPERTY_TYPE_BOOL",
-          "line": 56
+          "value": 1
         },
         {
           "name": "PROFILE_PROPERTY_TYPE_S32",
-          "line": 57
+          "value": 2
         },
         {
           "name": "PROFILE_PROPERTY_TYPE_U32",
-          "line": 58
+          "value": 3
         },
         {
           "name": "PROFILE_PROPERTY_TYPE_F32",
-          "line": 59
+          "value": 4
         },
         {
           "name": "PROFILE_PROPERTY_TYPE_S64",
-          "line": 60
+          "value": 5
         },
         {
           "name": "PROFILE_PROPERTY_TYPE_U64",
-          "line": 61
+          "value": 6
         },
         {
           "name": "PROFILE_PROPERTY_TYPE_F64",
-          "line": 62
+          "value": 7
         }
       ],
       "description": "Enum to describe type of a property",
@@ -13228,12 +13140,10 @@
       "members": [
         {
           "name": "PROFILE_PROPERTY_NONE",
-          "line": 88,
           "value": 0
         },
         {
           "name": "PROFILE_PROPERTY_FRAME_RESET",
-          "line": 89,
           "value": 1
         }
       ],
@@ -13256,17 +13166,14 @@
       "members": [
         {
           "name": "PROFILE_RESULT_OK",
-          "line": 101,
           "value": 0
         },
         {
           "name": "PROFILE_RESULT_NOT_INITIALIZED",
-          "line": 102,
           "value": 1
         },
         {
           "name": "PROFILE_RESULT_OUT_OF_SAMPLES",
-          "line": 103,
           "value": 2
         }
       ],
@@ -15475,22 +15382,18 @@
       "members": [
         {
           "name": "FLAGS_UP",
-          "line": 55,
           "value": 1
         },
         {
           "name": "FLAGS_RUNNING",
-          "line": 56,
           "value": 2
         },
         {
           "name": "FLAGS_INET",
-          "line": 57,
           "value": 4
         },
         {
           "name": "FLAGS_LINK",
-          "line": 58,
           "value": 8
         }
       ],
@@ -15510,19 +15413,19 @@
       "members": [
         {
           "name": "DOMAIN_MISSING",
-          "line": 72
+          "value": 0
         },
         {
           "name": "DOMAIN_IPV4",
-          "line": 73
+          "value": 1
         },
         {
           "name": "DOMAIN_IPV6",
-          "line": 74
+          "value": 2
         },
         {
           "name": "DOMAIN_UNKNOWN",
-          "line": 75
+          "value": 3
         }
       ],
       "description": "Domain type",
@@ -15544,11 +15447,11 @@
       "members": [
         {
           "name": "TYPE_STREAM",
-          "line": 87
+          "value": 0
         },
         {
           "name": "TYPE_DGRAM",
-          "line": 88
+          "value": 1
         }
       ],
       "description": "Socket type",
@@ -15570,11 +15473,11 @@
       "members": [
         {
           "name": "PROTOCOL_TCP",
-          "line": 100
+          "value": 0
         },
         {
           "name": "PROTOCOL_UDP",
-          "line": 101
+          "value": 1
         }
       ],
       "description": "Network protocol",
@@ -15596,15 +15499,15 @@
       "members": [
         {
           "name": "SHUTDOWNTYPE_READ",
-          "line": 114
+          "value": 0
         },
         {
           "name": "SHUTDOWNTYPE_WRITE",
-          "line": 115
+          "value": 1
         },
         {
           "name": "SHUTDOWNTYPE_READWRITE",
-          "line": 116
+          "value": 2
         }
       ],
       "description": "Socket shutdown type",
@@ -15626,172 +15529,138 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 160,
           "value": 0
         },
         {
           "name": "RESULT_ACCES",
-          "line": 162,
           "value": -1
         },
         {
           "name": "RESULT_AFNOSUPPORT",
-          "line": 163,
           "value": -2
         },
         {
           "name": "RESULT_WOULDBLOCK",
-          "line": 164,
           "value": -3
         },
         {
           "name": "RESULT_BADF",
-          "line": 165,
           "value": -4
         },
         {
           "name": "RESULT_CONNRESET",
-          "line": 166,
           "value": -5
         },
         {
           "name": "RESULT_DESTADDRREQ",
-          "line": 167,
           "value": -6
         },
         {
           "name": "RESULT_FAULT",
-          "line": 168,
           "value": -7
         },
         {
           "name": "RESULT_HOSTUNREACH",
-          "line": 169,
           "value": -8
         },
         {
           "name": "RESULT_INTR",
-          "line": 170,
           "value": -9
         },
         {
           "name": "RESULT_INVAL",
-          "line": 171,
           "value": -10
         },
         {
           "name": "RESULT_ISCONN",
-          "line": 172,
           "value": -11
         },
         {
           "name": "RESULT_MFILE",
-          "line": 173,
           "value": -12
         },
         {
           "name": "RESULT_MSGSIZE",
-          "line": 174,
           "value": -13
         },
         {
           "name": "RESULT_NETDOWN",
-          "line": 175,
           "value": -14
         },
         {
           "name": "RESULT_NETUNREACH",
-          "line": 176,
           "value": -15
         },
         {
           "name": "RESULT_NOBUFS",
-          "line": 178,
           "value": -17
         },
         {
           "name": "RESULT_NOTCONN",
-          "line": 181,
           "value": -20
         },
         {
           "name": "RESULT_NOTSOCK",
-          "line": 183,
           "value": -22
         },
         {
           "name": "RESULT_OPNOTSUPP",
-          "line": 184,
           "value": -23
         },
         {
           "name": "RESULT_PIPE",
-          "line": 185,
           "value": -24
         },
         {
           "name": "RESULT_PROTONOSUPPORT",
-          "line": 186,
           "value": -25
         },
         {
           "name": "RESULT_PROTOTYPE",
-          "line": 187,
           "value": -26
         },
         {
           "name": "RESULT_TIMEDOUT",
-          "line": 188,
           "value": -27
         },
         {
           "name": "RESULT_ADDRNOTAVAIL",
-          "line": 190,
           "value": -28
         },
         {
           "name": "RESULT_CONNREFUSED",
-          "line": 191,
           "value": -29
         },
         {
           "name": "RESULT_ADDRINUSE",
-          "line": 192,
           "value": -30
         },
         {
           "name": "RESULT_CONNABORTED",
-          "line": 193,
           "value": -31
         },
         {
           "name": "RESULT_INPROGRESS",
-          "line": 194,
           "value": -32
         },
         {
           "name": "RESULT_HOST_NOT_FOUND",
-          "line": 197,
           "value": -100
         },
         {
           "name": "RESULT_TRY_AGAIN",
-          "line": 198,
           "value": -101
         },
         {
           "name": "RESULT_NO_RECOVERY",
-          "line": 199,
           "value": -102
         },
         {
           "name": "RESULT_NO_DATA",
-          "line": 200,
           "value": -103
         },
         {
           "name": "RESULT_UNKNOWN",
-          "line": 202,
           "value": -1000
         }
       ],
@@ -16465,17 +16334,14 @@
       "members": [
         {
           "name": "SELECTOR_KIND_READ",
-          "line": 400,
           "value": 0
         },
         {
           "name": "SELECTOR_KIND_WRITE",
-          "line": 401,
           "value": 1
         },
         {
           "name": "SELECTOR_KIND_EXCEPT",
-          "line": 402,
           "value": 2
         }
       ],
@@ -16916,32 +16782,26 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 50,
           "value": 0
         },
         {
           "name": "RESULT_UNKNOWN",
-          "line": 51,
           "value": -1
         },
         {
           "name": "RESULT_SSL_INIT_FAILED",
-          "line": 52,
           "value": -2000
         },
         {
           "name": "RESULT_HANDSHAKE_FAILED",
-          "line": 53,
           "value": -2001
         },
         {
           "name": "RESULT_WOULDBLOCK",
-          "line": 54,
           "value": -2002
         },
         {
           "name": "RESULT_CONNREFUSED",
-          "line": 55,
           "value": -2003
         }
       ],
@@ -17201,172 +17061,138 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 74,
           "value": 0
         },
         {
           "name": "RESULT_PERM",
-          "line": 75,
           "value": -1
         },
         {
           "name": "RESULT_NOENT",
-          "line": 76,
           "value": -2
         },
         {
           "name": "RESULT_SRCH",
-          "line": 77,
           "value": -3
         },
         {
           "name": "RESULT_INTR",
-          "line": 78,
           "value": -4
         },
         {
           "name": "RESULT_IO",
-          "line": 79,
           "value": -5
         },
         {
           "name": "RESULT_NXIO",
-          "line": 80,
           "value": -6
         },
         {
           "name": "RESULT_2BIG",
-          "line": 81,
           "value": -7
         },
         {
           "name": "RESULT_NOEXEC",
-          "line": 82,
           "value": -8
         },
         {
           "name": "RESULT_BADF",
-          "line": 83,
           "value": -9
         },
         {
           "name": "RESULT_CHILD",
-          "line": 84,
           "value": -10
         },
         {
           "name": "RESULT_DEADLK",
-          "line": 85,
           "value": -11
         },
         {
           "name": "RESULT_NOMEM",
-          "line": 86,
           "value": -12
         },
         {
           "name": "RESULT_ACCES",
-          "line": 87,
           "value": -13
         },
         {
           "name": "RESULT_FAULT",
-          "line": 88,
           "value": -14
         },
         {
           "name": "RESULT_BUSY",
-          "line": 89,
           "value": -15
         },
         {
           "name": "RESULT_EXIST",
-          "line": 90,
           "value": -16
         },
         {
           "name": "RESULT_XDEV",
-          "line": 91,
           "value": -17
         },
         {
           "name": "RESULT_NODEV",
-          "line": 92,
           "value": -18
         },
         {
           "name": "RESULT_NOTDIR",
-          "line": 93,
           "value": -19
         },
         {
           "name": "RESULT_ISDIR",
-          "line": 94,
           "value": -20
         },
         {
           "name": "RESULT_INVAL",
-          "line": 95,
           "value": -21
         },
         {
           "name": "RESULT_NFILE",
-          "line": 96,
           "value": -22
         },
         {
           "name": "RESULT_MFILE",
-          "line": 97,
           "value": -23
         },
         {
           "name": "RESULT_NOTTY",
-          "line": 98,
           "value": -24
         },
         {
           "name": "RESULT_TXTBSY",
-          "line": 99,
           "value": -25
         },
         {
           "name": "RESULT_FBIG",
-          "line": 100,
           "value": -26
         },
         {
           "name": "RESULT_NOSPC",
-          "line": 101,
           "value": -27
         },
         {
           "name": "RESULT_SPIPE",
-          "line": 102,
           "value": -28
         },
         {
           "name": "RESULT_ROFS",
-          "line": 103,
           "value": -29
         },
         {
           "name": "RESULT_MLINK",
-          "line": 104,
           "value": -30
         },
         {
           "name": "RESULT_PIPE",
-          "line": 105,
           "value": -31
         },
         {
           "name": "RESULT_NOTEMPTY",
-          "line": 106,
           "value": -32
         },
         {
           "name": "RESULT_UNKNOWN",
-          "line": 108,
           "value": -1000
         }
       ],
@@ -18809,11 +18635,11 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 38
+          "value": 0
         },
         {
           "name": "RESULT_TOO_SMALL_BUFFER",
-          "line": 39
+          "value": 1
         }
       ],
       "description": "URI parsing result",
@@ -20446,42 +20272,34 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 61,
           "value": 0
         },
         {
           "name": "RESULT_SOCKET_ERROR",
-          "line": 62,
           "value": -1
         },
         {
           "name": "RESULT_INVALID_REQUEST",
-          "line": 63,
           "value": -2
         },
         {
           "name": "RESULT_ERROR_INVAL",
-          "line": 64,
           "value": -3
         },
         {
           "name": "RESULT_HANDLER_ALREADY_REGISTRED",
-          "line": 65,
           "value": -4
         },
         {
           "name": "RESULT_HANDLER_NOT_REGISTRED",
-          "line": 66,
           "value": -5
         },
         {
           "name": "RESULT_INTERNAL_ERROR",
-          "line": 67,
           "value": -100
         },
         {
           "name": "RESULT_UNKNOWN",
-          "line": 68,
           "value": -1000
         }
       ],
@@ -20974,12 +20792,10 @@
       "members": [
         {
           "name": "EXTENSION_RESULT_OK",
-          "line": 54,
           "value": 0
         },
         {
           "name": "EXTENSION_RESULT_INIT_ERROR",
-          "line": 55,
           "value": -1
         }
       ],
@@ -21019,27 +20835,27 @@
       "members": [
         {
           "name": "EXTENSION_EVENT_ID_ACTIVATEAPP",
-          "line": 77
+          "value": 0
         },
         {
           "name": "EXTENSION_EVENT_ID_DEACTIVATEAPP",
-          "line": 78
+          "value": 1
         },
         {
           "name": "EXTENSION_EVENT_ID_ICONIFYAPP",
-          "line": 79
+          "value": 2
         },
         {
           "name": "EXTENSION_EVENT_ID_DEICONIFYAPP",
-          "line": 80
+          "value": 3
         },
         {
           "name": "EXTENSION_EVENT_ID_ENGINE_INITIALIZED",
-          "line": 81
+          "value": 4
         },
         {
           "name": "EXTENSION_EVENT_ID_ENGINE_DELETE",
-          "line": 82
+          "value": 5
         }
       ],
       "description": "Event id enumeration.\nEVENT_ID_ICONIFYAPP and EVENT_ID_DEICONIFYAPP only available on <span class=\"icon-osx\"></span> <span class=\"icon-windows\"></span> <span class=\"icon-linux\"></span>",
@@ -21078,11 +20894,11 @@
       "members": [
         {
           "name": "EXTENSION_CALLBACK_PRE_RENDER",
-          "line": 97
+          "value": 0
         },
         {
           "name": "EXTENSION_CALLBACK_POST_RENDER",
-          "line": 98
+          "value": 1
         }
       ],
       "description": "Extra callback type for RegisterCallback function.",
@@ -21121,17 +20937,14 @@
       "members": [
         {
           "name": "EXTENSION_APP_EXIT_CODE_NONE",
-          "line": 114,
           "value": 0
         },
         {
           "name": "EXTENSION_APP_EXIT_CODE_REBOOT",
-          "line": 115,
           "value": 1
         },
         {
           "name": "EXTENSION_APP_EXIT_CODE_EXIT",
-          "line": 116,
           "value": -1
         }
       ],
@@ -22182,12 +21995,10 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 53,
           "value": 0
         },
         {
           "name": "RESULT_INIT_ERROR",
-          "line": 54,
           "value": -1
         }
       ],
@@ -22210,27 +22021,27 @@
       "members": [
         {
           "name": "EVENT_ID_ACTIVATEAPP",
-          "line": 72
+          "value": 0
         },
         {
           "name": "EVENT_ID_DEACTIVATEAPP",
-          "line": 73
+          "value": 1
         },
         {
           "name": "EVENT_ID_ICONIFYAPP",
-          "line": 74
+          "value": 2
         },
         {
           "name": "EVENT_ID_DEICONIFYAPP",
-          "line": 75
+          "value": 3
         },
         {
           "name": "EVENT_ID_ENGINE_INITIALIZED",
-          "line": 76
+          "value": 4
         },
         {
           "name": "EVENT_ID_ENGINE_DELETE",
-          "line": 77
+          "value": 5
         }
       ],
       "description": "Event id enumeration.\nEVENT_ID_ICONIFYAPP and EVENT_ID_DEICONIFYAPP only available on <span class=\"icon-osx\"></span> <span class=\"icon-windows\"></span> <span class=\"icon-linux\"></span>",
@@ -22252,11 +22063,11 @@
       "members": [
         {
           "name": "CALLBACK_PRE_RENDER",
-          "line": 89
+          "value": 0
         },
         {
           "name": "CALLBACK_POST_RENDER",
-          "line": 90
+          "value": 1
         }
       ],
       "description": "Extra callback type for RegisterCallback function.",
@@ -22278,17 +22089,14 @@
       "members": [
         {
           "name": "APP_EXIT_CODE_NONE",
-          "line": 103,
           "value": 0
         },
         {
           "name": "APP_EXIT_CODE_REBOOT",
-          "line": 104,
           "value": 1
         },
         {
           "name": "APP_EXIT_CODE_EXIT",
-          "line": 105,
           "value": -1
         }
       ],
@@ -22812,15 +22620,15 @@
       "members": [
         {
           "name": "FONT_RESULT_OK",
-          "line": 39
+          "value": 0
         },
         {
           "name": "FONT_RESULT_NOT_SUPPORTED",
-          "line": 40
+          "value": 1
         },
         {
           "name": "FONT_RESULT_ERROR",
-          "line": 41
+          "value": 2
         }
       ],
       "description": "FontResult",
@@ -22842,19 +22650,18 @@
       "members": [
         {
           "name": "FONT_TYPE_TTF",
-          "line": 55
+          "value": 0
         },
         {
           "name": "FONT_TYPE_OTF",
-          "line": 56
+          "value": 1
         },
         {
           "name": "FONT_TYPE_GLYPH_BANK",
-          "line": 57
+          "value": 2
         },
         {
           "name": "FONT_TYPE_UNKNOWN",
-          "line": 59,
           "value": 4294967295
         }
       ],
@@ -22877,17 +22684,14 @@
       "members": [
         {
           "name": "FONT_GLYPH_BM_FLAG_COMPRESSION_NONE",
-          "line": 71,
           "value": 0
         },
         {
           "name": "FONT_GLYPH_BM_FLAG_COMPRESSION_DEFLATE",
-          "line": 72,
           "value": 1
         },
         {
           "name": "FONT_GLYPH_BM_FLAG_DATA_IS_BORROWED",
-          "line": 73,
           "value": 2
         }
       ],
@@ -24076,11 +23880,11 @@
       "members": [
         {
           "name": "TEXT_RESULT_OK",
-          "line": 141
+          "value": 0
         },
         {
           "name": "TEXT_RESULT_ERROR",
-          "line": 142
+          "value": 1
         }
       ],
       "description": "An enum representing text layout results",
@@ -24102,12 +23906,10 @@
       "members": [
         {
           "name": "TEXT_DIRECTION_LTR",
-          "line": 154,
           "value": 0
         },
         {
           "name": "TEXT_DIRECTION_RTL",
-          "line": 155,
           "value": 1
         }
       ],
@@ -24130,12 +23932,10 @@
       "members": [
         {
           "name": "TEXT_LAYOUT_TYPE_LEGACY",
-          "line": 169,
           "value": 0
         },
         {
           "name": "TEXT_LAYOUT_TYPE_FULL",
-          "line": 170,
           "value": 1
         }
       ],
@@ -24158,7 +23958,6 @@
       "members": [
         {
           "name": "TEXT_GLYPH_FLAG_OBJECT",
-          "line": 180,
           "value": 1
         }
       ],
@@ -24347,11 +24146,11 @@
       "members": [
         {
           "name": "TEXT_DECORATION_PATTERN_SOLID",
-          "line": 255
+          "value": 0
         },
         {
           "name": "TEXT_DECORATION_PATTERN_DASHED",
-          "line": 256
+          "value": 1
         }
       ],
       "description": "Text decoration pattern",
@@ -27892,87 +27691,70 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 194,
           "value": 0
         },
         {
           "name": "RESULT_OUT_OF_RESOURCES",
-          "line": 195,
           "value": -1
         },
         {
           "name": "RESULT_ALREADY_REGISTERED",
-          "line": 196,
           "value": -2
         },
         {
           "name": "RESULT_IDENTIFIER_IN_USE",
-          "line": 197,
           "value": -3
         },
         {
           "name": "RESULT_IDENTIFIER_ALREADY_SET",
-          "line": 198,
           "value": -4
         },
         {
           "name": "RESULT_COMPONENT_NOT_FOUND",
-          "line": 199,
           "value": -5
         },
         {
           "name": "RESULT_MAXIMUM_HIEARCHICAL_DEPTH",
-          "line": 200,
           "value": -6
         },
         {
           "name": "RESULT_INVALID_OPERATION",
-          "line": 201,
           "value": -7
         },
         {
           "name": "RESULT_RESOURCE_TYPE_NOT_FOUND",
-          "line": 202,
           "value": -8
         },
         {
           "name": "RESULT_BUFFER_OVERFLOW",
-          "line": 203,
           "value": -9
         },
         {
           "name": "RESULT_IDENTIFIER_INVALID",
-          "line": 204,
           "value": -10
         },
         {
           "name": "RESULT_RESOURCE_ERROR",
-          "line": 205,
           "value": -11
         },
         {
           "name": "RESULT_CHILD_NOT_FOUND",
-          "line": 206,
           "value": -12
         },
         {
           "name": "RESULT_INVALID_PROPERTIES",
-          "line": 207,
           "value": -13
         },
         {
           "name": "RESULT_UNABLE_TO_CREATE_COMPONENTS",
-          "line": 208,
           "value": -14
         },
         {
           "name": "RESULT_UNABLE_TO_INIT_INSTANCE",
-          "line": 209,
           "value": -15
         },
         {
           "name": "RESULT_UNKNOWN_ERROR",
-          "line": 210,
           "value": -1000
         }
       ],
@@ -27995,52 +27777,43 @@
       "members": [
         {
           "name": "PROPERTY_TYPE_NUMBER",
-          "line": 232,
           "value": 0
         },
         {
           "name": "PROPERTY_TYPE_HASH",
-          "line": 233,
           "value": 1
         },
         {
           "name": "PROPERTY_TYPE_URL",
-          "line": 234,
           "value": 2
         },
         {
           "name": "PROPERTY_TYPE_VECTOR3",
-          "line": 235,
           "value": 3
         },
         {
           "name": "PROPERTY_TYPE_VECTOR4",
-          "line": 236,
           "value": 4
         },
         {
           "name": "PROPERTY_TYPE_QUAT",
-          "line": 237,
           "value": 5
         },
         {
           "name": "PROPERTY_TYPE_BOOLEAN",
-          "line": 238,
           "value": 6
         },
         {
           "name": "PROPERTY_TYPE_MATRIX4",
-          "line": 239,
           "value": 7
         },
         {
           "name": "PROPERTY_TYPE_TEXT",
-          "line": 240,
           "value": 8
         },
         {
           "name": "PROPERTY_TYPE_COUNT",
-          "line": 241
+          "value": 9
         }
       ],
       "description": "Property types.",
@@ -28062,72 +27835,58 @@
       "members": [
         {
           "name": "PROPERTY_RESULT_OK",
-          "line": 266,
           "value": 0
         },
         {
           "name": "PROPERTY_RESULT_NOT_FOUND",
-          "line": 267,
           "value": -1
         },
         {
           "name": "PROPERTY_RESULT_INVALID_FORMAT",
-          "line": 268,
           "value": -2
         },
         {
           "name": "PROPERTY_RESULT_UNSUPPORTED_TYPE",
-          "line": 269,
           "value": -3
         },
         {
           "name": "PROPERTY_RESULT_TYPE_MISMATCH",
-          "line": 270,
           "value": -4
         },
         {
           "name": "PROPERTY_RESULT_COMP_NOT_FOUND",
-          "line": 271,
           "value": -5
         },
         {
           "name": "PROPERTY_RESULT_INVALID_INSTANCE",
-          "line": 272,
           "value": -6
         },
         {
           "name": "PROPERTY_RESULT_BUFFER_OVERFLOW",
-          "line": 273,
           "value": -7
         },
         {
           "name": "PROPERTY_RESULT_UNSUPPORTED_VALUE",
-          "line": 274,
           "value": -8
         },
         {
           "name": "PROPERTY_RESULT_UNSUPPORTED_OPERATION",
-          "line": 275,
           "value": -9
         },
         {
           "name": "PROPERTY_RESULT_RESOURCE_NOT_FOUND",
-          "line": 276,
           "value": -10
         },
         {
           "name": "PROPERTY_RESULT_INVALID_INDEX",
-          "line": 277,
           "value": -11
         },
         {
           "name": "PROPERTY_RESULT_INVALID_KEY",
-          "line": 278,
           "value": -12
         },
         {
           "name": "PROPERTY_RESULT_READ_ONLY",
-          "line": 279,
           "value": -13
         }
       ],
@@ -28150,42 +27909,34 @@
       "members": [
         {
           "name": "PLAYBACK_NONE",
-          "line": 289,
           "value": 0
         },
         {
           "name": "PLAYBACK_ONCE_FORWARD",
-          "line": 290,
           "value": 1
         },
         {
           "name": "PLAYBACK_ONCE_BACKWARD",
-          "line": 291,
           "value": 2
         },
         {
           "name": "PLAYBACK_ONCE_PINGPONG",
-          "line": 292,
           "value": 3
         },
         {
           "name": "PLAYBACK_LOOP_FORWARD",
-          "line": 293,
           "value": 4
         },
         {
           "name": "PLAYBACK_LOOP_BACKWARD",
-          "line": 294,
           "value": 5
         },
         {
           "name": "PLAYBACK_LOOP_PINGPONG",
-          "line": 295,
           "value": 6
         },
         {
           "name": "PLAYBACK_COUNT",
-          "line": 296,
           "value": 7
         }
       ],
@@ -28208,17 +27959,14 @@
       "members": [
         {
           "name": "CREATE_RESULT_OK",
-          "line": 311,
           "value": 0
         },
         {
           "name": "CREATE_RESULT_TOO_MANY_COMPONENTS",
-          "line": 312,
           "value": -1
         },
         {
           "name": "CREATE_RESULT_UNKNOWN_ERROR",
-          "line": 313,
           "value": -1000
         }
       ],
@@ -28241,12 +27989,10 @@
       "members": [
         {
           "name": "UPDATE_RESULT_OK",
-          "line": 328,
           "value": 0
         },
         {
           "name": "UPDATE_RESULT_UNKNOWN_ERROR",
-          "line": 329,
           "value": -1000
         }
       ],
@@ -28269,12 +28015,10 @@
       "members": [
         {
           "name": "PROP_VALUE_ARRAY",
-          "line": 343,
           "value": 0
         },
         {
           "name": "PROP_VALUE_HASHTABLE",
-          "line": 344,
           "value": 1
         }
       ],
@@ -29053,17 +28797,14 @@
       "members": [
         {
           "name": "INPUT_RESULT_IGNORED",
-          "line": 527,
           "value": 0
         },
         {
           "name": "INPUT_RESULT_CONSUMED",
-          "line": 528,
           "value": 1
         },
         {
           "name": "INPUT_RESULT_UNKNOWN_ERROR",
-          "line": 529,
           "value": -1000
         }
       ],
@@ -31322,19 +31063,19 @@
       "members": [
         {
           "name": "SCENE_NODE_TYPE_COLLECTION",
-          "line": 1147
+          "value": 0
         },
         {
           "name": "SCENE_NODE_TYPE_GAMEOBJECT",
-          "line": 1148
+          "value": 1
         },
         {
           "name": "SCENE_NODE_TYPE_COMPONENT",
-          "line": 1149
+          "value": 2
         },
         {
           "name": "SCENE_NODE_TYPE_SUBCOMPONENT",
-          "line": 1150
+          "value": 3
         }
       ],
       "description": "scene node types",
@@ -31558,47 +31299,39 @@
       "members": [
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_NUMBER",
-          "line": 1258,
           "value": 0
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_HASH",
-          "line": 1259,
           "value": 1
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_URL",
-          "line": 1260,
           "value": 2
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_VECTOR3",
-          "line": 1261,
           "value": 3
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_VECTOR4",
-          "line": 1262,
           "value": 4
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_QUAT",
-          "line": 1263,
           "value": 5
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_BOOLEAN",
-          "line": 1264,
           "value": 6
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_TEXT",
-          "line": 1265,
           "value": 7
         },
         {
           "name": "SCENE_NODE_PROPERTY_TYPE_COUNT",
-          "line": 1266
+          "value": 8
         }
       ],
       "description": "scene node property types",
@@ -32765,17 +32498,14 @@
       "members": [
         {
           "name": "COMP_COLLECTION_FACTORY_STATUS_UNLOADED",
-          "line": 49,
           "value": 0
         },
         {
           "name": "COMP_COLLECTION_FACTORY_STATUS_LOADING",
-          "line": 50,
           "value": 1
         },
         {
           "name": "COMP_COLLECTION_FACTORY_STATUS_LOADED",
-          "line": 51,
           "value": 2
         }
       ],
@@ -33369,17 +33099,14 @@
       "members": [
         {
           "name": "COMP_FACTORY_STATUS_UNLOADED",
-          "line": 49,
           "value": 0
         },
         {
           "name": "COMP_FACTORY_STATUS_LOADING",
-          "line": 50,
           "value": 1
         },
         {
           "name": "COMP_FACTORY_STATUS_LOADED",
-          "line": 51,
           "value": 2
         }
       ],
@@ -37504,11 +37231,11 @@
       "members": [
         {
           "name": "RIG_MODEL_VERTEX_FORMAT_STATIC",
-          "line": 47
+          "value": 0
         },
         {
           "name": "RIG_MODEL_VERTEX_FORMAT_SKINNED",
-          "line": 48
+          "value": 1
         }
       ],
       "id": "dmsdk:dmGameSystem::RigModelVertexFormat@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_model.h:45:1279",
@@ -38588,17 +38315,14 @@
       "members": [
         {
           "name": "OWNER_C",
-          "line": 123,
           "value": 0
         },
         {
           "name": "OWNER_LUA",
-          "line": 124,
           "value": 1
         },
         {
           "name": "OWNER_RES",
-          "line": 125,
           "value": 2
         }
       ],
@@ -39280,17 +39004,14 @@
       "members": [
         {
           "name": "HANDLE_RESULT_OK",
-          "line": 166,
           "value": 0
         },
         {
           "name": "HANDLE_RESULT_NOT_AVAILABLE",
-          "line": 167,
           "value": -1
         },
         {
           "name": "HANDLE_RESULT_ERROR",
-          "line": 168,
           "value": -2
         }
       ],
@@ -39313,22 +39034,18 @@
       "members": [
         {
           "name": "ATTACHMENT_COLOR",
-          "line": 181,
           "value": 0
         },
         {
           "name": "ATTACHMENT_DEPTH",
-          "line": 182,
           "value": 1
         },
         {
           "name": "ATTACHMENT_STENCIL",
-          "line": 183,
           "value": 2
         },
         {
           "name": "MAX_ATTACHMENT_COUNT",
-          "line": 184,
           "value": 3
         }
       ],
@@ -39351,19 +39068,19 @@
       "members": [
         {
           "name": "ATTACHMENT_OP_DONT_CARE",
-          "line": 198
+          "value": 0
         },
         {
           "name": "ATTACHMENT_OP_LOAD",
-          "line": 199
+          "value": 1
         },
         {
           "name": "ATTACHMENT_OP_STORE",
-          "line": 200
+          "value": 2
         },
         {
           "name": "ATTACHMENT_OP_CLEAR",
-          "line": 201
+          "value": 3
         }
       ],
       "description": "Defines how an attachment should be treated at the start and end of a render pass",
@@ -39385,237 +39102,191 @@
       "members": [
         {
           "name": "TEXTURE_FORMAT_LUMINANCE",
-          "line": 258,
           "value": 0
         },
         {
           "name": "TEXTURE_FORMAT_LUMINANCE_ALPHA",
-          "line": 259,
           "value": 1
         },
         {
           "name": "TEXTURE_FORMAT_RGB",
-          "line": 260,
           "value": 2
         },
         {
           "name": "TEXTURE_FORMAT_RGBA",
-          "line": 261,
           "value": 3
         },
         {
           "name": "TEXTURE_FORMAT_RGB_16BPP",
-          "line": 262,
           "value": 4
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_16BPP",
-          "line": 263,
           "value": 5
         },
         {
           "name": "TEXTURE_FORMAT_DEPTH",
-          "line": 264,
           "value": 6
         },
         {
           "name": "TEXTURE_FORMAT_STENCIL",
-          "line": 265,
           "value": 7
         },
         {
           "name": "TEXTURE_FORMAT_RGB_PVRTC_2BPPV1",
-          "line": 267,
           "value": 8
         },
         {
           "name": "TEXTURE_FORMAT_RGB_PVRTC_4BPPV1",
-          "line": 268,
           "value": 9
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_PVRTC_2BPPV1",
-          "line": 269,
           "value": 10
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_PVRTC_4BPPV1",
-          "line": 270,
           "value": 11
         },
         {
           "name": "TEXTURE_FORMAT_RGB_ETC1",
-          "line": 271,
           "value": 12
         },
         {
           "name": "TEXTURE_FORMAT_R_ETC2",
-          "line": 272,
           "value": 13
         },
         {
           "name": "TEXTURE_FORMAT_RG_ETC2",
-          "line": 273,
           "value": 14
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ETC2",
-          "line": 274,
           "value": 15
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_4X4",
-          "line": 275,
           "value": 16
         },
         {
           "name": "TEXTURE_FORMAT_RGB_BC1",
-          "line": 276,
           "value": 17
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_BC3",
-          "line": 277,
           "value": 18
         },
         {
           "name": "TEXTURE_FORMAT_R_BC4",
-          "line": 278,
           "value": 19
         },
         {
           "name": "TEXTURE_FORMAT_RG_BC5",
-          "line": 279,
           "value": 20
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_BC7",
-          "line": 280,
           "value": 21
         },
         {
           "name": "TEXTURE_FORMAT_RGB16F",
-          "line": 282,
           "value": 22
         },
         {
           "name": "TEXTURE_FORMAT_RGB32F",
-          "line": 283,
           "value": 23
         },
         {
           "name": "TEXTURE_FORMAT_RGBA16F",
-          "line": 284,
           "value": 24
         },
         {
           "name": "TEXTURE_FORMAT_RGBA32F",
-          "line": 285,
           "value": 25
         },
         {
           "name": "TEXTURE_FORMAT_R16F",
-          "line": 286,
           "value": 26
         },
         {
           "name": "TEXTURE_FORMAT_RG16F",
-          "line": 287,
           "value": 27
         },
         {
           "name": "TEXTURE_FORMAT_R32F",
-          "line": 288,
           "value": 28
         },
         {
           "name": "TEXTURE_FORMAT_RG32F",
-          "line": 289,
           "value": 29
         },
         {
           "name": "TEXTURE_FORMAT_RGBA32UI",
-          "line": 291,
           "value": 30
         },
         {
           "name": "TEXTURE_FORMAT_BGRA8U",
-          "line": 292,
           "value": 31
         },
         {
           "name": "TEXTURE_FORMAT_R32UI",
-          "line": 293,
           "value": 32
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_5X4",
-          "line": 296,
           "value": 33
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_5X5",
-          "line": 297,
           "value": 34
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_6X5",
-          "line": 298,
           "value": 35
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_6X6",
-          "line": 299,
           "value": 36
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_8X5",
-          "line": 300,
           "value": 37
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_8X6",
-          "line": 301,
           "value": 38
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_8X8",
-          "line": 302,
           "value": 39
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_10X5",
-          "line": 303,
           "value": 40
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_10X6",
-          "line": 304,
           "value": 41
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_10X8",
-          "line": 305,
           "value": 42
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_10X10",
-          "line": 306,
           "value": 43
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_12X10",
-          "line": 307,
           "value": 44
         },
         {
           "name": "TEXTURE_FORMAT_RGBA_ASTC_12X12",
-          "line": 308,
           "value": 45
         },
         {
           "name": "TEXTURE_FORMAT_COUNT",
-          "line": 310
+          "value": 46
         }
       ],
       "description": "Pixel formats supported by textures.\nIncludes uncompressed, compressed, and floating-point variants",
@@ -39637,12 +39308,10 @@
       "members": [
         {
           "name": "TEXTURE_STATUS_OK",
-          "line": 322,
           "value": 0
         },
         {
           "name": "TEXTURE_STATUS_DATA_PENDING",
-          "line": 323,
           "value": 1
         }
       ],
@@ -39736,42 +39405,34 @@
       "members": [
         {
           "name": "COMPARE_FUNC_NEVER",
-          "line": 362,
           "value": 0
         },
         {
           "name": "COMPARE_FUNC_LESS",
-          "line": 363,
           "value": 1
         },
         {
           "name": "COMPARE_FUNC_LEQUAL",
-          "line": 364,
           "value": 2
         },
         {
           "name": "COMPARE_FUNC_GREATER",
-          "line": 365,
           "value": 3
         },
         {
           "name": "COMPARE_FUNC_GEQUAL",
-          "line": 366,
           "value": 4
         },
         {
           "name": "COMPARE_FUNC_EQUAL",
-          "line": 367,
           "value": 5
         },
         {
           "name": "COMPARE_FUNC_NOTEQUAL",
-          "line": 368,
           "value": 6
         },
         {
           "name": "COMPARE_FUNC_ALWAYS",
-          "line": 369,
           "value": 7
         }
       ],
@@ -39794,12 +39455,10 @@
       "members": [
         {
           "name": "FACE_WINDING_CCW",
-          "line": 380,
           "value": 0
         },
         {
           "name": "FACE_WINDING_CW",
-          "line": 381,
           "value": 1
         }
       ],
@@ -39822,17 +39481,14 @@
       "members": [
         {
           "name": "FACE_TYPE_FRONT",
-          "line": 387,
           "value": 0
         },
         {
           "name": "FACE_TYPE_BACK",
-          "line": 388,
           "value": 1
         },
         {
           "name": "FACE_TYPE_FRONT_AND_BACK",
-          "line": 389,
           "value": 2
         }
       ],
@@ -39852,42 +39508,34 @@
       "members": [
         {
           "name": "STENCIL_OP_KEEP",
-          "line": 408,
           "value": 0
         },
         {
           "name": "STENCIL_OP_ZERO",
-          "line": 409,
           "value": 1
         },
         {
           "name": "STENCIL_OP_REPLACE",
-          "line": 410,
           "value": 2
         },
         {
           "name": "STENCIL_OP_INCR",
-          "line": 411,
           "value": 3
         },
         {
           "name": "STENCIL_OP_INCR_WRAP",
-          "line": 412,
           "value": 4
         },
         {
           "name": "STENCIL_OP_DECR",
-          "line": 413,
           "value": 5
         },
         {
           "name": "STENCIL_OP_DECR_WRAP",
-          "line": 414,
           "value": 6
         },
         {
           "name": "STENCIL_OP_INVERT",
-          "line": 415,
           "value": 7
         }
       ],
@@ -39910,22 +39558,18 @@
       "members": [
         {
           "name": "BUFFER_USAGE_STREAM_DRAW",
-          "line": 430,
           "value": 0
         },
         {
           "name": "BUFFER_USAGE_DYNAMIC_DRAW",
-          "line": 431,
           "value": 1
         },
         {
           "name": "BUFFER_USAGE_STATIC_DRAW",
-          "line": 432,
           "value": 2
         },
         {
           "name": "BUFFER_USAGE_TRANSFER",
-          "line": 433,
           "value": 4
         }
       ],
@@ -39948,17 +39592,14 @@
       "members": [
         {
           "name": "BUFFER_ACCESS_READ_ONLY",
-          "line": 445,
           "value": 0
         },
         {
           "name": "BUFFER_ACCESS_WRITE_ONLY",
-          "line": 446,
           "value": 1
         },
         {
           "name": "BUFFER_ACCESS_READ_WRITE",
-          "line": 447,
           "value": 2
         }
       ],
@@ -39981,12 +39622,10 @@
       "members": [
         {
           "name": "INDEXBUFFER_FORMAT_16",
-          "line": 461,
           "value": 0
         },
         {
           "name": "INDEXBUFFER_FORMAT_32",
-          "line": 462,
           "value": 1
         }
       ],
@@ -40009,17 +39648,14 @@
       "members": [
         {
           "name": "PRIMITIVE_LINES",
-          "line": 476,
           "value": 0
         },
         {
           "name": "PRIMITIVE_TRIANGLES",
-          "line": 477,
           "value": 1
         },
         {
           "name": "PRIMITIVE_TRIANGLE_STRIP",
-          "line": 478,
           "value": 2
         }
       ],
@@ -40042,132 +39678,106 @@
       "members": [
         {
           "name": "TYPE_BYTE",
-          "line": 516,
           "value": 0
         },
         {
           "name": "TYPE_UNSIGNED_BYTE",
-          "line": 517,
           "value": 1
         },
         {
           "name": "TYPE_SHORT",
-          "line": 518,
           "value": 2
         },
         {
           "name": "TYPE_UNSIGNED_SHORT",
-          "line": 519,
           "value": 3
         },
         {
           "name": "TYPE_INT",
-          "line": 520,
           "value": 4
         },
         {
           "name": "TYPE_UNSIGNED_INT",
-          "line": 521,
           "value": 5
         },
         {
           "name": "TYPE_FLOAT",
-          "line": 522,
           "value": 6
         },
         {
           "name": "TYPE_FLOAT_VEC4",
-          "line": 523,
           "value": 7
         },
         {
           "name": "TYPE_FLOAT_MAT4",
-          "line": 524,
           "value": 8
         },
         {
           "name": "TYPE_SAMPLER_2D",
-          "line": 525,
           "value": 9
         },
         {
           "name": "TYPE_SAMPLER_CUBE",
-          "line": 526,
           "value": 10
         },
         {
           "name": "TYPE_SAMPLER_2D_ARRAY",
-          "line": 527,
           "value": 11
         },
         {
           "name": "TYPE_FLOAT_VEC2",
-          "line": 528,
           "value": 12
         },
         {
           "name": "TYPE_FLOAT_VEC3",
-          "line": 529,
           "value": 13
         },
         {
           "name": "TYPE_FLOAT_MAT2",
-          "line": 530,
           "value": 14
         },
         {
           "name": "TYPE_FLOAT_MAT3",
-          "line": 531,
           "value": 15
         },
         {
           "name": "TYPE_IMAGE_2D",
-          "line": 532,
           "value": 16
         },
         {
           "name": "TYPE_TEXTURE_2D",
-          "line": 533,
           "value": 17
         },
         {
           "name": "TYPE_SAMPLER",
-          "line": 534,
           "value": 18
         },
         {
           "name": "TYPE_TEXTURE_2D_ARRAY",
-          "line": 535,
           "value": 19
         },
         {
           "name": "TYPE_TEXTURE_CUBE",
-          "line": 536,
           "value": 20
         },
         {
           "name": "TYPE_SAMPLER_3D",
-          "line": 537,
           "value": 21
         },
         {
           "name": "TYPE_TEXTURE_3D",
-          "line": 538,
           "value": 22
         },
         {
           "name": "TYPE_IMAGE_3D",
-          "line": 539,
           "value": 23
         },
         {
           "name": "TYPE_SAMPLER_3D_ARRAY",
-          "line": 540,
           "value": 24
         },
         {
           "name": "TYPE_TEXTURE_3D_ARRAY",
-          "line": 541,
           "value": 25
         }
       ],
@@ -40190,77 +39800,62 @@
       "members": [
         {
           "name": "BLEND_FACTOR_ZERO",
-          "line": 567,
           "value": 0
         },
         {
           "name": "BLEND_FACTOR_ONE",
-          "line": 568,
           "value": 1
         },
         {
           "name": "BLEND_FACTOR_SRC_COLOR",
-          "line": 569,
           "value": 2
         },
         {
           "name": "BLEND_FACTOR_ONE_MINUS_SRC_COLOR",
-          "line": 570,
           "value": 3
         },
         {
           "name": "BLEND_FACTOR_DST_COLOR",
-          "line": 571,
           "value": 4
         },
         {
           "name": "BLEND_FACTOR_ONE_MINUS_DST_COLOR",
-          "line": 572,
           "value": 5
         },
         {
           "name": "BLEND_FACTOR_SRC_ALPHA",
-          "line": 573,
           "value": 6
         },
         {
           "name": "BLEND_FACTOR_ONE_MINUS_SRC_ALPHA",
-          "line": 574,
           "value": 7
         },
         {
           "name": "BLEND_FACTOR_DST_ALPHA",
-          "line": 575,
           "value": 8
         },
         {
           "name": "BLEND_FACTOR_ONE_MINUS_DST_ALPHA",
-          "line": 576,
           "value": 9
         },
         {
           "name": "BLEND_FACTOR_SRC_ALPHA_SATURATE",
-          "line": 577,
           "value": 10
         },
         {
           "name": "BLEND_FACTOR_CONSTANT_COLOR",
-          "line": 578,
           "value": 11
         },
         {
           "name": "BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR",
-          "line": 579,
           "value": 12
         },
         {
           "name": "BLEND_FACTOR_CONSTANT_ALPHA",
-          "line": 580,
           "value": 13
         },
         {
           "name": "BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA",
-          "line": 581,
           "value": 14
         }
       ],
@@ -40283,27 +39878,22 @@
       "members": [
         {
           "name": "BLEND_EQUATION_ADD",
-          "line": 597,
           "value": 0
         },
         {
           "name": "BLEND_EQUATION_SUBTRACT",
-          "line": 598,
           "value": 1
         },
         {
           "name": "BLEND_EQUATION_REVERSE_SUBTRACT",
-          "line": 599,
           "value": 2
         },
         {
           "name": "BLEND_EQUATION_MIN",
-          "line": 600,
           "value": 3
         },
         {
           "name": "BLEND_EQUATION_MAX",
-          "line": 601,
           "value": 4
         }
       ],
@@ -40326,47 +39916,38 @@
       "members": [
         {
           "name": "ADAPTER_FAMILY_NONE",
-          "line": 621,
           "value": -1
         },
         {
           "name": "ADAPTER_FAMILY_NULL",
-          "line": 622,
           "value": 1
         },
         {
           "name": "ADAPTER_FAMILY_OPENGL",
-          "line": 623,
           "value": 2
         },
         {
           "name": "ADAPTER_FAMILY_OPENGLES",
-          "line": 624,
           "value": 3
         },
         {
           "name": "ADAPTER_FAMILY_VULKAN",
-          "line": 625,
           "value": 4
         },
         {
           "name": "ADAPTER_FAMILY_VENDOR",
-          "line": 626,
           "value": 5
         },
         {
           "name": "ADAPTER_FAMILY_WEBGPU",
-          "line": 627,
           "value": 6
         },
         {
           "name": "ADAPTER_FAMILY_DIRECTX",
-          "line": 628,
           "value": 7
         },
         {
           "name": "ADAPTER_FAMILY_METAL",
-          "line": 629,
           "value": 8
         }
       ],
@@ -40389,57 +39970,46 @@
       "members": [
         {
           "name": "TEXTURE_TYPE_2D",
-          "line": 650,
           "value": 0
         },
         {
           "name": "TEXTURE_TYPE_2D_ARRAY",
-          "line": 651,
           "value": 1
         },
         {
           "name": "TEXTURE_TYPE_3D",
-          "line": 652,
           "value": 2
         },
         {
           "name": "TEXTURE_TYPE_CUBE_MAP",
-          "line": 653,
           "value": 3
         },
         {
           "name": "TEXTURE_TYPE_IMAGE_2D",
-          "line": 654,
           "value": 4
         },
         {
           "name": "TEXTURE_TYPE_IMAGE_3D",
-          "line": 655,
           "value": 5
         },
         {
           "name": "TEXTURE_TYPE_SAMPLER",
-          "line": 656,
           "value": 6
         },
         {
           "name": "TEXTURE_TYPE_TEXTURE_2D",
-          "line": 657,
           "value": 7
         },
         {
           "name": "TEXTURE_TYPE_TEXTURE_2D_ARRAY",
-          "line": 658,
           "value": 8
         },
         {
           "name": "TEXTURE_TYPE_TEXTURE_3D",
-          "line": 659,
           "value": 9
         },
         {
           "name": "TEXTURE_TYPE_TEXTURE_CUBE",
-          "line": 660,
           "value": 10
         }
       ],
@@ -40462,37 +40032,30 @@
       "members": [
         {
           "name": "TEXTURE_FILTER_DEFAULT",
-          "line": 678,
           "value": 0
         },
         {
           "name": "TEXTURE_FILTER_NEAREST",
-          "line": 679,
           "value": 1
         },
         {
           "name": "TEXTURE_FILTER_LINEAR",
-          "line": 680,
           "value": 2
         },
         {
           "name": "TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST",
-          "line": 681,
           "value": 3
         },
         {
           "name": "TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR",
-          "line": 682,
           "value": 4
         },
         {
           "name": "TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST",
-          "line": 683,
           "value": 5
         },
         {
           "name": "TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR",
-          "line": 684,
           "value": 6
         }
       ],
@@ -40515,22 +40078,18 @@
       "members": [
         {
           "name": "TEXTURE_WRAP_CLAMP_TO_BORDER",
-          "line": 699,
           "value": 0
         },
         {
           "name": "TEXTURE_WRAP_CLAMP_TO_EDGE",
-          "line": 700,
           "value": 1
         },
         {
           "name": "TEXTURE_WRAP_MIRRORED_REPEAT",
-          "line": 701,
           "value": 2
         },
         {
           "name": "TEXTURE_WRAP_REPEAT",
-          "line": 702,
           "value": 3
         }
       ],
@@ -40553,42 +40112,34 @@
       "members": [
         {
           "name": "STATE_DEPTH_TEST",
-          "line": 708,
           "value": 0
         },
         {
           "name": "STATE_SCISSOR_TEST",
-          "line": 709,
           "value": 1
         },
         {
           "name": "STATE_STENCIL_TEST",
-          "line": 710,
           "value": 2
         },
         {
           "name": "STATE_ALPHA_TEST",
-          "line": 711,
           "value": 3
         },
         {
           "name": "STATE_BLEND",
-          "line": 712,
           "value": 4
         },
         {
           "name": "STATE_CULL_FACE",
-          "line": 713,
           "value": 5
         },
         {
           "name": "STATE_POLYGON_OFFSET_FILL",
-          "line": 714,
           "value": 6
         },
         {
           "name": "STATE_ALPHA_TEST_SUPPORTED",
-          "line": 715,
           "value": 7
         }
       ],
@@ -40608,32 +40159,26 @@
       "members": [
         {
           "name": "BUFFER_TYPE_COLOR0_BIT",
-          "line": 721,
           "value": 1
         },
         {
           "name": "BUFFER_TYPE_COLOR1_BIT",
-          "line": 722,
           "value": 2
         },
         {
           "name": "BUFFER_TYPE_COLOR2_BIT",
-          "line": 723,
           "value": 4
         },
         {
           "name": "BUFFER_TYPE_COLOR3_BIT",
-          "line": 724,
           "value": 8
         },
         {
           "name": "BUFFER_TYPE_DEPTH_BIT",
-          "line": 725,
           "value": 16
         },
         {
           "name": "BUFFER_TYPE_STENCIL_BIT",
-          "line": 726,
           "value": 32
         }
       ],
@@ -46443,42 +45988,34 @@
       "members": [
         {
           "name": "PLAYBACK_ONCE_FORWARD",
-          "line": 90,
           "value": 0
         },
         {
           "name": "PLAYBACK_ONCE_BACKWARD",
-          "line": 91,
           "value": 1
         },
         {
           "name": "PLAYBACK_ONCE_PINGPONG",
-          "line": 92,
           "value": 2
         },
         {
           "name": "PLAYBACK_LOOP_FORWARD",
-          "line": 93,
           "value": 3
         },
         {
           "name": "PLAYBACK_LOOP_BACKWARD",
-          "line": 94,
           "value": 4
         },
         {
           "name": "PLAYBACK_LOOP_PINGPONG",
-          "line": 95,
           "value": 5
         },
         {
           "name": "PLAYBACK_NONE",
-          "line": 96,
           "value": 6
         },
         {
           "name": "PLAYBACK_COUNT",
-          "line": 97,
           "value": 7
         }
       ],
@@ -46501,17 +46038,14 @@
       "members": [
         {
           "name": "ADJUST_REFERENCE_LEGACY",
-          "line": 108,
           "value": 0
         },
         {
           "name": "ADJUST_REFERENCE_PARENT",
-          "line": 109,
           "value": 1
         },
         {
           "name": "ADJUST_REFERENCE_DISABLED",
-          "line": 110,
           "value": 2
         }
       ],
@@ -46534,15 +46068,15 @@
       "members": [
         {
           "name": "NODE_TEXTURE_TYPE_NONE",
-          "line": 123
+          "value": 0
         },
         {
           "name": "NODE_TEXTURE_TYPE_TEXTURE",
-          "line": 124
+          "value": 1
         },
         {
           "name": "NODE_TEXTURE_TYPE_TEXTURE_SET",
-          "line": 125
+          "value": 2
         }
       ],
       "description": "This enum denotes what kind of texture type the m_Texture pointer is referencing.",
@@ -46564,37 +46098,30 @@
       "members": [
         {
           "name": "NODE_TYPE_BOX",
-          "line": 144,
           "value": 0
         },
         {
           "name": "NODE_TYPE_TEXT",
-          "line": 145,
           "value": 1
         },
         {
           "name": "NODE_TYPE_PIE",
-          "line": 146,
           "value": 2
         },
         {
           "name": "NODE_TYPE_TEMPLATE",
-          "line": 147,
           "value": 3
         },
         {
           "name": "NODE_TYPE_PARTICLEFX",
-          "line": 148,
           "value": 5
         },
         {
           "name": "NODE_TYPE_CUSTOM",
-          "line": 149,
           "value": 6
         },
         {
           "name": "NODE_TYPE_COUNT",
-          "line": 150,
           "value": 7
         }
       ],
@@ -46614,52 +46141,42 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 170,
           "value": 0
         },
         {
           "name": "RESULT_SYNTAX_ERROR",
-          "line": 171,
           "value": -1
         },
         {
           "name": "RESULT_SCRIPT_ERROR",
-          "line": 172,
           "value": -2
         },
         {
           "name": "RESULT_OUT_OF_RESOURCES",
-          "line": 173,
           "value": -4
         },
         {
           "name": "RESULT_RESOURCE_NOT_FOUND",
-          "line": 174,
           "value": -5
         },
         {
           "name": "RESULT_TEXTURE_ALREADY_EXISTS",
-          "line": 175,
           "value": -6
         },
         {
           "name": "RESULT_INVAL_ERROR",
-          "line": 176,
           "value": -7
         },
         {
           "name": "RESULT_INF_RECURSION",
-          "line": 177,
           "value": -8
         },
         {
           "name": "RESULT_DATA_ERROR",
-          "line": 178,
           "value": -9
         },
         {
           "name": "RESULT_WRONG_TYPE",
-          "line": 179,
           "value": -10
         }
       ],
@@ -46682,37 +46199,30 @@
       "members": [
         {
           "name": "CUSTOM_PROPERTY_TYPE_NUMBER",
-          "line": 195,
           "value": 0
         },
         {
           "name": "CUSTOM_PROPERTY_TYPE_BOOLEAN",
-          "line": 196,
           "value": 1
         },
         {
           "name": "CUSTOM_PROPERTY_TYPE_HASH",
-          "line": 197,
           "value": 2
         },
         {
           "name": "CUSTOM_PROPERTY_TYPE_STRING",
-          "line": 198,
           "value": 3
         },
         {
           "name": "CUSTOM_PROPERTY_TYPE_VECTOR3",
-          "line": 199,
           "value": 5
         },
         {
           "name": "CUSTOM_PROPERTY_TYPE_VECTOR4",
-          "line": 200,
           "value": 6
         },
         {
           "name": "CUSTOM_PROPERTY_TYPE_QUAT",
-          "line": 201,
           "value": 7
         }
       ],
@@ -47160,67 +46670,54 @@
       "members": [
         {
           "name": "PROPERTY_POSITION",
-          "line": 336,
           "value": 0
         },
         {
           "name": "PROPERTY_ROTATION",
-          "line": 337,
           "value": 1
         },
         {
           "name": "PROPERTY_SCALE",
-          "line": 338,
           "value": 2
         },
         {
           "name": "PROPERTY_COLOR",
-          "line": 339,
           "value": 3
         },
         {
           "name": "PROPERTY_SIZE",
-          "line": 340,
           "value": 4
         },
         {
           "name": "PROPERTY_OUTLINE",
-          "line": 341,
           "value": 5
         },
         {
           "name": "PROPERTY_SHADOW",
-          "line": 342,
           "value": 6
         },
         {
           "name": "PROPERTY_SLICE9",
-          "line": 343,
           "value": 7
         },
         {
           "name": "PROPERTY_PIE_PARAMS",
-          "line": 344,
           "value": 8
         },
         {
           "name": "PROPERTY_TEXT_PARAMS",
-          "line": 345,
           "value": 9
         },
         {
           "name": "PROPERTY_EULER",
-          "line": 346,
           "value": 10
         },
         {
           "name": "PROPERTY_PREV_EULER",
-          "line": 347,
           "value": 11
         },
         {
           "name": "PROPERTY_COUNT",
-          "line": 349,
           "value": 12
         }
       ],
@@ -47412,17 +46909,14 @@
       "members": [
         {
           "name": "ADJUST_MODE_FIT",
-          "line": 409,
           "value": 0
         },
         {
           "name": "ADJUST_MODE_ZOOM",
-          "line": 410,
           "value": 1
         },
         {
           "name": "ADJUST_MODE_STRETCH",
-          "line": 411,
           "value": 2
         }
       ],
@@ -48170,23 +47664,23 @@
       "members": [
         {
           "name": "PHASE_BEGAN",
-          "line": 162
+          "value": 0
         },
         {
           "name": "PHASE_MOVED",
-          "line": 163
+          "value": 1
         },
         {
           "name": "PHASE_STATIONARY",
-          "line": 164
+          "value": 2
         },
         {
           "name": "PHASE_ENDED",
-          "line": 165
+          "value": 3
         },
         {
           "name": "PHASE_CANCELLED",
-          "line": 166
+          "value": 4
         }
       ],
       "description": "touch phase enumeration",
@@ -48208,632 +47702,506 @@
       "members": [
         {
           "name": "KEY_SPACE",
-          "line": 301,
           "value": 32
         },
         {
           "name": "KEY_EXCLAIM",
-          "line": 302,
           "value": 33
         },
         {
           "name": "KEY_QUOTEDBL",
-          "line": 303,
           "value": 34
         },
         {
           "name": "KEY_HASH",
-          "line": 304,
           "value": 35
         },
         {
           "name": "KEY_DOLLAR",
-          "line": 305,
           "value": 36
         },
         {
           "name": "KEY_AMPERSAND",
-          "line": 306,
           "value": 38
         },
         {
           "name": "KEY_QUOTE",
-          "line": 307,
           "value": 39
         },
         {
           "name": "KEY_LPAREN",
-          "line": 308,
           "value": 40
         },
         {
           "name": "KEY_RPAREN",
-          "line": 309,
           "value": 41
         },
         {
           "name": "KEY_ASTERISK",
-          "line": 310,
           "value": 42
         },
         {
           "name": "KEY_PLUS",
-          "line": 311,
           "value": 43
         },
         {
           "name": "KEY_COMMA",
-          "line": 312,
           "value": 44
         },
         {
           "name": "KEY_MINUS",
-          "line": 313,
           "value": 45
         },
         {
           "name": "KEY_PERIOD",
-          "line": 314,
           "value": 46
         },
         {
           "name": "KEY_SLASH",
-          "line": 315,
           "value": 47
         },
         {
           "name": "KEY_0",
-          "line": 317,
           "value": 48
         },
         {
           "name": "KEY_1",
-          "line": 318,
           "value": 49
         },
         {
           "name": "KEY_2",
-          "line": 319,
           "value": 50
         },
         {
           "name": "KEY_3",
-          "line": 320,
           "value": 51
         },
         {
           "name": "KEY_4",
-          "line": 321,
           "value": 52
         },
         {
           "name": "KEY_5",
-          "line": 322,
           "value": 53
         },
         {
           "name": "KEY_6",
-          "line": 323,
           "value": 54
         },
         {
           "name": "KEY_7",
-          "line": 324,
           "value": 55
         },
         {
           "name": "KEY_8",
-          "line": 325,
           "value": 56
         },
         {
           "name": "KEY_9",
-          "line": 326,
           "value": 57
         },
         {
           "name": "KEY_COLON",
-          "line": 328,
           "value": 58
         },
         {
           "name": "KEY_SEMICOLON",
-          "line": 329,
           "value": 59
         },
         {
           "name": "KEY_LESS",
-          "line": 330,
           "value": 60
         },
         {
           "name": "KEY_EQUALS",
-          "line": 331,
           "value": 61
         },
         {
           "name": "KEY_GREATER",
-          "line": 332,
           "value": 62
         },
         {
           "name": "KEY_QUESTION",
-          "line": 333,
           "value": 63
         },
         {
           "name": "KEY_AT",
-          "line": 334,
           "value": 64
         },
         {
           "name": "KEY_A",
-          "line": 336,
           "value": 65
         },
         {
           "name": "KEY_B",
-          "line": 337,
           "value": 66
         },
         {
           "name": "KEY_C",
-          "line": 338,
           "value": 67
         },
         {
           "name": "KEY_D",
-          "line": 339,
           "value": 68
         },
         {
           "name": "KEY_E",
-          "line": 340,
           "value": 69
         },
         {
           "name": "KEY_F",
-          "line": 341,
           "value": 70
         },
         {
           "name": "KEY_G",
-          "line": 342,
           "value": 71
         },
         {
           "name": "KEY_H",
-          "line": 343,
           "value": 72
         },
         {
           "name": "KEY_I",
-          "line": 344,
           "value": 73
         },
         {
           "name": "KEY_J",
-          "line": 345,
           "value": 74
         },
         {
           "name": "KEY_K",
-          "line": 346,
           "value": 75
         },
         {
           "name": "KEY_L",
-          "line": 347,
           "value": 76
         },
         {
           "name": "KEY_M",
-          "line": 348,
           "value": 77
         },
         {
           "name": "KEY_N",
-          "line": 349,
           "value": 78
         },
         {
           "name": "KEY_O",
-          "line": 350,
           "value": 79
         },
         {
           "name": "KEY_P",
-          "line": 351,
           "value": 80
         },
         {
           "name": "KEY_Q",
-          "line": 352,
           "value": 81
         },
         {
           "name": "KEY_R",
-          "line": 353,
           "value": 82
         },
         {
           "name": "KEY_S",
-          "line": 354,
           "value": 83
         },
         {
           "name": "KEY_T",
-          "line": 355,
           "value": 84
         },
         {
           "name": "KEY_U",
-          "line": 356,
           "value": 85
         },
         {
           "name": "KEY_V",
-          "line": 357,
           "value": 86
         },
         {
           "name": "KEY_W",
-          "line": 358,
           "value": 87
         },
         {
           "name": "KEY_X",
-          "line": 359,
           "value": 88
         },
         {
           "name": "KEY_Y",
-          "line": 360,
           "value": 89
         },
         {
           "name": "KEY_Z",
-          "line": 361,
           "value": 90
         },
         {
           "name": "KEY_LBRACKET",
-          "line": 363,
           "value": 91
         },
         {
           "name": "KEY_BACKSLASH",
-          "line": 364,
           "value": 92
         },
         {
           "name": "KEY_RBRACKET",
-          "line": 365,
           "value": 93
         },
         {
           "name": "KEY_CARET",
-          "line": 366,
           "value": 94
         },
         {
           "name": "KEY_UNDERSCORE",
-          "line": 367,
           "value": 95
         },
         {
           "name": "KEY_BACKQUOTE",
-          "line": 368,
           "value": 96
         },
         {
           "name": "KEY_LBRACE",
-          "line": 370,
           "value": 123
         },
         {
           "name": "KEY_PIPE",
-          "line": 371,
           "value": 124
         },
         {
           "name": "KEY_RBRACE",
-          "line": 372,
           "value": 125
         },
         {
           "name": "KEY_TILDE",
-          "line": 373,
           "value": 126
         },
         {
           "name": "KEY_ESC",
-          "line": 377,
           "value": 256
         },
         {
           "name": "KEY_F1",
-          "line": 378,
           "value": 257
         },
         {
           "name": "KEY_F2",
-          "line": 379,
           "value": 258
         },
         {
           "name": "KEY_F3",
-          "line": 380,
           "value": 259
         },
         {
           "name": "KEY_F4",
-          "line": 381,
           "value": 260
         },
         {
           "name": "KEY_F5",
-          "line": 382,
           "value": 261
         },
         {
           "name": "KEY_F6",
-          "line": 383,
           "value": 262
         },
         {
           "name": "KEY_F7",
-          "line": 384,
           "value": 263
         },
         {
           "name": "KEY_F8",
-          "line": 385,
           "value": 264
         },
         {
           "name": "KEY_F9",
-          "line": 386,
           "value": 265
         },
         {
           "name": "KEY_F10",
-          "line": 387,
           "value": 266
         },
         {
           "name": "KEY_F11",
-          "line": 388,
           "value": 267
         },
         {
           "name": "KEY_F12",
-          "line": 389,
           "value": 268
         },
         {
           "name": "KEY_UP",
-          "line": 390,
           "value": 269
         },
         {
           "name": "KEY_DOWN",
-          "line": 391,
           "value": 270
         },
         {
           "name": "KEY_LEFT",
-          "line": 392,
           "value": 271
         },
         {
           "name": "KEY_RIGHT",
-          "line": 393,
           "value": 272
         },
         {
           "name": "KEY_LSHIFT",
-          "line": 394,
           "value": 273
         },
         {
           "name": "KEY_RSHIFT",
-          "line": 395,
           "value": 274
         },
         {
           "name": "KEY_LCTRL",
-          "line": 396,
           "value": 275
         },
         {
           "name": "KEY_RCTRL",
-          "line": 397,
           "value": 276
         },
         {
           "name": "KEY_LALT",
-          "line": 398,
           "value": 277
         },
         {
           "name": "KEY_RALT",
-          "line": 399,
           "value": 278
         },
         {
           "name": "KEY_TAB",
-          "line": 400,
           "value": 279
         },
         {
           "name": "KEY_ENTER",
-          "line": 401,
           "value": 280
         },
         {
           "name": "KEY_BACKSPACE",
-          "line": 402,
           "value": 281
         },
         {
           "name": "KEY_INSERT",
-          "line": 403,
           "value": 282
         },
         {
           "name": "KEY_DEL",
-          "line": 404,
           "value": 283
         },
         {
           "name": "KEY_PAGEUP",
-          "line": 405,
           "value": 284
         },
         {
           "name": "KEY_PAGEDOWN",
-          "line": 406,
           "value": 285
         },
         {
           "name": "KEY_HOME",
-          "line": 407,
           "value": 286
         },
         {
           "name": "KEY_END",
-          "line": 408,
           "value": 287
         },
         {
           "name": "KEY_KP_0",
-          "line": 409,
           "value": 288
         },
         {
           "name": "KEY_KP_1",
-          "line": 410,
           "value": 289
         },
         {
           "name": "KEY_KP_2",
-          "line": 411,
           "value": 290
         },
         {
           "name": "KEY_KP_3",
-          "line": 412,
           "value": 291
         },
         {
           "name": "KEY_KP_4",
-          "line": 413,
           "value": 292
         },
         {
           "name": "KEY_KP_5",
-          "line": 414,
           "value": 293
         },
         {
           "name": "KEY_KP_6",
-          "line": 415,
           "value": 294
         },
         {
           "name": "KEY_KP_7",
-          "line": 416,
           "value": 295
         },
         {
           "name": "KEY_KP_8",
-          "line": 417,
           "value": 296
         },
         {
           "name": "KEY_KP_9",
-          "line": 418,
           "value": 297
         },
         {
           "name": "KEY_KP_DIVIDE",
-          "line": 419,
           "value": 298
         },
         {
           "name": "KEY_KP_MULTIPLY",
-          "line": 420,
           "value": 299
         },
         {
           "name": "KEY_KP_SUBTRACT",
-          "line": 421,
           "value": 300
         },
         {
           "name": "KEY_KP_ADD",
-          "line": 422,
           "value": 301
         },
         {
           "name": "KEY_KP_DECIMAL",
-          "line": 423,
           "value": 302
         },
         {
           "name": "KEY_KP_EQUAL",
-          "line": 424,
           "value": 303
         },
         {
           "name": "KEY_KP_ENTER",
-          "line": 425,
           "value": 304
         },
         {
           "name": "KEY_KP_NUM_LOCK",
-          "line": 426,
           "value": 305
         },
         {
           "name": "KEY_CAPS_LOCK",
-          "line": 427,
           "value": 306
         },
         {
           "name": "KEY_SCROLL_LOCK",
-          "line": 428,
           "value": 307
         },
         {
           "name": "KEY_PAUSE",
-          "line": 429,
           "value": 308
         },
         {
           "name": "KEY_LSUPER",
-          "line": 430,
           "value": 309
         },
         {
           "name": "KEY_RSUPER",
-          "line": 431,
           "value": 310
         },
         {
           "name": "KEY_MENU",
-          "line": 432,
           "value": 311
         },
         {
           "name": "KEY_BACK",
-          "line": 433,
           "value": 312
         },
         {
           "name": "MAX_KEY_COUNT",
-          "line": 435,
           "value": 313
         }
       ],
@@ -48856,62 +48224,50 @@
       "members": [
         {
           "name": "MOUSE_BUTTON_LEFT",
-          "line": 456,
           "value": 0
         },
         {
           "name": "MOUSE_BUTTON_MIDDLE",
-          "line": 457,
           "value": 2
         },
         {
           "name": "MOUSE_BUTTON_RIGHT",
-          "line": 458,
           "value": 1
         },
         {
           "name": "MOUSE_BUTTON_1",
-          "line": 459,
           "value": 0
         },
         {
           "name": "MOUSE_BUTTON_2",
-          "line": 460,
           "value": 1
         },
         {
           "name": "MOUSE_BUTTON_3",
-          "line": 461,
           "value": 2
         },
         {
           "name": "MOUSE_BUTTON_4",
-          "line": 462,
           "value": 3
         },
         {
           "name": "MOUSE_BUTTON_5",
-          "line": 463,
           "value": 4
         },
         {
           "name": "MOUSE_BUTTON_6",
-          "line": 464,
           "value": 5
         },
         {
           "name": "MOUSE_BUTTON_7",
-          "line": 465,
           "value": 6
         },
         {
           "name": "MOUSE_BUTTON_8",
-          "line": 466,
           "value": 7
         },
         {
           "name": "MAX_MOUSE_BUTTON_COUNT",
-          "line": 467,
           "value": 8
         }
       ],
@@ -54011,17 +53367,14 @@
       "members": [
         {
           "name": "WINDOW_RESULT_OK",
-          "line": 98,
           "value": 0
         },
         {
           "name": "WINDOW_RESULT_WINDOW_OPEN_ERROR",
-          "line": 99,
           "value": -1
         },
         {
           "name": "WINDOW_RESULT_WINDOW_ALREADY_OPENED",
-          "line": 100,
           "value": -2
         }
       ],
@@ -54061,42 +53414,34 @@
       "members": [
         {
           "name": "WINDOW_GRAPHICS_API_NULL",
-          "line": 117,
           "value": 0
         },
         {
           "name": "WINDOW_GRAPHICS_API_OPENGL",
-          "line": 118,
           "value": 1
         },
         {
           "name": "WINDOW_GRAPHICS_API_OPENGLES",
-          "line": 119,
           "value": 2
         },
         {
           "name": "WINDOW_GRAPHICS_API_VULKAN",
-          "line": 120,
           "value": 3
         },
         {
           "name": "WINDOW_GRAPHICS_API_VENDOR",
-          "line": 121,
           "value": 4
         },
         {
           "name": "WINDOW_GRAPHICS_API_WEBGPU",
-          "line": 122,
           "value": 5
         },
         {
           "name": "WINDOW_GRAPHICS_API_DIRECTX",
-          "line": 123,
           "value": 6
         },
         {
           "name": "WINDOW_GRAPHICS_API_METAL",
-          "line": 124,
           "value": 7
         }
       ],
@@ -54136,112 +53481,90 @@
       "members": [
         {
           "name": "WINDOW_STATE_OPENED",
-          "line": 155,
           "value": 1
         },
         {
           "name": "WINDOW_STATE_ACTIVE",
-          "line": 156,
           "value": 2
         },
         {
           "name": "WINDOW_STATE_ICONIFIED",
-          "line": 157,
           "value": 3
         },
         {
           "name": "WINDOW_STATE_ACCELERATED",
-          "line": 158,
           "value": 4
         },
         {
           "name": "WINDOW_STATE_RED_BITS",
-          "line": 159,
           "value": 5
         },
         {
           "name": "WINDOW_STATE_GREEN_BITS",
-          "line": 160,
           "value": 6
         },
         {
           "name": "WINDOW_STATE_BLUE_BITS",
-          "line": 161,
           "value": 7
         },
         {
           "name": "WINDOW_STATE_ALPHA_BITS",
-          "line": 162,
           "value": 8
         },
         {
           "name": "WINDOW_STATE_DEPTH_BITS",
-          "line": 163,
           "value": 9
         },
         {
           "name": "WINDOW_STATE_STENCIL_BITS",
-          "line": 164,
           "value": 10
         },
         {
           "name": "WINDOW_STATE_REFRESH_RATE",
-          "line": 165,
           "value": 11
         },
         {
           "name": "WINDOW_STATE_ACCUM_RED_BITS",
-          "line": 166,
           "value": 12
         },
         {
           "name": "WINDOW_STATE_ACCUM_GREEN_BITS",
-          "line": 167,
           "value": 13
         },
         {
           "name": "WINDOW_STATE_ACCUM_BLUE_BITS",
-          "line": 168,
           "value": 14
         },
         {
           "name": "WINDOW_STATE_ACCUM_ALPHA_BITS",
-          "line": 169,
           "value": 15
         },
         {
           "name": "WINDOW_STATE_AUX_BUFFERS",
-          "line": 170,
           "value": 16
         },
         {
           "name": "WINDOW_STATE_STEREO",
-          "line": 171,
           "value": 17
         },
         {
           "name": "WINDOW_STATE_WINDOW_NO_RESIZE",
-          "line": 172,
           "value": 18
         },
         {
           "name": "WINDOW_STATE_FSAA_SAMPLES",
-          "line": 173,
           "value": 19
         },
         {
           "name": "WINDOW_STATE_SAMPLE_COUNT",
-          "line": 174,
           "value": 20
         },
         {
           "name": "WINDOW_STATE_HIGH_DPI",
-          "line": 175,
           "value": 21
         },
         {
           "name": "WINDOW_STATE_AUX_CONTEXT",
-          "line": 176,
           "value": 22
         }
       ],
@@ -55059,32 +54382,26 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 112,
           "value": 0
         },
         {
           "name": "RESULT_INVALID_CONTEXT",
-          "line": 113,
           "value": -1
         },
         {
           "name": "RESULT_OUT_OF_RESOURCES",
-          "line": 114,
           "value": -2
         },
         {
           "name": "RESULT_BUFFER_IS_FULL",
-          "line": 115,
           "value": -3
         },
         {
           "name": "RESULT_INVALID_PARAMETER",
-          "line": 116,
           "value": -4
         },
         {
           "name": "RESULT_TYPE_MISMATCH",
-          "line": 117,
           "value": -5
         }
       ],
@@ -55551,15 +54868,15 @@
       "members": [
         {
           "name": "RENDER_LIST_OPERATION_BEGIN",
-          "line": 289
+          "value": 0
         },
         {
           "name": "RENDER_LIST_OPERATION_BATCH",
-          "line": 290
+          "value": 1
         },
         {
           "name": "RENDER_LIST_OPERATION_END",
-          "line": 291
+          "value": 2
         }
       ],
       "description": "Render batch callback states",
@@ -55581,17 +54898,14 @@
       "members": [
         {
           "name": "RENDER_ORDER_BEFORE_WORLD",
-          "line": 303,
           "value": 0
         },
         {
           "name": "RENDER_ORDER_WORLD",
-          "line": 304,
           "value": 1
         },
         {
           "name": "RENDER_ORDER_AFTER_WORLD",
-          "line": 305,
           "value": 2
         }
       ],
@@ -55614,12 +54928,10 @@
       "members": [
         {
           "name": "VISIBILITY_NONE",
-          "line": 317,
           "value": 0
         },
         {
           "name": "VISIBILITY_FULL",
-          "line": 318,
           "value": 1
         }
       ],
@@ -55642,12 +54954,10 @@
       "members": [
         {
           "name": "FRUSTUM_PLANES_SIDES",
-          "line": 330,
           "value": 4
         },
         {
           "name": "FRUSTUM_PLANES_ALL",
-          "line": 331,
           "value": 6
         }
       ],
@@ -57588,117 +56898,94 @@
       "members": [
         {
           "name": "RESOURCE_RESULT_OK",
-          "line": 112,
           "value": 0
         },
         {
           "name": "RESOURCE_RESULT_INVALID_DATA",
-          "line": 113,
           "value": -1
         },
         {
           "name": "RESOURCE_RESULT_DDF_ERROR",
-          "line": 114,
           "value": -2
         },
         {
           "name": "RESOURCE_RESULT_RESOURCE_NOT_FOUND",
-          "line": 115,
           "value": -3
         },
         {
           "name": "RESOURCE_RESULT_MISSING_FILE_EXTENSION",
-          "line": 116,
           "value": -4
         },
         {
           "name": "RESOURCE_RESULT_ALREADY_REGISTERED",
-          "line": 117,
           "value": -5
         },
         {
           "name": "RESOURCE_RESULT_INVAL",
-          "line": 118,
           "value": -6
         },
         {
           "name": "RESOURCE_RESULT_UNKNOWN_RESOURCE_TYPE",
-          "line": 119,
           "value": -7
         },
         {
           "name": "RESOURCE_RESULT_OUT_OF_MEMORY",
-          "line": 120,
           "value": -8
         },
         {
           "name": "RESOURCE_RESULT_IO_ERROR",
-          "line": 121,
           "value": -9
         },
         {
           "name": "RESOURCE_RESULT_NOT_LOADED",
-          "line": 122,
           "value": -10
         },
         {
           "name": "RESOURCE_RESULT_OUT_OF_RESOURCES",
-          "line": 123,
           "value": -11
         },
         {
           "name": "RESOURCE_RESULT_STREAMBUFFER_TOO_SMALL",
-          "line": 124,
           "value": -12
         },
         {
           "name": "RESOURCE_RESULT_FORMAT_ERROR",
-          "line": 125,
           "value": -13
         },
         {
           "name": "RESOURCE_RESULT_CONSTANT_ERROR",
-          "line": 126,
           "value": -14
         },
         {
           "name": "RESOURCE_RESULT_NOT_SUPPORTED",
-          "line": 127,
           "value": -15
         },
         {
           "name": "RESOURCE_RESULT_RESOURCE_LOOP_ERROR",
-          "line": 128,
           "value": -16
         },
         {
           "name": "RESOURCE_RESULT_PENDING",
-          "line": 129,
           "value": -17
         },
         {
           "name": "RESOURCE_RESULT_INVALID_FILE_EXTENSION",
-          "line": 130,
           "value": -18
         },
         {
           "name": "RESOURCE_RESULT_VERSION_MISMATCH",
-          "line": 131,
           "value": -19
         },
         {
           "name": "RESOURCE_RESULT_SIGNATURE_MISMATCH",
-          "line": 132,
           "value": -20
         },
         {
           "name": "RESOURCE_RESULT_UNKNOWN_ERROR",
-          "line": 133,
           "value": -21
         },
         {
           "name": "RESOURCE_RESULT_TOO_MANY_COMPONENTS",
-          "line": 134,
           "value": -22
         }
       ],
@@ -61161,117 +60448,94 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 74,
           "value": 0
         },
         {
           "name": "RESULT_INVALID_DATA",
-          "line": 75,
           "value": -1
         },
         {
           "name": "RESULT_DDF_ERROR",
-          "line": 76,
           "value": -2
         },
         {
           "name": "RESULT_RESOURCE_NOT_FOUND",
-          "line": 77,
           "value": -3
         },
         {
           "name": "RESULT_MISSING_FILE_EXTENSION",
-          "line": 78,
           "value": -4
         },
         {
           "name": "RESULT_ALREADY_REGISTERED",
-          "line": 79,
           "value": -5
         },
         {
           "name": "RESULT_INVAL",
-          "line": 80,
           "value": -6
         },
         {
           "name": "RESULT_UNKNOWN_RESOURCE_TYPE",
-          "line": 81,
           "value": -7
         },
         {
           "name": "RESULT_OUT_OF_MEMORY",
-          "line": 82,
           "value": -8
         },
         {
           "name": "RESULT_IO_ERROR",
-          "line": 83,
           "value": -9
         },
         {
           "name": "RESULT_NOT_LOADED",
-          "line": 84,
           "value": -10
         },
         {
           "name": "RESULT_OUT_OF_RESOURCES",
-          "line": 85,
           "value": -11
         },
         {
           "name": "RESULT_STREAMBUFFER_TOO_SMALL",
-          "line": 86,
           "value": -12
         },
         {
           "name": "RESULT_FORMAT_ERROR",
-          "line": 87,
           "value": -13
         },
         {
           "name": "RESULT_CONSTANT_ERROR",
-          "line": 88,
           "value": -14
         },
         {
           "name": "RESULT_NOT_SUPPORTED",
-          "line": 89,
           "value": -15
         },
         {
           "name": "RESULT_RESOURCE_LOOP_ERROR",
-          "line": 90,
           "value": -16
         },
         {
           "name": "RESULT_PENDING",
-          "line": 91,
           "value": -17
         },
         {
           "name": "RESULT_INVALID_FILE_EXTENSION",
-          "line": 92,
           "value": -18
         },
         {
           "name": "RESULT_VERSION_MISMATCH",
-          "line": 93,
           "value": -19
         },
         {
           "name": "RESULT_SIGNATURE_MISMATCH",
-          "line": 94,
           "value": -20
         },
         {
           "name": "RESULT_UNKNOWN_ERROR",
-          "line": 95,
           "value": -21
         },
         {
           "name": "RESULT_TOO_MANY_COMPONENTS",
-          "line": 96,
           "value": -22
         }
       ],
@@ -62125,27 +61389,22 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 47,
           "value": 0
         },
         {
           "name": "RESULT_ERROR",
-          "line": 48,
           "value": 1
         },
         {
           "name": "RESULT_ERROR_BUFFER_FULL",
-          "line": 49,
           "value": 2
         },
         {
           "name": "RESULT_ANIM_NOT_FOUND",
-          "line": 50,
           "value": 3
         },
         {
           "name": "RESULT_UPDATED_POSE",
-          "line": 51,
           "value": 4
         }
       ],
@@ -62165,42 +61424,34 @@
       "members": [
         {
           "name": "PLAYBACK_NONE",
-          "line": 56,
           "value": 0
         },
         {
           "name": "PLAYBACK_ONCE_FORWARD",
-          "line": 57,
           "value": 1
         },
         {
           "name": "PLAYBACK_ONCE_BACKWARD",
-          "line": 58,
           "value": 2
         },
         {
           "name": "PLAYBACK_ONCE_PINGPONG",
-          "line": 59,
           "value": 3
         },
         {
           "name": "PLAYBACK_LOOP_FORWARD",
-          "line": 60,
           "value": 4
         },
         {
           "name": "PLAYBACK_LOOP_BACKWARD",
-          "line": 61,
           "value": 5
         },
         {
           "name": "PLAYBACK_LOOP_PINGPONG",
-          "line": 62,
           "value": 6
         },
         {
           "name": "PLAYBACK_COUNT",
-          "line": 63,
           "value": 7
         }
       ],
@@ -62311,12 +61562,10 @@
       "members": [
         {
           "name": "RIG_EVENT_TYPE_COMPLETED",
-          "line": 87,
           "value": 0
         },
         {
           "name": "RIG_EVENT_TYPE_KEYFRAME",
-          "line": 88,
           "value": 1
         }
       ],
@@ -65757,112 +65006,90 @@
       "members": [
         {
           "name": "RESULT_OK",
-          "line": 60,
           "value": 0
         },
         {
           "name": "RESULT_PARTIAL_DATA",
-          "line": 61,
           "value": 1
         },
         {
           "name": "RESULT_OUT_OF_SOURCES",
-          "line": 62,
           "value": -1
         },
         {
           "name": "RESULT_EFFECT_NOT_FOUND",
-          "line": 63,
           "value": -2
         },
         {
           "name": "RESULT_OUT_OF_INSTANCES",
-          "line": 64,
           "value": -3
         },
         {
           "name": "RESULT_RESOURCE_LEAK",
-          "line": 65,
           "value": -4
         },
         {
           "name": "RESULT_OUT_OF_BUFFERS",
-          "line": 66,
           "value": -5
         },
         {
           "name": "RESULT_INVALID_PROPERTY",
-          "line": 67,
           "value": -6
         },
         {
           "name": "RESULT_UNKNOWN_SOUND_TYPE",
-          "line": 68,
           "value": -7
         },
         {
           "name": "RESULT_INVALID_STREAM_DATA",
-          "line": 69,
           "value": -8
         },
         {
           "name": "RESULT_OUT_OF_MEMORY",
-          "line": 70,
           "value": -9
         },
         {
           "name": "RESULT_UNSUPPORTED",
-          "line": 71,
           "value": -10
         },
         {
           "name": "RESULT_DEVICE_NOT_FOUND",
-          "line": 72,
           "value": -11
         },
         {
           "name": "RESULT_OUT_OF_GROUPS",
-          "line": 73,
           "value": -12
         },
         {
           "name": "RESULT_NO_SUCH_GROUP",
-          "line": 74,
           "value": -13
         },
         {
           "name": "RESULT_NOTHING_TO_PLAY",
-          "line": 75,
           "value": -14
         },
         {
           "name": "RESULT_INIT_ERROR",
-          "line": 76,
           "value": -15
         },
         {
           "name": "RESULT_FINI_ERROR",
-          "line": 77,
           "value": -16
         },
         {
           "name": "RESULT_NO_DATA",
-          "line": 78,
           "value": -17
         },
         {
           "name": "RESULT_END_OF_STREAM",
-          "line": 79,
           "value": -18
         },
         {
           "name": "RESULT_DEVICE_LOST",
-          "line": 80,
           "value": -19
         },
         {
           "name": "RESULT_UNKNOWN_ERROR",
-          "line": 81,
           "value": -1000
         }
       ],
@@ -65979,24 +65206,79 @@
       ]
     },
     {
-      "name": "dmArray<dmhash_t>",
-      "reason": "template-specialization",
+      "name": "KEY",
+      "reason": "template-parameter",
       "contexts": [
-        "dmGameSystem::GuiSceneResource"
+        "dmHashTable::dmHashTable::Erase",
+        "dmHashTable::dmHashTable::Get",
+        "dmHashTable::dmHashTable::Iterator::GetKey",
+        "dmHashTable::dmHashTable::Put",
+        "dmHashTable::dmHashTable::key_t"
       ]
     },
     {
-      "name": "dmArray<dmParticle::HPrototype>",
-      "reason": "template-specialization",
+      "name": "T",
+      "reason": "template-parameter",
       "contexts": [
-        "dmGameSystem::GuiSceneResource"
+        "Back",
+        "EraseSwap",
+        "EraseSwapRef",
+        "Front",
+        "Push",
+        "dmArray::dmArray::Back",
+        "dmArray::dmArray::EraseSwap",
+        "dmArray::dmArray::EraseSwapRef",
+        "dmArray::dmArray::Front",
+        "dmArray::dmArray::Push",
+        "dmArray::dmArray::operator[]",
+        "dmHashTable::dmHashTable::Iterator::GetValue",
+        "dmHashTable::dmHashTable::Put",
+        "dmHashTable::dmHashTable::value_t",
+        "dmObjectPool::dmObjectPool::Get",
+        "dmObjectPool::dmObjectPool::Set",
+        "operator[]"
       ]
     },
     {
-      "name": "dmArray<dmRig::RigBone>",
-      "reason": "template-specialization",
+      "name": "Vectormath::Aos::Matrix3",
+      "reason": "external-vectormath-type",
       "contexts": [
-        "dmGameSystem::RigSceneResource"
+        "dmVMath::Matrix3"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Matrix4",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Matrix4"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Point3",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Point3"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Quat",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Quat"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Vector3",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Vector3"
+      ]
+    },
+    {
+      "name": "Vectormath::Aos::Vector4",
+      "reason": "external-vectormath-type",
+      "contexts": [
+        "dmVMath::Vector4"
       ]
     },
     {
@@ -66044,6 +65326,27 @@
       ]
     },
     {
+      "name": "dmArray<dmParticle::HPrototype>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<dmRig::RigBone>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::RigSceneResource"
+      ]
+    },
+    {
+      "name": "dmArray<dmhash_t>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameSystem::GuiSceneResource"
+      ]
+    },
+    {
       "name": "dmArray<uint8_t>",
       "reason": "template-specialization",
       "contexts": [
@@ -66055,29 +65358,6 @@
       "reason": "template-specialization",
       "contexts": [
         "dmGameSystem::CollectionFactoryResource"
-      ]
-    },
-    {
-      "name": "dmHashTable<dmhash_t, dmhash_t>",
-      "reason": "template-specialization",
-      "contexts": [
-        "dmGameObject::InstanceIdMap"
-      ]
-    },
-    {
-      "name": "dmHashTable<dmhash_t, HPropertyContainer>",
-      "reason": "template-specialization",
-      "contexts": [
-        "dmGameObject::InstancePropertyContainers"
-      ]
-    },
-    {
-      "name": "dmHashTable<KEY, T>",
-      "reason": "template-specialization",
-      "contexts": [
-        "dmHashTable::dmHashTable::Iterator",
-        "dmHashTable::dmHashTable::Iterator::Iterator",
-        "dmHashTable::dmHashTable::Swap"
       ]
     },
     {
@@ -66104,6 +65384,29 @@
       ]
     },
     {
+      "name": "dmHashTable<KEY, T>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmHashTable::dmHashTable::Iterator",
+        "dmHashTable::dmHashTable::Iterator::Iterator",
+        "dmHashTable::dmHashTable::Swap"
+      ]
+    },
+    {
+      "name": "dmHashTable<dmhash_t, HPropertyContainer>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameObject::InstancePropertyContainers"
+      ]
+    },
+    {
+      "name": "dmHashTable<dmhash_t, dmhash_t>",
+      "reason": "template-specialization",
+      "contexts": [
+        "dmGameObject::InstanceIdMap"
+      ]
+    },
+    {
       "name": "id",
       "reason": "objective-c-object",
       "contexts": [
@@ -66113,40 +65416,6 @@
         "dmGraphics::GetNativeiOSEAGLContext",
         "dmGraphics::GetNativeiOSUIView",
         "dmGraphics::GetNativeiOSUIWindow"
-      ]
-    },
-    {
-      "name": "KEY",
-      "reason": "template-parameter",
-      "contexts": [
-        "dmHashTable::dmHashTable::Erase",
-        "dmHashTable::dmHashTable::Get",
-        "dmHashTable::dmHashTable::Iterator::GetKey",
-        "dmHashTable::dmHashTable::Put",
-        "dmHashTable::dmHashTable::key_t"
-      ]
-    },
-    {
-      "name": "T",
-      "reason": "template-parameter",
-      "contexts": [
-        "Back",
-        "EraseSwap",
-        "EraseSwapRef",
-        "Front",
-        "Push",
-        "dmArray::dmArray::Back",
-        "dmArray::dmArray::EraseSwap",
-        "dmArray::dmArray::EraseSwapRef",
-        "dmArray::dmArray::Front",
-        "dmArray::dmArray::Push",
-        "dmArray::dmArray::operator[]",
-        "dmHashTable::dmHashTable::Iterator::GetValue",
-        "dmHashTable::dmHashTable::Put",
-        "dmHashTable::dmHashTable::value_t",
-        "dmObjectPool::dmObjectPool::Get",
-        "dmObjectPool::dmObjectPool::Set",
-        "operator[]"
       ]
     },
     {
@@ -66161,48 +65430,6 @@
       "reason": "platform-variadic-list",
       "contexts": [
         "dm_lua_pushvfstring"
-      ]
-    },
-    {
-      "name": "Vectormath::Aos::Matrix3",
-      "reason": "external-vectormath-type",
-      "contexts": [
-        "dmVMath::Matrix3"
-      ]
-    },
-    {
-      "name": "Vectormath::Aos::Matrix4",
-      "reason": "external-vectormath-type",
-      "contexts": [
-        "dmVMath::Matrix4"
-      ]
-    },
-    {
-      "name": "Vectormath::Aos::Point3",
-      "reason": "external-vectormath-type",
-      "contexts": [
-        "dmVMath::Point3"
-      ]
-    },
-    {
-      "name": "Vectormath::Aos::Quat",
-      "reason": "external-vectormath-type",
-      "contexts": [
-        "dmVMath::Quat"
-      ]
-    },
-    {
-      "name": "Vectormath::Aos::Vector3",
-      "reason": "external-vectormath-type",
-      "contexts": [
-        "dmVMath::Vector3"
-      ]
-    },
-    {
-      "name": "Vectormath::Aos::Vector4",
-      "reason": "external-vectormath-type",
-      "contexts": [
-        "dmVMath::Vector4"
       ]
     }
   ]

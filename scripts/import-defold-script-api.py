@@ -14,7 +14,7 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / "upstream" / "ref-doc.zip"
 OUTPUT = ROOT / "bindings" / "generated" / "defold-script-api-inventory.json"
-REPORT = ROOT / "knowledge" / "research" / "script-api-coverage.md"
+REPORT = ROOT / ".agents" / "docs" / "research" / "script-api-coverage.md"
 
 FUNCTION = re.compile(r"^function\s+([\w.:]+)\(([^)]*)\)\s+end\s*$")
 ANNOTATION = re.compile(r"^---@(?P<kind>class|field|enum|alias|param|return)\s*(?P<body>.*)$")

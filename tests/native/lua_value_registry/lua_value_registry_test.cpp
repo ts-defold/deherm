@@ -170,6 +170,8 @@ bool TestValidationAndStaleRejection() {
   CHECK(lua_gettop(state) == top);
   CHECK(!registry.push(first, Owned(LuaValueKind::kTable)));
   CHECK(lua_gettop(state) == top);
+  CHECK(!registry.push(first, {LuaValueKind::kTable, LuaValuePolicy::kBorrowed, 7}));
+  CHECK(lua_gettop(state) == top);
 
   Handle wrongRuntime = first;
   ++wrongRuntime.runtime;
@@ -197,6 +199,7 @@ bool TestValidationAndStaleRejection() {
 
   CHECK(registry.stats().kindMismatchFailures == 2);
   CHECK(registry.stats().policyMismatchFailures == 1);
+  CHECK(registry.stats().semanticKindMismatchFailures == 1);
   CHECK(registry.stats().runtimeMismatchFailures == 1);
   CHECK(registry.stats().doubleReleaseFailures == 1);
   CHECK(registry.stats().staleHandleFailures >= 2);

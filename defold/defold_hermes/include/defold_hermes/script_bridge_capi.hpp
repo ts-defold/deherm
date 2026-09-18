@@ -41,6 +41,16 @@ enum class ScriptHandleKind : uint8_t {
   kGuiNode,
   /** Borrowed Lua userdata retained in the per-runtime registry pool. */
   kLuaUserdata,
+  /** Semantically branded userdata retained by the generated handle router. */
+  kLuaSemanticHandle,
+};
+
+/** Runtime container identity retained across the generic Lua/JS value graph. */
+enum class ScriptTableKind : uint8_t {
+  kUnspecified = 0,
+  kSequence = 1,
+  kRecord = 2,
+  kMap = 3,
 };
 
 struct ScriptValue {
@@ -95,6 +105,14 @@ struct ScriptBridgeApi {
       uint64_t payload) noexcept = nullptr;
 };
 
+struct ScriptBridgeReleaseQueueStats {
+  uint64_t enqueued = 0;
+  uint64_t drained = 0;
+  uint64_t dropped = 0;
+  uint32_t pending = 0;
+  uint32_t capacity = 0;
+};
+
 void installScriptBridgeApi(ScriptBridgeApi api) noexcept;
 void uninstallScriptBridgeApi() noexcept;
 bool dispatchScriptCall(ScriptCallFrame* frame) noexcept;
@@ -103,6 +121,9 @@ void releaseScriptHandle(
     ScriptHandleKind kind,
     uint32_t runtime,
     uint64_t payload) noexcept;
+/** Drain GC-thread finalizer releases on the Lua/runtime thread. */
+void drainReleasedScriptHandles() noexcept;
+ScriptBridgeReleaseQueueStats scriptBridgeReleaseQueueStats() noexcept;
 
 }  // namespace defold_hermes
 

@@ -39,18 +39,18 @@
     "ir": "bindings/generated/defold-sdk-ir.json",
     "classification": "bindings/generated/defold-dmsdk-binding-patterns.json",
     "hashes": {
-      "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+      "ir": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
       "classification": "db34de697fc30b34f4ba0cbd9cce3ff5277dfd774a5aaae26ecdde3b2d439cc8",
       "loweringEvidence": {
-        "scalar": "dffc13e11e53aa1147f32097f178270cf2b87995734c700cb9eebe99b4b9b6b2",
-        "enumValue": "4327eee79b6219b80a9e0b48f21693fb9791d9851e6f6b2e747756760130cd23",
-        "namedScalar": "e801ec68b75ef785eb8ee7471a1a0f53f98bde3f82f63aef0879db484971e613",
-        "fixedDigest": "6d718ff01c2bfa14650f0d83853e2c3fc12bde2315868e4febe2382531629427",
-        "base64Span": "ff7571c1d8f7ee5450ccc8102cd3b808908a9b07906d638b0ce0f422a834906c",
-        "astcProbe": "5846d60384b34787bf3880b1723dc3f1caead05b68ef2172b0e4819c72450268",
-        "xteaSpan": "04ec59105959ddf53419e9c66320da1d30b5d5e249d1254bdd0a3250232d7134",
-        "hashSpan": "fdf8d14a83f605059630902d46b4998f2fb8492aef782906fb039f05033b3092",
-        "arenaSpan": "f1dff732ed844941a36267f3ae2c66e6bd7cae83a004dfd320c00571b257c3c1"
+        "scalar": "397c5dfa370fcbb2fc35ca793f9c60b71b9159d11c8a35029845affb047d9e7a",
+        "enumValue": "4271e33db909e7fc1811adf46bd54681c2b72c13565b084638586a19c1edd4d9",
+        "namedScalar": "dff7b3e450a642ec907a9eef6309939d5dd0cd7ab22e8d28d4645eccca6868cc",
+        "fixedDigest": "121953fe1281ef34f3e37a5061ba622ff4d0dc00597fad00043c401ab563516d",
+        "base64Span": "ffdb7694aebbc81a834b4bcd47b85b220fd7b87e1fb1473651ad409e9ae1f0e2",
+        "astcProbe": "7c0a35cfe975375a9cf5983b8d2308149199db46cd1cb9f4bb32064784de2126",
+        "xteaSpan": "84368f9e74ef448aab6093933f13ffc4b583713523703bfda3d7b23c3eb7dec7",
+        "hashSpan": "4c8e62c689d866333aa738451b1cc5956b3c6579049dae0b4749b36a0a2eafb6",
+        "arenaSpan": "33c6162d6f11b08b39ffe8ebdd3be00f4aee28fedf71ffeb68e48e576542a374"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",

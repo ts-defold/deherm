@@ -1,10 +1,10 @@
-import { access, mkdir } from "node:fs/promises";
+import { access, mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
 import {
   componentProxyConstants,
   generateComponentProxies
-} from "../../../../scripts/lib/component-proxy-generator.mjs";
+} from "../../../compiler/src/component-proxy-generator.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "./model.mjs";
@@ -24,10 +24,25 @@ async function exists(file) {
 async function resolveEntry(projectRoot, requested) {
   if (requested) return path.resolve(requested);
   const candidates = [
-    path.join(projectRoot, "src", "main.ts")
+    path.join(projectRoot, "src", "main.ts"),
+    path.join(projectRoot, "src", "main.script.ts")
   ];
   for (const candidate of candidates) if (await exists(candidate)) return candidate;
-  throw new Error("deherm dev needs --entry <file>; no src/main.ts was found");
+  const sourceRoot = path.join(projectRoot, "src");
+  let componentEntries = [];
+  try {
+    componentEntries = (await readdir(sourceRoot, { recursive: true, withFileTypes: true }))
+      .filter((entry) => entry.isFile() && entry.name.endsWith(".script.ts"))
+      .map((entry) => path.join(entry.parentPath, entry.name))
+      .sort();
+  } catch {
+    // The actionable error below covers missing or unreadable source trees.
+  }
+  if (componentEntries.length === 1) return componentEntries[0];
+  if (componentEntries.length > 1) {
+    throw new Error(`deherm dev found multiple .script.ts entries; choose one with --entry:\n${componentEntries.map((file) => `- ${file}`).join("\n")}`);
+  }
+  throw new Error("deherm dev needs --entry <file>; no src/main.ts or src/main.script.ts was found");
 }
 
 function containedPath(root, relative, label) {
@@ -60,6 +75,21 @@ function isComponentSource(file) {
 
 function isComponentProxy(file) {
   return componentProxySuffixes.some((suffix) => file.endsWith(suffix));
+}
+
+async function entryTsconfig(projectRoot, entryPoint) {
+  const name = entryPoint.toLowerCase();
+  const context = name.endsWith(".script.ts")
+    ? "game-object"
+    : name.endsWith(".gui.ts") || name.endsWith(".gui_script.ts")
+      ? "gui"
+      : name.endsWith(".render.ts")
+        ? "render"
+        : "shared";
+  const generated = path.join(projectRoot, `tsconfig.deherm.${context}.json`);
+  if (await exists(generated)) return generated;
+  const conventional = path.join(projectRoot, "tsconfig.json");
+  return await exists(conventional) ? conventional : undefined;
 }
 
 export function createDevWatchOptions({ outputFile, sourceMirror, buildMirror }) {
@@ -109,6 +139,7 @@ export async function runDevSession(options = {}) {
   let generatedComponents = false;
   const compiler = await createIncrementalCompiler({
     entryPoint,
+    tsconfig: await entryTsconfig(projectRoot, entryPoint),
     outputFile,
     mirrors: [sourceMirror, buildMirror],
     resourcePath,

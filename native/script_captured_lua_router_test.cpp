@@ -323,7 +323,9 @@ int main() {
   SetInstance(state);
   scalar::ScriptAdapter adapter;
   gAdapter = &adapter;
-  expect(adapter.initialize(state, {GetInstance, SetInstance}), "adapter initialization failed");
+  const auto* runtimeProfile = defold_hermes::script_handle_lowering::findRuntimeProfile("default-legacy-bullet");
+  expect(runtimeProfile && adapter.initialize(state, {GetInstance, SetInstance},
+      defold_hermes::script_handle_lowering::runtimeProfileHandshake(*runtimeProfile)), "adapter initialization failed");
 
   constexpr uint32_t recordIds[] = {
     UINT32_C(0x3aac69fd), UINT32_C(0xea93e5f3), UINT32_C(0xf808b822)

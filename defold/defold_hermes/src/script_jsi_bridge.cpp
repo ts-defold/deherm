@@ -3,8 +3,14 @@
 #if !defined(DM_PLATFORM_HTML5)
 
 #include <defold_hermes/script_bridge_capi.hpp>
+#include <defold_hermes/generated_script_handle_kinds.hpp>
+#include <defold_hermes/generated_script_universal_value_bindings.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
 #include <defold_hermes/script_url_arena.hpp>
+
+#if defined(DEHERM_CANONICAL_RELEASE)
+#include <deherm_canonical_release.h>
+#endif
 
 #include <array>
 #include <atomic>
@@ -12,20 +18,27 @@
 #include <cstdint>
 #include <limits>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace defold_hermes {
 namespace jsi = facebook::jsi;
 namespace {
 
-constexpr size_t kMaximumArguments = 6;
+constexpr size_t kMaximumArguments = universal_value::kMaximumArgumentCount;
 constexpr size_t kMaximumResults = 8;
-constexpr size_t kMaximumTableEntries = 16;
+constexpr size_t kMaximumTableEntries = universal_value::kMaximumEntries;
+constexpr size_t kMaximumTableDepth = universal_value::kMaximumDepth;
+constexpr size_t kMaximumInputStrings = kMaximumArguments + kMaximumTableEntries * 2;
 constexpr size_t kStringScratchCapacity = 64 * 1024;
 constexpr size_t kMaximumReentrantDepth = 16;
 constexpr const char* kDefoldValueKindProperty = "__dehermValueKind";
 constexpr const char* kDefoldUrlProperty = "__dehermUrlV1";
+constexpr uint8_t kTableSequence = static_cast<uint8_t>(ScriptTableKind::kSequence);
+constexpr uint8_t kTableRecord = static_cast<uint8_t>(ScriptTableKind::kRecord);
+constexpr uint8_t kTableMap = static_cast<uint8_t>(ScriptTableKind::kMap);
 
 std::atomic<uint32_t> gNextUrlRuntimeToken{1};
 
@@ -38,13 +51,33 @@ uint32_t nextUrlRuntimeToken() noexcept {
 struct ScratchSlot {
   std::array<ScriptValue, kMaximumArguments> arguments{};
   std::array<ScriptValue, kMaximumResults> results{};
-  std::array<std::string, kMaximumArguments> inputStrings{};
-  std::array<std::array<ScriptTableEntry, kMaximumTableEntries>, kMaximumArguments> tableEntries{};
-  std::array<std::array<std::string, kMaximumTableEntries * 2>, kMaximumArguments> tableStrings{};
-  std::array<ScriptTableEntry, kMaximumResults * kMaximumTableEntries> outputTableEntries{};
+  std::array<std::string, kMaximumInputStrings> inputStrings{};
+  std::array<ScriptTableEntry, kMaximumTableEntries> inputTableEntries{};
+  std::array<ScriptTableEntry, kMaximumTableEntries> outputTableEntries{};
   std::array<char, kStringScratchCapacity> outputStrings{};
   ScriptMatrix4Arena matrix4Arena{};
   ScriptUrlArena<> urlArena{};
+  uint32_t inputStringCount = 0;
+  uint32_t inputTableEntryCount = 0;
+
+  void resetCallScratch() noexcept {
+    inputStringCount = 0;
+    inputTableEntryCount = 0;
+  }
+
+  std::string& acquireInputString() {
+    if (inputStringCount >= inputStrings.size()) {
+      throw std::out_of_range("Defold script input string arena is exhausted");
+    }
+    return inputStrings[inputStringCount++];
+  }
+
+  ScriptTableEntry* reserveInputEntries(uint32_t count) noexcept {
+    if (count > inputTableEntries.size() - inputTableEntryCount) return nullptr;
+    ScriptTableEntry* result = inputTableEntries.data() + inputTableEntryCount;
+    inputTableEntryCount += count;
+    return result;
+  }
 };
 
 struct Scratch {
@@ -62,6 +95,7 @@ class ScratchFrame {
   explicit ScratchFrame(Scratch& scratch) : scratch_(scratch) {
     if (scratch_.depth < scratch_.slots.size()) {
       slot_ = &scratch_.slots[scratch_.depth++];
+      slot_->resetCallScratch();
       urlMark_ = slot_->urlArena.mark();
     }
   }
@@ -95,30 +129,78 @@ float toFloat32(double value) noexcept {
   return static_cast<float>(value);
 }
 
-class ScriptHandleHostObject final : public jsi::HostObject {
+class ScriptHandleHostObject final : public jsi::HostObject,
+                                     public std::enable_shared_from_this<ScriptHandleHostObject> {
  public:
-  ScriptHandleHostObject(ScriptHandleKind kind, uint32_t runtime, uint64_t payload) noexcept
-      : kind_(kind), runtime_(runtime), payload_(payload) {}
+  ScriptHandleHostObject(
+      ScriptHandleKind kind,
+      uint8_t semanticKind,
+      uint32_t runtime,
+      uint64_t payload) noexcept
+      : kind_(kind), semanticKind_(semanticKind), runtime_(runtime), payload_(payload) {}
 
-  ~ScriptHandleHostObject() override {
-    releaseScriptHandle(kind_, runtime_, payload_);
-  }
+  ~ScriptHandleHostObject() override { dispose(); }
 
   ScriptHandleKind kind() const noexcept { return kind_; }
+  uint8_t semanticKind() const noexcept { return semanticKind_; }
   uint32_t runtime() const noexcept { return runtime_; }
   uint64_t payload() const noexcept { return payload_; }
+  bool disposed() const noexcept { return disposed_.load(std::memory_order_acquire); }
+
+  void dispose() noexcept {
+    bool expected = false;
+    if (disposed_.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
+      releaseScriptHandle(kind_, runtime_, payload_);
+    }
+  }
+
+  jsi::Value get(jsi::Runtime& runtime, const jsi::PropNameID& name) override {
+    const std::string property = name.utf8(runtime);
+    if (property == "runtime") return jsi::Value(static_cast<double>(runtime_));
+    if (property == "slot") return jsi::Value(static_cast<double>(static_cast<uint32_t>(payload_)));
+    if (property == "generation") return jsi::Value(static_cast<double>(static_cast<uint32_t>(payload_ >> 32u)));
+    if (property == "kind") return jsi::String::createFromAscii(runtime, kindName());
+    if (property == "dispose") {
+      std::weak_ptr<ScriptHandleHostObject> weak = shared_from_this();
+      return jsi::Function::createFromHostFunction(
+          runtime,
+          jsi::PropNameID::forAscii(runtime, "dispose"),
+          0,
+          [weak](jsi::Runtime&, const jsi::Value&, const jsi::Value*, size_t) {
+            if (const auto handle = weak.lock()) handle->dispose();
+            return jsi::Value::undefined();
+          });
+    }
+    return jsi::Value::undefined();
+  }
+
+  std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override {
+    return jsi::PropNameID::names(runtime, "runtime", "slot", "generation", "kind", "dispose");
+  }
 
  private:
+  const char* kindName() const noexcept {
+    if (kind_ == ScriptHandleKind::kLuaSemanticHandle && semanticKind_ > 0 &&
+        semanticKind_ <= script_handle_lowering::kSemanticHandleKindNameCount) {
+      return script_handle_lowering::semanticHandleKindName(semanticKind_);
+    }
+    if (kind_ == ScriptHandleKind::kGuiNode) return "gui-node";
+    if (kind_ == ScriptHandleKind::kLuaUserdata) return "lua-userdata";
+    return "unknown";
+  }
+
   ScriptHandleKind kind_ = ScriptHandleKind::kNone;
+  uint8_t semanticKind_ = 0;
   uint32_t runtime_ = 0;
   uint64_t payload_ = 0;
+  std::atomic<bool> disposed_{false};
 };
 
 void encodeLeaf(
     jsi::Runtime& runtime,
     const jsi::Value& value,
     ScriptValue& output,
-    std::string& string) {
+    ScratchSlot& scratch) {
   output = {};
   if (value.isUndefined()) {
     output.tag = ScriptValueTag::kUndefined;
@@ -137,6 +219,7 @@ void encodeLeaf(
     output.handleKind = ScriptHandleKind::kHash;
     output.payload = bigint.getUint64(runtime);
   } else if (value.isString()) {
+    std::string& string = scratch.acquireInputString();
     string = value.getString(runtime).utf8(runtime);
     if (string.size() > UINT32_MAX) throw jsi::JSError(runtime, "Defold script string exceeds ABI size");
     output.tag = ScriptValueTag::kString;
@@ -146,8 +229,10 @@ void encodeLeaf(
     auto object = value.asObject(runtime);
     if (object.isHostObject<ScriptHandleHostObject>(runtime)) {
       const auto handle = object.getHostObject<ScriptHandleHostObject>(runtime);
+      if (handle->disposed()) throw jsi::JSError(runtime, "Defold handle is disposed");
       output.tag = ScriptValueTag::kHandle;
       output.handleKind = handle->kind();
+      output.reserved = handle->semanticKind();
       output.length = handle->runtime();
       output.payload = handle->payload();
       return;
@@ -175,17 +260,33 @@ void encodeLeaf(
   }
 }
 
+struct ObjectAncestor {
+  const jsi::Object& object;
+  const ObjectAncestor* parent;
+};
+
+bool containsAncestor(
+    jsi::Runtime& runtime,
+    const jsi::Object& object,
+    const ObjectAncestor* ancestor) {
+  while (ancestor) {
+    if (jsi::Object::strictEquals(runtime, object, ancestor->object)) return true;
+    ancestor = ancestor->parent;
+  }
+  return false;
+}
+
 void encode(
     jsi::Runtime& runtime,
     const jsi::Value& value,
     ScriptValue& output,
-    std::string& string,
-    std::array<ScriptTableEntry, kMaximumTableEntries>& tableEntries,
-    std::array<std::string, kMaximumTableEntries * 2>& tableStrings,
+    ScratchSlot& scratch,
     ScriptMatrix4Arena& matrix4Arena,
-    ScriptUrlArena<>& urlArena) {
+    ScriptUrlArena<>& urlArena,
+    size_t depth = 0,
+    const ObjectAncestor* ancestor = nullptr) {
   if (!value.isObject()) {
-    encodeLeaf(runtime, value, output, string);
+    encodeLeaf(runtime, value, output, scratch);
     return;
   }
   auto object = value.asObject(runtime);
@@ -229,28 +330,66 @@ void encode(
   }
   if (object.isHostObject<ScriptHandleHostObject>(runtime) ||
       object.getProperty(runtime, kDefoldValueKindProperty).isString()) {
-    encodeLeaf(runtime, value, output, string);
+    encodeLeaf(runtime, value, output, scratch);
     return;
   }
 
+  if (depth >= kMaximumTableDepth) {
+    throw jsi::JSError(runtime, "Defold script value graph exceeds the generated depth bound");
+  }
+  if (containsAncestor(runtime, object, ancestor)) {
+    throw jsi::JSError(runtime, "Defold script value graph contains a cycle");
+  }
+  const ObjectAncestor current{object, ancestor};
+
   size_t entryCount = 0;
+  uint8_t tableKind = kTableRecord;
+  size_t expectedEntryCount = 0;
+  const bool isArray = object.isArray(runtime);
+  const auto mapValue = runtime.global().getProperty(runtime, "Map");
+  const bool isMap = mapValue.isObject() && mapValue.asObject(runtime).isFunction(runtime) &&
+      object.instanceOf(runtime, mapValue.asObject(runtime).asFunction(runtime));
+  if (isArray) {
+    tableKind = kTableSequence;
+    expectedEntryCount = object.asArray(runtime).size(runtime);
+  } else if (isMap) {
+    tableKind = kTableMap;
+    const auto size = object.getProperty(runtime, "size");
+    if (!size.isNumber() || !std::isfinite(size.asNumber()) ||
+        std::trunc(size.asNumber()) != size.asNumber() || size.asNumber() < 0) {
+      throw jsi::JSError(runtime, "Map.size is not a non-negative integer");
+    }
+    expectedEntryCount = static_cast<size_t>(size.asNumber());
+  } else {
+    expectedEntryCount = object.getPropertyNames(runtime).size(runtime);
+  }
+  if (expectedEntryCount > kMaximumTableEntries) {
+    throw jsi::JSError(runtime, "Defold script table exceeds the generated entry bound");
+  }
+  ScriptTableEntry* tableEntries = scratch.reserveInputEntries(
+      static_cast<uint32_t>(expectedEntryCount));
+  if (expectedEntryCount && !tableEntries) {
+    throw jsi::JSError(runtime, "Defold script call value arena is exhausted");
+  }
   auto append = [&](const jsi::Value& key, const jsi::Value& item) {
-    if (entryCount >= kMaximumTableEntries) {
-      throw jsi::JSError(runtime, "Defold script table exceeds the fixed 16-entry bound");
+    if (entryCount >= expectedEntryCount) {
+      throw jsi::JSError(runtime, "Defold script table changed while it was encoded");
     }
     auto& entry = tableEntries[entryCount];
-    encodeLeaf(runtime, key, entry.key, tableStrings[entryCount * 2]);
-    encodeLeaf(runtime, item, entry.value, tableStrings[entryCount * 2 + 1]);
+    encode(runtime, key, entry.key, scratch, matrix4Arena, urlArena, depth + 1, &current);
+    encode(runtime, item, entry.value, scratch, matrix4Arena, urlArena, depth + 1, &current);
     if (entry.key.tag == ScriptValueTag::kNull || entry.key.tag == ScriptValueTag::kUndefined) {
       throw jsi::JSError(runtime, "Defold script table keys cannot be null or undefined");
     }
     ++entryCount;
   };
 
-  const auto mapValue = runtime.global().getProperty(runtime, "Map");
-  const bool isMap = mapValue.isObject() && mapValue.asObject(runtime).isFunction(runtime) &&
-      object.instanceOf(runtime, mapValue.asObject(runtime).asFunction(runtime));
-  if (isMap) {
+  if (isArray) {
+    auto array = object.asArray(runtime);
+    for (size_t index = 0; index < expectedEntryCount; ++index) {
+      append(jsi::Value(static_cast<double>(index + 1)), array.getValueAtIndex(runtime, index));
+    }
+  } else if (isMap) {
     auto iteratorValue = object.getPropertyAsFunction(runtime, "entries").callWithThis(runtime, object);
     if (!iteratorValue.isObject()) throw jsi::JSError(runtime, "Map.entries did not return an iterator");
     auto iterator = iteratorValue.asObject(runtime);
@@ -273,9 +412,6 @@ void encode(
   } else {
     auto names = object.getPropertyNames(runtime);
     const size_t count = names.size(runtime);
-    if (count > kMaximumTableEntries) {
-      throw jsi::JSError(runtime, "Defold script table exceeds the fixed 16-entry bound");
-    }
     for (size_t index = 0; index < count; ++index) {
       const auto key = names.getValueAtIndex(runtime, index);
       append(key, object.getProperty(runtime, key.getString(runtime)));
@@ -284,8 +420,9 @@ void encode(
 
   output = {};
   output.tag = ScriptValueTag::kTable;
+  output.reserved = tableKind;
   output.length = static_cast<uint32_t>(entryCount);
-  output.data = tableEntries.data();
+  output.data = tableEntries;
 }
 
 jsi::Value decode(
@@ -306,11 +443,12 @@ jsi::Value decode(
         return jsi::Value(runtime, jsi::BigInt::fromUint64(runtime, value.payload));
       }
       if (value.handleKind == ScriptHandleKind::kGuiNode ||
-          value.handleKind == ScriptHandleKind::kLuaUserdata) {
+          value.handleKind == ScriptHandleKind::kLuaUserdata ||
+          value.handleKind == ScriptHandleKind::kLuaSemanticHandle) {
         return jsi::Object::createFromHostObject(
             runtime,
             std::make_shared<ScriptHandleHostObject>(
-                value.handleKind, value.length, value.payload));
+                value.handleKind, value.reserved, value.length, value.payload));
       }
       if (value.handleKind == ScriptHandleKind::kUrl) {
         ScriptResolvedUrl url{};
@@ -354,19 +492,46 @@ jsi::Value decode(
       if (value.length != 0 && !value.data) {
         throw jsi::JSError(runtime, "Defold script bridge returned a table with null storage");
       }
-      jsi::Object object(runtime);
       const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
-      for (uint32_t index = 0; index < value.length; ++index) {
-        const ScriptValue& key = entries[index].key;
-        if (key.tag != ScriptValueTag::kString || (key.length != 0 && !key.data)) {
-          throw jsi::JSError(runtime, "Defold script bridge returned a non-string record key");
+      if (value.reserved == kTableSequence) {
+        jsi::Array array(runtime, value.length);
+        for (uint32_t index = 0; index < value.length; ++index) {
+          const ScriptValue& key = entries[index].key;
+          if (key.tag != ScriptValueTag::kNumber || !std::isfinite(key.number) ||
+              std::trunc(key.number) != key.number || key.number < 1.0 ||
+              key.number > static_cast<double>(value.length)) {
+            throw jsi::JSError(runtime, "Defold script bridge returned an invalid sequence key");
+          }
+          array.setValueAtIndex(runtime, static_cast<size_t>(key.number - 1.0), decode(
+              runtime, entries[index].value, matrix4Arena, urlArena));
         }
-        const auto name = jsi::PropNameID::forUtf8(
-            runtime, static_cast<const uint8_t*>(key.data), key.length);
-        object.setProperty(runtime, name, decode(
-            runtime, entries[index].value, matrix4Arena, urlArena));
+        return array;
       }
-      return object;
+      if (value.reserved == kTableRecord) {
+        jsi::Object object(runtime);
+        for (uint32_t index = 0; index < value.length; ++index) {
+          const ScriptValue& key = entries[index].key;
+          if (key.tag != ScriptValueTag::kString || (key.length != 0 && !key.data)) {
+            throw jsi::JSError(runtime, "Defold script bridge returned a non-string record key");
+          }
+          const auto name = jsi::PropNameID::forUtf8(
+              runtime, static_cast<const uint8_t*>(key.data), key.length);
+          object.setProperty(runtime, name, decode(
+              runtime, entries[index].value, matrix4Arena, urlArena));
+        }
+        return object;
+      }
+      const auto mapConstructor = runtime.global().getPropertyAsFunction(runtime, "Map");
+      auto map = mapConstructor.callAsConstructor(runtime).asObject(runtime);
+      const auto set = map.getPropertyAsFunction(runtime, "set");
+      for (uint32_t index = 0; index < value.length; ++index) {
+        set.callWithThis(
+            runtime,
+            map,
+            decode(runtime, entries[index].key, matrix4Arena, urlArena),
+            decode(runtime, entries[index].value, matrix4Arena, urlArena));
+      }
+      return map;
     }
     case ScriptValueTag::kCallback:
       throw jsi::JSError(runtime, "Defold script bridge returned a value tag not implemented by JSI yet");
@@ -395,6 +560,11 @@ void installScriptJsiBridge(jsi::Runtime& runtime) {
         ScratchSlot* slot = scratchFrame.get();
         if (!slot) throw jsi::JSError(runtime, "Reentrant Defold script call depth exceeds the fixed scratch stack");
         const uint32_t id = stableId(runtime, args[0]);
+#if defined(DEHERM_CANONICAL_RELEASE)
+        if (!dehermCanonicalReleaseRouteEnabled(id)) {
+          throw jsi::JSError(runtime, "Defold script route was removed from this release build");
+        }
+#endif
         auto array = args[1].asObject(runtime).asArray(runtime);
         const size_t argumentCount = array.size(runtime);
         if (argumentCount > kMaximumArguments) {
@@ -405,9 +575,7 @@ void installScriptJsiBridge(jsi::Runtime& runtime) {
               runtime,
               array.getValueAtIndex(runtime, index),
               slot->arguments[index],
-              slot->inputStrings[index],
-              slot->tableEntries[index],
-              slot->tableStrings[index],
+              *slot,
               slot->matrix4Arena,
               slot->urlArena);
         }

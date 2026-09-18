@@ -15,7 +15,7 @@ const sourceBundle = resolve(root, "defold/deherm/app.dehermc");
 const probeReportPath = resolve(root, "bindings/generated/defold-script-real-engine-probes.json");
 const valueProbeReportPath = resolve(root, "bindings/generated/defold-script-value-real-engine-probes.json");
 const valueBindingReportPath = resolve(root, "bindings/generated/defold-script-value-bindings.json");
-const evidencePath = resolve(root, "knowledge/data/native-defold-runtime.log");
+const evidencePath = resolve(root, ".agents/docs/data/native-defold-runtime.log");
 const timeoutMs = Number.parseInt(process.env.DEFOLD_HERMES_RUNTIME_TIMEOUT_MS ?? "15000", 10);
 const arguments_ = new Set(process.argv.slice(2));
 for (const argument of arguments_) {

@@ -6,7 +6,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const reportPath = resolve(root, "bindings/generated/war-battles-script-real-engine-probes.json");
+const reportPath = resolve(root, "examples/war-battles-online/verification/generated/script-real-engine-probes.json");
 const executable = resolve(root, "build/bundle/Defold Hermes Spike.app/Contents/MacOS/DefoldHermesSpike");
 const resources = resolve(root, "build/bundle/Defold Hermes Spike.app/Contents/Resources");
 

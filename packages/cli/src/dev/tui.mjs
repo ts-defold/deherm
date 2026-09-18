@@ -280,6 +280,123 @@ export function renderDevDashboard(state) {
   });
 }
 
+function projectOptions(projects, cwd) {
+  return projects.map((project) => ({
+    value: project,
+    label: (project.startsWith(cwd) ? project.slice(cwd.length + 1) : project) || "."
+  }));
+}
+
+export function renderLauncher(state, actions) {
+  const options = projectOptions(state.projects, state.cwd);
+  const selected = state.selectedProject;
+  return ui.page({
+    p: 0,
+    gap: 0,
+    header: ui.box({ border: "none", px: 1, py: 0 }, [renderLogo(state.tick, state.reducedMotion, true)]),
+    body: ui.column({ px: 2, py: 1, gap: 1, height: "full", overflow: "hidden" }, [
+      ui.panel({ title: "PROJECT CONTROL", variant: "heavy", p: 1, gap: 1 }, [
+        ui.text(options.length
+          ? `${options.length} Defold project${options.length === 1 ? "" : "s"} discovered`
+          : "No game.project discovered yet", { style: { fg: options.length ? good : prism[2], bold: true } }),
+        ui.select({
+          id: "project",
+          value: selected,
+          options,
+          disabled: options.length === 0,
+          placeholder: "Select a Defold project",
+          onChange: actions.selectProject
+        }),
+        ui.row({ gap: 1 }, [
+          ui.button({ id: "start", label: "Start dev", disabled: !selected, intent: "primary", onPress: () => actions.finish({ type: "dev", project: selected }) }),
+          ui.button({ id: "doctor", label: "Doctor", disabled: !selected, onPress: () => actions.finish({ type: "doctor", project: selected }) }),
+          ui.button({ id: "quit", label: "Quit", onPress: () => actions.finish({ type: "quit" }) })
+        ])
+      ]),
+      ui.panel({ title: "CREATE", variant: "heavy", p: 1, gap: 1 }, [
+        ui.text("Scaffold a Defold + TypeScript project, generate its SDK, and create its .script proxy.", { style: { fg: dim } }),
+        ui.input({
+          id: "create-path",
+          value: state.createPath,
+          accessibleLabel: "New project directory",
+          onInput: actions.setCreatePath
+        }),
+        ui.button({
+          id: "create",
+          label: "Create project",
+          disabled: !state.createPath.trim(),
+          intent: "success",
+          onPress: () => actions.finish({ type: "create", directory: state.createPath.trim() })
+        })
+      ]),
+      ui.callout("deherm dev --project <path> starts directly · deherm create <dir> scaffolds without the TUI", { variant: "info", title: "CLI" })
+    ]),
+    footer: ui.statusBar({
+      left: [ui.text("tab navigate  enter activate")],
+      right: [ui.text("q quit", { style: { fg: prism[0], bold: true } })]
+    })
+  });
+}
+
+export async function runLauncherTui(options = {}) {
+  let result = { type: "quit" };
+  let interval;
+  let stopping = false;
+  const reducedMotion = options.reducedMotion ?? process.env.DEHERM_REDUCED_MOTION === "1";
+  const initialProjects = [...(options.projects ?? [])];
+  const app = (options.createApp ?? createNodeApp)({
+    initialState: {
+      cwd: options.cwd ?? process.cwd(),
+      projects: initialProjects,
+      selectedProject: options.selectedProject ?? initialProjects[0] ?? "",
+      createPath: options.createPath ?? "deherm-game",
+      reducedMotion,
+      tick: 0
+    },
+    config: { fpsCap: options.fpsCap ?? 20, executionMode: "worker" }
+  });
+  const finish = (next) => {
+    if (stopping) return;
+    result = next;
+    stopping = true;
+    clearInterval(interval);
+    interval = undefined;
+    setTimeout(() => {
+      Promise.resolve(app.stop()).catch((error) => {
+        options.onError?.(error);
+        app.dispose();
+      });
+    }, 0);
+  };
+  const actions = {
+    finish,
+    selectProject(value) {
+      app.update((state) => ({ ...state, selectedProject: value }));
+    },
+    setCreatePath(value) {
+      app.update((state) => ({ ...state, createPath: value }));
+    }
+  };
+  app.view((state) => renderLauncher(state, actions));
+  app.keys({ q: { description: "Quit", handler: () => finish({ type: "quit" }) } });
+  const runPromise = app.run();
+  void runPromise.catch(() => {});
+  try {
+    await app.ready();
+    if (!reducedMotion) {
+      interval = setInterval(() => {
+        if (!stopping) app.update((state) => ({ ...state, tick: state.tick + 1 }));
+      }, options.refreshMs ?? 80);
+    }
+    await runPromise;
+  } finally {
+    stopping = true;
+    clearInterval(interval);
+    app.dispose();
+  }
+  return result;
+}
+
 export async function runDevTui(options) {
   let logScroll = 0;
   let interval;

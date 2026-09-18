@@ -15,6 +15,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-defold-value-tail.mjs",
   "scripts/generate-script-overload-dispatch.mjs",
   "scripts/generate-script-table-record-bindings.mjs",
+  "scripts/generate-script-universal-value-bindings.mjs",
   "scripts/generate-script-copied-value-record-blockers.mjs",
   "scripts/generate-script-opaque-record-blockers.mjs",
   "scripts/generate-static-hermes-vmath.mjs",
@@ -27,9 +28,9 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-real-engine-matrix.mjs",
   "scripts/generate-script-route-availability-profiles.mjs",
   "scripts/generate-script-projection-ir.mjs",
-  "scripts/generate-war-battles-real-engine-probes.mjs",
+  "scripts/generate-script-handle-lowering.mjs",
   "scripts/generate-script-runtime.mjs",
-  "scripts/lib/binding-identity.mjs",
+  "packages/compiler/src/binding-identity.mjs",
   "scripts/lib/script-generator-pipeline.mjs",
   "scripts/lib/script-semantic-overrides.mjs",
   "packages/cli/src/names.mjs"
@@ -50,6 +51,7 @@ export const scriptPinnedInputs = Object.freeze([
   "bindings/overrides/script-dynamic-value-bindings.json",
   "bindings/overrides/script-overload-dispatch.json",
   "bindings/overrides/script-table-record-bindings.json",
+  "bindings/overrides/script-universal-value-bindings.json",
   "bindings/overrides/script-copied-value-record-blockers.json",
   "bindings/overrides/script-opaque-record-blockers.json",
   "bindings/overrides/script-fixed-tuple-registrations.json",
@@ -60,16 +62,16 @@ export const scriptPinnedInputs = Object.freeze([
   "bindings/overrides/script-table-tuple-schema-overrides.json",
   "bindings/overrides/script-url-address-classification.json",
   "bindings/overrides/script-route-availability-profiles.json",
+  "bindings/overrides/script-handle-lowering-policy.json",
   "bindings/overrides/static-hermes-vmath.json",
   "bindings/probes/defold-script-real-engine-matrix.json",
   "bindings/probes/defold-script-real-engine-probes.json",
-  "bindings/probes/defold-script-value-real-engine-probes.json",
-  "bindings/probes/war-battles-script-real-engine-probes.json"
+  "bindings/probes/defold-script-value-real-engine-probes.json"
 ]);
 
 export const generatedScriptArtifacts = Object.freeze([
   "bindings/generated/defold-script-api-inventory.json",
-  "knowledge/research/script-api-coverage.md",
+  ".agents/docs/research/script-api-coverage.md",
   "bindings/generated/defold-script-api-ir.json",
   "packages/sdk/src/generated/script/types.ts",
   "packages/sdk/src/generated/script/modules.ts",
@@ -114,6 +116,14 @@ export const generatedScriptArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_script_table_record_bindings.hpp",
   "defold/defold_hermes/src/generated_script_table_record_bindings.cpp",
   "packages/sdk/src/generated/script/table-record-bindings.ts",
+  "bindings/generated/defold-script-universal-value-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",
+  "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
+  "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h",
+  "defold/defold_hermes/src/generated_script_universal_value_capi.cpp",
+  "packages/sdk/src/generated/script/universal-value-bindings.ts",
+  "packages/static-hermes/src/generated/script-universal-value.ts",
+  "defold/defold_hermes/lib/web/generated_script_universal_value.js",
   "bindings/generated/defold-script-copied-value-record-blockers.json",
   "packages/sdk/src/generated/script/copied-value-record-blockers.ts",
   "bindings/generated/defold-script-opaque-record-blockers.json",
@@ -125,7 +135,7 @@ export const generatedScriptArtifacts = Object.freeze([
   "bindings/generated/defold-script-api-accounting.json",
   "bindings/generated/defold-script-borrowed-handle-classification.json",
   "bindings/generated/defold-script-table-tuple-schemas.json",
-  "knowledge/research/script-table-tuple-schema-classification.md",
+  ".agents/docs/research/script-table-tuple-schema-classification.md",
   "bindings/generated/defold-script-url-address-classification.json",
   "defold/defold_hermes/include/defold_hermes/generated_script_url_bindings.hpp",
   "defold/defold_hermes/src/generated_script_url_bindings.cpp",
@@ -133,8 +143,11 @@ export const generatedScriptArtifacts = Object.freeze([
   "bindings/generated/defold-script-real-engine-matrix.json",
   "bindings/generated/defold-script-route-availability-profiles.json",
   "bindings/generated/defold-script-projection-ir.json",
-  "bindings/generated/war-battles-script-real-engine-probes.json",
-  "sample/src/generated/war-battles-script-real-engine-probes.ts"
+  "bindings/generated/defold-script-handle-lowering.json",
+  "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",
+  "defold/defold_hermes/include/defold_hermes/generated_script_handle_lowering.hpp",
+  "defold/defold_hermes/src/generated_script_handle_lowering.cpp",
+  "packages/sdk/src/generated/script/handle-lowering.ts"
 ]);
 
 export const scriptGenerationSteps = Object.freeze([
@@ -162,5 +175,6 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-real-engine-matrix.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-route-availability-profiles.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-projection-ir.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-war-battles-real-engine-probes.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-universal-value-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" })
 ]);

@@ -23,6 +23,7 @@ function replaceJson(text, mutate) {
 }
 
 test("the canonical plan contains every API unit and all five backend dispositions", async () => {
+  assert.equal(generated.schemaVersion, 2);
   assert.deepEqual(generated.coverage, {
     units: 2287,
     scriptUnits: 926,
@@ -46,8 +47,150 @@ test("the canonical plan contains every API unit and all five backend dispositio
   assert.deepEqual(JSON.parse(await readFile(reportPath, "utf8")), generated);
 });
 
+test("generated implementation lanes are joined by exact identity and only explicit target-scoped codecs promote selection", () => {
+  const handleReport = JSON.parse(inputs.scriptHandleLowering);
+  const cstringReport = JSON.parse(inputs.dmsdkCStringValue);
+  const implementations = generated.units.flatMap((unit) => {
+    assert.ok(
+      unit.implementationSet >= 0 && unit.implementationSet < generated.tables.implementationSets.length,
+      unit.identity.id
+    );
+    return generated.tables.implementationSets[unit.implementationSet].map((implementation) => ({
+      unit,
+      implementation
+    }));
+  });
+  assert.equal(
+    implementations.filter(({ implementation }) => implementation.lane === "script-handle-lowering").length,
+    handleReport.routes.length
+  );
+  assert.equal(
+    implementations.filter(({ implementation }) => implementation.lane === "dmsdk-cstring-value").length,
+    cstringReport.declarations.length
+  );
+  const urlReport = JSON.parse(inputs.scriptUrlAddress);
+  assert.equal(
+    implementations.filter(({ implementation }) => implementation.lane === "script-url-dispatch").length,
+    urlReport.rows.length
+  );
+
+  const handle = generated.units.find(({ identity }) => identity.id === "script:b2d.body.apply_force");
+  const handleImplementation = generated.tables.implementationSets[handle.implementationSet][0];
+  assert.equal(handle.backends.dynamicHermesJsi.selection, "blocked-semantic");
+  assert.equal(handleImplementation.disposition, "generated-private-runtime");
+  assert.equal(handleImplementation.targets.nativeDynamicHermes, "captured-lua-router-harness-proven-jsi-unverified");
+  assert.equal(handleImplementation.evidence.defoldEngineBehavior, "unverified");
+
+  const cstringId = "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100";
+  const cstring = generated.units.find(({ identity }) => identity.id === cstringId);
+  const cstringImplementation = generated.tables.implementationSets[cstring.implementationSet][0];
+  assert.equal(cstringImplementation.disposition, "generated-private-staging");
+  assert.equal(cstringImplementation.semanticState, "explicit-string-contract-private-unlinked");
+  assert.equal(cstringImplementation.targets.nativeStaticHermes, "staged-private-c-abi-uncompiled-unlinked");
+  assert.equal(cstringImplementation.evidence.runtime, "unclaimed-by-canonical-plan");
+
+  assert.equal(Object.keys(generated.implementationLanes).length, 26);
+  for (const { source } of Object.values(generated.implementationLanes)) {
+    const input = Object.entries(inputPaths).find(([, path]) => path === source)?.[0];
+    assert.ok(input, `implementation lane source is not a declared plan input: ${source}`);
+    assert.match(generated.inputHashes[input], /^[a-f0-9]{64}$/);
+  }
+  assert.ok(generated.units.every((unit) => generated.tables.implementationSets[unit.implementationSet].length === 1));
+
+  const dynamic = generated.units.find(({ identity }) => identity.id === "script:bit.band");
+  const dynamicImplementation = generated.tables.implementationSets[dynamic.implementationSet][0];
+  assert.equal(dynamicImplementation.lane, "script-dynamic-values");
+  assert.equal(dynamicImplementation.reportState.generatedFamilyExecutableCandidate, true);
+  assert.equal(dynamicImplementation.targetClaims.nativeDynamicHermes, "candidate-awaits-shared-router-integration");
+  assert.equal(dynamic.backends.dynamicHermesJsi.selection, "blocked-semantic");
+
+  const digestId = "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160";
+  const digest = generated.units.find(({ identity }) => identity.id === digestId);
+  const digestImplementation = generated.tables.implementationSets[digest.implementationSet][0];
+  assert.equal(digestImplementation.lane, "dmsdk-fixed-digests");
+  assert.equal(digestImplementation.evidenceClaims.compiled, "packaged-sdk-object-test");
+  assert.equal(digestImplementation.evidenceClaims.runtime, "packaged-sdk-host-behavior-test");
+  assert.equal(digest.backends.dynamicHermesJsi.selection, "blocked-semantic");
+
+  const universal = generated.units.find(({ identity }) => identity.id === "script:physics.raycast");
+  const universalImplementation = generated.tables.implementationSets[universal.implementationSet][0];
+  assert.equal(universalImplementation.lane, "script-universal-value");
+  assert.equal(universal.backends.dynamicHermesJsi.selection, "emit");
+  assert.equal(universal.backends.luaStack.selection, "emit");
+  assert.equal(universal.backends.staticHermesCAbi.selection, "blocked-semantic");
+  assert.equal(universal.backends.browserWasmHost.selection, "blocked-semantic");
+
+  const borrowedId = "dmsdk:dmBuffer::IsBufferValid@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:227:93";
+  const borrowed = generated.units.find(({ identity }) => identity.id === borrowedId);
+  const borrowedImplementation = generated.tables.implementationSets[borrowed.implementationSet][0];
+  assert.equal(borrowedImplementation.lane, "dmsdk-borrowed-handle");
+  assert.equal(borrowedImplementation.disposition, "generated-provider-boundary");
+  assert.equal(borrowed.backends.dynamicHermesJsi.selection, "blocked-semantic");
+});
+
+test("implementation lane joins fail closed on identity and census drift", () => {
+  const handleIdentity = structuredClone(inputs);
+  handleIdentity.scriptHandleLowering = replaceJson(handleIdentity.scriptHandleLowering, (value) => {
+    value.routes[0].stableId += 1;
+  });
+  assert.throws(() => generateBindingLoweringPlan(handleIdentity), /script-handle-lowering: identity drift/);
+
+  const cstringIdentity = structuredClone(inputs);
+  cstringIdentity.dmsdkCStringValue = replaceJson(cstringIdentity.dmsdkCStringValue, (value) => {
+    value.declarations[0].projectionId = "dmsdk-projection:forged";
+  });
+  assert.throws(() => generateBindingLoweringPlan(cstringIdentity), /dmsdk-cstring-value: identity drift/);
+
+  const census = structuredClone(inputs);
+  census.scriptHandleLowering = replaceJson(census.scriptHandleLowering, (value) => value.routes.pop());
+  assert.throws(() => generateBindingLoweringPlan(census), /route census drifted/);
+
+  const genericIdentity = structuredClone(inputs);
+  genericIdentity.scriptFixedTuples = replaceJson(genericIdentity.scriptFixedTuples, (value) => {
+    value.bindings[0].stableId = "0xffffffff";
+  });
+  assert.throws(() => generateBindingLoweringPlan(genericIdentity), /script-fixed-tuples: stable identity drift/);
+
+  const genericCensus = structuredClone(inputs);
+  genericCensus.scriptDynamicValues = replaceJson(genericCensus.scriptDynamicValues, (value) => value.bindings.pop());
+  assert.throws(() => generateBindingLoweringPlan(genericCensus), /script-dynamic-values: report census drifted/);
+
+  const missingRevision = structuredClone(inputs);
+  missingRevision.dmsdkNamedScalars = replaceJson(missingRevision.dmsdkNamedScalars, (value) => {
+    delete value.defoldRevision;
+  });
+  assert.throws(() => generateBindingLoweringPlan(missingRevision), /dmsdk-named-scalars: Defold revision drifted/);
+
+  const dmsdkCensus = structuredClone(inputs);
+  dmsdkCensus.dmsdkScalarThunks = replaceJson(dmsdkCensus.dmsdkScalarThunks, (value) => {
+    value.coverage.reviewed -= 1;
+  });
+  assert.throws(() => generateBindingLoweringPlan(dmsdkCensus), /dmsdk-scalar-thunks: report census drifted/);
+
+  const overlap = structuredClone(inputs);
+  const scalar = JSON.parse(overlap.scriptScalarDispatch).bindings[0];
+  overlap.scriptUrlAddress = replaceJson(overlap.scriptUrlAddress, (value) => {
+    value.rows[0].id = scalar.id;
+    value.rows[0].stableId = scalar.stableId;
+  });
+  assert.throws(() => generateBindingLoweringPlan(overlap), /implementation lane overlap/);
+
+  const forgedEvidence = structuredClone(inputs);
+  forgedEvidence.dmsdkFixedDigests = replaceJson(forgedEvidence.dmsdkFixedDigests, (value) => {
+    value.declarations[0].stages.runtime = "packaged-engine-verified";
+  });
+  assert.throws(() => generateBindingLoweringPlan(forgedEvidence), /unsupported evidence status 'packaged-engine-verified'/);
+
+  const forgedTarget = structuredClone(inputs);
+  forgedTarget.scriptDynamicValues = replaceJson(forgedTarget.scriptDynamicValues, (value) => {
+    value.bindings[0].targetSupport.nativeDynamicHermes = "packaged-engine-verified";
+  });
+  assert.throws(() => generateBindingLoweringPlan(forgedTarget), /unsupported target status 'packaged-engine-verified'/);
+});
+
 test("runtime emit selections never escape unresolved semantics or target capability checks", () => {
   for (const unit of generated.units) {
+    assert.ok(unit.contractDetails >= 0 && unit.contractDetails < generated.tables.contracts.length, unit.identity.id);
     for (const target of generated.targetOrder.filter((name) => generated.targetCapabilities[name].runtime)) {
       const backend = unit.backends[target];
       assert.ok(backend.marshallingProgram >= 0 && backend.marshallingProgram < generated.tables.marshallingPrograms.length, `${unit.identity.id}/${target}`);
@@ -63,6 +206,7 @@ test("runtime emit selections never escape unresolved semantics or target capabi
 });
 
 test("marshalling is an interned data-oriented opcode algebra rather than route code", () => {
+  assert.ok(generated.tables.contracts.length < generated.coverage.units);
   assert.ok(generated.tables.marshallingPrograms.length < generated.coverage.units);
   assert.ok(generated.tables.blockerSets.length < 200);
   assert.ok(generated.tables.unresolvedTokenSets.length < 200);
@@ -90,6 +234,19 @@ test("marshalling is an interned data-oriented opcode algebra rather than route 
     "restore-scratch"
   ]);
   assert.equal(route.backends.dynamicHermesJsi.selection, "blocked-semantic");
+});
+
+test("interned contracts preserve every dmSDK composite effect record", () => {
+  const projection = JSON.parse(inputs.dmsdkProjection);
+  for (const unit of generated.units.filter(({ identity }) => identity.surface === "dmsdk")) {
+    const source = projection.rows[unit.sourceRef.row];
+    const contract = generated.tables.contracts[unit.contractDetails];
+    assert.deepEqual(contract.context, source.effects.context, `${unit.identity.id} context`);
+    assert.deepEqual(contract.ownership, source.effects.ownership, `${unit.identity.id} ownership`);
+    assert.deepEqual(contract.lifetime, source.effects.lifetime, `${unit.identity.id} lifetime`);
+    assert.deepEqual(contract.thread, source.effects.thread, `${unit.identity.id} thread`);
+    assert.deepEqual(contract.callback, source.effects.callbacks, `${unit.identity.id} callbacks`);
+  }
 });
 
 test("semantic policies are algebraic, reject identity selectors, overlap, and absent tokens", () => {
@@ -140,4 +297,25 @@ test("the plan regenerates byte-identically and rejects projection census drift"
   drift.scriptProjection = replaceJson(drift.scriptProjection, (value) => value.rows.pop());
   assert.throws(() => generateBindingLoweringPlan(drift), /Script projection census drifted/);
   assert.deepEqual(Object.keys(generated.inputHashes), Object.keys(inputPaths));
+});
+
+test("canonical ordering is byte-identical across host locales", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "deherm-lowering-locale-"));
+  try {
+    const cOutput = join(directory, "c.json");
+    const czechOutput = join(directory, "czech.json");
+    execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", cOutput], {
+      cwd: repositoryRoot,
+      env: { ...process.env, LC_ALL: "C", LANG: "C" },
+      stdio: "pipe"
+    });
+    execFileSync(process.execPath, ["scripts/generate-binding-lowering-plan.mjs", "--output", czechOutput], {
+      cwd: repositoryRoot,
+      env: { ...process.env, LC_ALL: "cs_CZ.UTF-8", LANG: "cs_CZ.UTF-8" },
+      stdio: "pipe"
+    });
+    assert.equal(await readFile(cOutput, "utf8"), await readFile(czechOutput, "utf8"));
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });

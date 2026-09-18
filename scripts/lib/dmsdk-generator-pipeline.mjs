@@ -15,6 +15,9 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-hash-span-bindings.mjs",
   "scripts/generate-dmsdk-arena-span-blockers.mjs",
   "scripts/generate-dmsdk-projection-ir.mjs",
+  "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
+  "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+  "scripts/generate-dmsdk-cstring-value-bindings.mjs",
   "scripts/generate-dmsdk-runtime.mjs",
   "scripts/lib/dmsdk-generator-pipeline.mjs"
 ]);
@@ -29,7 +32,10 @@ export const dmSdkPinnedInputs = Object.freeze([
   "bindings/overrides/dmsdk-astc-probe-bindings.json",
   "bindings/overrides/dmsdk-xtea-span-bindings.json",
   "bindings/overrides/dmsdk-hash-span-bindings.json",
-  "bindings/overrides/dmsdk-arena-span-blockers.json"
+  "bindings/overrides/dmsdk-arena-span-blockers.json",
+  "bindings/overrides/dmsdk-borrowed-handle-bindings.json",
+  "bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
+  "bindings/overrides/dmsdk-cstring-value-bindings.json"
 ]);
 
 export const generatedDmSdkArtifacts = Object.freeze([
@@ -93,7 +99,34 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp",
   "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp",
   "bindings/generated/defold-dmsdk-arena-span-blockers.json",
-  "bindings/generated/defold-dmsdk-projection-ir.json"
+  "bindings/generated/defold-dmsdk-projection-ir.json",
+  "bindings/generated/defold-dmsdk-borrowed-handle-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle_jsi.hpp",
+  "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp",
+  "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js",
+  "packages/sdk/src/generated/dmsdk/borrowed-handle.ts",
+  "packages/static-hermes/src/generated/dmsdk-borrowed-handle.ts",
+  "native/generated_dmsdk_borrowed_handle_header_audit.cpp",
+  "bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out_jsi.hpp",
+  "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp",
+  "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js",
+  "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts",
+  "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts",
+  "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp",
+  "bindings/generated/defold-dmsdk-cstring-value-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value_jsi.hpp",
+  "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_cstring_value_jsi.cpp",
+  "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js",
+  "packages/sdk/src/generated/dmsdk/cstring-value.ts",
+  "packages/static-hermes/src/generated/dmsdk-cstring-value.ts"
 ]);
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.
@@ -109,5 +142,8 @@ export const dmSdkGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-xtea-span-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-hash-span-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-arena-span-blockers.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-projection-ir.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-projection-ir.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-borrowed-handle-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-cstring-value-bindings.mjs" })
 ]);

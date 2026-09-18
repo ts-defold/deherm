@@ -50,8 +50,8 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
 
   const packageRoot = path.join(installRoot, "package");
   await symlink(path.join(repositoryRoot, "node_modules"), path.join(installRoot, "node_modules"), "dir");
-  await readFile(path.join(packageRoot, "scripts", "lib", "binding-identity.mjs"), "utf8");
-  await readFile(path.join(packageRoot, "scripts", "lib", "component-proxy-generator.mjs"), "utf8");
+  await readFile(path.join(packageRoot, "packages", "compiler", "src", "binding-identity.mjs"), "utf8");
+  await readFile(path.join(packageRoot, "packages", "compiler", "src", "component-proxy-generator.mjs"), "utf8");
   await readFile(path.join(packageRoot, "bindings", "generated", "defold-script-real-engine-probes.json"), "utf8");
 
   const help = run(process.execPath, [path.join(packageRoot, "bin", "deherm.mjs"), "--help"]);

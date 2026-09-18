@@ -8,7 +8,7 @@ import { markersObserved, validateWarBattlesRuntimeReadiness } from "../scripts/
 
 const root = new URL("../", import.meta.url);
 const paths = {
-  manifest: "bindings/probes/war-battles-script-real-engine-probes.json",
+  manifest: "examples/war-battles-online/verification/probes/script-real-engine-probes.json",
   ir: "bindings/generated/defold-script-api-ir.json",
   scalar: "bindings/generated/defold-script-scalar-dispatch.json",
   value: "bindings/generated/defold-script-value-bindings.json"

@@ -1,0 +1,214 @@
+import {
+  validateReliableChannel,
+  type GameTransport,
+  type ReliableChannel,
+  type SendDisposition,
+  type TransportCapabilities,
+  type TransportReceiver,
+} from "./transport.ts";
+
+const RELIABLE_HEADER_BYTES = 5;
+const MAX_RELIABLE_MESSAGE_BYTES = 64 * 1024;
+
+export interface WebTransportDatagramsLike {
+  readonly readable: ReadableStream<Uint8Array>;
+  readonly writable: WritableStream<Uint8Array>;
+  readonly maxDatagramSize?: number;
+}
+
+export interface WebTransportSessionLike {
+  readonly ready: Promise<void>;
+  readonly closed: Promise<{ closeCode?: number; reason?: string }>;
+  readonly datagrams: WebTransportDatagramsLike;
+  readonly incomingUnidirectionalStreams: ReadableStream<ReadableStream<Uint8Array>>;
+  createUnidirectionalStream(): Promise<WritableStream<Uint8Array>>;
+  close(options?: { closeCode?: number; reason?: string }): void;
+}
+
+export interface WebTransportConstructorLike {
+  new(url: string, options?: { serverCertificateHashes?: readonly { algorithm: string; value: ArrayBuffer }[] }): WebTransportSessionLike;
+}
+
+/**
+ * Browser-facing WebTransport adapter. Reliable messages use independent QUIC
+ * streams; tick inputs use datagrams only when the negotiated session exposes
+ * them and the writable queue can accept data immediately.
+ */
+export class BrowserWebTransportClient implements GameTransport {
+  readonly capabilities: TransportCapabilities;
+  private readonly datagramWriter: WritableStreamDefaultWriter<Uint8Array>;
+  private readonly session: WebTransportSessionLike;
+  private readonly receiver: TransportReceiver;
+  private closed = false;
+
+  private constructor(
+    session: WebTransportSessionLike,
+    receiver: TransportReceiver,
+  ) {
+    this.session = session;
+    this.receiver = receiver;
+    const maxDatagramBytes = session.datagrams.maxDatagramSize ?? 0;
+    this.capabilities = Object.freeze({
+      protocol: "webtransport-h3" as const,
+      reliableStreams: true,
+      datagrams: maxDatagramBytes > 0,
+      maxDatagramBytes,
+    });
+    this.datagramWriter = session.datagrams.writable.getWriter();
+  }
+
+  static async connect(
+    url: string,
+    receiver: TransportReceiver,
+    constructorOverride?: WebTransportConstructorLike,
+    options?: { serverCertificateHashes?: readonly { algorithm: string; value: ArrayBuffer }[] },
+  ): Promise<BrowserWebTransportClient> {
+    const Constructor = constructorOverride ?? browserWebTransportConstructor();
+    const session = new Constructor(url, options);
+    await session.ready;
+    return BrowserWebTransportClient.adopt(session, receiver);
+  }
+
+  static adopt(
+    session: WebTransportSessionLike,
+    receiver: TransportReceiver,
+  ): BrowserWebTransportClient {
+    const client = new BrowserWebTransportClient(session, receiver);
+    void client.receiveReliableStreams();
+    void client.receiveDatagrams();
+    void session.closed.then(
+      (close) => client.finishClose(close.closeCode ?? 0, close.reason ?? "transport closed"),
+      (error: unknown) => client.finishClose(1, error instanceof Error ? error.message : "transport failed"),
+    );
+    return client;
+  }
+
+  async sendReliable(channel: ReliableChannel, payload: Uint8Array, signal?: AbortSignal): Promise<SendDisposition> {
+    if (this.closed || signal?.aborted === true) return "closed";
+    validateReliableChannel(channel);
+    if (payload.byteLength > MAX_RELIABLE_MESSAGE_BYTES) return "too-large";
+    const stream = await this.session.createUnidirectionalStream();
+    const writer = stream.getWriter();
+    const header = new Uint8Array(RELIABLE_HEADER_BYTES);
+    const view = new DataView(header.buffer);
+    view.setUint8(0, channel);
+    view.setUint32(1, payload.byteLength, true);
+    const abort = (): void => { void writer.abort(signal?.reason); };
+    signal?.addEventListener("abort", abort, { once: true });
+    try {
+      await writer.ready;
+      await writer.write(header);
+      await writer.write(payload);
+      await writer.close();
+      return "sent";
+    } catch {
+      return "closed";
+    } finally {
+      signal?.removeEventListener("abort", abort);
+      writer.releaseLock();
+    }
+  }
+
+  async trySendDatagram(payload: Uint8Array): Promise<SendDisposition> {
+    if (this.closed) return "closed";
+    if (!this.capabilities.datagrams || payload.byteLength > this.capabilities.maxDatagramBytes) return "too-large";
+    // Do not await writer.ready here: waiting would turn stale inputs into a queue.
+    if ((this.datagramWriter.desiredSize ?? 0) <= 0) return "backpressured";
+    try {
+      await this.datagramWriter.write(payload);
+      return "sent";
+    } catch {
+      return "closed";
+    }
+  }
+
+  close(code: number, reason: string): void {
+    if (this.closed) return;
+    this.session.close({ closeCode: code, reason });
+    this.finishClose(code, reason);
+  }
+
+  private async receiveReliableStreams(): Promise<void> {
+    const reader = this.session.incomingUnidirectionalStreams.getReader();
+    try {
+      while (!this.closed) {
+        const next = await reader.read();
+        if (next.done) break;
+        void this.readReliableMessage(next.value);
+      }
+    } catch (error: unknown) {
+      this.finishClose(1, error instanceof Error ? error.message : "reliable stream receive failed");
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  private async readReliableMessage(stream: ReadableStream<Uint8Array>): Promise<void> {
+    const reader = stream.getReader();
+    let bytes = new Uint8Array(0);
+    try {
+      while (true) {
+        const next = await reader.read();
+        if (next.done) break;
+        if (bytes.byteLength + next.value.byteLength > MAX_RELIABLE_MESSAGE_BYTES + RELIABLE_HEADER_BYTES) {
+          throw new Error("reliable message exceeds fixed protocol limit");
+        }
+        const joined = new Uint8Array(bytes.byteLength + next.value.byteLength);
+        joined.set(bytes);
+        joined.set(next.value, bytes.byteLength);
+        bytes = joined;
+      }
+      if (bytes.byteLength < RELIABLE_HEADER_BYTES) throw new Error("truncated reliable message");
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const channel = view.getUint8(0);
+      validateReliableChannel(channel);
+      const length = view.getUint32(1, true);
+      if (length !== bytes.byteLength - RELIABLE_HEADER_BYTES) throw new Error("reliable message length mismatch");
+      this.receiver.onReliable(channel, bytes.subarray(RELIABLE_HEADER_BYTES));
+    } catch (error: unknown) {
+      this.finishClose(2, error instanceof Error ? error.message : "invalid reliable message");
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  private async receiveDatagrams(): Promise<void> {
+    const reader = this.session.datagrams.readable.getReader();
+    try {
+      while (!this.closed) {
+        const next = await reader.read();
+        if (next.done) break;
+        this.receiver.onDatagram(next.value);
+      }
+    } catch (error: unknown) {
+      this.finishClose(1, error instanceof Error ? error.message : "datagram receive failed");
+    } finally {
+      reader.releaseLock();
+    }
+  }
+
+  private finishClose(code: number, reason: string): void {
+    if (this.closed) return;
+    this.closed = true;
+    this.receiver.onClose(code, reason);
+  }
+}
+
+/**
+ * Adopts an already-authenticated server-side session exposed through the same
+ * stream/datagram primitives. A Rust/moq-dev or other backend owns TLS, HTTP/3,
+ * origin checks, and session acceptance before calling this boundary.
+ */
+export async function adoptServerWebTransportSession(
+  session: WebTransportSessionLike,
+  receiver: TransportReceiver,
+): Promise<GameTransport> {
+  await session.ready;
+  return BrowserWebTransportClient.adopt(session, receiver);
+}
+
+function browserWebTransportConstructor(): WebTransportConstructorLike {
+  const candidate = (globalThis as typeof globalThis & { WebTransport?: WebTransportConstructorLike }).WebTransport;
+  if (candidate === undefined) throw new Error("WebTransport is unavailable in this browser/runtime");
+  return candidate;
+}

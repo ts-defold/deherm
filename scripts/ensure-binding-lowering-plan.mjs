@@ -11,7 +11,7 @@ import {
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
-const generatorPath = resolve(scriptDirectory, "generate-binding-lowering-plan.mjs");
+const generatorPath = resolve(repositoryRoot, "packages/compiler/src/generate-binding-lowering-plan.mjs");
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -71,7 +71,7 @@ async function cacheIdentity(root, inputs) {
   const generatorSha256 = sha256(generatorSource);
   return {
     schemaVersion: 1,
-    generator: "scripts/generate-binding-lowering-plan.mjs",
+    generator: "packages/compiler/src/generate-binding-lowering-plan.mjs",
     generatorSha256,
     inputPaths,
     inputHashes,

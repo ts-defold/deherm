@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>War Battles Colyseus H3 probe</title>
+    <style>
+      body { max-width: 54rem; margin: 3rem auto; padding: 0 1rem; font: 16px/1.5 system-ui, sans-serif; }
+      button { font: inherit; padding: .6rem 1rem; }
+      pre { white-space: pre-wrap; padding: 1rem; background: #111; color: #d7ffd7; min-height: 14rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Colyseus H3/WebTransport browser probe</h1>
+    <p>This page never creates a WebSocket. It requests Colyseus protocol <code>h3</code>, verifies the selected SDK transport, then exercises one reliable stream message and repeated unreliable datagrams.</p>
+    <button id="run" type="button">Run H3 probe</button>
+    <pre id="log">Ready.</pre>
+    <script src="/sdk/colyseus.js"></script>
+    <script>
+      const log = document.querySelector("#log");
+      const button = document.querySelector("#run");
+
+      function write(line) {
+        log.textContent += `\n${line}`;
+      }
+
+      function waitFor(room, type, timeoutMs) {
+        return new Promise((resolve, reject) => {
+          const stop = room.onMessage(type, (message) => {
+            clearTimeout(timer);
+            stop();
+            resolve(message);
+          });
+          const timer = setTimeout(() => {
+            stop();
+            reject(new Error(`${type} timed out after ${timeoutMs} ms`));
+          }, timeoutMs);
+        });
+      }
+
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        log.textContent = "Starting…";
+        let room;
+        try {
+          if (typeof WebTransport !== "function") {
+            throw new Error("This browser does not expose WebTransport.");
+          }
+
+          const reservationResponse = await fetch("/reservation", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: "{}",
+          });
+          if (!reservationResponse.ok) {
+            throw new Error(`Matchmaking failed: HTTP ${reservationResponse.status}`);
+          }
+          const reservation = await reservationResponse.json();
+          const client = new Colyseus.Client(`https://${location.hostname}:2567`, { protocol: "h3" });
+          room = await client.consumeSeatReservation(reservation);
+
+          const transport = room.connection?.transport;
+          if (transport?.constructor?.name !== "H3TransportTransport" || !(transport.wt instanceof WebTransport)) {
+            throw new Error(`Unexpected transport: ${transport?.constructor?.name ?? "unknown"}`);
+          }
+          write("PASS: joined through the Colyseus H3 WebTransport client.");
+
+          const nonce = crypto.randomUUID();
+          const reliableAck = waitFor(room, "reliable-ack", 5000);
+          room.send("reliable-probe", { nonce });
+          const reliable = await reliableAck;
+          if (reliable.nonce !== nonce || reliable.lane !== "reliable-stream") {
+            throw new Error("Reliable acknowledgement did not match.");
+          }
+          write("PASS: reliable stream message round-tripped.");
+
+          const datagramAck = waitFor(room, "unreliable-ack", 5000);
+          for (let sequence = 0; sequence < 8; sequence += 1) {
+            room.sendUnreliable("unreliable-probe", { sequence });
+          }
+          const unreliable = await datagramAck;
+          if (unreliable.lane !== "quic-datagram-in/reliable-stream-out") {
+            throw new Error("Datagram acknowledgement did not match.");
+          }
+          write(`PASS: QUIC datagram reached the server (sequence ${unreliable.sequence}).`);
+          write("RESULT: PASS — browser H3 streams and client-to-server datagrams observed.");
+        } catch (error) {
+          write(`RESULT: FAIL — ${error?.stack ?? error}`);
+        } finally {
+          await room?.leave();
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

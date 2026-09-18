@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "family": "scratch-out-parameters",
+  "expectedCoverage": {
+    "candidates": 79,
+    "generated": 7,
+    "blocked": 72,
+    "handleKinds": 4,
+    "maxParameters": 4,
+    "maxOutputs": 1
+  },
+  "selection": {
+    "resultRolePrefixes": ["scalar:", "enum:"],
+    "valueRolePrefixes": ["handle:", "scalar:", "enum:"],
+    "pointerRolePrefixes": ["pointer:scalar:", "pointer:enum:"],
+    "pointerDirections": ["in", "out", "inout"],
+    "requiresWritablePointer": true,
+    "rejectedFamilies": ["platform-gated"]
+  },
+  "storageContract": {
+    "layout": "one-caller-owned-u64-slot-per-native-parameter",
+    "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+    "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+    "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+    "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+    "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+    "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+    "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+    "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
+  },
+  "targetPolicy": {
+    "dynamicHermes": "u64-and-handles-use-BigInt; returned tuple is result followed by writable scalar outputs",
+    "staticHermes": "caller-owned-u64-parameter-slots-and-result-slot",
+    "browser": "direct-Wasm-memory-u64-slots; provider-installation-remains-host-responsibility",
+    "typescript": "nominal-borrowed-handles-and-typed-result-output-records"
+  }
+}

@@ -1,11 +1,39 @@
 import { createHash } from "node:crypto";
+import { spawn } from "node:child_process";
 import { access, cp, lstat, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { API as TypeScriptApi } from "typescript/unstable/sync";
 
 import { safeParameterIdentifier } from "./names.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+const require = createRequire(import.meta.url);
+const generatedContextExportNames = new Set(["projectExtensions"]);
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+async function projectGenerationIdentity({ inventory, outputDirectory, core, engineProfiles }) {
+  const projectGeneratorSha256 = sha256(await readFile(fileURLToPath(import.meta.url)));
+  const cacheKey = sha256(JSON.stringify({
+    schemaVersion: 1,
+    projectGeneratorSha256,
+    outputDirectory: outputDirectory.split(path.sep).join("/"),
+    packageVersion: core.packageVersion,
+    coreInputs: core.inputs,
+    engineProfiles,
+    inventory
+  }));
+  return { schemaVersion: 1, projectGeneratorSha256, cacheKey };
+}
+
+function compareCodeUnits(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
 
 function property(name) {
   return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(name) ? name : JSON.stringify(name);
@@ -134,7 +162,7 @@ function collectModules(inventory) {
       }
     }
   }
-  return [...modules.values()].sort((left, right) => left.name.localeCompare(right.name));
+  return [...modules.values()].sort((left, right) => compareCodeUnits(left.name, right.name));
 }
 
 function normalizeMember(moduleName, member) {
@@ -219,6 +247,9 @@ export function buildProjectBindingIr(inventory) {
       if (group.length > 1) for (const module of group) collisions.add(module.runtimeName);
     }
   }
+  for (const module of baseModules) {
+    if (generatedContextExportNames.has(module.jsName)) collisions.add(module.runtimeName);
+  }
   const modules = baseModules.map((module) => {
     if (!collisions.has(module.runtimeName)) return module;
     const suffix = createHash("sha256").update(module.runtimeName).digest("hex").slice(0, 8);
@@ -294,7 +325,227 @@ export function getExtensionValue(moduleName: string, memberName: string): unkno
 `;
 }
 
-function projectConfig(outputDirectory) {
+const ignoredAuthoredGlobs = ["node_modules/**", ".internal/**", "build/**", "dist/**"];
+const authoredContexts = [
+  { id: "shared", suffix: null, includes: ["**/*.ts"], excludes: ["**/*.script.ts", "**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
+  { id: "game-object", suffix: ".script.ts", includes: ["**/*.ts"], excludes: ["**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
+  { id: "gui", suffix: ".gui.ts", legacySuffixes: [".gui_script.ts"], includes: ["**/*.ts"], excludes: ["**/*.script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
+  { id: "render", suffix: ".render.ts", includes: ["**/*.ts"], excludes: ["**/*.script.ts", "**/*.gui.ts", "**/*.gui_script.ts", ...ignoredAuthoredGlobs] }
+];
+
+function generatedOutputPaths() {
+  return {
+    output: ["script-contexts.json", ...authoredContexts.map(({ id }) => `sdk/contexts/${id}.ts`)],
+    project: [
+      "tsconfig.deherm.base.json",
+      ...authoredContexts.map(({ id }) => `tsconfig.deherm.${id}.json`),
+      "tsconfig.deherm.json"
+    ]
+  };
+}
+
+const routeContextClasses = new Map([
+  ["active-go", "game-object"],
+  ["game-object-instance", "game-object"],
+  ["component-property-compiler", "game-object"],
+  ["active-gui-scene", "gui"],
+  ["gui-scene", "gui"],
+  ["gui-script-instance", "gui"],
+  ["captured-gui-script-instance", "gui"],
+  ["render-script-instance", "render"],
+  ["render-script-instance-and-graphics-context", "render"],
+  ["captured-render-script-instance", "render"]
+]);
+
+const sharedContextTokens = new Set([
+  "explicit-physics-handle",
+  "global",
+  "runtime-global"
+]);
+
+// These context tokens prove that the whole Lua namespace is attached to one
+// Defold script kind. Other classified routes remain member-level restrictions.
+const namespaceAttachmentTokens = new Set([
+  "active-gui-scene",
+  "gui-scene",
+  "gui-script-instance",
+  "captured-gui-script-instance",
+  "render-script-instance",
+  "render-script-instance-and-graphics-context",
+  "captured-render-script-instance"
+]);
+
+function typeNameForScriptModule(name) {
+  return `${identifier(name)}Api`;
+}
+
+function addDeniedPath(tree, pathParts) {
+  let node = tree;
+  for (const part of pathParts.slice(0, -1)) {
+    if (node[part] === true) throw new Error(`Context mask path collides at ${pathParts.join(".")}`);
+    node[part] ??= {};
+    node = node[part];
+  }
+  node[pathParts.at(-1)] = true;
+}
+
+function renderMask(tree) {
+  return `{ ${Object.entries(tree)
+    .sort(([left], [right]) => compareCodeUnits(left, right))
+    .map(([name, value]) => `${property(name)}: ${value === true ? "true" : renderMask(value)}`)
+    .join("; ")} }`;
+}
+
+export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
+  if (loweringPlan?.schemaVersion !== 2) {
+    throw new Error(`Context projection requires canonical lowering-plan schema v2, got ${loweringPlan?.schemaVersion ?? "missing"}`);
+  }
+  const { planSha256, ...planBody } = loweringPlan;
+  if (typeof planSha256 !== "string" || sha256(JSON.stringify(planBody)) !== planSha256) {
+    throw new Error("Context projection requires a lowering plan with a valid internal digest");
+  }
+  const functions = new Map(scriptIr.functions.map((item) => [item.id, item]));
+  if (functions.size !== scriptIr.functions.length) throw new Error("Script API IR contains duplicate route ids");
+  const scriptUnits = loweringPlan.units.filter(({ identity }) => identity.surface === "script");
+  const unitIds = new Set();
+  for (const unit of scriptUnits) {
+    if (unitIds.has(unit.identity.id)) throw new Error(`Lowering plan contains duplicate route id ${unit.identity.id}`);
+    unitIds.add(unit.identity.id);
+  }
+  const missing = scriptIr.functions.map(({ id }) => id).filter((id) => !unitIds.has(id));
+  const extra = [...unitIds].filter((id) => !functions.has(id));
+  if (missing.length || extra.length) {
+    throw new Error(`Lowering plan route ids must exactly match script API IR (missing: ${missing.join(", ") || "none"}; extra: ${extra.join(", ") || "none"})`);
+  }
+  const unknownContextTokens = new Set();
+  const routes = scriptUnits
+    .map((unit) => {
+      const fn = functions.get(unit.identity.id);
+      if (!fn) throw new Error(`Lowering plan route ${unit.identity.id} is missing from the script API IR`);
+      const token = unit.contract?.context;
+      const mappedContext = routeContextClasses.get(token);
+      if (!mappedContext && token !== "context-policy-unresolved" && !sharedContextTokens.has(token)) {
+        unknownContextTokens.add(token ?? "<missing>");
+      }
+      return {
+        id: unit.identity.id,
+        modulePath: fn.modulePath,
+        member: fn.jsName,
+        token,
+        directContext: mappedContext ?? (sharedContextTokens.has(token) ? "shared" : "unresolved")
+      };
+    });
+  if (routes.length !== scriptIr.functions.length) {
+    throw new Error(`Lowering plan covers ${routes.length} script routes, expected ${scriptIr.functions.length}`);
+  }
+
+  const namespaceSignals = new Map();
+  for (const route of routes) {
+    if (!namespaceAttachmentTokens.has(route.token)) continue;
+    const namespace = route.modulePath[0];
+    const signals = namespaceSignals.get(namespace) ?? new Set();
+    signals.add(route.directContext);
+    namespaceSignals.set(namespace, signals);
+  }
+  const namespaceContexts = new Map();
+  for (const [namespace, signals] of namespaceSignals) {
+    if (signals.size !== 1) {
+      throw new Error(`Script namespace ${namespace} has conflicting attachment contexts: ${[...signals].sort().join(", ")}`);
+    }
+    namespaceContexts.set(namespace, [...signals][0]);
+  }
+
+  const classified = routes.map((route) => ({
+    ...route,
+    context: namespaceContexts.get(route.modulePath[0]) ?? route.directContext
+  }));
+  const namespaces = [...new Set(classified.map(({ modulePath }) => modulePath[0]))].sort();
+  const contexts = {};
+  for (const context of authoredContexts) {
+    const allowed = new Set(context.id === "shared" ? ["shared", "unresolved"] : ["shared", "unresolved", context.id]);
+    const masks = {};
+    const visibleNamespaces = [];
+    for (const namespace of namespaces) {
+      const namespaceRoutes = classified.filter((route) => route.modulePath[0] === namespace);
+      const denied = namespaceRoutes.filter((route) => !allowed.has(route.context));
+      if (denied.length === namespaceRoutes.length) continue;
+      visibleNamespaces.push(namespace);
+      if (denied.length) {
+        const mask = {};
+        for (const route of denied) addDeniedPath(mask, [...route.modulePath.slice(1), route.member]);
+        masks[namespace] = mask;
+      }
+    }
+    contexts[context.id] = {
+      suffix: context.suffix,
+      ...(context.legacySuffixes ? { legacySuffixes: context.legacySuffixes } : {}),
+      include: context.includes,
+      excludes: context.excludes,
+      capabilities: [...allowed],
+      namespaces: visibleNamespaces,
+      deniedRouteCount: classified.filter((route) => !allowed.has(route.context)).length,
+      masks
+    };
+  }
+  const routeContextCounts = {};
+  for (const route of classified) routeContextCounts[route.context] = (routeContextCounts[route.context] ?? 0) + 1;
+  return {
+    schemaVersion: 1,
+    source: "defold-binding-lowering-plan.contract.context",
+    defoldRevision: loweringPlan.defoldRevision,
+    loweringPlanSha256: loweringPlan.planSha256,
+    routeCount: classified.length,
+    routeContextCounts,
+    unknownContextTokens: [...unknownContextTokens].sort(),
+    unresolvedPolicy: {
+      routeCount: routeContextCounts.unresolved ?? 0,
+      visibility: "provisionally-visible-in-all-authored-contexts",
+      enforcement: "pending-context-contract-resolution"
+    },
+    namespaceContexts: Object.fromEntries([...namespaceContexts].sort(([left], [right]) => compareCodeUnits(left, right))),
+    contexts
+  };
+}
+
+function contextSdkSource(context, modules) {
+  const lines = [
+    "// Generated by deherm. Do not edit.",
+    'import * as ScriptModules from "../generated/script/modules.js";',
+    'import type * as ScriptTypes from "../generated/script/types.js";',
+    ...modules.map((module) => `import { ${module.jsName} as dehermExtension_${module.jsName} } from "../modules/${module.fileName}.js";`),
+    "",
+    "type DehermWithoutContextMembers<Api, Denied> = {",
+    "  readonly [Key in keyof Api as Key extends keyof Denied ? Denied[Key] extends true ? never : Key : Key]:",
+    "    Key extends keyof Denied ? DehermWithoutContextMembers<Api[Key], Denied[Key]> : Api[Key];",
+    "};",
+    "",
+    'export * from "../address.js";',
+    'export * from "../component.js";',
+    'export type * from "../generated/script/types.js";',
+    'export { installDefoldScriptBridge, type DefoldScriptBridge } from "../generated/script/runtime.js";',
+    'export * from "../generated/dmsdk/index.js";',
+    'export * from "../generated/dmsdk/scalar.js";',
+    'export * from "../runtime.js";'
+  ];
+  for (const module of modules) {
+    if (context.namespaces.includes(module.jsName)) continue;
+    lines.push(`export { ${module.jsName} } from "../modules/${module.fileName}.js";`);
+  }
+  lines.push("export const projectExtensions = {");
+  for (const module of modules) lines.push(`  ${property(module.jsName)}: dehermExtension_${module.jsName},`);
+  lines.push("} as const;");
+  lines.push("");
+  for (const namespace of context.namespaces) {
+    const apiType = `ScriptTypes.${typeNameForScriptModule(namespace)}`;
+    const mask = context.masks[namespace];
+    const exposedType = mask ? `DehermWithoutContextMembers<${apiType}, ${renderMask(mask)}>` : apiType;
+    lines.push(`export const ${namespace}: ${exposedType} = ScriptModules.${namespace};`);
+  }
+  lines.push("");
+  return `${lines.join("\n")}\n`;
+}
+
+function projectBaseConfig(outputDirectory) {
   const generated = outputDirectory.split(path.sep).join("/");
   return {
     $schema: "https://json.schemastore.org/tsconfig",
@@ -307,18 +558,38 @@ function projectConfig(outputDirectory) {
       lib: ["ES2020", "DOM"],
       skipLibCheck: true,
       verbatimModuleSyntax: true,
-      paths: {
-        "@deherm/project": [`./${generated}/sdk/index.ts`],
-        "@deherm/project/*": [`./${generated}/sdk/*`]
-      },
       plugins: [{
         transform: "@ts-defold/deherm/ttsc",
         enabled: false,
         inventory: `./${generated}/extensions.json`,
         profile: "development"
       }]
+    }
+  };
+}
+
+function contextProjectConfig(outputDirectory, context) {
+  const generated = outputDirectory.split(path.sep).join("/");
+  const excludes = [...context.excludes, `${generated}/generated/components/registry.ts`];
+  return {
+    extends: "./tsconfig.deherm.base.json",
+    compilerOptions: {
+      composite: true,
+      noEmit: true,
+      tsBuildInfoFile: `./${generated}/cache/typescript/${context.id}.tsbuildinfo`,
+      paths: {
+        "@deherm/project": [`./${generated}/sdk/contexts/${context.id}.ts`]
+      }
     },
-    include: ["src/**/*.ts", `${generated}/**/*.ts`]
+    include: [...context.includes, `${generated}/**/*.ts`],
+    exclude: excludes
+  };
+}
+
+function rootProjectConfig() {
+  return {
+    files: [],
+    references: authoredContexts.map(({ id }) => ({ path: `./tsconfig.deherm.${id}.json` }))
   };
 }
 
@@ -331,6 +602,30 @@ async function writeIfMissing(file, contents) {
     await writeFile(file, contents);
     return true;
   }
+}
+
+async function migrateLegacyGeneratedTsconfig(file, contents) {
+  let source;
+  try {
+    const information = await lstat(file);
+    if (!information.isFile() || information.isSymbolicLink()) return { created: false, migrated: false };
+    source = await readFile(file, "utf8");
+  } catch (error) {
+    if (error?.code === "ENOENT") return { created: await writeIfMissing(file, contents), migrated: false };
+    throw error;
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(source);
+  } catch {
+    return { created: false, migrated: false };
+  }
+  if (parsed && typeof parsed === "object" && !Array.isArray(parsed) &&
+      Object.keys(parsed).length === 1 && parsed.extends === "./tsconfig.deherm.json") {
+    await writeFile(file, contents);
+    return { created: false, migrated: true };
+  }
+  return { created: false, migrated: false };
 }
 
 async function readConfinedFile(baseRoot, relative, label) {
@@ -355,13 +650,17 @@ async function bundledCoreSdk(requestedRevision) {
   const scriptDispatchPath = path.join(packageRoot, "bindings", "generated", "defold-script-scalar-dispatch.json");
   const scriptProfilesPath = path.join(packageRoot, "bindings", "generated", "defold-script-route-availability-profiles.json");
   const loweringPlanPath = path.join(packageRoot, "bindings", "generated", "defold-binding-lowering-plan.json");
+  const loweringPlanSentinelPath = path.join(packageRoot, "bindings", "generated", "defold-binding-lowering-plan.sentinel.json");
+  const loweringPlanGeneratorPath = path.join(packageRoot, "packages", "compiler", "src", "generate-binding-lowering-plan.mjs");
   const dmsdkThunksPath = path.join(packageRoot, "bindings", "generated", "defold-dmsdk-scalar-thunks.json");
-  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptProfilesSource, loweringPlanSource, dmsdkThunksSource, packageSource] = await Promise.all([
+  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, packageSource] = await Promise.all([
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
     readFile(scriptDispatchPath),
     readFile(scriptProfilesPath),
     readFile(loweringPlanPath),
+    readFile(loweringPlanSentinelPath),
+    readFile(loweringPlanGeneratorPath),
     readFile(dmsdkThunksPath),
     readFile(path.join(packageRoot, "package.json"), "utf8")
   ]);
@@ -370,6 +669,7 @@ async function bundledCoreSdk(requestedRevision) {
   const scriptDispatch = JSON.parse(scriptDispatchSource);
   const scriptProfiles = JSON.parse(scriptProfilesSource);
   const loweringPlan = JSON.parse(loweringPlanSource);
+  const loweringPlanSentinel = JSON.parse(loweringPlanSentinelSource);
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
   const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, scriptProfiles, loweringPlan, dmsdkThunks].map(({ defoldRevision }) => defoldRevision));
   if (revisions.size !== 1) {
@@ -379,6 +679,22 @@ async function bundledCoreSdk(requestedRevision) {
     throw new Error(`This package contains Defold ${scriptIr.defoldRevision}, not requested ${requestedRevision}; version-resolved download generation is not available yet`);
   }
   const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
+  if (loweringPlan.schemaVersion !== 2) {
+    throw new Error(`Packaged canonical lowering plan must use schema v2, got ${loweringPlan.schemaVersion ?? "missing"}`);
+  }
+  const { planSha256, ...planBody } = loweringPlan;
+  if (sha256(JSON.stringify(planBody)) !== planSha256) {
+    throw new Error("Packaged canonical lowering plan has an invalid internal digest");
+  }
+  if (loweringPlanSentinel.schemaVersion !== 1 ||
+      loweringPlanSentinel.generator !== "packages/compiler/src/generate-binding-lowering-plan.mjs" ||
+      loweringPlanSentinel.generatorSha256 !== sha256(loweringPlanGeneratorSource) ||
+      loweringPlanSentinel.outputSha256 !== sha256(loweringPlanSource) ||
+      loweringPlanSentinel.outputBytes !== loweringPlanSource.byteLength ||
+      loweringPlanSentinel.planSha256 !== planSha256 ||
+      JSON.stringify(loweringPlanSentinel.inputHashes) !== JSON.stringify(loweringPlan.inputHashes)) {
+    throw new Error("Packaged canonical lowering-plan sentinel is stale or invalid");
+  }
   return {
     revision: scriptIr.defoldRevision,
     packageVersion: JSON.parse(packageSource).version,
@@ -388,6 +704,7 @@ async function bundledCoreSdk(requestedRevision) {
     scriptDispatch,
     scriptProfiles,
     loweringPlan,
+    loweringPlanSentinel,
     dmsdkThunks,
     inputs: {
       scriptIrSha256: sha256(scriptSource),
@@ -395,9 +712,10 @@ async function bundledCoreSdk(requestedRevision) {
       scriptDispatchSha256: sha256(scriptDispatchSource),
       scriptProfilesSha256: sha256(scriptProfilesSource),
       loweringPlanSha256: sha256(loweringPlanSource),
+      loweringPlanSentinelSha256: sha256(loweringPlanSentinelSource),
       dmsdkThunksSha256: sha256(dmsdkThunksSource)
     },
-    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptProfilesPath, loweringPlanPath, dmsdkThunksPath }
+    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath }
   };
 }
 
@@ -468,8 +786,40 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const core = await bundledCoreSdk(options.defoldSdk);
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const portableInventory = { ...inventory, projectRoot: "." };
-  await writeFile(path.join(root, "extensions.json"), `${JSON.stringify(portableInventory, null, 2)}\n`);
   const bindingIr = buildProjectBindingIr(inventory);
+  const generation = await projectGenerationIdentity({
+    inventory: portableInventory,
+    outputDirectory: relativeRoot,
+    core,
+    engineProfiles
+  });
+  const generationKey = generation.cacheKey;
+  if (options.force !== true) {
+    try {
+      const [manifestSource, lockSource] = await Promise.all([
+        readConfinedFile(resolvedOutputRoot, "manifest.json", "Generated manifest"),
+        readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock")
+      ]);
+      const previousManifest = JSON.parse(manifestSource.toString("utf8"));
+      const previousLock = JSON.parse(lockSource.toString("utf8"));
+      if (previousManifest.generation?.cacheKey === generationKey &&
+          previousLock.generation?.cacheKey === generationKey) {
+        return {
+          root,
+          defoldRevision: core.revision,
+          moduleCount: bindingIr.modules.length,
+          typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),
+          cached: true,
+          generationKey,
+          created: { tsconfig: false, vscodeExtensions: false, vscodeSettings: false },
+          migrated: { tsconfig: false }
+        };
+      }
+    } catch (error) {
+      if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
+    }
+  }
+  await writeFile(path.join(root, "extensions.json"), `${JSON.stringify(portableInventory, null, 2)}\n`);
   await writeFile(path.join(root, "bindings.ir.json"), `${JSON.stringify(bindingIr, null, 2)}\n`);
   const irRoot = path.join(root, "ir");
   await mkdir(irRoot, { recursive: true });
@@ -478,15 +828,20 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(core.paths.scriptDispatchPath, path.join(irRoot, "script-scalar-dispatch.json"));
   await cp(core.paths.scriptProfilesPath, path.join(irRoot, "script-route-profiles.json"));
   await cp(core.paths.loweringPlanPath, path.join(irRoot, "binding-lowering-plan.json"));
+  await cp(core.paths.loweringPlanSentinelPath, path.join(irRoot, "binding-lowering-plan.sentinel.json"));
   await cp(core.paths.dmsdkThunksPath, path.join(irRoot, "dmsdk-scalar-thunks.json"));
   await writeFile(path.join(root, "extensions.d.ts"), generateExtensionTypes(inventory));
   const modules = bindingIr.modules;
   const sdkRoot = path.join(root, "sdk");
   const modulesRoot = path.join(sdkRoot, "modules");
+  const contextsRoot = path.join(sdkRoot, "contexts");
   await rm(modulesRoot, { recursive: true, force: true });
   await rm(path.join(sdkRoot, "generated"), { recursive: true, force: true });
+  await rm(contextsRoot, { recursive: true, force: true });
   await mkdir(modulesRoot, { recursive: true });
+  await mkdir(contextsRoot, { recursive: true });
   await cp(path.join(packageRoot, "packages", "sdk", "src", "address.ts"), path.join(sdkRoot, "address.ts"));
+  await cp(path.join(packageRoot, "packages", "sdk", "src", "component.ts"), path.join(sdkRoot, "component.ts"));
   await cp(
     path.join(packageRoot, "packages", "sdk", "src", "generated", "script"),
     path.join(sdkRoot, "generated", "script"),
@@ -501,6 +856,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const exports = [
     "// Generated by deherm. Do not edit.",
     'export * from "./address.js";',
+    'export * from "./component.js";',
     'export * from "./generated/script/index.js";',
     'export * from "./generated/dmsdk/index.js";',
     'export * from "./generated/dmsdk/scalar.js";',
@@ -513,6 +869,37 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   }
   exports.push("");
   await writeFile(path.join(sdkRoot, "index.ts"), `${exports.join("\n")}\n`);
+  const scriptContexts = buildScriptContextCapabilities(core.scriptIr, core.loweringPlan);
+  const scriptContextsSource = `${JSON.stringify(scriptContexts, null, 2)}\n`;
+  await writeFile(path.join(root, "script-contexts.json"), scriptContextsSource);
+  const contextSources = {};
+  for (const context of authoredContexts) {
+    const source = contextSdkSource(scriptContexts.contexts[context.id], modules);
+    contextSources[`sdk/contexts/${context.id}.ts`] = source;
+    await writeFile(
+      path.join(contextsRoot, `${context.id}.ts`),
+      source
+    );
+  }
+  const relativeOutput = path.relative(inventory.projectRoot, root) || ".deherm";
+  const projectConfigSources = {
+    "tsconfig.deherm.base.json": `${JSON.stringify(projectBaseConfig(relativeOutput), null, 2)}\n`,
+    ...Object.fromEntries(authoredContexts.map((context) => [
+      `tsconfig.deherm.${context.id}.json`,
+      `${JSON.stringify(contextProjectConfig(relativeOutput, context), null, 2)}\n`
+    ])),
+    "tsconfig.deherm.json": `${JSON.stringify(rootProjectConfig(), null, 2)}\n`
+  };
+  for (const [relative, source] of Object.entries(projectConfigSources)) {
+    await writeFile(path.join(inventory.projectRoot, relative), source);
+  }
+  const generatedOutputs = {
+    output: Object.fromEntries(Object.entries({
+      "script-contexts.json": scriptContextsSource,
+      ...contextSources
+    }).map(([relative, source]) => [relative, sha256(source)])),
+    project: Object.fromEntries(Object.entries(projectConfigSources).map(([relative, source]) => [relative, sha256(source)]))
+  };
   const scriptDispatchableIds = new Set([
     ...core.scriptIr.functions.filter(({ runtimeStatus }) => runtimeStatus === "implemented-generated-lua-bridge").map(({ id }) => id),
     ...core.scriptDispatch.bindings.map(({ id }) => id)
@@ -523,12 +910,22 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     defoldRevision: core.revision,
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
+    generation,
     inputs: core.inputs,
+    generatedOutputs,
     engineProfiles,
     loweringPlan: {
       sha256: core.loweringPlan.planSha256,
       units: core.loweringPlan.coverage.units,
       backendRecords: core.loweringPlan.coverage.backendRecords
+    },
+    scriptContexts: {
+      source: scriptContexts.source,
+      loweringPlanSha256: scriptContexts.loweringPlanSha256,
+      routeCount: scriptContexts.routeCount,
+      routeContextCounts: scriptContexts.routeContextCounts,
+      unknownContextTokens: scriptContexts.unknownContextTokens,
+      suffixes: Object.fromEntries(authoredContexts.map(({ id, suffix }) => [id, suffix]))
     },
     coverage: {
       script: {
@@ -561,18 +958,14 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     defoldRevision: core.revision,
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
+    generation,
     inputs: core.inputs,
+    generatedOutputs,
     engineProfiles
   }, null, 2)}\n`);
-
-  const relativeOutput = path.relative(inventory.projectRoot, root) || ".deherm";
-  await writeFile(
-    path.join(inventory.projectRoot, "tsconfig.deherm.json"),
-    `${JSON.stringify(projectConfig(relativeOutput), null, 2)}\n`
-  );
-  const createdTsconfig = await writeIfMissing(
+  const tsconfigState = await migrateLegacyGeneratedTsconfig(
     path.join(inventory.projectRoot, "tsconfig.json"),
-    `${JSON.stringify({ extends: "./tsconfig.deherm.json" }, null, 2)}\n`
+    projectConfigSources["tsconfig.deherm.json"]
   );
   const createdVscodeExtensions = await writeIfMissing(
     path.join(inventory.projectRoot, ".vscode", "extensions.json"),
@@ -590,10 +983,16 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     root,
     defoldRevision: core.revision,
     moduleCount: modules.length,
+    cached: false,
+    generationKey,
+    typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),
     created: {
-      tsconfig: createdTsconfig,
+      tsconfig: tsconfigState.created,
       vscodeExtensions: createdVscodeExtensions,
       vscodeSettings: createdVscodeSettings
+    },
+    migrated: {
+      tsconfig: tsconfigState.migrated
     }
   };
 }
@@ -632,15 +1031,28 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   if (JSON.stringify(manifest.engineProfiles) !== JSON.stringify(expectedEngineProfiles)) {
     throw new Error("Generated manifest engine-profile authority differs from the installed Defold catalog");
   }
+  const inventorySource = await readConfinedFile(resolvedOutputRoot, "extensions.json", "Generated extension inventory");
+  const inventory = JSON.parse(inventorySource.toString("utf8"));
+  const expectedGeneration = await projectGenerationIdentity({
+    inventory,
+    outputDirectory: relativeRoot,
+    core,
+    engineProfiles: manifest.engineProfiles
+  });
+  if (JSON.stringify(manifest.generation) !== JSON.stringify(expectedGeneration)) {
+    throw new Error("Generated manifest project-generation key is stale or invalid");
+  }
   const files = {
     scriptIrSha256: "ir/script-api.json",
     dmsdkIrSha256: "ir/dmsdk.json",
     scriptDispatchSha256: "ir/script-scalar-dispatch.json",
     scriptProfilesSha256: "ir/script-route-profiles.json",
     loweringPlanSha256: "ir/binding-lowering-plan.json",
+    loweringPlanSentinelSha256: "ir/binding-lowering-plan.sentinel.json",
     dmsdkThunksSha256: "ir/dmsdk-scalar-thunks.json"
   };
   const verified = {};
+  verified["extensions.json"] = sha256(inventorySource);
   const verifiedSources = {};
   for (const [key, relative] of Object.entries(files)) {
     const source = await readConfinedFile(resolvedOutputRoot, relative, relative);
@@ -649,12 +1061,36 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     verified[relative] = actual;
     verifiedSources[relative] = source;
   }
+  const expectedOutputPaths = generatedOutputPaths();
+  for (const rootName of ["output", "project"]) {
+    const expected = [...expectedOutputPaths[rootName]].sort();
+    const declared = Object.keys(manifest.generatedOutputs?.[rootName] ?? {}).sort();
+    if (JSON.stringify(declared) !== JSON.stringify(expected)) {
+      throw new Error(`Generated manifest ${rootName} output sentinels are incomplete or contain unknown paths`);
+    }
+    const base = rootName === "output" ? resolvedOutputRoot : resolvedProjectRoot;
+    for (const relative of expected) {
+      const source = await readConfinedFile(base, relative, `Generated ${rootName} output ${relative}`);
+      const actual = sha256(source);
+      if (manifest.generatedOutputs[rootName][relative] !== actual) {
+        throw new Error(`${relative} does not match generated output sentinel`);
+      }
+      verified[`${rootName}:${relative}`] = actual;
+    }
+  }
   const loweringPlan = JSON.parse(verifiedSources[files.loweringPlanSha256].toString("utf8"));
+  const loweringPlanSentinel = JSON.parse(verifiedSources[files.loweringPlanSentinelSha256].toString("utf8"));
+  if (loweringPlan.schemaVersion !== 2) throw new Error("ir/binding-lowering-plan.json must use schema v2");
   const { planSha256, ...planBody } = loweringPlan;
   const calculatedPlanSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
   if (planSha256 !== calculatedPlanSha256) throw new Error("ir/binding-lowering-plan.json has an invalid internal plan digest");
   if (manifest.loweringPlan?.sha256 !== planSha256) throw new Error("Generated manifest names a different lowering plan");
   if (core.loweringPlan.planSha256 !== planSha256) throw new Error("Generated lowering plan differs from this installed deherm package");
+  if (loweringPlanSentinel.outputSha256 !== manifest.inputs.loweringPlanSha256 ||
+      loweringPlanSentinel.planSha256 !== planSha256 ||
+      loweringPlanSentinel.generatorSha256 !== core.loweringPlanSentinel.generatorSha256) {
+    throw new Error("Generated lowering-plan sentinel does not authenticate the copied plan and generator");
+  }
   if (manifest.loweringPlan?.units !== loweringPlan.coverage?.units ||
       manifest.loweringPlan?.backendRecords !== loweringPlan.coverage?.backendRecords) {
     throw new Error("Generated manifest lowering-plan census differs from the verified plan");
@@ -663,7 +1099,9 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     if (lock[key] !== manifest[key]) throw new Error(`deherm.lock ${key} differs from generated manifest`);
   }
   if (JSON.stringify(lock.generator) !== JSON.stringify(manifest.generator) ||
+      JSON.stringify(lock.generation) !== JSON.stringify(manifest.generation) ||
       JSON.stringify(lock.inputs) !== JSON.stringify(manifest.inputs) ||
+      JSON.stringify(lock.generatedOutputs) !== JSON.stringify(manifest.generatedOutputs) ||
       JSON.stringify(lock.engineProfiles) !== JSON.stringify(manifest.engineProfiles)) {
     throw new Error("deherm.lock does not match the generated manifest contract");
   }
@@ -674,4 +1112,147 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     checkedFiles: Object.keys(verified).length,
     verified
   };
+}
+
+function isWithinPath(parent, candidate) {
+  const relative = path.relative(parent, candidate);
+  return relative === "" || (relative !== ".." && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative));
+}
+
+function isInstalledPackageSdkTarget(packageSdkRoot, candidate) {
+  if (isWithinPath(packageSdkRoot, candidate)) return true;
+  const portableTarget = candidate.split(path.sep).join("/");
+  return portableTarget.includes("/node_modules/@ts-defold/deherm/packages/sdk/") ||
+    portableTarget.includes("/node_modules/@ts-defold/deherm/packages/sdk/src/");
+}
+
+function authoredContextForFile(file) {
+  const normalized = path.normalize(file);
+  if (normalized.endsWith(".d.ts")) return null;
+  if (normalized.endsWith(".script.ts")) return "game-object";
+  if (normalized.endsWith(".gui.ts") || normalized.endsWith(".gui_script.ts")) return "gui";
+  if (normalized.endsWith(".render.ts")) return "render";
+  return normalized.endsWith(".ts") ? "shared" : null;
+}
+
+async function validateAuthoredImportBoundaries(root) {
+  const sourceRoot = await realpath(root);
+  const packageSdkRoot = await realpath(path.join(packageRoot, "packages", "sdk", "src"));
+  const generatedRoots = new Set();
+  const configPaths = authoredContexts.map(({ id }) => path.join(root, `tsconfig.deherm.${id}.json`));
+  for (const context of authoredContexts) {
+    const configPath = path.join(root, `tsconfig.deherm.${context.id}.json`);
+    const config = JSON.parse(await readFile(configPath, "utf8"));
+    const projectTarget = config.compilerOptions?.paths?.["@deherm/project"]?.[0];
+    if (projectTarget) {
+      const contextEntry = path.resolve(root, projectTarget);
+      generatedRoots.add(await realpath(path.resolve(path.dirname(contextEntry), "../..")));
+    }
+  }
+
+  const diagnostics = [];
+  const api = new TypeScriptApi({ cwd: root });
+  try {
+    const snapshot = api.updateSnapshot({ openProjects: configPaths });
+    for (const project of snapshot.getProjects()) {
+      const projectContext = authoredContexts.find(({ id }) => project.configFileName === path.join(root, `tsconfig.deherm.${id}.json`));
+      if (!projectContext) continue;
+      for (const file of project.program.getSourceFileNames()) {
+        const programFile = path.resolve(file);
+        const absolute = await realpath(programFile);
+        if (!isWithinPath(sourceRoot, absolute) ||
+            [...generatedRoots].some((generatedRoot) => isWithinPath(generatedRoot, absolute)) ||
+            authoredContextForFile(absolute) !== projectContext.id) continue;
+        const sourceFile = project.program.getSourceFile(programFile);
+        if (!sourceFile) continue;
+        for (const literal of sourceFile.imports) {
+          const specifier = literal.text;
+          const position = sourceFile.getLineAndCharacterOfPosition(literal.getStart(sourceFile));
+          const location = `${path.relative(sourceRoot, absolute).split(path.sep).join("/")}:${position.line + 1}:${position.character + 1}`;
+          if (specifier.startsWith("@deherm/project/")) {
+            diagnostics.push(`${location} deherm context boundary: import '${specifier}' is a private deep import; use '@deherm/project'`);
+            continue;
+          }
+          if (specifier === "@ts-defold/deherm" || specifier.startsWith("@ts-defold/deherm/") ||
+              specifier === "@defold-hermes/sdk" || specifier.startsWith("@defold-hermes/sdk/")) {
+            diagnostics.push(`${location} deherm context boundary: import '${specifier}' bypasses the context-filtered '@deherm/project' SDK`);
+            continue;
+          }
+          const symbol = project.checker.getSymbolAtLocation(literal);
+          const declaration = symbol?.declarations?.[0]?.resolve(project);
+          let target = declaration?.fileName ? path.resolve(declaration.fileName) : null;
+          if (!target) continue;
+          try { target = await realpath(target); } catch {}
+          if (specifier !== "@deherm/project" && [...generatedRoots].some((generatedRoot) => isWithinPath(generatedRoot, target))) {
+            diagnostics.push(`${location} deherm context boundary: import '${specifier}' bypasses '@deherm/project' and reaches generated SDK internals`);
+            continue;
+          }
+          if (specifier !== "@deherm/project" && isInstalledPackageSdkTarget(packageSdkRoot, target)) {
+            diagnostics.push(`${location} deherm context boundary: import '${specifier}' reaches the unfiltered package SDK; use '@deherm/project'`);
+            continue;
+          }
+          if (!isWithinPath(sourceRoot, target)) continue;
+          const targetContext = authoredContextForFile(target);
+          if (targetContext && targetContext !== projectContext.id && targetContext !== "shared") {
+            diagnostics.push(`${location} deherm context boundary: ${projectContext.id} source cannot import ${targetContext} source '${specifier}'; only plain shared .ts imports may cross contexts`);
+          }
+        }
+      }
+    }
+  } finally {
+    api.close();
+  }
+  return diagnostics.sort(compareCodeUnits);
+}
+
+export async function typecheckGeneratedProject(projectRoot) {
+  const root = path.resolve(projectRoot);
+  const config = path.join(root, "tsconfig.deherm.json");
+  try {
+    const information = await lstat(config);
+    if (!information.isFile() || information.isSymbolicLink()) throw new Error();
+  } catch {
+    throw new Error(`Generated TypeScript solution is missing at ${config}; run 'deherm generate' first`);
+  }
+  await verifyGeneratedProject(root);
+  const typescriptPackage = require.resolve("typescript/package.json");
+  const tsc = path.join(path.dirname(typescriptPackage), "bin", "tsc");
+  const boundaryDiagnostics = await validateAuthoredImportBoundaries(root);
+  if (boundaryDiagnostics.length) {
+    return {
+      schemaVersion: 1,
+      project: root,
+      config,
+      compiler: tsc,
+      passed: false,
+      status: 1,
+      signal: null,
+      stdout: "",
+      stderr: `${boundaryDiagnostics.join("\n")}\n`
+    };
+  }
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [tsc, "--build", config, "--pretty", "false"], {
+      cwd: root,
+      stdio: ["ignore", "pipe", "pipe"]
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", (chunk) => { stdout += chunk; });
+    child.stderr.on("data", (chunk) => { stderr += chunk; });
+    child.once("error", reject);
+    child.once("close", (status, signal) => resolve({
+      schemaVersion: 1,
+      project: root,
+      config,
+      compiler: tsc,
+      passed: status === 0,
+      status,
+      signal,
+      stdout,
+      stderr
+    }));
+  });
 }

@@ -88,9 +88,20 @@ test("dynamic access chooses the full currently compatible pre-generated target 
     target: "dynamicHermesJsi",
     profile: "default-legacy-bullet"
   });
-  assert.equal(result.treeShaking.selectedForEmissionUnits, plan.selectionSummary.dynamicHermesJsi.emit);
+  const sourceRows = new Map(scriptProjection.rows.map((row, index) => [index, row]));
+  const profileAvailable = (unit) => {
+    if (unit.identity.surface !== "script") return true;
+    const availability = sourceRows.get(unit.sourceRef.row).availability;
+    return availability.token === "core" || availability.token === "html5-host" ||
+      availability.runtimeProfiles?.includes("default-legacy-bullet") === true;
+  };
+  const expected = plan.units.filter((unit) =>
+    unit.backends.dynamicHermesJsi.selection === "emit" && profileAvailable(unit)).length;
+  const expectedDiagnostics = plan.units.filter((unit) =>
+    unit.backends.dynamicHermesJsi.selection !== "emit" && profileAvailable(unit)).length;
+  assert.equal(result.treeShaking.selectedForEmissionUnits, expected);
   assert.equal(result.usage.requestedCount, 2287);
-  assert.ok(result.diagnostics.length > 2000);
+  assert.equal(result.diagnostics.length, expectedDiagnostics);
 });
 
 test("stale or forged lowering and profile authorities fail before selection", () => {

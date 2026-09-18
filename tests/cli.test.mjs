@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, readFile, rm, symlink, unlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, stat, symlink, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr, generateExtensionTypes, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 import { inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 
 async function fixture() {
@@ -193,9 +194,10 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(lock.defoldRevision, manifest.defoldRevision);
   assert.equal(lock.platform, manifest.platform);
   assert.deepEqual(lock.inputs, manifest.inputs);
+  assert.deepEqual(lock.generatedOutputs, manifest.generatedOutputs);
   assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
   const verified = await verifyGeneratedProject(project);
-  assert.equal(verified.checkedFiles, 6);
+  assert.equal(verified.checkedFiles, 19);
   assert.equal(verified.planSha256, loweringPlan.planSha256);
   const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
     cwd: process.cwd(),
@@ -207,7 +209,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   const dispatchPath = path.join(output.root, "ir", "script-scalar-dispatch.json");
   await writeFile(dispatchPath, `${await readFile(dispatchPath, "utf8")} `);
   await assert.rejects(verifyGeneratedProject(project), /does not match generated manifest/);
-  await writeGeneratedProject(inventory);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
 
   const forgedManifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
   const forgedLock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
@@ -216,7 +218,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   await writeFile(path.join(output.root, "manifest.json"), `${JSON.stringify(forgedManifest, null, 2)}\n`);
   await writeFile(path.join(project, "deherm.lock"), `${JSON.stringify(forgedLock, null, 2)}\n`);
   await assert.rejects(verifyGeneratedProject(project), /do not match this installed deherm package/);
-  await writeGeneratedProject(inventory);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
 
   const escaped = await mkdtemp(path.join(tmpdir(), "deherm-escaped-ir-"));
   const escapedDispatch = path.join(escaped, "script-scalar-dispatch.json");
@@ -225,24 +227,59 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   await symlink(escapedDispatch, dispatchPath);
   await assert.rejects(verifyGeneratedProject(project), /must be a regular file, not a symlink/);
   await unlink(dispatchPath);
-  await writeGeneratedProject(inventory);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
   await rm(escaped, { recursive: true, force: true });
 
   await writeFile(path.join(output.root, "sdk", "modules", "stale.ts"), "export {};\n");
   await writeFile(path.join(output.root, "sdk", "generated", "stale.ts"), "export {};\n");
-  await writeGeneratedProject(inventory);
+  await writeFile(path.join(output.root, "sdk", "contexts", "stale.ts"), "export {};\n");
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
   await assert.rejects(readFile(path.join(output.root, "sdk", "modules", "stale.ts"), "utf8"));
   await assert.rejects(readFile(path.join(output.root, "sdk", "generated", "stale.ts"), "utf8"));
+  await assert.rejects(readFile(path.join(output.root, "sdk", "contexts", "stale.ts"), "utf8"));
+
+  const guiContextPath = path.join(output.root, "sdk", "contexts", "gui.ts");
+  await writeFile(guiContextPath, `${await readFile(guiContextPath, "utf8")} `);
+  await assert.rejects(verifyGeneratedProject(project), /sdk\/contexts\/gui\.ts does not match generated output sentinel/);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
+  const guiConfigPath = path.join(project, "tsconfig.deherm.gui.json");
+  await writeFile(guiConfigPath, `${await readFile(guiConfigPath, "utf8")} `);
+  await assert.rejects(verifyGeneratedProject(project), /tsconfig\.deherm\.gui\.json does not match generated output sentinel/);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
 
   const config = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.json"), "utf8"));
-  assert.equal(config.compilerOptions.plugins[0].transform, "@ts-defold/deherm/ttsc");
-  assert.equal(config.compilerOptions.plugins[0].enabled, false);
+  assert.deepEqual(config.references.map(({ path: reference }) => reference), [
+    "./tsconfig.deherm.shared.json",
+    "./tsconfig.deherm.game-object.json",
+    "./tsconfig.deherm.gui.json",
+    "./tsconfig.deherm.render.json"
+  ]);
+  const baseConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.base.json"), "utf8"));
+  assert.equal(baseConfig.compilerOptions.plugins[0].transform, "@ts-defold/deherm/ttsc");
+  assert.equal(baseConfig.compilerOptions.plugins[0].enabled, false);
+  const guiConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.gui.json"), "utf8"));
+  assert.deepEqual(guiConfig.include, ["**/*.ts", ".deherm/**/*.ts"]);
+  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts"]);
+  assert.deepEqual(guiConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/contexts/gui.ts"]);
+  const contextManifest = JSON.parse(await readFile(path.join(output.root, "script-contexts.json"), "utf8"));
+  assert.equal(contextManifest.source, "defold-binding-lowering-plan.contract.context");
+  assert.equal(contextManifest.routeCount, 926);
+  assert.ok(contextManifest.unknownContextTokens.includes("script-instance"));
+  assert.ok(contextManifest.unknownContextTokens.includes("captured-script-instance"));
+  assert.equal(contextManifest.unresolvedPolicy.routeCount, contextManifest.routeContextCounts.unresolved);
+  assert.equal(contextManifest.contexts.gui.suffix, ".gui.ts");
+  assert.equal(contextManifest.contexts.render.suffix, ".render.ts");
+  assert.ok(contextManifest.contexts.gui.namespaces.includes("gui"));
+  assert.ok(!contextManifest.contexts.shared.namespaces.includes("gui"));
+  assert.ok(contextManifest.contexts.render.namespaces.includes("render"));
+  assert.ok(!contextManifest.contexts["game-object"].namespaces.includes("render"));
+  assert.match(await readFile(path.join(output.root, "sdk", "contexts", "game-object.ts"), "utf8"), /projectExtensions = \{/);
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "extensions.json"), "utf8")), {
     recommendations: ["samchon.ttsc"]
   });
 
   const tsc = path.resolve("node_modules/typescript/bin/tsc");
-  const checked = spawnSync(process.execPath, [tsc, "--project", path.join(project, "tsconfig.json"), "--noEmit"], {
+  const checked = spawnSync(process.execPath, [tsc, "--build", path.join(project, "tsconfig.deherm.json"), "--pretty", "false"], {
     cwd: process.cwd(),
     encoding: "utf8"
   });
@@ -266,7 +303,8 @@ test("project binding identities survive normalized-name collisions and reserved
         ]
       }]
     },
-    { name: "myExt", type: "table", members: [{ name: "ping", type: "function" }] }
+    { name: "myExt", type: "table", members: [{ name: "ping", type: "function" }] },
+    { name: "project_extensions", type: "table", members: [{ name: "ping", type: "function" }] }
   );
 
   const ir = buildProjectBindingIr(inventory);
@@ -279,6 +317,8 @@ test("project binding identities survive normalized-name collisions and reserved
     colliding.find(({ runtimeName }) => runtimeName === "my_ext").members[0].parameters.map(({ jsName }) => jsName),
     ["callback", "defaultValue", "value"]
   );
+  const reserved = ir.modules.find(({ runtimeName }) => runtimeName === "project_extensions");
+  assert.match(reserved.jsName, /^projectExtensions_[a-f0-9]{8}$/);
 
   const output = await writeGeneratedProject(inventory);
   const index = await readFile(path.join(output.root, "sdk", "index.ts"), "utf8");
@@ -286,6 +326,192 @@ test("project binding identities survive normalized-name collisions and reserved
     assert.match(index, new RegExp(`export \\{ ${module.jsName} \\} from "\\./modules/${module.fileName}\\.js"`));
     await readFile(path.join(output.root, "sdk", "modules", `${module.fileName}.ts`), "utf8");
   }
+  const tsc = path.resolve("node_modules/typescript/bin/tsc");
+  const checked = spawnSync(process.execPath, [tsc, "--build", path.join(project, "tsconfig.deherm.json"), "--pretty", "false", "--force"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
+});
+
+test("project generation uses an input key and does not rewrite current outputs", async () => {
+  const project = await fixture();
+  const inventory = await inspectDefoldProject({ project });
+  const first = await writeGeneratedProject(inventory);
+  assert.equal(first.cached, false);
+  const manifestPath = path.join(first.root, "manifest.json");
+  const before = await stat(manifestPath);
+  const second = await writeGeneratedProject(inventory);
+  const after = await stat(manifestPath);
+  assert.equal(second.cached, true);
+  assert.equal(second.generationKey, first.generationKey);
+  assert.equal(after.mtimeMs, before.mtimeMs);
+});
+
+test("script context projection requires an exact route-id bijection and records unknown tokens as unresolved", async () => {
+  const scriptIr = JSON.parse(await readFile(path.resolve("bindings/generated/defold-script-api-ir.json"), "utf8"));
+  const loweringPlan = JSON.parse(await readFile(path.resolve("bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
+  const scriptUnits = loweringPlan.units.filter(({ identity }) => identity.surface === "script");
+  assert.throws(() => buildScriptContextCapabilities(scriptIr, { ...loweringPlan, schemaVersion: 1 }), /schema v2/);
+  const duplicated = structuredClone(loweringPlan);
+  const first = scriptUnits[0].identity.id;
+  const omitted = scriptUnits.at(-1).identity.id;
+  duplicated.units.find(({ identity }) => identity.surface === "script" && identity.id === omitted).identity.id = first;
+  delete duplicated.planSha256;
+  duplicated.planSha256 = createHash("sha256").update(JSON.stringify(duplicated)).digest("hex");
+  assert.throws(() => buildScriptContextCapabilities(scriptIr, duplicated), /duplicate route id|exactly match/i);
+
+  const unknown = structuredClone(loweringPlan);
+  unknown.units.find(({ identity }) => identity.surface === "script").contract.context = "future-context-token";
+  delete unknown.planSha256;
+  unknown.planSha256 = createHash("sha256").update(JSON.stringify(unknown)).digest("hex");
+  const projected = buildScriptContextCapabilities(scriptIr, unknown);
+  assert.ok(projected.unknownContextTokens.includes("future-context-token"));
+  assert.ok(projected.routeContextCounts.unresolved > 0);
+});
+
+test("suffix projects type-check legal APIs and reject APIs from other Defold contexts", async () => {
+  const project = await fixture();
+  const inventory = await inspectDefoldProject({ project });
+  await writeGeneratedProject(inventory);
+  const sourceRoot = path.join(project, "src");
+  await mkdir(sourceRoot, { recursive: true });
+  const componentRoot = path.join(project, "components", "ui");
+  await mkdir(componentRoot, { recursive: true });
+  const sources = {
+    "utility.ts": "export const sharedValue = true;\n",
+    "shared.ts": 'import { vmath } from "@deherm/project"; void vmath;\n',
+    "player.script.ts": 'import { go, vmath } from "@deherm/project"; import { sharedValue } from "./utility.js"; void go; void vmath; void sharedValue;\n',
+    "hud.gui.ts": 'import { go, gui, vmath } from "@deherm/project"; import { sharedValue } from "./utility.js"; void go.PLAYBACK_ONCE_FORWARD; void gui; void vmath; void sharedValue;\n',
+    "legacy.gui_script.ts": 'import { gui } from "@deherm/project"; void gui;\n',
+    "main.render.ts": 'import { render, vmath } from "@deherm/project"; void render; void vmath;\n'
+  };
+  for (const [name, source] of Object.entries(sources)) await writeFile(path.join(sourceRoot, name), source);
+  await writeFile(path.join(componentRoot, "menu.gui.ts"), 'import { gui } from "@deherm/project"; void gui;\n');
+  await writeFile(path.join(project, "bootstrap.script.ts"), 'import { go } from "@deherm/project"; void go;\n');
+
+  const tsc = path.resolve("node_modules/typescript/bin/tsc");
+  const compile = (...arguments_) => spawnSync(process.execPath, [tsc, ...arguments_, "--pretty", "false"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  const legal = compile("--build", path.join(project, "tsconfig.deherm.json"), "--force");
+  assert.equal(legal.status, 0, `${legal.stdout}\n${legal.stderr}`);
+  const cliTypecheck = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(cliTypecheck.status, 0, `${cliTypecheck.stdout}\n${cliTypecheck.stderr}`);
+  assert.equal(JSON.parse(cliTypecheck.stdout).passed, true);
+
+  const negativeCases = [
+    ["player.script.ts", 'import { gui } from "@deherm/project"; void gui;\n', "tsconfig.deherm.game-object.json", "gui"],
+    ["hud.gui.ts", 'import { render } from "@deherm/project"; void render;\n', "tsconfig.deherm.gui.json", "render"],
+    ["main.render.ts", 'import { gui } from "@deherm/project"; void gui;\n', "tsconfig.deherm.render.json", "gui"],
+    ["shared.ts", 'import { gui } from "@deherm/project"; void gui;\n', "tsconfig.deherm.shared.json", "gui"],
+    ["shared.ts", 'import { gui } from "@deherm/project/generated/script/modules"; void gui;\n', "tsconfig.deherm.shared.json", "@deherm/project/generated"],
+    ["shared.ts", 'import { gui } from "@deherm/project/contexts/gui"; void gui;\n', "tsconfig.deherm.shared.json", "@deherm/project/contexts"]
+  ];
+  for (const [name, invalidSource, config, symbol] of negativeCases) {
+    const target = path.join(sourceRoot, name);
+    const original = sources[name];
+    await writeFile(target, invalidSource);
+    const rejected = compile("--project", path.join(project, config), "--noEmit");
+    assert.notEqual(rejected.status, 0, `${name} unexpectedly accepted ${symbol}`);
+    assert.match(rejected.stdout + rejected.stderr, symbol.startsWith("@") ? /cannot find module/i : new RegExp(`no exported member '${symbol}'`, "i"));
+    await writeFile(target, original);
+  }
+
+  const boundaryCases = [
+    ["shared.ts", 'import { gui } from "../.deherm/sdk/contexts/gui.js"; void gui;\n', /bypasses '@deherm\/project'/],
+    ["shared.ts", 'import { gui } from "../.deherm/sdk/contexts/../contexts/gui.js"; void gui;\n', /bypasses '@deherm\/project'/],
+    ["shared.ts", 'import { gui } from "../.deherm/sdk/generated/script/modules.js"; void gui;\n', /bypasses '@deherm\/project'/],
+    ["shared.ts", 'import { gui } from "@deherm/project/contexts/gui"; void gui;\n', /private deep import/],
+    ["shared.ts", 'import { gui } from "@ts-defold/deherm"; void gui;\n', /bypasses the context-filtered/],
+    ["hud.gui.ts", 'import { playerOnly } from "./player.script.js"; void playerOnly;\n', /gui source cannot import game-object source/]
+  ];
+  await writeFile(path.join(sourceRoot, "player.script.ts"), "export const playerOnly = true;\n");
+  for (const [name, invalidSource, message] of boundaryCases) {
+    const target = path.join(sourceRoot, name);
+    const original = await readFile(target, "utf8");
+    await writeFile(target, invalidSource);
+    const rejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
+      cwd: process.cwd(),
+      encoding: "utf8"
+    });
+    assert.equal(rejected.status, 1, `${name} unexpectedly crossed the authored context boundary`);
+    const diagnostic = JSON.parse(rejected.stdout);
+    assert.equal(diagnostic.passed, false);
+    assert.match(diagnostic.stderr, message);
+    await writeFile(target, original);
+  }
+
+  await writeFile(path.join(sourceRoot, "barrel.ts"), 'export { gui } from "@ts-defold/deherm";\n');
+  await writeFile(path.join(sourceRoot, "shared.ts"), 'import { gui } from "./barrel.js"; void gui;\n');
+  const reexportRejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(reexportRejected.status, 1, "shared barrel unexpectedly re-exported the package-root SDK");
+  assert.match(JSON.parse(reexportRejected.stdout).stderr, /barrel\.ts:1:.*bypasses the context-filtered/);
+  await writeFile(path.join(sourceRoot, "barrel.ts"), "export const barrel = true;\n");
+  await writeFile(path.join(sourceRoot, "shared.ts"), sources["shared.ts"]);
+
+  const outsideGui = path.join(componentRoot, "menu.gui.ts");
+  await writeFile(outsideGui, 'import { render } from "@deherm/project"; void render;\n');
+  const outsideRejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(outsideRejected.status, 1, "GUI resource outside src unexpectedly used render APIs");
+  assert.match(JSON.parse(outsideRejected.stdout).stdout, /no exported member 'render'/i);
+  await writeFile(outsideGui, 'import { gui } from "@deherm/project"; void gui;\n');
+
+  const contextEntry = path.join(project, ".deherm", "sdk", "contexts", "gui.ts");
+  await writeFile(contextEntry, `${await readFile(contextEntry, "utf8")} `);
+  const staleRejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(staleRejected.status, 1);
+  assert.match(staleRejected.stderr, /does not match generated output sentinel/);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
+
+  await writeFile(path.join(sourceRoot, "hud.gui.ts"), 'import { playerOnly } from "./player.script.js"; void playerOnly;\n');
+  const crossContext = compile("--project", path.join(project, "tsconfig.deherm.gui.json"), "--noEmit");
+  assert.notEqual(crossContext.status, 0, "GUI project unexpectedly accepted a game-object script import");
+  assert.match(crossContext.stdout + crossContext.stderr, /not listed within the file list of project|must list all files/i);
+});
+
+test("generation migrates only the exact legacy generated root tsconfig", async () => {
+  const project = await fixture();
+  await writeFile(path.join(project, "tsconfig.json"), `${JSON.stringify({ extends: "./tsconfig.deherm.json" }, null, 2)}\n`);
+  const inventory = await inspectDefoldProject({ project });
+  const migrated = await writeGeneratedProject(inventory);
+  assert.equal(migrated.created.tsconfig, false);
+  assert.equal(migrated.migrated.tsconfig, true);
+  assert.deepEqual(
+    JSON.parse(await readFile(path.join(project, "tsconfig.json"), "utf8")),
+    JSON.parse(await readFile(path.join(project, "tsconfig.deherm.json"), "utf8"))
+  );
+
+  await writeFile(path.join(project, "tsconfig.json"), `${JSON.stringify({ compilerOptions: { strict: false }, include: ["custom/**/*.ts"] }, null, 2)}\n`);
+  const preserved = await writeGeneratedProject(inventory);
+  assert.equal(preserved.migrated.tsconfig, false);
+  assert.deepEqual(JSON.parse(await readFile(path.join(project, "tsconfig.json"), "utf8")), {
+    compilerOptions: { strict: false },
+    include: ["custom/**/*.ts"]
+  });
+});
+
+test("typecheck command fails cleanly before generation", async () => {
+  const project = await fixture();
+  const result = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /run 'deherm generate' first/);
 });
 
 test("project generation rejects output outside the project", async () => {
@@ -344,6 +570,21 @@ platforms:
       libs: [physics_2d_defold, physics_2d, script_box2d]
 `);
   await assert.rejects(inspectDefoldProject({ project }), /both legacy Box2D and Box2D v3/);
+});
+
+test("a uniform app manifest becomes the project default API profile", async () => {
+  const project = await fixture();
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Fixture\n[native_extension]\napp_manifest = /game.appmanifest\n`);
+  await writeFile(path.join(project, "game.appmanifest"), `
+platforms:
+  arm64-ios:
+    context:
+      excludeLibs: [physics, LinearMath, BulletDynamics, BulletCollision, script_box2d_defold]
+      libs: [physics_2d, box2d, script_box2d]
+`);
+  const inventory = await inspectDefoldProject({ project });
+  assert.equal(inventory.engineProfiles.platforms["arm64-ios"], "v3-no-bullet");
+  assert.equal(inventory.engineProfiles.defaultProfileId, "v3-no-bullet");
 });
 
 test("project profile resolution respects extension-symbol removal and rejects partial Box2D replacement", async () => {

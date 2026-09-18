@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "family": "borrowed-handle-consumers",
+  "expectedCoverage": {
+    "candidates": 348,
+    "generated": 82,
+    "blocked": 266,
+    "handleKinds": 32,
+    "maxArguments": 2
+  },
+  "selection": {
+    "resultRoles": ["scalar:bool", "scalar:f32", "scalar:i32", "scalar:u32", "scalar:u64"],
+    "parameterRolePrefixes": ["handle:", "scalar:"],
+    "requiresHandleParameter": true,
+    "rejectedFamilies": ["platform-gated"]
+  },
+  "providerContract": {
+    "ownership": "borrowed-only-no-transfer-no-release",
+    "nullability": "zero-handle-rejected-before-provider",
+    "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
+    "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
+    "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
+    "result": "scalar-only-no-borrowed-pointer-or-handle-result"
+  },
+  "targetPolicy": {
+    "dynamicHermes": "handles-and-u64-use-BigInt; other scalar lanes are checked values",
+    "staticHermes": "caller-owned-uint64-argument-and-result-storage",
+    "browser": "direct-Wasm-memory-uint64-slots; provider installation remains host responsibility",
+    "typescript": "nominal BorrowedHandle kind prevents structural cross-kind assignment"
+  }
+}

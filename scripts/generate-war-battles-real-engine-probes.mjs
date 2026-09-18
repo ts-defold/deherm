@@ -6,13 +6,13 @@ import { pathToFileURL } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const urls = {
-  manifest: new URL("bindings/probes/war-battles-script-real-engine-probes.json", root),
+  manifest: new URL("examples/war-battles-online/verification/probes/script-real-engine-probes.json", root),
   ir: new URL("bindings/generated/defold-script-api-ir.json", root),
   scalar: new URL("bindings/generated/defold-script-scalar-dispatch.json", root),
   value: new URL("bindings/generated/defold-script-value-bindings.json", root)
 };
-const reportUrl = new URL("bindings/generated/war-battles-script-real-engine-probes.json", root);
-const typescriptUrl = new URL("sample/src/generated/war-battles-script-real-engine-probes.ts", root);
+const reportUrl = new URL("examples/war-battles-online/verification/generated/script-real-engine-probes.json", root);
+const typescriptUrl = new URL("examples/war-battles-online/verification/generated/script-real-engine-probes.ts", root);
 const requiredIds = ["script:msg.post", "script:factory.create", "script:go.delete", "script:gui.get_node", "script:gui.set_text"];
 const requiredAssertions = new Map([
   ["script:msg.post", ["receiver-observes-full-sender-url", "serialized-payload-at-or-below-2048-bytes-is-delivered", "serialized-payload-above-2048-bytes-is-rejected"]],

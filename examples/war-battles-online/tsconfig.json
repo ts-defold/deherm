@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@deherm/project": ["../../packages/sdk/src/index.ts"],
+      "@ts-defold/deherm": ["../../packages/sdk/src/index.ts"],
+      "@ts-defold/deherm/component": ["../../packages/sdk/src/component.ts"]
+    }
+  },
+  "include": ["core/**/*.ts", "integration/**/*.ts", "headless/**/*.ts", "defold/src/**/*.ts"]
+}

@@ -79,7 +79,12 @@ def main() -> None:
         EXTENSION / "src" / "lua_bridge.cpp",
         EXTENSION / "src" / "lua_bridge_core.cpp",
     ]
-    native = [*common, EXTENSION / "src" / "runtime.cpp", EXTENSION / "src" / "script_jsi_bridge.cpp"]
+    native = [
+        *common,
+        EXTENSION / "src" / "component_hermes_backend.cpp",
+        EXTENSION / "src" / "runtime.cpp",
+        EXTENSION / "src" / "script_jsi_bridge.cpp",
+    ]
     for source in native:
         compile_source(source, "OSX")
     for source in common:

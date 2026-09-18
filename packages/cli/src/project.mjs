@@ -6,6 +6,13 @@ import { unzipSync } from "fflate";
 import { parse as parseYaml } from "yaml";
 
 const ignoredDirectories = new Set([".git", ".internal", "build", "node_modules"]);
+const projectDiscoveryIgnoredDirectories = new Set([
+  ...ignoredDirectories,
+  ".agents",
+  ".deherm",
+  "dist",
+  "upstream"
+]);
 const textDecoder = new TextDecoder();
 const defaultEngineProfileId = "default-legacy-bullet";
 
@@ -26,16 +33,63 @@ async function exists(value) {
   }
 }
 
-export async function findProjectRoot(start = process.cwd(), explicit) {
-  let current = path.resolve(explicit ?? start);
+async function nearestProjectRoot(start) {
+  let current = path.resolve(start);
   if (path.basename(current) === "game.project") current = path.dirname(current);
   while (true) {
     if (await exists(path.join(current, "game.project"))) return current;
     const parent = path.dirname(current);
-    if (parent === current || explicit) break;
+    if (parent === current) return null;
     current = parent;
   }
-  throw new Error(`Unable to find game.project from ${path.resolve(explicit ?? start)}`);
+}
+
+export async function discoverProjectRoots(start = process.cwd(), options = {}) {
+  const root = path.resolve(start);
+  const maximumDepth = options.maximumDepth ?? 6;
+  const matches = [];
+  async function visit(directory, depth) {
+    if (await exists(path.join(directory, "game.project"))) {
+      matches.push(directory);
+      return;
+    }
+    if (depth >= maximumDepth) return;
+    let entries;
+    try {
+      entries = await readdir(directory, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    entries.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    for (const entry of entries) {
+      if (!entry.isDirectory() || entry.isSymbolicLink() || projectDiscoveryIgnoredDirectories.has(entry.name)) continue;
+      await visit(path.join(directory, entry.name), depth + 1);
+    }
+  }
+  await visit(root, 0);
+  return matches;
+}
+
+export async function findProjectRoot(start = process.cwd(), explicit, options = {}) {
+  if (explicit) {
+    const selected = await nearestProjectRoot(explicit);
+    if (selected) return selected;
+    throw new Error(`No game.project exists at or above explicit --project path ${path.resolve(explicit)}`);
+  }
+  const nearest = await nearestProjectRoot(start);
+  if (nearest) return nearest;
+  const matches = await discoverProjectRoots(start, options);
+  if (matches.length === 1) return matches[0];
+  if (matches.length > 1 && options.select) {
+    const selected = await options.select(matches);
+    if (matches.includes(selected)) return selected;
+    throw new Error("Project selector returned a path outside the discovered project set");
+  }
+  if (matches.length > 1) {
+    const choices = matches.map((match) => `  --project ${path.relative(path.resolve(start), match) || "."}`).join("\n");
+    throw new Error(`Multiple Defold projects found below ${path.resolve(start)}. Select one explicitly:\n${choices}`);
+  }
+  throw new Error(`No game.project found from ${path.resolve(start)}. Run 'deherm create <directory>' or pass --project <path>.`);
 }
 
 export function parseGameProject(source) {
@@ -262,11 +316,12 @@ export async function resolveEngineProfiles(projectRoot, properties) {
     }
     platforms[platform] = inferPlatformEngineProfile(platform, context);
   }
+  const selectedProfiles = new Set(Object.values(platforms));
   return {
     source: "app-manifest",
     manifest: resolved.relative,
     manifestSha256: sha256(source),
-    defaultProfileId: defaultEngineProfileId,
+    defaultProfileId: selectedProfiles.size === 1 ? [...selectedProfiles][0] : defaultEngineProfileId,
     platforms
   };
 }
@@ -392,7 +447,7 @@ async function dependencyExtensions(projectRoot, diagnostics) {
 }
 
 export async function inspectDefoldProject(options = {}) {
-  const projectRoot = await findProjectRoot(options.cwd, options.project);
+  const projectRoot = await findProjectRoot(options.cwd, options.project, { select: options.selectProject });
   const properties = parseGameProject(await readFile(path.join(projectRoot, "game.project"), "utf8"));
   const engineProfiles = await resolveEngineProfiles(projectRoot, properties);
   const diagnostics = [];

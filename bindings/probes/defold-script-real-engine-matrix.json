@@ -138,7 +138,7 @@
         "value:vmath.vector3.zero"
       ],
       "artifact": {
-        "path": "knowledge/data/native-defold-runtime.log",
+        "path": ".agents/docs/data/native-defold-runtime.log",
         "sha256": "f52a4571d78860c5d86e64e018e703e4e6c8b797ffc36fc969e3146a1835261b"
       },
       "requiredMarkers": [

@@ -56,4 +56,14 @@ test("generated dmSDK resolves every Clang declaration", async () => {
   const publicCalls = ir.declarations.filter(({ kind, disposition }) => ["function", "method", "constructor", "destructor", "function-template"].includes(kind) && disposition === "generated-raw-call");
   assert.equal(ir.runtimeImplementedCount + ir.runtimeUnimplementedCount, publicCalls.length);
   assert.ok(ir.declarations.every(({ disposition, abiStrategies }) => disposition && abiStrategies.length));
+  const enums = ir.declarations.filter(({ kind }) => kind === "enum");
+  assert.ok(enums.length > 0);
+  assert.ok(enums.every(({ members }) => members.length > 0 && members.every(({ value }) => Number.isSafeInteger(value))));
+  const types = await readFile(new URL("../packages/sdk/src/generated/dmsdk/types.ts", import.meta.url), "utf8");
+  assert.match(types, /export const DmBufferResult = \{/);
+  assert.match(types, /RESULT_METADATA_MISSING: 11/);
+  assert.match(types, /export type DmBufferResult = \(typeof DmBufferResult\)\[keyof typeof DmBufferResult\]/);
+  assert.match(types, /readonly "dmBuffer::Result": DmBufferResult;/);
+  assert.match(types, /export const DmSocketResult = \{[\s\S]*RESULT_ACCES: -1/);
+  assert.doesNotMatch(types, /readonly "dmBuffer::Result": DmNativeType/);
 });

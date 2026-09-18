@@ -1,0 +1,26 @@
+{
+  "extends": "./tsconfig.deherm.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "tsBuildInfoFile": "./.deherm/cache/typescript/game-object.tsbuildinfo",
+    "paths": {
+      "@deherm/project": [
+        "./.deherm/sdk/contexts/game-object.ts"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    ".deherm/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.gui.ts",
+    "**/*.gui_script.ts",
+    "**/*.render.ts",
+    "node_modules/**",
+    ".internal/**",
+    "build/**",
+    "dist/**"
+  ]
+}

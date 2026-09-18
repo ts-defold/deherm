@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "36710fbd80881a8bbff9189ac33ed7468b30a12278c549e9116387b9a48b5fdd",
+  "inputSha256": "e1ace52e5952a236666e76bf96679ae13c3063b0330148ade2bf1236dd6cdbbf",
   "evidencePolicy": "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
   "coverageClaim": "All 286 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
   "routeCount": 286,
@@ -2922,7 +2922,7 @@
         "value:vmath.vector3.zero"
       ],
       "artifact": {
-        "path": "knowledge/data/native-defold-runtime.log",
+        "path": ".agents/docs/data/native-defold-runtime.log",
         "sha256": "f52a4571d78860c5d86e64e018e703e4e6c8b797ffc36fc969e3146a1835261b"
       },
       "requiredMarkers": [

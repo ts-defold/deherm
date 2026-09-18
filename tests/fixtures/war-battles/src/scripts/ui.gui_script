@@ -5,12 +5,17 @@
 -- component-id: deherm.component/v1/1f924ee1bc2b11e24093f36213c1ab7f1cccd307fc315ac8253571e3d750cce2
 -- proxy-kind: gui_script
 -- context-kind: gui-scene
+-- teardown-policy: final-callback-detach
+-- proxy-runtime: native-dynamic-hermes-harness-executable
 
 local COMPONENT_ID = "deherm.component/v1/1f924ee1bc2b11e24093f36213c1ab7f1cccd307fc315ac8253571e3d750cce2"
 local SCHEMA_FINGERPRINT = "e4b935a43c8ad4ed2bcb617bef26285b2ca228a6ae7ef43d726fc0a6836c48fa"
+local COMPONENT_CONTEXT = "gui-scene"
+local PROPERTY_SPECIALIZATIONS = {
+}
 
 function init(self)
-    assert(defold_hermes.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT))
+    assert(defold_hermes.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT, COMPONENT_CONTEXT, PROPERTY_SPECIALIZATIONS))
     defold_hermes.dispatchLifecycle(self, COMPONENT_ID, "init")
 end
 

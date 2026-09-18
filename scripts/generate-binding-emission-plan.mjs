@@ -10,9 +10,14 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function compareCodeUnits(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
 function parseArguments(argv) {
   const options = {
     plan: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.json"),
+    sentinel: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.sentinel.json"),
     scriptProjection: resolve(repositoryRoot, "bindings/generated/defold-script-projection-ir.json"),
     profiles: resolve(repositoryRoot, "bindings/generated/defold-script-route-availability-profiles.json"),
     usage: null,
@@ -25,6 +30,7 @@ function parseArguments(argv) {
     const argument = argv[index];
     if (argument === "--check") options.check = true;
     else if (argument === "--plan") options.plan = resolve(argv[++index]);
+    else if (argument === "--sentinel") options.sentinel = resolve(argv[++index]);
     else if (argument === "--script-projection") options.scriptProjection = resolve(argv[++index]);
     else if (argument === "--profiles") options.profiles = resolve(argv[++index]);
     else if (argument === "--usage") options.usage = resolve(argv[++index]);
@@ -49,6 +55,9 @@ function usageIds(usage, known) {
 }
 
 function validatePlanIdentity(plan) {
+  if (plan?.schemaVersion !== 2) {
+    throw new Error(`Binding emission requires canonical lowering-plan schema v2, got ${plan?.schemaVersion ?? "missing"}`);
+  }
   if (!plan || typeof plan !== "object" || typeof plan.planSha256 !== "string") {
     throw new Error("Lowering plan has no internal identity");
   }
@@ -199,7 +208,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
       totalMarshallingPrograms: plan.tables.marshallingPrograms.length,
       policy: "Only explicitly reachable, profile-available units with an emit disposition are retained. Shared tables are compacted to referenced entries."
     },
-    familyCounts: Object.fromEntries(Object.entries(familyCounts).sort(([left], [right]) => left.localeCompare(right))),
+    familyCounts: Object.fromEntries(Object.entries(familyCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
     diagnostics,
     tables: {
       marshallingPrograms: programs.values,
@@ -214,13 +223,22 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
 
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
-  const [planText, scriptText, profilesText, usageText] = await Promise.all([
+  const [planText, sentinelText, loweringGeneratorText, scriptText, profilesText, usageText] = await Promise.all([
     readFile(options.plan, "utf8"),
+    readFile(options.sentinel, "utf8"),
+    readFile(resolve(repositoryRoot, "packages/compiler/src/generate-binding-lowering-plan.mjs"), "utf8"),
     readFile(options.scriptProjection, "utf8"),
     readFile(options.profiles, "utf8"),
     readFile(options.usage, "utf8")
   ]);
   const plan = JSON.parse(planText);
+  const sentinel = JSON.parse(sentinelText);
+  if (sentinel.schemaVersion !== 1 || sentinel.generator !== "packages/compiler/src/generate-binding-lowering-plan.mjs" ||
+      sentinel.generatorSha256 !== sha256(loweringGeneratorText) || sentinel.outputSha256 !== sha256(planText) ||
+      sentinel.outputBytes !== Buffer.byteLength(planText) || sentinel.planSha256 !== plan.planSha256 ||
+      JSON.stringify(sentinel.inputHashes) !== JSON.stringify(plan.inputHashes)) {
+    throw new Error("Canonical lowering-plan sentinel is stale or does not authenticate the selected plan");
+  }
   if (plan.inputHashes?.scriptProjection !== sha256(scriptText)) {
     throw new Error("Script projection bytes do not match the lowering plan authority");
   }

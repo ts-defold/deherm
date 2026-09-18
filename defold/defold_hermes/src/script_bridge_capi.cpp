@@ -1,30 +1,109 @@
 #include <defold_hermes/script_bridge_capi.hpp>
 
 #include <array>
+#include <atomic>
 
 namespace defold_hermes {
 namespace {
 ScriptBridgeApi gApi;
 const char* gUnavailable = "Defold script bridge is not installed";
+constexpr uint32_t kReleaseQueueCapacity = 8192;
+struct ReleaseRecord {
+  ScriptHandleKind kind = ScriptHandleKind::kNone;
+  uint32_t runtime = 0;
+  uint64_t payload = 0;
+};
+std::array<ReleaseRecord, kReleaseQueueCapacity> gReleaseQueue{};
+uint32_t gReleaseHead = 0;
+uint32_t gReleaseSize = 0;
+uint64_t gReleaseEnqueued = 0;
+uint64_t gReleaseDrained = 0;
+uint64_t gReleaseDropped = 0;
+bool gAcceptReleases = false;
+std::atomic_flag gReleaseLock = ATOMIC_FLAG_INIT;
+
+void lockReleaseQueue() noexcept {
+  while (gReleaseLock.test_and_set(std::memory_order_acquire)) {}
 }
 
-void installScriptBridgeApi(ScriptBridgeApi api) noexcept { gApi = api; }
+void unlockReleaseQueue() noexcept { gReleaseLock.clear(std::memory_order_release); }
+}
 
-void uninstallScriptBridgeApi() noexcept { gApi = {}; }
+void installScriptBridgeApi(ScriptBridgeApi api) noexcept {
+  lockReleaseQueue();
+  gApi = api;
+  gReleaseHead = gReleaseSize = 0;
+  gReleaseEnqueued = gReleaseDrained = gReleaseDropped = 0;
+  gAcceptReleases = true;
+  unlockReleaseQueue();
+}
+
+void uninstallScriptBridgeApi() noexcept {
+  lockReleaseQueue();
+  gAcceptReleases = false;
+  unlockReleaseQueue();
+  drainReleasedScriptHandles();
+  lockReleaseQueue();
+  gApi = {};
+  unlockReleaseQueue();
+}
 
 bool dispatchScriptCall(ScriptCallFrame* frame) noexcept {
-  return frame && gApi.dispatch && gApi.dispatch(gApi.context, frame);
+  drainReleasedScriptHandles();
+  lockReleaseQueue();
+  const ScriptBridgeApi api = gApi;
+  unlockReleaseQueue();
+  return frame && api.dispatch && api.dispatch(api.context, frame);
 }
 
 const char* scriptBridgeLastError() noexcept {
-  return gApi.lastError ? gApi.lastError(gApi.context) : gUnavailable;
+  lockReleaseQueue();
+  const ScriptBridgeApi api = gApi;
+  unlockReleaseQueue();
+  return api.lastError ? api.lastError(api.context) : gUnavailable;
 }
 
 void releaseScriptHandle(
     ScriptHandleKind kind,
     uint32_t runtime,
     uint64_t payload) noexcept {
-  if (gApi.releaseHandle) gApi.releaseHandle(gApi.context, kind, runtime, payload);
+  lockReleaseQueue();
+  if (!gAcceptReleases || gReleaseSize == kReleaseQueueCapacity) {
+    ++gReleaseDropped;
+    unlockReleaseQueue();
+    return;
+  }
+  const uint32_t tail = (gReleaseHead + gReleaseSize) % kReleaseQueueCapacity;
+  gReleaseQueue[tail] = {kind, runtime, payload};
+  ++gReleaseSize;
+  ++gReleaseEnqueued;
+  unlockReleaseQueue();
+}
+
+void drainReleasedScriptHandles() noexcept {
+  for (;;) {
+    lockReleaseQueue();
+    if (gReleaseSize == 0) {
+      unlockReleaseQueue();
+      return;
+    }
+    const ReleaseRecord record = gReleaseQueue[gReleaseHead];
+    gReleaseHead = (gReleaseHead + 1) % kReleaseQueueCapacity;
+    --gReleaseSize;
+    ++gReleaseDrained;
+    const ScriptBridgeApi api = gApi;
+    unlockReleaseQueue();
+    if (api.releaseHandle) api.releaseHandle(api.context, record.kind, record.runtime, record.payload);
+  }
+}
+
+ScriptBridgeReleaseQueueStats scriptBridgeReleaseQueueStats() noexcept {
+  lockReleaseQueue();
+  const ScriptBridgeReleaseQueueStats stats{
+    gReleaseEnqueued, gReleaseDrained, gReleaseDropped, gReleaseSize, kReleaseQueueCapacity
+  };
+  unlockReleaseQueue();
+  return stats;
 }
 
 }  // namespace defold_hermes

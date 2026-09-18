@@ -26,7 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFOLD = ROOT / "upstream" / "defold"
 ENGINE = DEFOLD / "engine"
 INVENTORY = ROOT / "bindings" / "generated" / "defold-sdk-inventory.json"
-REPORT = ROOT / "knowledge" / "research" / "sdk-coverage.md"
+REPORT = ROOT / ".agents" / "docs" / "research" / "sdk-coverage.md"
 
 DECL_KINDS = {
     "FunctionDecl": "function",

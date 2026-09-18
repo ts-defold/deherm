@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "selection": {
+    "loweringFamily": "borrowed-handle",
+    "excludedOperationClasses": [
+      "declaration-token"
+    ],
+    "allowedValueConstructors": [
+      "scalar",
+      "enum",
+      "defold-value",
+      "handle",
+      "optional",
+      "union"
+    ],
+    "maximumArguments": 7,
+    "maximumResults": 1,
+    "requiresFixedArity": true,
+    "requiresAcyclicValues": true,
+    "expectedRouteCount": 407
+  },
+  "operationClasses": {
+    "checked-handle-input-terminal": "call-preserves-host-wrapper-and-underlying-identity",
+    "checked-handle-return-capture": "capture-returned-identity-in-generation-checked-lua-registry",
+    "checked-self-engine-object-invalidate": "invalidate-underlying-self-and-preserve-host-wrapper",
+    "checked-child-engine-object-invalidate": "invalidate-underlying-child-and-preserve-host-wrapper"
+  },
+  "contexts": {
+    "explicit-physics-handle": "router-candidate",
+    "runtime-global": "router-candidate",
+    "game-object-instance": "router-candidate",
+    "gui-scene": "blocked-gui-script-attachment-unavailable",
+    "render-script-instance-and-graphics-context": "blocked-render-script-attachment-unavailable"
+  },
+  "targetBackends": {
+    "nativeDynamicHermes": "captured-lua-router-harness-proven-jsi-unverified",
+    "nativeStaticHermes": "static-ffi-unimplemented",
+    "html5BrowserHost": "browser-host-unimplemented"
+  },
+  "expected": {
+    "operationClassCounts": {
+      "checked-handle-input-terminal": 367,
+      "checked-handle-return-capture": 33,
+      "checked-self-engine-object-invalidate": 5,
+      "checked-child-engine-object-invalidate": 2
+    },
+    "contextCounts": {
+      "explicit-physics-handle": 332,
+      "game-object-instance": 5,
+      "runtime-global": 8,
+      "gui-scene": 55,
+      "render-script-instance-and-graphics-context": 7
+    },
+    "routerCandidateCount": 343,
+    "blockedCount": 64,
+    "runtimeUnavailableCount": 2
+  }
+}

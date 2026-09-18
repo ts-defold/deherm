@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "observedOn": "2026-09-18",
+  "scope": "In-process deterministic simulation; no network, engine, renderer, or VM allocation profiling",
+  "players": 32,
+  "ticks": 36000,
+  "tickRate": 60,
+  "simulatedSeconds": 600,
+  "replayBytes": 36864032,
+  "seed": 12648430,
+  "matchId": 77,
+  "stateHash": 238808479,
+  "replayBodyHash": 1903337259,
+  "alivePlayers": 29,
+  "totalKills": 3,
+  "rollbackCount": 1,
+  "rollbackMatchesUninterrupted": true,
+  "wallClockObservationMs": 478.6,
+  "note": "Wall-clock duration is one local observation and is not asserted by tests; deterministic hashes and counts are asserted."
+}

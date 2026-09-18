@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "policyVersion": "2026-09-18.1",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceShapeCensus": "bindings/generated/defold-dmsdk-abi-shapes.json",
   "scope": "The 21 declarations mechanically classified as next-named-scalar-direct. This report does not claim an engine lifecycle, thread, profiler, or sound-context capability.",
   "coverage": {
@@ -14,8 +15,8 @@
     "warmedDispatchObservedCppAllocations": 0
   },
   "sourceHashes": {
-    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
-    "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
+    "ir": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
+    "shapes": "72444404f060dbb010fc423bc56925fb622bbe241cca0da84d24b5befcf1bb60",
     "policy": "326e11c8855aa6e3a4d565facd25829ccc86ab9ee991a4f63432690bab74e6ec"
   },
   "artifactHashes": {

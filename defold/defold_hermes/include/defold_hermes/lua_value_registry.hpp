@@ -32,6 +32,8 @@ enum class LuaValuePolicy : uint8_t {
 struct LuaValueDescriptor {
   LuaValueKind kind = LuaValueKind::kAny;
   LuaValuePolicy policy = LuaValuePolicy::kAny;
+  /** Generated semantic kind. Zero is wildcard/unspecified. */
+  uint16_t semanticKind = 0;
 };
 
 struct LuaRegistryApi {
@@ -66,6 +68,7 @@ struct LuaValueRegistryStats {
   uint64_t runtimeMismatchFailures = 0;
   uint64_t kindMismatchFailures = 0;
   uint64_t policyMismatchFailures = 0;
+  uint64_t semanticKindMismatchFailures = 0;
   uint64_t luaTypeFailures = 0;
   uint64_t doubleReleaseFailures = 0;
   uint64_t invalidArgumentFailures = 0;
@@ -103,6 +106,10 @@ public:
   bool queueRelease(Handle handle, LuaValueDescriptor expected = {}) noexcept;
   uint32_t drainDeferred(uint32_t maximum = UINT32_MAX) noexcept;
 
+  /** Releases every root and reuses the existing storage for a new runtime generation. */
+  bool rebind(lua_State *state, uint32_t runtime,
+              LuaRegistryApi api = {}) noexcept;
+
   /** Unrefs every live/queued value. Must run before lua_close(). */
   uint32_t shutdown() noexcept;
 
@@ -119,6 +126,7 @@ private:
     uint32_t nextFree = UINT32_MAX;
     LuaValueKind kind = LuaValueKind::kAny;
     LuaValuePolicy policy = LuaValuePolicy::kAny;
+    uint16_t semanticKind = 0;
     SlotState state = kFree;
     uint8_t reserved = 0;
   };

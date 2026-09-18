@@ -4,7 +4,7 @@
   "sourceIr": "bindings/generated/defold-sdk-ir.json",
   "sourceClassification": "bindings/generated/defold-dmsdk-binding-patterns.json",
   "sourceHashes": {
-    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+    "ir": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
     "classification": "db34de697fc30b34f4ba0cbd9cce3ff5277dfd774a5aaae26ecdde3b2d439cc8",
     "headers": {
       "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",

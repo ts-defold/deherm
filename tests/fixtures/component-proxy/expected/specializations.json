@@ -1,6 +1,20 @@
 {
   "schemaVersion": 1,
   "generator": "@ts-defold/deherm component-proxy-generator/v1",
+  "proxyRuntimeCapability": {
+    "state": "native-dynamic-hermes-harness-executable",
+    "runtimeConformant": false,
+    "luaModule": "defold_hermes",
+    "requiredMethods": [
+      "attachComponent",
+      "dispatchLifecycle",
+      "dispatchMessage",
+      "dispatchInput",
+      "dispatchReload",
+      "detachComponent"
+    ],
+    "evidence": "generated-proxy-contract-native-lua-and-dynamic-hermes-harnesses-packaged-engine-unverified"
+  },
   "lifecycleSlots": {
     "init": 0,
     "update": 1,
@@ -27,6 +41,15 @@
       "nativeSymbol": "deherm_component_bf9d9d8ca59e486805b929b32e188c5c",
       "proxyKind": "script",
       "contextKind": "game-object",
+      "supportedLifecycles": [
+        "init",
+        "update",
+        "final",
+        "onMessage",
+        "onInput",
+        "onReload"
+      ],
+      "teardownPolicy": "final-callback-detach",
       "reloadPolicy": "preserve-instance-state",
       "lifecycleMask": 63,
       "dispatchSlots": {
@@ -85,6 +108,29 @@
           "resourceKind": "atlas"
         }
       ]
+    },
+    {
+      "componentId": "deherm.component/v1/bba628a1ee23634d353872b113e5c7bf3b52e4de28e2b105a34011aa682b07f1",
+      "schemaFingerprint": "275beaa7a289e36d9e1dfdf688522e980aaf6da482ff927957d9cf280f842446",
+      "nativeSymbol": "deherm_component_bba628a1ee23634d353872b113e5c7bf",
+      "proxyKind": "render_script",
+      "contextKind": "render-instance+graphics",
+      "supportedLifecycles": [
+        "init",
+        "update",
+        "onMessage",
+        "onReload"
+      ],
+      "teardownPolicy": "provider-required-unimplemented-no-final-callback",
+      "reloadPolicy": "preserve-instance-state",
+      "lifecycleMask": 43,
+      "dispatchSlots": {
+        "init": 0,
+        "update": 1,
+        "onMessage": 3,
+        "onReload": 5
+      },
+      "propertySlots": []
     }
   ]
 }

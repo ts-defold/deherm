@@ -14,7 +14,7 @@ const urls = {
   overrides: new URL("bindings/overrides/script-table-tuple-schema-overrides.json", root)
 };
 const reportUrl = new URL("bindings/generated/defold-script-table-tuple-schemas.json", root);
-const documentationUrl = new URL("knowledge/research/script-table-tuple-schema-classification.md", root);
+const documentationUrl = new URL(".agents/docs/research/script-table-tuple-schema-classification.md", root);
 
 const primitiveTypes = new Set([
   "boolean", "integer", "number", "string", "hash", "url", "vector", "vector3",

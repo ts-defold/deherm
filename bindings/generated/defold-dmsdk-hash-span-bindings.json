@@ -8,8 +8,8 @@
     "policy": "bindings/overrides/dmsdk-hash-span-bindings.json"
   },
   "sourceHashes": {
-    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
-    "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
+    "ir": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
+    "shapes": "72444404f060dbb010fc423bc56925fb622bbe241cca0da84d24b5befcf1bb60",
     "policy": "357676505afcb47db07fed2d0bf919715850208b83d71f5b5e06947ea2c63eea",
     "evidence": {
       "upstream/defold/engine/dlib/src/dlib/hash.cpp": "fb3577778af004b43b0585fafb5369bd18b89b0a0aa4b7eb322555ccda9a8c51",

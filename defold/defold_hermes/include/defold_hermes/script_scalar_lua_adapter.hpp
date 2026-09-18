@@ -7,22 +7,38 @@
 #include <defold_hermes/generated_script_table_record_bindings.hpp>
 #include <defold_hermes/generated_script_url_bindings.hpp>
 #include <defold_hermes/generated_script_value_tail_bindings.hpp>
+#include <defold_hermes/generated_script_handle_lowering.hpp>
+#include <defold_hermes/generated_script_universal_value_bindings.hpp>
 #include <defold_hermes/lua_bridge_core.hpp>
+#include <defold_hermes/lua_value_registry.hpp>
 #include <defold_hermes/script_bridge_capi.hpp>
 
 #include <array>
+#include <memory>
 
 namespace defold_hermes::lua_bridge::scalar {
 
 /** First universal-script-ABI backend: the generated scalar Lua fast lane. */
 class ScriptAdapter {
  public:
-  ScriptAdapter() noexcept;
-  bool initialize(lua_State* state, InstanceApi instanceApi) noexcept;
+  enum class ComponentContext : uint8_t { kGameObject, kGui, kRender };
+  static constexpr uint8_t kComponentContextDepth = 16;
+  ScriptAdapter();
+  bool initialize(lua_State* state, InstanceApi instanceApi,
+      const ::defold_hermes::script_handle_lowering::RuntimeProfileHandshake& profileHandshake,
+      ::defold_hermes::lua_bridge::LuaRegistryApi semanticRegistryApi = {});
   void shutdown() noexcept;
   bool captureInstance(int stackIndex) noexcept;
   bool captureGuiInstance(int stackIndex) noexcept;
+  bool captureRenderInstance(int stackIndex) noexcept;
   bool captureLuaUserdata(int stackIndex, ScriptValue* output) noexcept;
+  bool captureSemanticHandle(int stackIndex,
+      ::defold_hermes::script_handle_lowering::SemanticHandleKind kind,
+      ScriptValue* output) noexcept;
+  bool ensureComponentFallbackInstance(int stackIndex, ComponentContext context) noexcept;
+  bool pushComponentContext(ComponentContext context) noexcept;
+  void popComponentContext() noexcept;
+  bool componentContextActive() const noexcept { return componentContextDepth_ != 0; }
   void detachInstance() noexcept;
   bool dispatch(ScriptCallFrame* frame) noexcept;
 
@@ -81,6 +97,25 @@ class ScriptAdapter {
       ScriptCallFrame* frame,
       char* error,
       size_t errorCapacity) noexcept;
+  static universal_value::DispatchStatus UniversalValueInvokeThunk(
+      void* context,
+      const universal_value::Operation& operation,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  universal_value::DispatchStatus invokeUniversalValue(
+      const universal_value::Operation& operation,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  bool bindUniversalValue(const universal_value::Operation& operation) noexcept;
+  bool readUniversalValue(
+      int stackIndex,
+      ScriptValue* output,
+      ScriptCallFrame* frame,
+      uint32_t depth,
+      const void* const* ancestors,
+      uint32_t ancestorCount) noexcept;
   url_binding::DispatchStatus invokeUrl(
       const url_binding::Operation& operation,
       ScriptCallFrame* frame,
@@ -130,7 +165,10 @@ class ScriptAdapter {
       char* error,
       size_t errorCapacity) noexcept;
   bool bindStructured(const value_binding::StructuredLuaOperation& operation) noexcept;
-  bool captureContext(int stackIndex, value_binding::StructuredLuaContext context) noexcept;
+  enum class ActiveContext : uint8_t { kGameObject, kGui, kRender };
+  bool captureContext(int stackIndex, ActiveContext context) noexcept;
+  bool hasSelectedContext() const noexcept;
+  ActiveContext selectedContext() const noexcept;
   bool pushStructuredValue(
       const ScriptValue& value,
       ScriptCallFrame* frame = nullptr,
@@ -148,14 +186,17 @@ class ScriptAdapter {
   InstanceApi instanceApi_{};
   int instanceRef_ = LUA_NOREF;
   uint32_t runtimeGeneration_ = 0;
-  value_binding::StructuredLuaContext activeContext_ = value_binding::StructuredLuaContext::kScriptInstance;
+  ActiveContext activeContext_ = ActiveContext::kGameObject;
   bool hasActiveContext_ = false;
+  std::array<ActiveContext, kComponentContextDepth> componentContexts_{};
+  uint8_t componentContextDepth_ = 0;
   std::array<int, value_binding::kStructuredLuaOperationCount> structuredFunctionRefs_{};
   std::array<int, fixed_tuple::kBindingCount> fixedTupleFunctionRefs_{};
   std::array<int, url_binding::kBindingCount> urlFunctionRefs_{};
   std::array<int, value_tail::kCandidateCount> valueTailFunctionRefs_{};
   std::array<int, overload_dispatch::kBindingCount> overloadFunctionRefs_{};
   std::array<int, table_record::kCandidateCount> tableRecordFunctionRefs_{};
+  std::array<int, universal_value::kOperationCount> universalValueFunctionRefs_{};
   ::defold_hermes::lua_bridge::HandlePool luaHandles_;
   value_binding::StructuredLuaApi structuredLuaApi_{};
   fixed_tuple::LuaApi fixedTupleLuaApi_{};
@@ -163,6 +204,11 @@ class ScriptAdapter {
   value_tail::LuaApi valueTailLuaApi_{};
   overload_dispatch::LuaApi overloadLuaApi_{};
   table_record::LuaApi tableRecordLuaApi_{};
+  universal_value::LuaApi universalValueLuaApi_{};
+  std::unique_ptr<::defold_hermes::lua_bridge::LuaValueRegistry> semanticHandleRegistry_;
+  std::unique_ptr<::defold_hermes::script_handle_lowering::CapturedLuaRouter> handleRouter_;
+  const ::defold_hermes::script_handle_lowering::RuntimeProfile* runtimeProfile_ = nullptr;
+  ::defold_hermes::lua_bridge::LuaRegistryApi semanticRegistryApi_{};
   char adapterError_[384]{};
 };
 

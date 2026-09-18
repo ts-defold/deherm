@@ -7,6 +7,9 @@
 
 #include <memory>
 #include <atomic>
+#include <array>
+#include <exception>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
@@ -37,25 +40,25 @@ std::string asString(jsi::Runtime& runtime, const jsi::Value& value) {
 class Runtime::Impl {
  public:
   explicit Impl(Host& host)
-      : host_(host), runtime_(facebook::hermes::makeHermesRuntime()) {
+      : host_(host), runtime_(facebook::hermes::makeHermesRuntime()), identity_(acquireRuntimeId()) {
     callbacks_ = std::make_unique<CallbackRegistry>(
-        *runtime_, 4096, acquireRuntimeId());
+        *runtime_, 4096, identity_);
     installHost();
   }
 
   void load(const std::string& source, const std::string& sourceUrl) {
-    if (app_) throw std::runtime_error("A Defold Hermes application is already loaded");
+    if (loaded_) throw std::runtime_error("A Defold Hermes application is already loaded");
 
     auto buffer = std::make_shared<jsi::StringBuffer>(source);
     runtime_->evaluateJavaScript(buffer, sourceUrl);
-    captureApplication();
+    captureEntrypoints();
   }
 
   void loadStatic(
       const StaticUnitCreator* unitCreators,
       size_t unitCount,
       const std::string&) {
-    if (app_) throw std::runtime_error("A Defold Hermes application is already loaded");
+    if (loaded_) throw std::runtime_error("A Defold Hermes application is already loaded");
     if (!unitCreators || unitCount == 0) {
       throw std::invalid_argument("Static Hermes application requires at least one unit");
     }
@@ -65,13 +68,19 @@ class Runtime::Impl {
       if (!unitCreators[index]) throw std::invalid_argument("Static Hermes unit creator is null");
       hermes->evaluateSHUnit(unitCreators[index]);
     }
-    captureApplication();
+    captureEntrypoints();
   }
 
-  void captureApplication() {
-    auto value = runtime_->global().getProperty(*runtime_, "__defoldAppV1");
-    if (!value.isObject()) throw jsi::JSError(*runtime_, "Application did not register");
-    app_ = std::make_unique<jsi::Object>(value.asObject(*runtime_));
+  void captureEntrypoints() {
+    auto application = runtime_->global().getProperty(*runtime_, "__defoldAppV1");
+    auto components = runtime_->global().getProperty(*runtime_, "__defoldComponentsV1");
+    if (!application.isObject() && !components.isObject()) {
+      throw jsi::JSError(*runtime_, "Bundle registered neither __defoldAppV1 nor __defoldComponentsV1");
+    }
+    if (application.isObject()) {
+      app_ = std::make_unique<jsi::Object>(application.asObject(*runtime_));
+    }
+    loaded_ = true;
   }
 
   void init() { callOptional("init"); }
@@ -87,16 +96,181 @@ class Runtime::Impl {
   }
 
   void finalize() {
+    std::exception_ptr firstFailure;
+    try {
+      finalizeComponents();
+    } catch (...) {
+      firstFailure = std::current_exception();
+    }
     try {
       callOptional("final");
     } catch (...) {
-      app_.reset();
-      throw;
+      if (!firstFailure) firstFailure = std::current_exception();
     }
     app_.reset();
+    loaded_ = false;
+    if (firstFailure) std::rethrow_exception(firstFailure);
   }
 
+  ComponentHandle attachComponent(const char* componentId, const char* schemaFingerprint,
+      ComponentContext context) {
+    if (!componentId || !schemaFingerprint) throw std::invalid_argument("Component identity is missing");
+    size_t slotIndex = componentSlots_.size();
+    for (size_t index = 0; index < componentSlots_.size(); ++index) if (!componentSlots_[index].live) { slotIndex = index; break; }
+    if (slotIndex == componentSlots_.size()) throw std::runtime_error("Component instance pool is exhausted");
+    auto entryValue = runtime_->global().getProperty(*runtime_, "__defoldComponentsV1");
+    if (!entryValue.isObject()) throw jsi::JSError(*runtime_, "Component registry is not installed");
+    auto registry = entryValue.asObject(*runtime_);
+    auto definitionValue = registry.getProperty(*runtime_, componentId);
+    if (!definitionValue.isObject()) throw jsi::JSError(*runtime_, std::string("Component is not registered: ") + componentId);
+    auto entry = definitionValue.asObject(*runtime_);
+    auto schema = entry.getProperty(*runtime_, "schemaFingerprint");
+    auto contextValue = entry.getProperty(*runtime_, "contextKind");
+    auto definition = entry.getProperty(*runtime_, "definition");
+    if (!schema.isString() || schema.getString(*runtime_).utf8(*runtime_) != schemaFingerprint)
+      throw jsi::JSError(*runtime_, "Component schema fingerprint is stale");
+    const char* expectedContext = context == ComponentContext::kGameObject ? "game-object" :
+        context == ComponentContext::kGuiScene ? "gui-scene" : "render-instance+graphics";
+    if (!contextValue.isString() || contextValue.getString(*runtime_).utf8(*runtime_) != expectedContext)
+      throw jsi::JSError(*runtime_, "Component context does not match its registration");
+    if (!definition.isObject()) throw jsi::JSError(*runtime_, "Component definition is not an object");
+    ComponentSlot& slot = componentSlots_[slotIndex];
+    slot.definition.emplace(definition.asObject(*runtime_));
+    slot.self.emplace(*runtime_);
+    slot.componentId = componentId;
+    slot.schemaFingerprint = schemaFingerprint;
+    slot.context = context;
+    slot.live = true;
+    ++liveComponents_;
+    return {static_cast<uint32_t>(slotIndex), slot.generation};
+  }
+
+  void setComponentProperty(ComponentHandle handle, const char* name, const ComponentValue& value) {
+    ComponentSlot& slot = resolve(handle);
+    if (!name) throw std::invalid_argument("Component property name is null");
+    slot.self->setProperty(*runtime_, name, decodeComponentValue(value));
+  }
+
+  bool dispatchComponent(ComponentHandle handle, const char* lifecycle,
+      const ComponentArgument* arguments, uint8_t argumentCount) {
+    ComponentSlot& slot = resolve(handle);
+    if (!lifecycle || argumentCount > 4 || (argumentCount && !arguments))
+      throw std::invalid_argument("Component dispatch arguments are invalid");
+    auto hookValue = slot.definition->getProperty(*runtime_, lifecycle);
+    if (hookValue.isUndefined() || hookValue.isNull()) return false;
+    if (!hookValue.isObject() || !hookValue.asObject(*runtime_).isFunction(*runtime_))
+      throw jsi::JSError(*runtime_, std::string("Component hook is not a function: ") + lifecycle);
+    std::array<jsi::Value, 5> values;
+    values[0] = jsi::Value(*runtime_, *slot.self);
+    for (uint8_t index = 0; index < argumentCount; ++index) values[index + 1] = decodeComponentArgument(arguments[index]);
+    const jsi::Value* jsArguments = values.data();
+    auto result = hookValue.asObject(*runtime_).asFunction(*runtime_).callWithThis(
+        *runtime_, *slot.definition, jsArguments, static_cast<size_t>(argumentCount) + 1);
+    if (std::strcmp(lifecycle, "onInput") == 0) {
+      if (!result.isBool()) throw jsi::JSError(*runtime_, "Component onInput must return an exact boolean");
+      return result.getBool();
+    }
+    return false;
+  }
+
+  void reloadComponent(ComponentHandle handle) {
+    ComponentSlot& slot = resolve(handle);
+    auto registryValue = runtime_->global().getProperty(*runtime_, "__defoldComponentsV1");
+    if (!registryValue.isObject()) throw jsi::JSError(*runtime_, "Component registry is not installed during reload");
+    auto entryValue = registryValue.asObject(*runtime_).getProperty(*runtime_, slot.componentId.c_str());
+    if (!entryValue.isObject()) throw jsi::JSError(*runtime_, "Component disappeared during reload");
+    auto definition = entryValue.asObject(*runtime_).getProperty(*runtime_, "definition");
+    if (!definition.isObject()) throw jsi::JSError(*runtime_, "Reloaded component definition is invalid");
+    slot.definition.emplace(definition.asObject(*runtime_));
+    dispatchComponent(handle, "onReload", nullptr, 0);
+  }
+
+  void detachComponent(ComponentHandle handle) {
+    if (handle.slot >= componentSlots_.size()) return;
+    ComponentSlot& slot = componentSlots_[handle.slot];
+    if (!slot.live || slot.generation != handle.generation) return;
+    slot.definition.reset(); slot.self.reset(); slot.componentId.clear(); slot.schemaFingerprint.clear(); slot.live = false;
+    if (++slot.generation == 0) ++slot.generation;
+    --liveComponents_;
+  }
+
+  uint32_t liveComponents() const { return liveComponents_; }
+  uint32_t identity() const noexcept { return identity_; }
+
  private:
+  struct ComponentSlot {
+    std::optional<jsi::Object> definition;
+    std::optional<jsi::Object> self;
+    std::string componentId;
+    std::string schemaFingerprint;
+    ComponentContext context = ComponentContext::kGameObject;
+    uint32_t generation = 1;
+    bool live = false;
+  };
+
+  ComponentSlot& resolve(ComponentHandle handle) {
+    if (handle.slot >= componentSlots_.size()) throw std::runtime_error("Component handle is out of range");
+    ComponentSlot& slot = componentSlots_[handle.slot];
+    if (!slot.live || slot.generation != handle.generation) throw std::runtime_error("Component handle is stale");
+    return slot;
+  }
+
+  jsi::Value decodeComponentValue(const ComponentValue& value) {
+    switch (value.kind) {
+      case ComponentValueKind::kNil: return jsi::Value(nullptr);
+      case ComponentValueKind::kBoolean: return jsi::Value(value.boolean);
+      case ComponentValueKind::kNumber: return jsi::Value(value.number);
+      case ComponentValueKind::kString:
+        return jsi::String::createFromUtf8(*runtime_, reinterpret_cast<const uint8_t*>(value.string), value.stringLength);
+      case ComponentValueKind::kHash:
+        return jsi::Value(*runtime_, jsi::BigInt::fromUint64(*runtime_, value.lanes64[0]));
+      case ComponentValueKind::kUrl: {
+        jsi::Object object(*runtime_); object.setProperty(*runtime_, "__dehermUrlV1", true);
+        constexpr const char* names[] = {"socket", "reserved", "path", "fragment"};
+        for (size_t index = 0; index < 4; ++index)
+          object.setProperty(*runtime_, names[index], jsi::Value(*runtime_, jsi::BigInt::fromUint64(*runtime_, value.lanes64[index])));
+        return object;
+      }
+      case ComponentValueKind::kVector3:
+      case ComponentValueKind::kVector4:
+      case ComponentValueKind::kQuaternion: {
+        jsi::Object object(*runtime_);
+        const char* kind = value.kind == ComponentValueKind::kVector3 ? "vector3" : value.kind == ComponentValueKind::kVector4 ? "vector4" : "quaternion";
+        object.setProperty(*runtime_, "__dehermValueKind", jsi::String::createFromAscii(*runtime_, kind));
+        constexpr const char* names[] = {"x", "y", "z", "w"};
+        const size_t count = value.kind == ComponentValueKind::kVector3 ? 3 : 4;
+        for (size_t index = 0; index < count; ++index) object.setProperty(*runtime_, names[index], value.lanes32[index]);
+        return object;
+      }
+    }
+    return jsi::Value::undefined();
+  }
+
+  jsi::Value decodeComponentArgument(const ComponentArgument& argument) {
+    if (!argument.fields) return decodeComponentValue(argument.value);
+    jsi::Object object(*runtime_);
+    for (uint8_t index = 0; index < argument.fieldCount; ++index) {
+      if (!argument.fields[index].name) throw std::invalid_argument("Component table field has no name");
+      object.setProperty(*runtime_, argument.fields[index].name, decodeComponentValue(argument.fields[index].value));
+    }
+    return object;
+  }
+
+  void finalizeComponents() {
+    std::exception_ptr firstFailure;
+    for (uint32_t index = 0; index < componentSlots_.size(); ++index) {
+      ComponentSlot& slot = componentSlots_[index];
+      if (!slot.live) continue;
+      try {
+        dispatchComponent({index, slot.generation}, "final", nullptr, 0);
+      } catch (...) {
+        if (!firstFailure) firstFailure = std::current_exception();
+      }
+      detachComponent({index, slot.generation});
+    }
+    if (firstFailure) std::rethrow_exception(firstFailure);
+  }
+
   void installHost() {
     jsi::Object hostObject(*runtime_);
     hostObject.setProperty(*runtime_, "version", 1);
@@ -156,7 +330,8 @@ class Runtime::Impl {
       const char* name,
       const jsi::Value* args = nullptr,
       size_t count = 0) {
-    if (!app_) throw std::runtime_error("No Defold Hermes application is loaded");
+    if (!loaded_) throw std::runtime_error("No Defold Hermes bundle is loaded");
+    if (!app_) return;
     auto value = app_->getProperty(*runtime_, name);
     if (value.isUndefined() || value.isNull()) return;
     if (!value.isObject() || !value.asObject(*runtime_).isFunction(*runtime_)) {
@@ -169,8 +344,12 @@ class Runtime::Impl {
 
   Host& host_;
   std::unique_ptr<jsi::Runtime> runtime_;
+  uint32_t identity_ = 0;
   std::unique_ptr<CallbackRegistry> callbacks_;
   std::unique_ptr<jsi::Object> app_;
+  bool loaded_ = false;
+  std::array<ComponentSlot, 256> componentSlots_{};
+  uint32_t liveComponents_ = 0;
 
  public:
   bool invokeCallback(lua_bridge::Handle callback, uint32_t timer, double elapsed) {
@@ -206,6 +385,13 @@ bool Runtime::releaseCallback(lua_bridge::Handle callback) {
 }
 const char* Runtime::callbackError() const { return impl_->callbackError(); }
 uint32_t Runtime::liveCallbacks() const { return impl_->liveCallbacks(); }
+Runtime::ComponentHandle Runtime::attachComponent(const char* id, const char* schema, ComponentContext context) { return impl_->attachComponent(id, schema, context); }
+void Runtime::setComponentProperty(ComponentHandle handle, const char* name, const ComponentValue& value) { impl_->setComponentProperty(handle, name, value); }
+bool Runtime::dispatchComponent(ComponentHandle handle, const char* lifecycle, const ComponentArgument* arguments, uint8_t count) { return impl_->dispatchComponent(handle, lifecycle, arguments, count); }
+void Runtime::reloadComponent(ComponentHandle handle) { impl_->reloadComponent(handle); }
+void Runtime::detachComponent(ComponentHandle handle) { impl_->detachComponent(handle); }
+uint32_t Runtime::liveComponents() const { return impl_->liveComponents(); }
+uint32_t Runtime::identity() const noexcept { return impl_->identity(); }
 
 }  // namespace defold_hermes
 

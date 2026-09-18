@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.deherm.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": true,
+    "tsBuildInfoFile": "./.deherm/cache/typescript/gui.tsbuildinfo",
+    "paths": {
+      "@deherm/project": [
+        "./.deherm/sdk/contexts/gui.ts"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    ".deherm/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.script.ts",
+    "**/*.render.ts",
+    "node_modules/**",
+    ".internal/**",
+    "build/**",
+    "dist/**"
+  ]
+}

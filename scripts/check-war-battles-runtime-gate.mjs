@@ -10,7 +10,7 @@ import {
 } from "./lib/war-battles-runtime-gate.mjs";
 
 const repositoryRoot = path.resolve(fileURLToPath(new URL("../", import.meta.url)));
-const reportPath = path.join(repositoryRoot, "knowledge/data/war-battles-runtime-gate.json");
+const reportPath = path.join(repositoryRoot, ".agents/docs/data/war-battles-runtime-gate.json");
 
 function parseArguments(argv) {
   const options = { check: false, requireReady: false };

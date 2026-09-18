@@ -1,0 +1,55 @@
+export const WEAPON_CANNON = 1;
+export const WEAPON_AUTOCANNON = 2;
+export const WEAPON_RAILGUN = 3;
+
+export const UPGRADE_DAMAGE = 1;
+export const UPGRADE_MOBILITY = 2;
+export const UPGRADE_ARMOR = 3;
+
+export interface WeaponDefinition {
+  readonly id: number;
+  readonly name: string;
+  readonly damage: number;
+  readonly projectileSpeed: number;
+  readonly cooldownTicks: number;
+  readonly lifetimeTicks: number;
+}
+
+export interface UpgradeDefinition {
+  readonly id: number;
+  readonly name: string;
+  readonly maximumLevel: number;
+  readonly baseCost: number;
+  readonly costPerLevel: number;
+}
+
+// Indexed by the wire id. Index zero is an intentional invalid sentinel.
+export const WEAPONS: readonly (WeaponDefinition | undefined)[] = Object.freeze([
+  undefined,
+  Object.freeze({ id: WEAPON_CANNON, name: "cannon", damage: 25, projectileSpeed: 192, cooldownTicks: 18, lifetimeTicks: 90 }),
+  Object.freeze({ id: WEAPON_AUTOCANNON, name: "autocannon", damage: 10, projectileSpeed: 224, cooldownTicks: 6, lifetimeTicks: 72 }),
+  Object.freeze({ id: WEAPON_RAILGUN, name: "railgun", damage: 45, projectileSpeed: 320, cooldownTicks: 36, lifetimeTicks: 60 }),
+]);
+
+export const UPGRADES: readonly (UpgradeDefinition | undefined)[] = Object.freeze([
+  undefined,
+  Object.freeze({ id: UPGRADE_DAMAGE, name: "damage", maximumLevel: 3, baseCost: 100, costPerLevel: 75 }),
+  Object.freeze({ id: UPGRADE_MOBILITY, name: "mobility", maximumLevel: 3, baseCost: 100, costPerLevel: 75 }),
+  Object.freeze({ id: UPGRADE_ARMOR, name: "armor", maximumLevel: 3, baseCost: 125, costPerLevel: 100 }),
+]);
+
+export function weaponById(id: number): WeaponDefinition {
+  const weapon = WEAPONS[id];
+  if (weapon === undefined) throw new RangeError(`unknown weapon id ${id}`);
+  return weapon;
+}
+
+export function upgradeById(id: number): UpgradeDefinition {
+  const upgrade = UPGRADES[id];
+  if (upgrade === undefined) throw new RangeError(`unknown upgrade id ${id}`);
+  return upgrade;
+}
+
+export function upgradeCost(upgrade: UpgradeDefinition, currentLevel: number): number {
+  return upgrade.baseCost + upgrade.costPerLevel * currentLevel;
+}

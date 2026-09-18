@@ -1,0 +1,17 @@
+[project]
+title = War Battles Online Capability-Gated Skeleton
+version = 0.1.0
+
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[input]
+game_binding = /input/game.input_bindingc
+
+[display]
+width = 1280
+height = 720
+high_dpi = 1
+
+[script]
+shared_state = 0

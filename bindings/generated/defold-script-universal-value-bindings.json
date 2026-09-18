@@ -1,0 +1,3684 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "Every accounting-pending Lua-table or multi-result route selected mechanically by one bounded universal value-graph policy, excluding existing optimized table-record routes.",
+  "evidenceBoundary": "The shared recursive Lua backend, fixed-layout C ABI, Static Hermes declaration, and direct-memory browser provider are generated and independently harness-tested. Packaged Defold engine execution and an actual Static Hermes runtime call remain unverified.",
+  "selection": {
+    "accountingCategory": "pending",
+    "loweringFamilies": [
+      "lua-table",
+      "multi-result"
+    ],
+    "excludedContexts": [
+      "component-property-compiler"
+    ],
+    "excludedLoweringFamilies": [
+      "separate-module"
+    ],
+    "callbacks": "reject-from-this-family",
+    "variadics": "bounded-by-global-argument-capacity",
+    "optimizedFamilies": "remain-on-their-specialized-lanes"
+  },
+  "bounds": {
+    "maximumArguments": 32,
+    "maximumDepth": 8,
+    "maximumEntries": 256,
+    "maximumStringBytes": 65536
+  },
+  "tablePolicy": {
+    "arrays": "dense-one-based-lua-sequence",
+    "objects": "own-enumerable-string-keys",
+    "maps": "exact-js-map-keys",
+    "cycles": "reject",
+    "duplicateKeys": "last-write-is-lua-semantics",
+    "unsupportedValues": "reject-before-lua-call"
+  },
+  "candidateCount": 158,
+  "excludedCount": 3,
+  "targetSupport": {
+    "nativeDynamicHermes": "generated-recursive-jsi-lua-adapter-native-harness-proven-packaged-engine-unverified",
+    "nativeStaticHermes": "generated-caller-owned-c-abi-native-runtime-harness-and-static-compiler-proven-runtime-unverified",
+    "html5BrowserHost": "generated-direct-wasm-memory-provider-node-harness-proven-packaged-browser-engine-unverified"
+  },
+  "targetEvidence": {
+    "nativeDynamicHermes": {
+      "compile": "proven",
+      "harnessRuntime": "proven",
+      "packagedDefold": "unverified"
+    },
+    "nativeStaticHermes": {
+      "cAbiCompileLinkRuntime": "proven",
+      "staticCompiler": "proven",
+      "staticHermesRuntime": "unverified",
+      "packagedDefold": "unverified"
+    },
+    "html5BrowserHost": {
+      "providerSyntax": "proven",
+      "directMemoryHarness": "proven",
+      "packagedBrowserEngine": "unverified"
+    }
+  },
+  "inputHashes": {
+    "projection": "13d6e8543544fd344c448b769d87d00b8ad62c9e6b20b2dfb9b6c3dab87d8041",
+    "accounting": "edc48fb2e3c6aeeeabebcae531e1b052f688a11af49111585d4aaab8928ab044",
+    "tableRecords": "cee6a771a3fe7870ef8321f1a616c1e64b8ab7b0f7c4e5ef8b0919d221b6a3fd",
+    "policy": "52b4d3d90c1e2f0b5e788e480574f32190b02b2bbaa5257a98a5233a0429902a"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",
+    "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h",
+    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp",
+    "packages/sdk/src/generated/script/universal-value-bindings.ts",
+    "packages/static-hermes/src/generated/script-universal-value.ts",
+    "defold/defold_hermes/lib/web/generated_script_universal_value.js"
+  ],
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp": "1b7c1724c26de49e41cdf1ccf3c64a55be5813d3d4761da62c0efd948c3fc51a",
+    "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": "b62c8e49bfabaec12372f18f873fc9c80074e40890bcaa36371f43c09dbae481",
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": "5c182962a5bae4f4d4b3010fd55095bc3623a31da46f54a1287360c563bd46bf",
+    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "1ebb256ef5eeecbc469cc6a6fcb57bf5e6e4e83fc78fb6de02cecd50c197b2a1",
+    "packages/sdk/src/generated/script/universal-value-bindings.ts": "cde28b6e113a6c1dd070fd12ce1b1d0e802eb5a70dee17261c40cc2489bc2c9b",
+    "packages/static-hermes/src/generated/script-universal-value.ts": "c4b0786b979b24f4719673be6a0d98063f40e012b7abb5a93eb20dda7b3eac36",
+    "defold/defold_hermes/lib/web/generated_script_universal_value.js": "857b0e9ee96e7f1491e40188cd8361041c4b329b6726678cd62349168eb477b2"
+  },
+  "bindings": [
+    {
+      "id": "script:physics.raycast",
+      "stableId": 2636616,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "raycast",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_motor",
+      "stableId": 61804422,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_motor",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.world.cast_mover",
+      "stableId": 81357101,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "cast_mover",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "handle",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_pulley",
+      "stableId": 105428164,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_pulley",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.create_sound_data",
+      "stableId": 109392419,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_sound_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.overlap_aabb",
+      "stableId": 151808511,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "overlap_aabb",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.get_contact_data",
+      "stableId": 153831824,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "get_contact_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:image.load",
+      "stableId": 172398549,
+      "modulePath": [
+        "image"
+      ],
+      "member": "load",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "optional",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:gui.set",
+      "stableId": 222109861,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 4,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.select",
+      "stableId": 238271325,
+      "modulePath": [
+        "socket"
+      ],
+      "member": "select",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 3,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "map",
+        "named",
+        "optional",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:timer.get_info",
+      "stableId": 351971804,
+      "modulePath": [
+        "timer"
+      ],
+      "member": "get_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_hinge2",
+      "stableId": 358009820,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_hinge2",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_filter",
+      "stableId": 365344467,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_filter",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.chain.get_segments",
+      "stableId": 371299188,
+      "modulePath": [
+        "b2d",
+        "chain"
+      ],
+      "member": "get_segments",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.set_buffer",
+      "stableId": 446567953,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_buffer",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.shape.set_shape",
+      "stableId": 447070167,
+      "modulePath": [
+        "b2d",
+        "shape"
+      ],
+      "member": "set_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.serialize",
+      "stableId": 466939425,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "serialize",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "dynamic",
+        "map",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.overlap_point",
+      "stableId": 499375609,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "overlap_point",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.shape.get_shape",
+      "stableId": 510086131,
+      "modulePath": [
+        "b2d",
+        "shape"
+      ],
+      "member": "get_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_friction",
+      "stableId": 517998087,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_friction",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.shape.get_contact_data",
+      "stableId": 555667827,
+      "modulePath": [
+        "b2d",
+        "shape"
+      ],
+      "member": "get_contact_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.tcp",
+      "stableId": 557192288,
+      "modulePath": [
+        "socket"
+      ],
+      "member": "tcp",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:b2d.world.collide_mover",
+      "stableId": 561737880,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "collide_mover",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:render.clear",
+      "stableId": 583164307,
+      "modulePath": [
+        "render"
+      ],
+      "member": "clear",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "enum",
+        "map",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:model.get_aabb",
+      "stableId": 621943862,
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_aabb",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.create_texture",
+      "stableId": 646924158,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_texture",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.get_mass_data",
+      "stableId": 662219582,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "get_mass_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:gui.get",
+      "stableId": 683614105,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.create_buffer",
+      "stableId": 684194101,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_buffer",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_distance",
+      "stableId": 706695518,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_distance",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:render.set_render_target",
+      "stableId": 787481085,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_render_target",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.save",
+      "stableId": 798578280,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "save",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "dynamic",
+        "map",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.get_transform",
+      "stableId": 842021223,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "get_transform",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sound.stop",
+      "stableId": 851439019,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "stop",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.fixture.get_aabb",
+      "stableId": 941873080,
+      "modulePath": [
+        "b2d",
+        "fixture"
+      ],
+      "member": "get_aabb",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.fixture.set_filter_data",
+      "stableId": 943485969,
+      "modulePath": [
+        "b2d",
+        "fixture"
+      ],
+      "member": "set_filter_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:camera.get_cameras",
+      "stableId": 1001666066,
+      "modulePath": [
+        "camera"
+      ],
+      "member": "get_cameras",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:material.set_constants",
+      "stableId": 1039973353,
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_constants",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "named",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.connect",
+      "stableId": 1054417193,
+      "modulePath": [
+        "socket"
+      ],
+      "member": "connect",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 5,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:material.get_vertex_attributes",
+      "stableId": 1070053126,
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_vertex_attributes",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.get_shapes",
+      "stableId": 1090315027,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "get_shapes",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_cone_twist",
+      "stableId": 1095019524,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_cone_twist",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.fixture.get_shape",
+      "stableId": 1143938691,
+      "modulePath": [
+        "b2d",
+        "fixture"
+      ],
+      "member": "get_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.get_ifaddrs",
+      "stableId": 1174885233,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_ifaddrs",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:physics.get_shape",
+      "stableId": 1220373797,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:crash.get_modules",
+      "stableId": 1244117951,
+      "modulePath": [
+        "crash"
+      ],
+      "member": "get_modules",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.load",
+      "stableId": 1260100361,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "load",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "dynamic",
+        "map",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.get_collision_objects",
+      "stableId": 1273138459,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "get_collision_objects",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.get_application_info",
+      "stableId": 1294659359,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_application_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.dns.tohostname",
+      "stableId": 1298827590,
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "tohostname",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "optional",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:compute.get_samplers",
+      "stableId": 1345946881,
+      "modulePath": [
+        "compute"
+      ],
+      "member": "get_samplers",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:window.get_safe_area",
+      "stableId": 1389820634,
+      "modulePath": [
+        "window"
+      ],
+      "member": "get_safe_area",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:render.draw",
+      "stableId": 1437640116,
+      "modulePath": [
+        "render"
+      ],
+      "member": "draw",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:image.load_buffer",
+      "stableId": 1439789256,
+      "modulePath": [
+        "image"
+      ],
+      "member": "load_buffer",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "optional",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:vmath.vector",
+      "stableId": 1453669465,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "vector",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.udp6",
+      "stableId": 1576371206,
+      "modulePath": [
+        "socket"
+      ],
+      "member": "udp6",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:b2d.body.create_shape",
+      "stableId": 1659255850,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "create_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.world.get_counters",
+      "stableId": 1668733628,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "get_counters",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:buffer.set_metadata",
+      "stableId": 1693174388,
+      "modulePath": [
+        "buffer"
+      ],
+      "member": "set_metadata",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "enum",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:gui.clone_tree",
+      "stableId": 1696161745,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "clone_tree",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.get_sys_info",
+      "stableId": 1715761682,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_sys_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:profiler.view_recorded_frame",
+      "stableId": 1794446851,
+      "modulePath": [
+        "profiler"
+      ],
+      "member": "view_recorded_frame",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "record",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.world.explode",
+      "stableId": 1803447493,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "explode",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:render.dispatch_compute",
+      "stableId": 1831038998,
+      "modulePath": [
+        "render"
+      ],
+      "member": "dispatch_compute",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.rigid_body.compute_aabb",
+      "stableId": 1844217383,
+      "modulePath": [
+        "bullet3d",
+        "rigid_body"
+      ],
+      "member": "compute_aabb",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_point_to_point",
+      "stableId": 1855979400,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_point_to_point",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:font.get_info",
+      "stableId": 1863401472,
+      "modulePath": [
+        "font"
+      ],
+      "member": "get_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:material.get_samplers",
+      "stableId": 1893279761,
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_samplers",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_generic_6dof",
+      "stableId": 1926428006,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_generic_6dof",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:graphics.get_engine_adapters",
+      "stableId": 1938117379,
+      "modulePath": [
+        "graphics"
+      ],
+      "member": "get_engine_adapters",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.create_atlas",
+      "stableId": 1985681678,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_atlas",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:graphics.get_adapter_info",
+      "stableId": 1995008024,
+      "modulePath": [
+        "graphics"
+      ],
+      "member": "get_adapter_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.open_url",
+      "stableId": 2064699563,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "open_url",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.shape.get_mass_data",
+      "stableId": 2170719947,
+      "modulePath": [
+        "b2d",
+        "shape"
+      ],
+      "member": "get_mass_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:material.get_constants",
+      "stableId": 2177588733,
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_constants",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:liveupdate.get_mounts",
+      "stableId": 2185826800,
+      "modulePath": [
+        "liveupdate"
+      ],
+      "member": "get_mounts",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.chain.get_geometry",
+      "stableId": 2230884954,
+      "modulePath": [
+        "b2d",
+        "chain"
+      ],
+      "member": "get_geometry",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.dns.getnameinfo",
+      "stableId": 2254437809,
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "getnameinfo",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "optional",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.cast_shape_closest",
+      "stableId": 2301414672,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "cast_shape_closest",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "handle",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.load_resource",
+      "stableId": 2308150026,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "load_resource",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "optional",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:material.get_textures",
+      "stableId": 2324364704,
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_textures",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:tilemap.get_tiles",
+      "stableId": 2340730158,
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_tiles",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.fixture.set_shape",
+      "stableId": 2376748487,
+      "modulePath": [
+        "b2d",
+        "fixture"
+      ],
+      "member": "set_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:physics.get_joint_properties",
+      "stableId": 2390276224,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_joint_properties",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:gui.stop_particlefx",
+      "stableId": 2397019292,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "stop_particlefx",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.get_text_metrics",
+      "stableId": 2409976854,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_text_metrics",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.shape.get_shape",
+      "stableId": 2460977400,
+      "modulePath": [
+        "bullet3d",
+        "shape"
+      ],
+      "member": "get_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sound.get_groups",
+      "stableId": 2474752686,
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_groups",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:go.get",
+      "stableId": 2488072860,
+      "modulePath": [
+        "go"
+      ],
+      "member": "get",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.get_joints",
+      "stableId": 2537079216,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "get_joints",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:render.draw_debug3d",
+      "stableId": 2546261723,
+      "modulePath": [
+        "render"
+      ],
+      "member": "draw_debug3d",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 1,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.collision_object.get_shapes",
+      "stableId": 2552628718,
+      "modulePath": [
+        "bullet3d",
+        "collision_object"
+      ],
+      "member": "get_shapes",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_mouse",
+      "stableId": 2585544600,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_mouse",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.tcp6",
+      "stableId": 2653029218,
+      "modulePath": [
+        "socket"
+      ],
+      "member": "tcp6",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:physics.raycast_async",
+      "stableId": 2653555167,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "raycast_async",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_rope",
+      "stableId": 2656060889,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_rope",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.get_fixtures",
+      "stableId": 2698008815,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "get_fixtures",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:compute.get_constants",
+      "stableId": 2714229261,
+      "modulePath": [
+        "compute"
+      ],
+      "member": "get_constants",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.world.get_profile",
+      "stableId": 2730780762,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "get_profile",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:physics.create_joint",
+      "stableId": 2781780682,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "create_joint",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 6,
+      "maximumArgumentCount": 7,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "enum",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.cast_shape",
+      "stableId": 2801399124,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "cast_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 5,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.compute_aabb",
+      "stableId": 2872022140,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "compute_aabb",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:render.predicate",
+      "stableId": 2906327255,
+      "modulePath": [
+        "render"
+      ],
+      "member": "predicate",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.get_texture_info",
+      "stableId": 2929492759,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_texture_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:physics.set_shape",
+      "stableId": 2940108129,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.shape.ray_cast",
+      "stableId": 2941793277,
+      "modulePath": [
+        "b2d",
+        "shape"
+      ],
+      "member": "ray_cast",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "handle",
+        "optional",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+      "stableId": 2945060114,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_generic_6dof_spring",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.overlap_shape",
+      "stableId": 2945268910,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "overlap_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:go.set",
+      "stableId": 2949577104,
+      "modulePath": [
+        "go"
+      ],
+      "member": "set",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_gear",
+      "stableId": 3014196138,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_gear",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:compute.get_textures",
+      "stableId": 3022270032,
+      "modulePath": [
+        "compute"
+      ],
+      "member": "get_textures",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:particlefx.stop",
+      "stableId": 3044283654,
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "stop",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:gui.get_tree",
+      "stableId": 3059686062,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_tree",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.fixture.get_filter_data",
+      "stableId": 3062165453,
+      "modulePath": [
+        "b2d",
+        "fixture"
+      ],
+      "member": "get_filter_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_weld",
+      "stableId": 3107146269,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_weld",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:compute.set_samplers",
+      "stableId": 3114313573,
+      "modulePath": [
+        "compute"
+      ],
+      "member": "set_samplers",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "named",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:material.set_textures",
+      "stableId": 3114410068,
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_textures",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.create_chain",
+      "stableId": 3116923594,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "create_chain",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_hinge",
+      "stableId": 3217284614,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_hinge",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.cast_ray_closest",
+      "stableId": 3246574173,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "cast_ray_closest",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "handle",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.shape.get_sensor_overlaps",
+      "stableId": 3266602473,
+      "modulePath": [
+        "b2d",
+        "shape"
+      ],
+      "member": "get_sensor_overlaps",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_prismatic",
+      "stableId": 3277564767,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_prismatic",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.set_texture",
+      "stableId": 3344570634,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_texture",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:buffer.get_metadata",
+      "stableId": 3373475968,
+      "modulePath": [
+        "buffer"
+      ],
+      "member": "get_metadata",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "enum",
+        "optional",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:physics.set_joint_properties",
+      "stableId": 3377735404,
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_joint_properties",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.udp",
+      "stableId": 3428878228,
+      "modulePath": [
+        "socket"
+      ],
+      "member": "udp",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:material.set_vertex_attributes",
+      "stableId": 3500426026,
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_vertex_attributes",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "named",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:collectionfactory.create",
+      "stableId": 3514780936,
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "create",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 5,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "dynamic",
+        "map",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.get_render_target_info",
+      "stableId": 3518036150,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_render_target_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_slider",
+      "stableId": 3528448698,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_slider",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "optional",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:compute.set_textures",
+      "stableId": 3559237732,
+      "modulePath": [
+        "compute"
+      ],
+      "member": "set_textures",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_wheel",
+      "stableId": 3577999200,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_wheel",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:model.get_blend_weights",
+      "stableId": 3593377177,
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_blend_weights",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:crash.get_backtrace",
+      "stableId": 3602643930,
+      "modulePath": [
+        "crash"
+      ],
+      "member": "get_backtrace",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.get_engine_info",
+      "stableId": 3618995147,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_engine_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:compute.set_constants",
+      "stableId": 3697623257,
+      "modulePath": [
+        "compute"
+      ],
+      "member": "set_constants",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "named",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.shape.set_shape",
+      "stableId": 3770671780,
+      "modulePath": [
+        "bullet3d",
+        "shape"
+      ],
+      "member": "set_shape",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.constraint.create_universal",
+      "stableId": 3786780596,
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "create_universal",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:buffer.create",
+      "stableId": 3797079608,
+      "modulePath": [
+        "buffer"
+      ],
+      "member": "create",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.get_atlas",
+      "stableId": 3804314878,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_atlas",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:tilemap.get_tile_info",
+      "stableId": 3858575418,
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_tile_info",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 4,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.body.set_mass_data",
+      "stableId": 3871283770,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "set_mass_data",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.contact_test",
+      "stableId": 3921827144,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "contact_test",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:gui.get_layouts",
+      "stableId": 3963041037,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_layouts",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 0,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:sys.deserialize",
+      "stableId": 4006243984,
+      "modulePath": [
+        "sys"
+      ],
+      "member": "deserialize",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "dynamic",
+        "map",
+        "scalar"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.cast_ray",
+      "stableId": 4013454581,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "cast_ray",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 5,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.dns.getaddrinfo",
+      "stableId": 4017512905,
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "getaddrinfo",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "optional",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:material.set_samplers",
+      "stableId": 4042791701,
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_samplers",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "named",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:collectionproxy.get_resources",
+      "stableId": 4052177648,
+      "modulePath": [
+        "collectionproxy"
+      ],
+      "member": "get_resources",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:socket.dns.toip",
+      "stableId": 4052701394,
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "toip",
+      "loweringFamily": "multi-result",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 2,
+      "variadic": false,
+      "shapeKinds": [
+        "optional",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "acyclic-value-shape"
+      }
+    },
+    {
+      "id": "script:render.set_camera",
+      "stableId": 4056267072,
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_camera",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 0,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:gui.get_layout_objects",
+      "stableId": 4089348591,
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_layout_objects",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:resource.set_atlas",
+      "stableId": 4144449218,
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_atlas",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:model.set_blend_weights",
+      "stableId": 4149119709,
+      "modulePath": [
+        "model"
+      ],
+      "member": "set_blend_weights",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 2,
+      "resultCount": 0,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "optional",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:label.get_layout_objects",
+      "stableId": 4187510320,
+      "modulePath": [
+        "label"
+      ],
+      "member": "get_layout_objects",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "record-ref",
+        "scalar",
+        "sequence",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:bullet3d.world.contact_pair_test",
+      "stableId": 4259613133,
+      "modulePath": [
+        "bullet3d",
+        "world"
+      ],
+      "member": "contact_pair_test",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 3,
+      "maximumArgumentCount": 4,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref",
+        "scalar",
+        "sequence"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:b2d.joint.create_revolute",
+      "stableId": 4268006875,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "create_revolute",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 2,
+      "maximumArgumentCount": 3,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "handle",
+        "record-ref"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    },
+    {
+      "id": "script:model.get_mesh_aabb",
+      "stableId": 4275324396,
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_mesh_aabb",
+      "loweringFamily": "lua-table",
+      "minimumArgumentCount": 1,
+      "maximumArgumentCount": 1,
+      "resultCount": 1,
+      "variadic": false,
+      "shapeKinds": [
+        "defold-value",
+        "map",
+        "named",
+        "scalar",
+        "union"
+      ],
+      "recursive": {
+        "token": "recursive-value-graph",
+        "cyclePolicy": "policy-unresolved"
+      }
+    }
+  ],
+  "excluded": [
+    {
+      "id": "script:b2d.get_version",
+      "loweringFamily": "lua-table",
+      "context": "global",
+      "reason": "optimized-specialized-lane"
+    },
+    {
+      "id": "script:bullet3d.get_version",
+      "loweringFamily": "lua-table",
+      "context": "global",
+      "reason": "optimized-specialized-lane"
+    },
+    {
+      "id": "script:image.get_astc_header",
+      "loweringFamily": "lua-table",
+      "context": "global",
+      "reason": "optimized-specialized-lane"
+    }
+  ]
+}

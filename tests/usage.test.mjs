@@ -54,16 +54,25 @@ test("release binding generation contains only reachable symbols", async () => {
 });
 
 test("release planning joins the canonical API plan to bundler reachability", async () => {
-  const [usage, emission, lowering] = await Promise.all([
+  const [usage, emission, lowering, scriptProjection] = await Promise.all([
     json("../dist/defold-app.defold-api-usage.json"),
     json("../build/profiles/release/defold-binding-emission-plan.json"),
-    json("../bindings/generated/defold-binding-lowering-plan.json")
+    json("../bindings/generated/defold-binding-lowering-plan.json"),
+    json("../bindings/generated/defold-script-projection-ir.json")
   ]);
   assert.equal(usage.dynamicAccess, true);
   assert.deepEqual(usage.symbols, []);
   assert.equal(emission.sourcePlanSha256, lowering.planSha256);
   assert.equal(emission.sourceAuthorities.scriptProjectionSha256, lowering.inputHashes.scriptProjection);
-  assert.equal(emission.treeShaking.selectedForEmissionUnits, lowering.selectionSummary.dynamicHermesJsi.emit);
+  const sourceRows = new Map(scriptProjection.rows.map((row, index) => [index, row]));
+  const profileSelected = lowering.units.filter((unit) => {
+    if (unit.backends.dynamicHermesJsi.selection !== "emit") return false;
+    if (unit.identity.surface !== "script") return true;
+    const availability = sourceRows.get(unit.sourceRef.row).availability;
+    return availability.token === "core" || availability.token === "html5-host" ||
+      availability.runtimeProfiles?.includes(emission.profileId) === true;
+  }).length;
+  assert.equal(emission.treeShaking.selectedForEmissionUnits, profileSelected);
   assert.equal(emission.evidenceBoundary.generation, "planned-not-emitted");
   assert.equal(emission.evidenceBoundary.runtime, "not-claimed");
 });

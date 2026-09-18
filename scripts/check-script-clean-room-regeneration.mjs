@@ -235,11 +235,18 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
     if (file.endsWith("real-engine-probes.ts")) candidates.add(`sample/src/generated/${file}`);
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "packages/static-hermes/src/generated"))) {
-    if (file === "script-vmath.ts") candidates.add(`packages/static-hermes/src/generated/${file}`);
+    if (file === "script-vmath.ts" || file === "script-universal-value.ts") {
+      candidates.add(`packages/static-hermes/src/generated/${file}`);
+    }
+  }
+  for (const file of await walkFiles(path.join(repositoryRoot, "defold/defold_hermes/lib/web"))) {
+    if (file === "generated_script_universal_value.js") {
+      candidates.add(`defold/defold_hermes/lib/web/${file}`);
+    }
   }
   for (const documentation of [
-    "knowledge/research/script-api-coverage.md",
-    "knowledge/research/script-table-tuple-schema-classification.md"
+    ".agents/docs/research/script-api-coverage.md",
+    ".agents/docs/research/script-table-tuple-schema-classification.md"
   ]) {
     try {
       if ((await lstat(path.join(repositoryRoot, documentation))).isFile()) candidates.add(documentation);

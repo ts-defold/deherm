@@ -12,13 +12,6 @@ export type DmNativeCallback = DmPointer<"callback"> & { readonly [nativeCallbac
 export interface DmSpan<Value> { readonly data: DmPointer; readonly length: number; readonly __value?: Value; }
 
 export interface DmSdkCalls {
-  /**
-   * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
-   * With exception of changing the size and capacity, all operations are guaranteed to be O(1).
-   */
-  readonly "~dmArray<T>": {
-    (): void;
-  };
   readonly ArraySizeHelper: {
     (): void;
   };
@@ -138,354 +131,2155 @@ export interface DmSdkCalls {
      */
     (registry: DmSdkTypes["HContextRegistry"], name_hash: DmSdkTypes["dmhash_t"], context: DmPointer<"void">): number;
   };
-  readonly dm_lua_atpanic: {
-    (L: DmPointer<"lua_State">, panicf: DmSdkTypes["lua_CFunction"]): DmSdkTypes["lua_CFunction"];
-  };
-  readonly dm_lua_call: {
-    (L: DmPointer<"lua_State">, nargs: number, nresults: number): void;
-  };
-  readonly dm_lua_checkstack: {
-    (L: DmPointer<"lua_State">, sz: number): number;
-  };
-  readonly dm_lua_close: {
-    (L: DmPointer<"lua_State">): void;
-  };
-  readonly dm_lua_concat: {
-    (L: DmPointer<"lua_State">, n: number): void;
-  };
-  readonly dm_lua_cpcall: {
-    (L: DmPointer<"lua_State">, func: DmSdkTypes["lua_CFunction"], ud: DmPointer<"void">): number;
-  };
-  readonly dm_lua_createtable: {
-    (L: DmPointer<"lua_State">, narr: number, nrec: number): void;
-  };
-  readonly dm_lua_dump: {
-    (L: DmPointer<"lua_State">, writer: DmSdkTypes["lua_Writer"], data: DmPointer<"void">): number;
-  };
-  readonly dm_lua_equal: {
-    (L: DmPointer<"lua_State">, idx1: number, idx2: number): number;
-  };
-  readonly dm_lua_error: {
-    (L: DmPointer<"lua_State">): number;
-  };
-  readonly dm_lua_gc: {
-    (L: DmPointer<"lua_State">, what: number, data: number): number;
-  };
-  readonly dm_lua_getallocf: {
-    (L: DmPointer<"lua_State">, ud: DmPointer<"void">): DmSdkTypes["lua_Alloc"];
-  };
-  readonly dm_lua_getfenv: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_getfield: {
-    (L: DmPointer<"lua_State">, idx: number, k: DmReadonlyPointer<"char">): void;
-  };
-  readonly dm_lua_gethook: {
-    (L: DmPointer<"lua_State">): DmSdkTypes["lua_Hook"];
-  };
-  readonly dm_lua_gethookcount: {
-    (L: DmPointer<"lua_State">): number;
-  };
-  readonly dm_lua_gethookmask: {
-    (L: DmPointer<"lua_State">): number;
-  };
-  readonly dm_lua_getinfo: {
-    (L: DmPointer<"lua_State">, what: DmReadonlyPointer<"char">, ar: DmPointer<"lua_Debug">): number;
-  };
-  readonly dm_lua_getlocal: {
-    (L: DmPointer<"lua_State">, ar: DmReadonlyPointer<"lua_Debug">, n: number): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_getmetatable: {
-    (L: DmPointer<"lua_State">, objindex: number): number;
-  };
-  readonly dm_lua_getstack: {
-    (L: DmPointer<"lua_State">, level: number, ar: DmPointer<"lua_Debug">): number;
-  };
-  readonly dm_lua_gettable: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_gettop: {
-    (L: DmPointer<"lua_State">): number;
-  };
-  readonly dm_lua_getupvalue: {
-    (L: DmPointer<"lua_State">, funcindex: number, n: number): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_insert: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_iscfunction: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_isnumber: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_isstring: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_isuserdata: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_lessthan: {
-    (L: DmPointer<"lua_State">, idx1: number, idx2: number): number;
-  };
-  readonly dm_lua_load: {
-    (L: DmPointer<"lua_State">, reader: DmSdkTypes["lua_Reader"], dt: DmPointer<"void">, chunkname: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_lua_newstate: {
-    (f: DmSdkTypes["lua_Alloc"], ud: DmPointer<"void">): DmPointer<"lua_State">;
-  };
-  readonly dm_lua_newthread: {
-    (L: DmPointer<"lua_State">): DmPointer<"lua_State">;
-  };
-  readonly dm_lua_newuserdata: {
-    (L: DmPointer<"lua_State">, sz: number): DmPointer<"void">;
-  };
-  readonly dm_lua_next: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_objlen: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_pcall: {
-    (L: DmPointer<"lua_State">, nargs: number, nresults: number, errfunc: number): number;
-  };
-  readonly dm_lua_pushboolean: {
-    (L: DmPointer<"lua_State">, b: number): void;
-  };
-  readonly dm_lua_pushcclosure: {
-    (L: DmPointer<"lua_State">, fn: DmSdkTypes["lua_CFunction"], n: number): void;
-  };
-  readonly dm_lua_pushfstring: {
-    (L: DmPointer<"lua_State">, fmt: DmReadonlyPointer<"char">): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_pushinteger: {
-    (L: DmPointer<"lua_State">, n: DmSdkTypes["lua_Integer"]): void;
-  };
-  readonly dm_lua_pushlightuserdata: {
-    (L: DmPointer<"lua_State">, p: DmPointer<"void">): void;
-  };
-  readonly dm_lua_pushlstring: {
-    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">, l: number): void;
-  };
-  readonly dm_lua_pushnil: {
-    (L: DmPointer<"lua_State">): void;
-  };
-  readonly dm_lua_pushnumber: {
-    (L: DmPointer<"lua_State">, n: DmSdkTypes["lua_Number"]): void;
-  };
-  readonly dm_lua_pushstring: {
-    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">): void;
-  };
-  readonly dm_lua_pushthread: {
-    (L: DmPointer<"lua_State">): number;
-  };
-  readonly dm_lua_pushvalue: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_pushvfstring: {
-    (L: DmPointer<"lua_State">, fmt: DmReadonlyPointer<"char">, argp: DmNativeType<"va_list">): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_rawequal: {
-    (L: DmPointer<"lua_State">, idx1: number, idx2: number): number;
-  };
-  readonly dm_lua_rawget: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_rawgeti: {
-    (L: DmPointer<"lua_State">, idx: number, n: number): void;
-  };
-  readonly dm_lua_rawset: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_rawseti: {
-    (L: DmPointer<"lua_State">, idx: number, n: number): void;
-  };
-  readonly dm_lua_remove: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_replace: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_resume: {
-    (L: DmPointer<"lua_State">, narg: number): number;
-  };
-  readonly dm_lua_setallocf: {
-    (L: DmPointer<"lua_State">, f: DmSdkTypes["lua_Alloc"], ud: DmPointer<"void">): void;
-  };
-  readonly dm_lua_setfenv: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_setfield: {
-    (L: DmPointer<"lua_State">, idx: number, k: DmReadonlyPointer<"char">): void;
-  };
-  readonly dm_lua_sethook: {
-    (L: DmPointer<"lua_State">, func: DmSdkTypes["lua_Hook"], mask: number, count: number): number;
-  };
-  readonly dm_lua_setlevel: {
-    (from: DmPointer<"lua_State">, to: DmPointer<"lua_State">): void;
-  };
-  readonly dm_lua_setlocal: {
-    (L: DmPointer<"lua_State">, ar: DmReadonlyPointer<"lua_Debug">, n: number): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_setmetatable: {
-    (L: DmPointer<"lua_State">, objindex: number): number;
-  };
-  readonly dm_lua_settable: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_settop: {
-    (L: DmPointer<"lua_State">, idx: number): void;
-  };
-  readonly dm_lua_setupvalue: {
-    (L: DmPointer<"lua_State">, funcindex: number, n: number): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_status: {
-    (L: DmPointer<"lua_State">): number;
-  };
-  readonly dm_lua_toboolean: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_tocfunction: {
-    (L: DmPointer<"lua_State">, idx: number): DmSdkTypes["lua_CFunction"];
-  };
-  readonly dm_lua_tointeger: {
-    (L: DmPointer<"lua_State">, idx: number): DmSdkTypes["lua_Integer"];
-  };
-  readonly dm_lua_tolstring: {
-    (L: DmPointer<"lua_State">, idx: number, len: DmPointer<"size_t">): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_tonumber: {
-    (L: DmPointer<"lua_State">, idx: number): DmSdkTypes["lua_Number"];
-  };
-  readonly dm_lua_topointer: {
-    (L: DmPointer<"lua_State">, idx: number): DmReadonlyPointer<"void">;
-  };
-  readonly dm_lua_tothread: {
-    (L: DmPointer<"lua_State">, idx: number): DmPointer<"lua_State">;
-  };
-  readonly dm_lua_touserdata: {
-    (L: DmPointer<"lua_State">, idx: number): DmPointer<"void">;
-  };
-  readonly dm_lua_type: {
-    (L: DmPointer<"lua_State">, idx: number): number;
-  };
-  readonly dm_lua_typename: {
-    (L: DmPointer<"lua_State">, tp: number): DmReadonlyPointer<"char">;
-  };
-  readonly dm_lua_xmove: {
-    (from: DmPointer<"lua_State">, to: DmPointer<"lua_State">, n: number): void;
-  };
-  readonly dm_lua_yield: {
-    (L: DmPointer<"lua_State">, nresults: number): number;
-  };
-  readonly dm_luaL_addlstring: {
-    (B: DmPointer<"luaL_Buffer">, s: DmReadonlyPointer<"char">, l: number): void;
-  };
-  readonly dm_luaL_addstring: {
-    (B: DmPointer<"luaL_Buffer">, s: DmReadonlyPointer<"char">): void;
-  };
-  readonly dm_luaL_addvalue: {
-    (B: DmPointer<"luaL_Buffer">): void;
-  };
-  readonly dm_luaL_argerror: {
-    (L: DmPointer<"lua_State">, numarg: number, extramsg: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_buffinit: {
-    (L: DmPointer<"lua_State">, B: DmPointer<"luaL_Buffer">): void;
-  };
-  readonly dm_luaL_callmeta: {
-    (L: DmPointer<"lua_State">, obj: number, e: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_checkany: {
-    (L: DmPointer<"lua_State">, narg: number): void;
-  };
-  readonly dm_luaL_checkinteger: {
-    (L: DmPointer<"lua_State">, numArg: number): DmSdkTypes["lua_Integer"];
-  };
-  readonly dm_luaL_checklstring: {
-    (L: DmPointer<"lua_State">, numArg: number, l: DmPointer<"size_t">): DmReadonlyPointer<"char">;
-  };
-  readonly dm_luaL_checknumber: {
-    (L: DmPointer<"lua_State">, numArg: number): DmSdkTypes["lua_Number"];
-  };
-  readonly dm_luaL_checkoption: {
-    (L: DmPointer<"lua_State">, narg: number, def: DmReadonlyPointer<"char">, lst: DmReadonlyPointer<"char *">): number;
-  };
-  readonly dm_luaL_checkstack: {
-    (L: DmPointer<"lua_State">, sz: number, msg: DmReadonlyPointer<"char">): void;
-  };
-  readonly dm_luaL_checktype: {
-    (L: DmPointer<"lua_State">, narg: number, t: number): void;
-  };
-  readonly dm_luaL_checkudata: {
-    (L: DmPointer<"lua_State">, ud: number, tname: DmReadonlyPointer<"char">): DmPointer<"void">;
-  };
-  readonly dm_luaL_error: {
-    (L: DmPointer<"lua_State">, fmt: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_findtable: {
-    (L: DmPointer<"lua_State">, idx: number, fname: DmReadonlyPointer<"char">, szhint: number): DmReadonlyPointer<"char">;
-  };
-  readonly dm_luaL_getmetafield: {
-    (L: DmPointer<"lua_State">, obj: number, e: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_gsub: {
-    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">, p: DmReadonlyPointer<"char">, r: DmReadonlyPointer<"char">): DmReadonlyPointer<"char">;
-  };
-  readonly dm_luaL_loadbuffer: {
-    (L: DmPointer<"lua_State">, buff: DmReadonlyPointer<"char">, sz: number, name: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_loadfile: {
-    (L: DmPointer<"lua_State">, filename: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_loadstring: {
-    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_newmetatable: {
-    (L: DmPointer<"lua_State">, tname: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_newstate: {
-    (): DmPointer<"lua_State">;
-  };
-  readonly dm_luaL_openlib: {
-    (L: DmPointer<"lua_State">, libname: DmReadonlyPointer<"char">, l: DmReadonlyPointer<"luaL_Reg">, nup: number): void;
-  };
-  readonly dm_luaL_optinteger: {
-    (L: DmPointer<"lua_State">, nArg: number, def: DmSdkTypes["lua_Integer"]): DmSdkTypes["lua_Integer"];
-  };
-  readonly dm_luaL_optlstring: {
-    (L: DmPointer<"lua_State">, numArg: number, def: DmReadonlyPointer<"char">, l: DmPointer<"size_t">): DmReadonlyPointer<"char">;
-  };
-  readonly dm_luaL_optnumber: {
-    (L: DmPointer<"lua_State">, nArg: number, def: DmSdkTypes["lua_Number"]): DmSdkTypes["lua_Number"];
-  };
-  readonly dm_luaL_prepbuffer: {
-    (B: DmPointer<"luaL_Buffer">): DmPointer<"char">;
-  };
-  readonly dm_luaL_pushresult: {
-    (B: DmPointer<"luaL_Buffer">): void;
-  };
-  readonly dm_luaL_ref: {
-    (L: DmPointer<"lua_State">, t: number): number;
-  };
-  readonly dm_luaL_register: {
-    (L: DmPointer<"lua_State">, libname: DmReadonlyPointer<"char">, l: DmReadonlyPointer<"luaL_Reg">): void;
-  };
-  readonly dm_luaL_typerror: {
-    (L: DmPointer<"lua_State">, narg: number, tname: DmReadonlyPointer<"char">): number;
-  };
-  readonly dm_luaL_unref: {
-    (L: DmPointer<"lua_State">, t: number, ref: number): void;
-  };
-  readonly dm_luaL_where: {
-    (L: DmPointer<"lua_State">, lvl: number): void;
+  /**
+   * Check if the array is empty.
+   * The array is empty when the size is zero.
+   */
+  readonly Empty: {
+    /**
+     * @returns true if the array is empty
+     */
+    (): boolean;
   };
   /**
-   * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
-   * With exception of changing the size and capacity, all operations are guaranteed to be O(1).
+   * Pointer to the end of the backing storage
+   * The end is essentially outside of the used storage.
    */
-  readonly "dmArray::dmArray::~dmArray<T>": {
+  readonly End: {
+    /**
+     * @returns pointer to end of memory
+     */
+    (): DmPointer<"T">;
+    /**
+     * @returns pointer to end of memory
+     */
+    (): DmReadonlyPointer<"T">;
+  };
+  /**
+   * swap bytes in a 16-bit value
+   */
+  readonly EndianSwap16: {
+    /**
+     * @param x Value to byte swap
+     * @returns Byte-swapped value
+     */
+    (x: number): number;
+  };
+  /**
+   * swap bytes in a 32-bit value
+   */
+  readonly EndianSwap32: {
+    /**
+     * @param x Value to byte swap
+     * @returns Byte-swapped value
+     */
+    (x: number): number;
+  };
+  /**
+   * swap bytes in a 64-bit value
+   */
+  readonly EndianSwap64: {
+    /**
+     * @param x Value to byte swap
+     * @returns Byte-swapped value
+     */
+    (x: bigint): bigint;
+  };
+  /**
+   * Network byte order is big-endian.
+   */
+  readonly EndianToHost16: {
+    /**
+     * @param x Network-order (big-endian) value
+     * @returns Host-order value
+     */
+    (x: number): number;
+  };
+  /**
+   * Network byte order is big-endian.
+   */
+  readonly EndianToHost32: {
+    /**
+     * @param x Network-order (big-endian) value
+     * @returns Host-order value
+     */
+    (x: number): number;
+  };
+  /**
+   * Network byte order is big-endian.
+   */
+  readonly EndianToHost64: {
+    /**
+     * @param x Network-order (big-endian) value
+     * @returns Host-order value
+     */
+    (x: bigint): bigint;
+  };
+  /**
+   * Network byte order is big-endian.
+   */
+  readonly EndianToNetwork16: {
+    /**
+     * @param x Host-order value
+     * @returns Network-order (big-endian) value
+     */
+    (x: number): number;
+  };
+  /**
+   * Network byte order is big-endian.
+   */
+  readonly EndianToNetwork32: {
+    /**
+     * @param x Host-order value
+     * @returns Network-order (big-endian) value
+     */
+    (x: number): number;
+  };
+  /**
+   * Network byte order is big-endian.
+   */
+  readonly EndianToNetwork64: {
+    /**
+     * @param x Host-order value
+     * @returns Network-order (big-endian) value
+     */
+    (x: bigint): bigint;
+  };
+  /**
+   * Set size of the array, allocate if necessary
+   */
+  readonly EnsureSize: {
+    /**
+     * @param size size of the array
+     */
+    (size: number): void;
+  };
+  /**
+   * Remove the element at the specified index.
+   * The removed element is replaced by the element at the end (if any), thus potentially altering the order.
+   * While operation changes the array size, it is guaranteed to be O(1).
+   */
+  readonly EraseSwap: {
+    /**
+     * @param index index of the element to remove
+     * @returns reference to the new element at index
+     */
+    (index: number): DmReference<DmNativeType<"T">>;
+  };
+  /**
+   * Remove the element by reference
+   * The removed element is replaced by the element at the end (if any), thus potentially altering the order.
+   * While operation changes the array size, it is guaranteed to be O(1).
+   */
+  readonly EraseSwapRef: {
+    /**
+     * @param element reference to the element to remove.
+     * @returns reference to the new referenced element
+     */
+    (element: DmReference<DmNativeType<"T">>): DmReference<DmNativeType<"T">>;
+  };
+  /**
+   * Finalizes an extension app params struct (deallocates internal memory)
+   */
+  readonly ExtensionAppParamsFinalize: {
+    (params: DmPointer<"ExtensionAppParams">): void;
+  };
+  /**
+   * get the app exit code
+   */
+  readonly ExtensionAppParamsGetAppExitCode: {
+    /**
+     * @param app_params The app params sent to the extension dmExtension::AppInitialize / dmExtension::AppInitialize
+     * @returns engine exit code
+     */
+    (app_params: DmPointer<"ExtensionAppParams">): DmSdkTypes["ExtensionAppExitCode"];
+  };
+  /**
+   * Gets a context using a specified name hash
+   */
+  readonly ExtensionAppParamsGetContext: {
+    /**
+     * @param params the params
+     * @param name_hash the context name hash
+     * @returns The context, if it exists
+     */
+    (params: DmPointer<"ExtensionAppParams">, name_hash: DmSdkTypes["dmhash_t"]): DmPointer<"void">;
+  };
+  /**
+   * Gets a context using a specified name
+   */
+  readonly ExtensionAppParamsGetContextByName: {
+    /**
+     * @param params the params
+     * @param name the context name
+     * @returns The context, if it exists
+     */
+    (params: DmPointer<"ExtensionAppParams">, name: DmReadonlyPointer<"char">): DmPointer<"void">;
+  };
+  /**
+   * Gets the context registry used by the extension app params.
+   */
+  readonly ExtensionAppParamsGetContextRegistry: {
+    /**
+     * @param params the params
+     * @returns the context registry
+     */
+    (params: DmPointer<"ExtensionAppParams">): DmSdkTypes["HContextRegistry"];
+  };
+  /**
+   * Initializes an extension app params struct
+   * NOTE: this is an opaque struct, do not use it's members directly!
+   */
+  readonly ExtensionAppParamsInitialize: {
+    /**
+     * @param app_params the params
+     */
+    (app_params: DmPointer<"ExtensionAppParams">): void;
+  };
+  /**
+   * Sets a context using a specified name
+   */
+  readonly ExtensionAppParamsSetContext: {
+    /**
+     * @param params the params
+     * @param name the context name
+     * @param context the context
+     * @returns 0 if successful
+     */
+    (params: DmPointer<"ExtensionAppParams">, name: DmReadonlyPointer<"char">, context: DmPointer<"void">): number;
+  };
+  /**
+   * Finalizes an extension  params struct (deallocates internal memory)
+   */
+  readonly ExtensionParamsFinalize: {
+    (params: DmPointer<"ExtensionParams">): void;
+  };
+  /**
+   * Gets a context using a specified name hash
+   */
+  readonly ExtensionParamsGetContext: {
+    /**
+     * @param params the params
+     * @param name_hash the context name hash
+     * @returns The context, if it exists
+     */
+    (params: DmPointer<"ExtensionParams">, name_hash: DmSdkTypes["dmhash_t"]): DmPointer<"void">;
+  };
+  /**
+   * Gets a context using a specified name
+   */
+  readonly ExtensionParamsGetContextByName: {
+    /**
+     * @param params the params
+     * @param name the context name
+     * @returns The context, if it exists
+     */
+    (params: DmPointer<"ExtensionParams">, name: DmReadonlyPointer<"char">): DmPointer<"void">;
+  };
+  /**
+   * Gets the context registry used by the extension params.
+   */
+  readonly ExtensionParamsGetContextRegistry: {
+    /**
+     * @param params the params
+     * @returns the context registry
+     */
+    (params: DmPointer<"ExtensionParams">): DmSdkTypes["HContextRegistry"];
+  };
+  /**
+   * Initializes an extension params struct
+   * NOTE: this is an opaque struct, do not use it's members directly!
+   */
+  readonly ExtensionParamsInitialize: {
+    /**
+     * @param app_params the params
+     */
+    (app_params: DmPointer<"ExtensionParams">): void;
+  };
+  /**
+   * Sets a context using a specified name
+   */
+  readonly ExtensionParamsSetContext: {
+    /**
+     * @param params the params
+     * @param name the context name
+     * @param context the context
+     * @returns 0 if successful
+     */
+    (params: DmPointer<"ExtensionParams">, name: DmReadonlyPointer<"char">, context: DmPointer<"void">): number;
+  };
+  /**
+   * Extension declaration helper. Internal function. Use DM_DECLARE_EXTENSION
+   */
+  readonly ExtensionRegister: {
+    /**
+     * @param desc A persistent buffer of at least 128 bytes.
+     * @param desc_size size of buffer holding desc. in bytes
+     * @param name extension name. human readble. max 16 characters long.
+     * @param app_initialize app-init function. May be null
+     * @param app_finalize app-final function. May be null
+     * @param initialize init function. May not be 0
+     * @param finalize finalize function. May not be 0
+     * @param update update function. May be null
+     * @param on_event event callback function. May be null
+     */
+    (desc: DmPointer<"void">, desc_size: number, name: DmReadonlyPointer<"char">, app_initialize: DmSdkTypes["FExtensionAppInitialize"], app_finalize: DmSdkTypes["FExtensionAppFinalize"], initialize: DmSdkTypes["FExtensionInitialize"], finalize: DmSdkTypes["FExtensionFinalize"], update: DmSdkTypes["FExtensionUpdate"], on_event: DmSdkTypes["FExtensionOnEvent"]): void;
+  };
+  readonly ExtensionRegisterCallback: {
+    (callback_type: DmSdkTypes["ExtensionCallbackType"], func: DmSdkTypes["FExtensionCallback"]): boolean;
+  };
+  /**
+   * Register an iOS application delegate to the engine. Multiple delegates are supported (Max 32)
+   */
+  readonly ExtensionRegisteriOSUIApplicationDelegate: {
+    /**
+     * @param delegate An id , see: https://developer.apple.com/documentation/uikit/uiapplicationdelegate?language=objc
+     */
+    (delegate: DmPointer<"void">): void;
+  };
+  /**
+   * Deregister a previously registered iOS application delegate
+   * This function is only available on iOS.
+   */
+  readonly ExtensionUnregisteriOSUIApplicationDelegate: {
+    /**
+     * @param delegate an id
+     */
+    (delegate: DmPointer<"void">): void;
+  };
+  /**
+   * add a font to the font collection
+   */
+  readonly FontCollectionAddFont: {
+    /**
+     * @param coll the font collection
+     * @param font the font
+     * @returns the result. FONT_RESULT_OK if successful
+     */
+    (coll: DmSdkTypes["HFontCollection"], font: DmSdkTypes["HFont"]): DmSdkTypes["FontResult"];
+  };
+  /**
+   * Create a font collection
+   */
+  readonly FontCollectionCreate: {
+    /**
+     * @returns the font collection
+     */
+    (): DmSdkTypes["HFontCollection"];
+  };
+  /**
+   * destroy a font collection
+   */
+  readonly FontCollectionDestroy: {
+    /**
+     * @param coll the font collection
+     */
+    (coll: DmSdkTypes["HFontCollection"]): void;
+  };
+  /**
+   * return the font associated with the given index
+   */
+  readonly FontCollectionGetFont: {
+    /**
+     * @param coll the font collection
+     * @returns the font at the given index
+     */
+    (coll: DmSdkTypes["HFontCollection"], index: number): DmSdkTypes["HFont"];
+  };
+  /**
+   * return number of fonts in the collection
+   */
+  readonly FontCollectionGetFontCount: {
+    /**
+     * @param coll the font collection
+     * @returns the number of fonts
+     */
+    (coll: DmSdkTypes["HFontCollection"]): number;
+  };
+  /**
+   * remove a font from the font collection
+   */
+  readonly FontCollectionRemoveFont: {
+    /**
+     * @param coll the font collection
+     * @param font the font
+     * @returns the result. FONT_RESULT_OK if successful
+     */
+    (coll: DmSdkTypes["HFontCollection"], font: DmSdkTypes["HFont"]): DmSdkTypes["FontResult"];
+  };
+  /**
+   * Destroys a loaded font
+   */
+  readonly FontDestroy: {
+    /**
+     * @param font The font to deallocate
+     */
+    (font: DmSdkTypes["HFont"]): void;
+  };
+  /**
+   * Free the bitmap of the glyph
+   */
+  readonly FontFreeGlyph: {
+    /**
+     * @param font The font
+     * @param glyph The glyph
+     * @returns The result
+     */
+    (font: DmSdkTypes["HFont"], glyph: DmPointer<"FontGlyph">): DmSdkTypes["FontResult"];
+  };
+  /**
+   * Get the max ascent of the font
+   */
+  readonly FontGetAscent: {
+    /**
+     * @param font The font
+     * @param scale The scale factor
+     * @returns The max ascent
+     */
+    (font: DmSdkTypes["HFont"], scale: number): number;
+  };
+  /**
+   * Get the max descent of the font
+   */
+  readonly FontGetDescent: {
+    /**
+     * @param font The font
+     * @param scale The scale factor
+     * @returns The max descent
+     */
+    (font: DmSdkTypes["HFont"], scale: number): number;
+  };
+  /**
+   * Get the metrics of a glyph
+   */
+  readonly FontGetGlyph: {
+    /**
+     * @param font The font
+     * @param codepoint The unicode code point
+     * @param options (in)   FontGlyphOptions*  The glyph options
+     * @param glyph (out)   FontGlyph*  The glyph
+     * @returns If successful, user must call FreeGlyph() on the result to clear any image data.
+     */
+    (font: DmSdkTypes["HFont"], codepoint: number, options: DmPointer<"FontGlyphOptions">, glyph: DmPointer<"FontGlyph">): DmSdkTypes["FontResult"];
+  };
+  /**
+   * Get the metrics of a glyph
+   */
+  readonly FontGetGlyphByIndex: {
+    /**
+     * @param font The font
+     * @param glyph_index The unicode code point
+     * @param options (in)   FontGlyphOptions*  The glyph options
+     * @param glyph (out)   FontGlyph*  The glyph
+     * @returns If successful, user must call FreeGlyph() on the result to clear any image data.
+     */
+    (font: DmSdkTypes["HFont"], glyph_index: number, options: DmPointer<"FontGlyphOptions">, glyph: DmPointer<"FontGlyph">): DmSdkTypes["FontResult"];
+  };
+  /**
+   * Get glyph index of a codepoint
+   */
+  readonly FontGetGlyphIndex: {
+    /**
+     * @param font The font
+     * @param codepoint The unicode code point
+     * @returns 0 if no index was found
+     */
+    (font: DmSdkTypes["HFont"], codepoint: number): number;
+  };
+  /**
+   * Get the line gap of the font
+   */
+  readonly FontGetLineGap: {
+    /**
+     * @param font The font
+     * @param scale The scale factor
+     * @returns The line gap
+     */
+    (font: DmSdkTypes["HFont"], scale: number): number;
+  };
+  /**
+   * Gets the path of the loaded font
+   */
+  readonly FontGetPath: {
+    /**
+     * @param font The font
+     * @returns The path
+     */
+    (font: DmSdkTypes["HFont"]): DmReadonlyPointer<"char">;
+  };
+  /**
+   * Gets the path hash of the loaded font
+   */
+  readonly FontGetPathHash: {
+    /**
+     * @param font The font
+     * @returns The path
+     */
+    (font: DmSdkTypes["HFont"]): number;
+  };
+  /**
+   * Get the bytes used by this resource
+   */
+  readonly FontGetResourceSize: {
+    /**
+     * @param font The font
+     * @returns The resource size
+     */
+    (font: DmSdkTypes["HFont"]): number;
+  };
+  /**
+   * Get the scale factor from a given pixel size.
+   * Used to convert from points to pixel size
+   */
+  readonly FontGetScaleFromSize: {
+    /**
+     * @param font The font
+     * @param size The font size (in pixel height)
+     * @returns The scale factor
+     */
+    (font: DmSdkTypes["HFont"], size: number): number;
+  };
+  /**
+   * Gets the specific implementation of the loaded font
+   */
+  readonly FontGetType: {
+    /**
+     * @param font The font
+     * @returns The type
+     */
+    (font: DmSdkTypes["HFont"]): DmSdkTypes["FontType"];
+  };
+  /**
+   * Holds the bitmap data of a glyph.
+   * If there's an associated image, it is of size width * height * channels.
+   */
+  readonly "FontGlyphOptions::FontGlyphOptions": {
     (): void;
+  };
+  /**
+   * Loads a font from memory
+   */
+  readonly FontLoadFromMemory: {
+    /**
+     * @param name The name of the resource. For easier debugging
+     * @param data The raw data
+     * @param data_size The length of the data (in bytes)
+     * @param allocate If true, the font may allocate a copy of the data (if needed). If false, the caller will own the memory.
+     * @returns The loaded font, or null if it failed to load.
+     */
+    (name: DmReadonlyPointer<"char">, data: DmPointer<"void">, data_size: number, allocate: boolean): DmSdkTypes["HFont"];
+  };
+  /**
+   * Loads a font using a path
+   */
+  readonly FontLoadFromPath: {
+    /**
+     * @param path The path to the resource
+     * @returns The loaded font, or null if it failed to load.
+     */
+    (path: DmReadonlyPointer<"char">): DmSdkTypes["HFont"];
+  };
+  /**
+   * First element of the array
+   */
+  readonly Front: {
+    /**
+     * @returns reference to the first element
+     */
+    (): DmReference<DmNativeType<"T">>;
+  };
+  /**
+   * Check if the array is full.
+   * The array is full when the size is equal to the capacity.
+   */
+  readonly Full: {
+    /**
+     * @returns true if the array is full
+     */
+    (): boolean;
+  };
+  /**
+   * Hash state used for 32-bit incremental hashing
+   */
+  readonly "HashState32::HashState32": {
+    (): void;
+  };
+  /**
+   * Hash state used for 64-bit incremental hashing
+   */
+  readonly "HashState64::HashState64": {
+    (): void;
+  };
+  /**
+   * add a request header
+   */
+  readonly HttpAddHeader: {
+    /**
+     * @param request Request object.
+     * @param header Raw request header, eg "Accept: application/json".
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, header: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * Marks a queued or running request as canceled. Cancellation is best effort.
+   */
+  readonly HttpCancelRequest: {
+    /**
+     * @param service HTTP service object.
+     * @param request_handle Request handle returned by HttpPushRequest().
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (service: DmPointer<"HttpService">, request_handle: DmSdkTypes["HttpRequestHandle"]): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * Only valid before HttpPushRequest() succeeds.
+   */
+  readonly HttpDeleteRequest: {
+    /**
+     * @param request Request object.
+     */
+    (request: DmPointer<"HttpRequest">): void;
+  };
+  /**
+   * create a new HTTP request
+   */
+  readonly HttpNewRequest: {
+    /**
+     * @param request Request object on success.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * On success, ownership of request is transferred to the service and the caller
+   * must not modify or delete it.
+   */
+  readonly HttpPushRequest: {
+    /**
+     * @param service HTTP service object.
+     * @param request Request object.
+     * @param request_handle Request handle on success.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (service: DmPointer<"HttpService">, request: DmPointer<"HttpRequest">, request_handle: DmPointer<"HttpRequestHandle">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_PROGRESS.
+   */
+  readonly HttpResponseGetBytesReceived: {
+    /**
+     * @param response Response data.
+     * @returns Received byte count.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_PROGRESS.
+   */
+  readonly HttpResponseGetBytesSent: {
+    /**
+     * @param response Response data.
+     * @returns Sent byte count.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_PROGRESS.
+   */
+  readonly HttpResponseGetBytesTotal: {
+    /**
+     * @param response Response data.
+     * @returns Total byte count, or -1 if unknown.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_DATA.
+   */
+  readonly HttpResponseGetData: {
+    /**
+     * @param response Response data.
+     * @returns Response body chunk data.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"void">;
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_DATA.
+   */
+  readonly HttpResponseGetDataSize: {
+    /**
+     * @param response Response data.
+     * @returns Response body chunk size.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * get response document size
+   */
+  readonly HttpResponseGetDocumentSize: {
+    /**
+     * @param response Response data.
+     * @returns Full size of the requested file, when known.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * get response event
+   */
+  readonly HttpResponseGetEvent: {
+    /**
+     * @param response Response data.
+     * @returns Event type.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): DmSdkTypes["HttpResponseEvent"];
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_HEADER. Returns the raw response header line
+   * as "Name:Value", without a trailing newline. The returned pointer is valid
+   * only for the duration of the callback. Use HttpResponseGetHeaderSize() for
+   * the number of bytes in the header line.
+   */
+  readonly HttpResponseGetHeader: {
+    /**
+     * @param response Response data.
+     * @returns Raw header line in "Name:Value" form.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"char">;
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_HEADER.
+   */
+  readonly HttpResponseGetHeaderSize: {
+    /**
+     * @param response Response data.
+     * @returns Number of bytes returned by
+     * HttpResponseGetHeader(), excluding any null terminator.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * get response path
+   */
+  readonly HttpResponseGetPath: {
+    /**
+     * @param response Response data.
+     * @returns User supplied response path.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"char">;
+  };
+  /**
+   * get response range end
+   */
+  readonly HttpResponseGetRangeEnd: {
+    /**
+     * @param response Response data.
+     * @returns End offset into the requested file, when known.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * get response range start
+   */
+  readonly HttpResponseGetRangeStart: {
+    /**
+     * @param response Response data.
+     * @returns Start offset into the requested file, when known.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * Valid for HTTP_RESPONSE_EVENT_COMPLETE.
+   */
+  readonly HttpResponseGetResult: {
+    /**
+     * @param response Response data.
+     * @returns Transfer result.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * get response status code
+   */
+  readonly HttpResponseGetStatusCode: {
+    /**
+     * @param response Response data.
+     * @returns HTTP status code, eg 200.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
+  };
+  /**
+   * get response URL
+   */
+  readonly HttpResponseGetURL: {
+    /**
+     * @param response Response data.
+     * @returns Request URL.
+     */
+    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"char">;
+  };
+  /**
+   * set basic authentication credentials
+   */
+  readonly HttpSetBasicAuth: {
+    /**
+     * @param request Request object.
+     * @param username User name.
+     * @param password Password.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, username: DmReadonlyPointer<"char">, password: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set bearer authentication token
+   */
+  readonly HttpSetBearerAuth: {
+    /**
+     * @param request Request object.
+     * @param token Bearer token.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, token: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set chunked transfer
+   */
+  readonly HttpSetChunkedTransfer: {
+    /**
+     * @param request Request object.
+     * @param chunked_transfer Non-zero to allow chunked transfer encoding.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, chunked_transfer: number): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set ignore cache
+   */
+  readonly HttpSetIgnoreCache: {
+    /**
+     * @param request Request object.
+     * @param ignore_cache Non-zero to ignore the HTTP cache.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, ignore_cache: number): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set request method
+   */
+  readonly HttpSetMethod: {
+    /**
+     * @param request Request object.
+     * @param method HTTP method, eg "GET".
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, method: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set proxy URL
+   */
+  readonly HttpSetProxy: {
+    /**
+     * @param request Request object.
+     * @param proxy Full proxy URL, or 0 to clear.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, proxy: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set progress reporting
+   */
+  readonly HttpSetReportProgress: {
+    /**
+     * @param request Request object.
+     * @param report_progress Non-zero to receive HTTP_RESPONSE_EVENT_PROGRESS callbacks.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, report_progress: number): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * Copies request body data into the request. Passing a zero size clears the body.
+   * The current HTTP client sends request bodies for POST, PUT, and PATCH.
+   */
+  readonly HttpSetRequestBody: {
+    /**
+     * @param request Request object.
+     * @param body Request body data.
+     * @param body_size Request body size.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, body: DmReadonlyPointer<"void">, body_size: number): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set response callback
+   */
+  readonly HttpSetResponseCallback: {
+    /**
+     * @param request Request object.
+     * @param callback Response callback.
+     * @param user_data User data.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, callback: DmSdkTypes["HttpResponseCallback"], user_data: DmPointer<"void">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * Stores a user supplied path with the request. The HTTP API does not write the
+   * response to this path; it is returned in response callbacks for callers that
+   * want to write response data themselves.
+   */
+  readonly HttpSetResponsePath: {
+    /**
+     * @param request Request object.
+     * @param path Response path, or 0 to clear.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, path: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set request timeout
+   */
+  readonly HttpSetTimeout: {
+    /**
+     * @param request Request object.
+     * @param timeout_us Timeout in microseconds.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, timeout_us: number): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * set request URL
+   */
+  readonly HttpSetURL: {
+    /**
+     * @param request Request object.
+     * @param url Full request URL.
+     * @returns HTTP_RESULT_OK on success.
+     */
+    (request: DmPointer<"HttpRequest">, url: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
+  };
+  /**
+   * cancel a job (and its children)
+   */
+  readonly JobSystemCancelJob: {
+    /**
+     * @param context the job system context
+     * @param job the job to cancel
+     * @returns Returns JOBSYSTEM_RESULT_CANCELED if canceled, JOBSYSTEM_RESULT_PENDING if the job (or any child) is still in flight, or JOBSYSTEM_RESULT_INVALID_HANDLE if the handle is invalid
+     */
+    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmSdkTypes["JobSystemResult"];
+  };
+  /**
+   * Create a new job system context.
+   */
+  readonly JobSystemCreate: {
+    /**
+     * @param create_params creation parameters
+     * @returns job system context, or null on failure
+     */
+    (create_params: DmReadonlyPointer<"JobSystemCreateParams">): DmSdkTypes["HJobContext"];
+  };
+  /**
+   * create a job
+   */
+  readonly JobSystemCreateJob: {
+    /**
+     * @param context the job system context
+     * @param job the job creation parameters. This pointer is not stored, the data is copied as-is.
+     * @returns returns the job if successful. 0 otherwise.
+     */
+    (context: DmSdkTypes["HJobContext"], job: DmPointer<"Job">): DmSdkTypes["HJob"];
+  };
+  /**
+   * Destroy a job system context and free its resources.
+   */
+  readonly JobSystemDestroy: {
+    /**
+     * @param context job system context
+     */
+    (context: DmSdkTypes["HJobContext"]): void;
+  };
+  /**
+   * get the context from a job
+   */
+  readonly JobSystemGetContext: {
+    /**
+     * @param context the job system context
+     * @param job the job
+     * @returns The registered context pointer. 0 if the job handle is invalid.
+     */
+    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmPointer<"void">;
+  };
+  /**
+   * get the data from a job
+   */
+  readonly JobSystemGetData: {
+    /**
+     * @param context the job system context
+     * @param job the job
+     * @returns The registered data pointer. 0 if the job handle is invalid.
+     */
+    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmPointer<"void">;
+  };
+  /**
+   * get worker count
+   */
+  readonly JobSystemGetWorkerCount: {
+    /**
+     * @param context job system context
+     * @returns number of worker threads
+     */
+    (context: DmSdkTypes["HJobContext"]): number;
+  };
+  /**
+   * push a job onto the work queue
+   */
+  readonly JobSystemPushJob: {
+    /**
+     * @param context the job system context
+     * @param job the job to add to the work queue
+     * @returns return JOBSYSTEM_RESULT_OK if job was pushed
+     */
+    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmSdkTypes["JobSystemResult"];
+  };
+  /**
+   * set a job as a dependency
+   */
+  readonly JobSystemSetParent: {
+    /**
+     * @param context the job system context
+     * @param child the child job
+     * @param parent the parent job
+     * @returns return JOBSYSTEM_RESULT_OK if job was pushed
+     */
+    (context: DmSdkTypes["HJobContext"], child: DmSdkTypes["HJob"], parent: DmSdkTypes["HJob"]): DmSdkTypes["JobSystemResult"];
+  };
+  /**
+   * Flush finished jobs and invoke callbacks on the main thread.
+   * In single-threaded mode, this also processes jobs on the calling thread up to the time limit.
+   */
+  readonly JobSystemUpdate: {
+    /**
+     * @param context job system context
+     * @param time_limit max time (microseconds) to process jobs in single-threaded mode; 0 processes at most one job
+     */
+    (context: DmSdkTypes["HJobContext"], time_limit: bigint): void;
+  };
+  readonly LogInternal: {
+    (severity: DmSdkTypes["LogSeverity"], domain: DmReadonlyPointer<"char">, format: DmReadonlyPointer<"char">): void;
+  };
+  /**
+   * map a function on all values
+   */
+  readonly Map: {
+    /**
+     * @param fn function that will be called for each element
+     * @param ctx user defined context that will be passed in with each callback
+     */
+    (fn: DmNativeCallback, ctx: DmPointer<"void">): void;
+  };
+  /**
+   * Relative change of capacity
+   * Equivalent to SetCapacity(Capacity() + offset).
+   * Only allowed for auto-allocated arrays and will result in a new dynamic allocation followed by memcpy of the elements.
+   */
+  readonly OffsetCapacity: {
+    /**
+     * @param offset relative amount of elements to change the capacity
+     */
+    (offset: number): void;
+  };
+  /**
+   * Remove the last element of the array
+   * Only allowed when the size is larger than zero.
+   */
+  readonly Pop: {
+    (): void;
+  };
+  readonly ProfileCreatePropertyBool: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileCreatePropertyF32: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileCreatePropertyF64: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileCreatePropertyGroup: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileCreatePropertyS32: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileCreatePropertyS64: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileCreatePropertyU32: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileCreatePropertyU64: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
+  };
+  /**
+   * Finalize the profiling system
+   */
+  readonly ProfileFinalize: {
+    (): void;
+  };
+  /**
+   * Begin profiling, eg start of frame
+   */
+  readonly ProfileFrameBegin: {
+    /**
+     * @returns The current profiling context. Must be released by #EndFrame
+     */
+    (): DmSdkTypes["HProfile"];
+  };
+  /**
+   * Release profile returned by #ProfileFrameBegin
+   */
+  readonly ProfileFrameEnd: {
+    /**
+     * @param profile Profile to release
+     * @returns Status for the frame end operation
+     */
+    (profile: DmSdkTypes["HProfile"]): DmSdkTypes["ProfileResult"];
+  };
+  /**
+   * Initialize the profiling system
+   */
+  readonly ProfileInitialize: {
+    (): void;
+  };
+  /**
+   * Finalize the profiling system
+   */
+  readonly ProfileIsInitialized: {
+    /**
+     * @returns Returns non zero if the profiler is initialized
+     */
+    (): boolean;
+  };
+  /**
+   * Log text via the registered profilers
+   */
+  readonly ProfileLogText: {
+    /**
+     * @returns Status for the log text operation
+     */
+    (text: DmReadonlyPointer<"char">): DmSdkTypes["ProfileResult"];
+  };
+  readonly ProfilePropertyAddBool: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertyAddF32: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertyAddF64: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertyAddS32: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertyAddS64: {
+    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
+  };
+  readonly ProfilePropertyAddU32: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertyAddU64: {
+    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
+  };
+  readonly ProfilePropertySetBool: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertySetF32: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertySetF64: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertySetS32: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertySetS64: {
+    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
+  };
+  readonly ProfilePropertySetU32: {
+    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
+  };
+  readonly ProfilePropertySetU64: {
+    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
+  };
+  /**
+   * Register a new profiler. Can be done after the profiling has started.
+   */
+  readonly ProfileRegisterProfiler: {
+    /**
+     * @param name Name of the profiler
+     * @ @param profiler   ProfileListener*  Instance of the profiler. Keep alive until calling ProfileUnregisterProfiler()!
+     */
+    (name: DmReadonlyPointer<"char">, profiler: DmPointer<"ProfileListener">): void;
+  };
+  readonly ProfileRegisterPropertyBool: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileRegisterPropertyF32: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileRegisterPropertyF64: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileRegisterPropertyGroup: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileRegisterPropertyS32: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileRegisterPropertyS64: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileRegisterPropertyU32: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  readonly ProfileRegisterPropertyU64: {
+    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
+  };
+  /**
+   * Start a new profile scope
+   */
+  readonly ProfileScopeBegin: {
+    /**
+     * @param name Name of the scope
+     * @param name_hash Hashed name of the scope
+     * @returns Status for the scope begin operation
+     */
+    (name: DmReadonlyPointer<"char">, name_hash: DmPointer<"uint64_t">): DmSdkTypes["ProfileResult"];
+  };
+  /**
+   * End the last added scope
+   */
+  readonly ProfileScopeEnd: {
+    /**
+     * @param name Name of the scope
+     * @param name_hash Hashed name of the scope
+     * @returns Status for the scope end operation
+     */
+    (name: DmReadonlyPointer<"char">, name_hash: bigint): DmSdkTypes["ProfileResult"];
+  };
+  readonly "ProfileScopeHelper::ProfileScopeHelper": {
+    (name: DmReadonlyPointer<"char">, name_hash: DmPointer<"uint64_t">, info: DmPointer<"ProfileScope">): void;
+  };
+  readonly "ProfileScopeHelper::~ProfileScopeHelper": {
+    (): void;
+  };
+  /**
+   * Set the current thread name to each registered profiler
+   */
+  readonly ProfileSetThreadName: {
+    /**
+     * @param name Name of the thread
+     * @returns Status for the thread name operation
+     */
+    (name: DmReadonlyPointer<"char">): DmSdkTypes["ProfileResult"];
+  };
+  /**
+   * Unregister a profiler
+   */
+  readonly ProfileUnregisterProfiler: {
+    /**
+     * @param name Name of the profiler
+     */
+    (name: DmReadonlyPointer<"char">): void;
+  };
+  /**
+   * Add an element to the end of the array
+   * Only allowed when the capacity is larger than size.
+   */
+  readonly Push: {
+    /**
+     * @param element element element to add
+     */
+    (element: DmReference<DmNativeType<"T">>): void;
+  };
+  /**
+   * Add an array of elements to the end of the array
+   * Only allowed when the capacity is larger than size + count
+   */
+  readonly PushArray: {
+    /**
+     * @param array array of elements to add
+     * @param count amount of elements in the array
+     */
+    (array: DmReadonlyPointer<"T">, count: number): void;
+  };
+  /**
+   * Amount of additional elements that can be stored
+   */
+  readonly Remaining: {
+    /**
+     * @returns amount of additional elements that can be stored
+     */
+    (): number;
+  };
+  /**
+   * Adds a file to the resource system
+   * Any request for this path will go through any existing mounts first.
+   * If you wish to provide file overrides, please use the LiveUpdate feature for that.
+   * The file isn't persisted between sessions.
+   */
+  readonly ResourceAddFile: {
+    /**
+     * @param factory Factory handle
+     * @param path The path of the resource
+     * @param size The size of the resource (in bytes)
+     * @param resource The resource payload
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, size: number, resource: DmReadonlyPointer<"void">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Creates and inserts a resource into the factory
+   */
+  readonly ResourceCreateResource: {
+    /**
+     * @param factory Factory handle
+     * @param name Resource name
+     * @param data Resource data
+     * @param data_size Resource data size
+     * @param resource (out) Stores the created resource
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], name: DmReadonlyPointer<"char">, data: DmPointer<"void">, data_size: number, resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * get path hash of resource
+   */
+  readonly ResourceDescriptorGetNameHash: {
+    /**
+     * @param rd The resource
+     * @returns The path hash
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"]): DmSdkTypes["dmhash_t"];
+  };
+  /**
+   * get the previous resource data
+   */
+  readonly ResourceDescriptorGetPrevResource: {
+    /**
+     * @param rd The resource handle
+     * @returns The resource data
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"]): DmPointer<"void">;
+  };
+  /**
+   * get the resource data
+   */
+  readonly ResourceDescriptorGetResource: {
+    /**
+     * @param rd The resource handle
+     * @returns The resource data
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"]): DmPointer<"void">;
+  };
+  /**
+   * get the resource data size
+   */
+  readonly ResourceDescriptorGetResourceSize: {
+    /**
+     * @param rd The resource handle
+     * @returns The resource data size (in bytes)
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"]): number;
+  };
+  /**
+   * get the resource type
+   */
+  readonly ResourceDescriptorGetType: {
+    /**
+     * @param rd The resource handle
+     * @returns The resource type
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"]): DmSdkTypes["HResourceType"];
+  };
+  /**
+   * Increase resource reference count by 1.
+   */
+  readonly ResourceDescriptorIncRef: {
+    /**
+     * @param factory Factory handle
+     * @param rd The resource handle
+     */
+    (factory: DmSdkTypes["HResourceFactory"], rd: DmSdkTypes["HResourceDescriptor"]): void;
+  };
+  /**
+   * set the previous resource data
+   */
+  readonly ResourceDescriptorSetPrevResource: {
+    /**
+     * @param rd The resource handle
+     * @param resource The resource data
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"], resource: DmPointer<"void">): void;
+  };
+  /**
+   * set the resource data
+   */
+  readonly ResourceDescriptorSetResource: {
+    /**
+     * @param rd The resource handle
+     * @param resource The resource data
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"], resource: DmPointer<"void">): void;
+  };
+  /**
+   * set the resource data size
+   */
+  readonly ResourceDescriptorSetResourceSize: {
+    /**
+     * @param rd The resource handle
+     * @param size The resource data size (in bytes)
+     */
+    (rd: DmSdkTypes["HResourceDescriptor"], size: number): void;
+  };
+  /**
+   * Get (load) a resource from factory
+   */
+  readonly ResourceGet: {
+    /**
+     * @param factory Factory handle
+     * @param path Resource path
+     * @param resource Created resource
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get a loaded resource from factory
+   */
+  readonly ResourceGetByHash: {
+    /**
+     * @param factory Factory handle
+     * @param path_hash Resource path hash
+     * @param resource Created resource
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path_hash: DmSdkTypes["dmhash_t"], resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get a loaded resource from factory and also verifying that it's the expected file type
+   */
+  readonly ResourceGetByHashAndExt: {
+    /**
+     * @param factory Factory handle
+     * @param path_hash Resource path hash
+     * @param ext_hash Resource extension hash (e.g. "texturec", "ttf"). Must match the extension of the path.
+     * @param resource Created resource
+     * @returns RESOURCE_RESULT_OK on success.
+     * RESOURCE_RESULT_INVALID_FILE_EXTENSION if the path extension doesn't match the required extension.
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path_hash: DmSdkTypes["dmhash_t"], ext_hash: DmSdkTypes["dmhash_t"], resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Gets the normalized resource path: "/my//icon.texturec" -&gt; "/my/icon.texturec". "my/icon.texturec" -&gt; "/my/icon.texturec".
+   */
+  readonly ResourceGetCanonicalPath: {
+    /**
+     * @param path the relative dir of the resource
+     * @param buf the output of the normalization
+     * @param buf_len the size of the output buffer
+     * @returns the length of the output string
+     */
+    (path: DmReadonlyPointer<"char">, buf: DmPointer<"char">, buf_len: number): number;
+  };
+  /**
+   * Get resource descriptor from resource (name)
+   */
+  readonly ResourceGetDescriptor: {
+    /**
+     * @param factory Factory handle
+     * @param path Resource path
+     * @param descriptor Returned resource descriptor. Temporary, don't copy.
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, descriptor: DmPointer<"HResourceDescriptor">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get resource descriptor from resource (name)
+   */
+  readonly ResourceGetDescriptorByHash: {
+    /**
+     * @param factory Factory handle
+     * @param path_hash Resource path hash
+     * @param descriptor Returned resource descriptor. Temporary, don't copy.
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path_hash: DmSdkTypes["dmhash_t"], descriptor: DmPointer<"HResourceDescriptor">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get a resource extension from a path, i.e "resource.ext" will return "ext".
+   */
+  readonly ResourceGetExtFromPath: {
+    /**
+     * @param path The path to the resource
+     * @returns Pointer to extension string if an extension was found, 0 otherwise
+     */
+    (path: DmReadonlyPointer<"char">): DmReadonlyPointer<"char">;
+  };
+  /**
+   * Returns the canonical path hash of a resource
+   */
+  readonly ResourceGetPath: {
+    /**
+     * @param factory Factory handle
+     * @param resource The resource pointer
+     * @param hash (out) The path hash of the resource
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], resource: DmReadonlyPointer<"void">, hash: DmPointer<"dmhash_t">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get raw resource data. Unregistered resources can be loaded with this function.
+   * If successful, the returned resource data must be deallocated with free()
+   */
+  readonly ResourceGetRaw: {
+    /**
+     * @param factory Factory handle
+     * @param name Resource name
+     * @param resource Created resource
+     * @param resource_size Resource size
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], name: DmReadonlyPointer<"char">, resource: DmPointer<"void">, resource_size: DmPointer<"uint32_t">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get type from extension
+   */
+  readonly ResourceGetTypeFromExtension: {
+    /**
+     * @param factory Factory handle
+     * @param extension File extension, without leading "." character. E.g. "ttf"
+     * @param type (out) returned type if successful
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], extension: DmReadonlyPointer<"char">, type: DmPointer<"HResourceType">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get type from extension hash
+   */
+  readonly ResourceGetTypeFromExtensionHash: {
+    /**
+     * @param factory Factory handle
+     * @param extension_hash Hash of file extension, without leading "." character. E.g. hash("ttf")
+     * @param type (out) returned type if successful
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], extension_hash: DmSdkTypes["dmhash_t"], type: DmPointer<"HResourceType">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Get (load) a resource from factory
+   */
+  readonly ResourceGetWithExt: {
+    /**
+     * @param factory Factory handle
+     * @param path Resource path
+     * @param ext Resource extension (e.g. "texturec", "ttf"). Must match the extension of the path.
+     * @param resource Created resource
+     * @returns RESOURCE_RESULT_OK on success.
+     * RESOURCE_RESULT_INVALID_FILE_EXTENSION if the path extension doesn't match the required extension.
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, ext: DmReadonlyPointer<"char">, resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Increase resource reference count by 1.
+   */
+  readonly ResourceIncRef: {
+    /**
+     * @param factory Factory handle
+     * @param resource The resource
+     */
+    (factory: DmSdkTypes["HResourceFactory"], resource: DmPointer<"void">): void;
+  };
+  /**
+   * Hint the preloader what to load before Create is called on the resource.
+   * The resources are not guaranteed to be loaded before Create is called.
+   * This function can be called from a worker thread.
+   */
+  readonly ResourcePreloadHint: {
+    /**
+     * @param preloader Preloader handle
+     * @param path Resource path
+     * @returns if successfully invoking preloader.
+     */
+    (preloader: DmSdkTypes["HResourcePreloadHintInfo"], path: DmReadonlyPointer<"char">): boolean;
+  };
+  /**
+   * Registers a custom resource decryption function
+   */
+  readonly ResourceRegisterDecryptionFunction: {
+    /**
+     * @param decrypt_resource The decryption function
+     */
+    (decrypt_resource: DmSdkTypes["FResourceDecryption"]): void;
+  };
+  /**
+   * Register a callback function that will be called with the specified user data when a resource has been reloaded.
+   * The callbacks will not necessarily be called in the order they were registered.
+   * This has only effect when reloading is supported.
+   */
+  readonly ResourceRegisterReloadedCallback: {
+    /**
+     * @param factory Handle of the factory to which the callback will be registered
+     * @param callback Callback function to register
+     * @param user_data User data that will be supplied to the callback when it is called
+     */
+    (factory: DmSdkTypes["HResourceFactory"], callback: DmSdkTypes["FResourceReloadedCallback"], user_data: DmPointer<"void">): void;
+  };
+  /**
+   * Register a resource type
+   */
+  readonly ResourceRegisterType: {
+    /**
+     * @param factory Factory handle
+     * @param extension File extension for resource (e.g. "collectionc")
+     * @param context User context for this file type
+     * @param type (out) resource type. Valid if function returns RESOURCE_RESULT_OK
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], extension: DmReadonlyPointer<"char">, context: DmPointer<"void">, type: DmPointer<"HResourceType">): DmSdkTypes["ResourceResult"];
+  };
+  /**
+   * Resource type creator desc bytesize declaration.
+   */
+  readonly ResourceRegisterTypeCreatorDesc: {
+    /**
+     * @param desc Pointer to allocated area.
+     * Must be valid throughout the application life cycle.
+     * @param size Size of desc. Must be at least ResourceTypeCreatorDescBufferSize bytes
+     * @param name Name of resoruce type (e.g. "collectionc")
+     * @param register_fn Type register function. Called at each reboot
+     * @param deregister_fn Type deregister function. Called at each reboot
+     */
+    (desc: DmPointer<"void">, size: number, name: DmReadonlyPointer<"char">, register_fn: DmSdkTypes["FResourceTypeRegister"], deregister_fn: DmSdkTypes["FResourceTypeDeregister"]): void;
+  };
+  /**
+   * Release resource
+   */
+  readonly ResourceRelease: {
+    /**
+     * @param factory Factory handle
+     * @param resource Resource pointer
+     */
+    (factory: DmSdkTypes["HResourceFactory"], resource: DmPointer<"void">): void;
+  };
+  /**
+   * Removes a previously registered file from the resource system
+   */
+  readonly ResourceRemoveFile: {
+    /**
+     * @param factory Factory handle
+     * @param path The path of the resource
+     * @returns RESOURCE_RESULT_OK on success
+     */
+    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">): DmSdkTypes["ResourceResult"];
+  };
+  readonly ResourceTypeContextGetContextByHash: {
+    (arg1: DmSdkTypes["HResourceTypeContext"], extension_hash: DmSdkTypes["dmhash_t"]): DmPointer<"void">;
+  };
+  /**
+   * get context from type
+   */
+  readonly ResourceTypeGetContext: {
+    /**
+     * @param type The type
+     * @returns 0 if no context was registered
+     */
+    (type: DmSdkTypes["HResourceType"]): DmPointer<"void">;
+  };
+  /**
+   * get registered extension name of the type
+   */
+  readonly ResourceTypeGetName: {
+    /**
+     * @param type The type
+     * @returns The name of the type (e.g. "collectionc")
+     */
+    (type: DmSdkTypes["HResourceType"]): DmReadonlyPointer<"char">;
+  };
+  /**
+   * get registered extension name hash of the type
+   */
+  readonly ResourceTypeGetNameHash: {
+    /**
+     * @param type The type
+     * @returns The name hash of the type (e.g. "collectionc")
+     */
+    (type: DmSdkTypes["HResourceType"]): DmSdkTypes["dmhash_t"];
+  };
+  readonly ResourceTypeGetPreloadSize: {
+    (type: DmSdkTypes["HResourceType"]): number;
+  };
+  readonly ResourceTypeIsStreaming: {
+    (type: DmSdkTypes["HResourceType"]): boolean;
+  };
+  readonly ResourceTypeReset: {
+    (type: DmSdkTypes["HResourceType"]): void;
+  };
+  /**
+   * set context from type
+   */
+  readonly ResourceTypeSetContext: {
+    /**
+     * @param type The type
+     * @param context The context to associate with the type
+     */
+    (type: DmSdkTypes["HResourceType"], context: DmPointer<"void">): void;
+  };
+  /**
+   * set create function for type
+   */
+  readonly ResourceTypeSetCreateFn: {
+    /**
+     * @param type The type
+     * @param fn Function to be called to creating the resource
+     */
+    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourceCreate"]): void;
+  };
+  /**
+   * set destroy function for type
+   */
+  readonly ResourceTypeSetDestroyFn: {
+    /**
+     * @param type The type
+     * @param fn Function to be called to destroy the resource
+     */
+    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourceDestroy"]): void;
+  };
+  /**
+   * set post create function for type
+   */
+  readonly ResourceTypeSetPostCreateFn: {
+    /**
+     * @param type The type
+     * @param fn Function to be called after creating the resource
+     */
+    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourcePostCreate"]): void;
+  };
+  /**
+   * set preload function for type
+   */
+  readonly ResourceTypeSetPreloadFn: {
+    /**
+     * @param type The type
+     * @param fn Function to be called when loading of the resource starts
+     */
+    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourcePreload"]): void;
+  };
+  /**
+   * set recreate function for type
+   */
+  readonly ResourceTypeSetRecreateFn: {
+    /**
+     * @param type The type
+     * @param fn Function to be called when recreating the resource
+     */
+    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourceRecreate"]): void;
+  };
+  readonly ResourceTypeSetStreaming: {
+    (type: DmSdkTypes["HResourceType"], preload_size: number): void;
+  };
+  /**
+   * Remove a registered callback function, O(n).
+   */
+  readonly ResourceUnregisterReloadedCallback: {
+    /**
+     * @param factory Handle of the factory from which the callback will be removed
+     * @param callback Callback function to remove
+     * @param user_data User data that was supplied when the callback was registered
+     */
+    (factory: DmSdkTypes["HResourceFactory"], callback: DmSdkTypes["FResourceReloadedCallback"], user_data: DmPointer<"void">): void;
+  };
+  readonly Set: {
+    (user_array: DmPointer<"T">, size: number, capacity: number, user_allocated: boolean): void;
+  };
+  /**
+   * Set the capacity of the array.
+   * If the size is less than the capacity, the array is truncated.
+   * If it is larger, the array is extended.
+   * Only allowed for auto-allocated arrays and will result in a new dynamic allocation followed by memcpy of the elements.
+   */
+  readonly SetCapacity: {
+    /**
+     * @param capacity capacity of the array
+     */
+    (capacity: number): void;
+  };
+  /**
+   * Set size of the array
+   */
+  readonly SetSize: {
+    /**
+     * @param size size of the array, must be less or equal to the capacity
+     */
+    (size: number): void;
+  };
+  /**
+   * Size of the array in elements
+   */
+  readonly Size: {
+    /**
+     * @returns array size
+     */
+    (): number;
+  };
+  /**
+   * Swap the content of two arrays
+   */
+  readonly Swap: {
+    /**
+     * @param rhs reference to array to swap content with
+     */
+    (rhs: DmReference<DmNativeType<"dmArray<T>">>): void;
+  };
+  /**
+   * Acquire a shared reference to a previously created layout
+   */
+  readonly TextLayoutAcquire: {
+    /**
+     * @param layout the text layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): void;
+  };
+  /**
+   * Create a text layout using a font collection
+   * if successful, the caller owns the returned layout and must call TextLayoutRelease()
+   */
+  readonly TextLayoutCreate: {
+    /**
+     * @param collection the font collection
+     * @param codepoints an array of codepoints
+     * @param num_codepoints number of codepoints in the array
+     * @param settings the settings used for rendering
+     * @param layout (out) the output text layout
+     * @returns the result. TEXT_RESULT_OK if successful
+     */
+    (collection: DmSdkTypes["HFontCollection"], codepoints: DmPointer<"uint32_t">, num_codepoints: number, settings: DmPointer<"TextLayoutSettings">, layout: DmPointer<"HTextLayout">): DmSdkTypes["TextResult"];
+  };
+  /**
+   * Get the lines in the layout
+   */
+  readonly TextLayoutGetBounds: {
+    /**
+     * @param layout the text layout
+     * @returns the total width of the layout (out); the total height of the layout (out)
+     */
+    (layout: DmSdkTypes["HTextLayout"], width: DmPointer<"float">, height: DmPointer<"float">): void;
+  };
+  /**
+   * Get resolved decoration count
+   */
+  readonly TextLayoutGetDecorationCount: {
+    /**
+     * @param layout the text layout
+     * @returns number of underline and strike segments
+     */
+    (layout: DmSdkTypes["HTextLayout"]): number;
+  };
+  /**
+   * Get resolved decorations
+   */
+  readonly TextLayoutGetDecorations: {
+    /**
+     * @param layout the text layout
+     * @returns borrowed decoration array
+     */
+    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"TextDecoration">;
+  };
+  /**
+   * Get the glyph count in the layout
+   */
+  readonly TextLayoutGetGlyphCount: {
+    /**
+     * @param layout the text layout
+     * @returns the number of glyphs in the layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): number;
+  };
+  /**
+   * Get the glyphs in the layout
+   */
+  readonly TextLayoutGetGlyphs: {
+    /**
+     * @param layout the text layout
+     * @returns the array of glyphs in the layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): DmPointer<"TextGlyph">;
+  };
+  /**
+   * Get the line count in the layout
+   */
+  readonly TextLayoutGetLineCount: {
+    /**
+     * @param layout the text layout
+     * @returns the number of lines in the layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): number;
+  };
+  /**
+   * Get the lines in the layout
+   */
+  readonly TextLayoutGetLines: {
+    /**
+     * @param layout the text layout
+     * @returns the array of lines in the layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): DmPointer<"TextLine">;
+  };
+  /**
+   * Get layout object attributes
+   */
+  readonly TextLayoutGetObjectAttributes: {
+    /**
+     * @param layout the text layout
+     * @returns attribute array
+     */
+    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"TextLayoutObjectAttribute">;
+  };
+  /**
+   * Get layout object count
+   */
+  readonly TextLayoutGetObjectCount: {
+    /**
+     * @param layout the text layout
+     * @returns number of sprites and links
+     */
+    (layout: DmSdkTypes["HTextLayout"]): number;
+  };
+  /**
+   * Resolves the lower-left corner of an object using the same shaped-line
+   * coordinate normalization as text rendering.  paragraph_x  and
+   * paragraph_top  define the upper-left layout origin.  paragraph_width  is
+   * used to place right-to-left lines.
+   */
+  readonly TextLayoutGetObjectPosition: {
+    /**
+     * @param layout the text layout
+     * @param object object borrowed from  TextLayoutGetObjects
+     * @param paragraph_x left layout origin
+     * @param paragraph_top top layout origin
+     * @param paragraph_width layout width
+     * @param x resolved lower-left x coordinate (out)
+     * @param y resolved lower-left y coordinate (out)
+     * @returns non-zero when the object belongs to a layout line
+     */
+    (layout: DmSdkTypes["HTextLayout"], object: DmReadonlyPointer<"TextLayoutObject">, paragraph_x: number, paragraph_top: number, paragraph_width: number, x: DmPointer<"float">, y: DmPointer<"float">): number;
+  };
+  /**
+   * Get the UTF-8 source referenced by layout object attributes
+   */
+  readonly TextLayoutGetObjectSource: {
+    /**
+     * @param layout the text layout
+     * @returns null-terminated markup source copy
+     */
+    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"char">;
+  };
+  /**
+   * The borrowed array remains valid until the layout is released.
+   */
+  readonly TextLayoutGetObjects: {
+    /**
+     * @param layout the text layout
+     * @returns layout object array
+     */
+    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"TextLayoutObject">;
+  };
+  /**
+   * Get the paragraph count in the layout
+   */
+  readonly TextLayoutGetParagraphCount: {
+    /**
+     * @param layout the text layout
+     * @returns the number of paragraphs in the layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): number;
+  };
+  /**
+   * Get the paragraphs in the layout
+   */
+  readonly TextLayoutGetParagraphs: {
+    /**
+     * @param layout the text layout
+     * @returns the array of paragraphs in the layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): DmPointer<"TextParagraph">;
+  };
+  /**
+   * Release a previously created layout
+   */
+  readonly TextLayoutRelease: {
+    /**
+     * @param layout the text layout
+     */
+    (layout: DmSdkTypes["HTextLayout"]): void;
+  };
+  /**
+   * The named style replaces the object's default render properties, effects,
+   * and decorations. The default is the markup  style  attribute when present,
+   * otherwise the object's tag name. Inline markup remains applied over the
+   * selected style. Pass zero to restore the default style. This affects rendering
+   * only and never reshapes or reflows text.
+   */
+  readonly TextLayoutSetObjectStyle: {
+    /**
+     * @param layout the text layout
+     * @param object_id ID returned in  TextLayoutObject.m_Id
+     * @param style named style hash, or zero to restore the default
+     * @returns non-zero when the object style changed
+     */
+    (layout: DmSdkTypes["HTextLayout"], object_id: bigint, style: DmSdkTypes["dmhash_t"]): number;
+  };
+  /**
+   * Advance the animation clock used by markup effects in a text layout.
+   * This function only changes the layout's accumulated effect time. It does not
+   * reshape text or alter the base glyph positions, lines, paragraphs, or bounds.
+   * Animated offsets are applied later when glyph vertices are generated.
+   * Call this once per frame with the elapsed time since the previous frame.
+   * Non-finite and non-positive values are ignored.
+   */
+  readonly TextLayoutUpdate: {
+    /**
+     * @param layout the text layout
+     * @param delta_time elapsed time in seconds
+     */
+    (layout: DmSdkTypes["HTextLayout"], delta_time: number): void;
+  };
+  /**
+   * close the window
+   */
+  readonly WindowClose: {
+    /**
+     * @param window window handle
+     */
+    (window: DmSdkTypes["HWindow"]): void;
+  };
+  /**
+   * Initializes a WindowCreateParams struct with default values.
+   * The struct is first cleared to zero, then  m_Width  is set to 640,
+   * m_Height  is set to 480,  m_Samples  is set to 1,
+   * m_Title  is set to "Defold Application", and  m_FocusOnShow  is set to 1.
+   */
+  readonly WindowCreateParamsInitialize: {
+    /**
+     * @param params the params struct
+     */
+    (params: DmPointer<"WindowCreateParams">): void;
+  };
+  /**
+   * delete a window handle
+   */
+  readonly WindowDelete: {
+    /**
+     * @param window window handle
+     */
+    (window: DmSdkTypes["HWindow"]): void;
+  };
+  /**
+   * get display scale factor
+   */
+  readonly WindowGetDisplayScaleFactor: {
+    /**
+     * @param window window handle
+     * @returns display scale factor
+     */
+    (window: DmSdkTypes["HWindow"]): number;
+  };
+  /**
+   * get window height
+   */
+  readonly WindowGetHeight: {
+    /**
+     * @param window window handle
+     * @returns window height
+     */
+    (window: DmSdkTypes["HWindow"]): number;
+  };
+  /**
+   * get window state parameter
+   */
+  readonly WindowGetStateParam: {
+    /**
+     * @param window window handle
+     * @param state state parameter
+     * @returns parameter value
+     */
+    (window: DmSdkTypes["HWindow"], state: DmSdkTypes["WindowState"]): number;
+  };
+  /**
+   * get window width
+   */
+  readonly WindowGetWidth: {
+    /**
+     * @param window window handle
+     * @returns window width
+     */
+    (window: DmSdkTypes["HWindow"]): number;
+  };
+  /**
+   * iconify the window
+   */
+  readonly WindowIconify: {
+    /**
+     * @param window window handle
+     */
+    (window: DmSdkTypes["HWindow"]): void;
+  };
+  /**
+   * create a new window handle
+   */
+  readonly WindowNew: {
+    /**
+     * @returns window handle
+     */
+    (): DmSdkTypes["HWindow"];
+  };
+  /**
+   * open a window
+   */
+  readonly WindowOpen: {
+    /**
+     * @param window window handle
+     * @param params window parameters
+     * @returns result code
+     */
+    (window: DmSdkTypes["HWindow"], params: DmReadonlyPointer<"WindowCreateParams">): DmSdkTypes["WindowResult"];
+  };
+  /**
+   * poll window events
+   */
+  readonly WindowPollEvents: {
+    /**
+     * @param window window handle
+     */
+    (window: DmSdkTypes["HWindow"]): void;
+  };
+  /**
+   * set window size
+   */
+  readonly WindowSetSize: {
+    /**
+     * @param window window handle
+     * @param width window width
+     * @param height window height
+     */
+    (window: DmSdkTypes["HWindow"], width: number, height: number): void;
+  };
+  /**
+   * show the window
+   */
+  readonly WindowShow: {
+    /**
+     * @param window window handle
+     */
+    (window: DmSdkTypes["HWindow"]): void;
   };
   /**
    * Last element of the array
@@ -517,14 +2311,6 @@ export interface DmSdkCalls {
      * @returns array capacity
      */
     (): number;
-  };
-  /**
-   * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
-   * With exception of changing the size and capacity, all operations are guaranteed to be O(1).
-   */
-  readonly "dmArray::dmArray::dmArray<T>": {
-    (): void;
-    (user_array: DmPointer<"T">, size: number, capacity: number): void;
   };
   /**
    * Check if the array is empty.
@@ -624,15 +2410,6 @@ export interface DmSdkCalls {
     (offset: number): void;
   };
   /**
-   * Retrieve an element by index
-   */
-  readonly "dmArray::dmArray::operator[]": {
-    /**
-     * @returns reference to the element at the specified index
-     */
-    (i: number): DmReference<DmNativeType<"T">>;
-  };
-  /**
    * Remove the last element of the array
    * Only allowed when the size is larger than zero.
    */
@@ -710,6 +2487,30 @@ export interface DmSdkCalls {
      * @param rhs reference to array to swap content with
      */
     (rhs: DmReference<DmNativeType<"dmArray<T>">>): void;
+  };
+  /**
+   * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
+   * With exception of changing the size and capacity, all operations are guaranteed to be O(1).
+   */
+  readonly "dmArray::dmArray::dmArray<T>": {
+    (): void;
+    (user_array: DmPointer<"T">, size: number, capacity: number): void;
+  };
+  /**
+   * Retrieve an element by index
+   */
+  readonly "dmArray::dmArray::operator[]": {
+    /**
+     * @returns reference to the element at the specified index
+     */
+    (i: number): DmReference<DmNativeType<"T">>;
+  };
+  /**
+   * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
+   * With exception of changing the size and capacity, all operations are guaranteed to be O(1).
+   */
+  readonly "dmArray::dmArray::~dmArray<T>": {
+    (): void;
   };
   /**
    * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
@@ -1125,16 +2926,6 @@ export interface DmSdkCalls {
     (pool: DmSdkTypes["dmConnectionPool::HPool"], connection: DmSdkTypes["dmConnectionPool::HConnection"]): number;
   };
   /**
-   * Get socket for connection
-   */
-  readonly "dmConnectionPool::GetSocket": {
-    /**
-     * @param pool pool
-     * @returns on success
-     */
-    (pool: DmSdkTypes["dmConnectionPool::HPool"], connection: DmSdkTypes["dmConnectionPool::HConnection"]): DmSdkTypes["dmSocket::Socket"];
-  };
-  /**
    * Get secure socket.
    */
   readonly "dmConnectionPool::GetSSLSocket": {
@@ -1143,6 +2934,16 @@ export interface DmSdkCalls {
      * @returns on success
      */
     (pool: DmSdkTypes["dmConnectionPool::HPool"], connection: DmSdkTypes["dmConnectionPool::HConnection"]): DmSdkTypes["dmSSLSocket::Socket"];
+  };
+  /**
+   * Get socket for connection
+   */
+  readonly "dmConnectionPool::GetSocket": {
+    /**
+     * @param pool pool
+     * @returns on success
+     */
+    (pool: DmSdkTypes["dmConnectionPool::HPool"], connection: DmSdkTypes["dmConnectionPool::HConnection"]): DmSdkTypes["dmSocket::Socket"];
   };
   /**
    * Create a new connection pool
@@ -3873,33 +5674,6 @@ export interface DmSdkCalls {
     (): DmPointer<"JavaVM">;
   };
   /**
-   * Get iOS EAGLContext native handle (id). Any other platform return zero.
-   */
-  readonly "dmGraphics::GetNativeiOSEAGLContext": {
-    /**
-     * @returns native handle
-     */
-    (): DmNativeType<"id">;
-  };
-  /**
-   * Get iOS UIView native handle (id). Any other platform return zero.
-   */
-  readonly "dmGraphics::GetNativeiOSUIView": {
-    /**
-     * @returns native handle
-     */
-    (): DmNativeType<"id">;
-  };
-  /**
-   * Get iOS UIWindow native handle (id). Any other platform return zero.
-   */
-  readonly "dmGraphics::GetNativeiOSUIWindow": {
-    /**
-     * @returns native handle
-     */
-    (): DmNativeType<"id">;
-  };
-  /**
    * Get OSX NSOpenGLContext native handle (id). Any other platform return zero.
    */
   readonly "dmGraphics::GetNativeOSXNSOpenGLContext": {
@@ -3961,6 +5735,33 @@ export interface DmSdkCalls {
      * @returns native handle
      */
     (): DmSdkTypes["Window"];
+  };
+  /**
+   * Get iOS EAGLContext native handle (id). Any other platform return zero.
+   */
+  readonly "dmGraphics::GetNativeiOSEAGLContext": {
+    /**
+     * @returns native handle
+     */
+    (): DmNativeType<"id">;
+  };
+  /**
+   * Get iOS UIView native handle (id). Any other platform return zero.
+   */
+  readonly "dmGraphics::GetNativeiOSUIView": {
+    /**
+     * @returns native handle
+     */
+    (): DmNativeType<"id">;
+  };
+  /**
+   * Get iOS UIWindow native handle (id). Any other platform return zero.
+   */
+  readonly "dmGraphics::GetNativeiOSUIWindow": {
+    /**
+     * @returns native handle
+     */
+    (): DmNativeType<"id">;
   };
   readonly "dmGraphics::GetNumSupportedExtensions": {
     /**
@@ -5101,373 +6902,6 @@ export interface DmSdkCalls {
     (scene: DmSdkTypes["dmGui::HScene"], node: DmSdkTypes["dmGui::HNode"], type: DmSdkTypes["dmGui::NodeTextureType"], texture: DmSdkTypes["dmGui::HTextureSource"]): DmSdkTypes["dmGui::Result"];
   };
   /**
-   * Calculate 32-bit hash value from buffer
-   */
-  readonly dmHashBuffer32: {
-    /**
-     * @param buffer Buffer
-     * @param buffer_len Length of buffer
-     * @returns hash value
-     */
-    (buffer: DmReadonlyPointer<"void">, buffer_len: number): number;
-  };
-  /**
-   * calculate 64-bit hash value from buffer
-   */
-  readonly dmHashBuffer64: {
-    /**
-     * @param buffer Buffer
-     * @param buffer_len Length of buffer
-     * @returns hash value
-     */
-    (buffer: DmReadonlyPointer<"void">, buffer_len: number): bigint;
-  };
-  /**
-   * Clone 32-bit incremental hash state
-   */
-  readonly dmHashClone32: {
-    /**
-     * @param hash_state Hash state
-     * @param source_hash_state Source hash state
-     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH. Ignored if source state reverse hashing is disabled.
-     */
-    (hash_state: DmPointer<"HashState32">, source_hash_state: DmReadonlyPointer<"HashState32">, reverse_hash: boolean): void;
-  };
-  /**
-   * Clone 64-bit incremental hash state
-   */
-  readonly dmHashClone64: {
-    /**
-     * @param hash_state Hash state
-     * @param source_hash_state Source hash state
-     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH. Ignored if source state reverse hashing is disabled.
-     */
-    (hash_state: DmPointer<"HashState64">, source_hash_state: DmReadonlyPointer<"HashState64">, reverse_hash: boolean): void;
-  };
-  /**
-   * Finalize incremental hashing and release associated resources
-   */
-  readonly dmHashFinal32: {
-    /**
-     * @param hash_state Hash state
-     * @returns the hash value
-     */
-    (hash_state: DmPointer<"HashState32">): number;
-  };
-  /**
-   * Finalize incremental hashing and release associated resources
-   */
-  readonly dmHashFinal64: {
-    /**
-     * @param hash_state Hash state
-     * @returns The hash value
-     */
-    (hash_state: DmPointer<"HashState64">): bigint;
-  };
-  /**
-   * Initialize hash-state for 32-bit incremental hashing
-   */
-  readonly dmHashInit32: {
-    /**
-     * @param hash_state Hash state
-     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH
-     */
-    (hash_state: DmPointer<"HashState32">, reverse_hash: boolean): void;
-  };
-  /**
-   * Initialize hash-state for 64-bit incremental hashing
-   */
-  readonly dmHashInit64: {
-    /**
-     * @param hash_state Hash state
-     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH
-     */
-    (hash_state: DmPointer<"HashState64">, reverse_hash: boolean): void;
-  };
-  /**
-   * Release incremental hashing resources
-   * Used to release assocciated resources for intermediate incremental hash states.
-   */
-  readonly dmHashRelease32: {
-    /**
-     * @param hash_state Hash state
-     */
-    (hash_state: DmPointer<"HashState32">): void;
-  };
-  /**
-   * Release incremental hashing resources
-   * Used to release assocciated resources for intermediate incremental hash states.
-   */
-  readonly dmHashRelease64: {
-    /**
-     * @param hash_state Hash state
-     */
-    (hash_state: DmPointer<"HashState64">): void;
-  };
-  readonly dmHashReverse32: {
-    (hash: number, length: DmPointer<"uint32_t">): DmReadonlyPointer<"void">;
-  };
-  readonly dmHashReverse64: {
-    (hash: bigint, length: DmPointer<"uint32_t">): DmReadonlyPointer<"void">;
-  };
-  /**
-   * Returns the original string used to produce a hash.
-   * Always returns a null terminated string. Returns " " if the original string wasn't found.
-   */
-  readonly dmHashReverseSafe32: {
-    /**
-     * @param hash hash value
-     * @returns Original string value or " " if it wasn't found.
-     */
-    (hash: number): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Returns the original string used to produce a hash.
-   */
-  readonly dmHashReverseSafe32Alloc: {
-    /**
-     * @param allocator The reverse hash allocator
-     * @param hash hash value
-     * @returns Original string value or " " if it wasn't found,
-     * or " " if the allocator failed to allocate more memory.
-     * Always returns a null terminated string.
-     */
-    (allocator: DmPointer<"dmAllocator">, hash: number): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Returns the original string used to produce a hash.
-   * Always returns a null terminated string. Returns " " if the original string wasn't found.
-   */
-  readonly dmHashReverseSafe64: {
-    /**
-     * @param hash hash value
-     * @returns Original string value or " " if it wasn't found.
-     */
-    (hash: bigint): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Returns the original string used to produce a hash.
-   */
-  readonly dmHashReverseSafe64Alloc: {
-    /**
-     * @param allocator The reverse hash allocator
-     * @param hash hash value
-     * @returns Original string value or " " if it wasn't found,
-     * or " " if the allocator failed to allocate more memory.
-     * Always returns a null terminated string.
-     */
-    (allocator: DmPointer<"dmAllocator">, hash: bigint): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Calculate 32-bit hash value from string
-   */
-  readonly dmHashString32: {
-    /**
-     * @param string Null terminated string
-     * @returns hash value
-     */
-    (string: DmReadonlyPointer<"char">): number;
-  };
-  /**
-   * calculate 64-bit hash value from string
-   */
-  readonly dmHashString64: {
-    /**
-     * @param string Null terminated string
-     * @returns hash value
-     */
-    (string: DmReadonlyPointer<"char">): bigint;
-  };
-  /**
-   * Hashtable with chaining for collision resolution, memcpy-copy semantics (POD types) and 32-bit indicies instead of pointers. (NUMA-friendly)
-   */
-  readonly "dmHashTable::dmHashTable::~dmHashTable<KEY, T>": {
-    (): void;
-  };
-  /**
-   * Hashtable capacity. Maximum number of entries possible to store in table
-   */
-  readonly "dmHashTable::dmHashTable::Capacity": {
-    /**
-     * @returns the capacity of the table
-     */
-    (): number;
-  };
-  /**
-   * Removes all the entries from the table.
-   */
-  readonly "dmHashTable::dmHashTable::Clear": {
-    (): void;
-  };
-  /**
-   * Hashtable with chaining for collision resolution, memcpy-copy semantics (POD types) and 32-bit indicies instead of pointers. (NUMA-friendly)
-   */
-  readonly "dmHashTable::dmHashTable::dmHashTable<KEY, T>": {
-    (): void;
-    (user_allocated: DmPointer<"void">, table_size: number, capacity: number): void;
-  };
-  /**
-   * Check if the table is empty
-   */
-  readonly "dmHashTable::dmHashTable::Empty": {
-    /**
-     * @returns true if the table is empty
-     */
-    (): boolean;
-  };
-  /**
-   * Remove key/value pair.
-   */
-  readonly "dmHashTable::dmHashTable::Erase": {
-    /**
-     * @param key Key to remove
-     */
-    (key: DmNativeType<"KEY">): void;
-  };
-  /**
-   * Check if the table is full
-   */
-  readonly "dmHashTable::dmHashTable::Full": {
-    /**
-     * @returns true if the table is full
-     */
-    (): boolean;
-  };
-  /**
-   * Get pointer to value from key
-   */
-  readonly "dmHashTable::dmHashTable::Get": {
-    /**
-     * @param key Key
-     * @returns Pointer to value. NULL if the key/value pair doesn't exist.
-     */
-    (key: DmNativeType<"KEY">): DmPointer<"T">;
-    /**
-     * @param key Key
-     * @returns Pointer to value. NULL if the key/value pair doesn't exist.
-     */
-    (key: DmNativeType<"KEY">): DmReadonlyPointer<"T">;
-  };
-  /**
-   * Get an iterator for the key/value pairs
-   */
-  readonly "dmHashTable::dmHashTable::GetIterator": {
-    /**
-     * @returns the iterator
-     */
-    (): DmSdkTypes["dmHashTable::dmHashTable::Iterator"];
-  };
-  /**
-   * Returns the number of bytes needed for user allocated memory.
-   */
-  readonly "dmHashTable::dmHashTable::GetMemorySize": {
-    /**
-     * @param table_size Hashtable size, ie number of buckets. table_size &lt; 0xffffffff
-     * @param capacity Capacity. capacity &lt; 0xffffffff
-     * @returns Number of bytes needed.
-     */
-    (table_size: number, capacity: number): number;
-  };
-  /**
-   * Iterate over all entries in table
-   */
-  readonly "dmHashTable::dmHashTable::Iterate": {
-    (): void;
-  };
-  readonly "dmHashTable::dmHashTable::Iterator::GetKey": {
-    (): DmReference<DmNativeType<"KEY">>;
-  };
-  readonly "dmHashTable::dmHashTable::Iterator::GetValue": {
-    (): DmReference<DmNativeType<"T">>;
-  };
-  /**
-   * Iterator to the key/value pairs of a hash table
-   */
-  readonly "dmHashTable::dmHashTable::Iterator::Iterator": {
-    (table: DmReference<DmNativeType<"dmHashTable<KEY, T>">>): void;
-  };
-  readonly "dmHashTable::dmHashTable::Iterator::Next": {
-    (): boolean;
-  };
-  /**
-   * Relative change of capacity
-   * Equivalent to SetCapacity(Capacity() + offset).
-   * Only allowed for auto-allocated hash tables and will result in a new dynamic allocation
-   */
-  readonly "dmHashTable::dmHashTable::OffsetCapacity": {
-    /**
-     * @param offset relative amount of elements to change the capacity
-     */
-    (offset: number): void;
-  };
-  /**
-   * Put key/value pair in hash table. NOTE: The method will "assert" if the hashtable is full.
-   */
-  readonly "dmHashTable::dmHashTable::Put": {
-    /**
-     * @param key Key
-     * @param value Value
-     */
-    (key: DmNativeType<"KEY">, value: DmReference<DmNativeType<"T">>): void;
-  };
-  /**
-   * Set hashtable capacity. New capacity must be greater or equal to current capacity
-   */
-  readonly "dmHashTable::dmHashTable::SetCapacity": {
-    /**
-     * @param table_size Hashtable size, ie number of buckets. table_size &lt; 0xffffffff
-     * @param capacity Capacity. capacity &lt; 0xffffffff
-     */
-    (table_size: number, capacity: number): void;
-    /**
-     * @param capacity Capacity. capacity &lt; 0xffffffff
-     */
-    (capacity: number): void;
-  };
-  /**
-   * Number of entries stored in table. (not the actual hashtable size)
-   */
-  readonly "dmHashTable::dmHashTable::Size": {
-    /**
-     * @returns of entries.
-     */
-    (): number;
-  };
-  /**
-   * Swaps the contents of two hash tables
-   */
-  readonly "dmHashTable::dmHashTable::Swap": {
-    /**
-     * @param other the other table
-     */
-    (other: DmReference<DmNativeType<"dmHashTable<KEY, T>">>): void;
-  };
-  readonly "dmHashTable::dmHashTable::Verify": {
-    (): void;
-  };
-  /**
-   * Incremental hashing
-   */
-  readonly dmHashUpdateBuffer32: {
-    /**
-     * @param hash_state Hash state
-     * @param buffer Buffer
-     * @param buffer_len Length of buffer
-     */
-    (hash_state: DmPointer<"HashState32">, buffer: DmReadonlyPointer<"void">, buffer_len: number): void;
-  };
-  /**
-   * Incremental hashing
-   */
-  readonly dmHashUpdateBuffer64: {
-    /**
-     * @param hash_state Hash state
-     * @param buffer Buffer
-     * @param buffer_len Length of buffer
-     */
-    (hash_state: DmPointer<"HashState64">, buffer: DmReadonlyPointer<"void">, buffer_len: number): void;
-  };
-  /**
    * Add text input
    */
   readonly "dmHID::AddKeyboardChar": {
@@ -5680,6 +7114,373 @@ export interface DmSdkCalls {
      * @param value wheel value
      */
     (mouse: DmSdkTypes["dmHID::HMouse"], value: number): void;
+  };
+  /**
+   * Calculate 32-bit hash value from buffer
+   */
+  readonly dmHashBuffer32: {
+    /**
+     * @param buffer Buffer
+     * @param buffer_len Length of buffer
+     * @returns hash value
+     */
+    (buffer: DmReadonlyPointer<"void">, buffer_len: number): number;
+  };
+  /**
+   * calculate 64-bit hash value from buffer
+   */
+  readonly dmHashBuffer64: {
+    /**
+     * @param buffer Buffer
+     * @param buffer_len Length of buffer
+     * @returns hash value
+     */
+    (buffer: DmReadonlyPointer<"void">, buffer_len: number): bigint;
+  };
+  /**
+   * Clone 32-bit incremental hash state
+   */
+  readonly dmHashClone32: {
+    /**
+     * @param hash_state Hash state
+     * @param source_hash_state Source hash state
+     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH. Ignored if source state reverse hashing is disabled.
+     */
+    (hash_state: DmPointer<"HashState32">, source_hash_state: DmReadonlyPointer<"HashState32">, reverse_hash: boolean): void;
+  };
+  /**
+   * Clone 64-bit incremental hash state
+   */
+  readonly dmHashClone64: {
+    /**
+     * @param hash_state Hash state
+     * @param source_hash_state Source hash state
+     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH. Ignored if source state reverse hashing is disabled.
+     */
+    (hash_state: DmPointer<"HashState64">, source_hash_state: DmReadonlyPointer<"HashState64">, reverse_hash: boolean): void;
+  };
+  /**
+   * Finalize incremental hashing and release associated resources
+   */
+  readonly dmHashFinal32: {
+    /**
+     * @param hash_state Hash state
+     * @returns the hash value
+     */
+    (hash_state: DmPointer<"HashState32">): number;
+  };
+  /**
+   * Finalize incremental hashing and release associated resources
+   */
+  readonly dmHashFinal64: {
+    /**
+     * @param hash_state Hash state
+     * @returns The hash value
+     */
+    (hash_state: DmPointer<"HashState64">): bigint;
+  };
+  /**
+   * Initialize hash-state for 32-bit incremental hashing
+   */
+  readonly dmHashInit32: {
+    /**
+     * @param hash_state Hash state
+     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH
+     */
+    (hash_state: DmPointer<"HashState32">, reverse_hash: boolean): void;
+  };
+  /**
+   * Initialize hash-state for 64-bit incremental hashing
+   */
+  readonly dmHashInit64: {
+    /**
+     * @param hash_state Hash state
+     * @param reverse_hash true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH
+     */
+    (hash_state: DmPointer<"HashState64">, reverse_hash: boolean): void;
+  };
+  /**
+   * Release incremental hashing resources
+   * Used to release assocciated resources for intermediate incremental hash states.
+   */
+  readonly dmHashRelease32: {
+    /**
+     * @param hash_state Hash state
+     */
+    (hash_state: DmPointer<"HashState32">): void;
+  };
+  /**
+   * Release incremental hashing resources
+   * Used to release assocciated resources for intermediate incremental hash states.
+   */
+  readonly dmHashRelease64: {
+    /**
+     * @param hash_state Hash state
+     */
+    (hash_state: DmPointer<"HashState64">): void;
+  };
+  readonly dmHashReverse32: {
+    (hash: number, length: DmPointer<"uint32_t">): DmReadonlyPointer<"void">;
+  };
+  readonly dmHashReverse64: {
+    (hash: bigint, length: DmPointer<"uint32_t">): DmReadonlyPointer<"void">;
+  };
+  /**
+   * Returns the original string used to produce a hash.
+   * Always returns a null terminated string. Returns " " if the original string wasn't found.
+   */
+  readonly dmHashReverseSafe32: {
+    /**
+     * @param hash hash value
+     * @returns Original string value or " " if it wasn't found.
+     */
+    (hash: number): DmReadonlyPointer<"char">;
+  };
+  /**
+   * Returns the original string used to produce a hash.
+   */
+  readonly dmHashReverseSafe32Alloc: {
+    /**
+     * @param allocator The reverse hash allocator
+     * @param hash hash value
+     * @returns Original string value or " " if it wasn't found,
+     * or " " if the allocator failed to allocate more memory.
+     * Always returns a null terminated string.
+     */
+    (allocator: DmPointer<"dmAllocator">, hash: number): DmReadonlyPointer<"char">;
+  };
+  /**
+   * Returns the original string used to produce a hash.
+   * Always returns a null terminated string. Returns " " if the original string wasn't found.
+   */
+  readonly dmHashReverseSafe64: {
+    /**
+     * @param hash hash value
+     * @returns Original string value or " " if it wasn't found.
+     */
+    (hash: bigint): DmReadonlyPointer<"char">;
+  };
+  /**
+   * Returns the original string used to produce a hash.
+   */
+  readonly dmHashReverseSafe64Alloc: {
+    /**
+     * @param allocator The reverse hash allocator
+     * @param hash hash value
+     * @returns Original string value or " " if it wasn't found,
+     * or " " if the allocator failed to allocate more memory.
+     * Always returns a null terminated string.
+     */
+    (allocator: DmPointer<"dmAllocator">, hash: bigint): DmReadonlyPointer<"char">;
+  };
+  /**
+   * Calculate 32-bit hash value from string
+   */
+  readonly dmHashString32: {
+    /**
+     * @param string Null terminated string
+     * @returns hash value
+     */
+    (string: DmReadonlyPointer<"char">): number;
+  };
+  /**
+   * calculate 64-bit hash value from string
+   */
+  readonly dmHashString64: {
+    /**
+     * @param string Null terminated string
+     * @returns hash value
+     */
+    (string: DmReadonlyPointer<"char">): bigint;
+  };
+  /**
+   * Hashtable capacity. Maximum number of entries possible to store in table
+   */
+  readonly "dmHashTable::dmHashTable::Capacity": {
+    /**
+     * @returns the capacity of the table
+     */
+    (): number;
+  };
+  /**
+   * Removes all the entries from the table.
+   */
+  readonly "dmHashTable::dmHashTable::Clear": {
+    (): void;
+  };
+  /**
+   * Check if the table is empty
+   */
+  readonly "dmHashTable::dmHashTable::Empty": {
+    /**
+     * @returns true if the table is empty
+     */
+    (): boolean;
+  };
+  /**
+   * Remove key/value pair.
+   */
+  readonly "dmHashTable::dmHashTable::Erase": {
+    /**
+     * @param key Key to remove
+     */
+    (key: DmNativeType<"KEY">): void;
+  };
+  /**
+   * Check if the table is full
+   */
+  readonly "dmHashTable::dmHashTable::Full": {
+    /**
+     * @returns true if the table is full
+     */
+    (): boolean;
+  };
+  /**
+   * Get pointer to value from key
+   */
+  readonly "dmHashTable::dmHashTable::Get": {
+    /**
+     * @param key Key
+     * @returns Pointer to value. NULL if the key/value pair doesn't exist.
+     */
+    (key: DmNativeType<"KEY">): DmPointer<"T">;
+    /**
+     * @param key Key
+     * @returns Pointer to value. NULL if the key/value pair doesn't exist.
+     */
+    (key: DmNativeType<"KEY">): DmReadonlyPointer<"T">;
+  };
+  /**
+   * Get an iterator for the key/value pairs
+   */
+  readonly "dmHashTable::dmHashTable::GetIterator": {
+    /**
+     * @returns the iterator
+     */
+    (): DmSdkTypes["dmHashTable::dmHashTable::Iterator"];
+  };
+  /**
+   * Returns the number of bytes needed for user allocated memory.
+   */
+  readonly "dmHashTable::dmHashTable::GetMemorySize": {
+    /**
+     * @param table_size Hashtable size, ie number of buckets. table_size &lt; 0xffffffff
+     * @param capacity Capacity. capacity &lt; 0xffffffff
+     * @returns Number of bytes needed.
+     */
+    (table_size: number, capacity: number): number;
+  };
+  /**
+   * Iterate over all entries in table
+   */
+  readonly "dmHashTable::dmHashTable::Iterate": {
+    (): void;
+  };
+  readonly "dmHashTable::dmHashTable::Iterator::GetKey": {
+    (): DmReference<DmNativeType<"KEY">>;
+  };
+  readonly "dmHashTable::dmHashTable::Iterator::GetValue": {
+    (): DmReference<DmNativeType<"T">>;
+  };
+  /**
+   * Iterator to the key/value pairs of a hash table
+   */
+  readonly "dmHashTable::dmHashTable::Iterator::Iterator": {
+    (table: DmReference<DmNativeType<"dmHashTable<KEY, T>">>): void;
+  };
+  readonly "dmHashTable::dmHashTable::Iterator::Next": {
+    (): boolean;
+  };
+  /**
+   * Relative change of capacity
+   * Equivalent to SetCapacity(Capacity() + offset).
+   * Only allowed for auto-allocated hash tables and will result in a new dynamic allocation
+   */
+  readonly "dmHashTable::dmHashTable::OffsetCapacity": {
+    /**
+     * @param offset relative amount of elements to change the capacity
+     */
+    (offset: number): void;
+  };
+  /**
+   * Put key/value pair in hash table. NOTE: The method will "assert" if the hashtable is full.
+   */
+  readonly "dmHashTable::dmHashTable::Put": {
+    /**
+     * @param key Key
+     * @param value Value
+     */
+    (key: DmNativeType<"KEY">, value: DmReference<DmNativeType<"T">>): void;
+  };
+  /**
+   * Set hashtable capacity. New capacity must be greater or equal to current capacity
+   */
+  readonly "dmHashTable::dmHashTable::SetCapacity": {
+    /**
+     * @param table_size Hashtable size, ie number of buckets. table_size &lt; 0xffffffff
+     * @param capacity Capacity. capacity &lt; 0xffffffff
+     */
+    (table_size: number, capacity: number): void;
+    /**
+     * @param capacity Capacity. capacity &lt; 0xffffffff
+     */
+    (capacity: number): void;
+  };
+  /**
+   * Number of entries stored in table. (not the actual hashtable size)
+   */
+  readonly "dmHashTable::dmHashTable::Size": {
+    /**
+     * @returns of entries.
+     */
+    (): number;
+  };
+  /**
+   * Swaps the contents of two hash tables
+   */
+  readonly "dmHashTable::dmHashTable::Swap": {
+    /**
+     * @param other the other table
+     */
+    (other: DmReference<DmNativeType<"dmHashTable<KEY, T>">>): void;
+  };
+  readonly "dmHashTable::dmHashTable::Verify": {
+    (): void;
+  };
+  /**
+   * Hashtable with chaining for collision resolution, memcpy-copy semantics (POD types) and 32-bit indicies instead of pointers. (NUMA-friendly)
+   */
+  readonly "dmHashTable::dmHashTable::dmHashTable<KEY, T>": {
+    (): void;
+    (user_allocated: DmPointer<"void">, table_size: number, capacity: number): void;
+  };
+  /**
+   * Hashtable with chaining for collision resolution, memcpy-copy semantics (POD types) and 32-bit indicies instead of pointers. (NUMA-friendly)
+   */
+  readonly "dmHashTable::dmHashTable::~dmHashTable<KEY, T>": {
+    (): void;
+  };
+  /**
+   * Incremental hashing
+   */
+  readonly dmHashUpdateBuffer32: {
+    /**
+     * @param hash_state Hash state
+     * @param buffer Buffer
+     * @param buffer_len Length of buffer
+     */
+    (hash_state: DmPointer<"HashState32">, buffer: DmReadonlyPointer<"void">, buffer_len: number): void;
+  };
+  /**
+   * Incremental hashing
+   */
+  readonly dmHashUpdateBuffer64: {
+    /**
+     * @param hash_state Hash state
+     * @param buffer Buffer
+     * @param buffer_len Length of buffer
+     */
+    (hash_state: DmPointer<"HashState64">, buffer: DmReadonlyPointer<"void">, buffer_len: number): void;
   };
   /**
    * Parse the header data and make callbacks for each header/version entry and the start of the body.
@@ -6124,17 +7925,17 @@ export interface DmSdkCalls {
      */
     (): DmSdkTypes["dmMutex::HMutex"];
   };
-  readonly "dmMutex::OptionalScopedMutexLock::~OptionalScopedMutexLock": {
-    (): void;
-  };
   readonly "dmMutex::OptionalScopedMutexLock::OptionalScopedMutexLock": {
     (mutex: DmSdkTypes["dmMutex::HMutex"]): void;
   };
-  readonly "dmMutex::ScopedLock::~ScopedLock": {
+  readonly "dmMutex::OptionalScopedMutexLock::~OptionalScopedMutexLock": {
     (): void;
   };
   readonly "dmMutex::ScopedLock::ScopedLock": {
     (mutex: DmSdkTypes["dmMutex::HMutex"]): void;
+  };
+  readonly "dmMutex::ScopedLock::~ScopedLock": {
+    (): void;
   };
   /**
    * Tries to lock a HMutex, if mutex is already locked it will return false and
@@ -6170,18 +7971,6 @@ export interface DmSdkCalls {
      * @returns maximum number of objects
      */
     (): number;
-  };
-  /**
-   * Object pool data-structure with the following properties
-   * - Mapping from logical index to physical index
-   * - Logical index does not changes
-   * - Allocated objects are contiguously laid out in memory
-   * Loop of m_Objects [0..Size()-1] times to iterate all objects
-   * - Internal physical order is not preserved and a direct consequence of the
-   * contiguous property
-   */
-  readonly "dmObjectPool::dmObjectPool::dmObjectPool<T>": {
-    (): void;
   };
   /**
    * Returns object index to the object pool
@@ -6267,6 +8056,18 @@ export interface DmSdkCalls {
      * @returns returns the number of objects currently stored
      */
     (): number;
+  };
+  /**
+   * Object pool data-structure with the following properties
+   * - Mapping from logical index to physical index
+   * - Logical index does not changes
+   * - Allocated objects are contiguously laid out in memory
+   * Loop of m_Objects [0..Size()-1] times to iterate all objects
+   * - Internal physical order is not preserved and a direct consequence of the
+   * contiguous property
+   */
+  readonly "dmObjectPool::dmObjectPool::dmObjectPool<T>": {
+    (): void;
   };
   /**
    * Adds a render object to the current render frame
@@ -7045,6 +8846,58 @@ export interface DmSdkCalls {
     (context: DmSdkTypes["dmRig::HRigContext"], dt: number): DmSdkTypes["dmRig::Result"];
   };
   /**
+   * Delete a secure socket. Does not close the underlying socket
+   */
+  readonly "dmSSLSocket::Delete": {
+    /**
+     * @param socket Secure socket to close
+     * @returns RESULT_OK on success
+     */
+    (socket: DmSdkTypes["dmSSLSocket::Socket"]): DmSdkTypes["dmSSLSocket::Result"];
+  };
+  /**
+   * Create a new secure socket
+   */
+  readonly "dmSSLSocket::New": {
+    /**
+     * @param socket The socket to wrap
+     * @param host The name of the host (e.g. "httpbin.org")
+     * @param timeout The timeout for the handshake procedure. (microseconds)
+     * @param sslsocket Pointer to a secure socket
+     * @returns RESULT_OK on success
+     */
+    (socket: DmSdkTypes["dmSocket::Socket"], host: DmReadonlyPointer<"char">, timeout: bigint, sslsocket: DmPointer<"dmSSLSocket::Socket">): DmSdkTypes["dmSSLSocket::Result"];
+  };
+  /**
+   * Receive data on a secure socket
+   */
+  readonly "dmSSLSocket::Receive": {
+    /**
+     * @param socket Socket to receive data on
+     * @param buffer Buffer to receive to
+     * @param length Receive buffer length
+     * @param received_bytes Number of received bytes (result)
+     * @returns RESULT_OK on success
+     */
+    (socket: DmSdkTypes["dmSSLSocket::Socket"], buffer: DmPointer<"void">, length: number, received_bytes: DmPointer<"int">): DmSdkTypes["dmSocket::Result"];
+  };
+  /**
+   * Send a message on a secure socket
+   */
+  readonly "dmSSLSocket::Send": {
+    /**
+     * @param socket SSL socket to send a message on
+     * @param buffer Buffer to send
+     * @param length Length of buffer to send
+     * @param sent_bytes Number of bytes sent (result)
+     * @returns RESULT_OK on success
+     */
+    (socket: DmSdkTypes["dmSSLSocket::Socket"], buffer: DmReadonlyPointer<"void">, length: number, sent_bytes: DmPointer<"int">): DmSdkTypes["dmSocket::Result"];
+  };
+  readonly "dmSSLSocket::SetReceiveTimeout": {
+    (socket: DmSdkTypes["dmSSLSocket::Socket"], timeout: bigint): DmSdkTypes["dmSocket::Result"];
+  };
+  /**
    * Retrieve a LuaHBuffer from the supplied lua state.
    * Check if the value in the supplied index on the lua stack is a LuaHBuffer and returns it.
    */
@@ -7437,9 +9290,6 @@ export interface DmSdkCalls {
     (factory: DmSdkTypes["dmResource::HFactory"], buffer_resource: DmPointer<"void">): void;
     (buffer: DmSdkTypes["dmBuffer::HBuffer"], use_lua_gc: boolean): void;
   };
-  readonly "dmScript::LuaStackCheck::~LuaStackCheck": {
-    (): void;
-  };
   readonly "dmScript::LuaStackCheck::Error": {
     (fmt: DmReadonlyPointer<"char">): number;
   };
@@ -7448,6 +9298,9 @@ export interface DmSdkCalls {
   };
   readonly "dmScript::LuaStackCheck::Verify": {
     (diff: number): void;
+  };
+  readonly "dmScript::LuaStackCheck::~LuaStackCheck": {
+    (): void;
   };
   /**
    * Convert the Lua value at the supplied stack index to a Json string
@@ -8100,69 +9953,17 @@ export interface DmSdkCalls {
   readonly "dmSpinlock::Lock": {
     (lock: DmPointer<"dmSpinlock::Spinlock">): void;
   };
-  readonly "dmSpinlock::ScopedLock::~ScopedLock": {
-    (): void;
-  };
   readonly "dmSpinlock::ScopedLock::ScopedLock": {
     (spinlock: DmReference<DmSdkTypes["dmSpinlock::Spinlock"]>): void;
+  };
+  readonly "dmSpinlock::ScopedLock::~ScopedLock": {
+    (): void;
   };
   /**
    * Unlock a Spinlock
    */
   readonly "dmSpinlock::Unlock": {
     (lock: DmPointer<"dmSpinlock::Spinlock">): void;
-  };
-  /**
-   * Delete a secure socket. Does not close the underlying socket
-   */
-  readonly "dmSSLSocket::Delete": {
-    /**
-     * @param socket Secure socket to close
-     * @returns RESULT_OK on success
-     */
-    (socket: DmSdkTypes["dmSSLSocket::Socket"]): DmSdkTypes["dmSSLSocket::Result"];
-  };
-  /**
-   * Create a new secure socket
-   */
-  readonly "dmSSLSocket::New": {
-    /**
-     * @param socket The socket to wrap
-     * @param host The name of the host (e.g. "httpbin.org")
-     * @param timeout The timeout for the handshake procedure. (microseconds)
-     * @param sslsocket Pointer to a secure socket
-     * @returns RESULT_OK on success
-     */
-    (socket: DmSdkTypes["dmSocket::Socket"], host: DmReadonlyPointer<"char">, timeout: bigint, sslsocket: DmPointer<"dmSSLSocket::Socket">): DmSdkTypes["dmSSLSocket::Result"];
-  };
-  /**
-   * Receive data on a secure socket
-   */
-  readonly "dmSSLSocket::Receive": {
-    /**
-     * @param socket Socket to receive data on
-     * @param buffer Buffer to receive to
-     * @param length Receive buffer length
-     * @param received_bytes Number of received bytes (result)
-     * @returns RESULT_OK on success
-     */
-    (socket: DmSdkTypes["dmSSLSocket::Socket"], buffer: DmPointer<"void">, length: number, received_bytes: DmPointer<"int">): DmSdkTypes["dmSocket::Result"];
-  };
-  /**
-   * Send a message on a secure socket
-   */
-  readonly "dmSSLSocket::Send": {
-    /**
-     * @param socket SSL socket to send a message on
-     * @param buffer Buffer to send
-     * @param length Length of buffer to send
-     * @param sent_bytes Number of bytes sent (result)
-     * @returns RESULT_OK on success
-     */
-    (socket: DmSdkTypes["dmSSLSocket::Socket"], buffer: DmReadonlyPointer<"void">, length: number, sent_bytes: DmPointer<"int">): DmSdkTypes["dmSocket::Result"];
-  };
-  readonly "dmSSLSocket::SetReceiveTimeout": {
-    (socket: DmSdkTypes["dmSSLSocket::Socket"], timeout: bigint): DmSdkTypes["dmSocket::Result"];
   };
   /**
    * Case-insensitive string comparison
@@ -8187,6 +9988,33 @@ export interface DmSdkCalls {
      * @returns null-terminated error message
      */
     (dst: DmPointer<"char">, size: number, err: number): void;
+  };
+  /**
+   * Tokenize strings. Equivalent to BSD strsep_r. Thread-save version of strtok.
+   */
+  readonly dmStrTok: {
+    /**
+     * @param string Pointer to string. For the first call string is the string to tokenize. Subsequent should pass NULL.
+     * @param delim Delimiter string
+     * @param lasts Internal state pointer
+     * @returns call to dmStrTok() returns a pointer to a null-terminated string containing the next token. This string does not include the delimiting byte. If no more tokens are found, dmStrTok() returns NULL
+     */
+    (string: DmPointer<"char">, delim: DmReadonlyPointer<"char">, lasts: DmPointer<"char">): DmPointer<"char">;
+  };
+  /**
+   * Copies a string while removing leading and trailing whitespace. Internal
+   * whitespace is preserved. The source and destination may be the same buffer.
+   * The destination is null-terminated when  dst_size  is greater than zero.
+   */
+  readonly dmStrTrim: {
+    /**
+     * @param dst Destination buffer
+     * @param dst_size Size of the destination buffer
+     * @param src Null-terminated source string
+     * @returns of the trimmed source string. If the return value is greater
+     * than or equal to  dst_size , the destination was truncated.
+     */
+    (dst: DmPointer<"char">, dst_size: number, src: DmReadonlyPointer<"char">): number;
   };
   /**
    * Size-bounded string concatenation. Same as OpenBSD 2.4  strlcat .
@@ -8216,33 +10044,6 @@ export interface DmSdkCalls {
      * @returns length of the created string
      */
     (dst: DmPointer<"char">, src: DmReadonlyPointer<"char">, size: number): number;
-  };
-  /**
-   * Tokenize strings. Equivalent to BSD strsep_r. Thread-save version of strtok.
-   */
-  readonly dmStrTok: {
-    /**
-     * @param string Pointer to string. For the first call string is the string to tokenize. Subsequent should pass NULL.
-     * @param delim Delimiter string
-     * @param lasts Internal state pointer
-     * @returns call to dmStrTok() returns a pointer to a null-terminated string containing the next token. This string does not include the delimiting byte. If no more tokens are found, dmStrTok() returns NULL
-     */
-    (string: DmPointer<"char">, delim: DmReadonlyPointer<"char">, lasts: DmPointer<"char">): DmPointer<"char">;
-  };
-  /**
-   * Copies a string while removing leading and trailing whitespace. Internal
-   * whitespace is preserved. The source and destination may be the same buffer.
-   * The destination is null-terminated when  dst_size  is greater than zero.
-   */
-  readonly dmStrTrim: {
-    /**
-     * @param dst Destination buffer
-     * @param dst_size Size of the destination buffer
-     * @param src Null-terminated source string
-     * @returns of the trimmed source string. If the return value is greater
-     * than or equal to  dst_size , the destination was truncated.
-     */
-    (dst: DmPointer<"char">, dst_size: number, src: DmReadonlyPointer<"char">): number;
   };
   /**
    * Checks if a path exists
@@ -9046,1061 +10847,347 @@ export interface DmSdkCalls {
      */
     (request: DmPointer<"dmWebServer::Request">, status_code: number): DmSdkTypes["dmWebServer::Result"];
   };
-  /**
-   * Check if the array is empty.
-   * The array is empty when the size is zero.
-   */
-  readonly Empty: {
-    /**
-     * @returns true if the array is empty
-     */
-    (): boolean;
-  };
-  /**
-   * Pointer to the end of the backing storage
-   * The end is essentially outside of the used storage.
-   */
-  readonly End: {
-    /**
-     * @returns pointer to end of memory
-     */
-    (): DmPointer<"T">;
-    /**
-     * @returns pointer to end of memory
-     */
-    (): DmReadonlyPointer<"T">;
-  };
-  /**
-   * swap bytes in a 16-bit value
-   */
-  readonly EndianSwap16: {
-    /**
-     * @param x Value to byte swap
-     * @returns Byte-swapped value
-     */
-    (x: number): number;
-  };
-  /**
-   * swap bytes in a 32-bit value
-   */
-  readonly EndianSwap32: {
-    /**
-     * @param x Value to byte swap
-     * @returns Byte-swapped value
-     */
-    (x: number): number;
-  };
-  /**
-   * swap bytes in a 64-bit value
-   */
-  readonly EndianSwap64: {
-    /**
-     * @param x Value to byte swap
-     * @returns Byte-swapped value
-     */
-    (x: bigint): bigint;
-  };
-  /**
-   * Network byte order is big-endian.
-   */
-  readonly EndianToHost16: {
-    /**
-     * @param x Network-order (big-endian) value
-     * @returns Host-order value
-     */
-    (x: number): number;
-  };
-  /**
-   * Network byte order is big-endian.
-   */
-  readonly EndianToHost32: {
-    /**
-     * @param x Network-order (big-endian) value
-     * @returns Host-order value
-     */
-    (x: number): number;
-  };
-  /**
-   * Network byte order is big-endian.
-   */
-  readonly EndianToHost64: {
-    /**
-     * @param x Network-order (big-endian) value
-     * @returns Host-order value
-     */
-    (x: bigint): bigint;
-  };
-  /**
-   * Network byte order is big-endian.
-   */
-  readonly EndianToNetwork16: {
-    /**
-     * @param x Host-order value
-     * @returns Network-order (big-endian) value
-     */
-    (x: number): number;
-  };
-  /**
-   * Network byte order is big-endian.
-   */
-  readonly EndianToNetwork32: {
-    /**
-     * @param x Host-order value
-     * @returns Network-order (big-endian) value
-     */
-    (x: number): number;
-  };
-  /**
-   * Network byte order is big-endian.
-   */
-  readonly EndianToNetwork64: {
-    /**
-     * @param x Host-order value
-     * @returns Network-order (big-endian) value
-     */
-    (x: bigint): bigint;
-  };
-  /**
-   * Set size of the array, allocate if necessary
-   */
-  readonly EnsureSize: {
-    /**
-     * @param size size of the array
-     */
-    (size: number): void;
-  };
-  /**
-   * Remove the element at the specified index.
-   * The removed element is replaced by the element at the end (if any), thus potentially altering the order.
-   * While operation changes the array size, it is guaranteed to be O(1).
-   */
-  readonly EraseSwap: {
-    /**
-     * @param index index of the element to remove
-     * @returns reference to the new element at index
-     */
-    (index: number): DmReference<DmNativeType<"T">>;
-  };
-  /**
-   * Remove the element by reference
-   * The removed element is replaced by the element at the end (if any), thus potentially altering the order.
-   * While operation changes the array size, it is guaranteed to be O(1).
-   */
-  readonly EraseSwapRef: {
-    /**
-     * @param element reference to the element to remove.
-     * @returns reference to the new referenced element
-     */
-    (element: DmReference<DmNativeType<"T">>): DmReference<DmNativeType<"T">>;
-  };
-  /**
-   * Finalizes an extension app params struct (deallocates internal memory)
-   */
-  readonly ExtensionAppParamsFinalize: {
-    (params: DmPointer<"ExtensionAppParams">): void;
-  };
-  /**
-   * get the app exit code
-   */
-  readonly ExtensionAppParamsGetAppExitCode: {
-    /**
-     * @param app_params The app params sent to the extension dmExtension::AppInitialize / dmExtension::AppInitialize
-     * @returns engine exit code
-     */
-    (app_params: DmPointer<"ExtensionAppParams">): DmSdkTypes["ExtensionAppExitCode"];
-  };
-  /**
-   * Gets a context using a specified name hash
-   */
-  readonly ExtensionAppParamsGetContext: {
-    /**
-     * @param params the params
-     * @param name_hash the context name hash
-     * @returns The context, if it exists
-     */
-    (params: DmPointer<"ExtensionAppParams">, name_hash: DmSdkTypes["dmhash_t"]): DmPointer<"void">;
-  };
-  /**
-   * Gets a context using a specified name
-   */
-  readonly ExtensionAppParamsGetContextByName: {
-    /**
-     * @param params the params
-     * @param name the context name
-     * @returns The context, if it exists
-     */
-    (params: DmPointer<"ExtensionAppParams">, name: DmReadonlyPointer<"char">): DmPointer<"void">;
-  };
-  /**
-   * Gets the context registry used by the extension app params.
-   */
-  readonly ExtensionAppParamsGetContextRegistry: {
-    /**
-     * @param params the params
-     * @returns the context registry
-     */
-    (params: DmPointer<"ExtensionAppParams">): DmSdkTypes["HContextRegistry"];
-  };
-  /**
-   * Initializes an extension app params struct
-   * NOTE: this is an opaque struct, do not use it's members directly!
-   */
-  readonly ExtensionAppParamsInitialize: {
-    /**
-     * @param app_params the params
-     */
-    (app_params: DmPointer<"ExtensionAppParams">): void;
-  };
-  /**
-   * Sets a context using a specified name
-   */
-  readonly ExtensionAppParamsSetContext: {
-    /**
-     * @param params the params
-     * @param name the context name
-     * @param context the context
-     * @returns 0 if successful
-     */
-    (params: DmPointer<"ExtensionAppParams">, name: DmReadonlyPointer<"char">, context: DmPointer<"void">): number;
-  };
-  /**
-   * Finalizes an extension  params struct (deallocates internal memory)
-   */
-  readonly ExtensionParamsFinalize: {
-    (params: DmPointer<"ExtensionParams">): void;
-  };
-  /**
-   * Gets a context using a specified name hash
-   */
-  readonly ExtensionParamsGetContext: {
-    /**
-     * @param params the params
-     * @param name_hash the context name hash
-     * @returns The context, if it exists
-     */
-    (params: DmPointer<"ExtensionParams">, name_hash: DmSdkTypes["dmhash_t"]): DmPointer<"void">;
-  };
-  /**
-   * Gets a context using a specified name
-   */
-  readonly ExtensionParamsGetContextByName: {
-    /**
-     * @param params the params
-     * @param name the context name
-     * @returns The context, if it exists
-     */
-    (params: DmPointer<"ExtensionParams">, name: DmReadonlyPointer<"char">): DmPointer<"void">;
-  };
-  /**
-   * Gets the context registry used by the extension params.
-   */
-  readonly ExtensionParamsGetContextRegistry: {
-    /**
-     * @param params the params
-     * @returns the context registry
-     */
-    (params: DmPointer<"ExtensionParams">): DmSdkTypes["HContextRegistry"];
-  };
-  /**
-   * Initializes an extension params struct
-   * NOTE: this is an opaque struct, do not use it's members directly!
-   */
-  readonly ExtensionParamsInitialize: {
-    /**
-     * @param app_params the params
-     */
-    (app_params: DmPointer<"ExtensionParams">): void;
-  };
-  /**
-   * Sets a context using a specified name
-   */
-  readonly ExtensionParamsSetContext: {
-    /**
-     * @param params the params
-     * @param name the context name
-     * @param context the context
-     * @returns 0 if successful
-     */
-    (params: DmPointer<"ExtensionParams">, name: DmReadonlyPointer<"char">, context: DmPointer<"void">): number;
-  };
-  /**
-   * Extension declaration helper. Internal function. Use DM_DECLARE_EXTENSION
-   */
-  readonly ExtensionRegister: {
-    /**
-     * @param desc A persistent buffer of at least 128 bytes.
-     * @param desc_size size of buffer holding desc. in bytes
-     * @param name extension name. human readble. max 16 characters long.
-     * @param app_initialize app-init function. May be null
-     * @param app_finalize app-final function. May be null
-     * @param initialize init function. May not be 0
-     * @param finalize finalize function. May not be 0
-     * @param update update function. May be null
-     * @param on_event event callback function. May be null
-     */
-    (desc: DmPointer<"void">, desc_size: number, name: DmReadonlyPointer<"char">, app_initialize: DmSdkTypes["FExtensionAppInitialize"], app_finalize: DmSdkTypes["FExtensionAppFinalize"], initialize: DmSdkTypes["FExtensionInitialize"], finalize: DmSdkTypes["FExtensionFinalize"], update: DmSdkTypes["FExtensionUpdate"], on_event: DmSdkTypes["FExtensionOnEvent"]): void;
-  };
-  readonly ExtensionRegisterCallback: {
-    (callback_type: DmSdkTypes["ExtensionCallbackType"], func: DmSdkTypes["FExtensionCallback"]): boolean;
-  };
-  /**
-   * Register an iOS application delegate to the engine. Multiple delegates are supported (Max 32)
-   */
-  readonly ExtensionRegisteriOSUIApplicationDelegate: {
-    /**
-     * @param delegate An id , see: https://developer.apple.com/documentation/uikit/uiapplicationdelegate?language=objc
-     */
-    (delegate: DmPointer<"void">): void;
-  };
-  /**
-   * Deregister a previously registered iOS application delegate
-   * This function is only available on iOS.
-   */
-  readonly ExtensionUnregisteriOSUIApplicationDelegate: {
-    /**
-     * @param delegate an id
-     */
-    (delegate: DmPointer<"void">): void;
-  };
-  /**
-   * add a font to the font collection
-   */
-  readonly FontCollectionAddFont: {
-    /**
-     * @param coll the font collection
-     * @param font the font
-     * @returns the result. FONT_RESULT_OK if successful
-     */
-    (coll: DmSdkTypes["HFontCollection"], font: DmSdkTypes["HFont"]): DmSdkTypes["FontResult"];
-  };
-  /**
-   * Create a font collection
-   */
-  readonly FontCollectionCreate: {
-    /**
-     * @returns the font collection
-     */
-    (): DmSdkTypes["HFontCollection"];
-  };
-  /**
-   * destroy a font collection
-   */
-  readonly FontCollectionDestroy: {
-    /**
-     * @param coll the font collection
-     */
-    (coll: DmSdkTypes["HFontCollection"]): void;
-  };
-  /**
-   * return the font associated with the given index
-   */
-  readonly FontCollectionGetFont: {
-    /**
-     * @param coll the font collection
-     * @returns the font at the given index
-     */
-    (coll: DmSdkTypes["HFontCollection"], index: number): DmSdkTypes["HFont"];
-  };
-  /**
-   * return number of fonts in the collection
-   */
-  readonly FontCollectionGetFontCount: {
-    /**
-     * @param coll the font collection
-     * @returns the number of fonts
-     */
-    (coll: DmSdkTypes["HFontCollection"]): number;
-  };
-  /**
-   * remove a font from the font collection
-   */
-  readonly FontCollectionRemoveFont: {
-    /**
-     * @param coll the font collection
-     * @param font the font
-     * @returns the result. FONT_RESULT_OK if successful
-     */
-    (coll: DmSdkTypes["HFontCollection"], font: DmSdkTypes["HFont"]): DmSdkTypes["FontResult"];
-  };
-  /**
-   * Destroys a loaded font
-   */
-  readonly FontDestroy: {
-    /**
-     * @param font The font to deallocate
-     */
-    (font: DmSdkTypes["HFont"]): void;
-  };
-  /**
-   * Free the bitmap of the glyph
-   */
-  readonly FontFreeGlyph: {
-    /**
-     * @param font The font
-     * @param glyph The glyph
-     * @returns The result
-     */
-    (font: DmSdkTypes["HFont"], glyph: DmPointer<"FontGlyph">): DmSdkTypes["FontResult"];
-  };
-  /**
-   * Get the max ascent of the font
-   */
-  readonly FontGetAscent: {
-    /**
-     * @param font The font
-     * @param scale The scale factor
-     * @returns The max ascent
-     */
-    (font: DmSdkTypes["HFont"], scale: number): number;
-  };
-  /**
-   * Get the max descent of the font
-   */
-  readonly FontGetDescent: {
-    /**
-     * @param font The font
-     * @param scale The scale factor
-     * @returns The max descent
-     */
-    (font: DmSdkTypes["HFont"], scale: number): number;
-  };
-  /**
-   * Get the metrics of a glyph
-   */
-  readonly FontGetGlyph: {
-    /**
-     * @param font The font
-     * @param codepoint The unicode code point
-     * @param options (in)   FontGlyphOptions*  The glyph options
-     * @param glyph (out)   FontGlyph*  The glyph
-     * @returns If successful, user must call FreeGlyph() on the result to clear any image data.
-     */
-    (font: DmSdkTypes["HFont"], codepoint: number, options: DmPointer<"FontGlyphOptions">, glyph: DmPointer<"FontGlyph">): DmSdkTypes["FontResult"];
-  };
-  /**
-   * Get the metrics of a glyph
-   */
-  readonly FontGetGlyphByIndex: {
-    /**
-     * @param font The font
-     * @param glyph_index The unicode code point
-     * @param options (in)   FontGlyphOptions*  The glyph options
-     * @param glyph (out)   FontGlyph*  The glyph
-     * @returns If successful, user must call FreeGlyph() on the result to clear any image data.
-     */
-    (font: DmSdkTypes["HFont"], glyph_index: number, options: DmPointer<"FontGlyphOptions">, glyph: DmPointer<"FontGlyph">): DmSdkTypes["FontResult"];
-  };
-  /**
-   * Get glyph index of a codepoint
-   */
-  readonly FontGetGlyphIndex: {
-    /**
-     * @param font The font
-     * @param codepoint The unicode code point
-     * @returns 0 if no index was found
-     */
-    (font: DmSdkTypes["HFont"], codepoint: number): number;
-  };
-  /**
-   * Get the line gap of the font
-   */
-  readonly FontGetLineGap: {
-    /**
-     * @param font The font
-     * @param scale The scale factor
-     * @returns The line gap
-     */
-    (font: DmSdkTypes["HFont"], scale: number): number;
-  };
-  /**
-   * Gets the path of the loaded font
-   */
-  readonly FontGetPath: {
-    /**
-     * @param font The font
-     * @returns The path
-     */
-    (font: DmSdkTypes["HFont"]): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Gets the path hash of the loaded font
-   */
-  readonly FontGetPathHash: {
-    /**
-     * @param font The font
-     * @returns The path
-     */
-    (font: DmSdkTypes["HFont"]): number;
-  };
-  /**
-   * Get the bytes used by this resource
-   */
-  readonly FontGetResourceSize: {
-    /**
-     * @param font The font
-     * @returns The resource size
-     */
-    (font: DmSdkTypes["HFont"]): number;
-  };
-  /**
-   * Get the scale factor from a given pixel size.
-   * Used to convert from points to pixel size
-   */
-  readonly FontGetScaleFromSize: {
-    /**
-     * @param font The font
-     * @param size The font size (in pixel height)
-     * @returns The scale factor
-     */
-    (font: DmSdkTypes["HFont"], size: number): number;
-  };
-  /**
-   * Gets the specific implementation of the loaded font
-   */
-  readonly FontGetType: {
-    /**
-     * @param font The font
-     * @returns The type
-     */
-    (font: DmSdkTypes["HFont"]): DmSdkTypes["FontType"];
-  };
-  /**
-   * Holds the bitmap data of a glyph.
-   * If there's an associated image, it is of size width * height * channels.
-   */
-  readonly "FontGlyphOptions::FontGlyphOptions": {
-    (): void;
-  };
-  /**
-   * Loads a font from memory
-   */
-  readonly FontLoadFromMemory: {
-    /**
-     * @param name The name of the resource. For easier debugging
-     * @param data The raw data
-     * @param data_size The length of the data (in bytes)
-     * @param allocate If true, the font may allocate a copy of the data (if needed). If false, the caller will own the memory.
-     * @returns The loaded font, or null if it failed to load.
-     */
-    (name: DmReadonlyPointer<"char">, data: DmPointer<"void">, data_size: number, allocate: boolean): DmSdkTypes["HFont"];
-  };
-  /**
-   * Loads a font using a path
-   */
-  readonly FontLoadFromPath: {
-    /**
-     * @param path The path to the resource
-     * @returns The loaded font, or null if it failed to load.
-     */
-    (path: DmReadonlyPointer<"char">): DmSdkTypes["HFont"];
-  };
-  /**
-   * First element of the array
-   */
-  readonly Front: {
-    /**
-     * @returns reference to the first element
-     */
-    (): DmReference<DmNativeType<"T">>;
-  };
-  /**
-   * Check if the array is full.
-   * The array is full when the size is equal to the capacity.
-   */
-  readonly Full: {
-    /**
-     * @returns true if the array is full
-     */
-    (): boolean;
-  };
-  /**
-   * Hash state used for 32-bit incremental hashing
-   */
-  readonly "HashState32::HashState32": {
-    (): void;
-  };
-  /**
-   * Hash state used for 64-bit incremental hashing
-   */
-  readonly "HashState64::HashState64": {
-    (): void;
-  };
-  /**
-   * add a request header
-   */
-  readonly HttpAddHeader: {
-    /**
-     * @param request Request object.
-     * @param header Raw request header, eg "Accept: application/json".
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, header: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * Marks a queued or running request as canceled. Cancellation is best effort.
-   */
-  readonly HttpCancelRequest: {
-    /**
-     * @param service HTTP service object.
-     * @param request_handle Request handle returned by HttpPushRequest().
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (service: DmPointer<"HttpService">, request_handle: DmSdkTypes["HttpRequestHandle"]): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * Only valid before HttpPushRequest() succeeds.
-   */
-  readonly HttpDeleteRequest: {
-    /**
-     * @param request Request object.
-     */
-    (request: DmPointer<"HttpRequest">): void;
-  };
-  /**
-   * create a new HTTP request
-   */
-  readonly HttpNewRequest: {
-    /**
-     * @param request Request object on success.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * On success, ownership of request is transferred to the service and the caller
-   * must not modify or delete it.
-   */
-  readonly HttpPushRequest: {
-    /**
-     * @param service HTTP service object.
-     * @param request Request object.
-     * @param request_handle Request handle on success.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (service: DmPointer<"HttpService">, request: DmPointer<"HttpRequest">, request_handle: DmPointer<"HttpRequestHandle">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_PROGRESS.
-   */
-  readonly HttpResponseGetBytesReceived: {
-    /**
-     * @param response Response data.
-     * @returns Received byte count.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_PROGRESS.
-   */
-  readonly HttpResponseGetBytesSent: {
-    /**
-     * @param response Response data.
-     * @returns Sent byte count.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_PROGRESS.
-   */
-  readonly HttpResponseGetBytesTotal: {
-    /**
-     * @param response Response data.
-     * @returns Total byte count, or -1 if unknown.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_DATA.
-   */
-  readonly HttpResponseGetData: {
-    /**
-     * @param response Response data.
-     * @returns Response body chunk data.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"void">;
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_DATA.
-   */
-  readonly HttpResponseGetDataSize: {
-    /**
-     * @param response Response data.
-     * @returns Response body chunk size.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * get response document size
-   */
-  readonly HttpResponseGetDocumentSize: {
-    /**
-     * @param response Response data.
-     * @returns Full size of the requested file, when known.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * get response event
-   */
-  readonly HttpResponseGetEvent: {
-    /**
-     * @param response Response data.
-     * @returns Event type.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): DmSdkTypes["HttpResponseEvent"];
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_HEADER. Returns the raw response header line
-   * as "Name:Value", without a trailing newline. The returned pointer is valid
-   * only for the duration of the callback. Use HttpResponseGetHeaderSize() for
-   * the number of bytes in the header line.
-   */
-  readonly HttpResponseGetHeader: {
-    /**
-     * @param response Response data.
-     * @returns Raw header line in "Name:Value" form.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_HEADER.
-   */
-  readonly HttpResponseGetHeaderSize: {
-    /**
-     * @param response Response data.
-     * @returns Number of bytes returned by
-     * HttpResponseGetHeader(), excluding any null terminator.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * get response path
-   */
-  readonly HttpResponseGetPath: {
-    /**
-     * @param response Response data.
-     * @returns User supplied response path.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"char">;
-  };
-  /**
-   * get response range end
-   */
-  readonly HttpResponseGetRangeEnd: {
-    /**
-     * @param response Response data.
-     * @returns End offset into the requested file, when known.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * get response range start
-   */
-  readonly HttpResponseGetRangeStart: {
-    /**
-     * @param response Response data.
-     * @returns Start offset into the requested file, when known.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * Valid for HTTP_RESPONSE_EVENT_COMPLETE.
-   */
-  readonly HttpResponseGetResult: {
-    /**
-     * @param response Response data.
-     * @returns Transfer result.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * get response status code
-   */
-  readonly HttpResponseGetStatusCode: {
-    /**
-     * @param response Response data.
-     * @returns HTTP status code, eg 200.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): number;
-  };
-  /**
-   * get response URL
-   */
-  readonly HttpResponseGetURL: {
-    /**
-     * @param response Response data.
-     * @returns Request URL.
-     */
-    (response: DmReadonlyPointer<"HttpResponseInfo">): DmReadonlyPointer<"char">;
-  };
-  /**
-   * set basic authentication credentials
-   */
-  readonly HttpSetBasicAuth: {
-    /**
-     * @param request Request object.
-     * @param username User name.
-     * @param password Password.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, username: DmReadonlyPointer<"char">, password: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set bearer authentication token
-   */
-  readonly HttpSetBearerAuth: {
-    /**
-     * @param request Request object.
-     * @param token Bearer token.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, token: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set chunked transfer
-   */
-  readonly HttpSetChunkedTransfer: {
-    /**
-     * @param request Request object.
-     * @param chunked_transfer Non-zero to allow chunked transfer encoding.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, chunked_transfer: number): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set ignore cache
-   */
-  readonly HttpSetIgnoreCache: {
-    /**
-     * @param request Request object.
-     * @param ignore_cache Non-zero to ignore the HTTP cache.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, ignore_cache: number): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set request method
-   */
-  readonly HttpSetMethod: {
-    /**
-     * @param request Request object.
-     * @param method HTTP method, eg "GET".
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, method: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set proxy URL
-   */
-  readonly HttpSetProxy: {
-    /**
-     * @param request Request object.
-     * @param proxy Full proxy URL, or 0 to clear.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, proxy: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set progress reporting
-   */
-  readonly HttpSetReportProgress: {
-    /**
-     * @param request Request object.
-     * @param report_progress Non-zero to receive HTTP_RESPONSE_EVENT_PROGRESS callbacks.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, report_progress: number): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * Copies request body data into the request. Passing a zero size clears the body.
-   * The current HTTP client sends request bodies for POST, PUT, and PATCH.
-   */
-  readonly HttpSetRequestBody: {
-    /**
-     * @param request Request object.
-     * @param body Request body data.
-     * @param body_size Request body size.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, body: DmReadonlyPointer<"void">, body_size: number): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set response callback
-   */
-  readonly HttpSetResponseCallback: {
-    /**
-     * @param request Request object.
-     * @param callback Response callback.
-     * @param user_data User data.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, callback: DmSdkTypes["HttpResponseCallback"], user_data: DmPointer<"void">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * Stores a user supplied path with the request. The HTTP API does not write the
-   * response to this path; it is returned in response callbacks for callers that
-   * want to write response data themselves.
-   */
-  readonly HttpSetResponsePath: {
-    /**
-     * @param request Request object.
-     * @param path Response path, or 0 to clear.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, path: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set request timeout
-   */
-  readonly HttpSetTimeout: {
-    /**
-     * @param request Request object.
-     * @param timeout_us Timeout in microseconds.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, timeout_us: number): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * set request URL
-   */
-  readonly HttpSetURL: {
-    /**
-     * @param request Request object.
-     * @param url Full request URL.
-     * @returns HTTP_RESULT_OK on success.
-     */
-    (request: DmPointer<"HttpRequest">, url: DmReadonlyPointer<"char">): DmSdkTypes["HttpResult"];
-  };
-  /**
-   * cancel a job (and its children)
-   */
-  readonly JobSystemCancelJob: {
-    /**
-     * @param context the job system context
-     * @param job the job to cancel
-     * @returns Returns JOBSYSTEM_RESULT_CANCELED if canceled, JOBSYSTEM_RESULT_PENDING if the job (or any child) is still in flight, or JOBSYSTEM_RESULT_INVALID_HANDLE if the handle is invalid
-     */
-    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmSdkTypes["JobSystemResult"];
-  };
-  /**
-   * Create a new job system context.
-   */
-  readonly JobSystemCreate: {
-    /**
-     * @param create_params creation parameters
-     * @returns job system context, or null on failure
-     */
-    (create_params: DmReadonlyPointer<"JobSystemCreateParams">): DmSdkTypes["HJobContext"];
-  };
-  /**
-   * create a job
-   */
-  readonly JobSystemCreateJob: {
-    /**
-     * @param context the job system context
-     * @param job the job creation parameters. This pointer is not stored, the data is copied as-is.
-     * @returns returns the job if successful. 0 otherwise.
-     */
-    (context: DmSdkTypes["HJobContext"], job: DmPointer<"Job">): DmSdkTypes["HJob"];
-  };
-  /**
-   * Destroy a job system context and free its resources.
-   */
-  readonly JobSystemDestroy: {
-    /**
-     * @param context job system context
-     */
-    (context: DmSdkTypes["HJobContext"]): void;
-  };
-  /**
-   * get the context from a job
-   */
-  readonly JobSystemGetContext: {
-    /**
-     * @param context the job system context
-     * @param job the job
-     * @returns The registered context pointer. 0 if the job handle is invalid.
-     */
-    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmPointer<"void">;
-  };
-  /**
-   * get the data from a job
-   */
-  readonly JobSystemGetData: {
-    /**
-     * @param context the job system context
-     * @param job the job
-     * @returns The registered data pointer. 0 if the job handle is invalid.
-     */
-    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmPointer<"void">;
-  };
-  /**
-   * get worker count
-   */
-  readonly JobSystemGetWorkerCount: {
-    /**
-     * @param context job system context
-     * @returns number of worker threads
-     */
-    (context: DmSdkTypes["HJobContext"]): number;
-  };
-  /**
-   * push a job onto the work queue
-   */
-  readonly JobSystemPushJob: {
-    /**
-     * @param context the job system context
-     * @param job the job to add to the work queue
-     * @returns return JOBSYSTEM_RESULT_OK if job was pushed
-     */
-    (context: DmSdkTypes["HJobContext"], job: DmSdkTypes["HJob"]): DmSdkTypes["JobSystemResult"];
-  };
-  /**
-   * set a job as a dependency
-   */
-  readonly JobSystemSetParent: {
-    /**
-     * @param context the job system context
-     * @param child the child job
-     * @param parent the parent job
-     * @returns return JOBSYSTEM_RESULT_OK if job was pushed
-     */
-    (context: DmSdkTypes["HJobContext"], child: DmSdkTypes["HJob"], parent: DmSdkTypes["HJob"]): DmSdkTypes["JobSystemResult"];
-  };
-  /**
-   * Flush finished jobs and invoke callbacks on the main thread.
-   * In single-threaded mode, this also processes jobs on the calling thread up to the time limit.
-   */
-  readonly JobSystemUpdate: {
-    /**
-     * @param context job system context
-     * @param time_limit max time (microseconds) to process jobs in single-threaded mode; 0 processes at most one job
-     */
-    (context: DmSdkTypes["HJobContext"], time_limit: bigint): void;
-  };
-  readonly LogInternal: {
-    (severity: DmSdkTypes["LogSeverity"], domain: DmReadonlyPointer<"char">, format: DmReadonlyPointer<"char">): void;
-  };
-  /**
-   * map a function on all values
-   */
-  readonly Map: {
-    /**
-     * @param fn function that will be called for each element
-     * @param ctx user defined context that will be passed in with each callback
-     */
-    (fn: DmNativeCallback, ctx: DmPointer<"void">): void;
-  };
-  /**
-   * Relative change of capacity
-   * Equivalent to SetCapacity(Capacity() + offset).
-   * Only allowed for auto-allocated arrays and will result in a new dynamic allocation followed by memcpy of the elements.
-   */
-  readonly OffsetCapacity: {
-    /**
-     * @param offset relative amount of elements to change the capacity
-     */
-    (offset: number): void;
+  readonly dm_luaL_addlstring: {
+    (B: DmPointer<"luaL_Buffer">, s: DmReadonlyPointer<"char">, l: number): void;
+  };
+  readonly dm_luaL_addstring: {
+    (B: DmPointer<"luaL_Buffer">, s: DmReadonlyPointer<"char">): void;
+  };
+  readonly dm_luaL_addvalue: {
+    (B: DmPointer<"luaL_Buffer">): void;
+  };
+  readonly dm_luaL_argerror: {
+    (L: DmPointer<"lua_State">, numarg: number, extramsg: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_buffinit: {
+    (L: DmPointer<"lua_State">, B: DmPointer<"luaL_Buffer">): void;
+  };
+  readonly dm_luaL_callmeta: {
+    (L: DmPointer<"lua_State">, obj: number, e: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_checkany: {
+    (L: DmPointer<"lua_State">, narg: number): void;
+  };
+  readonly dm_luaL_checkinteger: {
+    (L: DmPointer<"lua_State">, numArg: number): DmSdkTypes["lua_Integer"];
+  };
+  readonly dm_luaL_checklstring: {
+    (L: DmPointer<"lua_State">, numArg: number, l: DmPointer<"size_t">): DmReadonlyPointer<"char">;
+  };
+  readonly dm_luaL_checknumber: {
+    (L: DmPointer<"lua_State">, numArg: number): DmSdkTypes["lua_Number"];
+  };
+  readonly dm_luaL_checkoption: {
+    (L: DmPointer<"lua_State">, narg: number, def: DmReadonlyPointer<"char">, lst: DmReadonlyPointer<"char *">): number;
+  };
+  readonly dm_luaL_checkstack: {
+    (L: DmPointer<"lua_State">, sz: number, msg: DmReadonlyPointer<"char">): void;
+  };
+  readonly dm_luaL_checktype: {
+    (L: DmPointer<"lua_State">, narg: number, t: number): void;
+  };
+  readonly dm_luaL_checkudata: {
+    (L: DmPointer<"lua_State">, ud: number, tname: DmReadonlyPointer<"char">): DmPointer<"void">;
+  };
+  readonly dm_luaL_error: {
+    (L: DmPointer<"lua_State">, fmt: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_findtable: {
+    (L: DmPointer<"lua_State">, idx: number, fname: DmReadonlyPointer<"char">, szhint: number): DmReadonlyPointer<"char">;
+  };
+  readonly dm_luaL_getmetafield: {
+    (L: DmPointer<"lua_State">, obj: number, e: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_gsub: {
+    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">, p: DmReadonlyPointer<"char">, r: DmReadonlyPointer<"char">): DmReadonlyPointer<"char">;
+  };
+  readonly dm_luaL_loadbuffer: {
+    (L: DmPointer<"lua_State">, buff: DmReadonlyPointer<"char">, sz: number, name: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_loadfile: {
+    (L: DmPointer<"lua_State">, filename: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_loadstring: {
+    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_newmetatable: {
+    (L: DmPointer<"lua_State">, tname: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_newstate: {
+    (): DmPointer<"lua_State">;
+  };
+  readonly dm_luaL_openlib: {
+    (L: DmPointer<"lua_State">, libname: DmReadonlyPointer<"char">, l: DmReadonlyPointer<"luaL_Reg">, nup: number): void;
+  };
+  readonly dm_luaL_optinteger: {
+    (L: DmPointer<"lua_State">, nArg: number, def: DmSdkTypes["lua_Integer"]): DmSdkTypes["lua_Integer"];
+  };
+  readonly dm_luaL_optlstring: {
+    (L: DmPointer<"lua_State">, numArg: number, def: DmReadonlyPointer<"char">, l: DmPointer<"size_t">): DmReadonlyPointer<"char">;
+  };
+  readonly dm_luaL_optnumber: {
+    (L: DmPointer<"lua_State">, nArg: number, def: DmSdkTypes["lua_Number"]): DmSdkTypes["lua_Number"];
+  };
+  readonly dm_luaL_prepbuffer: {
+    (B: DmPointer<"luaL_Buffer">): DmPointer<"char">;
+  };
+  readonly dm_luaL_pushresult: {
+    (B: DmPointer<"luaL_Buffer">): void;
+  };
+  readonly dm_luaL_ref: {
+    (L: DmPointer<"lua_State">, t: number): number;
+  };
+  readonly dm_luaL_register: {
+    (L: DmPointer<"lua_State">, libname: DmReadonlyPointer<"char">, l: DmReadonlyPointer<"luaL_Reg">): void;
+  };
+  readonly dm_luaL_typerror: {
+    (L: DmPointer<"lua_State">, narg: number, tname: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_luaL_unref: {
+    (L: DmPointer<"lua_State">, t: number, ref: number): void;
+  };
+  readonly dm_luaL_where: {
+    (L: DmPointer<"lua_State">, lvl: number): void;
+  };
+  readonly dm_lua_atpanic: {
+    (L: DmPointer<"lua_State">, panicf: DmSdkTypes["lua_CFunction"]): DmSdkTypes["lua_CFunction"];
+  };
+  readonly dm_lua_call: {
+    (L: DmPointer<"lua_State">, nargs: number, nresults: number): void;
+  };
+  readonly dm_lua_checkstack: {
+    (L: DmPointer<"lua_State">, sz: number): number;
+  };
+  readonly dm_lua_close: {
+    (L: DmPointer<"lua_State">): void;
+  };
+  readonly dm_lua_concat: {
+    (L: DmPointer<"lua_State">, n: number): void;
+  };
+  readonly dm_lua_cpcall: {
+    (L: DmPointer<"lua_State">, func: DmSdkTypes["lua_CFunction"], ud: DmPointer<"void">): number;
+  };
+  readonly dm_lua_createtable: {
+    (L: DmPointer<"lua_State">, narr: number, nrec: number): void;
+  };
+  readonly dm_lua_dump: {
+    (L: DmPointer<"lua_State">, writer: DmSdkTypes["lua_Writer"], data: DmPointer<"void">): number;
+  };
+  readonly dm_lua_equal: {
+    (L: DmPointer<"lua_State">, idx1: number, idx2: number): number;
+  };
+  readonly dm_lua_error: {
+    (L: DmPointer<"lua_State">): number;
+  };
+  readonly dm_lua_gc: {
+    (L: DmPointer<"lua_State">, what: number, data: number): number;
+  };
+  readonly dm_lua_getallocf: {
+    (L: DmPointer<"lua_State">, ud: DmPointer<"void">): DmSdkTypes["lua_Alloc"];
+  };
+  readonly dm_lua_getfenv: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_getfield: {
+    (L: DmPointer<"lua_State">, idx: number, k: DmReadonlyPointer<"char">): void;
+  };
+  readonly dm_lua_gethook: {
+    (L: DmPointer<"lua_State">): DmSdkTypes["lua_Hook"];
+  };
+  readonly dm_lua_gethookcount: {
+    (L: DmPointer<"lua_State">): number;
+  };
+  readonly dm_lua_gethookmask: {
+    (L: DmPointer<"lua_State">): number;
+  };
+  readonly dm_lua_getinfo: {
+    (L: DmPointer<"lua_State">, what: DmReadonlyPointer<"char">, ar: DmPointer<"lua_Debug">): number;
+  };
+  readonly dm_lua_getlocal: {
+    (L: DmPointer<"lua_State">, ar: DmReadonlyPointer<"lua_Debug">, n: number): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_getmetatable: {
+    (L: DmPointer<"lua_State">, objindex: number): number;
+  };
+  readonly dm_lua_getstack: {
+    (L: DmPointer<"lua_State">, level: number, ar: DmPointer<"lua_Debug">): number;
+  };
+  readonly dm_lua_gettable: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_gettop: {
+    (L: DmPointer<"lua_State">): number;
+  };
+  readonly dm_lua_getupvalue: {
+    (L: DmPointer<"lua_State">, funcindex: number, n: number): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_insert: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_iscfunction: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_isnumber: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_isstring: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_isuserdata: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_lessthan: {
+    (L: DmPointer<"lua_State">, idx1: number, idx2: number): number;
+  };
+  readonly dm_lua_load: {
+    (L: DmPointer<"lua_State">, reader: DmSdkTypes["lua_Reader"], dt: DmPointer<"void">, chunkname: DmReadonlyPointer<"char">): number;
+  };
+  readonly dm_lua_newstate: {
+    (f: DmSdkTypes["lua_Alloc"], ud: DmPointer<"void">): DmPointer<"lua_State">;
+  };
+  readonly dm_lua_newthread: {
+    (L: DmPointer<"lua_State">): DmPointer<"lua_State">;
+  };
+  readonly dm_lua_newuserdata: {
+    (L: DmPointer<"lua_State">, sz: number): DmPointer<"void">;
+  };
+  readonly dm_lua_next: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_objlen: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_pcall: {
+    (L: DmPointer<"lua_State">, nargs: number, nresults: number, errfunc: number): number;
+  };
+  readonly dm_lua_pushboolean: {
+    (L: DmPointer<"lua_State">, b: number): void;
+  };
+  readonly dm_lua_pushcclosure: {
+    (L: DmPointer<"lua_State">, fn: DmSdkTypes["lua_CFunction"], n: number): void;
+  };
+  readonly dm_lua_pushfstring: {
+    (L: DmPointer<"lua_State">, fmt: DmReadonlyPointer<"char">): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_pushinteger: {
+    (L: DmPointer<"lua_State">, n: DmSdkTypes["lua_Integer"]): void;
+  };
+  readonly dm_lua_pushlightuserdata: {
+    (L: DmPointer<"lua_State">, p: DmPointer<"void">): void;
+  };
+  readonly dm_lua_pushlstring: {
+    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">, l: number): void;
+  };
+  readonly dm_lua_pushnil: {
+    (L: DmPointer<"lua_State">): void;
+  };
+  readonly dm_lua_pushnumber: {
+    (L: DmPointer<"lua_State">, n: DmSdkTypes["lua_Number"]): void;
+  };
+  readonly dm_lua_pushstring: {
+    (L: DmPointer<"lua_State">, s: DmReadonlyPointer<"char">): void;
+  };
+  readonly dm_lua_pushthread: {
+    (L: DmPointer<"lua_State">): number;
+  };
+  readonly dm_lua_pushvalue: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_pushvfstring: {
+    (L: DmPointer<"lua_State">, fmt: DmReadonlyPointer<"char">, argp: DmNativeType<"va_list">): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_rawequal: {
+    (L: DmPointer<"lua_State">, idx1: number, idx2: number): number;
+  };
+  readonly dm_lua_rawget: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_rawgeti: {
+    (L: DmPointer<"lua_State">, idx: number, n: number): void;
+  };
+  readonly dm_lua_rawset: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_rawseti: {
+    (L: DmPointer<"lua_State">, idx: number, n: number): void;
+  };
+  readonly dm_lua_remove: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_replace: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_resume: {
+    (L: DmPointer<"lua_State">, narg: number): number;
+  };
+  readonly dm_lua_setallocf: {
+    (L: DmPointer<"lua_State">, f: DmSdkTypes["lua_Alloc"], ud: DmPointer<"void">): void;
+  };
+  readonly dm_lua_setfenv: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_setfield: {
+    (L: DmPointer<"lua_State">, idx: number, k: DmReadonlyPointer<"char">): void;
+  };
+  readonly dm_lua_sethook: {
+    (L: DmPointer<"lua_State">, func: DmSdkTypes["lua_Hook"], mask: number, count: number): number;
+  };
+  readonly dm_lua_setlevel: {
+    (from: DmPointer<"lua_State">, to: DmPointer<"lua_State">): void;
+  };
+  readonly dm_lua_setlocal: {
+    (L: DmPointer<"lua_State">, ar: DmReadonlyPointer<"lua_Debug">, n: number): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_setmetatable: {
+    (L: DmPointer<"lua_State">, objindex: number): number;
+  };
+  readonly dm_lua_settable: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_settop: {
+    (L: DmPointer<"lua_State">, idx: number): void;
+  };
+  readonly dm_lua_setupvalue: {
+    (L: DmPointer<"lua_State">, funcindex: number, n: number): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_status: {
+    (L: DmPointer<"lua_State">): number;
+  };
+  readonly dm_lua_toboolean: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_tocfunction: {
+    (L: DmPointer<"lua_State">, idx: number): DmSdkTypes["lua_CFunction"];
+  };
+  readonly dm_lua_tointeger: {
+    (L: DmPointer<"lua_State">, idx: number): DmSdkTypes["lua_Integer"];
+  };
+  readonly dm_lua_tolstring: {
+    (L: DmPointer<"lua_State">, idx: number, len: DmPointer<"size_t">): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_tonumber: {
+    (L: DmPointer<"lua_State">, idx: number): DmSdkTypes["lua_Number"];
+  };
+  readonly dm_lua_topointer: {
+    (L: DmPointer<"lua_State">, idx: number): DmReadonlyPointer<"void">;
+  };
+  readonly dm_lua_tothread: {
+    (L: DmPointer<"lua_State">, idx: number): DmPointer<"lua_State">;
+  };
+  readonly dm_lua_touserdata: {
+    (L: DmPointer<"lua_State">, idx: number): DmPointer<"void">;
+  };
+  readonly dm_lua_type: {
+    (L: DmPointer<"lua_State">, idx: number): number;
+  };
+  readonly dm_lua_typename: {
+    (L: DmPointer<"lua_State">, tp: number): DmReadonlyPointer<"char">;
+  };
+  readonly dm_lua_xmove: {
+    (from: DmPointer<"lua_State">, to: DmPointer<"lua_State">, n: number): void;
+  };
+  readonly dm_lua_yield: {
+    (L: DmPointer<"lua_State">, nresults: number): number;
   };
   /**
    * Retrieve an element by index
@@ -10112,1113 +11199,1843 @@ export interface DmSdkCalls {
     (i: number): DmReference<DmNativeType<"T">>;
   };
   /**
-   * Remove the last element of the array
-   * Only allowed when the size is larger than zero.
+   * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
+   * With exception of changing the size and capacity, all operations are guaranteed to be O(1).
    */
-  readonly Pop: {
+  readonly "~dmArray<T>": {
     (): void;
-  };
-  readonly ProfileCreatePropertyBool: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileCreatePropertyF32: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileCreatePropertyF64: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileCreatePropertyGroup: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileCreatePropertyS32: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileCreatePropertyS64: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileCreatePropertyU32: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileCreatePropertyU64: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parent: DmSdkTypes["ProfileIdx"]): DmSdkTypes["ProfileIdx"];
-  };
-  /**
-   * Finalize the profiling system
-   */
-  readonly ProfileFinalize: {
-    (): void;
-  };
-  /**
-   * Begin profiling, eg start of frame
-   */
-  readonly ProfileFrameBegin: {
-    /**
-     * @returns The current profiling context. Must be released by #EndFrame
-     */
-    (): DmSdkTypes["HProfile"];
-  };
-  /**
-   * Release profile returned by #ProfileFrameBegin
-   */
-  readonly ProfileFrameEnd: {
-    /**
-     * @param profile Profile to release
-     * @returns Status for the frame end operation
-     */
-    (profile: DmSdkTypes["HProfile"]): DmSdkTypes["ProfileResult"];
-  };
-  /**
-   * Initialize the profiling system
-   */
-  readonly ProfileInitialize: {
-    (): void;
-  };
-  /**
-   * Finalize the profiling system
-   */
-  readonly ProfileIsInitialized: {
-    /**
-     * @returns Returns non zero if the profiler is initialized
-     */
-    (): boolean;
-  };
-  /**
-   * Log text via the registered profilers
-   */
-  readonly ProfileLogText: {
-    /**
-     * @returns Status for the log text operation
-     */
-    (text: DmReadonlyPointer<"char">): DmSdkTypes["ProfileResult"];
-  };
-  readonly ProfilePropertyAddBool: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertyAddF32: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertyAddF64: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertyAddS32: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertyAddS64: {
-    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
-  };
-  readonly ProfilePropertyAddU32: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertyAddU64: {
-    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
-  };
-  readonly ProfilePropertySetBool: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertySetF32: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertySetF64: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertySetS32: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertySetS64: {
-    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
-  };
-  readonly ProfilePropertySetU32: {
-    (idx: DmSdkTypes["ProfileIdx"], v: number): void;
-  };
-  readonly ProfilePropertySetU64: {
-    (idx: DmSdkTypes["ProfileIdx"], v: bigint): void;
-  };
-  /**
-   * Register a new profiler. Can be done after the profiling has started.
-   */
-  readonly ProfileRegisterProfiler: {
-    /**
-     * @param name Name of the profiler
-     * @ @param profiler   ProfileListener*  Instance of the profiler. Keep alive until calling ProfileUnregisterProfiler()!
-     */
-    (name: DmReadonlyPointer<"char">, profiler: DmPointer<"ProfileListener">): void;
-  };
-  readonly ProfileRegisterPropertyBool: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileRegisterPropertyF32: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileRegisterPropertyF64: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileRegisterPropertyGroup: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileRegisterPropertyS32: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileRegisterPropertyS64: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileRegisterPropertyU32: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: number, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  readonly ProfileRegisterPropertyU64: {
-    (name: DmReadonlyPointer<"char">, desc: DmReadonlyPointer<"char">, value: bigint, flags: number, parentfn: DmNativeCallback): DmSdkTypes["ProfileIdx"];
-  };
-  /**
-   * Start a new profile scope
-   */
-  readonly ProfileScopeBegin: {
-    /**
-     * @param name Name of the scope
-     * @param name_hash Hashed name of the scope
-     * @returns Status for the scope begin operation
-     */
-    (name: DmReadonlyPointer<"char">, name_hash: DmPointer<"uint64_t">): DmSdkTypes["ProfileResult"];
-  };
-  /**
-   * End the last added scope
-   */
-  readonly ProfileScopeEnd: {
-    /**
-     * @param name Name of the scope
-     * @param name_hash Hashed name of the scope
-     * @returns Status for the scope end operation
-     */
-    (name: DmReadonlyPointer<"char">, name_hash: bigint): DmSdkTypes["ProfileResult"];
-  };
-  readonly "ProfileScopeHelper::~ProfileScopeHelper": {
-    (): void;
-  };
-  readonly "ProfileScopeHelper::ProfileScopeHelper": {
-    (name: DmReadonlyPointer<"char">, name_hash: DmPointer<"uint64_t">, info: DmPointer<"ProfileScope">): void;
-  };
-  /**
-   * Set the current thread name to each registered profiler
-   */
-  readonly ProfileSetThreadName: {
-    /**
-     * @param name Name of the thread
-     * @returns Status for the thread name operation
-     */
-    (name: DmReadonlyPointer<"char">): DmSdkTypes["ProfileResult"];
-  };
-  /**
-   * Unregister a profiler
-   */
-  readonly ProfileUnregisterProfiler: {
-    /**
-     * @param name Name of the profiler
-     */
-    (name: DmReadonlyPointer<"char">): void;
-  };
-  /**
-   * Add an element to the end of the array
-   * Only allowed when the capacity is larger than size.
-   */
-  readonly Push: {
-    /**
-     * @param element element element to add
-     */
-    (element: DmReference<DmNativeType<"T">>): void;
-  };
-  /**
-   * Add an array of elements to the end of the array
-   * Only allowed when the capacity is larger than size + count
-   */
-  readonly PushArray: {
-    /**
-     * @param array array of elements to add
-     * @param count amount of elements in the array
-     */
-    (array: DmReadonlyPointer<"T">, count: number): void;
-  };
-  /**
-   * Amount of additional elements that can be stored
-   */
-  readonly Remaining: {
-    /**
-     * @returns amount of additional elements that can be stored
-     */
-    (): number;
-  };
-  /**
-   * Adds a file to the resource system
-   * Any request for this path will go through any existing mounts first.
-   * If you wish to provide file overrides, please use the LiveUpdate feature for that.
-   * The file isn't persisted between sessions.
-   */
-  readonly ResourceAddFile: {
-    /**
-     * @param factory Factory handle
-     * @param path The path of the resource
-     * @param size The size of the resource (in bytes)
-     * @param resource The resource payload
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, size: number, resource: DmReadonlyPointer<"void">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Creates and inserts a resource into the factory
-   */
-  readonly ResourceCreateResource: {
-    /**
-     * @param factory Factory handle
-     * @param name Resource name
-     * @param data Resource data
-     * @param data_size Resource data size
-     * @param resource (out) Stores the created resource
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], name: DmReadonlyPointer<"char">, data: DmPointer<"void">, data_size: number, resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * get path hash of resource
-   */
-  readonly ResourceDescriptorGetNameHash: {
-    /**
-     * @param rd The resource
-     * @returns The path hash
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"]): DmSdkTypes["dmhash_t"];
-  };
-  /**
-   * get the previous resource data
-   */
-  readonly ResourceDescriptorGetPrevResource: {
-    /**
-     * @param rd The resource handle
-     * @returns The resource data
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"]): DmPointer<"void">;
-  };
-  /**
-   * get the resource data
-   */
-  readonly ResourceDescriptorGetResource: {
-    /**
-     * @param rd The resource handle
-     * @returns The resource data
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"]): DmPointer<"void">;
-  };
-  /**
-   * get the resource data size
-   */
-  readonly ResourceDescriptorGetResourceSize: {
-    /**
-     * @param rd The resource handle
-     * @returns The resource data size (in bytes)
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"]): number;
-  };
-  /**
-   * get the resource type
-   */
-  readonly ResourceDescriptorGetType: {
-    /**
-     * @param rd The resource handle
-     * @returns The resource type
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"]): DmSdkTypes["HResourceType"];
-  };
-  /**
-   * Increase resource reference count by 1.
-   */
-  readonly ResourceDescriptorIncRef: {
-    /**
-     * @param factory Factory handle
-     * @param rd The resource handle
-     */
-    (factory: DmSdkTypes["HResourceFactory"], rd: DmSdkTypes["HResourceDescriptor"]): void;
-  };
-  /**
-   * set the previous resource data
-   */
-  readonly ResourceDescriptorSetPrevResource: {
-    /**
-     * @param rd The resource handle
-     * @param resource The resource data
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"], resource: DmPointer<"void">): void;
-  };
-  /**
-   * set the resource data
-   */
-  readonly ResourceDescriptorSetResource: {
-    /**
-     * @param rd The resource handle
-     * @param resource The resource data
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"], resource: DmPointer<"void">): void;
-  };
-  /**
-   * set the resource data size
-   */
-  readonly ResourceDescriptorSetResourceSize: {
-    /**
-     * @param rd The resource handle
-     * @param size The resource data size (in bytes)
-     */
-    (rd: DmSdkTypes["HResourceDescriptor"], size: number): void;
-  };
-  /**
-   * Get (load) a resource from factory
-   */
-  readonly ResourceGet: {
-    /**
-     * @param factory Factory handle
-     * @param path Resource path
-     * @param resource Created resource
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get a loaded resource from factory
-   */
-  readonly ResourceGetByHash: {
-    /**
-     * @param factory Factory handle
-     * @param path_hash Resource path hash
-     * @param resource Created resource
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path_hash: DmSdkTypes["dmhash_t"], resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get a loaded resource from factory and also verifying that it's the expected file type
-   */
-  readonly ResourceGetByHashAndExt: {
-    /**
-     * @param factory Factory handle
-     * @param path_hash Resource path hash
-     * @param ext_hash Resource extension hash (e.g. "texturec", "ttf"). Must match the extension of the path.
-     * @param resource Created resource
-     * @returns RESOURCE_RESULT_OK on success.
-     * RESOURCE_RESULT_INVALID_FILE_EXTENSION if the path extension doesn't match the required extension.
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path_hash: DmSdkTypes["dmhash_t"], ext_hash: DmSdkTypes["dmhash_t"], resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Gets the normalized resource path: "/my//icon.texturec" -&gt; "/my/icon.texturec". "my/icon.texturec" -&gt; "/my/icon.texturec".
-   */
-  readonly ResourceGetCanonicalPath: {
-    /**
-     * @param path the relative dir of the resource
-     * @param buf the output of the normalization
-     * @param buf_len the size of the output buffer
-     * @returns the length of the output string
-     */
-    (path: DmReadonlyPointer<"char">, buf: DmPointer<"char">, buf_len: number): number;
-  };
-  /**
-   * Get resource descriptor from resource (name)
-   */
-  readonly ResourceGetDescriptor: {
-    /**
-     * @param factory Factory handle
-     * @param path Resource path
-     * @param descriptor Returned resource descriptor. Temporary, don't copy.
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, descriptor: DmPointer<"HResourceDescriptor">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get resource descriptor from resource (name)
-   */
-  readonly ResourceGetDescriptorByHash: {
-    /**
-     * @param factory Factory handle
-     * @param path_hash Resource path hash
-     * @param descriptor Returned resource descriptor. Temporary, don't copy.
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path_hash: DmSdkTypes["dmhash_t"], descriptor: DmPointer<"HResourceDescriptor">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get a resource extension from a path, i.e "resource.ext" will return "ext".
-   */
-  readonly ResourceGetExtFromPath: {
-    /**
-     * @param path The path to the resource
-     * @returns Pointer to extension string if an extension was found, 0 otherwise
-     */
-    (path: DmReadonlyPointer<"char">): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Returns the canonical path hash of a resource
-   */
-  readonly ResourceGetPath: {
-    /**
-     * @param factory Factory handle
-     * @param resource The resource pointer
-     * @param hash (out) The path hash of the resource
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], resource: DmReadonlyPointer<"void">, hash: DmPointer<"dmhash_t">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get raw resource data. Unregistered resources can be loaded with this function.
-   * If successful, the returned resource data must be deallocated with free()
-   */
-  readonly ResourceGetRaw: {
-    /**
-     * @param factory Factory handle
-     * @param name Resource name
-     * @param resource Created resource
-     * @param resource_size Resource size
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], name: DmReadonlyPointer<"char">, resource: DmPointer<"void">, resource_size: DmPointer<"uint32_t">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get type from extension
-   */
-  readonly ResourceGetTypeFromExtension: {
-    /**
-     * @param factory Factory handle
-     * @param extension File extension, without leading "." character. E.g. "ttf"
-     * @param type (out) returned type if successful
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], extension: DmReadonlyPointer<"char">, type: DmPointer<"HResourceType">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get type from extension hash
-   */
-  readonly ResourceGetTypeFromExtensionHash: {
-    /**
-     * @param factory Factory handle
-     * @param extension_hash Hash of file extension, without leading "." character. E.g. hash("ttf")
-     * @param type (out) returned type if successful
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], extension_hash: DmSdkTypes["dmhash_t"], type: DmPointer<"HResourceType">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Get (load) a resource from factory
-   */
-  readonly ResourceGetWithExt: {
-    /**
-     * @param factory Factory handle
-     * @param path Resource path
-     * @param ext Resource extension (e.g. "texturec", "ttf"). Must match the extension of the path.
-     * @param resource Created resource
-     * @returns RESOURCE_RESULT_OK on success.
-     * RESOURCE_RESULT_INVALID_FILE_EXTENSION if the path extension doesn't match the required extension.
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">, ext: DmReadonlyPointer<"char">, resource: DmPointer<"void">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Increase resource reference count by 1.
-   */
-  readonly ResourceIncRef: {
-    /**
-     * @param factory Factory handle
-     * @param resource The resource
-     */
-    (factory: DmSdkTypes["HResourceFactory"], resource: DmPointer<"void">): void;
-  };
-  /**
-   * Hint the preloader what to load before Create is called on the resource.
-   * The resources are not guaranteed to be loaded before Create is called.
-   * This function can be called from a worker thread.
-   */
-  readonly ResourcePreloadHint: {
-    /**
-     * @param preloader Preloader handle
-     * @param path Resource path
-     * @returns if successfully invoking preloader.
-     */
-    (preloader: DmSdkTypes["HResourcePreloadHintInfo"], path: DmReadonlyPointer<"char">): boolean;
-  };
-  /**
-   * Registers a custom resource decryption function
-   */
-  readonly ResourceRegisterDecryptionFunction: {
-    /**
-     * @param decrypt_resource The decryption function
-     */
-    (decrypt_resource: DmSdkTypes["FResourceDecryption"]): void;
-  };
-  /**
-   * Register a callback function that will be called with the specified user data when a resource has been reloaded.
-   * The callbacks will not necessarily be called in the order they were registered.
-   * This has only effect when reloading is supported.
-   */
-  readonly ResourceRegisterReloadedCallback: {
-    /**
-     * @param factory Handle of the factory to which the callback will be registered
-     * @param callback Callback function to register
-     * @param user_data User data that will be supplied to the callback when it is called
-     */
-    (factory: DmSdkTypes["HResourceFactory"], callback: DmSdkTypes["FResourceReloadedCallback"], user_data: DmPointer<"void">): void;
-  };
-  /**
-   * Register a resource type
-   */
-  readonly ResourceRegisterType: {
-    /**
-     * @param factory Factory handle
-     * @param extension File extension for resource (e.g. "collectionc")
-     * @param context User context for this file type
-     * @param type (out) resource type. Valid if function returns RESOURCE_RESULT_OK
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], extension: DmReadonlyPointer<"char">, context: DmPointer<"void">, type: DmPointer<"HResourceType">): DmSdkTypes["ResourceResult"];
-  };
-  /**
-   * Resource type creator desc bytesize declaration.
-   */
-  readonly ResourceRegisterTypeCreatorDesc: {
-    /**
-     * @param desc Pointer to allocated area.
-     * Must be valid throughout the application life cycle.
-     * @param size Size of desc. Must be at least ResourceTypeCreatorDescBufferSize bytes
-     * @param name Name of resoruce type (e.g. "collectionc")
-     * @param register_fn Type register function. Called at each reboot
-     * @param deregister_fn Type deregister function. Called at each reboot
-     */
-    (desc: DmPointer<"void">, size: number, name: DmReadonlyPointer<"char">, register_fn: DmSdkTypes["FResourceTypeRegister"], deregister_fn: DmSdkTypes["FResourceTypeDeregister"]): void;
-  };
-  /**
-   * Release resource
-   */
-  readonly ResourceRelease: {
-    /**
-     * @param factory Factory handle
-     * @param resource Resource pointer
-     */
-    (factory: DmSdkTypes["HResourceFactory"], resource: DmPointer<"void">): void;
-  };
-  /**
-   * Removes a previously registered file from the resource system
-   */
-  readonly ResourceRemoveFile: {
-    /**
-     * @param factory Factory handle
-     * @param path The path of the resource
-     * @returns RESOURCE_RESULT_OK on success
-     */
-    (factory: DmSdkTypes["HResourceFactory"], path: DmReadonlyPointer<"char">): DmSdkTypes["ResourceResult"];
-  };
-  readonly ResourceTypeContextGetContextByHash: {
-    (arg1: DmSdkTypes["HResourceTypeContext"], extension_hash: DmSdkTypes["dmhash_t"]): DmPointer<"void">;
-  };
-  /**
-   * get context from type
-   */
-  readonly ResourceTypeGetContext: {
-    /**
-     * @param type The type
-     * @returns 0 if no context was registered
-     */
-    (type: DmSdkTypes["HResourceType"]): DmPointer<"void">;
-  };
-  /**
-   * get registered extension name of the type
-   */
-  readonly ResourceTypeGetName: {
-    /**
-     * @param type The type
-     * @returns The name of the type (e.g. "collectionc")
-     */
-    (type: DmSdkTypes["HResourceType"]): DmReadonlyPointer<"char">;
-  };
-  /**
-   * get registered extension name hash of the type
-   */
-  readonly ResourceTypeGetNameHash: {
-    /**
-     * @param type The type
-     * @returns The name hash of the type (e.g. "collectionc")
-     */
-    (type: DmSdkTypes["HResourceType"]): DmSdkTypes["dmhash_t"];
-  };
-  readonly ResourceTypeGetPreloadSize: {
-    (type: DmSdkTypes["HResourceType"]): number;
-  };
-  readonly ResourceTypeIsStreaming: {
-    (type: DmSdkTypes["HResourceType"]): boolean;
-  };
-  readonly ResourceTypeReset: {
-    (type: DmSdkTypes["HResourceType"]): void;
-  };
-  /**
-   * set context from type
-   */
-  readonly ResourceTypeSetContext: {
-    /**
-     * @param type The type
-     * @param context The context to associate with the type
-     */
-    (type: DmSdkTypes["HResourceType"], context: DmPointer<"void">): void;
-  };
-  /**
-   * set create function for type
-   */
-  readonly ResourceTypeSetCreateFn: {
-    /**
-     * @param type The type
-     * @param fn Function to be called to creating the resource
-     */
-    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourceCreate"]): void;
-  };
-  /**
-   * set destroy function for type
-   */
-  readonly ResourceTypeSetDestroyFn: {
-    /**
-     * @param type The type
-     * @param fn Function to be called to destroy the resource
-     */
-    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourceDestroy"]): void;
-  };
-  /**
-   * set post create function for type
-   */
-  readonly ResourceTypeSetPostCreateFn: {
-    /**
-     * @param type The type
-     * @param fn Function to be called after creating the resource
-     */
-    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourcePostCreate"]): void;
-  };
-  /**
-   * set preload function for type
-   */
-  readonly ResourceTypeSetPreloadFn: {
-    /**
-     * @param type The type
-     * @param fn Function to be called when loading of the resource starts
-     */
-    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourcePreload"]): void;
-  };
-  /**
-   * set recreate function for type
-   */
-  readonly ResourceTypeSetRecreateFn: {
-    /**
-     * @param type The type
-     * @param fn Function to be called when recreating the resource
-     */
-    (type: DmSdkTypes["HResourceType"], fn: DmSdkTypes["FResourceRecreate"]): void;
-  };
-  readonly ResourceTypeSetStreaming: {
-    (type: DmSdkTypes["HResourceType"], preload_size: number): void;
-  };
-  /**
-   * Remove a registered callback function, O(n).
-   */
-  readonly ResourceUnregisterReloadedCallback: {
-    /**
-     * @param factory Handle of the factory from which the callback will be removed
-     * @param callback Callback function to remove
-     * @param user_data User data that was supplied when the callback was registered
-     */
-    (factory: DmSdkTypes["HResourceFactory"], callback: DmSdkTypes["FResourceReloadedCallback"], user_data: DmPointer<"void">): void;
-  };
-  readonly Set: {
-    (user_array: DmPointer<"T">, size: number, capacity: number, user_allocated: boolean): void;
-  };
-  /**
-   * Set the capacity of the array.
-   * If the size is less than the capacity, the array is truncated.
-   * If it is larger, the array is extended.
-   * Only allowed for auto-allocated arrays and will result in a new dynamic allocation followed by memcpy of the elements.
-   */
-  readonly SetCapacity: {
-    /**
-     * @param capacity capacity of the array
-     */
-    (capacity: number): void;
-  };
-  /**
-   * Set size of the array
-   */
-  readonly SetSize: {
-    /**
-     * @param size size of the array, must be less or equal to the capacity
-     */
-    (size: number): void;
-  };
-  /**
-   * Size of the array in elements
-   */
-  readonly Size: {
-    /**
-     * @returns array size
-     */
-    (): number;
-  };
-  /**
-   * Swap the content of two arrays
-   */
-  readonly Swap: {
-    /**
-     * @param rhs reference to array to swap content with
-     */
-    (rhs: DmReference<DmNativeType<"dmArray<T>">>): void;
-  };
-  /**
-   * Acquire a shared reference to a previously created layout
-   */
-  readonly TextLayoutAcquire: {
-    /**
-     * @param layout the text layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): void;
-  };
-  /**
-   * Create a text layout using a font collection
-   * if successful, the caller owns the returned layout and must call TextLayoutRelease()
-   */
-  readonly TextLayoutCreate: {
-    /**
-     * @param collection the font collection
-     * @param codepoints an array of codepoints
-     * @param num_codepoints number of codepoints in the array
-     * @param settings the settings used for rendering
-     * @param layout (out) the output text layout
-     * @returns the result. TEXT_RESULT_OK if successful
-     */
-    (collection: DmSdkTypes["HFontCollection"], codepoints: DmPointer<"uint32_t">, num_codepoints: number, settings: DmPointer<"TextLayoutSettings">, layout: DmPointer<"HTextLayout">): DmSdkTypes["TextResult"];
-  };
-  /**
-   * Get the lines in the layout
-   */
-  readonly TextLayoutGetBounds: {
-    /**
-     * @param layout the text layout
-     * @returns the total width of the layout (out); the total height of the layout (out)
-     */
-    (layout: DmSdkTypes["HTextLayout"], width: DmPointer<"float">, height: DmPointer<"float">): void;
-  };
-  /**
-   * Get resolved decoration count
-   */
-  readonly TextLayoutGetDecorationCount: {
-    /**
-     * @param layout the text layout
-     * @returns number of underline and strike segments
-     */
-    (layout: DmSdkTypes["HTextLayout"]): number;
-  };
-  /**
-   * Get resolved decorations
-   */
-  readonly TextLayoutGetDecorations: {
-    /**
-     * @param layout the text layout
-     * @returns borrowed decoration array
-     */
-    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"TextDecoration">;
-  };
-  /**
-   * Get the glyph count in the layout
-   */
-  readonly TextLayoutGetGlyphCount: {
-    /**
-     * @param layout the text layout
-     * @returns the number of glyphs in the layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): number;
-  };
-  /**
-   * Get the glyphs in the layout
-   */
-  readonly TextLayoutGetGlyphs: {
-    /**
-     * @param layout the text layout
-     * @returns the array of glyphs in the layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): DmPointer<"TextGlyph">;
-  };
-  /**
-   * Get the line count in the layout
-   */
-  readonly TextLayoutGetLineCount: {
-    /**
-     * @param layout the text layout
-     * @returns the number of lines in the layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): number;
-  };
-  /**
-   * Get the lines in the layout
-   */
-  readonly TextLayoutGetLines: {
-    /**
-     * @param layout the text layout
-     * @returns the array of lines in the layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): DmPointer<"TextLine">;
-  };
-  /**
-   * Get layout object attributes
-   */
-  readonly TextLayoutGetObjectAttributes: {
-    /**
-     * @param layout the text layout
-     * @returns attribute array
-     */
-    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"TextLayoutObjectAttribute">;
-  };
-  /**
-   * Get layout object count
-   */
-  readonly TextLayoutGetObjectCount: {
-    /**
-     * @param layout the text layout
-     * @returns number of sprites and links
-     */
-    (layout: DmSdkTypes["HTextLayout"]): number;
-  };
-  /**
-   * Resolves the lower-left corner of an object using the same shaped-line
-   * coordinate normalization as text rendering.  paragraph_x  and
-   * paragraph_top  define the upper-left layout origin.  paragraph_width  is
-   * used to place right-to-left lines.
-   */
-  readonly TextLayoutGetObjectPosition: {
-    /**
-     * @param layout the text layout
-     * @param object object borrowed from  TextLayoutGetObjects
-     * @param paragraph_x left layout origin
-     * @param paragraph_top top layout origin
-     * @param paragraph_width layout width
-     * @param x resolved lower-left x coordinate (out)
-     * @param y resolved lower-left y coordinate (out)
-     * @returns non-zero when the object belongs to a layout line
-     */
-    (layout: DmSdkTypes["HTextLayout"], object: DmReadonlyPointer<"TextLayoutObject">, paragraph_x: number, paragraph_top: number, paragraph_width: number, x: DmPointer<"float">, y: DmPointer<"float">): number;
-  };
-  /**
-   * The borrowed array remains valid until the layout is released.
-   */
-  readonly TextLayoutGetObjects: {
-    /**
-     * @param layout the text layout
-     * @returns layout object array
-     */
-    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"TextLayoutObject">;
-  };
-  /**
-   * Get the UTF-8 source referenced by layout object attributes
-   */
-  readonly TextLayoutGetObjectSource: {
-    /**
-     * @param layout the text layout
-     * @returns null-terminated markup source copy
-     */
-    (layout: DmSdkTypes["HTextLayout"]): DmReadonlyPointer<"char">;
-  };
-  /**
-   * Get the paragraph count in the layout
-   */
-  readonly TextLayoutGetParagraphCount: {
-    /**
-     * @param layout the text layout
-     * @returns the number of paragraphs in the layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): number;
-  };
-  /**
-   * Get the paragraphs in the layout
-   */
-  readonly TextLayoutGetParagraphs: {
-    /**
-     * @param layout the text layout
-     * @returns the array of paragraphs in the layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): DmPointer<"TextParagraph">;
-  };
-  /**
-   * Release a previously created layout
-   */
-  readonly TextLayoutRelease: {
-    /**
-     * @param layout the text layout
-     */
-    (layout: DmSdkTypes["HTextLayout"]): void;
-  };
-  /**
-   * The named style replaces the object's default render properties, effects,
-   * and decorations. The default is the markup  style  attribute when present,
-   * otherwise the object's tag name. Inline markup remains applied over the
-   * selected style. Pass zero to restore the default style. This affects rendering
-   * only and never reshapes or reflows text.
-   */
-  readonly TextLayoutSetObjectStyle: {
-    /**
-     * @param layout the text layout
-     * @param object_id ID returned in  TextLayoutObject.m_Id
-     * @param style named style hash, or zero to restore the default
-     * @returns non-zero when the object style changed
-     */
-    (layout: DmSdkTypes["HTextLayout"], object_id: bigint, style: DmSdkTypes["dmhash_t"]): number;
-  };
-  /**
-   * Advance the animation clock used by markup effects in a text layout.
-   * This function only changes the layout's accumulated effect time. It does not
-   * reshape text or alter the base glyph positions, lines, paragraphs, or bounds.
-   * Animated offsets are applied later when glyph vertices are generated.
-   * Call this once per frame with the elapsed time since the previous frame.
-   * Non-finite and non-positive values are ignored.
-   */
-  readonly TextLayoutUpdate: {
-    /**
-     * @param layout the text layout
-     * @param delta_time elapsed time in seconds
-     */
-    (layout: DmSdkTypes["HTextLayout"], delta_time: number): void;
-  };
-  /**
-   * close the window
-   */
-  readonly WindowClose: {
-    /**
-     * @param window window handle
-     */
-    (window: DmSdkTypes["HWindow"]): void;
-  };
-  /**
-   * Initializes a WindowCreateParams struct with default values.
-   * The struct is first cleared to zero, then  m_Width  is set to 640,
-   * m_Height  is set to 480,  m_Samples  is set to 1,
-   * m_Title  is set to "Defold Application", and  m_FocusOnShow  is set to 1.
-   */
-  readonly WindowCreateParamsInitialize: {
-    /**
-     * @param params the params struct
-     */
-    (params: DmPointer<"WindowCreateParams">): void;
-  };
-  /**
-   * delete a window handle
-   */
-  readonly WindowDelete: {
-    /**
-     * @param window window handle
-     */
-    (window: DmSdkTypes["HWindow"]): void;
-  };
-  /**
-   * get display scale factor
-   */
-  readonly WindowGetDisplayScaleFactor: {
-    /**
-     * @param window window handle
-     * @returns display scale factor
-     */
-    (window: DmSdkTypes["HWindow"]): number;
-  };
-  /**
-   * get window height
-   */
-  readonly WindowGetHeight: {
-    /**
-     * @param window window handle
-     * @returns window height
-     */
-    (window: DmSdkTypes["HWindow"]): number;
-  };
-  /**
-   * get window state parameter
-   */
-  readonly WindowGetStateParam: {
-    /**
-     * @param window window handle
-     * @param state state parameter
-     * @returns parameter value
-     */
-    (window: DmSdkTypes["HWindow"], state: DmSdkTypes["WindowState"]): number;
-  };
-  /**
-   * get window width
-   */
-  readonly WindowGetWidth: {
-    /**
-     * @param window window handle
-     * @returns window width
-     */
-    (window: DmSdkTypes["HWindow"]): number;
-  };
-  /**
-   * iconify the window
-   */
-  readonly WindowIconify: {
-    /**
-     * @param window window handle
-     */
-    (window: DmSdkTypes["HWindow"]): void;
-  };
-  /**
-   * create a new window handle
-   */
-  readonly WindowNew: {
-    /**
-     * @returns window handle
-     */
-    (): DmSdkTypes["HWindow"];
-  };
-  /**
-   * open a window
-   */
-  readonly WindowOpen: {
-    /**
-     * @param window window handle
-     * @param params window parameters
-     * @returns result code
-     */
-    (window: DmSdkTypes["HWindow"], params: DmReadonlyPointer<"WindowCreateParams">): DmSdkTypes["WindowResult"];
-  };
-  /**
-   * poll window events
-   */
-  readonly WindowPollEvents: {
-    /**
-     * @param window window handle
-     */
-    (window: DmSdkTypes["HWindow"]): void;
-  };
-  /**
-   * set window size
-   */
-  readonly WindowSetSize: {
-    /**
-     * @param window window handle
-     * @param width window width
-     * @param height window height
-     */
-    (window: DmSdkTypes["HWindow"], width: number, height: number): void;
-  };
-  /**
-   * show the window
-   */
-  readonly WindowShow: {
-    /**
-     * @param window window handle
-     */
-    (window: DmSdkTypes["HWindow"]): void;
   };
 }
 
 export type DmSdkSymbol = keyof DmSdkCalls;
 
+/**
+ * Engine exit code.
+ */
+export const ExtensionAppExitCode = {
+  EXTENSION_APP_EXIT_CODE_NONE: 0,
+  EXTENSION_APP_EXIT_CODE_REBOOT: 1,
+  EXTENSION_APP_EXIT_CODE_EXIT: -1,
+} as const;
+export type ExtensionAppExitCode = (typeof ExtensionAppExitCode)[keyof typeof ExtensionAppExitCode];
+
+/**
+ * Extra callback type for RegisterCallback function.
+ */
+export const ExtensionCallbackType = {
+  EXTENSION_CALLBACK_PRE_RENDER: 0,
+  EXTENSION_CALLBACK_POST_RENDER: 1,
+} as const;
+export type ExtensionCallbackType = (typeof ExtensionCallbackType)[keyof typeof ExtensionCallbackType];
+
+/**
+ * Event id enumeration.
+ * EVENT_ID_ICONIFYAPP and EVENT_ID_DEICONIFYAPP only available on
+ */
+export const ExtensionEventID = {
+  EXTENSION_EVENT_ID_ACTIVATEAPP: 0,
+  EXTENSION_EVENT_ID_DEACTIVATEAPP: 1,
+  EXTENSION_EVENT_ID_ICONIFYAPP: 2,
+  EXTENSION_EVENT_ID_DEICONIFYAPP: 3,
+  EXTENSION_EVENT_ID_ENGINE_INITIALIZED: 4,
+  EXTENSION_EVENT_ID_ENGINE_DELETE: 5,
+} as const;
+export type ExtensionEventID = (typeof ExtensionEventID)[keyof typeof ExtensionEventID];
+
+/**
+ * Result enumeration.
+ */
+export const ExtensionResult = {
+  EXTENSION_RESULT_OK: 0,
+  EXTENSION_RESULT_INIT_ERROR: -1,
+} as const;
+export type ExtensionResult = (typeof ExtensionResult)[keyof typeof ExtensionResult];
+
+/**
+ * FontGlyphBitmapFlags
+ */
+export const FontGlyphBitmapFlags = {
+  FONT_GLYPH_BM_FLAG_COMPRESSION_NONE: 0,
+  FONT_GLYPH_BM_FLAG_COMPRESSION_DEFLATE: 1,
+  FONT_GLYPH_BM_FLAG_DATA_IS_BORROWED: 2,
+} as const;
+export type FontGlyphBitmapFlags = (typeof FontGlyphBitmapFlags)[keyof typeof FontGlyphBitmapFlags];
+
+/**
+ * FontResult
+ */
+export const FontResult = {
+  FONT_RESULT_OK: 0,
+  FONT_RESULT_NOT_SUPPORTED: 1,
+  FONT_RESULT_ERROR: 2,
+} as const;
+export type FontResult = (typeof FontResult)[keyof typeof FontResult];
+
+/**
+ * FontType
+ */
+export const FontType = {
+  FONT_TYPE_TTF: 0,
+  FONT_TYPE_OTF: 1,
+  FONT_TYPE_GLYPH_BANK: 2,
+  FONT_TYPE_UNKNOWN: 4294967295,
+} as const;
+export type FontType = (typeof FontType)[keyof typeof FontType];
+
+/**
+ * Return value from HttpResponseCallback.
+ */
+export const HttpCallbackResult = {
+  HTTP_CALLBACK_RESULT_CONTINUE: 0,
+  HTTP_CALLBACK_RESULT_CANCEL: 1,
+} as const;
+export type HttpCallbackResult = (typeof HttpCallbackResult)[keyof typeof HttpCallbackResult];
+
+/**
+ * HTTP response event
+ */
+export const HttpResponseEvent = {
+  HTTP_RESPONSE_EVENT_HEADER: 0,
+  HTTP_RESPONSE_EVENT_DATA: 1,
+  HTTP_RESPONSE_EVENT_COMPLETE: 2,
+  HTTP_RESPONSE_EVENT_PROGRESS: 3,
+} as const;
+export type HttpResponseEvent = (typeof HttpResponseEvent)[keyof typeof HttpResponseEvent];
+
+/**
+ * HTTP result values
+ */
+export const HttpResult = {
+  HTTP_RESULT_NOT_200_OK: 1,
+  HTTP_RESULT_OK: 0,
+  HTTP_RESULT_SOCKET_ERROR: -1,
+  HTTP_RESULT_HTTP_HEADERS_ERROR: -2,
+  HTTP_RESULT_INVALID_RESPONSE: -3,
+  HTTP_RESULT_PARTIAL_CONTENT: -4,
+  HTTP_RESULT_UNSUPPORTED_TRANSFER_ENCODING: -5,
+  HTTP_RESULT_INVAL_ERROR: -6,
+  HTTP_RESULT_UNEXPECTED_EOF: -7,
+  HTTP_RESULT_IO_ERROR: -8,
+  HTTP_RESULT_HANDSHAKE_FAILED: -9,
+  HTTP_RESULT_INVAL: -10,
+  HTTP_RESULT_UNKNOWN: -1000,
+} as const;
+export type HttpResult = (typeof HttpResult)[keyof typeof HttpResult];
+
+/**
+ * job result enumeration
+ */
+export const JobSystemResult = {
+  JOBSYSTEM_RESULT_OK: 0,
+  JOBSYSTEM_RESULT_ERROR: 1,
+  JOBSYSTEM_RESULT_INVALID_HANDLE: 2,
+  JOBSYSTEM_RESULT_CANCELED: 3,
+  JOBSYSTEM_RESULT_PENDING: 4,
+} as const;
+export type JobSystemResult = (typeof JobSystemResult)[keyof typeof JobSystemResult];
+
+/**
+ * job status enumeration
+ */
+export const JobSystemStatus = {
+  JOBSYSTEM_STATUS_FREE: 0,
+  JOBSYSTEM_STATUS_CREATED: 1,
+  JOBSYSTEM_STATUS_QUEUED: 2,
+  JOBSYSTEM_STATUS_PROCESSING: 3,
+  JOBSYSTEM_STATUS_FINISHED: 4,
+  JOBSYSTEM_STATUS_CALLBACK: 5,
+  JOBSYSTEM_STATUS_CANCELED: 6,
+} as const;
+export type JobSystemStatus = (typeof JobSystemStatus)[keyof typeof JobSystemStatus];
+
+/**
+ * Log severity
+ */
+export const LogSeverity = {
+  LOG_SEVERITY_DEBUG: 0,
+  LOG_SEVERITY_USER_DEBUG: 1,
+  LOG_SEVERITY_INFO: 2,
+  LOG_SEVERITY_WARNING: 3,
+  LOG_SEVERITY_ERROR: 4,
+  LOG_SEVERITY_FATAL: 5,
+} as const;
+export type LogSeverity = (typeof LogSeverity)[keyof typeof LogSeverity];
+
+/**
+ * Set of bit flags to be used when declaring propertis
+ */
+export const ProfilePropertyFlags = {
+  PROFILE_PROPERTY_NONE: 0,
+  PROFILE_PROPERTY_FRAME_RESET: 1,
+} as const;
+export type ProfilePropertyFlags = (typeof ProfilePropertyFlags)[keyof typeof ProfilePropertyFlags];
+
+/**
+ * Enum to describe type of a property
+ */
+export const ProfilePropertyType = {
+  PROFILE_PROPERTY_TYPE_GROUP: 0,
+  PROFILE_PROPERTY_TYPE_BOOL: 1,
+  PROFILE_PROPERTY_TYPE_S32: 2,
+  PROFILE_PROPERTY_TYPE_U32: 3,
+  PROFILE_PROPERTY_TYPE_F32: 4,
+  PROFILE_PROPERTY_TYPE_S64: 5,
+  PROFILE_PROPERTY_TYPE_U64: 6,
+  PROFILE_PROPERTY_TYPE_F64: 7,
+} as const;
+export type ProfilePropertyType = (typeof ProfilePropertyType)[keyof typeof ProfilePropertyType];
+
+/**
+ * Enum to describe the result of a profiler operation
+ */
+export const ProfileResult = {
+  PROFILE_RESULT_OK: 0,
+  PROFILE_RESULT_NOT_INITIALIZED: 1,
+  PROFILE_RESULT_OUT_OF_SAMPLES: 2,
+} as const;
+export type ProfileResult = (typeof ProfileResult)[keyof typeof ProfileResult];
+
+/**
+ * ResourceResult
+ */
+export const ResourceResult = {
+  RESOURCE_RESULT_OK: 0,
+  RESOURCE_RESULT_INVALID_DATA: -1,
+  RESOURCE_RESULT_DDF_ERROR: -2,
+  RESOURCE_RESULT_RESOURCE_NOT_FOUND: -3,
+  RESOURCE_RESULT_MISSING_FILE_EXTENSION: -4,
+  RESOURCE_RESULT_ALREADY_REGISTERED: -5,
+  RESOURCE_RESULT_INVAL: -6,
+  RESOURCE_RESULT_UNKNOWN_RESOURCE_TYPE: -7,
+  RESOURCE_RESULT_OUT_OF_MEMORY: -8,
+  RESOURCE_RESULT_IO_ERROR: -9,
+  RESOURCE_RESULT_NOT_LOADED: -10,
+  RESOURCE_RESULT_OUT_OF_RESOURCES: -11,
+  RESOURCE_RESULT_STREAMBUFFER_TOO_SMALL: -12,
+  RESOURCE_RESULT_FORMAT_ERROR: -13,
+  RESOURCE_RESULT_CONSTANT_ERROR: -14,
+  RESOURCE_RESULT_NOT_SUPPORTED: -15,
+  RESOURCE_RESULT_RESOURCE_LOOP_ERROR: -16,
+  RESOURCE_RESULT_PENDING: -17,
+  RESOURCE_RESULT_INVALID_FILE_EXTENSION: -18,
+  RESOURCE_RESULT_VERSION_MISMATCH: -19,
+  RESOURCE_RESULT_SIGNATURE_MISMATCH: -20,
+  RESOURCE_RESULT_UNKNOWN_ERROR: -21,
+  RESOURCE_RESULT_TOO_MANY_COMPONENTS: -22,
+} as const;
+export type ResourceResult = (typeof ResourceResult)[keyof typeof ResourceResult];
+
+/**
+ * Text decoration pattern
+ */
+export const TextDecorationPattern = {
+  TEXT_DECORATION_PATTERN_SOLID: 0,
+  TEXT_DECORATION_PATTERN_DASHED: 1,
+} as const;
+export type TextDecorationPattern = (typeof TextDecorationPattern)[keyof typeof TextDecorationPattern];
+
+/**
+ * An enum representing text layout directions
+ */
+export const TextDirection = {
+  TEXT_DIRECTION_LTR: 0,
+  TEXT_DIRECTION_RTL: 1,
+} as const;
+export type TextDirection = (typeof TextDirection)[keyof typeof TextDirection];
+
+/**
+ * Text glyph flags
+ */
+export const TextGlyphFlags = {
+  TEXT_GLYPH_FLAG_OBJECT: 1,
+} as const;
+export type TextGlyphFlags = (typeof TextGlyphFlags)[keyof typeof TextGlyphFlags];
+
+/**
+ * An enum representing text layout features
+ * Each font supports a layout type
+ * The selected layout type it the minimum value of layout types
+ */
+export const TextLayoutType = {
+  TEXT_LAYOUT_TYPE_LEGACY: 0,
+  TEXT_LAYOUT_TYPE_FULL: 1,
+} as const;
+export type TextLayoutType = (typeof TextLayoutType)[keyof typeof TextLayoutType];
+
+/**
+ * An enum representing text layout results
+ */
+export const TextResult = {
+  TEXT_RESULT_OK: 0,
+  TEXT_RESULT_ERROR: 1,
+} as const;
+export type TextResult = (typeof TextResult)[keyof typeof TextResult];
+
+/**
+ * result enumeration
+ */
+export const WindowResult = {
+  WINDOW_RESULT_OK: 0,
+  WINDOW_RESULT_WINDOW_OPEN_ERROR: -1,
+  WINDOW_RESULT_WINDOW_ALREADY_OPENED: -2,
+} as const;
+export type WindowResult = (typeof WindowResult)[keyof typeof WindowResult];
+
+/**
+ * window state enumeration
+ */
+export const WindowState = {
+  WINDOW_STATE_OPENED: 1,
+  WINDOW_STATE_ACTIVE: 2,
+  WINDOW_STATE_ICONIFIED: 3,
+  WINDOW_STATE_ACCELERATED: 4,
+  WINDOW_STATE_RED_BITS: 5,
+  WINDOW_STATE_GREEN_BITS: 6,
+  WINDOW_STATE_BLUE_BITS: 7,
+  WINDOW_STATE_ALPHA_BITS: 8,
+  WINDOW_STATE_DEPTH_BITS: 9,
+  WINDOW_STATE_STENCIL_BITS: 10,
+  WINDOW_STATE_REFRESH_RATE: 11,
+  WINDOW_STATE_ACCUM_RED_BITS: 12,
+  WINDOW_STATE_ACCUM_GREEN_BITS: 13,
+  WINDOW_STATE_ACCUM_BLUE_BITS: 14,
+  WINDOW_STATE_ACCUM_ALPHA_BITS: 15,
+  WINDOW_STATE_AUX_BUFFERS: 16,
+  WINDOW_STATE_STEREO: 17,
+  WINDOW_STATE_WINDOW_NO_RESIZE: 18,
+  WINDOW_STATE_FSAA_SAMPLES: 19,
+  WINDOW_STATE_SAMPLE_COUNT: 20,
+  WINDOW_STATE_HIGH_DPI: 21,
+  WINDOW_STATE_AUX_CONTEXT: 22,
+} as const;
+export type WindowState = (typeof WindowState)[keyof typeof WindowState];
+
+/**
+ * graphics api enumeration
+ */
+export const WindowsGraphicsApi = {
+  WINDOW_GRAPHICS_API_NULL: 0,
+  WINDOW_GRAPHICS_API_OPENGL: 1,
+  WINDOW_GRAPHICS_API_OPENGLES: 2,
+  WINDOW_GRAPHICS_API_VULKAN: 3,
+  WINDOW_GRAPHICS_API_VENDOR: 4,
+  WINDOW_GRAPHICS_API_WEBGPU: 5,
+  WINDOW_GRAPHICS_API_DIRECTX: 6,
+  WINDOW_GRAPHICS_API_METAL: 7,
+} as const;
+export type WindowsGraphicsApi = (typeof WindowsGraphicsApi)[keyof typeof WindowsGraphicsApi];
+
+/**
+ * Result enumeration.
+ */
+export const DmBufferResult = {
+  RESULT_OK: 0,
+  RESULT_GUARD_INVALID: 1,
+  RESULT_ALLOCATION_ERROR: 2,
+  RESULT_BUFFER_INVALID: 3,
+  RESULT_BUFFER_SIZE_ERROR: 4,
+  RESULT_STREAM_SIZE_ERROR: 5,
+  RESULT_STREAM_MISSING: 6,
+  RESULT_STREAM_TYPE_MISMATCH: 7,
+  RESULT_STREAM_COUNT_MISMATCH: 8,
+  RESULT_STREAM_MISMATCH: 9,
+  RESULT_METADATA_INVALID: 10,
+  RESULT_METADATA_MISSING: 11,
+} as const;
+export type DmBufferResult = (typeof DmBufferResult)[keyof typeof DmBufferResult];
+
+/**
+ * ValueType enumeration.
+ */
+export const DmBufferValueType = {
+  VALUE_TYPE_UINT8: 0,
+  VALUE_TYPE_UINT16: 1,
+  VALUE_TYPE_UINT32: 2,
+  VALUE_TYPE_UINT64: 3,
+  VALUE_TYPE_INT8: 4,
+  VALUE_TYPE_INT16: 5,
+  VALUE_TYPE_INT32: 6,
+  VALUE_TYPE_INT64: 7,
+  VALUE_TYPE_FLOAT32: 8,
+  MAX_VALUE_TYPE_COUNT: 9,
+} as const;
+export type DmBufferValueType = (typeof DmBufferValueType)[keyof typeof DmBufferValueType];
+
+/**
+ * Result enumeration.
+ */
+export const DmConnectionPoolResult = {
+  RESULT_OK: 0,
+  RESULT_OUT_OF_RESOURCES: -1,
+  RESULT_SOCKET_ERROR: -2,
+  RESULT_HANDSHAKE_FAILED: -3,
+  RESULT_SHUT_DOWN: -4,
+} as const;
+export type DmConnectionPoolResult = (typeof DmConnectionPoolResult)[keyof typeof DmConnectionPoolResult];
+
+/**
+ * encryption algorithm enumeration
+ */
+export const DmCryptAlgorithm = {
+  ALGORITHM_XTEA: 0,
+} as const;
+export type DmCryptAlgorithm = (typeof DmCryptAlgorithm)[keyof typeof DmCryptAlgorithm];
+
+/**
+ * result enumeration
+ */
+export const DmCryptResult = {
+  RESULT_OK: 0,
+  RESULT_ERROR: 1,
+} as const;
+export type DmCryptResult = (typeof DmCryptResult)[keyof typeof DmCryptResult];
+
+/**
+ * Result enumeration.
+ */
+export const DmDDFResult = {
+  RESULT_OK: 0,
+  RESULT_FIELDTYPE_MISMATCH: 1,
+  RESULT_WIRE_FORMAT_ERROR: 2,
+  RESULT_IO_ERROR: 3,
+  RESULT_VERSION_MISMATCH: 4,
+  RESULT_MISSING_REQUIRED: 5,
+  RESULT_INTERNAL_ERROR: 1000,
+} as const;
+export type DmDDFResult = (typeof DmDDFResult)[keyof typeof DmDDFResult];
+
+/**
+ * Engine exit code.
+ */
+export const DmExtensionAppExitCode = {
+  APP_EXIT_CODE_NONE: 0,
+  APP_EXIT_CODE_REBOOT: 1,
+  APP_EXIT_CODE_EXIT: -1,
+} as const;
+export type DmExtensionAppExitCode = (typeof DmExtensionAppExitCode)[keyof typeof DmExtensionAppExitCode];
+
+/**
+ * Extra callback type for RegisterCallback function.
+ */
+export const DmExtensionCallbackType = {
+  CALLBACK_PRE_RENDER: 0,
+  CALLBACK_POST_RENDER: 1,
+} as const;
+export type DmExtensionCallbackType = (typeof DmExtensionCallbackType)[keyof typeof DmExtensionCallbackType];
+
+/**
+ * Event id enumeration.
+ * EVENT_ID_ICONIFYAPP and EVENT_ID_DEICONIFYAPP only available on
+ */
+export const DmExtensionEventID = {
+  EVENT_ID_ACTIVATEAPP: 0,
+  EVENT_ID_DEACTIVATEAPP: 1,
+  EVENT_ID_ICONIFYAPP: 2,
+  EVENT_ID_DEICONIFYAPP: 3,
+  EVENT_ID_ENGINE_INITIALIZED: 4,
+  EVENT_ID_ENGINE_DELETE: 5,
+} as const;
+export type DmExtensionEventID = (typeof DmExtensionEventID)[keyof typeof DmExtensionEventID];
+
+/**
+ * Result enumeration.
+ */
+export const DmExtensionResult = {
+  RESULT_OK: 0,
+  RESULT_INIT_ERROR: -1,
+} as const;
+export type DmExtensionResult = (typeof DmExtensionResult)[keyof typeof DmExtensionResult];
+
+/**
+ * Poll events
+ */
+export const DmFileDescriptorPollEvent = {
+  EVENT_READ: 0,
+  EVENT_WRITE: 1,
+  EVENT_ERROR: 2,
+} as const;
+export type DmFileDescriptorPollEvent = (typeof DmFileDescriptorPollEvent)[keyof typeof DmFileDescriptorPollEvent];
+
+/**
+ * Create result enum.
+ */
+export const DmGameObjectCreateResult = {
+  CREATE_RESULT_OK: 0,
+  CREATE_RESULT_TOO_MANY_COMPONENTS: -1,
+  CREATE_RESULT_UNKNOWN_ERROR: -1000,
+} as const;
+export type DmGameObjectCreateResult = (typeof DmGameObjectCreateResult)[keyof typeof DmGameObjectCreateResult];
+
+/**
+ * Input result enum
+ */
+export const DmGameObjectInputResult = {
+  INPUT_RESULT_IGNORED: 0,
+  INPUT_RESULT_CONSUMED: 1,
+  INPUT_RESULT_UNKNOWN_ERROR: -1000,
+} as const;
+export type DmGameObjectInputResult = (typeof DmGameObjectInputResult)[keyof typeof DmGameObjectInputResult];
+
+/**
+ * Playback type enum
+ */
+export const DmGameObjectPlayback = {
+  PLAYBACK_NONE: 0,
+  PLAYBACK_ONCE_FORWARD: 1,
+  PLAYBACK_ONCE_BACKWARD: 2,
+  PLAYBACK_ONCE_PINGPONG: 3,
+  PLAYBACK_LOOP_FORWARD: 4,
+  PLAYBACK_LOOP_BACKWARD: 5,
+  PLAYBACK_LOOP_PINGPONG: 6,
+  PLAYBACK_COUNT: 7,
+} as const;
+export type DmGameObjectPlayback = (typeof DmGameObjectPlayback)[keyof typeof DmGameObjectPlayback];
+
+/**
+ * Property result.
+ */
+export const DmGameObjectPropertyResult = {
+  PROPERTY_RESULT_OK: 0,
+  PROPERTY_RESULT_NOT_FOUND: -1,
+  PROPERTY_RESULT_INVALID_FORMAT: -2,
+  PROPERTY_RESULT_UNSUPPORTED_TYPE: -3,
+  PROPERTY_RESULT_TYPE_MISMATCH: -4,
+  PROPERTY_RESULT_COMP_NOT_FOUND: -5,
+  PROPERTY_RESULT_INVALID_INSTANCE: -6,
+  PROPERTY_RESULT_BUFFER_OVERFLOW: -7,
+  PROPERTY_RESULT_UNSUPPORTED_VALUE: -8,
+  PROPERTY_RESULT_UNSUPPORTED_OPERATION: -9,
+  PROPERTY_RESULT_RESOURCE_NOT_FOUND: -10,
+  PROPERTY_RESULT_INVALID_INDEX: -11,
+  PROPERTY_RESULT_INVALID_KEY: -12,
+  PROPERTY_RESULT_READ_ONLY: -13,
+} as const;
+export type DmGameObjectPropertyResult = (typeof DmGameObjectPropertyResult)[keyof typeof DmGameObjectPropertyResult];
+
+/**
+ * Property types.
+ */
+export const DmGameObjectPropertyType = {
+  PROPERTY_TYPE_NUMBER: 0,
+  PROPERTY_TYPE_HASH: 1,
+  PROPERTY_TYPE_URL: 2,
+  PROPERTY_TYPE_VECTOR3: 3,
+  PROPERTY_TYPE_VECTOR4: 4,
+  PROPERTY_TYPE_QUAT: 5,
+  PROPERTY_TYPE_BOOLEAN: 6,
+  PROPERTY_TYPE_MATRIX4: 7,
+  PROPERTY_TYPE_TEXT: 8,
+  PROPERTY_TYPE_COUNT: 9,
+} as const;
+export type DmGameObjectPropertyType = (typeof DmGameObjectPropertyType)[keyof typeof DmGameObjectPropertyType];
+
+/**
+ * Type of property value
+ */
+export const DmGameObjectPropertyValueType = {
+  PROP_VALUE_ARRAY: 0,
+  PROP_VALUE_HASHTABLE: 1,
+} as const;
+export type DmGameObjectPropertyValueType = (typeof DmGameObjectPropertyValueType)[keyof typeof DmGameObjectPropertyValueType];
+
+/**
+ * Result enumeration.
+ */
+export const DmGameObjectResult = {
+  RESULT_OK: 0,
+  RESULT_OUT_OF_RESOURCES: -1,
+  RESULT_ALREADY_REGISTERED: -2,
+  RESULT_IDENTIFIER_IN_USE: -3,
+  RESULT_IDENTIFIER_ALREADY_SET: -4,
+  RESULT_COMPONENT_NOT_FOUND: -5,
+  RESULT_MAXIMUM_HIEARCHICAL_DEPTH: -6,
+  RESULT_INVALID_OPERATION: -7,
+  RESULT_RESOURCE_TYPE_NOT_FOUND: -8,
+  RESULT_BUFFER_OVERFLOW: -9,
+  RESULT_IDENTIFIER_INVALID: -10,
+  RESULT_RESOURCE_ERROR: -11,
+  RESULT_CHILD_NOT_FOUND: -12,
+  RESULT_INVALID_PROPERTIES: -13,
+  RESULT_UNABLE_TO_CREATE_COMPONENTS: -14,
+  RESULT_UNABLE_TO_INIT_INSTANCE: -15,
+  RESULT_UNKNOWN_ERROR: -1000,
+} as const;
+export type DmGameObjectResult = (typeof DmGameObjectResult)[keyof typeof DmGameObjectResult];
+
+/**
+ * scene node property types
+ */
+export const DmGameObjectSceneNodePropertyType = {
+  SCENE_NODE_PROPERTY_TYPE_NUMBER: 0,
+  SCENE_NODE_PROPERTY_TYPE_HASH: 1,
+  SCENE_NODE_PROPERTY_TYPE_URL: 2,
+  SCENE_NODE_PROPERTY_TYPE_VECTOR3: 3,
+  SCENE_NODE_PROPERTY_TYPE_VECTOR4: 4,
+  SCENE_NODE_PROPERTY_TYPE_QUAT: 5,
+  SCENE_NODE_PROPERTY_TYPE_BOOLEAN: 6,
+  SCENE_NODE_PROPERTY_TYPE_TEXT: 7,
+  SCENE_NODE_PROPERTY_TYPE_COUNT: 8,
+} as const;
+export type DmGameObjectSceneNodePropertyType = (typeof DmGameObjectSceneNodePropertyType)[keyof typeof DmGameObjectSceneNodePropertyType];
+
+/**
+ * scene node types
+ */
+export const DmGameObjectSceneNodeType = {
+  SCENE_NODE_TYPE_COLLECTION: 0,
+  SCENE_NODE_TYPE_GAMEOBJECT: 1,
+  SCENE_NODE_TYPE_COMPONENT: 2,
+  SCENE_NODE_TYPE_SUBCOMPONENT: 3,
+} as const;
+export type DmGameObjectSceneNodeType = (typeof DmGameObjectSceneNodeType)[keyof typeof DmGameObjectSceneNodeType];
+
+/**
+ * Update result enum.
+ */
+export const DmGameObjectUpdateResult = {
+  UPDATE_RESULT_OK: 0,
+  UPDATE_RESULT_UNKNOWN_ERROR: -1000,
+} as const;
+export type DmGameObjectUpdateResult = (typeof DmGameObjectUpdateResult)[keyof typeof DmGameObjectUpdateResult];
+
+/**
+ * CompCollectionFactoryStatus
+ */
+export const DmGameSystemCompCollectionFactoryStatus = {
+  COMP_COLLECTION_FACTORY_STATUS_UNLOADED: 0,
+  COMP_COLLECTION_FACTORY_STATUS_LOADING: 1,
+  COMP_COLLECTION_FACTORY_STATUS_LOADED: 2,
+} as const;
+export type DmGameSystemCompCollectionFactoryStatus = (typeof DmGameSystemCompCollectionFactoryStatus)[keyof typeof DmGameSystemCompCollectionFactoryStatus];
+
+/**
+ * CompFactoryStatus
+ */
+export const DmGameSystemCompFactoryStatus = {
+  COMP_FACTORY_STATUS_UNLOADED: 0,
+  COMP_FACTORY_STATUS_LOADING: 1,
+  COMP_FACTORY_STATUS_LOADED: 2,
+} as const;
+export type DmGameSystemCompFactoryStatus = (typeof DmGameSystemCompFactoryStatus)[keyof typeof DmGameSystemCompFactoryStatus];
+
+/**
+ * Native enum dmGameSystem::RigModelVertexFormat.
+ */
+export const DmGameSystemRigModelVertexFormat = {
+  RIG_MODEL_VERTEX_FORMAT_STATIC: 0,
+  RIG_MODEL_VERTEX_FORMAT_SKINNED: 1,
+} as const;
+export type DmGameSystemRigModelVertexFormat = (typeof DmGameSystemRigModelVertexFormat)[keyof typeof DmGameSystemRigModelVertexFormat];
+
+/**
+ * Graphics adapter family.
+ * Identifies the type of graphics backend used by the rendering system
+ */
+export const DmGraphicsAdapterFamily = {
+  ADAPTER_FAMILY_NONE: -1,
+  ADAPTER_FAMILY_NULL: 1,
+  ADAPTER_FAMILY_OPENGL: 2,
+  ADAPTER_FAMILY_OPENGLES: 3,
+  ADAPTER_FAMILY_VULKAN: 4,
+  ADAPTER_FAMILY_VENDOR: 5,
+  ADAPTER_FAMILY_WEBGPU: 6,
+  ADAPTER_FAMILY_DIRECTX: 7,
+  ADAPTER_FAMILY_METAL: 8,
+} as const;
+export type DmGraphicsAdapterFamily = (typeof DmGraphicsAdapterFamily)[keyof typeof DmGraphicsAdapterFamily];
+
+/**
+ * Defines how an attachment should be treated at the start and end of a render pass
+ */
+export const DmGraphicsAttachmentOp = {
+  ATTACHMENT_OP_DONT_CARE: 0,
+  ATTACHMENT_OP_LOAD: 1,
+  ATTACHMENT_OP_STORE: 2,
+  ATTACHMENT_OP_CLEAR: 3,
+} as const;
+export type DmGraphicsAttachmentOp = (typeof DmGraphicsAttachmentOp)[keyof typeof DmGraphicsAttachmentOp];
+
+/**
+ * Blend equation operations.
+ * Determines how source and destination colors are combined during blending
+ */
+export const DmGraphicsBlendEquation = {
+  BLEND_EQUATION_ADD: 0,
+  BLEND_EQUATION_SUBTRACT: 1,
+  BLEND_EQUATION_REVERSE_SUBTRACT: 2,
+  BLEND_EQUATION_MIN: 3,
+  BLEND_EQUATION_MAX: 4,
+} as const;
+export type DmGraphicsBlendEquation = (typeof DmGraphicsBlendEquation)[keyof typeof DmGraphicsBlendEquation];
+
+/**
+ * Blend factors for color blending.
+ * Defines how source and destination colors are combined
+ */
+export const DmGraphicsBlendFactor = {
+  BLEND_FACTOR_ZERO: 0,
+  BLEND_FACTOR_ONE: 1,
+  BLEND_FACTOR_SRC_COLOR: 2,
+  BLEND_FACTOR_ONE_MINUS_SRC_COLOR: 3,
+  BLEND_FACTOR_DST_COLOR: 4,
+  BLEND_FACTOR_ONE_MINUS_DST_COLOR: 5,
+  BLEND_FACTOR_SRC_ALPHA: 6,
+  BLEND_FACTOR_ONE_MINUS_SRC_ALPHA: 7,
+  BLEND_FACTOR_DST_ALPHA: 8,
+  BLEND_FACTOR_ONE_MINUS_DST_ALPHA: 9,
+  BLEND_FACTOR_SRC_ALPHA_SATURATE: 10,
+  BLEND_FACTOR_CONSTANT_COLOR: 11,
+  BLEND_FACTOR_ONE_MINUS_CONSTANT_COLOR: 12,
+  BLEND_FACTOR_CONSTANT_ALPHA: 13,
+  BLEND_FACTOR_ONE_MINUS_CONSTANT_ALPHA: 14,
+} as const;
+export type DmGraphicsBlendFactor = (typeof DmGraphicsBlendFactor)[keyof typeof DmGraphicsBlendFactor];
+
+/**
+ * Native enum dmGraphics::BufferAccess.
+ */
+export const DmGraphicsBufferAccess = {
+  BUFFER_ACCESS_READ_ONLY: 0,
+  BUFFER_ACCESS_WRITE_ONLY: 1,
+  BUFFER_ACCESS_READ_WRITE: 2,
+} as const;
+export type DmGraphicsBufferAccess = (typeof DmGraphicsBufferAccess)[keyof typeof DmGraphicsBufferAccess];
+
+/**
+ * Native enum dmGraphics::BufferType.
+ */
+export const DmGraphicsBufferType = {
+  BUFFER_TYPE_COLOR0_BIT: 1,
+  BUFFER_TYPE_COLOR1_BIT: 2,
+  BUFFER_TYPE_COLOR2_BIT: 4,
+  BUFFER_TYPE_COLOR3_BIT: 8,
+  BUFFER_TYPE_DEPTH_BIT: 16,
+  BUFFER_TYPE_STENCIL_BIT: 32,
+} as const;
+export type DmGraphicsBufferType = (typeof DmGraphicsBufferType)[keyof typeof DmGraphicsBufferType];
+
+/**
+ * Buffer usage hints.
+ * Indicates how often the data in a buffer will be updated.
+ * Helps the driver optimize memory placement
+ */
+export const DmGraphicsBufferUsage = {
+  BUFFER_USAGE_STREAM_DRAW: 0,
+  BUFFER_USAGE_DYNAMIC_DRAW: 1,
+  BUFFER_USAGE_STATIC_DRAW: 2,
+  BUFFER_USAGE_TRANSFER: 4,
+} as const;
+export type DmGraphicsBufferUsage = (typeof DmGraphicsBufferUsage)[keyof typeof DmGraphicsBufferUsage];
+
+/**
+ * Depth and alpha test comparison functions.
+ * Defines how incoming values are compared against stored ones
+ */
+export const DmGraphicsCompareFunc = {
+  COMPARE_FUNC_NEVER: 0,
+  COMPARE_FUNC_LESS: 1,
+  COMPARE_FUNC_LEQUAL: 2,
+  COMPARE_FUNC_GREATER: 3,
+  COMPARE_FUNC_GEQUAL: 4,
+  COMPARE_FUNC_EQUAL: 5,
+  COMPARE_FUNC_NOTEQUAL: 6,
+  COMPARE_FUNC_ALWAYS: 7,
+} as const;
+export type DmGraphicsCompareFunc = (typeof DmGraphicsCompareFunc)[keyof typeof DmGraphicsCompareFunc];
+
+/**
+ * Native enum dmGraphics::FaceType.
+ */
+export const DmGraphicsFaceType = {
+  FACE_TYPE_FRONT: 0,
+  FACE_TYPE_BACK: 1,
+  FACE_TYPE_FRONT_AND_BACK: 2,
+} as const;
+export type DmGraphicsFaceType = (typeof DmGraphicsFaceType)[keyof typeof DmGraphicsFaceType];
+
+/**
+ * Native enum dmGraphics::FaceWinding.
+ */
+export const DmGraphicsFaceWinding = {
+  FACE_WINDING_CCW: 0,
+  FACE_WINDING_CW: 1,
+} as const;
+export type DmGraphicsFaceWinding = (typeof DmGraphicsFaceWinding)[keyof typeof DmGraphicsFaceWinding];
+
+/**
+ * Function's call result code
+ */
+export const DmGraphicsHandleResult = {
+  HANDLE_RESULT_OK: 0,
+  HANDLE_RESULT_NOT_AVAILABLE: -1,
+  HANDLE_RESULT_ERROR: -2,
+} as const;
+export type DmGraphicsHandleResult = (typeof DmGraphicsHandleResult)[keyof typeof DmGraphicsHandleResult];
+
+/**
+ * Index buffer element types.
+ * Defines the integer size used for vertex indices
+ */
+export const DmGraphicsIndexBufferFormat = {
+  INDEXBUFFER_FORMAT_16: 0,
+  INDEXBUFFER_FORMAT_32: 1,
+} as const;
+export type DmGraphicsIndexBufferFormat = (typeof DmGraphicsIndexBufferFormat)[keyof typeof DmGraphicsIndexBufferFormat];
+
+/**
+ * Primitive drawing modes.
+ * Defines how vertex data is assembled into primitives
+ */
+export const DmGraphicsPrimitiveType = {
+  PRIMITIVE_LINES: 0,
+  PRIMITIVE_TRIANGLES: 1,
+  PRIMITIVE_TRIANGLE_STRIP: 2,
+} as const;
+export type DmGraphicsPrimitiveType = (typeof DmGraphicsPrimitiveType)[keyof typeof DmGraphicsPrimitiveType];
+
+/**
+ * Attachment points for render targets
+ */
+export const DmGraphicsRenderTargetAttachment = {
+  ATTACHMENT_COLOR: 0,
+  ATTACHMENT_DEPTH: 1,
+  ATTACHMENT_STENCIL: 2,
+  MAX_ATTACHMENT_COUNT: 3,
+} as const;
+export type DmGraphicsRenderTargetAttachment = (typeof DmGraphicsRenderTargetAttachment)[keyof typeof DmGraphicsRenderTargetAttachment];
+
+/**
+ * Native enum dmGraphics::State.
+ */
+export const DmGraphicsState = {
+  STATE_DEPTH_TEST: 0,
+  STATE_SCISSOR_TEST: 1,
+  STATE_STENCIL_TEST: 2,
+  STATE_ALPHA_TEST: 3,
+  STATE_BLEND: 4,
+  STATE_CULL_FACE: 5,
+  STATE_POLYGON_OFFSET_FILL: 6,
+  STATE_ALPHA_TEST_SUPPORTED: 7,
+} as const;
+export type DmGraphicsState = (typeof DmGraphicsState)[keyof typeof DmGraphicsState];
+
+/**
+ * Stencil test actions.
+ * Defines what happens to a stencil buffer value depending on the outcome of the stencil/depth test.
+ */
+export const DmGraphicsStencilOp = {
+  STENCIL_OP_KEEP: 0,
+  STENCIL_OP_ZERO: 1,
+  STENCIL_OP_REPLACE: 2,
+  STENCIL_OP_INCR: 3,
+  STENCIL_OP_INCR_WRAP: 4,
+  STENCIL_OP_DECR: 5,
+  STENCIL_OP_DECR_WRAP: 6,
+  STENCIL_OP_INVERT: 7,
+} as const;
+export type DmGraphicsStencilOp = (typeof DmGraphicsStencilOp)[keyof typeof DmGraphicsStencilOp];
+
+/**
+ * Texture filtering modes.
+ * Controls how texels are sampled when scaling or rotating textures
+ */
+export const DmGraphicsTextureFilter = {
+  TEXTURE_FILTER_DEFAULT: 0,
+  TEXTURE_FILTER_NEAREST: 1,
+  TEXTURE_FILTER_LINEAR: 2,
+  TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST: 3,
+  TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR: 4,
+  TEXTURE_FILTER_LINEAR_MIPMAP_NEAREST: 5,
+  TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR: 6,
+} as const;
+export type DmGraphicsTextureFilter = (typeof DmGraphicsTextureFilter)[keyof typeof DmGraphicsTextureFilter];
+
+/**
+ * Pixel formats supported by textures.
+ * Includes uncompressed, compressed, and floating-point variants
+ */
+export const DmGraphicsTextureFormat = {
+  TEXTURE_FORMAT_LUMINANCE: 0,
+  TEXTURE_FORMAT_LUMINANCE_ALPHA: 1,
+  TEXTURE_FORMAT_RGB: 2,
+  TEXTURE_FORMAT_RGBA: 3,
+  TEXTURE_FORMAT_RGB_16BPP: 4,
+  TEXTURE_FORMAT_RGBA_16BPP: 5,
+  TEXTURE_FORMAT_DEPTH: 6,
+  TEXTURE_FORMAT_STENCIL: 7,
+  TEXTURE_FORMAT_RGB_PVRTC_2BPPV1: 8,
+  TEXTURE_FORMAT_RGB_PVRTC_4BPPV1: 9,
+  TEXTURE_FORMAT_RGBA_PVRTC_2BPPV1: 10,
+  TEXTURE_FORMAT_RGBA_PVRTC_4BPPV1: 11,
+  TEXTURE_FORMAT_RGB_ETC1: 12,
+  TEXTURE_FORMAT_R_ETC2: 13,
+  TEXTURE_FORMAT_RG_ETC2: 14,
+  TEXTURE_FORMAT_RGBA_ETC2: 15,
+  TEXTURE_FORMAT_RGBA_ASTC_4X4: 16,
+  TEXTURE_FORMAT_RGB_BC1: 17,
+  TEXTURE_FORMAT_RGBA_BC3: 18,
+  TEXTURE_FORMAT_R_BC4: 19,
+  TEXTURE_FORMAT_RG_BC5: 20,
+  TEXTURE_FORMAT_RGBA_BC7: 21,
+  TEXTURE_FORMAT_RGB16F: 22,
+  TEXTURE_FORMAT_RGB32F: 23,
+  TEXTURE_FORMAT_RGBA16F: 24,
+  TEXTURE_FORMAT_RGBA32F: 25,
+  TEXTURE_FORMAT_R16F: 26,
+  TEXTURE_FORMAT_RG16F: 27,
+  TEXTURE_FORMAT_R32F: 28,
+  TEXTURE_FORMAT_RG32F: 29,
+  TEXTURE_FORMAT_RGBA32UI: 30,
+  TEXTURE_FORMAT_BGRA8U: 31,
+  TEXTURE_FORMAT_R32UI: 32,
+  TEXTURE_FORMAT_RGBA_ASTC_5X4: 33,
+  TEXTURE_FORMAT_RGBA_ASTC_5X5: 34,
+  TEXTURE_FORMAT_RGBA_ASTC_6X5: 35,
+  TEXTURE_FORMAT_RGBA_ASTC_6X6: 36,
+  TEXTURE_FORMAT_RGBA_ASTC_8X5: 37,
+  TEXTURE_FORMAT_RGBA_ASTC_8X6: 38,
+  TEXTURE_FORMAT_RGBA_ASTC_8X8: 39,
+  TEXTURE_FORMAT_RGBA_ASTC_10X5: 40,
+  TEXTURE_FORMAT_RGBA_ASTC_10X6: 41,
+  TEXTURE_FORMAT_RGBA_ASTC_10X8: 42,
+  TEXTURE_FORMAT_RGBA_ASTC_10X10: 43,
+  TEXTURE_FORMAT_RGBA_ASTC_12X10: 44,
+  TEXTURE_FORMAT_RGBA_ASTC_12X12: 45,
+  TEXTURE_FORMAT_COUNT: 46,
+} as const;
+export type DmGraphicsTextureFormat = (typeof DmGraphicsTextureFormat)[keyof typeof DmGraphicsTextureFormat];
+
+/**
+ * Texture data upload status flags
+ */
+export const DmGraphicsTextureStatusFlags = {
+  TEXTURE_STATUS_OK: 0,
+  TEXTURE_STATUS_DATA_PENDING: 1,
+} as const;
+export type DmGraphicsTextureStatusFlags = (typeof DmGraphicsTextureStatusFlags)[keyof typeof DmGraphicsTextureStatusFlags];
+
+/**
+ * Texture types
+ */
+export const DmGraphicsTextureType = {
+  TEXTURE_TYPE_2D: 0,
+  TEXTURE_TYPE_2D_ARRAY: 1,
+  TEXTURE_TYPE_3D: 2,
+  TEXTURE_TYPE_CUBE_MAP: 3,
+  TEXTURE_TYPE_IMAGE_2D: 4,
+  TEXTURE_TYPE_IMAGE_3D: 5,
+  TEXTURE_TYPE_SAMPLER: 6,
+  TEXTURE_TYPE_TEXTURE_2D: 7,
+  TEXTURE_TYPE_TEXTURE_2D_ARRAY: 8,
+  TEXTURE_TYPE_TEXTURE_3D: 9,
+  TEXTURE_TYPE_TEXTURE_CUBE: 10,
+} as const;
+export type DmGraphicsTextureType = (typeof DmGraphicsTextureType)[keyof typeof DmGraphicsTextureType];
+
+/**
+ * Texture addressing/wrapping modes.
+ * Controls behavior when texture coordinates fall outside the [0,1] range
+ */
+export const DmGraphicsTextureWrap = {
+  TEXTURE_WRAP_CLAMP_TO_BORDER: 0,
+  TEXTURE_WRAP_CLAMP_TO_EDGE: 1,
+  TEXTURE_WRAP_MIRRORED_REPEAT: 2,
+  TEXTURE_WRAP_REPEAT: 3,
+} as const;
+export type DmGraphicsTextureWrap = (typeof DmGraphicsTextureWrap)[keyof typeof DmGraphicsTextureWrap];
+
+/**
+ * Data type.
+ * Represents scalar, vector, matrix, image, or sampler types used
+ * for vertex attributes, uniforms, and shader interface definitions
+ */
+export const DmGraphicsType = {
+  TYPE_BYTE: 0,
+  TYPE_UNSIGNED_BYTE: 1,
+  TYPE_SHORT: 2,
+  TYPE_UNSIGNED_SHORT: 3,
+  TYPE_INT: 4,
+  TYPE_UNSIGNED_INT: 5,
+  TYPE_FLOAT: 6,
+  TYPE_FLOAT_VEC4: 7,
+  TYPE_FLOAT_MAT4: 8,
+  TYPE_SAMPLER_2D: 9,
+  TYPE_SAMPLER_CUBE: 10,
+  TYPE_SAMPLER_2D_ARRAY: 11,
+  TYPE_FLOAT_VEC2: 12,
+  TYPE_FLOAT_VEC3: 13,
+  TYPE_FLOAT_MAT2: 14,
+  TYPE_FLOAT_MAT3: 15,
+  TYPE_IMAGE_2D: 16,
+  TYPE_TEXTURE_2D: 17,
+  TYPE_SAMPLER: 18,
+  TYPE_TEXTURE_2D_ARRAY: 19,
+  TYPE_TEXTURE_CUBE: 20,
+  TYPE_SAMPLER_3D: 21,
+  TYPE_TEXTURE_3D: 22,
+  TYPE_IMAGE_3D: 23,
+  TYPE_SAMPLER_3D_ARRAY: 24,
+  TYPE_TEXTURE_3D_ARRAY: 25,
+} as const;
+export type DmGraphicsType = (typeof DmGraphicsType)[keyof typeof DmGraphicsType];
+
+/**
+ * Native enum dmGui::AdjustMode.
+ */
+export const DmGuiAdjustMode = {
+  ADJUST_MODE_FIT: 0,
+  ADJUST_MODE_ZOOM: 1,
+  ADJUST_MODE_STRETCH: 2,
+} as const;
+export type DmGuiAdjustMode = (typeof DmGuiAdjustMode)[keyof typeof DmGuiAdjustMode];
+
+/**
+ * Native enum dmGui::AdjustReference.
+ */
+export const DmGuiAdjustReference = {
+  ADJUST_REFERENCE_LEGACY: 0,
+  ADJUST_REFERENCE_PARENT: 1,
+  ADJUST_REFERENCE_DISABLED: 2,
+} as const;
+export type DmGuiAdjustReference = (typeof DmGuiAdjustReference)[keyof typeof DmGuiAdjustReference];
+
+/**
+ * Native enum dmGui::CustomPropertyType.
+ */
+export const DmGuiCustomPropertyType = {
+  CUSTOM_PROPERTY_TYPE_NUMBER: 0,
+  CUSTOM_PROPERTY_TYPE_BOOLEAN: 1,
+  CUSTOM_PROPERTY_TYPE_HASH: 2,
+  CUSTOM_PROPERTY_TYPE_STRING: 3,
+  CUSTOM_PROPERTY_TYPE_VECTOR3: 5,
+  CUSTOM_PROPERTY_TYPE_VECTOR4: 6,
+  CUSTOM_PROPERTY_TYPE_QUAT: 7,
+} as const;
+export type DmGuiCustomPropertyType = (typeof DmGuiCustomPropertyType)[keyof typeof DmGuiCustomPropertyType];
+
+/**
+ * This enum denotes what kind of texture type the m_Texture pointer is referencing.
+ */
+export const DmGuiNodeTextureType = {
+  NODE_TEXTURE_TYPE_NONE: 0,
+  NODE_TEXTURE_TYPE_TEXTURE: 1,
+  NODE_TEXTURE_TYPE_TEXTURE_SET: 2,
+} as const;
+export type DmGuiNodeTextureType = (typeof DmGuiNodeTextureType)[keyof typeof DmGuiNodeTextureType];
+
+/**
+ * Native enum dmGui::NodeType.
+ */
+export const DmGuiNodeType = {
+  NODE_TYPE_BOX: 0,
+  NODE_TYPE_TEXT: 1,
+  NODE_TYPE_PIE: 2,
+  NODE_TYPE_TEMPLATE: 3,
+  NODE_TYPE_PARTICLEFX: 5,
+  NODE_TYPE_CUSTOM: 6,
+  NODE_TYPE_COUNT: 7,
+} as const;
+export type DmGuiNodeType = (typeof DmGuiNodeType)[keyof typeof DmGuiNodeType];
+
+/**
+ * Native enum dmGui::Playback.
+ */
+export const DmGuiPlayback = {
+  PLAYBACK_ONCE_FORWARD: 0,
+  PLAYBACK_ONCE_BACKWARD: 1,
+  PLAYBACK_ONCE_PINGPONG: 2,
+  PLAYBACK_LOOP_FORWARD: 3,
+  PLAYBACK_LOOP_BACKWARD: 4,
+  PLAYBACK_LOOP_PINGPONG: 5,
+  PLAYBACK_NONE: 6,
+  PLAYBACK_COUNT: 7,
+} as const;
+export type DmGuiPlayback = (typeof DmGuiPlayback)[keyof typeof DmGuiPlayback];
+
+/**
+ * Native enum dmGui::Property.
+ */
+export const DmGuiProperty = {
+  PROPERTY_POSITION: 0,
+  PROPERTY_ROTATION: 1,
+  PROPERTY_SCALE: 2,
+  PROPERTY_COLOR: 3,
+  PROPERTY_SIZE: 4,
+  PROPERTY_OUTLINE: 5,
+  PROPERTY_SHADOW: 6,
+  PROPERTY_SLICE9: 7,
+  PROPERTY_PIE_PARAMS: 8,
+  PROPERTY_TEXT_PARAMS: 9,
+  PROPERTY_EULER: 10,
+  PROPERTY_PREV_EULER: 11,
+  PROPERTY_COUNT: 12,
+} as const;
+export type DmGuiProperty = (typeof DmGuiProperty)[keyof typeof DmGuiProperty];
+
+/**
+ * Native enum dmGui::Result.
+ */
+export const DmGuiResult = {
+  RESULT_OK: 0,
+  RESULT_SYNTAX_ERROR: -1,
+  RESULT_SCRIPT_ERROR: -2,
+  RESULT_OUT_OF_RESOURCES: -4,
+  RESULT_RESOURCE_NOT_FOUND: -5,
+  RESULT_TEXTURE_ALREADY_EXISTS: -6,
+  RESULT_INVAL_ERROR: -7,
+  RESULT_INF_RECURSION: -8,
+  RESULT_DATA_ERROR: -9,
+  RESULT_WRONG_TYPE: -10,
+} as const;
+export type DmGuiResult = (typeof DmGuiResult)[keyof typeof DmGuiResult];
+
+/**
+ * keyboard key enumeration
+ */
+export const DmHIDKey = {
+  KEY_SPACE: 32,
+  KEY_EXCLAIM: 33,
+  KEY_QUOTEDBL: 34,
+  KEY_HASH: 35,
+  KEY_DOLLAR: 36,
+  KEY_AMPERSAND: 38,
+  KEY_QUOTE: 39,
+  KEY_LPAREN: 40,
+  KEY_RPAREN: 41,
+  KEY_ASTERISK: 42,
+  KEY_PLUS: 43,
+  KEY_COMMA: 44,
+  KEY_MINUS: 45,
+  KEY_PERIOD: 46,
+  KEY_SLASH: 47,
+  KEY_0: 48,
+  KEY_1: 49,
+  KEY_2: 50,
+  KEY_3: 51,
+  KEY_4: 52,
+  KEY_5: 53,
+  KEY_6: 54,
+  KEY_7: 55,
+  KEY_8: 56,
+  KEY_9: 57,
+  KEY_COLON: 58,
+  KEY_SEMICOLON: 59,
+  KEY_LESS: 60,
+  KEY_EQUALS: 61,
+  KEY_GREATER: 62,
+  KEY_QUESTION: 63,
+  KEY_AT: 64,
+  KEY_A: 65,
+  KEY_B: 66,
+  KEY_C: 67,
+  KEY_D: 68,
+  KEY_E: 69,
+  KEY_F: 70,
+  KEY_G: 71,
+  KEY_H: 72,
+  KEY_I: 73,
+  KEY_J: 74,
+  KEY_K: 75,
+  KEY_L: 76,
+  KEY_M: 77,
+  KEY_N: 78,
+  KEY_O: 79,
+  KEY_P: 80,
+  KEY_Q: 81,
+  KEY_R: 82,
+  KEY_S: 83,
+  KEY_T: 84,
+  KEY_U: 85,
+  KEY_V: 86,
+  KEY_W: 87,
+  KEY_X: 88,
+  KEY_Y: 89,
+  KEY_Z: 90,
+  KEY_LBRACKET: 91,
+  KEY_BACKSLASH: 92,
+  KEY_RBRACKET: 93,
+  KEY_CARET: 94,
+  KEY_UNDERSCORE: 95,
+  KEY_BACKQUOTE: 96,
+  KEY_LBRACE: 123,
+  KEY_PIPE: 124,
+  KEY_RBRACE: 125,
+  KEY_TILDE: 126,
+  KEY_ESC: 256,
+  KEY_F1: 257,
+  KEY_F2: 258,
+  KEY_F3: 259,
+  KEY_F4: 260,
+  KEY_F5: 261,
+  KEY_F6: 262,
+  KEY_F7: 263,
+  KEY_F8: 264,
+  KEY_F9: 265,
+  KEY_F10: 266,
+  KEY_F11: 267,
+  KEY_F12: 268,
+  KEY_UP: 269,
+  KEY_DOWN: 270,
+  KEY_LEFT: 271,
+  KEY_RIGHT: 272,
+  KEY_LSHIFT: 273,
+  KEY_RSHIFT: 274,
+  KEY_LCTRL: 275,
+  KEY_RCTRL: 276,
+  KEY_LALT: 277,
+  KEY_RALT: 278,
+  KEY_TAB: 279,
+  KEY_ENTER: 280,
+  KEY_BACKSPACE: 281,
+  KEY_INSERT: 282,
+  KEY_DEL: 283,
+  KEY_PAGEUP: 284,
+  KEY_PAGEDOWN: 285,
+  KEY_HOME: 286,
+  KEY_END: 287,
+  KEY_KP_0: 288,
+  KEY_KP_1: 289,
+  KEY_KP_2: 290,
+  KEY_KP_3: 291,
+  KEY_KP_4: 292,
+  KEY_KP_5: 293,
+  KEY_KP_6: 294,
+  KEY_KP_7: 295,
+  KEY_KP_8: 296,
+  KEY_KP_9: 297,
+  KEY_KP_DIVIDE: 298,
+  KEY_KP_MULTIPLY: 299,
+  KEY_KP_SUBTRACT: 300,
+  KEY_KP_ADD: 301,
+  KEY_KP_DECIMAL: 302,
+  KEY_KP_EQUAL: 303,
+  KEY_KP_ENTER: 304,
+  KEY_KP_NUM_LOCK: 305,
+  KEY_CAPS_LOCK: 306,
+  KEY_SCROLL_LOCK: 307,
+  KEY_PAUSE: 308,
+  KEY_LSUPER: 309,
+  KEY_RSUPER: 310,
+  KEY_MENU: 311,
+  KEY_BACK: 312,
+  MAX_KEY_COUNT: 313,
+} as const;
+export type DmHIDKey = (typeof DmHIDKey)[keyof typeof DmHIDKey];
+
+/**
+ * mouse button enumeration
+ */
+export const DmHIDMouseButton = {
+  MOUSE_BUTTON_LEFT: 0,
+  MOUSE_BUTTON_MIDDLE: 2,
+  MOUSE_BUTTON_RIGHT: 1,
+  MOUSE_BUTTON_1: 0,
+  MOUSE_BUTTON_2: 1,
+  MOUSE_BUTTON_3: 2,
+  MOUSE_BUTTON_4: 3,
+  MOUSE_BUTTON_5: 4,
+  MOUSE_BUTTON_6: 5,
+  MOUSE_BUTTON_7: 6,
+  MOUSE_BUTTON_8: 7,
+  MAX_MOUSE_BUTTON_COUNT: 8,
+} as const;
+export type DmHIDMouseButton = (typeof DmHIDMouseButton)[keyof typeof DmHIDMouseButton];
+
+/**
+ * touch phase enumeration
+ */
+export const DmHIDPhase = {
+  PHASE_BEGAN: 0,
+  PHASE_MOVED: 1,
+  PHASE_STATIONARY: 2,
+  PHASE_ENDED: 3,
+  PHASE_CANCELLED: 4,
+} as const;
+export type DmHIDPhase = (typeof DmHIDPhase)[keyof typeof DmHIDPhase];
+
+/**
+ * Native enum dmHashTable::dmHashTable::STATE_FLAGS.
+ */
+export const DmHashTableDmHashTableSTATEFLAGS = {
+  STATE_DEFAULT: 0,
+  STATE_USER_ALLOCATED: 1,
+} as const;
+export type DmHashTableDmHashTableSTATEFLAGS = (typeof DmHashTableDmHashTableSTATEFLAGS)[keyof typeof DmHashTableDmHashTableSTATEFLAGS];
+
+/**
+ * Header parse result enumeration.
+ */
+export const DmHttpClientParseResult = {
+  PARSE_RESULT_NEED_MORE_DATA: 1,
+  PARSE_RESULT_OK: 0,
+  PARSE_RESULT_SYNTAX_ERROR: -1,
+} as const;
+export type DmHttpClientParseResult = (typeof DmHttpClientParseResult)[keyof typeof DmHttpClientParseResult];
+
+/**
+ * Native enum dmImage::CompressionType.
+ */
+export const DmImageCompressionType = {
+  COMPRESSION_TYPE_NONE: 0,
+  COMPRESSION_TYPE_ASTC: 1,
+} as const;
+export type DmImageCompressionType = (typeof DmImageCompressionType)[keyof typeof DmImageCompressionType];
+
+/**
+ * result enumeration
+ */
+export const DmImageResult = {
+  RESULT_OK: 0,
+  RESULT_UNSUPPORTED_FORMAT: -1,
+  RESULT_IMAGE_ERROR: -2,
+} as const;
+export type DmImageResult = (typeof DmImageResult)[keyof typeof DmImageResult];
+
+/**
+ * type enumeration
+ */
+export const DmImageType = {
+  TYPE_RGB: 0,
+  TYPE_RGBA: 1,
+  TYPE_LUMINANCE: 2,
+  TYPE_LUMINANCE_ALPHA: 3,
+} as const;
+export type DmImageType = (typeof DmImageType)[keyof typeof DmImageType];
+
+/**
+ * Aligned memory allocation result
+ */
+export const DmMemoryResult = {
+  RESULT_OK: 0,
+  RESULT_INVAL: -1,
+  RESULT_NOMEM: -2,
+} as const;
+export type DmMemoryResult = (typeof DmMemoryResult)[keyof typeof DmMemoryResult];
+
+/**
+ * Result enum
+ */
+export const DmMessageResult = {
+  RESULT_OK: 0,
+  RESULT_SOCKET_EXISTS: -1,
+  RESULT_SOCKET_NOT_FOUND: -2,
+  RESULT_SOCKET_OUT_OF_RESOURCES: -3,
+  RESULT_INVALID_SOCKET_NAME: -4,
+  RESULT_MALFORMED_URL: -5,
+  RESULT_NAME_OK_SOCKET_NOT_FOUND: -6,
+} as const;
+export type DmMessageResult = (typeof DmMessageResult)[keyof typeof DmMessageResult];
+
+/**
+ * Frustum planes to use in a frustum
+ */
+export const DmRenderFrustumPlanes = {
+  FRUSTUM_PLANES_SIDES: 4,
+  FRUSTUM_PLANES_ALL: 6,
+} as const;
+export type DmRenderFrustumPlanes = (typeof DmRenderFrustumPlanes)[keyof typeof DmRenderFrustumPlanes];
+
+/**
+ * Render batch callback states
+ */
+export const DmRenderRenderListOperation = {
+  RENDER_LIST_OPERATION_BEGIN: 0,
+  RENDER_LIST_OPERATION_BATCH: 1,
+  RENDER_LIST_OPERATION_END: 2,
+} as const;
+export type DmRenderRenderListOperation = (typeof DmRenderRenderListOperation)[keyof typeof DmRenderRenderListOperation];
+
+/**
+ * Render order
+ */
+export const DmRenderRenderOrder = {
+  RENDER_ORDER_BEFORE_WORLD: 0,
+  RENDER_ORDER_WORLD: 1,
+  RENDER_ORDER_AFTER_WORLD: 2,
+} as const;
+export type DmRenderRenderOrder = (typeof DmRenderRenderOrder)[keyof typeof DmRenderRenderOrder];
+
+/**
+ * Native enum dmRender::Result.
+ */
+export const DmRenderResult = {
+  RESULT_OK: 0,
+  RESULT_INVALID_CONTEXT: -1,
+  RESULT_OUT_OF_RESOURCES: -2,
+  RESULT_BUFFER_IS_FULL: -3,
+  RESULT_INVALID_PARAMETER: -4,
+  RESULT_TYPE_MISMATCH: -5,
+} as const;
+export type DmRenderResult = (typeof DmRenderResult)[keyof typeof DmRenderResult];
+
+/**
+ * Visibility status
+ */
+export const DmRenderVisibility = {
+  VISIBILITY_NONE: 0,
+  VISIBILITY_FULL: 1,
+} as const;
+export type DmRenderVisibility = (typeof DmRenderVisibility)[keyof typeof DmRenderVisibility];
+
+/**
+ * ResourceResult
+ */
+export const DmResourceResult = {
+  RESULT_OK: 0,
+  RESULT_INVALID_DATA: -1,
+  RESULT_DDF_ERROR: -2,
+  RESULT_RESOURCE_NOT_FOUND: -3,
+  RESULT_MISSING_FILE_EXTENSION: -4,
+  RESULT_ALREADY_REGISTERED: -5,
+  RESULT_INVAL: -6,
+  RESULT_UNKNOWN_RESOURCE_TYPE: -7,
+  RESULT_OUT_OF_MEMORY: -8,
+  RESULT_IO_ERROR: -9,
+  RESULT_NOT_LOADED: -10,
+  RESULT_OUT_OF_RESOURCES: -11,
+  RESULT_STREAMBUFFER_TOO_SMALL: -12,
+  RESULT_FORMAT_ERROR: -13,
+  RESULT_CONSTANT_ERROR: -14,
+  RESULT_NOT_SUPPORTED: -15,
+  RESULT_RESOURCE_LOOP_ERROR: -16,
+  RESULT_PENDING: -17,
+  RESULT_INVALID_FILE_EXTENSION: -18,
+  RESULT_VERSION_MISMATCH: -19,
+  RESULT_SIGNATURE_MISMATCH: -20,
+  RESULT_UNKNOWN_ERROR: -21,
+  RESULT_TOO_MANY_COMPONENTS: -22,
+} as const;
+export type DmResourceResult = (typeof DmResourceResult)[keyof typeof DmResourceResult];
+
+/**
+ * Native enum dmRig::Result.
+ */
+export const DmRigResult = {
+  RESULT_OK: 0,
+  RESULT_ERROR: 1,
+  RESULT_ERROR_BUFFER_FULL: 2,
+  RESULT_ANIM_NOT_FOUND: 3,
+  RESULT_UPDATED_POSE: 4,
+} as const;
+export type DmRigResult = (typeof DmRigResult)[keyof typeof DmRigResult];
+
+/**
+ * Native enum dmRig::RigEventType.
+ */
+export const DmRigRigEventType = {
+  RIG_EVENT_TYPE_COMPLETED: 0,
+  RIG_EVENT_TYPE_KEYFRAME: 1,
+} as const;
+export type DmRigRigEventType = (typeof DmRigRigEventType)[keyof typeof DmRigRigEventType];
+
+/**
+ * Native enum dmRig::RigPlayback.
+ */
+export const DmRigRigPlayback = {
+  PLAYBACK_NONE: 0,
+  PLAYBACK_ONCE_FORWARD: 1,
+  PLAYBACK_ONCE_BACKWARD: 2,
+  PLAYBACK_ONCE_PINGPONG: 3,
+  PLAYBACK_LOOP_FORWARD: 4,
+  PLAYBACK_LOOP_BACKWARD: 5,
+  PLAYBACK_LOOP_PINGPONG: 6,
+  PLAYBACK_COUNT: 7,
+} as const;
+export type DmRigRigPlayback = (typeof DmRigRigPlayback)[keyof typeof DmRigRigPlayback];
+
+/**
+ * Result enumeration.
+ */
+export const DmSSLSocketResult = {
+  RESULT_OK: 0,
+  RESULT_UNKNOWN: -1,
+  RESULT_SSL_INIT_FAILED: -2000,
+  RESULT_HANDSHAKE_FAILED: -2001,
+  RESULT_WOULDBLOCK: -2002,
+  RESULT_CONNREFUSED: -2003,
+} as const;
+export type DmSSLSocketResult = (typeof DmSSLSocketResult)[keyof typeof DmSSLSocketResult];
+
+/**
+ * Buffer ownership.
+ * - OWNER_C   - m_Buffer is owned by C side, should not be destroyed when GCed
+ * - OWNER_LUA - m_Buffer is owned by Lua side, will be destroyed when GCed
+ * - OWNER_RES - m_Buffer not used, has a reference to a buffer resource instead. m_BufferRes is owned by C side, will be released when GCed
+ */
+export const DmScriptLuaBufferOwnership = {
+  OWNER_C: 0,
+  OWNER_LUA: 1,
+  OWNER_RES: 2,
+} as const;
+export type DmScriptLuaBufferOwnership = (typeof DmScriptLuaBufferOwnership)[keyof typeof DmScriptLuaBufferOwnership];
+
+/**
+ * Domain type
+ */
+export const DmSocketDomain = {
+  DOMAIN_MISSING: 0,
+  DOMAIN_IPV4: 1,
+  DOMAIN_IPV6: 2,
+  DOMAIN_UNKNOWN: 3,
+} as const;
+export type DmSocketDomain = (typeof DmSocketDomain)[keyof typeof DmSocketDomain];
+
+/**
+ * Native enum dmSocket::Flags.
+ */
+export const DmSocketFlags = {
+  FLAGS_UP: 1,
+  FLAGS_RUNNING: 2,
+  FLAGS_INET: 4,
+  FLAGS_LINK: 8,
+} as const;
+export type DmSocketFlags = (typeof DmSocketFlags)[keyof typeof DmSocketFlags];
+
+/**
+ * Network protocol
+ */
+export const DmSocketProtocol = {
+  PROTOCOL_TCP: 0,
+  PROTOCOL_UDP: 1,
+} as const;
+export type DmSocketProtocol = (typeof DmSocketProtocol)[keyof typeof DmSocketProtocol];
+
+/**
+ * Socket result
+ */
+export const DmSocketResult = {
+  RESULT_OK: 0,
+  RESULT_ACCES: -1,
+  RESULT_AFNOSUPPORT: -2,
+  RESULT_WOULDBLOCK: -3,
+  RESULT_BADF: -4,
+  RESULT_CONNRESET: -5,
+  RESULT_DESTADDRREQ: -6,
+  RESULT_FAULT: -7,
+  RESULT_HOSTUNREACH: -8,
+  RESULT_INTR: -9,
+  RESULT_INVAL: -10,
+  RESULT_ISCONN: -11,
+  RESULT_MFILE: -12,
+  RESULT_MSGSIZE: -13,
+  RESULT_NETDOWN: -14,
+  RESULT_NETUNREACH: -15,
+  RESULT_NOBUFS: -17,
+  RESULT_NOTCONN: -20,
+  RESULT_NOTSOCK: -22,
+  RESULT_OPNOTSUPP: -23,
+  RESULT_PIPE: -24,
+  RESULT_PROTONOSUPPORT: -25,
+  RESULT_PROTOTYPE: -26,
+  RESULT_TIMEDOUT: -27,
+  RESULT_ADDRNOTAVAIL: -28,
+  RESULT_CONNREFUSED: -29,
+  RESULT_ADDRINUSE: -30,
+  RESULT_CONNABORTED: -31,
+  RESULT_INPROGRESS: -32,
+  RESULT_HOST_NOT_FOUND: -100,
+  RESULT_TRY_AGAIN: -101,
+  RESULT_NO_RECOVERY: -102,
+  RESULT_NO_DATA: -103,
+  RESULT_UNKNOWN: -1000,
+} as const;
+export type DmSocketResult = (typeof DmSocketResult)[keyof typeof DmSocketResult];
+
+/**
+ * Selector kind
+ */
+export const DmSocketSelectorKind = {
+  SELECTOR_KIND_READ: 0,
+  SELECTOR_KIND_WRITE: 1,
+  SELECTOR_KIND_EXCEPT: 2,
+} as const;
+export type DmSocketSelectorKind = (typeof DmSocketSelectorKind)[keyof typeof DmSocketSelectorKind];
+
+/**
+ * Socket shutdown type
+ */
+export const DmSocketShutdownType = {
+  SHUTDOWNTYPE_READ: 0,
+  SHUTDOWNTYPE_WRITE: 1,
+  SHUTDOWNTYPE_READWRITE: 2,
+} as const;
+export type DmSocketShutdownType = (typeof DmSocketShutdownType)[keyof typeof DmSocketShutdownType];
+
+/**
+ * Socket type
+ */
+export const DmSocketType = {
+  TYPE_STREAM: 0,
+  TYPE_DGRAM: 1,
+} as const;
+export type DmSocketType = (typeof DmSocketType)[keyof typeof DmSocketType];
+
+/**
+ * Native enum dmSound::Result.
+ */
+export const DmSoundResult = {
+  RESULT_OK: 0,
+  RESULT_PARTIAL_DATA: 1,
+  RESULT_OUT_OF_SOURCES: -1,
+  RESULT_EFFECT_NOT_FOUND: -2,
+  RESULT_OUT_OF_INSTANCES: -3,
+  RESULT_RESOURCE_LEAK: -4,
+  RESULT_OUT_OF_BUFFERS: -5,
+  RESULT_INVALID_PROPERTY: -6,
+  RESULT_UNKNOWN_SOUND_TYPE: -7,
+  RESULT_INVALID_STREAM_DATA: -8,
+  RESULT_OUT_OF_MEMORY: -9,
+  RESULT_UNSUPPORTED: -10,
+  RESULT_DEVICE_NOT_FOUND: -11,
+  RESULT_OUT_OF_GROUPS: -12,
+  RESULT_NO_SUCH_GROUP: -13,
+  RESULT_NOTHING_TO_PLAY: -14,
+  RESULT_INIT_ERROR: -15,
+  RESULT_FINI_ERROR: -16,
+  RESULT_NO_DATA: -17,
+  RESULT_END_OF_STREAM: -18,
+  RESULT_DEVICE_LOST: -19,
+  RESULT_UNKNOWN_ERROR: -1000,
+} as const;
+export type DmSoundResult = (typeof DmSoundResult)[keyof typeof DmSoundResult];
+
+/**
+ * Result code. Similar to standard posix result codes
+ */
+export const DmSysResult = {
+  RESULT_OK: 0,
+  RESULT_PERM: -1,
+  RESULT_NOENT: -2,
+  RESULT_SRCH: -3,
+  RESULT_INTR: -4,
+  RESULT_IO: -5,
+  RESULT_NXIO: -6,
+  RESULT_2BIG: -7,
+  RESULT_NOEXEC: -8,
+  RESULT_BADF: -9,
+  RESULT_CHILD: -10,
+  RESULT_DEADLK: -11,
+  RESULT_NOMEM: -12,
+  RESULT_ACCES: -13,
+  RESULT_FAULT: -14,
+  RESULT_BUSY: -15,
+  RESULT_EXIST: -16,
+  RESULT_XDEV: -17,
+  RESULT_NODEV: -18,
+  RESULT_NOTDIR: -19,
+  RESULT_ISDIR: -20,
+  RESULT_INVAL: -21,
+  RESULT_NFILE: -22,
+  RESULT_MFILE: -23,
+  RESULT_NOTTY: -24,
+  RESULT_TXTBSY: -25,
+  RESULT_FBIG: -26,
+  RESULT_NOSPC: -27,
+  RESULT_SPIPE: -28,
+  RESULT_ROFS: -29,
+  RESULT_MLINK: -30,
+  RESULT_PIPE: -31,
+  RESULT_NOTEMPTY: -32,
+  RESULT_UNKNOWN: -1000,
+} as const;
+export type DmSysResult = (typeof DmSysResult)[keyof typeof DmSysResult];
+
+/**
+ * URI parsing result
+ */
+export const DmURIResult = {
+  RESULT_OK: 0,
+  RESULT_TOO_SMALL_BUFFER: 1,
+} as const;
+export type DmURIResult = (typeof DmURIResult)[keyof typeof DmURIResult];
+
+/**
+ * result codes
+ */
+export const DmWebServerResult = {
+  RESULT_OK: 0,
+  RESULT_SOCKET_ERROR: -1,
+  RESULT_INVALID_REQUEST: -2,
+  RESULT_ERROR_INVAL: -3,
+  RESULT_HANDLER_ALREADY_REGISTRED: -4,
+  RESULT_HANDLER_NOT_REGISTRED: -5,
+  RESULT_INTERNAL_ERROR: -100,
+  RESULT_UNKNOWN: -1000,
+} as const;
+export type DmWebServerResult = (typeof DmWebServerResult)[keyof typeof DmWebServerResult];
+
 export interface DmSdkTypes {
-  readonly android_app: DmPointer<"void">;
   readonly ConfigFile: DmNativeType<"ConfigFile">;
   readonly ContextRegistry: DmNativeType<"ContextRegistry">;
+  readonly EGLContext: DmPointer<"void">;
+  readonly EGLSurface: DmPointer<"void">;
+  readonly ExtensionAppExitCode: ExtensionAppExitCode;
+  readonly ExtensionAppParams: Readonly<{ m_ConfigFile: DmSdkTypes["HConfigFile"]; m_ExitStatus: DmSdkTypes["ExtensionAppExitCode"]; m_Impl: DmPointer<"ExtensionAppParams::ExtensionParamsImpl"> }>;
+  readonly "ExtensionAppParams::ExtensionParamsImpl": DmNativeType<"ExtensionAppParams::ExtensionParamsImpl">;
+  readonly ExtensionCallbackType: ExtensionCallbackType;
+  readonly ExtensionEvent: Readonly<{ m_Event: DmSdkTypes["ExtensionEventID"] }>;
+  readonly ExtensionEventID: ExtensionEventID;
+  readonly ExtensionParams: Readonly<{ m_ConfigFile: DmSdkTypes["HConfigFile"]; m_ResourceFactory: DmSdkTypes["HResourceFactory"]; m_L: DmPointer<"lua_State">; m_Impl: DmPointer<"ExtensionAppParams::ExtensionParamsImpl"> }>;
+  readonly ExtensionResult: ExtensionResult;
+  readonly FConfigFileCreate: DmNativeCallback;
+  readonly FConfigFileDestroy: DmNativeCallback;
+  readonly FConfigFileGetFloat: DmNativeCallback;
+  readonly FConfigFileGetInt: DmNativeCallback;
+  readonly FConfigFileGetString: DmNativeCallback;
+  readonly FExtensionAppFinalize: DmNativeCallback;
+  readonly FExtensionAppInitialize: DmNativeCallback;
+  readonly FExtensionCallback: DmNativeCallback;
+  readonly FExtensionFinalize: DmNativeCallback;
+  readonly FExtensionInitialize: DmNativeCallback;
+  readonly FExtensionOnEvent: DmNativeCallback;
+  readonly FExtensionUpdate: DmNativeCallback;
+  readonly FJobCallback: DmNativeCallback;
+  readonly FJobProcess: DmNativeCallback;
+  readonly FLogListener: DmNativeCallback;
+  readonly FResourceCreate: DmNativeCallback;
+  readonly FResourceDecryption: DmNativeCallback;
+  readonly FResourceDestroy: DmNativeCallback;
+  readonly FResourcePostCreate: DmNativeCallback;
+  readonly FResourcePreload: DmNativeCallback;
+  readonly FResourceRecreate: DmNativeCallback;
+  readonly FResourceReloadedCallback: DmNativeCallback;
+  readonly FResourceTypeDeregister: DmNativeCallback;
+  readonly FResourceTypeRegister: DmNativeCallback;
+  readonly FTextLayoutReleaseObject: DmNativeCallback;
+  readonly FTextLayoutResolveObject: DmNativeCallback;
+  readonly FWindowAddKeyboardCharCallback: DmNativeCallback;
+  readonly FWindowCloseCallback: DmNativeCallback;
+  readonly FWindowDeviceChangedCallback: DmNativeCallback;
+  readonly FWindowFocusCallback: DmNativeCallback;
+  readonly FWindowIconifyCallback: DmNativeCallback;
+  readonly FWindowResizeCallback: DmNativeCallback;
+  readonly FWindowSetMarkedTextCallback: DmNativeCallback;
+  readonly Font: DmNativeType<"Font">;
+  readonly FontCollection: DmNativeType<"FontCollection">;
+  readonly FontGlyph: Readonly<{ m_Bitmap: DmSdkTypes["FontGlyphBitmap"]; m_Codepoint: number; m_GlyphIndex: number; m_Width: number; m_Height: number; m_Advance: number; m_LeftBearing: number; m_Ascent: number; m_Descent: number }>;
+  readonly FontGlyphBitmap: Readonly<{ m_Data: DmPointer<"uint8_t">; m_DataSize: number; m_Width: number; m_Height: number; m_Channels: number; m_Flags: number }>;
+  readonly FontGlyphBitmapFlags: FontGlyphBitmapFlags;
+  readonly FontGlyphOptions: Readonly<{ m_Scale: number; m_GenerateImage: boolean; m_StbttSDFPadding: number; m_StbttSDFOnEdgeValue: number }>;
+  readonly FontResult: FontResult;
+  readonly FontType: FontType;
+  readonly GLXContext: DmPointer<"void">;
+  readonly HConfigFile: DmPointer<"ConfigFile">;
+  readonly HContextRegistry: DmPointer<"ContextRegistry">;
+  readonly HFont: DmPointer<"Font">;
+  readonly HFontCollection: DmPointer<"FontCollection">;
+  readonly HGLRC: DmPointer<"void">;
+  readonly HJob: bigint;
+  readonly HJobContext: DmPointer<"JobContext">;
+  readonly HProfile: number;
+  readonly HResourceDescriptor: DmPointer<"ResourceDescriptor">;
+  readonly HResourceFactory: DmPointer<"ResourceFactory">;
+  readonly HResourcePreloadHintInfo: DmPointer<"ResourcePreloadHintInfo">;
+  readonly HResourceType: DmPointer<"ResourceType">;
+  readonly HResourceTypeContext: DmPointer<"ResourceTypeContext">;
+  readonly HTextLayout: DmPointer<"TextLayout">;
+  readonly HWND: DmPointer<"void">;
+  readonly HWindow: DmPointer<"dmWindow">;
+  readonly HashState32: Readonly<{ m_Hash: number; m_Tail: number; m_Count: number; m_Size: number; m_ReverseHashEntryIndex: number }>;
+  readonly HashState64: Readonly<{ m_Hash: bigint; m_Tail: bigint; m_Count: number; m_Size: number; m_ReverseHashEntryIndex: number }>;
+  readonly HttpCallbackResult: HttpCallbackResult;
+  readonly HttpRequest: DmNativeType<"HttpRequest">;
+  readonly HttpRequestHandle: number;
+  readonly HttpResponseCallback: DmNativeCallback;
+  readonly HttpResponseEvent: HttpResponseEvent;
+  readonly HttpResponseInfo: DmNativeType<"HttpResponseInfo">;
+  readonly HttpResult: HttpResult;
+  readonly HttpService: DmNativeType<"HttpService">;
+  readonly JavaVM: DmPointer<"void">;
+  readonly Job: Readonly<{ m_Process: DmSdkTypes["FJobProcess"]; m_Callback: DmSdkTypes["FJobCallback"]; m_Context: DmPointer<"void">; m_Data: DmPointer<"void"> }>;
+  readonly JobContext: DmNativeType<"JobContext">;
+  readonly JobSystemCreateParams: Readonly<{ m_ThreadNamePrefix: DmReadonlyPointer<"char">; m_ThreadCount: number }>;
+  readonly JobSystemResult: JobSystemResult;
+  readonly JobSystemStatus: JobSystemStatus;
+  readonly LogParams: Readonly<{ m_Reserved: number }>;
+  readonly LogSeverity: LogSeverity;
+  readonly ProfileCreateListenerFn: DmNativeCallback;
+  readonly ProfileDestroyListenerFn: DmNativeCallback;
+  readonly ProfileFrameBeginFn: DmNativeCallback;
+  readonly ProfileFrameEndFn: DmNativeCallback;
+  readonly ProfileIdx: bigint;
+  readonly ProfileListener: Readonly<{ m_Name: DmSpan<number>; m_Next: DmPointer<"ProfileListener">; m_Ctx: DmPointer<"void">; m_Disabled: boolean; m_Create: DmSdkTypes["ProfileCreateListenerFn"]; m_Destroy: DmSdkTypes["ProfileDestroyListenerFn"]; m_FrameBegin: DmSdkTypes["ProfileFrameBeginFn"]; m_FrameEnd: DmSdkTypes["ProfileFrameEndFn"]; m_ScopeBegin: DmSdkTypes["ProfileScopeBeginFn"]; m_ScopeEnd: DmSdkTypes["ProfileScopeEndFn"]; m_SetThreadName: DmSdkTypes["ProfileSetThreadNameFn"]; m_LogText: DmSdkTypes["ProfileLogTextFn"]; m_CreatePropertyGroup: DmSdkTypes["ProfilePropertyCreateGroupFn"]; m_CreatePropertyBool: DmSdkTypes["ProfilePropertyCreateBoolFn"]; m_CreatePropertyS32: DmSdkTypes["ProfilePropertyCreateS32Fn"]; m_CreatePropertyU32: DmSdkTypes["ProfilePropertyCreateU32Fn"]; m_CreatePropertyF32: DmSdkTypes["ProfilePropertyCreateF32Fn"]; m_CreatePropertyS64: DmSdkTypes["ProfilePropertyCreateS64Fn"]; m_CreatePropertyU64: DmSdkTypes["ProfilePropertyCreateU64Fn"]; m_CreatePropertyF64: DmSdkTypes["ProfilePropertyCreateF64Fn"]; m_PropertySetBool: DmSdkTypes["ProfilePropertySetBoolFn"]; m_PropertySetS32: DmSdkTypes["ProfilePropertySetS32Fn"]; m_PropertySetU32: DmSdkTypes["ProfilePropertySetU32Fn"]; m_PropertySetF32: DmSdkTypes["ProfilePropertySetF32Fn"]; m_PropertySetS64: DmSdkTypes["ProfilePropertySetS64Fn"]; m_PropertySetU64: DmSdkTypes["ProfilePropertySetU64Fn"]; m_PropertySetF64: DmSdkTypes["ProfilePropertySetF64Fn"]; m_PropertyAddS32: DmSdkTypes["ProfilePropertyAddS32Fn"]; m_PropertyAddU32: DmSdkTypes["ProfilePropertyAddU32Fn"]; m_PropertyAddF32: DmSdkTypes["ProfilePropertyAddF32Fn"]; m_PropertyAddS64: DmSdkTypes["ProfilePropertyAddS64Fn"]; m_PropertyAddU64: DmSdkTypes["ProfilePropertyAddU64Fn"]; m_PropertyAddF64: DmSdkTypes["ProfilePropertyAddF64Fn"]; m_PropertyReset: DmSdkTypes["ProfilePropertyResetFn"] }>;
+  readonly ProfileLogTextFn: DmNativeCallback;
+  readonly ProfilePropertyAddF32Fn: DmNativeCallback;
+  readonly ProfilePropertyAddF64Fn: DmNativeCallback;
+  readonly ProfilePropertyAddS32Fn: DmNativeCallback;
+  readonly ProfilePropertyAddS64Fn: DmNativeCallback;
+  readonly ProfilePropertyAddU32Fn: DmNativeCallback;
+  readonly ProfilePropertyAddU64Fn: DmNativeCallback;
+  readonly ProfilePropertyCreateBoolFn: DmNativeCallback;
+  readonly ProfilePropertyCreateF32Fn: DmNativeCallback;
+  readonly ProfilePropertyCreateF64Fn: DmNativeCallback;
+  readonly ProfilePropertyCreateGroupFn: DmNativeCallback;
+  readonly ProfilePropertyCreateS32Fn: DmNativeCallback;
+  readonly ProfilePropertyCreateS64Fn: DmNativeCallback;
+  readonly ProfilePropertyCreateU32Fn: DmNativeCallback;
+  readonly ProfilePropertyCreateU64Fn: DmNativeCallback;
+  readonly ProfilePropertyFlags: ProfilePropertyFlags;
+  readonly ProfilePropertyResetFn: DmNativeCallback;
+  readonly ProfilePropertySetBoolFn: DmNativeCallback;
+  readonly ProfilePropertySetF32Fn: DmNativeCallback;
+  readonly ProfilePropertySetF64Fn: DmNativeCallback;
+  readonly ProfilePropertySetS32Fn: DmNativeCallback;
+  readonly ProfilePropertySetS64Fn: DmNativeCallback;
+  readonly ProfilePropertySetU32Fn: DmNativeCallback;
+  readonly ProfilePropertySetU64Fn: DmNativeCallback;
+  readonly ProfilePropertyType: ProfilePropertyType;
+  readonly ProfilePropertyValue: DmNativeType<"ProfilePropertyValue">;
+  readonly ProfileResult: ProfileResult;
+  readonly ProfileScope: Readonly<{ m_Internal: DmPointer<"void"> }>;
+  readonly ProfileScopeBeginFn: DmNativeCallback;
+  readonly ProfileScopeEndFn: DmNativeCallback;
+  readonly ProfileScopeHelper: Readonly<{ m_ScopeInfo: DmPointer<"ProfileScope">; m_Name: DmReadonlyPointer<"char">; m_NameHash: DmPointer<"uint64_t"> }>;
+  readonly ProfileSetThreadNameFn: DmNativeCallback;
+  readonly ResourceCreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_PreloadData: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
+  readonly ResourceDescriptor: DmNativeType<"ResourceDescriptor">;
+  readonly ResourceDestroyParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
+  readonly ResourceFactory: DmNativeType<"ResourceFactory">;
+  readonly ResourcePostCreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_PreloadData: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
+  readonly ResourcePreloadHintInfo: DmNativeType<"ResourcePreloadHintInfo">;
+  readonly ResourcePreloadParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_IsBufferTransferrable: number; m_HintInfo: DmSdkTypes["HResourcePreloadHintInfo"]; m_Type: DmSdkTypes["HResourceType"]; m_PreloadData: DmPointer<"void">; m_IsBufferOwnershipTransferred: DmPointer<"bool"> }>;
+  readonly ResourceRecreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_FilenameHash: DmSdkTypes["dmhash_t"]; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_Message: DmReadonlyPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
+  readonly ResourceReloadedParams: Readonly<{ m_UserData: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_FilenameHash: bigint; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
+  readonly ResourceResult: ResourceResult;
+  readonly ResourceType: DmNativeType<"ResourceType">;
+  readonly ResourceTypeContext: DmNativeType<"ResourceTypeContext">;
+  readonly TextDecoration: Readonly<{ m_X: number; m_Y: number; m_Length: number; m_Thickness: number; m_PatternOffset: number; m_GlyphStart: number; m_GlyphCount: number; m_LineIndex: number; m_Pattern: number }>;
+  readonly TextDecorationPattern: TextDecorationPattern;
+  readonly TextDirection: TextDirection;
+  readonly TextGlyph: Readonly<{ m_Font: DmSdkTypes["HFont"]; m_X: number; m_Y: number; m_Width: number; m_Height: number; m_RenderScale: number; m_Codepoint: number; m_Cluster: number; m_GlyphIndex: number; m_StyleIndex: number; m_BaseStyleIndex: number; m_MarkupSpanIndex: number; m_BaseMarkupSpanIndex: number; m_Flags: number; m_Advance: number; m_LeftBearing: number }>;
+  readonly TextGlyphFlags: TextGlyphFlags;
+  readonly TextLayout: DmNativeType<"TextLayout">;
+  readonly TextLayoutObject: Readonly<{ m_Resource: bigint; m_Id: bigint; m_Width: number; m_Height: number; m_TextOffset: number; m_TextLength: number; m_AttributeIndex: number; m_AttributeCount: number; m_Tag: DmSdkTypes["dmhash_t"] }>;
+  readonly TextLayoutObjectAttribute: Readonly<{ m_NameOffset: number; m_ValueOffset: number; m_NameLength: number; m_ValueLength: number }>;
+  readonly TextLayoutSettings: Readonly<{ m_Size: number; m_Width: number; m_Leading: number; m_Tracking: number; m_ResolveObject: DmSdkTypes["FTextLayoutResolveObject"]; m_ReleaseObject: DmSdkTypes["FTextLayoutReleaseObject"]; m_ObjectContext: DmPointer<"void">; m_BaseStyle: DmSdkTypes["dmhash_t"]; m_Padding: number; m_LineBreak: number; m_Monospace: number; m_UseBaseStyle: number }>;
+  readonly TextLayoutType: TextLayoutType;
+  readonly TextLine: Readonly<{ m_Width: number; m_Baseline: number; m_Index: number; m_Length: number; m_ParagraphIndex: number }>;
+  readonly TextParagraph: Readonly<{ m_TextIndex: number; m_TextLength: number; m_LineIndex: number; m_LineCount: number; m_Direction: DmSdkTypes["TextDirection"] }>;
+  readonly TextResult: TextResult;
+  readonly WGPUAdapter: number;
+  readonly WGPUCommandEncoder: number;
+  readonly WGPUDevice: number;
+  readonly WGPUInstance: number;
+  readonly WGPUQueue: number;
+  readonly WGPURenderPassEncoder: number;
+  readonly WGPUTexture: number;
+  readonly WGPUTextureView: number;
+  readonly Window: DmPointer<"void">;
+  readonly WindowCreateParams: Readonly<{ m_GraphicsApi: DmSdkTypes["WindowsGraphicsApi"]; m_ResizeCallback: DmSdkTypes["FWindowResizeCallback"]; m_ResizeCallbackUserData: DmPointer<"void">; m_CloseCallback: DmSdkTypes["FWindowCloseCallback"]; m_CloseCallbackUserData: DmPointer<"void">; m_FocusCallback: DmSdkTypes["FWindowFocusCallback"]; m_FocusCallbackUserData: DmPointer<"void">; m_IconifyCallback: DmSdkTypes["FWindowIconifyCallback"]; m_IconifyCallbackUserData: DmPointer<"void">; m_Title: DmReadonlyPointer<"char">; m_Width: number; m_Height: number; m_Samples: number; m_BackgroundColor: number; m_ContextAlphabits: number; m_GraphicsApiVersionHint: number; m_OpenGLUseCoreProfileHint: number; m_Hidden: number; m_Fullscreen: number; m_PrintDeviceInfo: number; m_HighDPI: number; m_FocusOnShow: number }>;
+  readonly WindowResult: WindowResult;
+  readonly WindowState: WindowState;
+  readonly WindowsGraphicsApi: WindowsGraphicsApi;
+  readonly android_app: DmPointer<"void">;
   readonly dmAllocator: Readonly<{ m_Alloc: DmNativeCallback; m_Free: DmNativeCallback; m_UserData: DmPointer<"void"> }>;
   readonly "dmArray::dmArray": DmNativeType<"dmArray::dmArray">;
   readonly "dmBuffer::HBuffer": number;
-  readonly "dmBuffer::Result": DmNativeType<"dmBuffer::Result">;
+  readonly "dmBuffer::Result": DmBufferResult;
   readonly "dmBuffer::StreamDeclaration": Readonly<{ m_Name: DmSdkTypes["dmhash_t"]; m_Type: DmSdkTypes["dmBuffer::ValueType"]; m_Count: number; m_Flags: number; m_Reserved: number }>;
-  readonly "dmBuffer::ValueType": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+  readonly "dmBuffer::ValueType": DmBufferValueType;
   readonly "dmConditionVariable::ConditionVariable": DmNativeType<"dmConditionVariable::ConditionVariable">;
   readonly "dmConditionVariable::HConditionVariable": DmPointer<"dmConditionVariable::ConditionVariable">;
   readonly "dmConfigFile::HConfig": DmSdkTypes["HConfigFile"];
@@ -11226,24 +13043,24 @@ export interface DmSdkTypes {
   readonly "dmConnectionPool::HConnection": number;
   readonly "dmConnectionPool::HPool": DmPointer<"dmConnectionPool::ConnectionPool">;
   readonly "dmConnectionPool::Params": Readonly<{ m_MaxConnections: number; m_MaxKeepAlive: number }>;
-  readonly "dmConnectionPool::Result": 0 | -1 | -2 | -3 | -4;
-  readonly "dmCrypt::Algorithm": DmNativeType<"dmCrypt::Algorithm">;
-  readonly "dmCrypt::Result": 0 | 1;
+  readonly "dmConnectionPool::Result": DmConnectionPoolResult;
+  readonly "dmCrypt::Algorithm": DmCryptAlgorithm;
+  readonly "dmCrypt::Result": DmCryptResult;
   readonly "dmDDF::Descriptor": DmNativeType<"dmDDF::Descriptor">;
-  readonly "dmDDF::Result": 0 | 1 | 2 | 3 | 4 | 5 | 1000;
+  readonly "dmDDF::Result": DmDDFResult;
   readonly "dmDoubleLinkedList::List": Readonly<{ m_Head: DmSdkTypes["dmDoubleLinkedList::ListNode"]; m_Tail: DmSdkTypes["dmDoubleLinkedList::ListNode"] }>;
   readonly "dmDoubleLinkedList::ListNode": Readonly<{ m_Prev: DmPointer<"dmDoubleLinkedList::ListNode">; m_Next: DmPointer<"dmDoubleLinkedList::ListNode"> }>;
-  readonly "dmExtension::AppExitCode": 0 | 1 | -1;
+  readonly "dmExtension::AppExitCode": DmExtensionAppExitCode;
   readonly "dmExtension::AppParams": DmSdkTypes["ExtensionAppParams"];
-  readonly "dmExtension::CallbackType": DmNativeType<"dmExtension::CallbackType">;
+  readonly "dmExtension::CallbackType": DmExtensionCallbackType;
   readonly "dmExtension::Event": DmSdkTypes["ExtensionEvent"];
-  readonly "dmExtension::EventID": DmNativeType<"dmExtension::EventID">;
+  readonly "dmExtension::EventID": DmExtensionEventID;
   readonly "dmExtension::FCallback": DmSdkTypes["FExtensionCallback"];
   readonly "dmExtension::Params": DmSdkTypes["ExtensionParams"];
-  readonly "dmExtension::Result": 0 | -1;
-  readonly "dmFileDescriptor::Poller": Readonly<{ m_Pollfds: DmNativeType<"dmArray<PollFD>"> }>;
-  readonly "dmFileDescriptor::PollEvent": 0 | 1 | 2;
+  readonly "dmExtension::Result": DmExtensionResult;
+  readonly "dmFileDescriptor::PollEvent": DmFileDescriptorPollEvent;
   readonly "dmFileDescriptor::PollFD": Readonly<{ m_Fd: number; m_Events: number; m_REvents: number }>;
+  readonly "dmFileDescriptor::Poller": Readonly<{ m_Pollfds: DmNativeType<"dmArray<PollFD>"> }>;
   readonly dmFixedMemAllocator: Readonly<{ m_Allocator: DmSdkTypes["dmAllocator"]; m_Memory: DmPointer<"uint8_t">; m_Used: number; m_Capacity: number }>;
   readonly "dmGameObject::CollectionHandle": DmNativeType<"dmGameObject::CollectionHandle">;
   readonly "dmGameObject::ComponentAddToUpdate": DmNativeCallback;
@@ -11275,6 +13092,12 @@ export interface DmSdkTypes {
   readonly "dmGameObject::ComponentSetPropertiesParams": Readonly<{ m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_PropertySet: DmSdkTypes["dmGameObject::PropertySet"]; m_UserData: DmPointer<"uintptr_t"> }>;
   readonly "dmGameObject::ComponentSetProperty": DmNativeCallback;
   readonly "dmGameObject::ComponentSetPropertyParams": Readonly<{ m_Context: DmPointer<"void">; m_World: DmPointer<"void">; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_PropertyId: DmSdkTypes["dmhash_t"]; m_UserData: DmPointer<"uintptr_t">; m_Value: DmSdkTypes["dmGameObject::PropertyVar"]; m_Options: DmSdkTypes["dmGameObject::HPropertyOptions"] }>;
+  readonly "dmGameObject::ComponentType": DmNativeType<"dmGameObject::ComponentType">;
+  readonly "dmGameObject::ComponentTypeCreateCtx": Readonly<{ m_Impl: DmPointer<"dmGameObject::ComponentTypeCreateCtxImpl">; m_Config: DmSdkTypes["dmConfigFile::HConfig"]; m_Factory: DmSdkTypes["dmResource::HFactory"]; m_Register: DmSdkTypes["dmGameObject::HRegister"]; m_Script: DmSdkTypes["dmScript::HContext"]; m_Contexts: DmNativeType<"dmHashTable64<void *>"> }>;
+  readonly "dmGameObject::ComponentTypeCreateCtxImpl": DmNativeType<"dmGameObject::ComponentTypeCreateCtxImpl">;
+  readonly "dmGameObject::ComponentTypeCreateFunction": DmNativeCallback;
+  readonly "dmGameObject::ComponentTypeDescriptor": DmNativeType<"dmGameObject::ComponentTypeDescriptor">;
+  readonly "dmGameObject::ComponentTypeDestroyFunction": DmNativeCallback;
   readonly "dmGameObject::ComponentsPostUpdate": DmNativeCallback;
   readonly "dmGameObject::ComponentsPostUpdateParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void"> }>;
   readonly "dmGameObject::ComponentsRender": DmNativeCallback;
@@ -11282,13 +13105,7 @@ export interface DmSdkTypes {
   readonly "dmGameObject::ComponentsUpdate": DmNativeCallback;
   readonly "dmGameObject::ComponentsUpdateParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_UpdateContext: DmReadonlyPointer<"dmGameObject::UpdateContext">; m_World: DmPointer<"void">; m_Context: DmPointer<"void"> }>;
   readonly "dmGameObject::ComponentsUpdateResult": Readonly<{ m_TransformsUpdated: boolean }>;
-  readonly "dmGameObject::ComponentType": DmNativeType<"dmGameObject::ComponentType">;
-  readonly "dmGameObject::ComponentTypeCreateCtx": Readonly<{ m_Impl: DmPointer<"dmGameObject::ComponentTypeCreateCtxImpl">; m_Config: DmSdkTypes["dmConfigFile::HConfig"]; m_Factory: DmSdkTypes["dmResource::HFactory"]; m_Register: DmSdkTypes["dmGameObject::HRegister"]; m_Script: DmSdkTypes["dmScript::HContext"]; m_Contexts: DmNativeType<"dmHashTable64<void *>"> }>;
-  readonly "dmGameObject::ComponentTypeCreateCtxImpl": DmNativeType<"dmGameObject::ComponentTypeCreateCtxImpl">;
-  readonly "dmGameObject::ComponentTypeCreateFunction": DmNativeCallback;
-  readonly "dmGameObject::ComponentTypeDescriptor": DmNativeType<"dmGameObject::ComponentTypeDescriptor">;
-  readonly "dmGameObject::ComponentTypeDestroyFunction": DmNativeCallback;
-  readonly "dmGameObject::CreateResult": 0 | -1 | -1000;
+  readonly "dmGameObject::CreateResult": DmGameObjectCreateResult;
   readonly "dmGameObject::FIteratorChildren": DmNativeCallback;
   readonly "dmGameObject::FIteratorNext": DmNativeCallback;
   readonly "dmGameObject::FIteratorProperties": DmNativeCallback;
@@ -11311,36 +13128,36 @@ export interface DmSdkTypes {
   readonly "dmGameObject::HScript": DmPointer<"dmGameObject::Script">;
   readonly "dmGameObject::HScriptInstance": DmPointer<"dmGameObject::ScriptInstance">;
   readonly "dmGameObject::InputAction": Readonly<{ m_GamepadGuid: DmSdkTypes["dmHID::GamepadGuid"]; m_ActionId: DmSdkTypes["dmhash_t"]; m_Value: number; m_X: number; m_Y: number; m_DX: number; m_DY: number; m_ScreenX: number; m_ScreenY: number; m_ScreenDX: number; m_ScreenDY: number; m_AccX: number; m_AccY: number; m_AccZ: number; m_Count: number; m_GamepadIndex: number; m_UserID: number; m_IsGamepad: number; m_GamepadUnknown: number; m_GamepadDisconnected: number; m_GamepadConnected: number; m_HasGamepadPacket: number; m_HasText: number; m_Pressed: number; m_Released: number; m_Repeated: number; m_PositionSet: number; m_AccelerationSet: number; m_Consumed: number }>;
-  readonly "dmGameObject::InputResult": 0 | 1 | -1000;
+  readonly "dmGameObject::InputResult": DmGameObjectInputResult;
   readonly "dmGameObject::Instance": DmNativeType<"dmGameObject::Instance">;
   readonly "dmGameObject::InstanceIdMap": DmNativeType<"dmHashTable<dmhash_t, dmhash_t>">;
   readonly "dmGameObject::InstancePropertyContainers": DmNativeType<"dmHashTable<dmhash_t, HPropertyContainer>">;
   readonly "dmGameObject::LuaScript": Readonly<{ m_LuaModule: DmPointer<"int"> }>;
-  readonly "dmGameObject::Playback": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  readonly "dmGameObject::Playback": DmGameObjectPlayback;
   readonly "dmGameObject::Properties": DmNativeType<"dmGameObject::Properties">;
   readonly "dmGameObject::PropertyContainer": DmNativeType<"dmGameObject::PropertyContainer">;
   readonly "dmGameObject::PropertyContainerBuilder": DmNativeType<"dmGameObject::PropertyContainerBuilder">;
   readonly "dmGameObject::PropertyContainerBuilderParams": Readonly<{ m_NumberCount: number; m_HashCount: number; m_URLStringCount: number; m_URLStringSize: number; m_URLCount: number; m_Vector3Count: number; m_Vector4Count: number; m_QuatCount: number; m_BoolCount: number; m_TextCount: number; m_TextSize: number }>;
   readonly "dmGameObject::PropertyDesc": Readonly<{ m_ElementIds: DmSpan<DmSdkTypes["dmhash_t"]>; m_Variant: DmSdkTypes["dmGameObject::PropertyVar"]; m_ValuePtr: DmPointer<"float">; m_ReadOnly: number; m_ValueType: number; m_ArrayLength: number }>;
   readonly "dmGameObject::PropertyOptions": DmNativeType<"dmGameObject::PropertyOptions">;
-  readonly "dmGameObject::PropertyResult": 0 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -11 | -12 | -13;
+  readonly "dmGameObject::PropertyResult": DmGameObjectPropertyResult;
   readonly "dmGameObject::PropertySet": Readonly<{ m_GetPropertyCallback: DmSdkTypes["dmGameObject::GetPropertyCallback"]; m_FreeUserDataCallback: DmSdkTypes["dmGameObject::FreeUserDataCallback"]; m_UserData: bigint }>;
-  readonly "dmGameObject::PropertyType": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-  readonly "dmGameObject::PropertyValueType": 0 | 1;
+  readonly "dmGameObject::PropertyType": DmGameObjectPropertyType;
+  readonly "dmGameObject::PropertyValueType": DmGameObjectPropertyValueType;
   readonly "dmGameObject::PropertyVar": Readonly<{ m_Type: DmSdkTypes["dmGameObject::PropertyType"] }>;
   readonly "dmGameObject::Prototype": DmNativeType<"dmGameObject::Prototype">;
   readonly "dmGameObject::Register": DmNativeType<"dmGameObject::Register">;
-  readonly "dmGameObject::Result": 0 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -11 | -12 | -13 | -14 | -15 | -1000;
+  readonly "dmGameObject::Result": DmGameObjectResult;
   readonly "dmGameObject::SceneNode": Readonly<{ m_Node: bigint; m_Type: DmSdkTypes["dmGameObject::SceneNodeType"]; m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_ComponentType: DmPointer<"dmGameObject::ComponentType">; m_ComponentPrototype: DmPointer<"void">; m_ComponentWorld: DmPointer<"void">; m_Component: bigint }>;
   readonly "dmGameObject::SceneNodeIterator": Readonly<{ m_Node: DmSdkTypes["dmGameObject::SceneNode"]; m_Parent: DmSdkTypes["dmGameObject::SceneNode"]; m_NextChild: DmSdkTypes["dmGameObject::SceneNode"]; m_FnIterateNext: DmSdkTypes["dmGameObject::FIteratorNext"] }>;
   readonly "dmGameObject::SceneNodeProperty": Readonly<{ m_NameHash: DmSdkTypes["dmhash_t"]; m_Type: DmSdkTypes["dmGameObject::SceneNodePropertyType"]; m_Value: DmNativeType<"union (unnamed union at /Users/mini/Documents/defold-hermes/upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)"> }>;
   readonly "dmGameObject::SceneNodePropertyIterator": Readonly<{ m_Property: DmSdkTypes["dmGameObject::SceneNodeProperty"]; m_Node: DmPointer<"dmGameObject::SceneNode">; m_Next: bigint; m_FnIterateNext: DmSdkTypes["dmGameObject::FIteratorPropertiesNext"] }>;
-  readonly "dmGameObject::SceneNodePropertyType": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  readonly "dmGameObject::SceneNodeType": DmNativeType<"dmGameObject::SceneNodeType">;
+  readonly "dmGameObject::SceneNodePropertyType": DmGameObjectSceneNodePropertyType;
+  readonly "dmGameObject::SceneNodeType": DmGameObjectSceneNodeType;
   readonly "dmGameObject::Script": DmNativeType<"dmGameObject::Script">;
   readonly "dmGameObject::ScriptInstance": DmNativeType<"dmGameObject::ScriptInstance">;
   readonly "dmGameObject::UpdateContext": Readonly<{ m_TimeScale: number; m_DT: number; m_AccumFrameTime: number; m_FixedUpdateFrequency: number }>;
-  readonly "dmGameObject::UpdateResult": 0 | -1000;
+  readonly "dmGameObject::UpdateResult": DmGameObjectUpdateResult;
   readonly "dmGameSystem::AnimationSetResource": Readonly<{ m_AnimationSet: DmPointer<"int"> }>;
   readonly "dmGameSystem::BufferResource": Readonly<{ m_BufferDDF: DmPointer<"int">; m_Buffer: DmSdkTypes["dmBuffer::HBuffer"]; m_NameHash: DmSdkTypes["dmhash_t"]; m_ElementCount: number; m_Stride: number; m_Version: number }>;
   readonly "dmGameSystem::CameraResource": Readonly<{ m_DDF: DmPointer<"int"> }>;
@@ -11353,8 +13170,8 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::CollisionObjectResource": Readonly<{ m_DDF: DmPointer<"int">; m_ShapeTranslation: DmPointer<"dmVMath::Vector3">; m_ShapeRotation: DmPointer<"dmVMath::Quat">; m_ShapeTypes: DmPointer<"int">; m_Mask: DmSpan<bigint>; m_Group: bigint; m_ShapeCount: number }>;
   readonly "dmGameSystem::CollisionObjectResourceBox2D": Readonly<{ m_BaseResource: DmSdkTypes["dmGameSystem::CollisionObjectResource"]; m_TileGridResource: DmPointer<"dmGameSystem::TileGridResource">; m_Shapes2D: DmPointer<"dmPhysics::HCollisionShape2D">; m_TileGridShapeCount: number; m_TileGrid: number }>;
   readonly "dmGameSystem::CollisionObjectResourceBullet3D": Readonly<{ m_BaseResource: DmSdkTypes["dmGameSystem::CollisionObjectResource"]; m_Shapes3D: DmPointer<"dmPhysics::HCollisionShape3D"> }>;
-  readonly "dmGameSystem::CompCollectionFactoryStatus": 0 | 1 | 2;
-  readonly "dmGameSystem::CompFactoryStatus": 0 | 1 | 2;
+  readonly "dmGameSystem::CompCollectionFactoryStatus": DmGameSystemCompCollectionFactoryStatus;
+  readonly "dmGameSystem::CompFactoryStatus": DmGameSystemCompFactoryStatus;
   readonly "dmGameSystem::CompGetConstantCallback": DmNativeCallback;
   readonly "dmGameSystem::CompGuiNodeCloneFn": DmNativeCallback;
   readonly "dmGameSystem::CompGuiNodeContext": DmNativeType<"dmGameSystem::CompGuiNodeContext">;
@@ -11374,13 +13191,13 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::ConvexShapeResourceBullet3D": Readonly<{ m_Shape3D: DmSdkTypes["dmPhysics::HCollisionShape3D"] }>;
   readonly "dmGameSystem::CustomNodeCtx": Readonly<{ m_NodeData: DmPointer<"void">; m_TypeContext: DmPointer<"void">; m_Scene: DmSdkTypes["dmGui::HScene"]; m_Node: DmSdkTypes["dmGui::HNode"]; m_Type: number }>;
   readonly "dmGameSystem::DataResource": DmNativeType<"dmGameSystem::DataResource">;
+  readonly "dmGameSystem::FModelAnimationCallback": DmNativeCallback;
+  readonly "dmGameSystem::FPrewarmTextCallback": DmNativeCallback;
   readonly "dmGameSystem::FactoryComponent": DmNativeType<"dmGameSystem::FactoryComponent">;
   readonly "dmGameSystem::FactoryResource": Readonly<{ m_Prototype: DmSdkTypes["dmGameObject::HPrototype"]; m_PrototypePath: DmReadonlyPointer<"char">; m_LoadDynamically: number; m_DynamicPrototype: number }>;
   readonly "dmGameSystem::FactoryWorld": DmNativeType<"dmGameSystem::FactoryWorld">;
-  readonly "dmGameSystem::FModelAnimationCallback": DmNativeCallback;
   readonly "dmGameSystem::FontInfo": Readonly<{ m_Size: number; m_ShadowX: number; m_ShadowY: number; m_ShadowBlur: number; m_ShadowAlpha: number; m_Alpha: number; m_OutlineAlpha: number; m_OutlineWidth: number; m_OutputFormat: number; m_RenderMode: number }>;
   readonly "dmGameSystem::FontResource": DmNativeType<"dmGameSystem::FontResource">;
-  readonly "dmGameSystem::FPrewarmTextCallback": DmNativeCallback;
   readonly "dmGameSystem::GuiNodeTypeCreateFunction": DmNativeCallback;
   readonly "dmGameSystem::GuiNodeTypeDestroyFunction": DmNativeCallback;
   readonly "dmGameSystem::GuiSceneResource": Readonly<{ m_SceneDesc: DmPointer<"int">; m_Script: DmSdkTypes["dmGui::HScript"]; m_Fonts: DmNativeType<"dmArray<FontResource *>">; m_FontMapPaths: DmNativeType<"dmArray<dmhash_t>">; m_GuiTextureSets: DmNativeType<"dmArray<GuiSceneTextureSetResource>">; m_ParticlePrototypes: DmNativeType<"dmArray<dmParticle::HPrototype>">; m_Materials: DmNativeType<"dmArray<MaterialResource *>">; m_Path: DmReadonlyPointer<"char">; m_GuiContext: DmSdkTypes["dmGui::HContext"]; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Resources: DmNativeType<"dmHashTable64<void *>">; m_ResourceTypes: DmNativeType<"dmHashTable64<dmhash_t>"> }>;
@@ -11412,30 +13229,29 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::PropVector4": Readonly<{ m_Vector: DmSdkTypes["dmhash_t"]; m_X: DmSdkTypes["dmhash_t"]; m_Y: DmSdkTypes["dmhash_t"]; m_Z: DmSdkTypes["dmhash_t"]; m_W: DmSdkTypes["dmhash_t"]; m_ReadOnly: boolean }>;
   readonly "dmGameSystem::ProxyLoadCallback": DmNativeCallback;
   readonly "dmGameSystem::RenderTargetResource": DmNativeType<"dmGameSystem::RenderTargetResource">;
-  readonly "dmGameSystem::RigModelVertexFormat": DmNativeType<"dmGameSystem::RigModelVertexFormat">;
+  readonly "dmGameSystem::RigModelVertexFormat": DmGameSystemRigModelVertexFormat;
   readonly "dmGameSystem::RigSceneResource": Readonly<{ m_BindPose: DmNativeType<"dmArray<dmRig::RigBone>">; m_RigScene: DmPointer<"int">; m_SkeletonRes: DmPointer<"dmGameSystem::SkeletonResource">; m_MeshSetRes: DmPointer<"dmGameSystem::MeshSetResource">; m_AnimationSetRes: DmPointer<"dmGameSystem::AnimationSetResource">; m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource"> }>;
   readonly "dmGameSystem::SkeletonResource": Readonly<{ m_Skeleton: DmPointer<"int">; m_BoneIndices: DmNativeType<"dmHashTable64<uint32_t>"> }>;
   readonly "dmGameSystem::Sound": Readonly<{ m_GroupHash: DmSdkTypes["dmhash_t"]; m_SoundDataRes: DmPointer<"dmGameSystem::SoundDataResource">; m_Gain: number; m_Pan: number; m_Speed: number; m_Loopcount: number; m_Looping: number }>;
   readonly "dmGameSystem::SoundDataResource": DmNativeType<"dmGameSystem::SoundDataResource">;
   readonly "dmGameSystem::SpriteResource": Readonly<{ m_DDF: DmPointer<"int">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_DefaultAnimation: DmSdkTypes["dmhash_t"]; m_Textures: DmPointer<"dmGameSystem::SpriteTexture">; m_NumTextures: number }>;
   readonly "dmGameSystem::SpriteTexture": Readonly<{ m_SamplerNameHash: DmSdkTypes["dmhash_t"]; m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource"> }>;
+  readonly "dmGameSystem::TTFResource": DmNativeType<"dmGameSystem::TTFResource">;
   readonly "dmGameSystem::TextureResource": Readonly<{ m_Texture: DmSdkTypes["dmGraphics::HTexture"]; m_OriginalWidth: number; m_OriginalHeight: number; m_Uploading: number; m_DelayDelete: number }>;
   readonly "dmGameSystem::TextureSetResource": Readonly<{ m_HullCollisionGroups: number; m_AnimationIds: DmNativeType<"dmHashTable64<uint32_t>">; m_FrameIds: DmNativeType<"dmHashTable64<uint32_t>">; m_Texture: DmPointer<"dmGameSystem::TextureResource">; m_TexturePath: DmSdkTypes["dmhash_t"]; m_TextureSet: DmPointer<"int">; m_HullSet: DmSdkTypes["dmPhysics::HHullSet2D"]; m_TexturesGeneration: number }>;
   readonly "dmGameSystem::TileGridResource": Readonly<{ m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource">; m_TileGrid: DmPointer<"int">; m_GridShapes: number; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_ColumnCount: number; m_RowCount: number; m_Dirty: number; m_MinCellX: number; m_MinCellY: number }>;
-  readonly "dmGameSystem::TTFResource": DmNativeType<"dmGameSystem::TTFResource">;
-  readonly "dmGraphics::AdapterFamily": -1 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-  readonly "dmGraphics::AttachmentOp": DmNativeType<"dmGraphics::AttachmentOp">;
-  readonly "dmGraphics::BlendEquation": 0 | 1 | 2 | 3 | 4;
-  readonly "dmGraphics::BlendFactor": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
-  readonly "dmGraphics::BufferAccess": 0 | 1 | 2;
-  readonly "dmGraphics::BufferType": 1 | 2 | 4 | 8 | 16 | 32;
-  readonly "dmGraphics::BufferUsage": 0 | 1 | 2 | 4;
-  readonly "dmGraphics::CompareFunc": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  readonly "dmGraphics::AdapterFamily": DmGraphicsAdapterFamily;
+  readonly "dmGraphics::AttachmentOp": DmGraphicsAttachmentOp;
+  readonly "dmGraphics::BlendEquation": DmGraphicsBlendEquation;
+  readonly "dmGraphics::BlendFactor": DmGraphicsBlendFactor;
+  readonly "dmGraphics::BufferAccess": DmGraphicsBufferAccess;
+  readonly "dmGraphics::BufferType": DmGraphicsBufferType;
+  readonly "dmGraphics::BufferUsage": DmGraphicsBufferUsage;
+  readonly "dmGraphics::CompareFunc": DmGraphicsCompareFunc;
   readonly "dmGraphics::ContextParams": Readonly<{ m_Window: DmSdkTypes["HWindow"]; m_JobContext: DmSdkTypes["HJobContext"]; m_DefaultTextureMinFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_DefaultTextureMagFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_Width: number; m_Height: number; m_GraphicsMemorySize: number; m_SwapInterval: number; m_GraphicsApiVersionMajorHint: number; m_GraphicsApiVersionMinorHint: number; m_VerifyGraphicsCalls: number; m_PrintDeviceInfo: number; m_UseValidationLayers: number }>;
-  readonly "dmGraphics::FaceType": 0 | 1 | 2;
-  readonly "dmGraphics::FaceWinding": 0 | 1;
+  readonly "dmGraphics::FaceType": DmGraphicsFaceType;
+  readonly "dmGraphics::FaceWinding": DmGraphicsFaceWinding;
   readonly "dmGraphics::GraphicsContext": DmNativeType<"dmGraphics::GraphicsContext">;
-  readonly "dmGraphics::HandleResult": 0 | -1 | -2;
   readonly "dmGraphics::HContext": DmPointer<"dmGraphics::GraphicsContext">;
   readonly "dmGraphics::HIndexBuffer": bigint;
   readonly "dmGraphics::HProgram": bigint;
@@ -11446,54 +13262,45 @@ export interface DmSdkTypes {
   readonly "dmGraphics::HVertexBuffer": bigint;
   readonly "dmGraphics::HVertexDeclaration": DmPointer<"dmGraphics::VertexDeclaration">;
   readonly "dmGraphics::HVertexStreamDeclaration": DmPointer<"dmGraphics::VertexStreamDeclaration">;
-  readonly "dmGraphics::IndexBufferFormat": 0 | 1;
+  readonly "dmGraphics::HandleResult": DmGraphicsHandleResult;
+  readonly "dmGraphics::IndexBufferFormat": DmGraphicsIndexBufferFormat;
   readonly "dmGraphics::PipelineState": Readonly<{ m_WriteColorMask: bigint; m_WriteDepth: bigint; m_PrimtiveType: bigint; m_DepthTestEnabled: bigint; m_DepthTestFunc: bigint; m_StencilEnabled: bigint; m_ScissorTestEnabled: bigint; m_StencilFrontOpFail: bigint; m_StencilFrontOpPass: bigint; m_StencilFrontOpDepthFail: bigint; m_StencilFrontTestFunc: bigint; m_StencilBackOpFail: bigint; m_StencilBackOpPass: bigint; m_StencilBackOpDepthFail: bigint; m_StencilBackTestFunc: bigint; m_StencilWriteMask: bigint; m_StencilCompareMask: bigint; m_StencilReference: bigint; m_BlendEnabled: bigint; m_BlendSrcFactor: bigint; m_BlendDstFactor: bigint; m_BlendSrcFactorAlpha: bigint; m_BlendDstFactorAlpha: bigint; m_BlendEquationColor: bigint; m_BlendEquationAlpha: bigint; m_CullFaceEnabled: bigint; m_CullFaceType: bigint; m_FaceWinding: bigint; m_PolygonOffsetFillEnabled: bigint }>;
-  readonly "dmGraphics::PrimitiveType": 0 | 1 | 2;
-  readonly "dmGraphics::RenderTargetAttachment": 0 | 1 | 2 | 3;
+  readonly "dmGraphics::PrimitiveType": DmGraphicsPrimitiveType;
+  readonly "dmGraphics::RenderTargetAttachment": DmGraphicsRenderTargetAttachment;
   readonly "dmGraphics::RenderTargetCreationParams": Readonly<{ m_ColorBufferCreationParams: DmSpan<DmSdkTypes["dmGraphics::TextureCreationParams"]>; m_DepthBufferCreationParams: DmSdkTypes["dmGraphics::TextureCreationParams"]; m_StencilBufferCreationParams: DmSdkTypes["dmGraphics::TextureCreationParams"]; m_ColorBufferParams: DmSpan<DmSdkTypes["dmGraphics::TextureParams"]>; m_DepthBufferParams: DmSdkTypes["dmGraphics::TextureParams"]; m_StencilBufferParams: DmSdkTypes["dmGraphics::TextureParams"]; m_SampleCount: number; m_ColorBufferLoadOps: DmSpan<DmSdkTypes["dmGraphics::AttachmentOp"]>; m_ColorBufferStoreOps: DmSpan<DmSdkTypes["dmGraphics::AttachmentOp"]>; m_ColorBufferClearValue: DmSpan<DmSpan<number>>; m_DepthTexture: number; m_StencilTexture: number }>;
   readonly "dmGraphics::SetTextureAsyncCallback": DmNativeCallback;
-  readonly "dmGraphics::State": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  readonly "dmGraphics::StencilOp": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  readonly "dmGraphics::State": DmGraphicsState;
+  readonly "dmGraphics::StencilOp": DmGraphicsStencilOp;
   readonly "dmGraphics::TextureCreationParams": Readonly<{ m_Type: DmSdkTypes["dmGraphics::TextureType"]; m_Width: number; m_Height: number; m_Depth: number; m_OriginalWidth: number; m_OriginalHeight: number; m_OriginalDepth: number; m_LayerCount: number; m_MipMapCount: number; m_UsageHintBits: number }>;
-  readonly "dmGraphics::TextureFilter": 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  readonly "dmGraphics::TextureFormat": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 | 30 | 31 | 32 | 33 | 34 | 35 | 36 | 37 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45;
+  readonly "dmGraphics::TextureFilter": DmGraphicsTextureFilter;
+  readonly "dmGraphics::TextureFormat": DmGraphicsTextureFormat;
   readonly "dmGraphics::TextureParams": Readonly<{ m_Data: DmReadonlyPointer<"void">; m_DataSize: number; m_Format: DmSdkTypes["dmGraphics::TextureFormat"]; m_MinFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_MagFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_UWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_VWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_WWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_X: number; m_Y: number; m_Z: number; m_Slice: number; m_Width: number; m_Height: number; m_Depth: number; m_LayerCount: number; m_MipMap: number; m_SubUpdate: number }>;
-  readonly "dmGraphics::TextureStatusFlags": 0 | 1;
-  readonly "dmGraphics::TextureType": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-  readonly "dmGraphics::TextureWrap": 0 | 1 | 2 | 3;
-  readonly "dmGraphics::Type": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22 | 23 | 24 | 25;
+  readonly "dmGraphics::TextureStatusFlags": DmGraphicsTextureStatusFlags;
+  readonly "dmGraphics::TextureType": DmGraphicsTextureType;
+  readonly "dmGraphics::TextureWrap": DmGraphicsTextureWrap;
+  readonly "dmGraphics::Type": DmGraphicsType;
   readonly "dmGraphics::VertexAttributeInfo": DmNativeType<"dmGraphics::VertexAttributeInfo">;
   readonly "dmGraphics::VertexAttributeInfos": DmNativeType<"dmGraphics::VertexAttributeInfos">;
   readonly "dmGraphics::VertexDeclaration": DmNativeType<"dmGraphics::VertexDeclaration">;
   readonly "dmGraphics::VertexStreamDeclaration": DmNativeType<"dmGraphics::VertexStreamDeclaration">;
   readonly "dmGraphics::WriteAttributeParams": DmNativeType<"dmGraphics::WriteAttributeParams">;
-  readonly "dmGui::AdjustMode": 0 | 1 | 2;
-  readonly "dmGui::AdjustReference": 0 | 1 | 2;
+  readonly "dmGui::AdjustMode": DmGuiAdjustMode;
+  readonly "dmGui::AdjustReference": DmGuiAdjustReference;
   readonly "dmGui::Context": DmNativeType<"dmGui::Context">;
   readonly "dmGui::CustomProperty": Readonly<{ m_Type: DmSdkTypes["dmGui::CustomPropertyType"]; m_Number: number; m_Boolean: boolean; m_Hash: DmSdkTypes["dmhash_t"]; m_String: DmReadonlyPointer<"char">; m_Vector3: DmSdkTypes["dmVMath::Vector3"]; m_Vector4: DmSdkTypes["dmVMath::Vector4"]; m_Quat: DmSdkTypes["dmVMath::Quat"] }>;
-  readonly "dmGui::CustomPropertyType": 0 | 1 | 2 | 3 | 5 | 6 | 7;
+  readonly "dmGui::CustomPropertyType": DmGuiCustomPropertyType;
   readonly "dmGui::HContext": DmPointer<"dmGui::Context">;
   readonly "dmGui::HNode": number;
   readonly "dmGui::HScene": DmPointer<"dmGui::Scene">;
   readonly "dmGui::HScript": DmPointer<"dmGui::Script">;
   readonly "dmGui::HTextureSource": bigint;
-  readonly "dmGui::NodeTextureType": DmNativeType<"dmGui::NodeTextureType">;
-  readonly "dmGui::NodeType": 0 | 1 | 2 | 3 | 5 | 6 | 7;
-  readonly "dmGui::Playback": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  readonly "dmGui::Property": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  readonly "dmGui::Result": 0 | -1 | -2 | -4 | -5 | -6 | -7 | -8 | -9 | -10;
+  readonly "dmGui::NodeTextureType": DmGuiNodeTextureType;
+  readonly "dmGui::NodeType": DmGuiNodeType;
+  readonly "dmGui::Playback": DmGuiPlayback;
+  readonly "dmGui::Property": DmGuiProperty;
+  readonly "dmGui::Result": DmGuiResult;
   readonly "dmGui::Scene": DmNativeType<"dmGui::Scene">;
   readonly "dmGui::Script": DmNativeType<"dmGui::Script">;
-  readonly dmhash_t: bigint;
-  readonly "dmHashTable::dmHashTable": DmNativeType<"dmHashTable::dmHashTable">;
-  readonly "dmHashTable::dmHashTable::Entry": Readonly<{ m_Key: DmSdkTypes["dmHashTable::dmHashTable::key_t"]; m_Value: DmSdkTypes["dmHashTable::dmHashTable::value_t"]; m_Next: number }>;
-  readonly "dmHashTable::dmHashTable::Iterator": Readonly<{ m_Table: DmReference<DmNativeType<"dmHashTable<KEY, T>">>; m_EntryPtr: DmPointer<"dmHashTable::dmHashTable::Entry">; m_Entry: number; m_BucketIndex: number }>;
-  readonly "dmHashTable::dmHashTable::key_t": DmNativeType<"KEY">;
-  readonly "dmHashTable::dmHashTable::STATE_FLAGS": 0 | 1;
-  readonly "dmHashTable::dmHashTable::value_t": DmNativeType<"T">;
-  readonly "dmHashTable16::dmHashTable16": DmNativeType<"dmHashTable16::dmHashTable16">;
-  readonly "dmHashTable32::dmHashTable32": DmNativeType<"dmHashTable32::dmHashTable32">;
-  readonly "dmHashTable64::dmHashTable64": DmNativeType<"dmHashTable64::dmHashTable64">;
   readonly "dmHID::Context": DmNativeType<"dmHID::Context">;
   readonly "dmHID::Gamepad": DmNativeType<"dmHID::Gamepad">;
   readonly "dmHID::GamepadGuid": Readonly<{ m_Bus: number; m_CRC16: number; m_Vendor: number; m_Product: number; m_Version: number; m_DriverSignature: number; m_DriverData: number }>;
@@ -11503,29 +13310,38 @@ export interface DmSdkTypes {
   readonly "dmHID::HKeyboard": DmPointer<"dmHID::Keyboard">;
   readonly "dmHID::HMouse": DmPointer<"dmHID::Mouse">;
   readonly "dmHID::HTouchDevice": DmPointer<"dmHID::TouchDevice">;
-  readonly "dmHID::Key": 32 | 33 | 34 | 35 | 36 | 38 | 39 | 40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 | 50 | 51 | 52 | 53 | 54 | 55 | 56 | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 | 70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 | 80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 | 90 | 91 | 92 | 93 | 94 | 95 | 96 | 123 | 124 | 125 | 126 | 256 | 257 | 258 | 259 | 260 | 261 | 262 | 263 | 264 | 265 | 266 | 267 | 268 | 269 | 270 | 271 | 272 | 273 | 274 | 275 | 276 | 277 | 278 | 279 | 280 | 281 | 282 | 283 | 284 | 285 | 286 | 287 | 288 | 289 | 290 | 291 | 292 | 293 | 294 | 295 | 296 | 297 | 298 | 299 | 300 | 301 | 302 | 303 | 304 | 305 | 306 | 307 | 308 | 309 | 310 | 311 | 312 | 313;
+  readonly "dmHID::Key": DmHIDKey;
   readonly "dmHID::Keyboard": DmNativeType<"dmHID::Keyboard">;
   readonly "dmHID::KeyboardPacket": Readonly<{ m_Keys: DmSpan<number> }>;
   readonly "dmHID::Mouse": DmNativeType<"dmHID::Mouse">;
-  readonly "dmHID::MouseButton": 0 | 2 | 1 | 3 | 4 | 5 | 6 | 7 | 8;
+  readonly "dmHID::MouseButton": DmHIDMouseButton;
   readonly "dmHID::MousePacket": Readonly<{ m_PositionX: number; m_PositionY: number; m_Wheel: number; m_Buttons: DmSpan<number> }>;
-  readonly "dmHID::Phase": DmNativeType<"dmHID::Phase">;
+  readonly "dmHID::Phase": DmHIDPhase;
   readonly "dmHID::Touch": Readonly<{ m_TapCount: number; m_X: number; m_Y: number; m_ScreenX: number; m_ScreenY: number; m_DX: number; m_DY: number; m_ScreenDX: number; m_ScreenDY: number; m_Id: number; m_Phase: DmSdkTypes["dmHID::Phase"] }>;
   readonly "dmHID::TouchDevice": DmNativeType<"dmHID::TouchDevice">;
-  readonly "dmHttpClient::ParseResult": 1 | 0 | -1;
-  readonly "dmImage::CompressionType": 0 | 1;
+  readonly "dmHashTable16::dmHashTable16": DmNativeType<"dmHashTable16::dmHashTable16">;
+  readonly "dmHashTable32::dmHashTable32": DmNativeType<"dmHashTable32::dmHashTable32">;
+  readonly "dmHashTable64::dmHashTable64": DmNativeType<"dmHashTable64::dmHashTable64">;
+  readonly "dmHashTable::dmHashTable": DmNativeType<"dmHashTable::dmHashTable">;
+  readonly "dmHashTable::dmHashTable::Entry": Readonly<{ m_Key: DmSdkTypes["dmHashTable::dmHashTable::key_t"]; m_Value: DmSdkTypes["dmHashTable::dmHashTable::value_t"]; m_Next: number }>;
+  readonly "dmHashTable::dmHashTable::Iterator": Readonly<{ m_Table: DmReference<DmNativeType<"dmHashTable<KEY, T>">>; m_EntryPtr: DmPointer<"dmHashTable::dmHashTable::Entry">; m_Entry: number; m_BucketIndex: number }>;
+  readonly "dmHashTable::dmHashTable::STATE_FLAGS": DmHashTableDmHashTableSTATEFLAGS;
+  readonly "dmHashTable::dmHashTable::key_t": DmNativeType<"KEY">;
+  readonly "dmHashTable::dmHashTable::value_t": DmNativeType<"T">;
+  readonly "dmHttpClient::ParseResult": DmHttpClientParseResult;
+  readonly "dmImage::CompressionType": DmImageCompressionType;
   readonly "dmImage::HImage": DmPointer<"dmImage::Image">;
   readonly "dmImage::Image": DmNativeType<"dmImage::Image">;
-  readonly "dmImage::Result": 0 | -1 | -2;
-  readonly "dmImage::Type": 0 | 1 | 2 | 3;
+  readonly "dmImage::Result": DmImageResult;
+  readonly "dmImage::Type": DmImageType;
   readonly "dmIntersection::Frustum": Readonly<{ m_Planes: DmSpan<DmSdkTypes["dmIntersection::Plane"]>; m_NumPlanes: number }>;
   readonly "dmIntersection::Plane": DmSdkTypes["dmVMath::Vector4"];
   readonly "dmLog::LogParams": DmSdkTypes["LogParams"];
-  readonly "dmMemory::Result": 0 | -1 | -2;
+  readonly "dmMemory::Result": DmMemoryResult;
   readonly "dmMessage::HSocket": DmSdkTypes["dmhash_t"];
   readonly "dmMessage::Message": Readonly<{ m_Sender: DmSdkTypes["dmMessage::URL"]; m_Receiver: DmSdkTypes["dmMessage::URL"]; m_Id: DmSdkTypes["dmhash_t"]; m_UserData1: bigint; m_UserData2: bigint; m_Descriptor: bigint; m_DataSize: number; m_Next: DmPointer<"dmMessage::Message">; m_DestroyCallback: DmSdkTypes["dmMessage::MessageDestroyCallback"]; m_Data: DmSpan<number> }>;
   readonly "dmMessage::MessageDestroyCallback": DmNativeCallback;
-  readonly "dmMessage::Result": 0 | -1 | -2 | -3 | -4 | -5 | -6;
+  readonly "dmMessage::Result": DmMessageResult;
   readonly "dmMessage::StringURL": Readonly<{ m_Socket: DmReadonlyPointer<"char">; m_SocketSize: number; m_Path: DmReadonlyPointer<"char">; m_PathSize: number; m_Fragment: DmReadonlyPointer<"char">; m_FragmentSize: number }>;
   readonly "dmMessage::URL": Readonly<{ m_Socket: DmSdkTypes["dmMessage::HSocket"]; _reserved: DmSdkTypes["dmhash_t"]; m_Path: DmSdkTypes["dmhash_t"]; m_Fragment: DmSdkTypes["dmhash_t"] }>;
   readonly "dmModelDDF::Model": DmNativeType<"dmModelDDF::Model">;
@@ -11543,7 +13359,7 @@ export interface DmSdkTypes {
   readonly "dmRender::Constant": DmNativeType<"dmRender::Constant">;
   readonly "dmRender::FontMap": DmNativeType<"dmRender::FontMap">;
   readonly "dmRender::FrustumOptions": Readonly<{ m_Matrix: DmSdkTypes["dmVMath::Matrix4"]; m_NumPlanes: DmSdkTypes["dmRender::FrustumPlanes"] }>;
-  readonly "dmRender::FrustumPlanes": 4 | 6;
+  readonly "dmRender::FrustumPlanes": DmRenderFrustumPlanes;
   readonly "dmRender::HConstant": DmPointer<"dmRender::Constant">;
   readonly "dmRender::HFontMap": DmPointer<"dmRender::FontMap">;
   readonly "dmRender::HLightPrototype": number;
@@ -11559,15 +13375,15 @@ export interface DmSdkTypes {
   readonly "dmRender::RenderListDispatchFn": DmNativeCallback;
   readonly "dmRender::RenderListDispatchParams": Readonly<{ m_Context: DmSdkTypes["dmRender::HRenderContext"]; m_UserData: DmPointer<"void">; m_Operation: DmSdkTypes["dmRender::RenderListOperation"]; m_Buf: DmPointer<"dmRender::RenderListEntry">; m_Begin: DmPointer<"uint32_t">; m_End: DmPointer<"uint32_t"> }>;
   readonly "dmRender::RenderListEntry": Readonly<{ m_WorldPosition: DmSdkTypes["dmVMath::Point3"]; m_UserData: bigint; m_Order: number; m_BatchKey: number; m_TagListKey: number; m_FrustumHash: number; m_MinorOrder: number; m_MajorOrder: number; m_Dispatch: number; m_Visibility: number }>;
-  readonly "dmRender::RenderListOperation": DmNativeType<"dmRender::RenderListOperation">;
+  readonly "dmRender::RenderListOperation": DmRenderRenderListOperation;
   readonly "dmRender::RenderListVisibilityFn": DmNativeCallback;
   readonly "dmRender::RenderListVisibilityParams": Readonly<{ m_Frustum: DmReadonlyPointer<"dmIntersection::Frustum">; m_UserData: DmPointer<"void">; m_Entries: DmPointer<"dmRender::RenderListEntry">; m_NumEntries: number }>;
   readonly "dmRender::RenderObject": Readonly<{ m_ConstantBuffer: DmSdkTypes["dmRender::HNamedConstantBuffer"]; m_WorldTransform: DmSdkTypes["dmVMath::Matrix4"]; m_TextureTransform: DmSdkTypes["dmVMath::Matrix4"]; m_IndexBuffer: DmSdkTypes["dmGraphics::HIndexBuffer"]; m_Material: DmSdkTypes["dmRender::HMaterial"]; m_Textures: DmSpan<DmSdkTypes["dmGraphics::HTexture"]>; m_PrimitiveType: DmSdkTypes["dmGraphics::PrimitiveType"]; m_IndexType: DmSdkTypes["dmGraphics::Type"]; m_SourceBlendFactor: DmSdkTypes["dmGraphics::BlendFactor"]; m_DestinationBlendFactor: DmSdkTypes["dmGraphics::BlendFactor"]; m_SourceBlendFactorAlpha: DmSdkTypes["dmGraphics::BlendFactor"]; m_DestinationBlendFactorAlpha: DmSdkTypes["dmGraphics::BlendFactor"]; m_BlendEquationColor: DmSdkTypes["dmGraphics::BlendEquation"]; m_BlendEquationAlpha: DmSdkTypes["dmGraphics::BlendEquation"]; m_FaceWinding: DmSdkTypes["dmGraphics::FaceWinding"]; m_StencilTestParams: DmSdkTypes["dmRender::StencilTestParams"]; m_VertexBufferOffsets: DmSpan<number>; m_VertexStart: number; m_VertexCount: number; m_InstanceCount: number; m_SetBlendFactors: number; m_SetStencilTest: number; m_SetFaceWinding: number }>;
-  readonly "dmRender::RenderOrder": 0 | 1 | 2;
-  readonly "dmRender::Result": 0 | -1 | -2 | -3 | -4 | -5;
+  readonly "dmRender::RenderOrder": DmRenderRenderOrder;
+  readonly "dmRender::Result": DmRenderResult;
   readonly "dmRender::Sampler": DmNativeType<"dmRender::Sampler">;
   readonly "dmRender::StencilTestParams": Readonly<{ m_Front: DmNativeType<"(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)">; m_Back: DmNativeType<"(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)">; m_Ref: number; m_RefMask: number; m_BufferMask: number; m_ColorBufferMask: number; m_ClearBuffer: number; m_SeparateFaceStates: number }>;
-  readonly "dmRender::Visibility": 0 | 1;
+  readonly "dmRender::Visibility": DmRenderVisibility;
   readonly "dmResource::FDecryptResource": DmNativeCallback;
   readonly "dmResource::FReloadedCallback": DmSdkTypes["FResourceReloadedCallback"];
   readonly "dmResource::FResourceCreate": DmNativeCallback;
@@ -11586,159 +13402,76 @@ export interface DmSdkTypes {
   readonly "dmResource::ResourcePreloadParams": DmSdkTypes["ResourcePreloadParams"];
   readonly "dmResource::ResourceRecreateParams": DmSdkTypes["ResourceRecreateParams"];
   readonly "dmResource::ResourceReloadedParams": DmSdkTypes["ResourceReloadedParams"];
-  readonly "dmResource::Result": 0 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -11 | -12 | -13 | -14 | -15 | -16 | -17 | -18 | -19 | -20 | -21 | -22;
+  readonly "dmResource::Result": DmResourceResult;
   readonly "dmRig::BonePose": Readonly<{ m_Local: DmSdkTypes["dmTransform::Transform"]; m_World: DmSdkTypes["dmTransform::Transform"]; m_Final: DmSdkTypes["dmVMath::Matrix4"]; m_ParentIndex: number; m_Length: number }>;
   readonly "dmRig::HRigContext": DmPointer<"dmRig::RigContext">;
   readonly "dmRig::HRigInstance": DmPointer<"dmRig::RigInstance">;
   readonly "dmRig::IKTarget": Readonly<{ m_Mix: number; m_Position: DmSdkTypes["dmVMath::Vector3"]; m_Callback: DmSdkTypes["dmRig::RigIKTargetCallback"]; m_UserPtr: DmPointer<"void">; m_UserHash: DmSdkTypes["dmhash_t"] }>;
   readonly "dmRig::InstanceCreateParams": Readonly<{ m_ModelId: DmSdkTypes["dmhash_t"]; m_DefaultAnimation: DmSdkTypes["dmhash_t"]; m_BindPose: DmReadonlyPointer<"dmArray<struct RigBone>">; m_BoneIndices: DmReadonlyPointer<"dmHashTable64<uint32_t>">; m_Skeleton: DmReadonlyPointer<"int">; m_MeshSet: DmReadonlyPointer<"int">; m_AnimationSet: DmReadonlyPointer<"int">; m_PoseCallback: DmSdkTypes["dmRig::RigPoseCallback"]; m_PoseCBUserData1: DmPointer<"void">; m_PoseCBUserData2: DmPointer<"void">; m_EventCallback: DmSdkTypes["dmRig::RigEventCallback"]; m_EventCBUserData1: DmPointer<"void">; m_EventCBUserData2: DmPointer<"void">; m_ForceAnimatePose: boolean }>;
   readonly "dmRig::NewContextParams": Readonly<{ m_MaxRigInstanceCount: number }>;
-  readonly "dmRig::Result": 0 | 1 | 2 | 3 | 4;
+  readonly "dmRig::Result": DmRigResult;
   readonly "dmRig::RigBone": Readonly<{ m_ModelToLocal: DmSdkTypes["dmVMath::Matrix4"]; m_ParentIndex: number; m_Length: number }>;
   readonly "dmRig::RigCompletedEventData": Readonly<{ m_AnimationId: bigint; m_Playback: number }>;
   readonly "dmRig::RigContext": DmNativeType<"dmRig::RigContext">;
   readonly "dmRig::RigEventCallback": DmNativeCallback;
-  readonly "dmRig::RigEventType": 0 | 1;
+  readonly "dmRig::RigEventType": DmRigRigEventType;
   readonly "dmRig::RigIKTargetCallback": DmNativeCallback;
   readonly "dmRig::RigInstance": DmNativeType<"dmRig::RigInstance">;
   readonly "dmRig::RigKeyframeEventData": Readonly<{ m_EventId: bigint; m_AnimationId: bigint; m_T: number; m_BlendWeight: number; m_Integer: number; m_Float: number; m_String: bigint }>;
   readonly "dmRig::RigModelVertex": Readonly<{ pos: DmSpan<number>; normal: DmSpan<number>; tangent: DmSpan<number>; color: DmSpan<number>; uv0: DmSpan<number>; uv1: DmSpan<number> }>;
-  readonly "dmRig::RigPlayback": 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  readonly "dmRig::RigPlayback": DmRigRigPlayback;
   readonly "dmRig::RigPoseCallback": DmNativeCallback;
   readonly "dmRigDDF::Mesh": DmNativeType<"dmRigDDF::Mesh">;
   readonly "dmRigDDF::Model": DmNativeType<"dmRigDDF::Model">;
   readonly "dmRigDDF::RigScene": DmNativeType<"dmRigDDF::RigScene">;
+  readonly "dmSSLSocket::Result": DmSSLSocketResult;
+  readonly "dmSSLSocket::SSLSocket": DmNativeType<"dmSSLSocket::SSLSocket">;
+  readonly "dmSSLSocket::Socket": DmPointer<"dmSSLSocket::SSLSocket">;
   readonly "dmScript::Context": DmNativeType<"dmScript::Context">;
   readonly "dmScript::HContext": DmPointer<"dmScript::Context">;
-  readonly "dmScript::LuaBufferOwnership": 0 | 1 | 2;
+  readonly "dmScript::LuaBufferOwnership": DmScriptLuaBufferOwnership;
   readonly "dmScript::LuaCallbackInfo": DmNativeType<"dmScript::LuaCallbackInfo">;
   readonly "dmScript::LuaHBuffer": Readonly<{ m_BufferResPathHash: DmSdkTypes["dmhash_t"]; m_BufferResVersion: number }>;
   readonly "dmScript::LuaStackCheck": Readonly<{ m_L: DmPointer<"lua_State">; m_Filename: DmReadonlyPointer<"char">; m_Linenumber: number; m_Top: number; m_Diff: number }>;
   readonly "dmSocket::Address": Readonly<{ m_family: DmSdkTypes["dmSocket::Domain"]; m_address: DmSpan<number> }>;
-  readonly "dmSocket::Domain": DmNativeType<"dmSocket::Domain">;
-  readonly "dmSocket::Flags": 1 | 2 | 4 | 8;
-  readonly "dmSocket::Protocol": DmNativeType<"dmSocket::Protocol">;
-  readonly "dmSocket::Result": 0 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -11 | -12 | -13 | -14 | -15 | -17 | -20 | -22 | -23 | -24 | -25 | -26 | -27 | -28 | -29 | -30 | -31 | -32 | -100 | -101 | -102 | -103 | -1000;
+  readonly "dmSocket::Domain": DmSocketDomain;
+  readonly "dmSocket::Flags": DmSocketFlags;
+  readonly "dmSocket::Protocol": DmSocketProtocol;
+  readonly "dmSocket::Result": DmSocketResult;
   readonly "dmSocket::Selector": Readonly<{ m_Poller: DmSdkTypes["dmFileDescriptor::Poller"] }>;
-  readonly "dmSocket::SelectorKind": 0 | 1 | 2;
-  readonly "dmSocket::ShutdownType": DmNativeType<"dmSocket::ShutdownType">;
+  readonly "dmSocket::SelectorKind": DmSocketSelectorKind;
+  readonly "dmSocket::ShutdownType": DmSocketShutdownType;
   readonly "dmSocket::Socket": number;
-  readonly "dmSocket::Type": DmNativeType<"dmSocket::Type">;
-  readonly "dmSound::Result": 0 | 1 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -11 | -12 | -13 | -14 | -15 | -16 | -17 | -18 | -19 | -1000;
+  readonly "dmSocket::Type": DmSocketType;
+  readonly "dmSound::Result": DmSoundResult;
   readonly "dmSpinlock::ScopedLock": Readonly<{ m_Spinlock: DmReference<DmSdkTypes["dmSpinlock::Spinlock"]> }>;
   readonly "dmSpinlock::Spinlock": DmNativeType<"dmSpinlock::Spinlock">;
-  readonly "dmSSLSocket::Result": 0 | -1 | -2000 | -2001 | -2002 | -2003;
-  readonly "dmSSLSocket::Socket": DmPointer<"dmSSLSocket::SSLSocket">;
-  readonly "dmSSLSocket::SSLSocket": DmNativeType<"dmSSLSocket::SSLSocket">;
-  readonly "dmSys::Result": 0 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -11 | -12 | -13 | -14 | -15 | -16 | -17 | -18 | -19 | -20 | -21 | -22 | -23 | -24 | -25 | -26 | -27 | -28 | -29 | -30 | -31 | -32 | -1000;
+  readonly "dmSys::Result": DmSysResult;
   readonly "dmSys::StatInfo": Readonly<{ m_Size: bigint; m_Mode: number; m_AccessTime: number; m_ModifiedTime: number }>;
   readonly "dmThread::Thread": bigint;
   readonly "dmThread::ThreadStart": DmNativeCallback;
   readonly "dmThread::TlsKey": bigint;
   readonly "dmTransform::Transform": DmNativeType<"dmTransform::Transform">;
   readonly "dmURI::Parts": Readonly<{ m_Scheme: DmSpan<number>; m_Location: DmSpan<number>; m_Hostname: DmSpan<number>; m_Port: number; m_Path: DmSpan<number> }>;
-  readonly "dmURI::Result": DmNativeType<"dmURI::Result">;
+  readonly "dmURI::Result": DmURIResult;
   readonly "dmVMath::Matrix3": DmNativeType<"Vectormath::Aos::Matrix3">;
   readonly "dmVMath::Matrix4": DmNativeType<"Vectormath::Aos::Matrix4">;
   readonly "dmVMath::Point3": DmNativeType<"Vectormath::Aos::Point3">;
   readonly "dmVMath::Quat": DmNativeType<"Vectormath::Aos::Quat">;
   readonly "dmVMath::Vector3": DmNativeType<"Vectormath::Aos::Vector3">;
   readonly "dmVMath::Vector4": DmNativeType<"Vectormath::Aos::Vector4">;
+  readonly "dmWebServer::HServer": DmPointer<"dmWebServer::Server">;
   readonly "dmWebServer::Handler": DmNativeCallback;
   readonly "dmWebServer::HandlerParams": Readonly<{ m_Userdata: DmPointer<"void">; m_Handler: DmSdkTypes["dmWebServer::Handler"] }>;
-  readonly "dmWebServer::HServer": DmPointer<"dmWebServer::Server">;
   readonly "dmWebServer::Request": Readonly<{ m_Method: DmReadonlyPointer<"char">; m_Resource: DmReadonlyPointer<"char">; m_ContentLength: number; m_Internal: DmPointer<"void"> }>;
-  readonly "dmWebServer::Result": 0 | -1 | -2 | -3 | -4 | -5 | -100 | -1000;
+  readonly "dmWebServer::Result": DmWebServerResult;
   readonly "dmWebServer::Server": DmNativeType<"dmWebServer::Server">;
   readonly dmWindow: DmNativeType<"dmWindow">;
-  readonly EGLContext: DmPointer<"void">;
-  readonly EGLSurface: DmPointer<"void">;
-  readonly ExtensionAppExitCode: 0 | 1 | -1;
-  readonly ExtensionAppParams: Readonly<{ m_ConfigFile: DmSdkTypes["HConfigFile"]; m_ExitStatus: DmSdkTypes["ExtensionAppExitCode"]; m_Impl: DmPointer<"ExtensionAppParams::ExtensionParamsImpl"> }>;
-  readonly "ExtensionAppParams::ExtensionParamsImpl": DmNativeType<"ExtensionAppParams::ExtensionParamsImpl">;
-  readonly ExtensionCallbackType: DmNativeType<"ExtensionCallbackType">;
-  readonly ExtensionEvent: Readonly<{ m_Event: DmSdkTypes["ExtensionEventID"] }>;
-  readonly ExtensionEventID: DmNativeType<"ExtensionEventID">;
-  readonly ExtensionParams: Readonly<{ m_ConfigFile: DmSdkTypes["HConfigFile"]; m_ResourceFactory: DmSdkTypes["HResourceFactory"]; m_L: DmPointer<"lua_State">; m_Impl: DmPointer<"ExtensionAppParams::ExtensionParamsImpl"> }>;
-  readonly ExtensionResult: 0 | -1;
-  readonly FConfigFileCreate: DmNativeCallback;
-  readonly FConfigFileDestroy: DmNativeCallback;
-  readonly FConfigFileGetFloat: DmNativeCallback;
-  readonly FConfigFileGetInt: DmNativeCallback;
-  readonly FConfigFileGetString: DmNativeCallback;
-  readonly FExtensionAppFinalize: DmNativeCallback;
-  readonly FExtensionAppInitialize: DmNativeCallback;
-  readonly FExtensionCallback: DmNativeCallback;
-  readonly FExtensionFinalize: DmNativeCallback;
-  readonly FExtensionInitialize: DmNativeCallback;
-  readonly FExtensionOnEvent: DmNativeCallback;
-  readonly FExtensionUpdate: DmNativeCallback;
-  readonly FJobCallback: DmNativeCallback;
-  readonly FJobProcess: DmNativeCallback;
-  readonly FLogListener: DmNativeCallback;
-  readonly Font: DmNativeType<"Font">;
-  readonly FontCollection: DmNativeType<"FontCollection">;
-  readonly FontGlyph: Readonly<{ m_Bitmap: DmSdkTypes["FontGlyphBitmap"]; m_Codepoint: number; m_GlyphIndex: number; m_Width: number; m_Height: number; m_Advance: number; m_LeftBearing: number; m_Ascent: number; m_Descent: number }>;
-  readonly FontGlyphBitmap: Readonly<{ m_Data: DmPointer<"uint8_t">; m_DataSize: number; m_Width: number; m_Height: number; m_Channels: number; m_Flags: number }>;
-  readonly FontGlyphBitmapFlags: 0 | 1 | 2;
-  readonly FontGlyphOptions: Readonly<{ m_Scale: number; m_GenerateImage: boolean; m_StbttSDFPadding: number; m_StbttSDFOnEdgeValue: number }>;
-  readonly FontResult: DmNativeType<"FontResult">;
-  readonly FontType: 4294967295;
-  readonly FResourceCreate: DmNativeCallback;
-  readonly FResourceDecryption: DmNativeCallback;
-  readonly FResourceDestroy: DmNativeCallback;
-  readonly FResourcePostCreate: DmNativeCallback;
-  readonly FResourcePreload: DmNativeCallback;
-  readonly FResourceRecreate: DmNativeCallback;
-  readonly FResourceReloadedCallback: DmNativeCallback;
-  readonly FResourceTypeDeregister: DmNativeCallback;
-  readonly FResourceTypeRegister: DmNativeCallback;
-  readonly FTextLayoutReleaseObject: DmNativeCallback;
-  readonly FTextLayoutResolveObject: DmNativeCallback;
-  readonly FWindowAddKeyboardCharCallback: DmNativeCallback;
-  readonly FWindowCloseCallback: DmNativeCallback;
-  readonly FWindowDeviceChangedCallback: DmNativeCallback;
-  readonly FWindowFocusCallback: DmNativeCallback;
-  readonly FWindowIconifyCallback: DmNativeCallback;
-  readonly FWindowResizeCallback: DmNativeCallback;
-  readonly FWindowSetMarkedTextCallback: DmNativeCallback;
-  readonly GLXContext: DmPointer<"void">;
-  readonly HashState32: Readonly<{ m_Hash: number; m_Tail: number; m_Count: number; m_Size: number; m_ReverseHashEntryIndex: number }>;
-  readonly HashState64: Readonly<{ m_Hash: bigint; m_Tail: bigint; m_Count: number; m_Size: number; m_ReverseHashEntryIndex: number }>;
-  readonly HConfigFile: DmPointer<"ConfigFile">;
-  readonly HContextRegistry: DmPointer<"ContextRegistry">;
-  readonly HFont: DmPointer<"Font">;
-  readonly HFontCollection: DmPointer<"FontCollection">;
-  readonly HGLRC: DmPointer<"void">;
-  readonly HJob: bigint;
-  readonly HJobContext: DmPointer<"JobContext">;
-  readonly HProfile: number;
-  readonly HResourceDescriptor: DmPointer<"ResourceDescriptor">;
-  readonly HResourceFactory: DmPointer<"ResourceFactory">;
-  readonly HResourcePreloadHintInfo: DmPointer<"ResourcePreloadHintInfo">;
-  readonly HResourceType: DmPointer<"ResourceType">;
-  readonly HResourceTypeContext: DmPointer<"ResourceTypeContext">;
-  readonly HTextLayout: DmPointer<"TextLayout">;
-  readonly HttpCallbackResult: 0 | 1;
-  readonly HttpRequest: DmNativeType<"HttpRequest">;
-  readonly HttpRequestHandle: number;
-  readonly HttpResponseCallback: DmNativeCallback;
-  readonly HttpResponseEvent: 0 | 1 | 2 | 3;
-  readonly HttpResponseInfo: DmNativeType<"HttpResponseInfo">;
-  readonly HttpResult: 1 | 0 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -1000;
-  readonly HttpService: DmNativeType<"HttpService">;
-  readonly HWindow: DmPointer<"dmWindow">;
-  readonly HWND: DmPointer<"void">;
+  readonly dmhash_t: bigint;
   readonly int32_atomic_t: number;
-  readonly JavaVM: DmPointer<"void">;
-  readonly Job: Readonly<{ m_Process: DmSdkTypes["FJobProcess"]; m_Callback: DmSdkTypes["FJobCallback"]; m_Context: DmPointer<"void">; m_Data: DmPointer<"void"> }>;
-  readonly JobContext: DmNativeType<"JobContext">;
   readonly jobject: DmPointer<"void">;
-  readonly JobSystemCreateParams: Readonly<{ m_ThreadNamePrefix: DmReadonlyPointer<"char">; m_ThreadCount: number }>;
-  readonly JobSystemResult: 0 | 1 | 2 | 3 | 4;
-  readonly JobSystemStatus: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  readonly LogParams: Readonly<{ m_Reserved: number }>;
-  readonly LogSeverity: 0 | 1 | 2 | 3 | 4 | 5;
+  readonly luaL_Buffer: Readonly<{ p: DmPointer<"char">; lvl: number; L: DmPointer<"lua_State">; buffer: DmSpan<number> }>;
+  readonly luaL_Reg: Readonly<{ name: DmReadonlyPointer<"char">; func: DmSdkTypes["lua_CFunction"] }>;
   readonly lua_Alloc: DmNativeCallback;
   readonly lua_CFunction: DmNativeCallback;
   readonly lua_Debug: Readonly<{ event: number; name: DmReadonlyPointer<"char">; namewhat: DmReadonlyPointer<"char">; what: DmReadonlyPointer<"char">; source: DmReadonlyPointer<"char">; currentline: number; nups: number; linedefined: number; lastlinedefined: number; short_src: DmSpan<number>; i_ci: number }>;
@@ -11748,100 +13481,24 @@ export interface DmSdkTypes {
   readonly lua_Reader: DmNativeCallback;
   readonly lua_State: DmNativeType<"lua_State">;
   readonly lua_Writer: DmNativeCallback;
-  readonly luaL_Buffer: Readonly<{ p: DmPointer<"char">; lvl: number; L: DmPointer<"lua_State">; buffer: DmSpan<number> }>;
-  readonly luaL_Reg: Readonly<{ name: DmReadonlyPointer<"char">; func: DmSdkTypes["lua_CFunction"] }>;
-  readonly ProfileCreateListenerFn: DmNativeCallback;
-  readonly ProfileDestroyListenerFn: DmNativeCallback;
-  readonly ProfileFrameBeginFn: DmNativeCallback;
-  readonly ProfileFrameEndFn: DmNativeCallback;
-  readonly ProfileIdx: bigint;
-  readonly ProfileListener: Readonly<{ m_Name: DmSpan<number>; m_Next: DmPointer<"ProfileListener">; m_Ctx: DmPointer<"void">; m_Disabled: boolean; m_Create: DmSdkTypes["ProfileCreateListenerFn"]; m_Destroy: DmSdkTypes["ProfileDestroyListenerFn"]; m_FrameBegin: DmSdkTypes["ProfileFrameBeginFn"]; m_FrameEnd: DmSdkTypes["ProfileFrameEndFn"]; m_ScopeBegin: DmSdkTypes["ProfileScopeBeginFn"]; m_ScopeEnd: DmSdkTypes["ProfileScopeEndFn"]; m_SetThreadName: DmSdkTypes["ProfileSetThreadNameFn"]; m_LogText: DmSdkTypes["ProfileLogTextFn"]; m_CreatePropertyGroup: DmSdkTypes["ProfilePropertyCreateGroupFn"]; m_CreatePropertyBool: DmSdkTypes["ProfilePropertyCreateBoolFn"]; m_CreatePropertyS32: DmSdkTypes["ProfilePropertyCreateS32Fn"]; m_CreatePropertyU32: DmSdkTypes["ProfilePropertyCreateU32Fn"]; m_CreatePropertyF32: DmSdkTypes["ProfilePropertyCreateF32Fn"]; m_CreatePropertyS64: DmSdkTypes["ProfilePropertyCreateS64Fn"]; m_CreatePropertyU64: DmSdkTypes["ProfilePropertyCreateU64Fn"]; m_CreatePropertyF64: DmSdkTypes["ProfilePropertyCreateF64Fn"]; m_PropertySetBool: DmSdkTypes["ProfilePropertySetBoolFn"]; m_PropertySetS32: DmSdkTypes["ProfilePropertySetS32Fn"]; m_PropertySetU32: DmSdkTypes["ProfilePropertySetU32Fn"]; m_PropertySetF32: DmSdkTypes["ProfilePropertySetF32Fn"]; m_PropertySetS64: DmSdkTypes["ProfilePropertySetS64Fn"]; m_PropertySetU64: DmSdkTypes["ProfilePropertySetU64Fn"]; m_PropertySetF64: DmSdkTypes["ProfilePropertySetF64Fn"]; m_PropertyAddS32: DmSdkTypes["ProfilePropertyAddS32Fn"]; m_PropertyAddU32: DmSdkTypes["ProfilePropertyAddU32Fn"]; m_PropertyAddF32: DmSdkTypes["ProfilePropertyAddF32Fn"]; m_PropertyAddS64: DmSdkTypes["ProfilePropertyAddS64Fn"]; m_PropertyAddU64: DmSdkTypes["ProfilePropertyAddU64Fn"]; m_PropertyAddF64: DmSdkTypes["ProfilePropertyAddF64Fn"]; m_PropertyReset: DmSdkTypes["ProfilePropertyResetFn"] }>;
-  readonly ProfileLogTextFn: DmNativeCallback;
-  readonly ProfilePropertyAddF32Fn: DmNativeCallback;
-  readonly ProfilePropertyAddF64Fn: DmNativeCallback;
-  readonly ProfilePropertyAddS32Fn: DmNativeCallback;
-  readonly ProfilePropertyAddS64Fn: DmNativeCallback;
-  readonly ProfilePropertyAddU32Fn: DmNativeCallback;
-  readonly ProfilePropertyAddU64Fn: DmNativeCallback;
-  readonly ProfilePropertyCreateBoolFn: DmNativeCallback;
-  readonly ProfilePropertyCreateF32Fn: DmNativeCallback;
-  readonly ProfilePropertyCreateF64Fn: DmNativeCallback;
-  readonly ProfilePropertyCreateGroupFn: DmNativeCallback;
-  readonly ProfilePropertyCreateS32Fn: DmNativeCallback;
-  readonly ProfilePropertyCreateS64Fn: DmNativeCallback;
-  readonly ProfilePropertyCreateU32Fn: DmNativeCallback;
-  readonly ProfilePropertyCreateU64Fn: DmNativeCallback;
-  readonly ProfilePropertyFlags: 0 | 1;
-  readonly ProfilePropertyResetFn: DmNativeCallback;
-  readonly ProfilePropertySetBoolFn: DmNativeCallback;
-  readonly ProfilePropertySetF32Fn: DmNativeCallback;
-  readonly ProfilePropertySetF64Fn: DmNativeCallback;
-  readonly ProfilePropertySetS32Fn: DmNativeCallback;
-  readonly ProfilePropertySetS64Fn: DmNativeCallback;
-  readonly ProfilePropertySetU32Fn: DmNativeCallback;
-  readonly ProfilePropertySetU64Fn: DmNativeCallback;
-  readonly ProfilePropertyType: DmNativeType<"ProfilePropertyType">;
-  readonly ProfilePropertyValue: DmNativeType<"ProfilePropertyValue">;
-  readonly ProfileResult: 0 | 1 | 2;
-  readonly ProfileScope: Readonly<{ m_Internal: DmPointer<"void"> }>;
-  readonly ProfileScopeBeginFn: DmNativeCallback;
-  readonly ProfileScopeEndFn: DmNativeCallback;
-  readonly ProfileScopeHelper: Readonly<{ m_ScopeInfo: DmPointer<"ProfileScope">; m_Name: DmReadonlyPointer<"char">; m_NameHash: DmPointer<"uint64_t"> }>;
-  readonly ProfileSetThreadNameFn: DmNativeCallback;
-  readonly ResourceCreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_PreloadData: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
-  readonly ResourceDescriptor: DmNativeType<"ResourceDescriptor">;
-  readonly ResourceDestroyParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
-  readonly ResourceFactory: DmNativeType<"ResourceFactory">;
-  readonly ResourcePostCreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_PreloadData: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
-  readonly ResourcePreloadHintInfo: DmNativeType<"ResourcePreloadHintInfo">;
-  readonly ResourcePreloadParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_IsBufferTransferrable: number; m_HintInfo: DmSdkTypes["HResourcePreloadHintInfo"]; m_Type: DmSdkTypes["HResourceType"]; m_PreloadData: DmPointer<"void">; m_IsBufferOwnershipTransferred: DmPointer<"bool"> }>;
-  readonly ResourceRecreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_FilenameHash: DmSdkTypes["dmhash_t"]; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_Message: DmReadonlyPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
-  readonly ResourceReloadedParams: Readonly<{ m_UserData: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_FilenameHash: bigint; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
-  readonly ResourceResult: 0 | -1 | -2 | -3 | -4 | -5 | -6 | -7 | -8 | -9 | -10 | -11 | -12 | -13 | -14 | -15 | -16 | -17 | -18 | -19 | -20 | -21 | -22;
-  readonly ResourceType: DmNativeType<"ResourceType">;
-  readonly ResourceTypeContext: DmNativeType<"ResourceTypeContext">;
-  readonly TextDecoration: Readonly<{ m_X: number; m_Y: number; m_Length: number; m_Thickness: number; m_PatternOffset: number; m_GlyphStart: number; m_GlyphCount: number; m_LineIndex: number; m_Pattern: number }>;
-  readonly TextDecorationPattern: DmNativeType<"TextDecorationPattern">;
-  readonly TextDirection: 0 | 1;
-  readonly TextGlyph: Readonly<{ m_Font: DmSdkTypes["HFont"]; m_X: number; m_Y: number; m_Width: number; m_Height: number; m_RenderScale: number; m_Codepoint: number; m_Cluster: number; m_GlyphIndex: number; m_StyleIndex: number; m_BaseStyleIndex: number; m_MarkupSpanIndex: number; m_BaseMarkupSpanIndex: number; m_Flags: number; m_Advance: number; m_LeftBearing: number }>;
-  readonly TextGlyphFlags: 1;
-  readonly TextLayout: DmNativeType<"TextLayout">;
-  readonly TextLayoutObject: Readonly<{ m_Resource: bigint; m_Id: bigint; m_Width: number; m_Height: number; m_TextOffset: number; m_TextLength: number; m_AttributeIndex: number; m_AttributeCount: number; m_Tag: DmSdkTypes["dmhash_t"] }>;
-  readonly TextLayoutObjectAttribute: Readonly<{ m_NameOffset: number; m_ValueOffset: number; m_NameLength: number; m_ValueLength: number }>;
-  readonly TextLayoutSettings: Readonly<{ m_Size: number; m_Width: number; m_Leading: number; m_Tracking: number; m_ResolveObject: DmSdkTypes["FTextLayoutResolveObject"]; m_ReleaseObject: DmSdkTypes["FTextLayoutReleaseObject"]; m_ObjectContext: DmPointer<"void">; m_BaseStyle: DmSdkTypes["dmhash_t"]; m_Padding: number; m_LineBreak: number; m_Monospace: number; m_UseBaseStyle: number }>;
-  readonly TextLayoutType: 0 | 1;
-  readonly TextLine: Readonly<{ m_Width: number; m_Baseline: number; m_Index: number; m_Length: number; m_ParagraphIndex: number }>;
-  readonly TextParagraph: Readonly<{ m_TextIndex: number; m_TextLength: number; m_LineIndex: number; m_LineCount: number; m_Direction: DmSdkTypes["TextDirection"] }>;
-  readonly TextResult: DmNativeType<"TextResult">;
-  readonly WGPUAdapter: number;
-  readonly WGPUCommandEncoder: number;
-  readonly WGPUDevice: number;
-  readonly WGPUInstance: number;
-  readonly WGPUQueue: number;
-  readonly WGPURenderPassEncoder: number;
-  readonly WGPUTexture: number;
-  readonly WGPUTextureView: number;
-  readonly Window: DmPointer<"void">;
-  readonly WindowCreateParams: Readonly<{ m_GraphicsApi: DmSdkTypes["WindowsGraphicsApi"]; m_ResizeCallback: DmSdkTypes["FWindowResizeCallback"]; m_ResizeCallbackUserData: DmPointer<"void">; m_CloseCallback: DmSdkTypes["FWindowCloseCallback"]; m_CloseCallbackUserData: DmPointer<"void">; m_FocusCallback: DmSdkTypes["FWindowFocusCallback"]; m_FocusCallbackUserData: DmPointer<"void">; m_IconifyCallback: DmSdkTypes["FWindowIconifyCallback"]; m_IconifyCallbackUserData: DmPointer<"void">; m_Title: DmReadonlyPointer<"char">; m_Width: number; m_Height: number; m_Samples: number; m_BackgroundColor: number; m_ContextAlphabits: number; m_GraphicsApiVersionHint: number; m_OpenGLUseCoreProfileHint: number; m_Hidden: number; m_Fullscreen: number; m_PrintDeviceInfo: number; m_HighDPI: number; m_FocusOnShow: number }>;
-  readonly WindowResult: 0 | -1 | -2;
-  readonly WindowsGraphicsApi: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
-  readonly WindowState: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
 }
 
 export interface DmSdkVariables {
   readonly ConfigFileExtensionDescBufferSize: number;
+  readonly ExtensionDescBufferSize: number;
+  readonly PROFILER_MAX_NUM_PROPERTIES: number;
+  readonly PROFILE_PROPERTY_INVALID_IDX: number;
+  readonly ResourceTypeCreatorDescBufferSize: number;
   readonly "dmDDF::OPTION_OFFSET_POINTERS": number;
   readonly "dmGameObject::INVALID_INSTANCE_POOL_INDEX": number;
   readonly "dmGameObject::s_ComponentTypeDescBufferSize": number;
-  readonly "dmGameSystem::s_CompGuiNodeTypeDescBufferSize": number;
   readonly "dmGameSystem::SDF_EDGE_VALUE": number;
+  readonly "dmGameSystem::s_CompGuiNodeTypeDescBufferSize": number;
   readonly "dmGraphics::INVALID_PROGRAM_HANDLE": DmSdkTypes["dmGraphics::HProgram"];
   readonly "dmGraphics::INVALID_STREAM_OFFSET": number;
   readonly "dmGraphics::INVALID_UNIFORM_LOCATION": DmSdkTypes["dmGraphics::HUniformLocation"];
   readonly "dmGraphics::MAX_BUFFER_COLOR_ATTACHMENTS": number;
   readonly "dmGui::INVALID_HANDLE": DmSdkTypes["dmGui::HNode"];
-  readonly "dmHashTable::dmHashTable::INVALID_INDEX": number;
-  readonly "dmHashTable::dmHashTable::MAX_SIZE": number;
   readonly "dmHID::INVALID_GAMEPAD_HANDLE": DmSdkTypes["dmHID::HGamepad"];
   readonly "dmHID::INVALID_KEYBOARD_HANDLE": DmSdkTypes["dmHID::HKeyboard"];
   readonly "dmHID::INVALID_MOUSE_HANDLE": DmSdkTypes["dmHID::HMouse"];
@@ -11857,13 +13514,15 @@ export interface DmSdkVariables {
   readonly "dmHID::MAX_MOUSE_COUNT": number;
   readonly "dmHID::MAX_TOUCH_COUNT": number;
   readonly "dmHID::MAX_TOUCH_DEVICE_COUNT": number;
+  readonly "dmHashTable::dmHashTable::INVALID_INDEX": number;
+  readonly "dmHashTable::dmHashTable::MAX_SIZE": number;
   readonly "dmRender::RenderObject::MAX_TEXTURE_COUNT": number;
   readonly "dmRender::RenderObject::MAX_VERTEX_BUFFER_COUNT": number;
   readonly "dmResource::s_ResourceTypeCreatorDescBufferSize": number;
   readonly "dmRig::INVALID_BONE_INDEX": number;
+  readonly "dmSSLSocket::INVALID_SOCKET_HANDLE": DmSdkTypes["dmSSLSocket::Socket"];
   readonly "dmSocket::INVALID_SOCKET_HANDLE": DmSdkTypes["dmSocket::Socket"];
   readonly "dmSocket::SOCKET_TIMEOUT": number;
-  readonly "dmSSLSocket::INVALID_SOCKET_HANDLE": DmSdkTypes["dmSSLSocket::Socket"];
   readonly "dmTrigLookup::COS_TABLE": DmReadonlyPointer<"float">;
   readonly "dmTrigLookup::COS_TABLE_SIZE": number;
   readonly "dmURI::MAX_LOCATION_LEN": number;
@@ -11877,10 +13536,6 @@ export interface DmSdkVariables {
   readonly "dmUtf8::UTF_WHITESPACE_SPACE": number;
   readonly "dmUtf8::UTF_WHITESPACE_TAB": number;
   readonly "dmUtf8::UTF_WHITESPACE_ZERO_WIDTH_SPACE": number;
-  readonly ExtensionDescBufferSize: number;
-  readonly PROFILE_PROPERTY_INVALID_IDX: number;
-  readonly PROFILER_MAX_NUM_PROPERTIES: number;
-  readonly ResourceTypeCreatorDescBufferSize: number;
 }
 
 export interface DmSdkDeclarationMap {

@@ -1,22 +1,30 @@
 import path from "node:path";
+import { readFile } from "node:fs/promises";
+import { createInterface } from "node:readline/promises";
 
 import { compileConformanceHarness, generateConformanceHarness, readConformanceReport } from "./conformance.mjs";
-import { inspectDefoldProject } from "./project.mjs";
-import { verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
+import { generateComponentProxies } from "../../compiler/src/component-proxy-generator.mjs";
+import { discoverProjectRoots, findProjectRoot, inspectDefoldProject } from "./project.mjs";
+import { typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
+import { createDefoldProject } from "./scaffold.mjs";
 
 const help = `deherm <command> [options]
 
 Commands:
+  (no command) Launch the interactive project/dev TUI
+  create       Scaffold a Defold + TypeScript project and generate its SDK
   doctor       Validate the project and report discoverable extension APIs
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
-  verify-generated  Deep-verify generated IR digests and lock/manifest consistency
+  typecheck    Type-check shared, game-object, GUI, and render TypeScript projects
+  verify-generated  Verify packaged IR plus generated context/config output sentinels
   dev          Run the incremental compiler, watcher, reload coordinator, and Rezi console
   conformance generate  Generate exhaustive API compile/runtime fixtures and a disposition plan
   conformance compile   Compile a generated shard and emit per-binding observations
   conformance report    Merge generated plans with independently captured observations
 
 Options:
+  --name <name>       Project title used by create
   --project <path>   Defold project directory or game.project
   --out-dir <path>   Generated directory relative to the project (default: .deherm)
   --defold-sdk <sha> Exact Defold engine SHA expected by generated API inputs
@@ -36,24 +44,28 @@ Options:
   --no-ttsc          Disable ttsc transforms for a diagnostic dev build
   --shard <i/n>      Stable zero-based shard selection (default: 0/1)
   --strict           Fail a report unless every required selected stage passed
+  --force            Regenerate owned project outputs even when the input key is current
   --json             Print machine-readable JSON
   -h, --help         Show this help
 `;
 
 export function parseArguments(argv) {
-  const options = { command: "doctor", json: false, observations: [], contexts: [], targets: [] };
+  const options = { command: argv.length === 0 ? "ui" : "doctor", json: false, observations: [], contexts: [], targets: [] };
   const args = [...argv];
   if (args[0] && !args[0].startsWith("-")) options.command = args.shift();
   if (options.command === "conformance" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
+  if (options.command === "create" && args[0] && !args[0].startsWith("-")) options.directory = args.shift();
   while (args.length) {
     const value = args.shift();
     if (value === "--json") options.json = true;
     else if (value === "--strict") options.strict = true;
+    else if (value === "--force") options.force = true;
     else if (value === "--once") options.once = true;
     else if (value === "--headless") options.headless = true;
     else if (value === "--no-ttsc") options.useTtsc = false;
     else if (value === "-h" || value === "--help") options.help = true;
     else if (value === "--project") options.project = args.shift();
+    else if (value === "--name") options.name = args.shift();
     else if (value === "--out-dir") options.outDir = args.shift();
     else if (value === "--defold-sdk") options.defoldSdk = args.shift();
     else if (value === "--output") options.output = args.shift();
@@ -76,6 +88,34 @@ export function parseArguments(argv) {
   return options;
 }
 
+async function selectProjectFromTerminal(projects) {
+  const prompt = createInterface({ input: process.stdin, output: process.stderr });
+  try {
+    process.stderr.write("Multiple Defold projects were found:\n");
+    projects.forEach((project, index) => process.stderr.write(`  ${index + 1}. ${path.relative(process.cwd(), project) || "."}\n`));
+    const answer = await prompt.question("Choose a project number: ");
+    const index = Number(answer) - 1;
+    if (!Number.isInteger(index) || !projects[index]) throw new Error(`Invalid project selection: ${answer}`);
+    return projects[index];
+  } finally {
+    prompt.close();
+  }
+}
+
+async function scaffoldProject(options) {
+  const packageRoot = path.resolve(import.meta.dirname, "../../..");
+  const packageVersion = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8")).version;
+  const scaffold = await createDefoldProject({
+    directory: options.directory,
+    name: options.name,
+    packageVersion
+  });
+  const inventory = await inspectDefoldProject({ project: scaffold.projectRoot });
+  const generated = await writeGeneratedProject(inventory, options.outDir, { force: true });
+  const components = await generateComponentProxies({ projectRoot: scaffold.projectRoot, outputRoot: scaffold.projectRoot });
+  return { ...scaffold, generatedRoot: generated.root, componentCount: components.manifest.components.length };
+}
+
 function printExtensions(inventory) {
   if (!inventory.extensions.length) {
     console.log("No native extensions found.");
@@ -91,6 +131,33 @@ export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
   if (options.help || options.command === "help") {
     console.log(help);
+    return 0;
+  }
+  if (options.command === "ui") {
+    if (!process.stdin.isTTY || !process.stdout.isTTY) {
+      throw new Error("The base déherm TUI requires an interactive terminal. Use 'deherm --help' or an explicit command in non-interactive environments.");
+    }
+    const { runLauncherTui } = await import("./dev/tui.mjs");
+    const action = await runLauncherTui({ cwd: process.cwd(), projects: await discoverProjectRoots(process.cwd()) });
+    if (action.type === "quit") return 0;
+    if (action.type === "create") {
+      const created = await scaffoldProject({ directory: path.resolve(process.cwd(), action.directory) });
+      console.log(`Created ${created.name} in ${created.projectRoot}`);
+      options.command = "dev";
+      options.project = created.projectRoot;
+    } else {
+      options.command = action.type;
+      options.project = action.project;
+    }
+  }
+  if (options.command === "create") {
+    const created = await scaffoldProject(options);
+    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...created }, null, 2));
+    else {
+      console.log(`Created ${created.name} in ${created.projectRoot}`);
+      console.log(`Generated SDK in ${created.generatedRoot} and ${created.componentCount} component proxy/proxies`);
+      console.log(`Next: cd ${path.relative(process.cwd(), created.projectRoot) || "."} && pnpm install && pnpm dev`);
+    }
     return 0;
   }
   if (options.command === "conformance") {
@@ -157,11 +224,19 @@ export async function run(argv = process.argv.slice(2)) {
     // Keep doctor/generate/conformance usable without loading the heavier dev
     // compiler and terminal stack. This also keeps `deherm --help` portable.
     const { runDevSession } = await import("./dev/session.mjs");
+    if (!options.project && !options.entry) {
+      options.project = await findProjectRoot(process.cwd(), undefined, {
+        select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined
+      });
+    }
     const snapshot = await runDevSession(options);
     if (options.once && options.json) console.log(JSON.stringify({ schemaVersion: 1, snapshot }, null, 2));
     return snapshot.phase === "failed" ? 1 : 0;
   }
-  const inventory = await inspectDefoldProject({ project: options.project });
+  const inventory = await inspectDefoldProject({
+    project: options.project,
+    selectProject: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined
+  });
   if (options.command === "extensions") {
     if (options.json) console.log(JSON.stringify(inventory, null, 2));
     else printExtensions(inventory);
@@ -169,13 +244,14 @@ export async function run(argv = process.argv.slice(2)) {
   }
   if (options.command === "generate") {
     if (options.defoldSdk && !/^[a-f0-9]{40}$/i.test(options.defoldSdk)) throw new Error("--defold-sdk must be a 40-character SHA");
-    const output = await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk });
+    const output = await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk, force: options.force });
     if (options.json) console.log(JSON.stringify({ ...output, summary: inventory.summary }, null, 2));
     else {
-      console.log(`Generated extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
+      console.log(`${output.cached ? "Current" : "Generated"} extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
       console.log(`Pinned Defold API: ${output.defoldRevision}`);
-      if (output.created.tsconfig) console.log("Created tsconfig.json extending tsconfig.deherm.json");
-      else console.log("Kept existing tsconfig.json; extend tsconfig.deherm.json from your project config");
+      if (output.created.tsconfig) console.log("Created tsconfig.json referencing all generated TypeScript context projects");
+      else if (output.migrated.tsconfig) console.log("Migrated the legacy generated tsconfig.json to TypeScript project references");
+      else console.log("Kept existing tsconfig.json; run 'deherm typecheck' to check every generated context project");
     }
     return inventory.diagnostics.some(({ severity }) => severity === "error") ? 1 : 0;
   }
@@ -183,11 +259,23 @@ export async function run(argv = process.argv.slice(2)) {
     const result = await verifyGeneratedProject(inventory.projectRoot, options.outDir);
     if (options.json) console.log(JSON.stringify(result, null, 2));
     else {
-      console.log(`ok generated project: ${result.checkedFiles} hashed IR input(s)`);
+      console.log(`ok generated project: ${result.checkedFiles} verified IR and generated-output sentinel(s)`);
       console.log(`ok lowering plan: ${result.planSha256}`);
       console.log(`ok Defold API: ${result.defoldRevision}`);
     }
     return 0;
+  }
+  if (options.command === "typecheck") {
+    const result = await typecheckGeneratedProject(inventory.projectRoot);
+    if (options.json) {
+      console.log(JSON.stringify(result, null, 2));
+    } else if (result.passed) {
+      console.log("ok TypeScript contexts: shared, game-object, GUI, render");
+    } else {
+      if (result.stdout.trim()) console.error(result.stdout.trimEnd());
+      if (result.stderr.trim()) console.error(result.stderr.trimEnd());
+    }
+    return result.passed ? 0 : 1;
   }
   if (options.command === "doctor") {
     const ok = !inventory.diagnostics.some(({ severity }) => severity === "error");

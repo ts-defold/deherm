@@ -200,7 +200,8 @@ export async function build({ irPath = defaultIrPath, shapesPath = defaultShapes
     [outputPaths.jsi, renderJsi()], [outputPaths.typescript, renderTypeScript(emitted)],
   ]);
   const report = {
-    schemaVersion: 1, policyVersion: policy.policyVersion, sourceShapeCensus: "bindings/generated/defold-dmsdk-abi-shapes.json",
+    schemaVersion: 1, policyVersion: policy.policyVersion, defoldRevision: ir.defoldRevision,
+    sourceShapeCensus: "bindings/generated/defold-dmsdk-abi-shapes.json",
     scope: "The 21 declarations mechanically classified as next-named-scalar-direct. This report does not claim an engine lifecycle, thread, profiler, or sound-context capability.",
     coverage: { reviewed: 21, generated: 0, policyBlocked: 21, signatureCompileCovered: 21, linked: 0, behaviorCovered: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 },
     sourceHashes: { ir: digest(irContent), shapes: digest(shapesContent), policy: digest(policyContent) },

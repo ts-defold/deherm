@@ -5,6 +5,8 @@
 -- component-id: deherm.component/v1/bf9d9d8ca59e486805b929b32e188c5c6c8b4fafded4442d26e6ad27f931304b
 -- proxy-kind: script
 -- context-kind: game-object
+-- teardown-policy: final-callback-detach
+-- proxy-runtime: native-dynamic-hermes-harness-executable
 
 go.property("speed", 120)
 go.property("enabled", true)
@@ -18,9 +20,21 @@ go.property("tankAtlas", resource.atlas("/assets/tanks.atlas"))
 
 local COMPONENT_ID = "deherm.component/v1/bf9d9d8ca59e486805b929b32e188c5c6c8b4fafded4442d26e6ad27f931304b"
 local SCHEMA_FINGERPRINT = "86ee3419221d007f14096a22ac7dbfd337c4dd7af7ec6f2e70c97fdfef48946c"
+local COMPONENT_CONTEXT = "game-object"
+local PROPERTY_SPECIALIZATIONS = {
+    { "speed", 1 },
+    { "enabled", 2 },
+    { "title", 3 },
+    { "team", 4 },
+    { "target", 5 },
+    { "spawn", 6 },
+    { "tint", 7 },
+    { "rotation", 8 },
+    { "tankAtlas", 9 },
+}
 
 function init(self)
-    assert(defold_hermes.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT))
+    assert(defold_hermes.attachComponent(self, COMPONENT_ID, SCHEMA_FINGERPRINT, COMPONENT_CONTEXT, PROPERTY_SPECIALIZATIONS))
     defold_hermes.dispatchLifecycle(self, COMPONENT_ID, "init")
 end
 

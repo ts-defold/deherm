@@ -1,0 +1,5 @@
+name: "war_battles_online"
+instances {
+  id: "controller"
+  prototype: "/main/controller.go"
+}

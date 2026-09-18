@@ -1,0 +1,140 @@
+export const TRANSPORT_CHANNEL_SESSION = 1;
+export const TRANSPORT_CHANNEL_CONTROL = 2;
+export const TRANSPORT_CHANNEL_SNAPSHOT = 3;
+export const TRANSPORT_CHANNEL_INPUT_FALLBACK = 4;
+
+export type ReliableChannel =
+  | typeof TRANSPORT_CHANNEL_SESSION
+  | typeof TRANSPORT_CHANNEL_CONTROL
+  | typeof TRANSPORT_CHANNEL_SNAPSHOT
+  | typeof TRANSPORT_CHANNEL_INPUT_FALLBACK;
+
+export type SendDisposition = "sent" | "backpressured" | "too-large" | "closed";
+
+export interface TransportCapabilities {
+  readonly protocol: "webtransport-h3" | "webrtc-datachannel" | "in-memory";
+  readonly reliableStreams: boolean;
+  readonly datagrams: boolean;
+  readonly maxDatagramBytes: number;
+}
+
+export interface TransportReceiver {
+  onReliable(channel: ReliableChannel, payload: Uint8Array): void;
+  onDatagram(payload: Uint8Array): void;
+  onClose(code: number, reason: string): void;
+}
+
+export interface GameTransport {
+  readonly capabilities: TransportCapabilities;
+  sendReliable(channel: ReliableChannel, payload: Uint8Array, signal?: AbortSignal): Promise<SendDisposition>;
+  /**
+   * Latest-only send path. A backpressured result is deliberately dropped by
+   * the caller instead of building an unbounded queue of stale tick inputs.
+   */
+  trySendDatagram(payload: Uint8Array): Promise<SendDisposition>;
+  close(code: number, reason: string): void;
+}
+
+export interface TickInputSendResult {
+  readonly route: "datagram" | "reliable-fallback";
+  readonly disposition: SendDisposition;
+}
+
+/**
+ * Uses QUIC datagrams only when the negotiated adapter advertises a sufficient
+ * payload size. Backpressured datagrams are dropped; they are never copied into
+ * the reliable lane because an old tick is less useful than a fresh one.
+ */
+export async function sendTickInput(
+  transport: GameTransport,
+  payload: Uint8Array,
+  cancellation?: AbortSignal,
+): Promise<TickInputSendResult> {
+  if (transport.capabilities.datagrams && payload.byteLength <= transport.capabilities.maxDatagramBytes) {
+    return { route: "datagram", disposition: await transport.trySendDatagram(payload) };
+  }
+  return {
+    route: "reliable-fallback",
+    disposition: await transport.sendReliable(TRANSPORT_CHANNEL_INPUT_FALLBACK, payload, cancellation),
+  };
+}
+
+export interface InMemoryTransportOptions {
+  readonly maxDatagramBytes?: number;
+  /** Deterministically drops every Nth datagram. Zero disables loss. */
+  readonly dropEvery?: number;
+}
+
+export function createInMemoryTransportPair(
+  leftReceiver: TransportReceiver,
+  rightReceiver: TransportReceiver,
+  options: InMemoryTransportOptions = {},
+): readonly [GameTransport, GameTransport] {
+  const maxDatagramBytes = options.maxDatagramBytes ?? 1_200;
+  const dropEvery = options.dropEvery ?? 0;
+  if (!Number.isInteger(maxDatagramBytes) || maxDatagramBytes <= 0) throw new RangeError("maxDatagramBytes must be positive");
+  if (!Number.isInteger(dropEvery) || dropEvery < 0) throw new RangeError("dropEvery must be non-negative");
+  const left = new InMemoryEndpoint(leftReceiver, maxDatagramBytes, dropEvery);
+  const right = new InMemoryEndpoint(rightReceiver, maxDatagramBytes, dropEvery);
+  left.peer = right;
+  right.peer = left;
+  return [left, right];
+}
+
+class InMemoryEndpoint implements GameTransport {
+  readonly capabilities: TransportCapabilities;
+  peer?: InMemoryEndpoint;
+  private closed = false;
+  private datagramsSent = 0;
+  private readonly receiver: TransportReceiver;
+  private readonly dropEvery: number;
+
+  constructor(
+    receiver: TransportReceiver,
+    maxDatagramBytes: number,
+    dropEvery: number,
+  ) {
+    this.receiver = receiver;
+    this.dropEvery = dropEvery;
+    this.capabilities = Object.freeze({
+      protocol: "in-memory" as const,
+      reliableStreams: true,
+      datagrams: true,
+      maxDatagramBytes,
+    });
+  }
+
+  async sendReliable(channel: ReliableChannel, payload: Uint8Array, signal?: AbortSignal): Promise<SendDisposition> {
+    if (this.closed || this.peer?.closed !== false) return "closed";
+    if (signal?.aborted === true) return "closed";
+    validateReliableChannel(channel);
+    this.peer.receiver.onReliable(channel, payload.slice());
+    return "sent";
+  }
+
+  async trySendDatagram(payload: Uint8Array): Promise<SendDisposition> {
+    if (this.closed || this.peer?.closed !== false) return "closed";
+    if (payload.byteLength > this.capabilities.maxDatagramBytes) return "too-large";
+    this.datagramsSent += 1;
+    if (this.dropEvery === 0 || this.datagramsSent % this.dropEvery !== 0) {
+      this.peer.receiver.onDatagram(payload.slice());
+    }
+    return "sent";
+  }
+
+  close(code: number, reason: string): void {
+    if (this.closed) return;
+    this.closed = true;
+    this.receiver.onClose(code, reason);
+    this.peer?.receiver.onClose(code, reason);
+  }
+}
+
+export function validateReliableChannel(channel: number): asserts channel is ReliableChannel {
+  if (
+    channel !== TRANSPORT_CHANNEL_SESSION &&
+    channel !== TRANSPORT_CHANNEL_CONTROL &&
+    channel !== TRANSPORT_CHANNEL_SNAPSHOT &&
+    channel !== TRANSPORT_CHANNEL_INPUT_FALLBACK
+  ) throw new Error(`unknown reliable channel ${channel}`);
+}

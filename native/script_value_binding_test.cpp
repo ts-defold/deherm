@@ -1066,7 +1066,9 @@ int main() {
 
   scalar::ScriptAdapter adapter;
   const scalar::InstanceApi luaInstanceApi{GetLuaInstance, SetLuaInstance};
-  Expect(adapter.initialize(lua, luaInstanceApi), adapter.lastError());
+  const auto* runtimeProfile = defold_hermes::script_handle_lowering::findRuntimeProfile("default-legacy-bullet");
+  Expect(runtimeProfile && adapter.initialize(lua, luaInstanceApi,
+      defold_hermes::script_handle_lowering::runtimeProfileHandshake(*runtimeProfile)), adapter.lastError());
   int capturedLuaInstance = 0;
   gExpectedLuaInstance = &capturedLuaInstance;
   lua_pushlightuserdata(lua, gExpectedLuaInstance);

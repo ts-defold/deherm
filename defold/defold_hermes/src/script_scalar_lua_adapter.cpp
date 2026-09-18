@@ -72,7 +72,7 @@ bool findDenseIndex(uint32_t stableId, size_t* outDenseIndex) noexcept {
 }
 }
 
-ScriptAdapter::ScriptAdapter() noexcept : luaHandles_(kLuaHandleCapacity) {
+ScriptAdapter::ScriptAdapter() : luaHandles_(kLuaHandleCapacity) {
   structuredFunctionRefs_.fill(LUA_NOREF);
   fixedTupleFunctionRefs_.fill(LUA_NOREF);
   structuredLuaApi_ = {this, StructuredInvokeThunk};
@@ -81,26 +81,39 @@ ScriptAdapter::ScriptAdapter() noexcept : luaHandles_(kLuaHandleCapacity) {
   valueTailLuaApi_ = {this, ValueTailInvokeThunk};
   overloadLuaApi_ = {this, OverloadInvokeThunk};
   tableRecordLuaApi_ = {this, TableRecordInvokeThunk};
+  universalValueLuaApi_ = {this, UniversalValueInvokeThunk};
 }
 
-bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi) noexcept {
+bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi,
+    const ::defold_hermes::script_handle_lowering::RuntimeProfileHandshake& profileHandshake,
+    ::defold_hermes::lua_bridge::LuaRegistryApi semanticRegistryApi) {
   shutdown();
   adapterError_[0] = '\0';
+  runtimeProfile_ = ::defold_hermes::script_handle_lowering::validateRuntimeProfile(profileHandshake);
+  if (!runtimeProfile_) return fail("Defold runtime profile capability handshake is missing or stale");
   if (!dispatcher_.initialize(state, 32, instanceApi)) return false;
   state_ = state;
   instanceApi_ = instanceApi;
+  semanticRegistryApi_ = semanticRegistryApi;
   if (++runtimeGeneration_ == 0) ++runtimeGeneration_;
+  semanticHandleRegistry_ = std::make_unique<::defold_hermes::lua_bridge::LuaValueRegistry>(
+      state_, runtimeGeneration_, kLuaHandleCapacity, kLuaHandleCapacity, semanticRegistryApi_);
+  handleRouter_ = std::make_unique<::defold_hermes::script_handle_lowering::CapturedLuaRouter>(
+      state_, *semanticHandleRegistry_, *runtimeProfile_, instanceApi_);
   structuredFunctionRefs_.fill(LUA_NOREF);
   fixedTupleFunctionRefs_.fill(LUA_NOREF);
   urlFunctionRefs_.fill(LUA_NOREF);
   valueTailFunctionRefs_.fill(LUA_NOREF);
   overloadFunctionRefs_.fill(LUA_NOREF);
   tableRecordFunctionRefs_.fill(LUA_NOREF);
+  universalValueFunctionRefs_.fill(LUA_NOREF);
   return true;
 }
 
 void ScriptAdapter::shutdown() noexcept {
   if (state_) {
+    handleRouter_.reset();
+    semanticHandleRegistry_.reset();
     drainReleasedHandles();
     luaHandles_.sweep([this](const HandleRecord& record) {
       if (record.state == state_) luaL_unref(state_, LUA_REGISTRYINDEX, static_cast<int>(record.payload));
@@ -129,23 +142,36 @@ void ScriptAdapter::shutdown() noexcept {
       if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
       reference = LUA_NOREF;
     }
+    for (int& reference : universalValueFunctionRefs_) {
+      if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+      reference = LUA_NOREF;
+    }
     if (instanceRef_ != LUA_NOREF && instanceRef_ != LUA_REFNIL) {
       luaL_unref(state_, LUA_REGISTRYINDEX, instanceRef_);
     }
   }
   instanceRef_ = LUA_NOREF;
+  handleRouter_.reset();
+  semanticHandleRegistry_.reset();
   hasActiveContext_ = false;
+  componentContextDepth_ = 0;
   state_ = nullptr;
   instanceApi_ = {};
+  runtimeProfile_ = nullptr;
+  semanticRegistryApi_ = {};
   dispatcher_.shutdown();
 }
 
 bool ScriptAdapter::captureInstance(int stackIndex) noexcept {
-  return captureContext(stackIndex, value_binding::StructuredLuaContext::kScriptInstance);
+  return captureContext(stackIndex, ActiveContext::kGameObject);
 }
 
 bool ScriptAdapter::captureGuiInstance(int stackIndex) noexcept {
-  return captureContext(stackIndex, value_binding::StructuredLuaContext::kGuiScriptInstance);
+  return captureContext(stackIndex, ActiveContext::kGui);
+}
+
+bool ScriptAdapter::captureRenderInstance(int stackIndex) noexcept {
+  return captureContext(stackIndex, ActiveContext::kRender);
 }
 
 bool ScriptAdapter::captureLuaUserdata(int stackIndex, ScriptValue* output) noexcept {
@@ -164,13 +190,62 @@ bool ScriptAdapter::captureLuaUserdata(int stackIndex, ScriptValue* output) noex
   return true;
 }
 
+bool ScriptAdapter::captureSemanticHandle(
+    int stackIndex,
+    ::defold_hermes::script_handle_lowering::SemanticHandleKind kind,
+    ScriptValue* output) noexcept {
+  adapterError_[0] = '\0';
+  if (!handleRouter_ || !handleRouter_->captureHandle(stackIndex, kind, output)) {
+    return fail("Semantic Lua handle capture failed or the fixed registry is exhausted");
+  }
+  return true;
+}
+
+bool ScriptAdapter::ensureComponentFallbackInstance(
+    int stackIndex,
+    ComponentContext context) noexcept {
+  if (instanceRef_ != LUA_NOREF && instanceRef_ != LUA_REFNIL) return true;
+  const ActiveContext selected = context == ComponentContext::kGameObject
+      ? ActiveContext::kGameObject
+      : context == ComponentContext::kGui ? ActiveContext::kGui : ActiveContext::kRender;
+  return captureContext(stackIndex, selected);
+}
+
+bool ScriptAdapter::pushComponentContext(ComponentContext context) noexcept {
+  if (componentContextDepth_ >= componentContexts_.size()) {
+    return fail("component script context stack is exhausted");
+  }
+  componentContexts_[componentContextDepth_++] = context == ComponentContext::kGameObject
+      ? ActiveContext::kGameObject
+      : context == ComponentContext::kGui ? ActiveContext::kGui : ActiveContext::kRender;
+  return true;
+}
+
+void ScriptAdapter::popComponentContext() noexcept {
+  if (componentContextDepth_ != 0) --componentContextDepth_;
+}
+
+bool ScriptAdapter::hasSelectedContext() const noexcept {
+  return componentContextDepth_ != 0 || hasActiveContext_;
+}
+
+ScriptAdapter::ActiveContext ScriptAdapter::selectedContext() const noexcept {
+  return componentContextDepth_ != 0
+      ? componentContexts_[componentContextDepth_ - 1]
+      : activeContext_;
+}
+
 bool ScriptAdapter::captureContext(
     int stackIndex,
-    value_binding::StructuredLuaContext context) noexcept {
+    ActiveContext context) noexcept {
   adapterError_[0] = '\0';
   if (!state_ || !instanceApi_.get || !instanceApi_.set) return fail("instance capture is not configured");
   detachInstance();
   if (!dispatcher_.captureInstance(stackIndex)) return false;
+  if (!handleRouter_ || !handleRouter_->captureInstance(stackIndex)) {
+    dispatcher_.detachInstance();
+    return fail("unable to capture the handle-router script instance");
+  }
   lua_pushvalue(state_, stackIndex);
   instanceRef_ = luaL_ref(state_, LUA_REGISTRYINDEX);
   if (instanceRef_ == LUA_NOREF || instanceRef_ == LUA_REFNIL) {
@@ -190,6 +265,7 @@ void ScriptAdapter::detachInstance() noexcept {
     return;
   }
   drainReleasedHandles();
+  if (handleRouter_) handleRouter_->detachInstance();
   luaHandles_.sweep([this](const HandleRecord& record) {
     if (record.state == state_) luaL_unref(state_, LUA_REGISTRYINDEX, static_cast<int>(record.payload));
   });
@@ -199,6 +275,9 @@ void ScriptAdapter::detachInstance() noexcept {
   instanceRef_ = LUA_NOREF;
   hasActiveContext_ = false;
   if (++runtimeGeneration_ == 0) ++runtimeGeneration_;
+  if (semanticHandleRegistry_) {
+    semanticHandleRegistry_->rebind(state_, runtimeGeneration_, semanticRegistryApi_);
+  }
 }
 
 bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
@@ -238,6 +317,17 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
       frame, adapterError_, sizeof(adapterError_), &tableRecordLuaApi_);
   if (tableRecordStatus == table_record::DispatchStatus::kSuccess) return true;
   if (tableRecordStatus == table_record::DispatchStatus::kError) return false;
+
+  if (const auto* handleRoute = script_handle_lowering::find(frame->stableId)) {
+    (void)handleRoute;
+    if (!handleRouter_) return fail("Defold semantic handle router is unavailable");
+    return handleRouter_->dispatch(frame, adapterError_, sizeof(adapterError_));
+  }
+
+  const auto universalStatus = universal_value::dispatch(
+      frame, adapterError_, sizeof(adapterError_), &universalValueLuaApi_);
+  if (universalStatus == universal_value::DispatchStatus::kSuccess) return true;
+  if (universalStatus == universal_value::DispatchStatus::kError) return false;
 
   size_t denseIndex = 0;
   if (!findDenseIndex(frame->stableId, &denseIndex)) {
@@ -442,6 +532,19 @@ bool ScriptAdapter::pushStructuredValue(
         lua_rawgeti(state_, LUA_REGISTRYINDEX, static_cast<int>(record.payload));
         return true;
       }
+      if (value.handleKind == ScriptHandleKind::kLuaSemanticHandle && semanticHandleRegistry_) {
+        const ::defold_hermes::lua_bridge::Handle handle{
+          value.length,
+          static_cast<uint32_t>(value.payload),
+          static_cast<uint32_t>(value.payload >> 32u),
+          static_cast<uint32_t>(::defold_hermes::lua_bridge::LuaValueKind::kUserdata)
+        };
+        if (semanticHandleRegistry_->push(handle, {
+              ::defold_hermes::lua_bridge::LuaValueKind::kUserdata,
+              ::defold_hermes::lua_bridge::LuaValuePolicy::kBorrowed,
+              value.reserved})) return true;
+        return fail("Semantic Lua handle is stale, cross-runtime, or wrong-kind");
+      }
       return fail("Structured Lua handle kind is unsupported");
     case ScriptValueTag::kDefoldValue:
       if (value.defoldKind == ScriptDefoldValueKind::kVector3) {
@@ -479,11 +582,13 @@ bool ScriptAdapter::pushStructuredValue(
       }
       return fail("Structured Lua Defold value kind is unsupported");
     case ScriptValueTag::kTable: {
-      if (depth != 0) return fail("Structured Lua tables must be flat");
-      if (value.length > 16 || (value.length != 0 && !value.data)) {
-        return fail("Structured Lua table exceeds the fixed 16-entry bound");
+      if (depth >= universal_value::kMaximumDepth) return fail("Structured Lua table exceeds the generated depth bound");
+      if (value.length > universal_value::kMaximumEntries || (value.length != 0 && !value.data)) {
+        return fail("Structured Lua table exceeds the generated entry bound");
       }
-      lua_createtable(state_, 0, static_cast<int>(value.length));
+      const bool sequence = value.reserved == static_cast<uint8_t>(ScriptTableKind::kSequence);
+      lua_createtable(state_, sequence ? static_cast<int>(value.length) : 0,
+          sequence ? 0 : static_cast<int>(value.length));
       const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
       for (uint32_t index = 0; index < value.length; ++index) {
         if (!pushStructuredValue(entries[index].key, frame, depth + 1) ||
@@ -600,8 +705,8 @@ fixed_tuple::DispatchStatus ScriptAdapter::invokeFixedTuple(
   if (!state_ || !frame || !bindFixedTuple(operation)) { writeError(error,errorCapacity,lastError()); return fixed_tuple::DispatchStatus::kError; }
   const bool scoped=operation.context!=fixed_tuple::Context::kGlobal;
   if (scoped && (!instanceApi_.get||!instanceApi_.set||instanceRef_==LUA_NOREF||instanceRef_==LUA_REFNIL)) { writeError(error,errorCapacity,"Fixed tuple call has no captured Defold instance"); return fixed_tuple::DispatchStatus::kError; }
-  if (operation.context==fixed_tuple::Context::kScriptInstance && (!hasActiveContext_||activeContext_!=value_binding::StructuredLuaContext::kScriptInstance)) { writeError(error,errorCapacity,"Fixed tuple call requires an active game-object script instance"); return fixed_tuple::DispatchStatus::kError; }
-  if (operation.context==fixed_tuple::Context::kGuiScriptInstance && (!hasActiveContext_||activeContext_!=value_binding::StructuredLuaContext::kGuiScriptInstance)) { writeError(error,errorCapacity,"Fixed tuple call requires an active GUI script instance"); return fixed_tuple::DispatchStatus::kError; }
+  if (operation.context==fixed_tuple::Context::kScriptInstance && (!hasSelectedContext()||selectedContext()!=ActiveContext::kGameObject)) { writeError(error,errorCapacity,"Fixed tuple call requires an active game-object script instance"); return fixed_tuple::DispatchStatus::kError; }
+  if (operation.context==fixed_tuple::Context::kGuiScriptInstance && (!hasSelectedContext()||selectedContext()!=ActiveContext::kGui)) { writeError(error,errorCapacity,"Fixed tuple call requires an active GUI script instance"); return fixed_tuple::DispatchStatus::kError; }
   const int baseTop=lua_gettop(state_);
   if(scoped){instanceApi_.get(state_);lua_rawgeti(state_,LUA_REGISTRYINDEX,instanceRef_);instanceApi_.set(state_);}
   const int callBase=lua_gettop(state_); lua_rawgeti(state_,LUA_REGISTRYINDEX,fixedTupleFunctionRefs_[operation.index]);
@@ -633,7 +738,9 @@ value_binding::DispatchStatus ScriptAdapter::invokeStructured(
     writeError(error, errorCapacity, "Structured Lua call has no captured Defold instance");
     return value_binding::DispatchStatus::kError;
   }
-  if (!hasActiveContext_ || activeContext_ != operation.context) {
+  const ActiveContext requiredContext = operation.context == value_binding::StructuredLuaContext::kGuiScriptInstance
+      ? ActiveContext::kGui : ActiveContext::kGameObject;
+  if (!hasSelectedContext() || selectedContext() != requiredContext) {
     writeError(error, errorCapacity,
         operation.context == value_binding::StructuredLuaContext::kGuiScriptInstance
           ? "Structured Lua call requires an active GUI script instance"
@@ -789,8 +896,8 @@ url_binding::DispatchStatus ScriptAdapter::invokeUrl(
     return Status::kError;
   }
   if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
-      instanceRef_ == LUA_REFNIL || !hasActiveContext_ ||
-      activeContext_ != value_binding::StructuredLuaContext::kScriptInstance) {
+      instanceRef_ == LUA_REFNIL || !hasSelectedContext() ||
+      selectedContext() != ActiveContext::kGameObject) {
     writeError(error, errorCapacity, "URL Lua call requires a captured game-object script instance");
     return Status::kError;
   }
@@ -932,8 +1039,8 @@ value_tail::DispatchStatus ScriptAdapter::invokeValueTail(
     return Status::kError;
   }
   if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
-      instanceRef_ == LUA_REFNIL || !hasActiveContext_ ||
-      activeContext_ != value_binding::StructuredLuaContext::kScriptInstance) {
+      instanceRef_ == LUA_REFNIL || !hasSelectedContext() ||
+      selectedContext() != ActiveContext::kGameObject) {
     writeError(error, errorCapacity, "Defold value-tail call requires a captured game-object script instance");
     return Status::kError;
   }
@@ -1058,7 +1165,7 @@ overload_dispatch::DispatchStatus ScriptAdapter::invokeOverload(
     return Status::kError;
   }
   if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
-      instanceRef_ == LUA_REFNIL || !hasActiveContext_) {
+      instanceRef_ == LUA_REFNIL || !hasSelectedContext()) {
     writeError(error, errorCapacity, "Overload-dispatch call requires a captured script instance");
     return Status::kError;
   }
@@ -1235,17 +1342,17 @@ table_record::DispatchStatus ScriptAdapter::invokeTableRecord(
   }
   const bool scoped = operation.context != table_record::Context::kGlobal;
   if (scoped && (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
-      instanceRef_ == LUA_REFNIL || !hasActiveContext_)) {
+      instanceRef_ == LUA_REFNIL || !hasSelectedContext())) {
     writeError(error, errorCapacity, "Table-record call has no captured Defold instance");
     return Status::kError;
   }
   if (operation.context == table_record::Context::kScriptInstance &&
-      activeContext_ != value_binding::StructuredLuaContext::kScriptInstance) {
+      selectedContext() != ActiveContext::kGameObject) {
     writeError(error, errorCapacity, "Table-record call requires an active game-object script instance");
     return Status::kError;
   }
   if (operation.context == table_record::Context::kGuiScriptInstance &&
-      activeContext_ != value_binding::StructuredLuaContext::kGuiScriptInstance) {
+      selectedContext() != ActiveContext::kGui) {
     writeError(error, errorCapacity, "Table-record call requires an active GUI script instance");
     return Status::kError;
   }
@@ -1287,8 +1394,300 @@ table_record::DispatchStatus ScriptAdapter::invokeTableRecord(
   return Status::kSuccess;
 }
 
+universal_value::DispatchStatus ScriptAdapter::UniversalValueInvokeThunk(
+    void* context,
+    const universal_value::Operation& operation,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  return static_cast<ScriptAdapter*>(context)->invokeUniversalValue(
+      operation, frame, error, errorCapacity);
+}
+
+bool ScriptAdapter::bindUniversalValue(
+    const universal_value::Operation& operation) noexcept {
+  if (!state_) return fail("Universal-value Lua backend is not initialized");
+  const ptrdiff_t denseIndex = &operation - universal_value::operations();
+  if (denseIndex < 0 || static_cast<size_t>(denseIndex) >= universalValueFunctionRefs_.size()) {
+    return fail("Universal-value operation index is invalid");
+  }
+  int& reference = universalValueFunctionRefs_[static_cast<size_t>(denseIndex)];
+  if (reference != LUA_NOREF && reference != LUA_REFNIL) return true;
+  const int baseTop = lua_gettop(state_);
+  if (!operation.modulePath[0]) {
+    lua_getglobal(state_, operation.member);
+  } else {
+    const char* segment = operation.modulePath;
+    const char* dot = std::strchr(segment, '.');
+    const size_t firstLength = dot ? static_cast<size_t>(dot - segment) : std::strlen(segment);
+    if (firstLength == 0 || firstLength >= 96) {
+      lua_settop(state_, baseTop);
+      return fail("Universal-value module segment exceeds fixed scratch");
+    }
+    char first[96]{};
+    std::memcpy(first, segment, firstLength);
+    lua_getglobal(state_, first);
+    while (dot && lua_istable(state_, -1)) {
+      segment = dot + 1;
+      dot = std::strchr(segment, '.');
+      const size_t length = dot ? static_cast<size_t>(dot - segment) : std::strlen(segment);
+      if (length == 0 || length >= 96) {
+        lua_settop(state_, baseTop);
+        return fail("Universal-value module segment exceeds fixed scratch");
+      }
+      lua_pushlstring(state_, segment, length);
+      lua_gettable(state_, -2);
+      lua_remove(state_, -2);
+    }
+    if (!lua_istable(state_, -1)) {
+      lua_settop(state_, baseTop);
+      return fail("Universal-value Lua module is unavailable");
+    }
+    lua_getfield(state_, -1, operation.member);
+  }
+  if (!lua_isfunction(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("Universal-value Lua function is unavailable");
+  }
+  reference = luaL_ref(state_, LUA_REGISTRYINDEX);
+  lua_settop(state_, baseTop);
+  return reference != LUA_NOREF && reference != LUA_REFNIL;
+}
+
+bool ScriptAdapter::readUniversalValue(
+    int stackIndex,
+    ScriptValue* output,
+    ScriptCallFrame* frame,
+    uint32_t depth,
+    const void* const* ancestors,
+    uint32_t ancestorCount) noexcept {
+  if (!state_ || !output || !frame) return fail("Universal-value result reader is not initialized");
+  const int absoluteIndex = stackIndex < 0 ? lua_gettop(state_) + stackIndex + 1 : stackIndex;
+  *output = {};
+  switch (lua_type(state_, absoluteIndex)) {
+    case LUA_TNIL:
+      output->tag = ScriptValueTag::kNull;
+      return true;
+    case LUA_TBOOLEAN:
+      output->tag = ScriptValueTag::kBoolean;
+      output->number = lua_toboolean(state_, absoluteIndex) ? 1.0 : 0.0;
+      return true;
+    case LUA_TNUMBER:
+      output->tag = ScriptValueTag::kNumber;
+      output->number = lua_tonumber(state_, absoluteIndex);
+      return true;
+    case LUA_TSTRING: {
+      size_t length = 0;
+      const char* source = lua_tolstring(state_, absoluteIndex, &length);
+      if (!frame->stringScratch || frame->stringScratchUsed > frame->stringScratchCapacity ||
+          length > frame->stringScratchCapacity - frame->stringScratchUsed) {
+        return fail("Universal-value string scratch is exhausted");
+      }
+      char* destination = frame->stringScratch + frame->stringScratchUsed;
+      if (length) std::memcpy(destination, source, length);
+      output->tag = ScriptValueTag::kString;
+      output->data = destination;
+      output->length = static_cast<uint32_t>(length);
+      frame->stringScratchUsed += static_cast<uint32_t>(length);
+      return true;
+    }
+    case LUA_TUSERDATA: {
+      if (auto* value = dmScript::ToVector3(state_, absoluteIndex)) {
+        output->tag = ScriptValueTag::kDefoldValue;
+        output->defoldKind = ScriptDefoldValueKind::kVector3;
+        output->defoldValue[0] = value->getX();
+        output->defoldValue[1] = value->getY();
+        output->defoldValue[2] = value->getZ();
+        return true;
+      }
+      if (auto* value = dmScript::ToVector4(state_, absoluteIndex)) {
+        output->tag = ScriptValueTag::kDefoldValue;
+        output->defoldKind = ScriptDefoldValueKind::kVector4;
+        output->defoldValue[0] = value->getX();
+        output->defoldValue[1] = value->getY();
+        output->defoldValue[2] = value->getZ();
+        output->defoldValue[3] = value->getW();
+        return true;
+      }
+      if (auto* value = dmScript::ToQuat(state_, absoluteIndex)) {
+        output->tag = ScriptValueTag::kDefoldValue;
+        output->defoldKind = ScriptDefoldValueKind::kQuaternion;
+        output->defoldValue[0] = value->getX();
+        output->defoldValue[1] = value->getY();
+        output->defoldValue[2] = value->getZ();
+        output->defoldValue[3] = value->getW();
+        return true;
+      }
+      if (auto* value = dmScript::ToMatrix4(state_, absoluteIndex)) {
+        float elements[16]{};
+        for (uint32_t column = 0; column < 4; ++column) {
+          for (uint32_t row = 0; row < 4; ++row) {
+            elements[column * 4 + row] = value->getElem(column, row);
+          }
+        }
+        if (!frame->matrix4Arena || !frame->matrix4Arena->store(elements, output)) {
+          return fail("Universal-value Matrix4 arena is exhausted");
+        }
+        return true;
+      }
+      if (auto* value = dmScript::ToHash(state_, absoluteIndex)) {
+        output->tag = ScriptValueTag::kHandle;
+        output->handleKind = ScriptHandleKind::kHash;
+        output->payload = *value;
+        return true;
+      }
+      if (auto* value = dmScript::ToURL(state_, absoluteIndex)) {
+        if (!frame->urlArena || !frame->urlArena->store({
+              value->m_Socket, value->_reserved, value->m_Path, value->m_Fragment}, output)) {
+          return fail("Universal-value URL arena is exhausted");
+        }
+        return true;
+      }
+      return captureLuaUserdata(absoluteIndex, output);
+    }
+    case LUA_TTABLE: {
+      if (depth >= universal_value::kMaximumDepth) {
+        return fail("Universal-value Lua table exceeds the generated depth bound");
+      }
+      const void* identity = lua_topointer(state_, absoluteIndex);
+      for (uint32_t index = 0; index < ancestorCount; ++index) {
+        if (ancestors[index] == identity) return fail("Universal-value Lua table contains a cycle");
+      }
+      uint32_t count = 0;
+      bool allStrings = true;
+      bool denseSequence = true;
+      std::array<bool, universal_value::kMaximumEntries> sequenceKeys{};
+      lua_pushnil(state_);
+      while (lua_next(state_, absoluteIndex) != 0) {
+        if (++count > universal_value::kMaximumEntries) {
+          lua_pop(state_, 2);
+          return fail("Universal-value Lua table exceeds the generated entry bound");
+        }
+        const int keyType = lua_type(state_, -2);
+        allStrings = allStrings && keyType == LUA_TSTRING;
+        if (keyType == LUA_TNUMBER) {
+          const double key = lua_tonumber(state_, -2);
+          if (!std::isfinite(key) || std::trunc(key) != key || key < 1.0 ||
+              key > static_cast<double>(universal_value::kMaximumEntries)) {
+            denseSequence = false;
+          } else {
+            const size_t position = static_cast<size_t>(key - 1.0);
+            if (sequenceKeys[position]) denseSequence = false;
+            sequenceKeys[position] = true;
+          }
+        } else {
+          denseSequence = false;
+        }
+        lua_pop(state_, 1);
+      }
+      if (denseSequence) {
+        for (uint32_t index = 0; index < count; ++index) denseSequence = denseSequence && sequenceKeys[index];
+      }
+      if (!frame->tableScratch || frame->tableScratchUsed > frame->tableScratchCapacity ||
+          count > frame->tableScratchCapacity - frame->tableScratchUsed) {
+        return fail("Universal-value table scratch is exhausted");
+      }
+      ScriptTableEntry* entries = frame->tableScratch + frame->tableScratchUsed;
+      frame->tableScratchUsed += count;
+      std::array<const void*, universal_value::kMaximumDepth> nextAncestors{};
+      for (uint32_t index = 0; index < ancestorCount; ++index) nextAncestors[index] = ancestors[index];
+      nextAncestors[ancestorCount] = identity;
+      uint32_t entry = 0;
+      lua_pushnil(state_);
+      while (lua_next(state_, absoluteIndex) != 0) {
+        if (!readUniversalValue(-2, &entries[entry].key, frame, depth + 1,
+                nextAncestors.data(), ancestorCount + 1) ||
+            !readUniversalValue(-1, &entries[entry].value, frame, depth + 1,
+                nextAncestors.data(), ancestorCount + 1)) {
+          lua_pop(state_, 2);
+          return false;
+        }
+        ++entry;
+        lua_pop(state_, 1);
+      }
+      output->tag = ScriptValueTag::kTable;
+      output->reserved = static_cast<uint8_t>(denseSequence
+          ? ScriptTableKind::kSequence
+          : allStrings ? ScriptTableKind::kRecord : ScriptTableKind::kMap);
+      output->length = count;
+      output->data = entries;
+      return true;
+    }
+    default:
+      return fail("Universal-value Lua result has an unsupported type");
+  }
+}
+
+universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
+    const universal_value::Operation& operation,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  using Status = universal_value::DispatchStatus;
+  if (!state_ || !frame || !bindUniversalValue(operation)) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  const ptrdiff_t denseIndex = &operation - universal_value::operations();
+  if (denseIndex < 0 || static_cast<size_t>(denseIndex) >= universalValueFunctionRefs_.size()) {
+    writeError(error, errorCapacity, "Universal-value operation index is invalid");
+    return Status::kError;
+  }
+  const bool scoped = hasSelectedContext() && instanceApi_.get && instanceApi_.set &&
+      instanceRef_ != LUA_NOREF && instanceRef_ != LUA_REFNIL;
+  const uint32_t tableMark = frame->tableScratchUsed;
+  const uint32_t stringMark = frame->stringScratchUsed;
+  const int baseTop = lua_gettop(state_);
+  if (scoped) {
+    instanceApi_.get(state_);
+    lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
+    instanceApi_.set(state_);
+  }
+  const int callBase = lua_gettop(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX,
+      universalValueFunctionRefs_[static_cast<size_t>(denseIndex)]);
+  bool ok = true;
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
+  }
+  if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), LUA_MULTRET, 0) != 0) {
+    const char* message = lua_tostring(state_, -1);
+    ok = fail(message ? message : "Universal-value Lua call failed without an error string");
+  }
+  const int actualResultCount = ok ? lua_gettop(state_) - callBase : 0;
+  if (ok && actualResultCount != operation.resultCount) {
+    ok = fail("Universal-value Lua result count does not match exact descriptor");
+  }
+  const void* ancestors[universal_value::kMaximumDepth]{};
+  if (ok) {
+    for (uint8_t index = 0; index < operation.resultCount; ++index) {
+      if (!readUniversalValue(callBase + 1 + index, &frame->results[index], frame,
+              0, ancestors, 0)) {
+        ok = false;
+        break;
+      }
+    }
+  }
+  if (ok) frame->resultCount = operation.resultCount;
+  if (scoped) {
+    lua_settop(state_, baseTop + 1);
+    instanceApi_.set(state_);
+  }
+  lua_settop(state_, baseTop);
+  if (!ok) {
+    frame->tableScratchUsed = tableMark;
+    frame->stringScratchUsed = stringMark;
+    frame->resultCount = 0;
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  adapterError_[0] = '\0';
+  return Status::kSuccess;
+}
+
 void ScriptAdapter::drainReleasedHandles() noexcept {
   if (!state_) return;
+  if (handleRouter_) handleRouter_->drainReleased();
   luaHandles_.drain([this](const HandleRecord& record) {
     if (record.state == state_) luaL_unref(state_, LUA_REGISTRYINDEX, static_cast<int>(record.payload));
   });
@@ -1298,6 +1697,13 @@ void ScriptAdapter::releaseHandle(
     ScriptHandleKind kind,
     uint32_t runtime,
     uint64_t payload) noexcept {
+  if (kind == ScriptHandleKind::kLuaSemanticHandle) {
+    if (handleRouter_) {
+      ScriptValue value{}; value.tag=ScriptValueTag::kHandle; value.handleKind=kind;
+      value.length=runtime; value.payload=payload; handleRouter_->queueRelease(value);
+    }
+    return;
+  }
   if (kind != ScriptHandleKind::kGuiNode && kind != ScriptHandleKind::kLuaUserdata) return;
   const uint32_t type = kind == ScriptHandleKind::kGuiNode ? kNodeHandleType : kLuaUserdataHandleType;
   luaHandles_.queueRelease(unpackHandle(runtime, payload, type));

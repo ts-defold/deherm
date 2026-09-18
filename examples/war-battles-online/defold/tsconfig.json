@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.deherm.shared.json"
+    },
+    {
+      "path": "./tsconfig.deherm.game-object.json"
+    },
+    {
+      "path": "./tsconfig.deherm.gui.json"
+    },
+    {
+      "path": "./tsconfig.deherm.render.json"
+    }
+  ]
+}

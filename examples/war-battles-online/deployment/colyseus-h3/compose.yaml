@@ -1,0 +1,27 @@
+services:
+  colyseus-h3:
+    build:
+      context: .
+    environment:
+      HOST: 0.0.0.0
+      PORT: 2567
+      PROBE_PORT: 8080
+    ports:
+      # Matchmaking and the probe page use HTTPS over TCP. WebTransport uses
+      # HTTP/3 over QUIC and therefore needs the same numeric UDP port too.
+      - "2567:2567/tcp"
+      - "2567:2567/udp"
+      # Plain HTTP serves only the local probe and proxies matchmaking inside
+      # the container. It avoids asking users to bypass a certificate warning;
+      # WebTransport itself still pins the generated certificate fingerprint.
+      - "8080:8080/tcp"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          node -e
+          "fetch('http://127.0.0.1:8080/health').then(r=>{if(!r.ok)throw Error(r.status)}).catch(()=>process.exit(1))"
+      interval: 3s
+      timeout: 2s
+      retries: 20
+      start_period: 5s
