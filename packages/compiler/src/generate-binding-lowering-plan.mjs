@@ -878,6 +878,41 @@ function countSelections(units, target) {
   return Object.fromEntries(Object.entries(counts).sort(([left], [right]) => compareCodeUnits(left, right)));
 }
 
+/**
+ * Backends are transports, not engines. Hermes 1.0 carries the JSI, typed-native
+ * (`$SHBuiltin.extern_c`), and Lua-stack transports in one runtime, so per-backend
+ * counts understate what a runtime can execute: a route absent from the
+ * typed-native transport is still reachable over JSI in the same process. This
+ * aggregates each runtime's union and reports the typed-native share separately,
+ * because that share is a soundness and performance tier rather than coverage.
+ */
+function runtimeCoverage(units, targets) {
+  const runtimeIds = [...new Set(targets.filter((target) => target.runtime === true && target.runtimeId)
+    .map((target) => target.runtimeId))].sort(compareCodeUnits);
+  const summary = {};
+  for (const runtimeId of runtimeIds) {
+    const members = targets.filter((target) => target.runtimeId === runtimeId && target.runtime === true);
+    const byTransport = {};
+    const reachable = new Set();
+    for (const target of members) {
+      const emitted = units.filter((unit) => unit.backends[target.target]?.selection === "emit");
+      byTransport[target.transport] = { backend: target.target, emit: emitted.length };
+      for (const unit of emitted) reachable.add(`${unit.identity.surface}:${unit.identity.id}`);
+    }
+    const typedNative = members.find((target) => target.transport === "typed-native");
+    summary[runtimeId] = {
+      transports: members.map((target) => target.transport).sort(compareCodeUnits),
+      unitsWithAnyTransport: reachable.size,
+      byTransport,
+      typedNativeShare: typedNative
+        ? { emit: byTransport["typed-native"].emit, ofReachable: reachable.size }
+        : null,
+      evidence: "Transport selection only. This is not compile, link, runtime, or conformance evidence."
+    };
+  }
+  return summary;
+}
+
 export function generateBindingLoweringPlan(inputs) {
   const parsed = Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, JSON.parse(content)]));
   const { scriptProjection, dmsdkProjection, semanticPolicies } = parsed;
@@ -889,6 +924,10 @@ export function generateBindingLoweringPlan(inputs) {
   for (let index = 0; index < targets.length; index += 1) {
     if (targets[index].target !== targetOrder[index]) throw new Error(`Target capability order/name mismatch for ${targetOrder[index]}`);
     if (!Array.isArray(targets[index].surfaces) || !Array.isArray(targets[index].unsupportedValueKinds)) throw new Error(`${targetOrder[index]} target capability is malformed`);
+    if (typeof targets[index].transport !== "string") throw new Error(`${targetOrder[index]} declares no transport`);
+    if (targets[index].runtime === true && typeof targets[index].runtimeId !== "string") {
+      throw new Error(`${targetOrder[index]} is a runtime backend but declares no runtimeId`);
+    }
   }
   const units = [
     ...scriptProjection.rows.map(scriptUnit),
@@ -923,6 +962,7 @@ export function generateBindingLoweringPlan(inputs) {
     inputCanonicalHashes: Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, sha256(JSON.stringify(JSON.parse(content)))])),
     targetOrder,
     targetCapabilities: Object.fromEntries(targets.map((target) => [target.target, target])),
+    runtimes: runtimeCoverage(units, targets),
     semanticPolicyMatches: ruleMatches,
     coverage: {
       units: units.length,

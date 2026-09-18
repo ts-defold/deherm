@@ -1,9 +1,25 @@
 {
   "schemaVersion": 1,
   "target": "staticHermesCAbi",
+  "runtimeId": "hermes",
+  "transport": "typed-native",
+  "transportNote": "$SHBuiltin.extern_c direct native calls. Emitted only by the Static Hermes C backend, so only AOT-compiled sound-typed units can issue them.",
   "emitter": "static-hermes-cabi",
-  "surfaces": ["script", "dmsdk"],
+  "surfaces": [
+    "script",
+    "dmsdk"
+  ],
   "runtime": true,
-  "capabilities": ["sound-types", "extern-c", "caller-owned-out-storage", "bounded-scratch", "bigint-u64"],
-  "unsupportedValueKinds": ["dynamic", "unknown", "variadic"]
+  "capabilities": [
+    "sound-types",
+    "extern-c",
+    "caller-owned-out-storage",
+    "bounded-scratch",
+    "bigint-u64"
+  ],
+  "unsupportedValueKinds": [
+    "dynamic",
+    "unknown",
+    "variadic"
+  ]
 }

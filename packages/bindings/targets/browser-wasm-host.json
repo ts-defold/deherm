@@ -1,9 +1,25 @@
 {
   "schemaVersion": 1,
   "target": "browserWasmHost",
+  "runtimeId": "browser",
+  "transport": "direct-memory",
+  "transportNote": "The browser's own JavaScript engine over Defold's WebAssembly memory. Hermes is not present.",
   "emitter": "browser-wasm-host",
-  "surfaces": ["script", "dmsdk"],
+  "surfaces": [
+    "script",
+    "dmsdk"
+  ],
   "runtime": true,
-  "capabilities": ["browser-js-host", "wasm-bigint", "direct-memory-layout", "caller-owned-out-storage", "finalization-registry"],
-  "unsupportedValueKinds": ["unknown", "variadic", "callback"]
+  "capabilities": [
+    "browser-js-host",
+    "wasm-bigint",
+    "direct-memory-layout",
+    "caller-owned-out-storage",
+    "finalization-registry"
+  ],
+  "unsupportedValueKinds": [
+    "unknown",
+    "variadic",
+    "callback"
+  ]
 }

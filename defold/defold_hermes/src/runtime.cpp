@@ -124,9 +124,21 @@ class Runtime::Impl {
   ComponentHandle attachComponent(const char* componentId, const char* schemaFingerprint,
       ComponentContext context) {
     if (!componentId || !schemaFingerprint) throw std::invalid_argument("Component identity is missing");
+    // Scan from the last successful allocation so factory spawn bursts stay
+    // amortised O(1) instead of rescanning the whole pool for every instance.
     size_t slotIndex = componentSlots_.size();
-    for (size_t index = 0; index < componentSlots_.size(); ++index) if (!componentSlots_[index].live) { slotIndex = index; break; }
-    if (slotIndex == componentSlots_.size()) throw std::runtime_error("Component instance pool is exhausted");
+    for (size_t probe = 0; probe < componentSlots_.size(); ++probe) {
+      const size_t index = (componentSlotCursor_ + probe) % componentSlots_.size();
+      if (!componentSlots_[index].live) { slotIndex = index; break; }
+    }
+    if (slotIndex == componentSlots_.size()) {
+      throw std::runtime_error(
+          std::string("Component instance pool is exhausted: all ") +
+          std::to_string(componentSlots_.size()) +
+          " slots are live. Component '" + componentId +
+          "' cannot attach. Every live TypeScript component instance, including "
+          "each factory-spawned game object, occupies one slot.");
+    }
     auto entryValue = runtime_->global().getProperty(*runtime_, "__defoldComponentsV1");
     if (!entryValue.isObject()) throw jsi::JSError(*runtime_, "Component registry is not installed");
     auto registry = entryValue.asObject(*runtime_);
@@ -150,6 +162,7 @@ class Runtime::Impl {
     slot.schemaFingerprint = schemaFingerprint;
     slot.context = context;
     slot.live = true;
+    componentSlotCursor_ = (slotIndex + 1) % componentSlots_.size();
     ++liveComponents_;
     return {static_cast<uint32_t>(slotIndex), slot.generation};
   }
@@ -400,7 +413,12 @@ class Runtime::Impl {
   std::shared_ptr<ScriptJsiBridgeLifetime> scriptBridgeLifetime_;
   std::unique_ptr<jsi::Object> app_;
   bool loaded_ = false;
-  std::array<ComponentSlot, 256> componentSlots_{};
+  // One slot per live TypeScript component instance. Factory-spawned game
+  // objects each attach one, so a game that spawns projectiles or units from a
+  // factory reaches this bound quickly; 256 was below a single tutorial scene.
+  static constexpr size_t kComponentSlotCapacity = 4096;
+  std::array<ComponentSlot, kComponentSlotCapacity> componentSlots_{};
+  size_t componentSlotCursor_ = 0;
   uint32_t liveComponents_ = 0;
 
  public:

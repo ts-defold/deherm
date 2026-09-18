@@ -40,11 +40,11 @@
     "dmsdkCStringValue": "60e03716f6e074c8cb30acbdfcfe635315e2f41da04ea7d9451c124f3a52a78c",
     "dmsdkBorrowedHandle": "6e956062424f9a3307549427b15f29f5c4f3d5888175f6095c976fcc44b9222e",
     "semanticPolicies": "d082520c927e8d40deca7e7829941e55075531ec58f73730063e6064d2688906",
-    "typescriptSdk": "5d705cca934ab3f4f1cd28cffcedadb317b656c358e24321e9e38de3707caa68",
-    "dynamicHermesJsi": "7ec51a1f94925818f7877b4776a96ee0e5d0954454b8bb7ffbd0a6ceae666225",
-    "staticHermesCAbi": "df43dfc62585f40e7d74511e5c7ad7799ef54b302a4c5d31114f9ddb87e04a66",
-    "luaStack": "d967e395b2deee7830fcebb68f724620ca514c8c7d43f7fa7933b31f9a6c79b3",
-    "browserWasmHost": "4fb8d7ef7a91481c03bc4b3e675bd4faa607e9b1983df22243ce453dd43668df"
+    "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
+    "dynamicHermesJsi": "32be0b54b6bda4396d9c3bacfffa05292de96977cca1e8b17266622906751ee3",
+    "staticHermesCAbi": "161c0c11e9c8418532d5abcade6318535e2ef91b1ea5b63d5fca306bc276db2f",
+    "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
+    "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
   "inputCanonicalHashes": {
     "scriptProjection": "dceb546345ac51d69fd3898a5e4d5b95518c156091e4d20f5e9f4cd1004deb76",
@@ -75,11 +75,11 @@
     "dmsdkCStringValue": "6df54dba7be2843fe74494595e5a75dee186dd610237bbed6cbb6dd3ce946982",
     "dmsdkBorrowedHandle": "5849074dde34d7eb5298593d363b34eba1d40cb568214f5af2f2d5fabeb68dea",
     "semanticPolicies": "2770f7863c5b18a4410224b0720429d2ffe79d7d6070857cd706ede3fe3a8319",
-    "typescriptSdk": "5e357774c261e34e6325f3f33b039afe4654605096b042a3dcc5b02d4e9662c4",
-    "dynamicHermesJsi": "2c623755ece0b7af82c6cf471287ba641ceb852e342f6bf048d217cfecf43cb4",
-    "staticHermesCAbi": "7f8f4f742f16993e234696a154cd884bbf3ca99e32ac55a4792f2e989c937f09",
-    "luaStack": "0823201be8aa01b0435000933b9e9583ea72670a465baef9a6c1533b9434bf0f",
-    "browserWasmHost": "6b98ee3f00a32ea348c0c764a43b59578ae6c61fd1dee6b29a11e2b9c74d0ab7"
+    "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
+    "dynamicHermesJsi": "2888cfa7afbc9caf7bfdc3de1771a5dd7639ff3b16a14dfe09adf44b604c7b1a",
+    "staticHermesCAbi": "66fcc05ae6228c1e7d61b2057e6be5d829cb2983d2dceae7c708b741f863dbee",
+    "luaStack": "ee2d214e6592bfc0327f1a29619130fb57c52a9ca055d4b93a9e85c35df962cb",
+    "browserWasmHost": "b8b1a2888d0c9164e6394f76f8c80423034a6433f905128dd12df6278ecbb966"
   },
   "targetOrder": [
     "typescriptSdk",
@@ -92,6 +92,9 @@
     "typescriptSdk": {
       "schemaVersion": 1,
       "target": "typescriptSdk",
+      "runtimeId": null,
+      "transport": "declaration",
+      "transportNote": "Type-level projection only; not an execution runtime.",
       "emitter": "typescript-sdk",
       "surfaces": [
         "script",
@@ -110,6 +113,9 @@
     "dynamicHermesJsi": {
       "schemaVersion": 1,
       "target": "dynamicHermesJsi",
+      "runtimeId": "hermes",
+      "transport": "jsi",
+      "transportNote": "Host functions installed on the Hermes runtime; reachable from interpreted bytecode and from AOT units.",
       "emitter": "dynamic-hermes-jsi",
       "surfaces": [
         "script",
@@ -132,6 +138,9 @@
     "staticHermesCAbi": {
       "schemaVersion": 1,
       "target": "staticHermesCAbi",
+      "runtimeId": "hermes",
+      "transport": "typed-native",
+      "transportNote": "$SHBuiltin.extern_c direct native calls. Emitted only by the Static Hermes C backend, so only AOT-compiled sound-typed units can issue them.",
       "emitter": "static-hermes-cabi",
       "surfaces": [
         "script",
@@ -154,6 +163,9 @@
     "luaStack": {
       "schemaVersion": 1,
       "target": "luaStack",
+      "runtimeId": "hermes",
+      "transport": "lua-stack",
+      "transportNote": "Marshalling across the Defold Lua 5.1 stack inside the same engine process.",
       "emitter": "lua-stack",
       "surfaces": [
         "script"
@@ -173,6 +185,9 @@
     "browserWasmHost": {
       "schemaVersion": 1,
       "target": "browserWasmHost",
+      "runtimeId": "browser",
+      "transport": "direct-memory",
+      "transportNote": "The browser's own JavaScript engine over Defold's WebAssembly memory. Hermes is not present.",
       "emitter": "browser-wasm-host",
       "surfaces": [
         "script",
@@ -191,6 +206,49 @@
         "variadic",
         "callback"
       ]
+    }
+  },
+  "runtimes": {
+    "browser": {
+      "transports": [
+        "direct-memory"
+      ],
+      "unitsWithAnyTransport": 911,
+      "byTransport": {
+        "direct-memory": {
+          "backend": "browserWasmHost",
+          "emit": 911
+        }
+      },
+      "typedNativeShare": null,
+      "evidence": "Transport selection only. This is not compile, link, runtime, or conformance evidence."
+    },
+    "hermes": {
+      "transports": [
+        "jsi",
+        "lua-stack",
+        "typed-native"
+      ],
+      "unitsWithAnyTransport": 913,
+      "byTransport": {
+        "jsi": {
+          "backend": "dynamicHermesJsi",
+          "emit": 913
+        },
+        "typed-native": {
+          "backend": "staticHermesCAbi",
+          "emit": 138
+        },
+        "lua-stack": {
+          "backend": "luaStack",
+          "emit": 911
+        }
+      },
+      "typedNativeShare": {
+        "emit": 138,
+        "ofReachable": 913
+      },
+      "evidence": "Transport selection only. This is not compile, link, runtime, or conformance evidence."
     }
   },
   "semanticPolicyMatches": {},
@@ -464329,5 +464387,5 @@
       }
     }
   ],
-  "planSha256": "ae1a3306928857f977290e3f87c0b8825f1ebedb177c47b19d63ff3f63e52061"
+  "planSha256": "afa3ec6563bb5ad5c23ab7fa82d48e0a734d3b41cf322a0552c83cf486eaa91f"
 }

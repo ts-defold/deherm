@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generator": "packages/compiler/src/generate-binding-lowering-plan.mjs",
-  "generatorSha256": "9dc5832b6248a136bd28b94cc92602b25cdd3efd4285435e63ee5361d696202d",
+  "generatorSha256": "128126cb42da36013a6ec285d98041a52e0aafb95716b0936970342239f955ef",
   "inputPaths": {
     "scriptProjection": "packages/bindings/generated/defold-script-projection-ir.json",
     "scriptScalarDispatch": "packages/bindings/generated/defold-script-scalar-dispatch.json",
@@ -66,15 +66,15 @@
     "dmsdkCStringValue": "60e03716f6e074c8cb30acbdfcfe635315e2f41da04ea7d9451c124f3a52a78c",
     "dmsdkBorrowedHandle": "6e956062424f9a3307549427b15f29f5c4f3d5888175f6095c976fcc44b9222e",
     "semanticPolicies": "d082520c927e8d40deca7e7829941e55075531ec58f73730063e6064d2688906",
-    "typescriptSdk": "5d705cca934ab3f4f1cd28cffcedadb317b656c358e24321e9e38de3707caa68",
-    "dynamicHermesJsi": "7ec51a1f94925818f7877b4776a96ee0e5d0954454b8bb7ffbd0a6ceae666225",
-    "staticHermesCAbi": "df43dfc62585f40e7d74511e5c7ad7799ef54b302a4c5d31114f9ddb87e04a66",
-    "luaStack": "d967e395b2deee7830fcebb68f724620ca514c8c7d43f7fa7933b31f9a6c79b3",
-    "browserWasmHost": "4fb8d7ef7a91481c03bc4b3e675bd4faa607e9b1983df22243ce453dd43668df"
+    "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
+    "dynamicHermesJsi": "32be0b54b6bda4396d9c3bacfffa05292de96977cca1e8b17266622906751ee3",
+    "staticHermesCAbi": "161c0c11e9c8418532d5abcade6318535e2ef91b1ea5b63d5fca306bc276db2f",
+    "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
+    "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "386990ad16e17e0e20b9087c8ad3d21b6a83878d4c45d18a71aa96e467c5ddcf",
+  "cacheKey": "3d83fc34ac9911b561a5631b8bcc58bc14946516710fa77547f7972bb142afb7",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
-  "outputBytes": 15750207,
-  "outputSha256": "d18d11de91535f4229b90d179d1dbd943f5eb165d10ae2ae9a063aaaeb2d6aa2",
-  "planSha256": "ae1a3306928857f977290e3f87c0b8825f1ebedb177c47b19d63ff3f63e52061"
+  "outputBytes": 15752167,
+  "outputSha256": "838fe083454e3828341f6258e8cb1b3fade98ef780c92670fea22814c67212ac",
+  "planSha256": "afa3ec6563bb5ad5c23ab7fa82d48e0a734d3b41cf322a0552c83cf486eaa91f"
 }

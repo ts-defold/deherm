@@ -1,9 +1,21 @@
 {
   "schemaVersion": 1,
   "target": "typescriptSdk",
+  "runtimeId": null,
+  "transport": "declaration",
+  "transportNote": "Type-level projection only; not an execution runtime.",
   "emitter": "typescript-sdk",
-  "surfaces": ["script", "dmsdk"],
+  "surfaces": [
+    "script",
+    "dmsdk"
+  ],
   "runtime": false,
-  "capabilities": ["documented-surface", "tsdoc", "branded-scalars", "discriminated-unions", "target-dispositions"],
+  "capabilities": [
+    "documented-surface",
+    "tsdoc",
+    "branded-scalars",
+    "discriminated-unions",
+    "target-dispositions"
+  ],
   "unsupportedValueKinds": []
 }

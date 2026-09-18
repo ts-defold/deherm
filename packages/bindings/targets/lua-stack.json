@@ -1,9 +1,22 @@
 {
   "schemaVersion": 1,
   "target": "luaStack",
+  "runtimeId": "hermes",
+  "transport": "lua-stack",
+  "transportNote": "Marshalling across the Defold Lua 5.1 stack inside the same engine process.",
   "emitter": "lua-stack",
-  "surfaces": ["script"],
+  "surfaces": [
+    "script"
+  ],
   "runtime": true,
-  "capabilities": ["lua-5.1-stack", "cached-route", "protected-call", "stack-restoration", "bounded-registry"],
-  "unsupportedValueKinds": ["unknown"]
+  "capabilities": [
+    "lua-5.1-stack",
+    "cached-route",
+    "protected-call",
+    "stack-restoration",
+    "bounded-registry"
+  ],
+  "unsupportedValueKinds": [
+    "unknown"
+  ]
 }

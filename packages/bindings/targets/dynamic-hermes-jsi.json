@@ -1,9 +1,25 @@
 {
   "schemaVersion": 1,
   "target": "dynamicHermesJsi",
+  "runtimeId": "hermes",
+  "transport": "jsi",
+  "transportNote": "Host functions installed on the Hermes runtime; reachable from interpreted bytecode and from AOT units.",
   "emitter": "dynamic-hermes-jsi",
-  "surfaces": ["script", "dmsdk"],
+  "surfaces": [
+    "script",
+    "dmsdk"
+  ],
   "runtime": true,
-  "capabilities": ["jsi", "bigint-u64", "host-objects", "finalization-registry", "caller-owned-out-storage", "bounded-scratch"],
-  "unsupportedValueKinds": ["unknown", "variadic"]
+  "capabilities": [
+    "jsi",
+    "bigint-u64",
+    "host-objects",
+    "finalization-registry",
+    "caller-owned-out-storage",
+    "bounded-scratch"
+  ],
+  "unsupportedValueKinds": [
+    "unknown",
+    "variadic"
+  ]
 }
