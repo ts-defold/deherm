@@ -1,0 +1,587 @@
+{
+  "schemaVersion": 1,
+  "title": "War Battles Deherm executable API readiness gate",
+  "status": "ready",
+  "readinessMeaning": "Every API used by the TypeScript fixture has a generated executable route (or an intentional compile-time proxy route). Gameplay execution is a separate later proof.",
+  "gameplayExecutionObserved": false,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "inputs": {
+    "bindings/generated/defold-script-api-ir.json": {
+      "sha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049"
+    },
+    "bindings/generated/defold-script-scalar-dispatch.json": {
+      "sha256": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
+    },
+    "bindings/generated/defold-script-value-bindings.json": {
+      "sha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d"
+    },
+    "knowledge/data/war-battles-api-usage.json": {
+      "sha256": "6a24b142feccda910554aad48bafd5dabd786e75ed1c217e79611cbf04420366"
+    },
+    "tests/fixtures/war-battles/.deherm/generated/components/manifest.json": {
+      "sha256": "ed2fc1a11400d37db041951eb40d53a8124a2df03585a56f94def118e9edb77c"
+    },
+    "tests/fixtures/war-battles/src/scripts/player.script.ts": {
+      "sha256": "ebe603655cc163487603907b687e6a38ad1a0d1c3b629f638cd12e4529414c4e"
+    },
+    "tests/fixtures/war-battles/src/scripts/rocket.script": {
+      "sha256": "a8ebdf62bd0469a75d3980e6be6f42f41782ba2b81c64b20a0574edbdc1d96da"
+    },
+    "tests/fixtures/war-battles/src/scripts/rocket.script.ts": {
+      "sha256": "2b3ac7ca02cf112460e816c9244528806ead7cee14af3fc570f3b461530a3767"
+    },
+    "tests/fixtures/war-battles/src/scripts/ui.gui_script.ts": {
+      "sha256": "53cf70d7ddaf25ca9b57da6ebe6316433ba841ff67883fc7788b785b4418629b"
+    }
+  },
+  "componentSurface": {
+    "status": "generated",
+    "ready": true,
+    "componentCount": 3,
+    "components": [
+      {
+        "source": "src/scripts/player.script.ts",
+        "proxy": "src/scripts/player.script",
+        "proxyKind": "script",
+        "contextKind": "game-object",
+        "lifecycleMask": 23,
+        "lifecycles": [
+          "init",
+          "update",
+          "final",
+          "onInput"
+        ],
+        "editorProperties": [],
+        "generated": true
+      },
+      {
+        "source": "src/scripts/rocket.script.ts",
+        "proxy": "src/scripts/rocket.script",
+        "proxyKind": "script",
+        "contextKind": "game-object",
+        "lifecycleMask": 11,
+        "lifecycles": [
+          "init",
+          "update",
+          "onMessage"
+        ],
+        "editorProperties": [
+          {
+            "name": "dir",
+            "type": "vector3",
+            "default": [
+              0,
+              0,
+              0
+            ]
+          }
+        ],
+        "generated": true
+      },
+      {
+        "source": "src/scripts/ui.gui_script.ts",
+        "proxy": "src/scripts/ui.gui_script",
+        "proxyKind": "gui_script",
+        "contextKind": "gui-scene",
+        "lifecycleMask": 9,
+        "lifecycles": [
+          "init",
+          "onMessage"
+        ],
+        "editorProperties": [],
+        "generated": true
+      }
+    ]
+  },
+  "sourceCoverage": {
+    "ready": true,
+    "requiredApiCount": 15,
+    "requirements": [
+      {
+        "id": "script:hash",
+        "token": "builtins.hash(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts",
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts",
+          "tests/fixtures/war-battles/src/scripts/ui.gui_script.ts"
+        ]
+      },
+      {
+        "id": "script:msg.post",
+        "token": "msg.post(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts",
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:vmath.vector3",
+        "token": "vmath.vector3(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts",
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:go.get_position",
+        "token": "go.getPosition(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts",
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:go.set_position",
+        "token": "go.setPosition(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts",
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:factory.create",
+        "token": "factory.create(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts"
+        ]
+      },
+      {
+        "id": "script:vmath.length",
+        "token": "vmath.length(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts"
+        ]
+      },
+      {
+        "id": "script:vmath.normalize",
+        "token": "vmath.normalize(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts"
+        ]
+      },
+      {
+        "id": "script:vmath.quat_rotation_z",
+        "token": "vmath.quatRotationZ(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts"
+        ]
+      },
+      {
+        "id": "script:go.property",
+        "token": "property.vector3(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:go.delete",
+        "token": "go.delete(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:go.set_rotation",
+        "token": "go.setRotation(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/player.script.ts",
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:vmath.quat",
+        "token": "vmath.quat(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/rocket.script.ts"
+        ]
+      },
+      {
+        "id": "script:gui.get_node",
+        "token": "gui.getNode(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/ui.gui_script.ts"
+        ]
+      },
+      {
+        "id": "script:gui.set_text",
+        "token": "gui.setText(",
+        "sources": [
+          "tests/fixtures/war-battles/src/scripts/ui.gui_script.ts"
+        ]
+      }
+    ]
+  },
+  "counts": {
+    "requiredApiCount": 15,
+    "compileTimeGeneratedCount": 1,
+    "runtimeRequiredCount": 14,
+    "generatedRuntimeRouteCount": 14,
+    "missingExecutableCount": 0
+  },
+  "missingExecutableIds": [],
+  "requirements": [
+    {
+      "id": "script:hash",
+      "typescriptName": "hash",
+      "stableId": 2845099200,
+      "stableIdHex": "0xa994c4c0",
+      "callCount": 9,
+      "loweringFamily": "defold-value",
+      "requiredContexts": [
+        "game-object",
+        "gui-scene"
+      ],
+      "preferredRoute": "compile-time literal hash with runtime fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "hash",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 2845099200,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:msg.post",
+      "typescriptName": "msg.post",
+      "stableId": 1111726479,
+      "stableIdHex": "0x4243998f",
+      "callCount": 4,
+      "loweringFamily": "lua-table",
+      "requiredContexts": [
+        "game-object"
+      ],
+      "preferredRoute": "generated typed message ABI; Lua compatibility for arbitrary payloads",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "msg.post",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 1111726479,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:vmath.vector3",
+      "typescriptName": "vmath.vector3",
+      "stableId": 3491633886,
+      "stableIdHex": "0xd01e1ade",
+      "callCount": 3,
+      "loweringFamily": "overload-dispatch",
+      "requiredContexts": [
+        "engine"
+      ],
+      "preferredRoute": "generated fixed-layout value constructor",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "vmath.vector3",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 3491633886,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:go.get_position",
+      "typescriptName": "go.getPosition",
+      "stableId": 3918772974,
+      "stableIdHex": "0xe993baee",
+      "callCount": 2,
+      "loweringFamily": "defold-value",
+      "requiredContexts": [
+        "game-object"
+      ],
+      "preferredRoute": "direct dmGameObject transform binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "go.get_position",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 3918772974,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:go.set_position",
+      "typescriptName": "go.setPosition",
+      "stableId": 608141138,
+      "stableIdHex": "0x243f7f52",
+      "callCount": 2,
+      "loweringFamily": "defold-value",
+      "requiredContexts": [
+        "game-object"
+      ],
+      "preferredRoute": "direct dmGameObject transform binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "go.set_position",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 608141138,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:factory.create",
+      "typescriptName": "factory.create",
+      "stableId": 96184340,
+      "stableIdHex": "0x05bba814",
+      "callCount": 1,
+      "loweringFamily": "lua-table",
+      "requiredContexts": [
+        "game-object"
+      ],
+      "preferredRoute": "generated property-table codec preserving current script instance",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "factory.create",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 96184340,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:vmath.length",
+      "typescriptName": "vmath.length",
+      "stableId": 2370510694,
+      "stableIdHex": "0x8d4b1f66",
+      "callCount": 1,
+      "loweringFamily": "defold-value",
+      "requiredContexts": [
+        "engine"
+      ],
+      "preferredRoute": "ttsc math IR or generated fixed-layout intrinsic",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "vmath.length",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 2370510694,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:vmath.normalize",
+      "typescriptName": "vmath.normalize",
+      "stableId": 3582341977,
+      "stableIdHex": "0xd5863359",
+      "callCount": 1,
+      "loweringFamily": "overload-dispatch",
+      "requiredContexts": [
+        "engine"
+      ],
+      "preferredRoute": "ttsc math IR or generated fixed-layout intrinsic",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "vmath.normalize",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 3582341977,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:vmath.quat_rotation_z",
+      "typescriptName": "vmath.quatRotationZ",
+      "stableId": 653417741,
+      "stableIdHex": "0x26f25d0d",
+      "callCount": 1,
+      "loweringFamily": "defold-value",
+      "requiredContexts": [
+        "engine"
+      ],
+      "preferredRoute": "generated fixed-layout value intrinsic",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "vmath.quat_rotation_z",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 653417741,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:go.property",
+      "typescriptName": "go.property",
+      "stableId": 993185129,
+      "stableIdHex": "0x3b32cd69",
+      "callCount": 1,
+      "loweringFamily": "borrowed-handle",
+      "requiredContexts": [
+        "script-resource-load"
+      ],
+      "preferredRoute": "compile-time component manifest and generated proxy declaration",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "go.property",
+      "route": "compile-time-component-proxy",
+      "status": "compile-time-generated",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "manifest": "tests/fixtures/war-battles/.deherm/generated/components/manifest.json#src/scripts/rocket.script.ts/properties/dir",
+        "proxy": "tests/fixtures/war-battles/src/scripts/rocket.script",
+        "declaration": "go.property(\"dir\", vmath.vector3(0, 0, 0))",
+        "manifestMatches": true,
+        "proxyMatches": true
+      }
+    },
+    {
+      "id": "script:go.delete",
+      "typescriptName": "go.delete",
+      "stableId": 2920192283,
+      "stableIdHex": "0xae0e991b",
+      "callCount": 2,
+      "loweringFamily": "lua-table",
+      "requiredContexts": [
+        "game-object"
+      ],
+      "preferredRoute": "direct dmGameObject binding with array/address overload codecs",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "go.delete",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 2920192283,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:go.set_rotation",
+      "typescriptName": "go.setRotation",
+      "stableId": 2093413559,
+      "stableIdHex": "0x7cc6f4b7",
+      "callCount": 1,
+      "loweringFamily": "defold-value",
+      "requiredContexts": [
+        "game-object"
+      ],
+      "preferredRoute": "direct dmGameObject transform binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "go.set_rotation",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 2093413559,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:vmath.quat",
+      "typescriptName": "vmath.quat",
+      "stableId": 2756728049,
+      "stableIdHex": "0xa45054f1",
+      "callCount": 1,
+      "loweringFamily": "overload-dispatch",
+      "requiredContexts": [
+        "engine"
+      ],
+      "preferredRoute": "generated fixed-layout value constructor",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "vmath.quat",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 2756728049,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:gui.get_node",
+      "typescriptName": "gui.getNode",
+      "stableId": 509983822,
+      "stableIdHex": "0x1e65bc4e",
+      "callCount": 1,
+      "loweringFamily": "borrowed-handle",
+      "requiredContexts": [
+        "gui-scene"
+      ],
+      "preferredRoute": "generated GUI-scene handle binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "gui.get_node",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 509983822,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    },
+    {
+      "id": "script:gui.set_text",
+      "typescriptName": "gui.setText",
+      "stableId": 1480837389,
+      "stableIdHex": "0x5843c90d",
+      "callCount": 1,
+      "loweringFamily": "borrowed-handle",
+      "requiredContexts": [
+        "gui-scene"
+      ],
+      "preferredRoute": "generated GUI-scene handle binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false,
+      "rawName": "gui.set_text",
+      "route": "generated-native-defold-value-dispatch",
+      "status": "generated-executable-route",
+      "executable": true,
+      "engineContextVerified": false,
+      "evidence": {
+        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "stableId": 1480837389,
+        "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
+      }
+    }
+  ]
+}

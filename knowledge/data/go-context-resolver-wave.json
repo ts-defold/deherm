@@ -1,0 +1,593 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": 1,
+  "kind": "deherm-generator-wave-design-and-proof-matrix",
+  "status": "current-instance-implemented-addressed-forms-pending",
+  "title": "GO execution context and address resolver wave",
+  "scope": {
+    "primaryBindings": [
+      "script:go.get_position",
+      "script:go.set_position",
+      "script:go.set_rotation"
+    ],
+    "adjacentWarBattlesBlockers": [
+      "component-dispatch-context",
+      "address-codec:string-hash-url",
+      "script:msg.post",
+      "script:factory.create",
+      "script:go.delete"
+    ],
+    "remainingExcludedWork": [
+      "addressed string/hash/url resolution",
+      "general per-component dispatcher beyond the bootstrap attachment",
+      "async attachment re-resolution"
+    ]
+  },
+  "validatedInputs": {
+    "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+    "descriptorAbiSha256": "c9436592d52ed41bdbf83833304093aa2d12e0e837ab5e0ca6a95b1aabc15e74",
+    "scriptIr": "bindings/generated/defold-script-api-ir.json",
+    "bindingPatterns": "bindings/generated/defold-script-binding-patterns.json",
+    "bindingDescriptors": "bindings/generated/defold-script-binding-descriptors.json",
+    "warBattlesUsage": "knowledge/data/war-battles-api-usage.json",
+    "warBattlesGate": "knowledge/data/war-battles-runtime-gate.json",
+    "sourceVerification": {
+      "gitCommand": "git -C upstream/defold rev-parse HEAD",
+      "observedRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05"
+    }
+  },
+  "currentState": {
+    "runtimeGate": {
+      "status": "blocked",
+      "generatedRuntimeRouteCount": 9,
+      "missingExecutableCount": 5,
+      "primaryBindingsMissing": 0
+    },
+    "primaryBindings": [
+      {
+        "id": "script:go.get_position",
+        "stableId": 3918772974,
+        "stableIdHex": "0xe993baee",
+        "loweringFamily": "defold-value",
+        "traits": ["heterogeneous-union:string|hash|url"],
+        "runtimeStatus": "current-instance-form-target-proven; addressed forms pending"
+      },
+      {
+        "id": "script:go.set_position",
+        "stableId": 608141138,
+        "stableIdHex": "0x243f7f52",
+        "loweringFamily": "defold-value",
+        "traits": ["heterogeneous-union:string|hash|url"],
+        "runtimeStatus": "current-instance-form-target-proven; addressed forms pending"
+      },
+      {
+        "id": "script:go.set_rotation",
+        "stableId": 2093413559,
+        "stableIdHex": "0x7cc6f4b7",
+        "loweringFamily": "defold-value",
+        "traits": ["heterogeneous-union:string|hash|url"],
+        "runtimeStatus": "current-instance-form-target-proven; addressed forms pending"
+      }
+    ],
+    "implementedEvidence": {
+      "nativeHarness": [
+        "nested A-to-B-to-A context restoration",
+        "stale attachment rejection before engine-pointer reads",
+        "fixed depth-32 overflow rejection",
+        "500000 warmed iterations across all nine structured routes with zero generated C++ allocations"
+      ],
+      "packagedDefoldMarkers": [
+        "INFO:DEFOLD_HERMES: script-value:go.get_position.current:ok",
+        "DEBUG:SCRIPT: script-value:go.set_position.current:ok",
+        "DEBUG:SCRIPT: script-value:go.set_rotation.current:ok"
+      ],
+      "boundary": "The bootstrap attachment supplies a real engine context. Generated .script.ts per-instance dispatch remains a separate implementation frontier."
+    },
+    "nextWarBattlesWaveSourceEvidence": {
+      "status": "pinned-source-verified; implementation in progress",
+      "directPublicDmSdkCandidates": [
+        "script:msg.post",
+        "script:factory.create",
+        "script:go.delete"
+      ],
+      "luaFallbackOrUpstreamDmSdkRequired": [
+        "script:gui.get_node",
+        "script:gui.set_text"
+      ],
+      "findings": [
+        {
+          "id": "script:msg.post",
+          "source": "upstream/defold/engine/script/src/script_msg.cpp",
+          "finding": "Exact relative receiver resolution requires the full sender URL including component fragment. The generic payload is bounded to 2 KiB and needs generated DDF plus generic-table codecs. dmMessage::Post and dmDDF descriptor lookup are public, but the engine message queue may allocate pages on first use or overflow."
+        },
+        {
+          "id": "script:factory.create",
+          "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_factory.cpp",
+          "finding": "The public CompFactorySpawn path can avoid Lua. Failure returns nil, so the sound TypeScript result is DefoldHash | undefined. Default position, rotation, and scale come from the sender instance. Child initialization is synchronous and must push then restore the parent active context."
+        },
+        {
+          "id": "script:go.delete",
+          "source": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
+          "finding": "The public game-object APIs support a Lua-free route. Deletion is deferred until the end of the frame, so deleting the current instance must not invalidate its active callback context early. Single-target and list missing-target behavior differ and remain explicit semantic tokens."
+        },
+        {
+          "id": "script:gui.get_node",
+          "source": "upstream/defold/engine/gui/src/gui_script.cpp",
+          "finding": "Exact lookup returns a private NodeProxy carrying scene and HNode. Public dmSDK lacks exact lookup and validity operations. A portable plugin therefore needs a generated Lua fallback or a focused upstream dmSDK addition; private symbol declarations are forbidden."
+        },
+        {
+          "id": "script:gui.set_text",
+          "source": "upstream/defold/engine/gui/src/gui_script.cpp",
+          "finding": "Exact node validation and text mutation are not public dmSDK. Number input follows Lua %.14g formatting, and the engine inherently frees then duplicates text on each call. Scene-bound generation-tagged handles are required for any bridge token."
+        }
+      ]
+    },
+    "verifiedIntegrationGaps": [
+      {
+        "id": "single-captured-lua-instance",
+        "evidence": [
+          "defold/defold_hermes/src/extension.cpp:285-299",
+          "defold/defold_hermes/src/scalar_lua_dispatch.cpp:140-152",
+          "defold/defold_hermes/src/scalar_lua_dispatch.cpp:356-387"
+        ],
+        "finding": "The present adapter stores one instanceRef and attach replaces it. That model cannot prove correct current-instance behavior for multiple player, rocket, and GUI component instances or reentrant callbacks."
+      },
+      {
+        "id": "generated-proxy-native-api-gap",
+        "evidence": [
+          "tests/fixtures/war-battles/src/scripts/player.script:12-28",
+          "tests/fixtures/war-battles/src/scripts/rocket.script:14-28",
+          "tests/fixtures/war-battles/src/scripts/ui.gui_script:12-22",
+          "defold/defold_hermes/src/extension.cpp:303-309"
+        ],
+        "finding": "Generated proxies call attachComponent, dispatchLifecycle, dispatchInput, dispatchMessage, and detachComponent, while the inspected extension registration only exposes attach. This proposal assumes a future component dispatcher and does not claim it exists."
+      },
+      {
+        "id": "script-call-frame-has-no-context",
+        "evidence": [
+          "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp:33-46"
+        ],
+        "finding": "ScriptCallFrame carries values and scratch only. The smallest design is a native scoped context stack owned by the component dispatcher, not a raw native pointer exposed to JavaScript."
+      }
+    ]
+  },
+  "generatorProposal": {
+    "namespace": "context-bound-game-object",
+    "selectionRule": {
+      "all": [
+        "modulePath equals go",
+        "binding consumes or returns a fixed-layout Defold value or scalar",
+        "binding target is an HInstance resolved relative to the current script instance",
+        "public dmSDK provides the terminal engine call"
+      ],
+      "traitsHandled": [
+        "optional address",
+        "heterogeneous-union:string|hash|url",
+        "void result",
+        "single fixed-layout value result"
+      ]
+    },
+    "normalizedShape": {
+      "hiddenInput": "ActiveGameObjectContext",
+      "visibleArguments": [
+        "zero or one required fixed-layout value",
+        "zero or one optional Address"
+      ],
+      "result": "void or one copied fixed-layout Defold value",
+      "failure": "structured native error converted to JSError; no Lua longjmp in the direct terminal call"
+    },
+    "generatedArtifactsProposed": [
+      {
+        "kind": "binding-descriptor-extension",
+        "fields": [
+          "contextKind",
+          "targetResolver",
+          "engineSymbol",
+          "inputValueKind",
+          "outputValueKind",
+          "coordinateSpace",
+          "errorPolicy"
+        ]
+      },
+      {
+        "kind": "native-thunk-table",
+        "key": "stableId",
+        "payload": "context resolver id plus direct dmSDK call id"
+      },
+      {
+        "kind": "real-engine-probe-manifest",
+        "payload": "positive, negative, reentrant, stale-context, and allocation scenarios"
+      }
+    ],
+    "noHandAuthoredPerApiLogic": "Per-binding thunks must be selected from structured metadata and small reusable terminal operations. Source-derived semantic exceptions must be explicit data records with citations."
+  },
+  "contextContract": {
+    "activeScope": {
+      "entry": "Every generated Lua proxy callback enters native code while Defold has already set its current Lua script instance. The component dispatcher obtains the current HInstance with public dmScript::CheckGOInstance(L), then pushes a native RAII context scope before invoking Hermes.",
+      "exit": "The scope pops on success, JavaScript exception, Lua error conversion, nested dispatch, and early return.",
+      "reentrancy": "A bounded or arena-backed stack is required. A single global current instance and a single replaceable registry reference are forbidden for component dispatch.",
+      "threading": "Context is engine-thread scoped. No HInstance pointer may be transferred to a worker or retained by JavaScript."
+    },
+    "record": {
+      "callScopedFields": [
+        "dmGameObject::HInstance currentInstance",
+        "dmGameObject::HCollection currentCollection",
+        "dmhash_t currentIdentifier",
+        "uint32_t currentGeneration"
+      ],
+      "persistentAttachmentFields": [
+        "attachment handle with its own generation",
+        "collection identity owned by the attachment lifetime",
+        "instance identifier",
+        "instance generation",
+        "per-instance Lua registry reference only when a Lua fallback is required"
+      ],
+      "forbiddenFields": [
+        "JavaScript-visible HInstance pointer",
+        "process-global last-attached instance",
+        "unversioned attachment index"
+      ]
+    },
+    "lifetime": {
+      "synchronous": "currentInstance is borrowed only for the synchronous proxy-to-Hermes call extent",
+      "asynchronous": "timer or deferred callback stores an attachment handle, then re-resolves identifier in the collection and validates both attachment generation and game-object generation before pushing a scope",
+      "detach": "final/detach invalidates the attachment generation and releases any Lua registry reference before JavaScript state can be reused"
+    },
+    "publicDmSdkEntryEvidence": [
+      "upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:42-50",
+      "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:556-562",
+      "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:616-663"
+    ]
+  },
+  "addressResolverContract": {
+    "name": "GameObjectAddressResolver",
+    "acceptedVariants": [
+      {
+        "variant": "omitted-or-nil",
+        "result": "currentInstance",
+        "sourceParity": "ResolveInstance defaults to the current instance when the argument is absent or nil"
+      },
+      {
+        "variant": "string",
+        "result": "parse [socket:][path][#fragment], resolve a relative path against currentInstance, then select the URL path",
+        "notes": [
+          "A component fragment is ignored for GO instance selection after URL parsing.",
+          "The current source accepts Lua strings, therefore embedded NUL behavior is NUL-terminated in downstream C-string operations."
+        ]
+      },
+      {
+        "variant": "hash",
+        "result": "current collection socket plus hash as the path and fragment zero"
+      },
+      {
+        "variant": "url",
+        "result": "copy URL POD, then use its socket and path"
+      }
+    ],
+    "algorithm": [
+      "Require an active game-object context.",
+      "Normalize omitted, undefined, and raw-runtime null to current instance; generated TypeScript continues to expose only an optional argument.",
+      "For string, parse URL syntax. Resolve relative path with dmGameObject::GetAbsoluteIdentifier(currentInstance, path). Preserve explicit absolute path hashing and socket lookup semantics.",
+      "For hash, use it directly as the instance path in currentCollection.",
+      "For URL, copy the fixed-layout value.",
+      "Reject any socket unequal to dmGameObject::GetMessageSocket(currentCollection).",
+      "Resolve path with dmGameObject::GetInstanceFromIdentifier(currentCollection, path).",
+      "Reject missing instances before calling an engine terminal operation."
+    ],
+    "result": {
+      "type": "borrowed dmGameObject::HInstance",
+      "lifetime": "current dispatch scope only",
+      "allocation": "none for omitted, hash, or URL; string route is designed for bounded stack parsing and must prove no heap allocation after warm-up"
+    },
+    "exactSourceEvidence": [
+      "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp:530-560",
+      "upstream/defold/engine/script/src/script_msg.cpp:640-703",
+      "upstream/defold/engine/script/src/script_msg.cpp:710-823",
+      "upstream/defold/engine/gameobject/src/gameobject/gameobject.cpp:2196-2225"
+    ],
+    "publicDmSdkEvidence": [
+      "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:532-538",
+      "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:643-663"
+    ],
+    "policyDifferencesToRecord": [
+      {
+        "sourceBehavior": "Extra arguments can cause ResolveInstance to keep the current instance because it tests exact Lua stack arity.",
+        "generatedPolicy": "Reject arguments outside generated call shapes before resolution. Do not emulate undocumented extra-argument behavior."
+      },
+      {
+        "sourceBehavior": "Explicit nil chooses the current instance.",
+        "generatedPolicy": "TypeScript exposes an optional address. Raw JavaScript null and undefined may normalize to omitted for parity, but that must be tested and documented."
+      }
+    ]
+  },
+  "bindingMatrix": [
+    {
+      "id": "script:go.get_position",
+      "stableIdHex": "0xe993baee",
+      "typescriptCallShapes": [
+        "go.getPosition()",
+        "go.getPosition(id: string | DefoldHash | Url)"
+      ],
+      "warBattlesShapes": ["go.getPosition()"],
+      "sourceSemantics": {
+        "target": "current attached game object unless id resolves another instance in the same collection",
+        "coordinateSpace": "local, relative to parent",
+        "result": "new vector3 value copied from dmGameObject::GetPosition",
+        "errors": ["no active game-object context", "cross-collection target", "missing target", "invalid address kind"]
+      },
+      "terminalCall": {
+        "symbol": "dmGameObject::GetPosition",
+        "publicDmSdk": true,
+        "evidence": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:695-701"
+      },
+      "sourceImplementation": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp:1003-1029",
+      "ownership": "target HInstance borrowed for call; result copied into ScriptValue",
+      "allocation": "direct path should allocate zero bytes after initialization; Lua parity path allocates vector3 userdata via PushVector3",
+      "abi": {
+        "arguments": ["optional Address"],
+        "result": "ScriptValue{kDefoldValue,kVector3,float32[3]}"
+      }
+    },
+    {
+      "id": "script:go.set_position",
+      "stableIdHex": "0x243f7f52",
+      "typescriptCallShapes": [
+        "go.setPosition(position: Vector3)",
+        "go.setPosition(position: Vector3, id: string | DefoldHash | Url)"
+      ],
+      "warBattlesShapes": ["go.setPosition(Vector3)"],
+      "sourceSemantics": {
+        "target": "current attached game object unless id resolves another instance in the same collection",
+        "coordinateSpace": "local, relative to parent; world position is not set",
+        "input": "vector3 checked for correct value kind and NaN components by the Lua route",
+        "result": "void",
+        "errors": ["no active game-object context", "wrong value kind", "NaN component", "cross-collection target", "missing target", "invalid address kind"]
+      },
+      "terminalCall": {
+        "symbol": "dmGameObject::SetPosition",
+        "publicDmSdk": true,
+        "evidence": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:687-693"
+      },
+      "sourceImplementation": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp:1112-1140",
+      "ownership": "target HInstance and argument bytes borrowed for call; engine copies Point3",
+      "allocation": "direct path should allocate zero bytes after initialization",
+      "abi": {
+        "arguments": ["ScriptValue{kDefoldValue,kVector3,float32[3]}", "optional Address"],
+        "result": "void"
+      }
+    },
+    {
+      "id": "script:go.set_rotation",
+      "stableIdHex": "0x7cc6f4b7",
+      "typescriptCallShapes": [
+        "go.setRotation(rotation: Quaternion)",
+        "go.setRotation(rotation: Quaternion, id: string | DefoldHash | Url)"
+      ],
+      "warBattlesShapes": ["go.setRotation(Quaternion)"],
+      "sourceSemantics": {
+        "target": "current attached game object unless id resolves another instance in the same collection",
+        "coordinateSpace": "local, relative to parent; world rotation is not set",
+        "input": "quaternion checked for correct value kind and NaN components by the Lua route; it is not automatically normalized",
+        "result": "void",
+        "errors": ["no active game-object context", "wrong value kind", "NaN component", "cross-collection target", "missing target", "invalid address kind"]
+      },
+      "terminalCall": {
+        "symbol": "dmGameObject::SetRotation",
+        "publicDmSdk": true,
+        "evidence": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:703-709"
+      },
+      "sourceImplementation": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp:1142-1169",
+      "ownership": "target HInstance and argument bytes borrowed for call; engine copies Quat",
+      "allocation": "direct path should allocate zero bytes after initialization",
+      "abi": {
+        "arguments": ["ScriptValue{kDefoldValue,kQuaternion,float32[4]}", "optional Address"],
+        "result": "void"
+      }
+    }
+  ],
+  "adjacentBlockerMatrix": [
+    {
+      "id": "component-dispatch-context",
+      "whyAdjacent": "All three bindings depend on the exact currently executing player or rocket instance.",
+      "minimumContract": "Proxy entry pushes a per-attachment ActiveGameObjectContext around the synchronous Hermes call; nested entries restore the previous context.",
+      "mustNotAssume": "The most recently attached component is the current component."
+    },
+    {
+      "id": "script:hash",
+      "whyAdjacent": "The shared address union accepts hash, and War Battles passes message.otherId to go.delete and compares hashed action/message identifiers.",
+      "currentEvidence": "Resolved after this design snapshot: generated_script_value_bindings.cpp carries all 64 bits in a POD handle payload and JavaScript exposes a branded bigint.",
+      "minimumContract": "Satisfied for the hash value itself; the address resolver still needs to consume the generated hash kind."
+    },
+    {
+      "id": "address-codec:string-hash-url",
+      "whyAdjacent": "It removes the heterogeneous-union blocker for the three GO transforms and is reused by msg.post, factory.create, and go.delete.",
+      "minimumContract": "Structured variant tag with copied hash/URL POD or borrowed call-local UTF-8 string."
+    },
+    {
+      "id": "script:go.delete",
+      "whyAdjacent": "Uses the same active context and single-address resolver for both War Battles call shapes: go.delete() and go.delete(hash).",
+      "deferredComplexity": "Address arrays, recursive boolean overload, bone rejection, and asynchronous stale-handle semantics are a separate lifecycle terminal pattern."
+    },
+    {
+      "id": "script:msg.post",
+      "whyAdjacent": "Uses the same sender context and address codec, but payload encoding and queue allocation are separate from GO transform terminals.",
+      "deferredComplexity": "DDF versus generic table wire codecs and the 2048-byte bound."
+    },
+    {
+      "id": "script:factory.create",
+      "whyAdjacent": "Uses the same address codec and proves reentrant context restoration because spawn can synchronously invoke child script initialization.",
+      "deferredComplexity": "Factory component resolution, property container generation, resource loading, and nullable spawn failure."
+    }
+  ],
+  "allocationAndCachePolicy": {
+    "hotPathTargets": [
+      "current-instance getPosition: zero Lua allocator calls and zero C++ heap calls after initialization",
+      "current-instance setPosition/setRotation: zero Lua allocator calls and zero C++ heap calls after initialization",
+      "hash/URL addressed variants: zero allocations after initialization",
+      "string addressed variant: bounded call-local parsing with no persistent allocation"
+    ],
+    "scratch": "Any call-local resolver scratch is scoped by a reentrant BindingArena frame. Nested Hermes-to-engine-to-Hermes calls receive nested frames and cannot overwrite parent scratch.",
+    "cache": "A per-attachment optional address cache may key on exact UTF-8 bytes and collection identity, but cached targets must store identifier plus generation, not an unchecked HInstance pointer.",
+    "notCountedAsAllocationFree": [
+      "first-time component attachment",
+      "Lua registry reference creation for fallback",
+      "engine allocations caused by unrelated component behavior",
+      "factory spawn and message queue operations"
+    ]
+  },
+  "realEngineProofMatrix": [
+    {
+      "id": "go-context-two-instance-isolation",
+      "layer": "Defold native executable",
+      "setup": "Create two game objects with the same generated TypeScript component and distinct initial local positions.",
+      "stimulus": "Each update calls go.getPosition() and reports its value through a deterministic native transcript.",
+      "requiredObservation": "Each component observes its own position on every alternating update; neither observes the most recently attached instance.",
+      "proves": ["per-invocation context", "multiple attachments", "no global last-attached context"]
+    },
+    {
+      "id": "go-local-position-parity",
+      "layer": "Defold native executable",
+      "setup": "Place a TypeScript-controlled child under a translated, rotated, and scaled parent.",
+      "stimulus": "TypeScript reads local position, sets a new local position, and a Lua verifier reads go.get_position and go.get_world_position in the same frame.",
+      "requiredObservation": "TypeScript and Lua local values match component-wise at float32 precision; world value differs according to the parent transform.",
+      "proves": ["local coordinate semantics", "vector result copying", "SetPosition terminal parity"]
+    },
+    {
+      "id": "go-local-rotation-parity",
+      "layer": "Defold native executable",
+      "setup": "Place a TypeScript-controlled child under a rotated parent.",
+      "stimulus": "TypeScript sets a non-normalized finite quaternion and a Lua verifier reads local and world rotations.",
+      "requiredObservation": "Local quaternion matches the supplied float32 components without generator normalization; world rotation includes the parent transform.",
+      "proves": ["local rotation semantics", "no implicit normalization", "SetRotation terminal parity"]
+    },
+    {
+      "id": "go-address-string-relative-and-absolute",
+      "layer": "Defold native executable",
+      "setup": "Create caller and target instances inside a nested collection path.",
+      "stimulus": "Call all three bindings using a relative string and an absolute string for the same target.",
+      "requiredObservation": "Both routes resolve the intended target and agree with Lua GO calls.",
+      "proves": ["ParseURL", "GetAbsoluteIdentifier parity", "same-collection resolver"]
+    },
+    {
+      "id": "go-address-hash",
+      "layer": "Defold native executable",
+      "setup": "Obtain an absolute target hash without converting it through JavaScript number.",
+      "stimulus": "Read and mutate the target using the hash address variant.",
+      "requiredObservation": "All 64 bits survive and the exact target is selected.",
+      "proves": ["hash ABI", "hash address resolver"]
+    },
+    {
+      "id": "go-address-url",
+      "layer": "native ABI harness then Defold native executable when URL production is executable",
+      "setup": "Supply a fixed-layout URL value whose socket and path identify a same-collection target.",
+      "stimulus": "Read and mutate through the URL variant.",
+      "requiredObservation": "URL bytes are copied, fragment does not change selected game object, and no pointer escapes the call.",
+      "proves": ["URL ABI", "URL address resolver"]
+    },
+    {
+      "id": "go-address-cross-collection-rejection",
+      "layer": "Defold native executable",
+      "setup": "Load a second collection socket and construct its target URL.",
+      "stimulus": "Call each GO transform binding from the first collection against the second collection URL.",
+      "requiredObservation": "Each call fails before the terminal dmGameObject operation; the current instance and Lua stack remain intact; a following valid call succeeds.",
+      "proves": ["same-collection guard", "failure cleanup", "post-error recovery"]
+    },
+    {
+      "id": "go-address-missing-target-rejection",
+      "layer": "Defold native executable",
+      "setup": "Construct a valid same-collection path that has no live instance.",
+      "stimulus": "Call each GO transform binding with it.",
+      "requiredObservation": "Each fails deterministically and no engine terminal call is recorded; the next valid call succeeds.",
+      "proves": ["missing-instance guard", "failure cleanup"]
+    },
+    {
+      "id": "go-invalid-value-rejection",
+      "layer": "native ABI harness and Defold native executable",
+      "setup": "Prepare wrong Defold value kinds and vector/quaternion values containing NaN.",
+      "stimulus": "Invoke setPosition and setRotation.",
+      "requiredObservation": "Wrong kinds and NaN are rejected before engine mutation. Infinity behavior is recorded separately because pinned Lua checks reject NaN but not infinity.",
+      "proves": ["sound value tag", "pinned numeric validation parity"]
+    },
+    {
+      "id": "go-reentrant-context-restoration",
+      "layer": "Defold native executable after component dispatcher and factory.create are executable",
+      "setup": "Object A spawns object B; B init calls GO transforms synchronously before A resumes.",
+      "stimulus": "A reads before spawn, B mutates itself in init, then A mutates itself after spawn returns.",
+      "requiredObservation": "B operations target B and the post-spawn A operation targets A.",
+      "proves": ["reentrant context stack", "scope restoration", "factory adjacency"]
+    },
+    {
+      "id": "go-stale-attachment-rejection",
+      "layer": "Defold native executable after deferred callback support exists",
+      "setup": "Capture an async callback in a component, delete/finalize that component, and create another object that may reuse storage.",
+      "stimulus": "Attempt to fire the old callback.",
+      "requiredObservation": "Attachment generation rejects the callback before HInstance dereference and the new object is not mutated.",
+      "proves": ["stale handle safety", "generation checks", "no pointer reuse bug"]
+    },
+    {
+      "id": "go-hot-path-allocation",
+      "layer": "native harness plus instrumented Defold native executable",
+      "setup": "Warm descriptor lookup, context attachment, and all address variants; install Lua allocator and C++ allocation counters around the measured region.",
+      "stimulus": "Run at least 10000 current-instance getPosition/setPosition/setRotation calls, then hash and URL addressed variants.",
+      "requiredObservation": "Zero Lua allocator calls and zero C++ heap calls in direct binding code; stable Lua stack height; stable context depth; no scratch high-water growth after warm-up.",
+      "proves": ["allocation target", "scratch rewind", "cache locality claim"]
+    },
+    {
+      "id": "go-html5-parity",
+      "layer": "Defold HTML5 browser executable",
+      "setup": "Reuse the two-instance and local transform fixture under the browser-host JavaScript route.",
+      "stimulus": "Execute the same deterministic transcript.",
+      "requiredObservation": "Transcript matches native within declared float32 tolerance and context isolation remains correct.",
+      "proves": ["browser host path", "shared semantic generator output"]
+    }
+  ],
+  "acceptanceGates": [
+    "The generator emits all three primary stable IDs from structured IR plus explicit semantic metadata.",
+    "No per-function handwritten switch is required outside reusable terminal operation selection.",
+    "Every generated route rejects absence of ActiveGameObjectContext.",
+    "All current-instance and hash/URL probes pass on a real Defold native executable.",
+    "String, cross-collection, missing-target, and post-error recovery probes pass.",
+    "The reentrant A-to-B-to-A probe passes before factory.create is called executable.",
+    "Allocation claims are made only after counter evidence, never from code inspection alone.",
+    "The runtime gate changes an API to generatedDispatch=true only after its real-engine probe evidence is recorded."
+  ],
+  "recommendedOrder": [
+    {
+      "step": 1,
+      "deliverable": "Per-invocation ActiveGameObjectContext stack in the component dispatcher",
+      "reason": "Without it direct GO calls can silently target the wrong object even if terminal calls are correct."
+    },
+    {
+      "step": 2,
+      "deliverable": "Current-instance-only thunks for getPosition, setPosition, and setRotation",
+      "reason": "This matches every War Battles use of these APIs and proves the context contract with the smallest surface. It is a fixture milestone, not full API completion."
+    },
+    {
+      "step": 3,
+      "deliverable": "Shared string/hash/URL resolver and full optional-address call shapes",
+      "reason": "This completes the documented three APIs and becomes reusable input infrastructure for delete, msg.post, and factory.create."
+    },
+    {
+      "step": 4,
+      "deliverable": "Reentrant and stale-context probes",
+      "reason": "They validate lifecycle safety before expanding to spawn, delete, timers, and messages."
+    }
+  ],
+  "openQuestions": [
+    {
+      "id": "url-script-value-layout",
+      "question": "Should URL receive a dedicated fixed-layout ScriptValue payload or a call-local data pointer plus size?",
+      "decisionConstraint": "All three 64-bit URL fields must survive Static Hermes, dynamic Hermes, and browser-host bridges without JavaScript-number truncation."
+    },
+    {
+      "id": "raw-null-policy",
+      "question": "Should raw JavaScript null be accepted as omitted for parity with explicit Lua nil?",
+      "decisionConstraint": "Generated TypeScript need not expose null even if runtime parity accepts it."
+    },
+    {
+      "id": "string-cache-policy",
+      "question": "Is address caching worth its invalidation complexity for string targets?",
+      "decisionConstraint": "No unchecked HInstance pointer may be cached across frames; identifier and generation must be validated."
+    }
+  ]
+}

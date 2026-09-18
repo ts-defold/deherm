@@ -2,7 +2,7 @@
   <img src="docs/assets/brand/deherm-wordmark-basalt-heart.png" alt="deherm" width="960">
 </p>
 
-# Defold Hermes
+# déherm
 
 An experimental TypeScript runtime for Defold, backed by Hermes on native
 targets and the browser's JavaScript engine on HTML5.
@@ -36,6 +36,10 @@ npm run run:web
 npm run package:defold
 npm run bob:version
 npm run bob:web:bundle
+npm run test:native-defold:runtime
+npm run test:native-defold:hot-reload
+npm run test:static-hermes
+npm run test:conformance
 npm run cli -- doctor --project defold
 npm run cli -- extensions --project defold
 npm run cli -- generate --project defold
@@ -43,17 +47,17 @@ npm run cli -- generate --project defold
 
 ## Project CLI
 
-The npm package exposes a `defold-hermes` binary. Its first vertical slice
+The npm package exposes a `deherm` binary. Its first vertical slice
 discovers native extensions already present in a Defold project, including
 Bob-resolved library ZIPs, and generates a stable inventory, declarations,
 executable TypeScript SDK modules, a TypeScript 7 project, and non-destructive
 VS Code setup from extension `.script_api` metadata:
 
 ```sh
-npm install --save-dev @ts-defold/hermes
-npx defold-hermes doctor
-npx defold-hermes extensions
-npx defold-hermes generate
+npm install --save-dev @ts-defold/deherm
+npx deherm doctor
+npx deherm extensions
+npx deherm generate
 ```
 
 The package has not been published yet; use `npm run cli -- ...` in this
@@ -73,8 +77,8 @@ implementation is a zero-serialization JSI host function.
 
 `bob:web:bundle` builds the actual Defold `wasm-web` game against local
 Extender. It first emits an IIFE application bundle through ttsc and esbuild,
-then stores it as `/defold_hermes_app/app.js` in the game archive. Extender
-automatically links the generated files under the extension's `lib/web`
+then stores it as the typed `/deherm/app.dehermc` resource in the game archive. Extender
+automatically links the generated module adapter and hand-written host library under the extension's `lib/web`
 directory as Emscripten JavaScript libraries. The HTML5 extension loads the
 archived application and runs it in the browser VM; no Hermes library is added
 to the default web build. See the [HTML5 bundle decision](knowledge/decisions/html5-bundle-and-static-wasm.md)
@@ -87,7 +91,7 @@ compiler and runtime revisions paired because Hermes bytecode is versioned.
 
 Normal development uses precompiled complete bindings: edits only run the
 TypeScript transform/bundle/reload loop. Direct imports such as
-`@defold-hermes/sdk/ExampleMath` are tracked per function. `npm run
+`@deherm/sdk/ExampleMath` are tracked per function. `npm run
 build:release-plan` emits `dist/sample.usage.json` from the actual tree-shaken
 bundle, then creates reachable-only binding projections under
 `build/profiles/release`. Importing the dynamic `DefoldModules` registry is an
@@ -116,6 +120,15 @@ declarations and 40 modules / 2,734 script declarations. These are inventory
 numbers, not a claim that each declaration has a finished runtime lowering.
 The status of every declaration is machine-readable under
 `bindings/generated/` and drift-gated by `npm run check`.
+
+The current generated execution floor is also machine-readable: all 926 script
+functions and 2,140 dmSDK declarations compile as TypeScript types; 93 script
+calls (90 generic scalar dispatchers plus 3 specialized timer calls) and 26
+scalar dmSDK thunks have runtime adapters. Per-function target behavior remains
+a separate conformance gate. The pinned arm64 macOS Defold engine currently
+proves 14 generated calls across 12 unique script bindings and a transactional
+dynamic-Hermes reject/retain/recover reload; it does not prove the remaining API
+by association.
 
 Exact upstream revisions live in `upstream.lock`; `npm run bootstrap`
 materializes ignored working copies and downloads the checksum-pinned Bob JAR.

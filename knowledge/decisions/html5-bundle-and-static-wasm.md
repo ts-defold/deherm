@@ -50,8 +50,9 @@ support archives are placed under `lib/wasm-web`, and the generated C++
 -emit-c -exported-unit=deherm_app` produces a library-shaped `SHUnit` creator
 named `sh_export_deherm_app` without a competing `main`; the shell creates the
 runtime, calls `_sh_unit_init_guarded`, roots the registered lifecycle values,
-and invokes them at Defold's safe lifecycle points. This exact exported-unit
-shape was reproduced against the pinned compiler before recording the design.
+and invokes them at Defold's safe lifecycle points. `npm run
+check:static-hermes` reproduces this exact exported-unit shape against the
+pinned compiler and asserts both the creator symbol and absence of `main`.
 
 # Default browser-host pipeline
 
@@ -72,8 +73,8 @@ flowchart LR
 ```
 
 The current build emits an ES2020 IIFE because the archived resource is loaded
-synchronously by the extension. `game.project` includes
-`/defold_hermes_app/app.js` as a custom resource. On initialization the HTML5
+synchronously by the extension. `game.project` includes the generated
+`/deherm/app.dehermc` resource. On initialization the HTML5
 C++ extension reads those bytes with `dmResource::GetRaw`, then calls the linked
 Emscripten library to install the generated modules and application lifecycle.
 Extender discovers `.js` files under `lib/wasm-web` and the shared `lib/web`
@@ -104,10 +105,21 @@ flowchart LR
 ```
 
 Meta's checked-in helper proves the mechanical route: `shermes -emit-c`,
-`emcc -c`, then link against the Emscripten-built Hermes libraries. It also
-states that direct application-to-Wasm compilation is not yet a fully integrated
-CLI path. Therefore this profile remains experimental until we reproduce it
-with Defold's exact Emscripten version and link flags.
+`emcc -c`, then link against the Emscripten-built Hermes libraries. The separate
+Emscripten document states that this is not yet a fully integrated CLI path.
+That helper builds an executable under Hermes's own flags; it does not prove a
+library link into Defold.
+
+The largest known blocker is the C++ exception-model mismatch. Defold's
+`wasm-web` extension objects use `-fno-exceptions -fno-rtti` and the final link
+sets `DISABLE_EXCEPTION_CATCHING=1`, while Hermes's API/JSI objects explicitly
+enable exceptions and RTTI and `_sh_init` constructs a full JSI Hermes runtime.
+Static Hermes's JS exception machinery uses setjmp/longjmp, which Defold's web
+Lua build also uses and is therefore likely compatible, but that does not make
+JSI C++ exceptions safe. The profile remains blocked until the exact emsdk 4.0.6
+archive build and Defold link succeed and both a thrown JS exception and a JSI
+C++ exception are exercised without aborting. Runtime/archive size is measured
+at the same gate.
 
 # Why browser-host remains the default
 

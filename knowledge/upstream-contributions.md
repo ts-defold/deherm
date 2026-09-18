@@ -48,7 +48,7 @@ Record candidates here before opening external state:
 
 | Candidate | Upstream | Reproducer | Status |
 | --- | --- | --- | --- |
-| None yet | Static Hermes | Generated scalar `extern_c` compiles cleanly | no issue |
+| Function-expression and arrow return annotations remain TS nodes after TS2Flow | Static Hermes | `test/AST/ts2flow/function-expression-return-types.ts` fails at pinned `4947871` and passes with commit `dcd175842` | [draft PR #2188](https://github.com/facebook/hermes/pull/2188); Meta CLA action required |
 
 When a candidate appears, add its reduced fixture under the repository tests,
 record the pinned upstream revision, and verify that it fails without the patch

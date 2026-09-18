@@ -1,0 +1,334 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": 1,
+  "title": "War Battles TypeScript consumer inventory",
+  "generatedAt": "2026-09-17T20:50:00-04:00",
+  "sourceSelection": {
+    "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+    "editorTemplateRevision": "a90dc4941de4b4a15551e0ccd89ccd6e2d35e20a",
+    "licensedTutorialRevision": "645d9a1bc6c164237116e685694fca94021fc001",
+    "typescriptReferenceRevision": "a3e6b8d066110d8607bada4cc7f456eefc529218",
+    "notes": [
+      "The editor template is an intentionally empty tutorial starter with assets and prose, not a completed game.",
+      "The licensed tutorial revision differs from the editor-pinned revision only by the addition of LICENSE.",
+      "The ts-defold reference contains the completed project resources and three TypeScript gameplay scripts."
+    ]
+  },
+  "assets": {
+    "portableFileCount": 304,
+    "normalizedSha256Manifest": "bd67f1db8fcf509ac108418bcd8941f0a7a0453f6cad0696d8c000564633403d",
+    "typescriptReferenceMatchesTutorial": true,
+    "excludedFiles": ["assets/.DS_Store"]
+  },
+  "components": [
+    {
+      "source": "src/scripts/player.script.ts",
+      "resource": "/scripts/player.script",
+      "proxyKind": "script",
+      "lifecycles": ["init", "final", "update", "onInput"],
+      "editorProperties": []
+    },
+    {
+      "source": "src/scripts/rocket.script.ts",
+      "resource": "/scripts/rocket.script",
+      "proxyKind": "script",
+      "lifecycles": ["init", "update", "onMessage"],
+      "editorProperties": [
+        {
+          "name": "dir",
+          "type": "vector3",
+          "default": [0, 0, 0],
+          "providedBy": "factory.create"
+        }
+      ]
+    },
+    {
+      "source": "src/scripts/ui.gui_script.ts",
+      "resource": "/scripts/ui.gui_script",
+      "proxyKind": "gui_script",
+      "lifecycles": ["init", "onMessage"],
+      "editorProperties": []
+    }
+  ],
+  "sourceCalls": {
+    "src/scripts/player.script.ts": [
+      { "sourceName": "msg.post", "lines": [15, 25] },
+      { "sourceName": "vmath.vector3", "lines": [19, 20] },
+      { "sourceName": "go.get_position", "lines": [30] },
+      { "sourceName": "go.set_position", "lines": [32] },
+      { "sourceName": "math.atan2", "lines": [36] },
+      { "sourceName": "vmath.quat_rotation_z", "lines": [37] },
+      { "sourceName": "factory.create", "lines": [39] },
+      { "sourceName": "hash", "lines": [49, 51, 53, 55, 57] },
+      { "sourceName": "vmath.length", "lines": [61] },
+      { "sourceName": "vmath.normalize", "lines": [63] }
+    ],
+    "src/scripts/rocket.script.ts": [
+      { "sourceName": "go.property", "lines": [6] },
+      { "sourceName": "vmath.vector3", "lines": [6] },
+      { "sourceName": "go.get_position", "lines": [14] },
+      { "sourceName": "go.set_position", "lines": [16] },
+      { "sourceName": "hash", "lines": [30, 32, 43] },
+      { "sourceName": "go.delete", "lines": [31, 34] },
+      { "sourceName": "msg.post", "lines": [35, 43] },
+      { "sourceName": "go.set_rotation", "lines": [41] },
+      { "sourceName": "vmath.quat", "lines": [41] }
+    ],
+    "src/scripts/ui.gui_script.ts": [
+      { "sourceName": "hash", "lines": [15] },
+      { "sourceName": "gui.get_node", "lines": [17] },
+      { "sourceName": "gui.set_text", "lines": [18] }
+    ]
+  },
+  "apiUsage": [
+    {
+      "id": "script:hash",
+      "typescriptName": "hash",
+      "stableId": 2845099200,
+      "stableIdHex": "0xa994c4c0",
+      "callCount": 9,
+      "loweringFamily": "defold-value",
+      "requiredContexts": ["game-object", "gui-scene"],
+      "preferredRoute": "compile-time literal hash with runtime fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:msg.post",
+      "typescriptName": "msg.post",
+      "stableId": 1111726479,
+      "stableIdHex": "0x4243998f",
+      "callCount": 4,
+      "loweringFamily": "lua-table",
+      "requiredContexts": ["game-object"],
+      "preferredRoute": "generated typed message ABI; Lua compatibility for arbitrary payloads",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:vmath.vector3",
+      "typescriptName": "vmath.vector3",
+      "stableId": 3491633886,
+      "stableIdHex": "0xd01e1ade",
+      "callCount": 3,
+      "loweringFamily": "overload-dispatch",
+      "requiredContexts": ["engine"],
+      "preferredRoute": "generated fixed-layout value constructor",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:go.get_position",
+      "typescriptName": "go.getPosition",
+      "stableId": 3918772974,
+      "stableIdHex": "0xe993baee",
+      "callCount": 2,
+      "loweringFamily": "defold-value",
+      "requiredContexts": ["game-object"],
+      "preferredRoute": "direct dmGameObject transform binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:go.set_position",
+      "typescriptName": "go.setPosition",
+      "stableId": 608141138,
+      "stableIdHex": "0x243f7f52",
+      "callCount": 2,
+      "loweringFamily": "defold-value",
+      "requiredContexts": ["game-object"],
+      "preferredRoute": "direct dmGameObject transform binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:factory.create",
+      "typescriptName": "factory.create",
+      "stableId": 96184340,
+      "stableIdHex": "0x05bba814",
+      "callCount": 1,
+      "loweringFamily": "lua-table",
+      "requiredContexts": ["game-object"],
+      "preferredRoute": "generated property-table codec preserving current script instance",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:vmath.length",
+      "typescriptName": "vmath.length",
+      "stableId": 2370510694,
+      "stableIdHex": "0x8d4b1f66",
+      "callCount": 1,
+      "loweringFamily": "defold-value",
+      "requiredContexts": ["engine"],
+      "preferredRoute": "ttsc math IR or generated fixed-layout intrinsic",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:vmath.normalize",
+      "typescriptName": "vmath.normalize",
+      "stableId": 3582341977,
+      "stableIdHex": "0xd5863359",
+      "callCount": 1,
+      "loweringFamily": "overload-dispatch",
+      "requiredContexts": ["engine"],
+      "preferredRoute": "ttsc math IR or generated fixed-layout intrinsic",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:vmath.quat_rotation_z",
+      "typescriptName": "vmath.quatRotationZ",
+      "stableId": 653417741,
+      "stableIdHex": "0x26f25d0d",
+      "callCount": 1,
+      "loweringFamily": "defold-value",
+      "requiredContexts": ["engine"],
+      "preferredRoute": "generated fixed-layout value intrinsic",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:go.property",
+      "typescriptName": "go.property",
+      "stableId": 993185129,
+      "stableIdHex": "0x3b32cd69",
+      "callCount": 1,
+      "loweringFamily": "borrowed-handle",
+      "requiredContexts": ["script-resource-load"],
+      "preferredRoute": "compile-time component manifest and generated proxy declaration",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:go.delete",
+      "typescriptName": "go.delete",
+      "stableId": 2920192283,
+      "stableIdHex": "0xae0e991b",
+      "callCount": 2,
+      "loweringFamily": "lua-table",
+      "requiredContexts": ["game-object"],
+      "preferredRoute": "direct dmGameObject binding with array/address overload codecs",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:go.set_rotation",
+      "typescriptName": "go.setRotation",
+      "stableId": 2093413559,
+      "stableIdHex": "0x7cc6f4b7",
+      "callCount": 1,
+      "loweringFamily": "defold-value",
+      "requiredContexts": ["game-object"],
+      "preferredRoute": "direct dmGameObject transform binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:vmath.quat",
+      "typescriptName": "vmath.quat",
+      "stableId": 2756728049,
+      "stableIdHex": "0xa45054f1",
+      "callCount": 1,
+      "loweringFamily": "overload-dispatch",
+      "requiredContexts": ["engine"],
+      "preferredRoute": "generated fixed-layout value constructor",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:gui.get_node",
+      "typescriptName": "gui.getNode",
+      "stableId": 509983822,
+      "stableIdHex": "0x1e65bc4e",
+      "callCount": 1,
+      "loweringFamily": "borrowed-handle",
+      "requiredContexts": ["gui-scene"],
+      "preferredRoute": "generated GUI-scene handle binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    },
+    {
+      "id": "script:gui.set_text",
+      "typescriptName": "gui.setText",
+      "stableId": 1480837389,
+      "stableIdHex": "0x5843c90d",
+      "callCount": 1,
+      "loweringFamily": "borrowed-handle",
+      "requiredContexts": ["gui-scene"],
+      "preferredRoute": "generated GUI-scene handle binding with Lua parity fallback",
+      "currentRuntimeStatus": "requires-universal-lua-bridge",
+      "generatedDispatch": false
+    }
+  ],
+  "hostLanguageUsage": [
+    {
+      "typescriptName": "Math.atan2",
+      "sourceName": "math.atan2",
+      "callCount": 1,
+      "preferredRoute": "Hermes/browser standard library with a sound Static Hermes declaration"
+    },
+    {
+      "typescriptName": "vector operators",
+      "sourceName": "vector3 addition and scalar multiplication",
+      "callCount": 2,
+      "preferredRoute": "ttsc use-math lowering; explicit vmath operations until proven"
+    }
+  ],
+  "messages": [
+    {
+      "id": "acquire_input_focus",
+      "sender": "player",
+      "receiver": ".",
+      "payload": null,
+      "direction": "application-to-engine"
+    },
+    {
+      "id": "release_input_focus",
+      "sender": "player",
+      "receiver": ".",
+      "payload": null,
+      "direction": "application-to-engine"
+    },
+    {
+      "id": "collision_response",
+      "sender": "physics",
+      "receiver": "rocket",
+      "consumedFields": { "otherId": "hash" },
+      "direction": "engine-to-application"
+    },
+    {
+      "id": "play_animation",
+      "sender": "rocket",
+      "receiver": "#sprite",
+      "payload": { "id": "hash(explosion)" },
+      "direction": "application-to-engine"
+    },
+    {
+      "id": "animation_done",
+      "sender": "#sprite",
+      "receiver": "rocket",
+      "consumedFields": {},
+      "direction": "engine-to-application"
+    },
+    {
+      "id": "add_score",
+      "sender": "rocket",
+      "receiver": "/gui#ui",
+      "payload": { "score": "number" },
+      "consumedFields": { "score": "number" },
+      "direction": "application-to-application"
+    }
+  ],
+  "addresses": [".", "#rocketfactory", "#sprite", "/gui#ui"],
+  "inputActions": ["up", "down", "left", "right", "fire"],
+  "extensions": [
+    {
+      "name": "defold-lldebugger",
+      "url": "https://github.com/ts-defold/defold-lldebugger/archive/extension.zip",
+      "usedByGameplaySource": false,
+      "portDisposition": "remove from the gameplay baseline; validate Deherm's planned debugger independently"
+    }
+  ]
+}

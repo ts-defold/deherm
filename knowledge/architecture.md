@@ -73,10 +73,11 @@ invoke a native compiler on code edits. Release builds consume the bundler's
 per-entry symbol manifest and generate only the reachable adapters. Types cover
 the entire SDK in both modes; executable code remains pay-for-use.
 
-This is intentionally a hybrid runtime, not a blanket Lua replacement. Defold
-script components retain the Lua VM's native lifecycle and editor behavior.
-Hermes is selected for modules that benefit from JavaScript semantics, npm
-packages, JSI host objects, or native/browser parity.
+This is intentionally a hybrid runtime, not a removal of Defold's Lua VM.
+Authored `*.script.ts` components use generated sibling `.script` proxies to
+retain Defold's native lifecycle, editor properties, factories, messages, and
+instance semantics while gameplay state and behavior live in Hermes/browser
+JavaScript. TS-to-Lua remains an optional migration/fallback lane.
 
 Native modules sit beside the host contract. TypeScript looks them up through
 `DefoldModules.getEnforcing<T>(name)`. Hermes receives objects containing JSI
@@ -97,7 +98,7 @@ type DefoldApp = {
   final?(): void;
 };
 
-declare function registerDefoldApp(factory: (api: DefoldApiV1) => DefoldApp): void;
+declare function defineDefoldApp(factory: (api: DefoldApiV1) => DefoldApp): void;
 ```
 
 The registration boundary avoids runtime-specific module loading in the first
@@ -148,16 +149,18 @@ a later isolation option and must be justified by measurements.
 
 # HTML5 ownership
 
-The page owns the JavaScript application. The Defold Wasm module publishes a
-small exported bridge and a readiness signal. The page loads the TypeScript
-bundle only after Defold is ready, registers callbacks, and schedules lifecycle
-calls through the bridge. This avoids VM duplication and lets browser devtools,
-source maps, promises, fetch, and web workers remain native browser features.
+The browser owns the JavaScript runtime. In the current proof, the Defold Wasm
+extension reads the archived application resource and asks its linked
+Emscripten JavaScript library to evaluate and register it. The production
+browser-host profile instead injects a content-hashed external script through
+the HTML5 template, then uses an explicit registration/readiness handshake.
+Both avoid VM duplication and keep browser DevTools, source maps, promises,
+fetch, and web workers native.
 
-Hermes can be built as an Emscripten Wasm VM, and Static Hermes can AOT an
-application plus its JavaScript library into Wasm. Neither is the default here:
-the page already owns a JavaScript VM. Keep Wasm as a later sandbox or
-determinism experiment, not a shipping dependency.
+Static Hermes can also AOT the application into the same Defold Wasm module.
+That is an opt-in release experiment, not the default, and is blocked on exact
+Defold exception/link compatibility plus size, performance, memory, and
+language-compatibility gates.
 
 # Shader lane
 

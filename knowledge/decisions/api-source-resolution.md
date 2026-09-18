@@ -54,7 +54,7 @@ written to the generation manifest.
 The CLI prefers matching local editor/Bob artifacts, then a content-addressed
 user cache, then the immutable Defold archive. Cached bytes are accepted only
 when their engine SHA and checksum match. Project-local output lives under
-`.defold-hermes/`; a small tracked `defold-hermes.lock` records the selected SHA
+`.deherm/`; a small tracked `deherm.lock` records the selected SHA
 and generator inputs.
 
 # Coverage states

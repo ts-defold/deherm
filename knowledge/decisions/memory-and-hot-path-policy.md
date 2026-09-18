@@ -85,3 +85,16 @@ A generated binding family advances only when it has:
 are released under normal, error, cancellation, and shutdown cases with clean
 sanitizer evidence. It remains a per-family/per-target conformance state until
 the complete runtime matrix has passed.
+
+The structured script bridge has a reproducible macOS gate:
+
+```sh
+npm run test:script-value-sanitize
+```
+
+It instruments the pinned Lua runtime, generated dispatch, value registry, and
+flat C ABI with AddressSanitizer and UndefinedBehaviorSanitizer. macOS ASan does
+not implement LeakSanitizer, so this command proves memory-access/UB cleanliness
+for its exercised paths, not whole-runtime leak freedom. Leak closure additionally
+requires balanced registry/runtime ownership counters and a target where LSAN is
+available.

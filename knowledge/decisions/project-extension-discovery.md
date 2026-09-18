@@ -25,9 +25,9 @@ sources:
 The npm package owns project-aware discovery. Before generating or compiling a
 game, `defold-hermes` reads `game.project`, scans project-local extension roots,
 and reads Bob's resolved dependency archives under `.internal/lib`. It emits a
-stable `.defold-hermes/extensions.json` inventory plus TypeScript declarations
+stable `.deherm/extensions.json` inventory plus TypeScript declarations
 derived from extension `.script_api` files. The normalized
-`.defold-hermes/bindings.ir.json` sits between discovery and every emitter.
+`.deherm/bindings.ir.json` sits between discovery and every emitter.
 
 This is the front door for third-party modules such as xMath. Authors should not
 have to manually repeat which Defold extensions their project already uses.

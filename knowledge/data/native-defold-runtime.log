@@ -1,0 +1,44 @@
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: init:hermes
+INFO:DEFOLD_HERMES: bundle:1f1baf76d98ad2295510a596b11ed89582bf3fc1fc9de8b2dae40025b7e792a3
+INFO:DEFOLD_HERMES: module:42
+INFO:DEFOLD_HERMES: script-api-probes:30e0fc542abf0832c1c44defec7483412b4ff8076177de1a981ec1347dbc0c11
+INFO:DEFOLD_HERMES: script-api:bit.tohex.explicit-width:0021
+INFO:DEFOLD_HERMES: script-api:bit.tohex.default-width:00000021
+INFO:DEFOLD_HERMES: script-api:bit.lshift.number:256
+INFO:DEFOLD_HERMES: script-api:sys.get_config_string.present:Defold Hermes Spike
+INFO:DEFOLD_HERMES: script-api:sys.get_config_string.nullable:null
+INFO:DEFOLD_HERMES: script-api:sys.get_config_boolean:true
+INFO:DEFOLD_HERMES: script-api:sys.get_config_int:37
+INFO:DEFOLD_HERMES: script-api:sys.get_config_number:12.5
+INFO:DEFOLD_HERMES: script-api:sys.get_connectivity.integer-enum:1
+INFO:DEFOLD_HERMES: script-api:sys.get_application_path:/Users/mini/Documents/defold-hermes/build/bundle/Defold Hermes Spike.app
+INFO:DEFOLD_HERMES: script-api:sys.get_save_file:/Users/mini/Library/Application Support/deherm-conformance/deherm-proof.bin
+INFO:DEFOLD_HERMES: script-api:sys.exists.false:false
+INFO:DEFOLD_HERMES: script-api:profiler.scope_begin.void:undefined
+INFO:DEFOLD_HERMES: script-api:profiler.scope_end.void:undefined
+INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58
+INFO:DEFOLD_HERMES: script-value:builtins.hash.my_hash:ok
+INFO:DEFOLD_HERMES: script-value:vmath.vector3.zero:ok
+INFO:DEFOLD_HERMES: script-value:vmath.length.vector3:ok
+INFO:DEFOLD_HERMES: script-value:vmath.normalize.vector3:ok
+INFO:DEFOLD_HERMES: script-value:vmath.quat_rotation_z.pi:ok
+INFO:DEFOLD_HERMES: script-value:vmath.quat.identity:ok
+DEBUG:SCRIPT: script-value:go.set_position.current:ok
+INFO:DEFOLD_HERMES: script-value:go.get_position.current:ok
+DEBUG:SCRIPT: script-value:go.set_rotation.current:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-rotation-y:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-rotation-x:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.euler-to-quat:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-from-to:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.project:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-basis:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.length-sqr:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.cross:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.rotate:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-axis-angle:ok
+INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.conj:ok
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+INFO:DEFOLD_HERMES: lifecycle:update:1
+INFO:DEFOLD_HERMES: final:ok

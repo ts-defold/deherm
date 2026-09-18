@@ -186,6 +186,19 @@ private patch stack.
 6. Port an official Defold example game only after generated bindings compile
    and link with no unclassified public declarations.
 
+## Phase 7 - War Battles product proof
+
+1. Pin the official War Battles tutorial and the existing TSDefold template,
+   then preserve licenses and import hashes.
+2. Port the tutorial faithfully to application-level TypeScript with no
+   hand-written per-symbol glue and no new Lua gameplay code.
+3. Prove native dynamic-Hermes, native Static-Hermes, and HTML5 browser-host
+   profiles from the same gameplay source.
+4. Expand the port into the data-oriented, server-authoritative 32-player game
+   defined in [the War Battles showcase roadmap](roadmap/war-battles-showcase.md).
+5. Gate release on 32-bot soak tests, allocation budgets, sanitizer/leak runs,
+   network metrics, and complete generated binding disposition.
+
 # Non-goals of the first slice
 
 * Replacing Lua across the engine.

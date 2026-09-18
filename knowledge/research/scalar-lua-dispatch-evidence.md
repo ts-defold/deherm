@@ -22,6 +22,33 @@ other functions require modules and engine-owned context registered by Defold.
 The dispatcher binds only functions selected by generated code or the bundler,
 so a target does not need to cache every platform-specific API.
 
+## Installed universal seam
+
+All 926 generated TypeScript function wrappers now embed the same collision-
+checked FNV-1a stable ID used by the native descriptors and call one public
+`DefoldScriptBridge.call(stableId, args)` surface. Native Hermes installs that
+surface as `globalThis.__defoldScriptBridgeV1` through JSI. The browser host
+installs the same surface and crosses a bounded Emscripten C shim without
+`embind`. A manual `installDefoldScriptBridge` override remains available for
+tests and alternate hosts.
+
+The C++ ABI is deliberately wider than the first executable family: a tagged
+`ScriptValue` reserves primitive, handle, callback, table, and Defold-value
+tags, while `ScriptCallFrame` supports multiple results. The current adapter
+executes the 90 scalar descriptors only. Calls in the other 836 generated
+function rows fail with an explicit unsupported-family error; they are not
+counted as executable. This preserves one public bridge while later codecs
+graduate onto the same stable-ID dispatch path.
+
+The native end-to-end fixture bundles actual generated TypeScript wrappers and
+proves the complete path through Hermes, JSI, the tagged frame, the scalar
+descriptor, and pinned Defold Lua 5.1. It covers number, integer, boolean,
+string, optional input, and void output shapes; then checks an unsupported
+table-family call, a Lua error, and a successful call after that error. The
+Lua stack top and prior Defold script instance are exact before and after.
+The browser test exercises the equivalent stable-ID/tagged memory layout and
+verifies that its stack scratch rewinds after both success and rejection.
+
 ## Reproduced source claims
 
 - `render.set_viewport` reads four integer stack slots with
@@ -72,15 +99,13 @@ Defold function may allocate internally. String results are copied into a
 caller-provided bounded buffer before stack restoration; the bridge never
 returns a pointer into a popped Lua value.
 
-## Remaining blockers before executable 90/90
+## Remaining blockers before engine-validated 90/90
 
 1. Generate usage-selected bind lists per bundle and target. HTML5-only and
    native-only modules cannot all be required in one state.
-2. Wire Defold's instance get/set hooks and capture the correct script, GUI, or
-   render instance at the Hermes ownership boundary.
-3. Run conformance calls inside real engine fixtures for every module; the
+2. Run conformance calls inside real engine fixtures for every module; the
    standalone harness deliberately mocks only representative stack shapes.
-4. Resolve source/reference discrepancies as explicit semantic tokens, never
+3. Resolve source/reference discrepancies as explicit semantic tokens, never
    by broad coercion. `bit.tohex` is the first proven example.
-5. Measure allocators on device. The codec eliminates native transient heap
+4. Measure allocators on device. The codec eliminates native transient heap
    work, but an individual Defold API may still allocate by design.

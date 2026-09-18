@@ -77,7 +77,7 @@ Reviewed IR:
 Proposed idiomatic API:
 
 ```ts
-import { xmath, vec3 } from "@defold-hermes/project";
+import { xmath, vec3 } from "@deherm/project";
 
 const alignment = xmath.dot(vec3(1, 0, 0), vec3(0.5, 0.5, 0));
 ```
@@ -272,3 +272,34 @@ The first API review should settle:
 
 No generator implementation should hard-code those choices before the golden
 examples are accepted.
+
+# Generated fixed-POD `vmath` family
+
+The second `vmath` wave demonstrates a finite family selector rather than
+eleven handwritten bindings. It selects still-pending `defold-value` functions
+from the pinned `vmath` IR whose parameter and result atoms are limited to
+`number`, `vector3`, `vector4`, and `quaternion`. A reviewed terminal-operation
+vocabulary is matched against each registered C++ function body. Unknown,
+missing, duplicate, or source-stale operations stop generation.
+
+The family currently generates 11 routes and 14 executable call shapes:
+
+* quaternion construction and transformation: `conj`, `euler_to_quat`,
+  `quat_axis_angle`, `quat_basis`, `quat_from_to`, `quat_rotation_x`, and
+  `quat_rotation_y`;
+* vector operations: `cross` and `rotate`;
+* numeric operations: `length_sqr` and `project`.
+
+The semantic overlay intentionally narrows `euler_to_quat` to the two shapes
+implemented by Defold—one `vector3`, or exactly three numbers—even though the
+documentation IR marks the second and third numbers optional. `project`
+preserves Defold's error for a zero-length target vector. All Defold-value
+inputs reject NaN components, scalar numbers narrow to float32 at the same
+boundary as `luaL_checknumber` plus the C++ cast, and no input is normalized on
+the caller's behalf.
+
+Native dispatch is context-free, stack/POD-only, and uses binary search over
+the stable-ID-sorted descriptor table. These routes remain guarded on the
+HTML5 browser host until its Vector3/Vector4/Quaternion codecs exist. Focused
+native execution is not packaged-engine evidence; each new route therefore has
+a deterministic planned-only engine-probe disposition.
