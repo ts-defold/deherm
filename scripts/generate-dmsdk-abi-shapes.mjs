@@ -5,9 +5,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
-const defaultIrPath = resolve(repositoryRoot, "bindings/generated/defold-sdk-ir.json");
-const defaultClassificationPath = resolve(repositoryRoot, "bindings/generated/defold-dmsdk-binding-patterns.json");
-const defaultOutputPath = resolve(repositoryRoot, "bindings/generated/defold-dmsdk-abi-shapes.json");
+const defaultIrPath = resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json");
+const defaultClassificationPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json");
+const defaultOutputPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json");
 
 const PRIMITIVES = new Map([
   ["void", "void"], ["bool", "bool"], ["char", "i8"], ["signed char", "i8"],
@@ -245,8 +245,8 @@ export async function build(irContent, classificationContent) {
   return {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
-    sourceIr: "bindings/generated/defold-sdk-ir.json",
-    sourceClassification: "bindings/generated/defold-dmsdk-binding-patterns.json",
+    sourceIr: "packages/bindings/generated/defold-sdk-ir.json",
+    sourceClassification: "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
     sourceHashes: { ir: sha256(irContent), classification: sha256(classificationContent), headers: headerHashes },
     policy: {
       classificationOnly: true,

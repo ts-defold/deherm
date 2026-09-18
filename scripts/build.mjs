@@ -7,7 +7,7 @@ import path from "node:path";
 import { ensureBindingLoweringPlan } from "./ensure-binding-lowering-plan.mjs";
 
 await ensureBindingLoweringPlan({ deepCheck: true });
-const canonicalLoweringPlan = JSON.parse(await readFile("bindings/generated/defold-binding-lowering-plan.json", "utf8"));
+const canonicalLoweringPlan = JSON.parse(await readFile("packages/bindings/generated/defold-binding-lowering-plan.json", "utf8"));
 if (canonicalLoweringPlan.schemaVersion !== 2) {
   throw new Error(`JavaScript build requires canonical lowering-plan schema v2, got ${canonicalLoweringPlan.schemaVersion ?? "missing"}`);
 }
@@ -52,7 +52,7 @@ await writeFile(
   defoldAppWithPlaceholder.replace(pendingFingerprint, defoldAppFingerprint)
 );
 
-const symbolMap = JSON.parse(await readFile("bindings/generated/symbol-map.json", "utf8"));
+const symbolMap = JSON.parse(await readFile("packages/bindings/generated/symbol-map.json", "utf8"));
 const symbolsBySource = new Map(symbolMap.symbols.map((symbol) => [symbol.source, symbol]));
 const dynamicRegistry = "packages/sdk/src/registry.ts";
 const canonicalBindingRoots = [

@@ -397,8 +397,8 @@ async function writeOrCheck(outRoot, relativePath, content, check) {
 }
 
 export async function build() {
-  const ir = JSON.parse(await readFile(resolve(repositoryRoot, "bindings/generated/defold-sdk-ir.json"), "utf8"));
-  const patterns = JSON.parse(await readFile(resolve(repositoryRoot, "bindings/generated/defold-dmsdk-binding-patterns.json"), "utf8"));
+  const ir = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
+  const patterns = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json"), "utf8"));
   const scalarIds = new Set(patterns.bindings.filter(({ primaryFamily }) => primaryFamily === "scalar-direct").map(({ id }) => id));
   const declarations = ir.declarations
     .filter(({ id }) => scalarIds.has(id))
@@ -518,8 +518,8 @@ export async function build() {
   const report = {
     schemaVersion: 2,
     defoldRevision: ir.defoldRevision,
-    sourceIr: "bindings/generated/defold-sdk-ir.json",
-    sourceClassification: "bindings/generated/defold-dmsdk-binding-patterns.json",
+    sourceIr: "packages/bindings/generated/defold-sdk-ir.json",
+    sourceClassification: "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
     scope: "The 31 declarations classified as primary scalar-direct. Stage counts describe this generated family only, not overall dmSDK coverage.",
     abiPolicy: {
       linkage: "extern C",
@@ -552,14 +552,14 @@ export async function build() {
       allTargetConformant: 0,
     },
     sourceHashes: {
-      ir: sha256(await readFile(resolve(repositoryRoot, "bindings/generated/defold-sdk-ir.json"))),
-      classification: sha256(await readFile(resolve(repositoryRoot, "bindings/generated/defold-dmsdk-binding-patterns.json"))),
+      ir: sha256(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"))),
+      classification: sha256(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json"))),
     },
     artifactHashes: Object.fromEntries([...artifacts.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([path, content]) => [path, sha256(content)])),
     artifacts: [...artifacts.keys()].sort(),
     declarations: reportEntries,
   };
-  artifacts.set("bindings/generated/defold-dmsdk-scalar-thunks.json", `${JSON.stringify(report, null, 2)}\n`);
+  artifacts.set("packages/bindings/generated/defold-dmsdk-scalar-thunks.json", `${JSON.stringify(report, null, 2)}\n`);
   return { artifacts, report };
 }
 

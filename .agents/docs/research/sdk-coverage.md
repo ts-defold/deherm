@@ -63,17 +63,17 @@ None.
 35 headers emitted Clang diagnostics, mostly because generated DDF headers are build artifacts not present in a source checkout. Clang still produced a target-header AST for the inventory. These headers must be re-imported against the packaged Defold SDK before code emission.
 
 The machine-readable inventory is
-`bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it
+`packages/bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it
 so new or removed upstream API cannot drift unnoticed.
-The enriched per-symbol ledger is `bindings/generated/defold-sdk-ir.json`.
+The enriched per-symbol ledger is `packages/bindings/generated/defold-sdk-ir.json`.
 
 ## Executable coverage audit
 
 The complete declaration surface is generated, but this source inventory does
 not embed mutable runtime-implementation counts. The exact generated adapter
 and blocker census lives in the SHA-bound family reports under
-`bindings/generated/defold-dmsdk-*.json`; the ABI-shape queue is
-`bindings/generated/defold-dmsdk-abi-shapes.json`. Host behavior, extension
+`packages/bindings/generated/defold-dmsdk-*.json`; the ABI-shape queue is
+`packages/bindings/generated/defold-dmsdk-abi-shapes.json`. Host behavior, extension
 retention, target compilation, and live-engine observation remain independent
 evidence stages.
 

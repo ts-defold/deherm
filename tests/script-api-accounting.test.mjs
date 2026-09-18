@@ -14,12 +14,12 @@ async function text(path) {
 
 async function inputs() {
   const definitionPaths = [
-    "bindings/overrides/script-defold-value-bindings.json",
-    "bindings/overrides/script-defold-handle-bindings.json",
-    "bindings/overrides/script-go-current-instance-bindings.json",
-    "bindings/overrides/script-msg-structured-bindings.json",
-    "bindings/overrides/script-factory-structured-bindings.json",
-    "bindings/overrides/script-gui-structured-bindings.json"
+    "packages/bindings/overrides/script-defold-value-bindings.json",
+    "packages/bindings/overrides/script-defold-handle-bindings.json",
+    "packages/bindings/overrides/script-go-current-instance-bindings.json",
+    "packages/bindings/overrides/script-msg-structured-bindings.json",
+    "packages/bindings/overrides/script-factory-structured-bindings.json",
+    "packages/bindings/overrides/script-gui-structured-bindings.json"
   ];
   const valueDefinitions = await Promise.all(definitionPaths.map(async (path) => {
     const definitionText = await text(path);
@@ -35,23 +35,23 @@ async function inputs() {
       additionalSources
     };
   }));
-  const urlOverrideText = await text("bindings/overrides/script-url-address-classification.json");
+  const urlOverrideText = await text("packages/bindings/overrides/script-url-address-classification.json");
   const urlOverride = JSON.parse(urlOverrideText);
   const urlSourceTexts = new Map(await Promise.all(urlOverride.sourceEvidence.map(async ({ source }) => [
     source,
     await text(`upstream/defold/${source}`)
   ])));
   return {
-    inventoryText: await text("bindings/generated/defold-script-api-inventory.json"),
-    irText: await text("bindings/generated/defold-script-api-ir.json"),
-    patternsText: await text("bindings/generated/defold-script-binding-patterns.json"),
-    descriptorsText: await text("bindings/generated/defold-script-binding-descriptors.json"),
-    scalarText: await text("bindings/generated/defold-script-scalar-dispatch.json"),
-    valueText: await text("bindings/generated/defold-script-value-bindings.json"),
-    tupleText: await text("bindings/generated/defold-script-fixed-tuples.json"),
-    urlText: await text("bindings/generated/defold-script-url-address-classification.json"),
-    valueTailText: await text("bindings/generated/defold-script-value-tail-bindings.json"),
-    overloadText: await text("bindings/generated/defold-script-overload-dispatch.json"),
+    inventoryText: await text("packages/bindings/generated/defold-script-api-inventory.json"),
+    irText: await text("packages/bindings/generated/defold-script-api-ir.json"),
+    patternsText: await text("packages/bindings/generated/defold-script-binding-patterns.json"),
+    descriptorsText: await text("packages/bindings/generated/defold-script-binding-descriptors.json"),
+    scalarText: await text("packages/bindings/generated/defold-script-scalar-dispatch.json"),
+    valueText: await text("packages/bindings/generated/defold-script-value-bindings.json"),
+    tupleText: await text("packages/bindings/generated/defold-script-fixed-tuples.json"),
+    urlText: await text("packages/bindings/generated/defold-script-url-address-classification.json"),
+    valueTailText: await text("packages/bindings/generated/defold-script-value-tail-bindings.json"),
+    overloadText: await text("packages/bindings/generated/defold-script-overload-dispatch.json"),
     urlOverrideText,
     urlSourceTexts,
     valueDefinitions
@@ -60,7 +60,7 @@ async function inputs() {
 
 const sourceInputs = await inputs();
 const generated = generateScriptApiAccounting(sourceInputs);
-const checked = JSON.parse(await text("bindings/generated/defold-script-api-accounting.json"));
+const checked = JSON.parse(await text("packages/bindings/generated/defold-script-api-accounting.json"));
 
 function replaceJson(input, mutate) {
   const value = JSON.parse(input);

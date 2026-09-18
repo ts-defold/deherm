@@ -2,5 +2,9 @@
   "name": "@ts-defold/deherm-internal-polyfills",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "source": "./compatibility.json",
+  "exports": {
+    ".": "./compatibility.json"
+  }
 }

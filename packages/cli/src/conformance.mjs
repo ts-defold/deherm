@@ -110,13 +110,13 @@ export const conformanceJsonSchema = Object.freeze({
 });
 
 const inputPaths = {
-  scriptIr: "bindings/generated/defold-script-api-ir.json",
-  dmsdkIr: "bindings/generated/defold-sdk-ir.json",
-  scriptPatterns: "bindings/generated/defold-script-binding-patterns.json",
-  dmsdkPatterns: "bindings/generated/defold-dmsdk-binding-patterns.json",
-  scriptDispatch: "bindings/generated/defold-script-scalar-dispatch.json",
-  scriptProbes: "bindings/generated/defold-script-real-engine-probes.json",
-  dmsdkThunks: "bindings/generated/defold-dmsdk-scalar-thunks.json"
+  scriptIr: "packages/bindings/generated/defold-script-api-ir.json",
+  dmsdkIr: "packages/bindings/generated/defold-sdk-ir.json",
+  scriptPatterns: "packages/bindings/generated/defold-script-binding-patterns.json",
+  dmsdkPatterns: "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
+  scriptDispatch: "packages/bindings/generated/defold-script-scalar-dispatch.json",
+  scriptProbes: "packages/bindings/generated/defold-script-real-engine-probes.json",
+  dmsdkThunks: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json"
 };
 
 function invariant(condition, message) {

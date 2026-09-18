@@ -35,6 +35,8 @@ importers:
 
   packages/abi: {}
 
+  packages/bindings: {}
+
   packages/cli: {}
 
   packages/compiler: {}

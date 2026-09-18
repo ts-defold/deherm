@@ -10,27 +10,27 @@ import { generateScriptUrlAddressClassification } from "./generate-script-url-ad
 
 const root = new URL("../", import.meta.url);
 const inputUrls = {
-  inventory: new URL("bindings/generated/defold-script-api-inventory.json", root),
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  descriptors: new URL("bindings/generated/defold-script-binding-descriptors.json", root),
-  scalar: new URL("bindings/generated/defold-script-scalar-dispatch.json", root),
-  value: new URL("bindings/generated/defold-script-value-bindings.json", root),
-  tuple: new URL("bindings/generated/defold-script-fixed-tuples.json", root),
-  url: new URL("bindings/generated/defold-script-url-address-classification.json", root),
-  valueTail: new URL("bindings/generated/defold-script-value-tail-bindings.json", root),
-  overload: new URL("bindings/generated/defold-script-overload-dispatch.json", root)
+  inventory: new URL("packages/bindings/generated/defold-script-api-inventory.json", root),
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  descriptors: new URL("packages/bindings/generated/defold-script-binding-descriptors.json", root),
+  scalar: new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root),
+  value: new URL("packages/bindings/generated/defold-script-value-bindings.json", root),
+  tuple: new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root),
+  url: new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
+  valueTail: new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root),
+  overload: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root)
 };
 const valueDefinitionUrls = [
-  new URL("bindings/overrides/script-defold-value-bindings.json", root),
-  new URL("bindings/overrides/script-defold-handle-bindings.json", root),
-  new URL("bindings/overrides/script-go-current-instance-bindings.json", root),
-  new URL("bindings/overrides/script-msg-structured-bindings.json", root),
-  new URL("bindings/overrides/script-factory-structured-bindings.json", root),
-  new URL("bindings/overrides/script-gui-structured-bindings.json", root)
+  new URL("packages/bindings/overrides/script-defold-value-bindings.json", root),
+  new URL("packages/bindings/overrides/script-defold-handle-bindings.json", root),
+  new URL("packages/bindings/overrides/script-go-current-instance-bindings.json", root),
+  new URL("packages/bindings/overrides/script-msg-structured-bindings.json", root),
+  new URL("packages/bindings/overrides/script-factory-structured-bindings.json", root),
+  new URL("packages/bindings/overrides/script-gui-structured-bindings.json", root)
 ];
-const urlOverrideUrl = new URL("bindings/overrides/script-url-address-classification.json", root);
-const outputUrl = new URL("bindings/generated/defold-script-api-accounting.json", root);
+const urlOverrideUrl = new URL("packages/bindings/overrides/script-url-address-classification.json", root);
+const outputUrl = new URL("packages/bindings/generated/defold-script-api-accounting.json", root);
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);

@@ -2,5 +2,14 @@
   "name": "@ts-defold/deherm-internal-abi",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "source": "./src/generated/layouts.ts",
+  "types": "./src/generated/layouts.ts",
+  "exports": {
+    ".": {
+      "types": "./src/generated/layouts.ts",
+      "import": "./src/generated/layouts.ts",
+      "default": "./src/generated/layouts.ts"
+    }
+  }
 }

@@ -12,7 +12,7 @@ const root = new URL("../", import.meta.url);
 
 test("callback lifecycle generator covers the exact classified family with bounded support", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-callback-lifecycle.mjs", "--check"], { cwd: root, stdio: "pipe" });
-  const report = JSON.parse(await readFile(new URL("bindings/generated/defold-script-callback-lifecycle.json", root), "utf8"));
+  const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-callback-lifecycle.json", root), "utf8"));
   assert.equal(report.routeCount, 25);
   assert.equal(report.registryEligibleRouteCount, 23);
   assert.equal(report.higherOrderClosureRouteCount, 2);

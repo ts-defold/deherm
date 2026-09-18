@@ -20,7 +20,7 @@ does not contain a function-name allowlist or per-symbol exception table.
 | blocked with row-local tokens | 72 | The complete complement: records, templates, strings, opaque/unknown pointers, unsupported results or directions, no writable scalar pointer, or platform-specific ABI. |
 
 The generated report is
-`bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json`. It preserves
+`packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json`. It preserves
 every stable declaration/projection identity and the exact blockers for every
 rejected row. The promoted symbols are:
 

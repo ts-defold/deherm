@@ -5,26 +5,26 @@ import { fileURLToPath } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
-const outputUrl = new URL("bindings/generated/defold-script-projection-ir.json", root);
+const outputUrl = new URL("packages/bindings/generated/defold-script-projection-ir.json", root);
 
 export const inputPaths = Object.freeze({
-  ir: "bindings/generated/defold-script-api-ir.json",
-  patterns: "bindings/generated/defold-script-binding-patterns.json",
-  accounting: "bindings/generated/defold-script-api-accounting.json",
-  values: "bindings/generated/defold-script-value-bindings.json",
-  callbacks: "bindings/generated/defold-script-callback-lifecycle.json",
-  handles: "bindings/generated/defold-script-borrowed-handle-classification.json",
-  urls: "bindings/generated/defold-script-url-address-classification.json",
-  tuples: "bindings/generated/defold-script-fixed-tuples.json",
-  dynamics: "bindings/generated/defold-script-dynamic-value-bindings.json",
-  tails: "bindings/generated/defold-script-value-tail-bindings.json",
-  overloads: "bindings/generated/defold-script-overload-dispatch.json",
-  tableSchemas: "bindings/generated/defold-script-table-tuple-schemas.json",
-  tableRecords: "bindings/generated/defold-script-table-record-bindings.json",
-  copiedRecords: "bindings/generated/defold-script-copied-value-record-blockers.json",
-  opaqueRecords: "bindings/generated/defold-script-opaque-record-blockers.json",
-  engineMatrix: "bindings/generated/defold-script-real-engine-matrix.json",
-  availabilityProfiles: "bindings/generated/defold-script-route-availability-profiles.json"
+  ir: "packages/bindings/generated/defold-script-api-ir.json",
+  patterns: "packages/bindings/generated/defold-script-binding-patterns.json",
+  accounting: "packages/bindings/generated/defold-script-api-accounting.json",
+  values: "packages/bindings/generated/defold-script-value-bindings.json",
+  callbacks: "packages/bindings/generated/defold-script-callback-lifecycle.json",
+  handles: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
+  urls: "packages/bindings/generated/defold-script-url-address-classification.json",
+  tuples: "packages/bindings/generated/defold-script-fixed-tuples.json",
+  dynamics: "packages/bindings/generated/defold-script-dynamic-value-bindings.json",
+  tails: "packages/bindings/generated/defold-script-value-tail-bindings.json",
+  overloads: "packages/bindings/generated/defold-script-overload-dispatch.json",
+  tableSchemas: "packages/bindings/generated/defold-script-table-tuple-schemas.json",
+  tableRecords: "packages/bindings/generated/defold-script-table-record-bindings.json",
+  copiedRecords: "packages/bindings/generated/defold-script-copied-value-record-blockers.json",
+  opaqueRecords: "packages/bindings/generated/defold-script-opaque-record-blockers.json",
+  engineMatrix: "packages/bindings/generated/defold-script-real-engine-matrix.json",
+  availabilityProfiles: "packages/bindings/generated/defold-script-route-availability-profiles.json"
 });
 
 function sha256(text) {

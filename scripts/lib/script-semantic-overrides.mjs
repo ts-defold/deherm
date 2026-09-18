@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 
 export async function loadScriptSemanticOverrides(root) {
-  const definitionUrl = new URL("bindings/overrides/script-api-semantic-overrides.json", root);
+  const definitionUrl = new URL("packages/bindings/overrides/script-api-semantic-overrides.json", root);
   const definition = JSON.parse(await readFile(definitionUrl, "utf8"));
   if (definition.schemaVersion !== 1 || !Array.isArray(definition.overrides)) {
     throw new Error(`Unsupported script semantic override schema in ${definitionUrl.pathname}`);

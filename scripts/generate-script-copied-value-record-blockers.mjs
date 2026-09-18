@@ -7,11 +7,11 @@ import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  frontier: new URL("bindings/generated/defold-script-table-record-bindings.json", root),
-  policy: new URL("bindings/overrides/script-copied-value-record-blockers.json", root),
-  report: new URL("bindings/generated/defold-script-copied-value-record-blockers.json", root),
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  frontier: new URL("packages/bindings/generated/defold-script-table-record-bindings.json", root),
+  policy: new URL("packages/bindings/overrides/script-copied-value-record-blockers.json", root),
+  report: new URL("packages/bindings/generated/defold-script-copied-value-record-blockers.json", root),
   target: new URL("packages/sdk/src/generated/script/copied-value-record-blockers.ts", root)
 };
 const assert = (value, message) => { if (!value) throw new Error(message); };

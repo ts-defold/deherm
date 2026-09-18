@@ -1,0 +1,1060 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "The reviewed, finite fixed-record subset of the accounting-pending lua-table routes",
+  "coverageClaim": "All listed candidates have generated fail-closed descriptors and a native-dynamic captured-Lua adapter using caller-owned bounded record storage. Static Hermes, packaged-engine, and browser execution are not claimed.",
+  "routeCount": 148,
+  "mechanicallySafeFixedRecordCount": 6,
+  "candidateCount": 3,
+  "executableCount": 3,
+  "blockedCount": 145,
+  "targetSupport": {
+    "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+    "nativeStaticHermes": "not-integrated",
+    "html5BrowserHost": "not-executable-no-provider"
+  },
+  "blockerTaxonomy": {
+    "unbounded-typed-sequence": "IR supplies element codecs but no maximum length or dense-array policy.",
+    "unbounded-typed-map": "IR supplies key/value codecs but no maximum-entry, own-key, or collision policy.",
+    "dynamic-recursive-values": "Recursive or any-valued tables require bounded depth, entry, cycle, and value-union policies.",
+    "tagged-table-union": "A table branch needs an explicit discriminator and ambiguity rejection.",
+    "opaque-or-nested-record": "The record has an unresolved nested or opaque context.",
+    "reviewed-semantic-record": "The table shape has ownership, binary, discriminator, or borrowed-handle semantics outside the structural IR.",
+    "handle-or-callback-crossing": "The route crosses a handle or callback in addition to a record; no first-wave ownership/lifetime codec is installed.",
+    "copied-defold-value-record": "The fixed record also crosses a copied Defold value; this needs a value codec wave.",
+    "target-context-or-platform-state-record": "The scalar record is coupled to platform state, engine context, or target side effects and has no reviewed provider."
+  },
+  "blockerCounts": {
+    "copied-defold-value-record": 9,
+    "dynamic-recursive-values": 5,
+    "handle-or-callback-crossing": 39,
+    "opaque-or-nested-record": 2,
+    "reviewed-semantic-record": 6,
+    "tagged-table-union": 3,
+    "target-context-or-platform-state-record": 6,
+    "unbounded-typed-map": 15,
+    "unbounded-typed-sequence": 60
+  },
+  "inputEvidence": {
+    "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
+    "accountingSha256": "b08a9a864c39618107a8d249daee0fdb24eb79c11625e30e1875482361c5ed2d",
+    "tableTupleSchemaSha256": "9c404f87640e1b5e490c875b3ff003bfa865ccc527577f73ed24698e306b409d",
+    "reviewedPolicySha256": "09f583ae396de5d6eba52f6ae773fef07b564607a93999c1a8554e407a03dc7d",
+    "defoldSources": [
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",
+        "sha256": "0ef39bda9de2db39ec59f97ffb04d916b522b80bd1a51a3cfdc8d07f23f0d281"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+        "sha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95"
+      },
+      {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
+        "sha256": "50c51d3d802eaa495eb7c66ffc87b1e9deb31ec7126001c44652c8f5cefd8996"
+      }
+    ]
+  },
+  "bindings": [
+    {
+      "id": "script:b2d.get_version",
+      "stableId": 984377853,
+      "modulePath": [
+        "b2d"
+      ],
+      "member": "get_version",
+      "requiredContext": "global",
+      "context": "Global",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+      "sourceSha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95",
+      "sourceAnchors": [
+        "void PushBox2DVersion(lua_State* L)",
+        "lua_setfield(L, -2, \"version\");",
+        "lua_setfield(L, -2, \"major\");",
+        "lua_setfield(L, -2, \"middle\");",
+        "lua_setfield(L, -2, \"minor\");"
+      ],
+      "argumentCodecs": [],
+      "fields": [
+        {
+          "name": "version",
+          "codec": "String"
+        },
+        {
+          "name": "major",
+          "codec": "Integer"
+        },
+        {
+          "name": "middle",
+          "codec": "Integer"
+        },
+        {
+          "name": "minor",
+          "codec": "Integer"
+        }
+      ],
+      "reason": "The active Box2D backend emits one four-field scalar version record with no input, resource lookup, handles, callbacks, recursive values, maps, or sequences."
+    },
+    {
+      "id": "script:image.get_astc_header",
+      "stableId": 3935561203,
+      "modulePath": [
+        "image"
+      ],
+      "member": "get_astc_header",
+      "requiredContext": "global",
+      "context": "Global",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",
+      "sourceSha256": "0ef39bda9de2db39ec59f97ffb04d916b522b80bd1a51a3cfdc8d07f23f0d281",
+      "sourceAnchors": [
+        "int Image_GetAstcHeader(lua_State* L)",
+        "return luaL_error(L, \"Data is not a valid .astc file\");",
+        "lua_setfield(L, -2, \"block_size_z\");",
+        "{\"get_astc_header\", Image_GetAstcHeader}"
+      ],
+      "argumentCodecs": [
+        "String"
+      ],
+      "fields": [
+        {
+          "name": "width",
+          "codec": "Integer"
+        },
+        {
+          "name": "height",
+          "codec": "Integer"
+        },
+        {
+          "name": "depth",
+          "codec": "Integer"
+        },
+        {
+          "name": "block_size_x",
+          "codec": "Integer"
+        },
+        {
+          "name": "block_size_y",
+          "codec": "Integer"
+        },
+        {
+          "name": "block_size_z",
+          "codec": "Integer"
+        }
+      ],
+      "reason": "A caller-owned byte string is decoded into one finite, six-integer output record. Although the documentation IR permits nil, the pinned implementation raises a Lua error for invalid data, so this descriptor accepts the successful record result only. The route does not consume a Defold resource or cross handles, callbacks, recursive values, maps, or sequences."
+    },
+    {
+      "id": "script:bullet3d.get_version",
+      "stableId": 4161320994,
+      "modulePath": [
+        "bullet3d"
+      ],
+      "member": "get_version",
+      "requiredContext": "global",
+      "context": "Global",
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
+      "sourceSha256": "50c51d3d802eaa495eb7c66ffc87b1e9deb31ec7126001c44652c8f5cefd8996",
+      "sourceAnchors": [
+        "static int Bullet3D_GetVersion(lua_State* L)",
+        "lua_setfield(L, -2, \"version\");",
+        "lua_setfield(L, -2, \"number\");",
+        "lua_setfield(L, -2, \"major\");",
+        "lua_setfield(L, -2, \"minor\");",
+        "{ \"get_version\", Bullet3D_GetVersion }"
+      ],
+      "argumentCodecs": [],
+      "fields": [
+        {
+          "name": "version",
+          "codec": "String"
+        },
+        {
+          "name": "number",
+          "codec": "Integer"
+        },
+        {
+          "name": "major",
+          "codec": "Integer"
+        },
+        {
+          "name": "minor",
+          "codec": "Integer"
+        }
+      ],
+      "reason": "The Bullet version helper emits one four-field scalar version record with no input, resource lookup, handles, callbacks, recursive values, maps, or sequences."
+    }
+  ],
+  "blockedRoutes": [
+    {
+      "id": "script:physics.raycast",
+      "stableId": 2636616,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.joint.create_motor",
+      "stableId": 61804422,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.world.cast_mover",
+      "stableId": 81357101,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.joint.create_pulley",
+      "stableId": 105428164,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:resource.create_sound_data",
+      "stableId": 109392419,
+      "bucket": "semantic-flat-record",
+      "blocker": "reviewed-semantic-record"
+    },
+    {
+      "id": "script:bullet3d.world.overlap_aabb",
+      "stableId": 151808511,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.body.get_contact_data",
+      "stableId": 153831824,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:image.load",
+      "stableId": 172398549,
+      "bucket": "tagged-table-union",
+      "blocker": "tagged-table-union"
+    },
+    {
+      "id": "script:gui.set",
+      "stableId": 222109861,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:timer.get_info",
+      "stableId": 351971804,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_hinge2",
+      "stableId": 358009820,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.joint.create_filter",
+      "stableId": 365344467,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.chain.get_segments",
+      "stableId": 371299188,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:resource.set_buffer",
+      "stableId": 446567953,
+      "bucket": "semantic-flat-record",
+      "blocker": "reviewed-semantic-record"
+    },
+    {
+      "id": "script:b2d.shape.set_shape",
+      "stableId": 447070167,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sys.serialize",
+      "stableId": 466939425,
+      "bucket": "dynamic-recursive",
+      "blocker": "dynamic-recursive-values"
+    },
+    {
+      "id": "script:bullet3d.world.overlap_point",
+      "stableId": 499375609,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.shape.get_shape",
+      "stableId": 510086131,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.joint.create_friction",
+      "stableId": 517998087,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.shape.get_contact_data",
+      "stableId": 555667827,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.world.collide_mover",
+      "stableId": 561737880,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:render.clear",
+      "stableId": 583164307,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:model.get_aabb",
+      "stableId": 621943862,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:resource.create_texture",
+      "stableId": 646924158,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.body.get_mass_data",
+      "stableId": 662219582,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:gui.get",
+      "stableId": 683614105,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:resource.create_buffer",
+      "stableId": 684194101,
+      "bucket": "semantic-flat-record",
+      "blocker": "reviewed-semantic-record"
+    },
+    {
+      "id": "script:b2d.joint.create_distance",
+      "stableId": 706695518,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:render.set_render_target",
+      "stableId": 787481085,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sys.save",
+      "stableId": 798578280,
+      "bucket": "dynamic-recursive",
+      "blocker": "dynamic-recursive-values"
+    },
+    {
+      "id": "script:b2d.body.get_transform",
+      "stableId": 842021223,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:sound.stop",
+      "stableId": 851439019,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:b2d.fixture.get_aabb",
+      "stableId": 941873080,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.fixture.set_filter_data",
+      "stableId": 943485969,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:camera.get_cameras",
+      "stableId": 1001666066,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:material.set_constants",
+      "stableId": 1039973353,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:material.get_vertex_attributes",
+      "stableId": 1070053126,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.body.get_shapes",
+      "stableId": 1090315027,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_cone_twist",
+      "stableId": 1095019524,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.fixture.get_shape",
+      "stableId": 1143938691,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sys.get_ifaddrs",
+      "stableId": 1174885233,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:physics.get_shape",
+      "stableId": 1220373797,
+      "bucket": "semantic-flat-record",
+      "blocker": "reviewed-semantic-record"
+    },
+    {
+      "id": "script:crash.get_modules",
+      "stableId": 1244117951,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sys.load",
+      "stableId": 1260100361,
+      "bucket": "dynamic-recursive",
+      "blocker": "dynamic-recursive-values"
+    },
+    {
+      "id": "script:bullet3d.world.get_collision_objects",
+      "stableId": 1273138459,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sys.get_application_info",
+      "stableId": 1294659359,
+      "bucket": "flat-record",
+      "blocker": "target-context-or-platform-state-record"
+    },
+    {
+      "id": "script:compute.get_samplers",
+      "stableId": 1345946881,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:window.get_safe_area",
+      "stableId": 1389820634,
+      "bucket": "flat-record",
+      "blocker": "target-context-or-platform-state-record"
+    },
+    {
+      "id": "script:render.draw",
+      "stableId": 1437640116,
+      "bucket": "opaque-record",
+      "blocker": "opaque-or-nested-record"
+    },
+    {
+      "id": "script:image.load_buffer",
+      "stableId": 1439789256,
+      "bucket": "tagged-table-union",
+      "blocker": "tagged-table-union"
+    },
+    {
+      "id": "script:vmath.vector",
+      "stableId": 1453669465,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.body.create_shape",
+      "stableId": 1659255850,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.world.get_counters",
+      "stableId": 1668733628,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:buffer.set_metadata",
+      "stableId": 1693174388,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:gui.clone_tree",
+      "stableId": 1696161745,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:sys.get_sys_info",
+      "stableId": 1715761682,
+      "bucket": "flat-record",
+      "blocker": "target-context-or-platform-state-record"
+    },
+    {
+      "id": "script:profiler.view_recorded_frame",
+      "stableId": 1794446851,
+      "bucket": "tagged-table-union",
+      "blocker": "tagged-table-union"
+    },
+    {
+      "id": "script:b2d.world.explode",
+      "stableId": 1803447493,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:render.dispatch_compute",
+      "stableId": 1831038998,
+      "bucket": "opaque-record",
+      "blocker": "opaque-or-nested-record"
+    },
+    {
+      "id": "script:bullet3d.rigid_body.compute_aabb",
+      "stableId": 1844217383,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_point_to_point",
+      "stableId": 1855979400,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:font.get_info",
+      "stableId": 1863401472,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:material.get_samplers",
+      "stableId": 1893279761,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_generic_6dof",
+      "stableId": 1926428006,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:graphics.get_engine_adapters",
+      "stableId": 1938117379,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:resource.create_atlas",
+      "stableId": 1985681678,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:graphics.get_adapter_info",
+      "stableId": 1995008024,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sys.open_url",
+      "stableId": 2064699563,
+      "bucket": "flat-record",
+      "blocker": "target-context-or-platform-state-record"
+    },
+    {
+      "id": "script:b2d.shape.get_mass_data",
+      "stableId": 2170719947,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:material.get_constants",
+      "stableId": 2177588733,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:liveupdate.get_mounts",
+      "stableId": 2185826800,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.chain.get_geometry",
+      "stableId": 2230884954,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:bullet3d.world.cast_shape_closest",
+      "stableId": 2301414672,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:material.get_textures",
+      "stableId": 2324364704,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:tilemap.get_tiles",
+      "stableId": 2340730158,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:b2d.fixture.set_shape",
+      "stableId": 2376748487,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:physics.get_joint_properties",
+      "stableId": 2390276224,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:gui.stop_particlefx",
+      "stableId": 2397019292,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:resource.get_text_metrics",
+      "stableId": 2409976854,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:bullet3d.shape.get_shape",
+      "stableId": 2460977400,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sound.get_groups",
+      "stableId": 2474752686,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:go.get",
+      "stableId": 2488072860,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.body.get_joints",
+      "stableId": 2537079216,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:render.draw_debug3d",
+      "stableId": 2546261723,
+      "bucket": "flat-record",
+      "blocker": "target-context-or-platform-state-record"
+    },
+    {
+      "id": "script:bullet3d.collision_object.get_shapes",
+      "stableId": 2552628718,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.joint.create_mouse",
+      "stableId": 2585544600,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:physics.raycast_async",
+      "stableId": 2653555167,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.joint.create_rope",
+      "stableId": 2656060889,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.body.get_fixtures",
+      "stableId": 2698008815,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:compute.get_constants",
+      "stableId": 2714229261,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.world.get_profile",
+      "stableId": 2730780762,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:physics.create_joint",
+      "stableId": 2781780682,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:bullet3d.world.cast_shape",
+      "stableId": 2801399124,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.body.compute_aabb",
+      "stableId": 2872022140,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:render.predicate",
+      "stableId": 2906327255,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:resource.get_texture_info",
+      "stableId": 2929492759,
+      "bucket": "semantic-flat-record",
+      "blocker": "reviewed-semantic-record"
+    },
+    {
+      "id": "script:physics.set_shape",
+      "stableId": 2940108129,
+      "bucket": "semantic-flat-record",
+      "blocker": "reviewed-semantic-record"
+    },
+    {
+      "id": "script:b2d.shape.ray_cast",
+      "stableId": 2941793277,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+      "stableId": 2945060114,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:bullet3d.world.overlap_shape",
+      "stableId": 2945268910,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:go.set",
+      "stableId": 2949577104,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.joint.create_gear",
+      "stableId": 3014196138,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:compute.get_textures",
+      "stableId": 3022270032,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:particlefx.stop",
+      "stableId": 3044283654,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:gui.get_tree",
+      "stableId": 3059686062,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:b2d.fixture.get_filter_data",
+      "stableId": 3062165453,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:b2d.joint.create_weld",
+      "stableId": 3107146269,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:compute.set_samplers",
+      "stableId": 3114313573,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:material.set_textures",
+      "stableId": 3114410068,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_hinge",
+      "stableId": 3217284614,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:bullet3d.world.cast_ray_closest",
+      "stableId": 3246574173,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.shape.get_sensor_overlaps",
+      "stableId": 3266602473,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.joint.create_prismatic",
+      "stableId": 3277564767,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:resource.set_texture",
+      "stableId": 3344570634,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:physics.set_joint_properties",
+      "stableId": 3377735404,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:material.set_vertex_attributes",
+      "stableId": 3500426026,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:collectionfactory.create",
+      "stableId": 3514780936,
+      "bucket": "dynamic-recursive",
+      "blocker": "dynamic-recursive-values"
+    },
+    {
+      "id": "script:resource.get_render_target_info",
+      "stableId": 3518036150,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_slider",
+      "stableId": 3528448698,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:compute.set_textures",
+      "stableId": 3559237732,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:b2d.joint.create_wheel",
+      "stableId": 3577999200,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:model.get_blend_weights",
+      "stableId": 3593377177,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:crash.get_backtrace",
+      "stableId": 3602643930,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:sys.get_engine_info",
+      "stableId": 3618995147,
+      "bucket": "flat-record",
+      "blocker": "target-context-or-platform-state-record"
+    },
+    {
+      "id": "script:compute.set_constants",
+      "stableId": 3697623257,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:bullet3d.shape.set_shape",
+      "stableId": 3770671780,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:bullet3d.constraint.create_universal",
+      "stableId": 3786780596,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:buffer.create",
+      "stableId": 3797079608,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:resource.get_atlas",
+      "stableId": 3804314878,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:tilemap.get_tile_info",
+      "stableId": 3858575418,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:b2d.body.set_mass_data",
+      "stableId": 3871283770,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:bullet3d.world.contact_test",
+      "stableId": 3921827144,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:gui.get_layouts",
+      "stableId": 3963041037,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:sys.deserialize",
+      "stableId": 4006243984,
+      "bucket": "dynamic-recursive",
+      "blocker": "dynamic-recursive-values"
+    },
+    {
+      "id": "script:bullet3d.world.cast_ray",
+      "stableId": 4013454581,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:material.set_samplers",
+      "stableId": 4042791701,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:collectionproxy.get_resources",
+      "stableId": 4052177648,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:render.set_camera",
+      "stableId": 4056267072,
+      "bucket": "flat-record",
+      "blocker": "copied-defold-value-record"
+    },
+    {
+      "id": "script:gui.get_layout_objects",
+      "stableId": 4089348591,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:resource.set_atlas",
+      "stableId": 4144449218,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:model.set_blend_weights",
+      "stableId": 4149119709,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:label.get_layout_objects",
+      "stableId": 4187510320,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    },
+    {
+      "id": "script:bullet3d.world.contact_pair_test",
+      "stableId": 4259613133,
+      "bucket": "typed-sequence",
+      "blocker": "unbounded-typed-sequence"
+    },
+    {
+      "id": "script:b2d.joint.create_revolute",
+      "stableId": 4268006875,
+      "bucket": "flat-record",
+      "blocker": "handle-or-callback-crossing"
+    },
+    {
+      "id": "script:model.get_mesh_aabb",
+      "stableId": 4275324396,
+      "bucket": "typed-map",
+      "blocker": "unbounded-typed-map"
+    }
+  ]
+}

@@ -6,10 +6,10 @@ import test from "node:test";
 import { generateScriptTableTupleSchemas } from "../scripts/generate-script-table-tuple-schemas.mjs";
 
 const paths = {
-  ir: new URL("../bindings/generated/defold-script-api-ir.json", import.meta.url),
-  patterns: new URL("../bindings/generated/defold-script-binding-patterns.json", import.meta.url),
-  accounting: new URL("../bindings/generated/defold-script-api-accounting.json", import.meta.url),
-  overrides: new URL("../bindings/overrides/script-table-tuple-schema-overrides.json", import.meta.url)
+  ir: new URL("../packages/bindings/generated/defold-script-api-ir.json", import.meta.url),
+  patterns: new URL("../packages/bindings/generated/defold-script-binding-patterns.json", import.meta.url),
+  accounting: new URL("../packages/bindings/generated/defold-script-api-accounting.json", import.meta.url),
+  overrides: new URL("../packages/bindings/overrides/script-table-tuple-schema-overrides.json", import.meta.url)
 };
 
 async function inputs() {

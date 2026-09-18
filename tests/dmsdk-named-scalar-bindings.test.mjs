@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const reportPath = join(repositoryRoot, "bindings/generated/defold-dmsdk-named-scalar-bindings.json");
+const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json");
 const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
 function run(command, args) { return execFileSync(command, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe" }); }
@@ -17,8 +17,8 @@ function sha256(content) { return createHash("sha256").update(content).digest("h
 async function expectProvenanceFailure(label, mutate, expected) {
   const directory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-named-scalar-provenance-"));
   try {
-    let irContent = await readFile(join(repositoryRoot, "bindings/generated/defold-sdk-ir.json"), "utf8");
-    let shapesContent = await readFile(join(repositoryRoot, "bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8");
+    let irContent = await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8");
+    let shapesContent = await readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8");
     ({ irContent, shapesContent } = await mutate({ irContent, shapesContent }));
     const irPath = join(directory, "ir.json");
     const shapesPath = join(directory, "shapes.json");
@@ -36,7 +36,7 @@ test("named-scalar policy artifacts are deterministic and completely census-deri
     assert.deepEqual(report.coverage, { reviewed: 21, generated: 0, policyBlocked: 21, signatureCompileCovered: 21, linked: 0, behaviorCovered: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 });
     assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 21);
     assert.equal(new Set(report.declarations.map(({ policy }) => policy.id)).size, 3);
-    for (const artifact of [...report.artifacts, "bindings/generated/defold-dmsdk-named-scalar-bindings.json"])
+    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json"])
       assert.equal(await readFile(join(output, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
   } finally { await rm(output, { recursive: true, force: true }); }
 });

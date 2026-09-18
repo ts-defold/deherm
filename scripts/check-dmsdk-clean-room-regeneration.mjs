@@ -65,7 +65,7 @@ async function copyRelative(sourceRoot, targetRoot, relativePath) {
 }
 
 async function evidencePaths(repositoryRoot, defoldRevision) {
-  const ir = JSON.parse(await readFile(path.join(repositoryRoot, "bindings/generated/defold-sdk-ir.json"), "utf8"));
+  const ir = JSON.parse(await readFile(path.join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
   assert(ir.defoldRevision === defoldRevision,
     `dmSDK IR revision ${ir.defoldRevision} does not match upstream.lock ${defoldRevision}`);
   const result = new Set(scalarImplementationEvidence);
@@ -76,7 +76,7 @@ async function evidencePaths(repositoryRoot, defoldRevision) {
   result.add(`${sdkRoot}/sdk/include/dmsdk/graphics/graphics.h`);
   result.add(`${sdkRoot}/include/graphics/graphics_ddf.h`);
   const namedScalarPolicy = JSON.parse(await readFile(
-    path.join(repositoryRoot, "bindings/overrides/dmsdk-named-scalar-policies.json"),
+    path.join(repositoryRoot, "packages/bindings/overrides/dmsdk-named-scalar-policies.json"),
     "utf8"
   ));
   for (const rule of namedScalarPolicy.rules ?? []) {
@@ -85,7 +85,7 @@ async function evidencePaths(repositoryRoot, defoldRevision) {
     }
   }
   const cstringPolicy = JSON.parse(await readFile(
-    path.join(repositoryRoot, "bindings/overrides/dmsdk-cstring-value-bindings.json"),
+    path.join(repositoryRoot, "packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),
     "utf8"
   ));
   for (const evidence of [...(cstringPolicy.sourceEvidence ?? []), ...(cstringPolicy.blockerSourceEvidence ?? [])]) {
@@ -132,9 +132,9 @@ async function walk(root, relative = "") {
 
 export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositoryRootDefault) {
   const result = new Set();
-  for (const file of await walk(path.join(repositoryRoot, "bindings/generated"))) {
+  for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings)\.json$/.test(file)) {
-      result.add(`bindings/generated/${file}`);
+      result.add(`packages/bindings/generated/${file}`);
     }
   }
   for (const file of await walk(path.join(repositoryRoot, "defold/defold_hermes/include/defold_hermes"))) {
@@ -208,21 +208,21 @@ async function compareArtifacts(cleanRoot, repositoryRoot) {
 async function validateReports(root) {
   const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
   const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, arenaSpan, projection, borrowedHandle, scratchScalarOut, cstringValue] = await Promise.all([
-    load("bindings/generated/defold-dmsdk-binding-patterns.json"),
-    load("bindings/generated/defold-dmsdk-scalar-thunks.json"),
-    load("bindings/generated/defold-dmsdk-abi-shapes.json"),
-    load("bindings/generated/defold-dmsdk-enum-value-bindings.json"),
-    load("bindings/generated/defold-dmsdk-named-scalar-bindings.json"),
-    load("bindings/generated/defold-dmsdk-fixed-digest-bindings.json"),
-    load("bindings/generated/defold-dmsdk-base64-span-bindings.json"),
-    load("bindings/generated/defold-dmsdk-astc-probe-bindings.json"),
-    load("bindings/generated/defold-dmsdk-xtea-span-bindings.json"),
-    load("bindings/generated/defold-dmsdk-hash-span-bindings.json"),
-    load("bindings/generated/defold-dmsdk-arena-span-blockers.json"),
-    load("bindings/generated/defold-dmsdk-projection-ir.json"),
-    load("bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"),
-    load("bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
-    load("bindings/generated/defold-dmsdk-cstring-value-bindings.json")
+    load("packages/bindings/generated/defold-dmsdk-binding-patterns.json"),
+    load("packages/bindings/generated/defold-dmsdk-scalar-thunks.json"),
+    load("packages/bindings/generated/defold-dmsdk-abi-shapes.json"),
+    load("packages/bindings/generated/defold-dmsdk-enum-value-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-base64-span-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-hash-span-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"),
+    load("packages/bindings/generated/defold-dmsdk-projection-ir.json"),
+    load("packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json")
   ]);
   assert(patterns.coverage.runtimePendingCount === 1361 && patterns.coverage.classifiedCount === 1361,
     "dmSDK classifier did not account for all 1,361 runtime-pending declarations");

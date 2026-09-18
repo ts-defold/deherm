@@ -10,7 +10,7 @@ const root = new URL("../", import.meta.url);
 
 test("dynamic-value generator classifies the complete family from pinned source", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-dynamic-values.mjs", "--check"], { cwd: root });
-  const report = JSON.parse(await readFile(new URL("bindings/generated/defold-script-dynamic-value-bindings.json", root), "utf8"));
+  const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-dynamic-value-bindings.json", root), "utf8"));
   assert.equal(report.routeCount, 14);
   assert.equal(report.generatedFamilyCandidateCount, 11);
   assert.equal(report.blockedCount, 3);
@@ -40,7 +40,7 @@ test("generated dynamic-value glue is bounded and fail-closed", async () => {
     readFile(new URL("defold/defold_hermes/src/generated_script_dynamic_values.cpp", root), "utf8"),
     readFile(new URL("defold/defold_hermes/include/defold_hermes/generated_script_dynamic_values.hpp", root), "utf8"),
     readFile(new URL("packages/sdk/src/generated/script/dynamic-values.ts", root), "utf8"),
-    readFile(new URL("bindings/generated/defold-script-dynamic-value-bindings.json", root), "utf8").then(JSON.parse)
+    readFile(new URL("packages/bindings/generated/defold-script-dynamic-value-bindings.json", root), "utf8").then(JSON.parse)
   ]);
   assert.match(header, /kMaximumArgumentCount = 32/);
   assert.match(source, /Dynamic-value argument count is outside the generated fixed capacity/);

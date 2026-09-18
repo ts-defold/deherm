@@ -8,8 +8,8 @@ import test from "node:test";
 import { buildClassification, FAMILY_CATALOG } from "../scripts/classify-dmsdk-bindings.mjs";
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
-const irPath = join(repositoryRoot, "bindings/generated/defold-sdk-ir.json");
-const generatedPath = join(repositoryRoot, "bindings/generated/defold-dmsdk-binding-patterns.json");
+const irPath = join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json");
+const generatedPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json");
 
 async function fixtures() {
   const ir = JSON.parse(await readFile(irPath, "utf8"));

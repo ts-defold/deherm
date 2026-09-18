@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "xtea-span-v1",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "packages/bindings/generated/defold-sdk-ir.json",
+    "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "policy": "packages/bindings/overrides/dmsdk-xtea-span-bindings.json"
+  },
+  "sourceHashes": {
+    "ir": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
+    "shapes": "0277bf19d42b2c3185917adb3dbc58af4b1ff29311d2ed5d37aab162cbe5cec9",
+    "policy": "4c46725302c710ca2fc05e0fb83d43acc7b865dc8b3c67fcec865010b5be54fc"
+  },
+  "policy": {
+    "algorithm": "ALGORITHM_XTEA only",
+    "keyLength": "0..16 bytes checked before native assertion"
+  },
+  "coverage": {
+    "baselineRuntimePending": 1361,
+    "discovered": 2,
+    "emitted": 2,
+    "policyBlocked": 0,
+    "hostBehaviorVerified": 2,
+    "remainingWithoutGeneratedAdapters": 1318
+  },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span.h": "5b5d028511bb9ddfb0f60b77252bfb5fb14a0ba24ffabf747c759b7e82eba6c0",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span_runtime.h": "8a88ccd166975f0be93eeb9d85b770ee6b4d9bae2653cfe0be52e714ce11b967",
+    "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp": "dfee2146f526879f5719145d379dfd77cddbf0f859904a195edc0abb1fe94eb1",
+    "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp": "eb330fed73c59a888543a9ec174514d4893ce7bb64217298ef20befa7dd883ba"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span_runtime.h",
+    "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp"
+  ],
+  "declarations": [
+    {
+      "id": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
+      "symbol": "dmCrypt::Decrypt",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+      "line": 76,
+      "primaryFamily": "pointer-span",
+      "families": [
+        "pointer-span",
+        "pointer",
+        "enum-handle"
+      ],
+      "shape": "enum:dmCrypt::Result(value:enum:dmCrypt::Algorithm,inout:pointer:scalar:u8,value:scalar:u32,in:pointer:scalar:u8,value:scalar:u32)",
+      "result": {
+        "role": "enum:dmCrypt::Result",
+        "direction": "value",
+        "nativeType": "Result"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "algo",
+          "role": "enum:dmCrypt::Algorithm",
+          "direction": "value",
+          "nativeType": "Algorithm"
+        },
+        {
+          "position": 1,
+          "name": "data",
+          "role": "pointer:scalar:u8",
+          "direction": "inout",
+          "nativeType": "uint8_t *"
+        },
+        {
+          "position": 2,
+          "name": "datalen",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        },
+        {
+          "position": 3,
+          "name": "key",
+          "role": "pointer:scalar:u8",
+          "direction": "in",
+          "nativeType": "const uint8_t *"
+        },
+        {
+          "position": 4,
+          "name": "keylen",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 0,
+      "mode": "decrypt",
+      "evidence": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 40,
+          "text": "        ALGORITHM_XTEA"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 76,
+          "text": "    Result Decrypt(Algorithm algo, uint8_t* data, uint32_t datalen, const uint8_t* key, uint32_t keylen);"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+          "line": 44,
+          "text": "        assert(keylen <= 16);"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_decrypt",
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-behavior-test",
+        "allocation": "100000-warmed-dispatch-zero-cpp-operator-new"
+      }
+    },
+    {
+      "id": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
+      "symbol": "dmCrypt::Encrypt",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+      "line": 65,
+      "primaryFamily": "pointer-span",
+      "families": [
+        "pointer-span",
+        "pointer",
+        "enum-handle"
+      ],
+      "shape": "enum:dmCrypt::Result(value:enum:dmCrypt::Algorithm,inout:pointer:scalar:u8,value:scalar:u32,in:pointer:scalar:u8,value:scalar:u32)",
+      "result": {
+        "role": "enum:dmCrypt::Result",
+        "direction": "value",
+        "nativeType": "Result"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "algo",
+          "role": "enum:dmCrypt::Algorithm",
+          "direction": "value",
+          "nativeType": "Algorithm"
+        },
+        {
+          "position": 1,
+          "name": "data",
+          "role": "pointer:scalar:u8",
+          "direction": "inout",
+          "nativeType": "uint8_t *"
+        },
+        {
+          "position": 2,
+          "name": "datalen",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        },
+        {
+          "position": 3,
+          "name": "key",
+          "role": "pointer:scalar:u8",
+          "direction": "in",
+          "nativeType": "const uint8_t *"
+        },
+        {
+          "position": 4,
+          "name": "keylen",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 1,
+      "mode": "encrypt",
+      "evidence": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 40,
+          "text": "        ALGORITHM_XTEA"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+          "line": 65,
+          "text": "    Result Encrypt(Algorithm algo, uint8_t* data, uint32_t datalen, const uint8_t* key, uint32_t keylen);"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
+          "line": 44,
+          "text": "        assert(keylen <= 16);"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_encrypt",
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-behavior-test",
+        "allocation": "100000-warmed-dispatch-zero-cpp-operator-new"
+      }
+    }
+  ]
+}

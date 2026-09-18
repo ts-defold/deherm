@@ -7,7 +7,7 @@ async function json(path) {
 }
 
 test("dmSDK inventory accounts for every parsed declaration", async () => {
-  const inventory = await json("../bindings/generated/defold-sdk-inventory.json");
+  const inventory = await json("../packages/bindings/generated/defold-sdk-inventory.json");
   assert.equal(inventory.parsedHeaderCount + inventory.failedHeaderCount, inventory.headerCount);
   assert.equal(inventory.failedHeaderCount, 0);
   assert.equal(inventory.declarations.length, inventory.declarationCount);
@@ -23,7 +23,7 @@ test("dmSDK inventory accounts for every parsed declaration", async () => {
 });
 
 test("script inventory accounts for every public annotation declaration", async () => {
-  const inventory = await json("../bindings/generated/defold-script-api-inventory.json");
+  const inventory = await json("../packages/bindings/generated/defold-script-api-inventory.json");
   assert.equal(inventory.declarations.length, inventory.declarationCount);
   assert.equal(
     Object.values(inventory.countsByKind).reduce((sum, count) => sum + count, 0),
@@ -35,8 +35,8 @@ test("script inventory accounts for every public annotation declaration", async 
 });
 
 test("generated script SDK resolves every discovered function and type", async () => {
-  const inventory = await json("../bindings/generated/defold-script-api-inventory.json");
-  const ir = await json("../bindings/generated/defold-script-api-ir.json");
+  const inventory = await json("../packages/bindings/generated/defold-script-api-inventory.json");
+  const ir = await json("../packages/bindings/generated/defold-script-api-ir.json");
   assert.equal(ir.sourceFileCount, inventory.fileCount);
   assert.equal(ir.counts.functions, inventory.countsByKind.function);
   assert.equal(ir.typeSurfaceUnresolvedCount, 0);
@@ -47,8 +47,8 @@ test("generated script SDK resolves every discovered function and type", async (
 });
 
 test("generated dmSDK resolves every Clang declaration", async () => {
-  const inventory = await json("../bindings/generated/defold-sdk-inventory.json");
-  const ir = await json("../bindings/generated/defold-sdk-ir.json");
+  const inventory = await json("../packages/bindings/generated/defold-sdk-inventory.json");
+  const ir = await json("../packages/bindings/generated/defold-sdk-ir.json");
   assert.equal(ir.headerCount, inventory.headerCount);
   assert.equal(ir.declarationCount, inventory.declarationCount);
   assert.equal(ir.declarations.length, inventory.declarationCount);

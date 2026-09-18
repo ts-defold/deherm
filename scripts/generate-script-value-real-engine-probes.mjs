@@ -5,9 +5,9 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 const root = new URL("../", import.meta.url);
-const sourceUrl = new URL("bindings/probes/defold-script-value-real-engine-probes.json", root);
-const bindingsUrl = new URL("bindings/generated/defold-script-value-bindings.json", root);
-const reportUrl = new URL("bindings/generated/defold-script-value-real-engine-probes.json", root);
+const sourceUrl = new URL("packages/bindings/probes/defold-script-value-real-engine-probes.json", root);
+const bindingsUrl = new URL("packages/bindings/generated/defold-script-value-bindings.json", root);
+const reportUrl = new URL("packages/bindings/generated/defold-script-value-real-engine-probes.json", root);
 const typescriptUrl = new URL("examples/runtime-smoke/src/generated/script-value-real-engine-probes.ts", root);
 
 const componentNames = ["x", "y", "z", "w"];

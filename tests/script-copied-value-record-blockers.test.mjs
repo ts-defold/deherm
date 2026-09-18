@@ -7,7 +7,7 @@ import { generate, loadInputs } from "../scripts/generate-script-copied-value-re
 const root = new URL("../", import.meta.url);
 test("copied-value frontier is completely source-pinned and blocked", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-copied-value-record-blockers.mjs", "--check"], { cwd: root, stdio: "pipe" });
-  const report = JSON.parse(await readFile(new URL("bindings/generated/defold-script-copied-value-record-blockers.json", root), "utf8"));
+  const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-copied-value-record-blockers.json", root), "utf8"));
   assert.equal(report.routeCount, 9); assert.equal(report.candidateCount, 0); assert.equal(report.executableCount, 0);
   assert.deepEqual(report.blockerCounts, { "captured-component-context": 3, "component-resource-url-resolution": 1, "font-resource-and-hash-resolution": 1, "physics-world-and-sparse-variant-record": 1, "physics-world-and-variant-record": 2, "render-context-and-camera-url": 1 });
   assert.match(report.coverageClaim, /No generated runtime is emitted/);

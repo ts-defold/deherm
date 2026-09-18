@@ -84,7 +84,7 @@ test("generated web bindings normalize C ABI booleans to JavaScript booleans", a
 
 test("generated browser dmSDK scalar adapter exposes only the 16 semantically valid bindings", async () => {
   const report = JSON.parse(await readFile(
-    new URL("../bindings/generated/defold-dmsdk-scalar-thunks.json", import.meta.url),
+    new URL("../packages/bindings/generated/defold-dmsdk-scalar-thunks.json", import.meta.url),
     "utf8"
   ));
   const source = await readFile(

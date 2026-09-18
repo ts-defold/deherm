@@ -24,7 +24,7 @@ compiled, linked into a retained extension, crossed Hermes or the browser host,
 matched Defold behavior, or met its allocation and lifetime contract.
 
 The generated per-API authority is
-`bindings/generated/defold-binding-lowering-plan.json`. This document tracks
+`packages/bindings/generated/defold-binding-lowering-plan.json`. This document tracks
 the larger compiler and product systems that cannot be represented as one API
 unit.
 

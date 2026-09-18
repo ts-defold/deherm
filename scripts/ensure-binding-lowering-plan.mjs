@@ -20,8 +20,8 @@ function sha256(value) {
 function parseArguments(argv) {
   const options = {
     root: repositoryRoot,
-    output: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.json"),
-    sentinel: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.sentinel.json"),
+    output: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
+    sentinel: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"),
     check: false,
     deepCheck: false,
     force: false
@@ -89,8 +89,8 @@ function validateCurrent(identity, sentinel, outputStat) {
 
 export async function ensureBindingLoweringPlan(options = {}) {
   const root = resolve(options.root ?? repositoryRoot);
-  const outputPath = resolve(options.output ?? resolve(root, "bindings/generated/defold-binding-lowering-plan.json"));
-  const sentinelPath = resolve(options.sentinel ?? resolve(root, "bindings/generated/defold-binding-lowering-plan.sentinel.json"));
+  const outputPath = resolve(options.output ?? resolve(root, "packages/bindings/generated/defold-binding-lowering-plan.json"));
+  const sentinelPath = resolve(options.sentinel ?? resolve(root, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"));
   const inputs = await loadBindingLoweringInputs(root);
   const identity = await cacheIdentity(root, inputs);
   const [sentinelText, outputStat] = await Promise.all([readIfPresent(sentinelPath), statIfPresent(outputPath)]);
@@ -128,7 +128,7 @@ export async function ensureBindingLoweringPlan(options = {}) {
   const serialized = `${JSON.stringify(plan, null, 2)}\n`;
   const nextSentinel = {
     ...identity,
-    output: "bindings/generated/defold-binding-lowering-plan.json",
+    output: "packages/bindings/generated/defold-binding-lowering-plan.json",
     outputBytes: Buffer.byteLength(serialized),
     outputSha256: sha256(serialized),
     planSha256: plan.planSha256

@@ -7,10 +7,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
-  ir: "bindings/generated/defold-sdk-ir.json",
-  shapes: "bindings/generated/defold-dmsdk-abi-shapes.json",
-  policy: "bindings/overrides/dmsdk-arena-span-blockers.json",
-  output: "bindings/generated/defold-dmsdk-arena-span-blockers.json"
+  ir: "packages/bindings/generated/defold-sdk-ir.json",
+  shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  policy: "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
+  output: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"
 });
 
 const assert = (condition, message) => {
@@ -65,7 +65,7 @@ function validatePolicy(policy) {
     "coveredByPriorWaves");
   for (const entry of policy.priorWaveReports) {
     assertExactKeys(entry, ["path", "policyVersion"], "prior-wave report entry");
-    assert(/^bindings\/generated\/defold-dmsdk-[a-z0-9-]+-bindings\.json$/.test(entry.path),
+    assert(/^packages\/bindings\/generated\/defold-dmsdk-[a-z0-9-]+-bindings\.json$/.test(entry.path),
       `prior-wave report path is not confined: ${entry.path}`);
     assert(typeof entry.policyVersion === "string" && entry.policyVersion.length > 0,
       `${entry.path}: expected policyVersion is missing`);

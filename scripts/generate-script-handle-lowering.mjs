@@ -7,14 +7,14 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
 
 export const inputPaths = Object.freeze({
-  policy: "bindings/overrides/script-handle-lowering-policy.json",
-  projection: "bindings/generated/defold-script-projection-ir.json",
-  classification: "bindings/generated/defold-script-borrowed-handle-classification.json",
-  availability: "bindings/generated/defold-script-route-availability-profiles.json"
+  policy: "packages/bindings/overrides/script-handle-lowering-policy.json",
+  projection: "packages/bindings/generated/defold-script-projection-ir.json",
+  classification: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
+  availability: "packages/bindings/generated/defold-script-route-availability-profiles.json"
 });
 
 export const outputPaths = Object.freeze({
-  report: "bindings/generated/defold-script-handle-lowering.json",
+  report: "packages/bindings/generated/defold-script-handle-lowering.json",
   kindHeader: "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",
   header: "defold/defold_hermes/include/defold_hermes/generated_script_handle_lowering.hpp",
   source: "defold/defold_hermes/src/generated_script_handle_lowering.cpp",

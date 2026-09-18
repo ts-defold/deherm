@@ -12,7 +12,7 @@ if (process.env.DEHERM_REQUIRE_ENGINE_ARTIFACTS === "1" && !artifactsExist) {
   throw new Error("Required local Extender engine artifacts are missing; run npm run bob:local:bundle first");
 }
 const ledger = JSON.parse(
-  readFileSync(`${root}bindings/generated/defold-dmsdk-scalar-thunks.json`, "utf8")
+  readFileSync(`${root}packages/bindings/generated/defold-dmsdk-scalar-thunks.json`, "utf8")
 );
 
 test(

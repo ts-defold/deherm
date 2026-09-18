@@ -5,9 +5,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
-  ir: "bindings/generated/defold-sdk-ir.json",
-  shapes: "bindings/generated/defold-dmsdk-abi-shapes.json",
-  policy: "bindings/overrides/dmsdk-xtea-span-bindings.json",
+  ir: "packages/bindings/generated/defold-sdk-ir.json",
+  shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  policy: "packages/bindings/overrides/dmsdk-xtea-span-bindings.json",
 };
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
@@ -207,7 +207,7 @@ export async function run(argv = process.argv.slice(2)) {
   const artifacts = renderArtifacts(entries);
   const report = createReport(contents, ir, shapes, policy, entries, artifacts);
   artifacts.set(
-    "bindings/generated/defold-dmsdk-xtea-span-bindings.json",
+    "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
     `${JSON.stringify(report, null, 2)}\n`,
   );
 

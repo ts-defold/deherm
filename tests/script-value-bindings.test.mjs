@@ -15,7 +15,7 @@ test("Defold value and handle bindings are deterministic structured descriptors"
     stdio: "pipe"
   });
   const report = JSON.parse(await readFile(new URL(
-    "bindings/generated/defold-script-value-bindings.json", root), "utf8"));
+    "packages/bindings/generated/defold-script-value-bindings.json", root), "utf8"));
   assert.equal(report.bindingCount, 78);
   assert.equal(report.callShapeCount, 112);
   const familyBindings = report.bindings.filter(({ generatedFamily }) => generatedFamily === "gui-node-setters");
@@ -294,8 +294,8 @@ test("every generated value binding has a deterministic packaged-engine probe di
     stdio: "pipe"
   });
   const [report, bindings] = await Promise.all([
-    readFile(new URL("bindings/generated/defold-script-value-real-engine-probes.json", root), "utf8").then(JSON.parse),
-    readFile(new URL("bindings/generated/defold-script-value-bindings.json", root), "utf8").then(JSON.parse)
+    readFile(new URL("packages/bindings/generated/defold-script-value-real-engine-probes.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("packages/bindings/generated/defold-script-value-bindings.json", root), "utf8").then(JSON.parse)
   ]);
   assert.equal(report.target, "arm64-macos-dynamic-hermes");
   assert.equal(report.uniqueBindingCount, bindings.bindingCount);
@@ -331,8 +331,8 @@ test("every generated value binding has a deterministic packaged-engine probe di
 
 test("value probes reject unimplemented overloads and marker aliases", async () => {
   const [probeText, bindingsText] = await Promise.all([
-    readFile(new URL("bindings/probes/defold-script-value-real-engine-probes.json", root), "utf8"),
-    readFile(new URL("bindings/generated/defold-script-value-bindings.json", root), "utf8")
+    readFile(new URL("packages/bindings/probes/defold-script-value-real-engine-probes.json", root), "utf8"),
+    readFile(new URL("packages/bindings/generated/defold-script-value-bindings.json", root), "utf8")
   ]);
   const addressed = JSON.parse(probeText);
   addressed.probes.find(({ id }) => id === "script:go.set_position").arguments.push("other_go");

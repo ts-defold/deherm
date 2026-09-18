@@ -10,7 +10,7 @@ const root = new URL("../", import.meta.url);
 
 test("overload-dispatch generator derives the exact disjoint classifier remainder", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-overload-dispatch.mjs", "--check"], { cwd: root });
-  const report = JSON.parse(await readFile(new URL("bindings/generated/defold-script-overload-dispatch.json", root), "utf8"));
+  const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root), "utf8"));
   assert.equal(report.routeCount, 20);
   assert.equal(report.generatedFamilyCandidateCount, 8);
   assert.equal(report.blockedCount, 12);

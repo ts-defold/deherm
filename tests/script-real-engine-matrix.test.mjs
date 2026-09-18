@@ -8,16 +8,16 @@ import { generateScriptRealEngineMatrix } from "../scripts/generate-script-real-
 
 const root = new URL("../", import.meta.url);
 const paths = {
-  manifest: "bindings/probes/defold-script-real-engine-matrix.json",
-  scalarRoutes: "bindings/generated/defold-script-scalar-dispatch.json",
-  valueRoutes: "bindings/generated/defold-script-value-bindings.json",
-  tupleRoutes: "bindings/generated/defold-script-fixed-tuples.json",
-  urlRoutes: "bindings/generated/defold-script-url-address-classification.json",
-  valueTailRoutes: "bindings/generated/defold-script-value-tail-bindings.json",
-  overloadRoutes: "bindings/generated/defold-script-overload-dispatch.json",
-  scalarProbes: "bindings/generated/defold-script-real-engine-probes.json",
-  valueProbes: "bindings/generated/defold-script-value-real-engine-probes.json",
-  tupleProbes: "bindings/generated/defold-script-fixed-tuple-probes.json"
+  manifest: "packages/bindings/probes/defold-script-real-engine-matrix.json",
+  scalarRoutes: "packages/bindings/generated/defold-script-scalar-dispatch.json",
+  valueRoutes: "packages/bindings/generated/defold-script-value-bindings.json",
+  tupleRoutes: "packages/bindings/generated/defold-script-fixed-tuples.json",
+  urlRoutes: "packages/bindings/generated/defold-script-url-address-classification.json",
+  valueTailRoutes: "packages/bindings/generated/defold-script-value-tail-bindings.json",
+  overloadRoutes: "packages/bindings/generated/defold-script-overload-dispatch.json",
+  scalarProbes: "packages/bindings/generated/defold-script-real-engine-probes.json",
+  valueProbes: "packages/bindings/generated/defold-script-value-real-engine-probes.json",
+  tupleProbes: "packages/bindings/generated/defold-script-fixed-tuple-probes.json"
 };
 const texts = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([key, path]) => [key, await readFile(new URL(path, root), "utf8")])));
 
@@ -243,7 +243,7 @@ test("runtime evidence is bound to the current probe set and repository-confined
 
 test("checked-in report is deterministic and current", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-real-engine-matrix.mjs", "--check"], { cwd: root, stdio: "pipe" });
-  const checked = JSON.parse(await readFile(new URL("bindings/generated/defold-script-real-engine-matrix.json", root), "utf8"));
+  const checked = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-real-engine-matrix.json", root), "utf8"));
   const regenerated = await generateScriptRealEngineMatrix(texts);
   assert.deepEqual(checked, regenerated);
   assert.deepEqual(checked.routes.map(({ id }) => id), [...checked.routes.map(({ id }) => id)].sort());

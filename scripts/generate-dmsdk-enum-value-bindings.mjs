@@ -5,10 +5,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = {
-  ir: "bindings/generated/defold-sdk-ir.json",
-  shapes: "bindings/generated/defold-dmsdk-abi-shapes.json",
-  scalarReport: "bindings/generated/defold-dmsdk-scalar-thunks.json",
-  overrides: "bindings/overrides/dmsdk-enum-value-bindings.json",
+  ir: "packages/bindings/generated/defold-sdk-ir.json",
+  shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  scalarReport: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
+  overrides: "packages/bindings/overrides/dmsdk-enum-value-bindings.json",
 };
 const KIND = { void: 0, bool: 1, u32: 2, u64: 3, i32: 4 };
 
@@ -226,7 +226,7 @@ async function build() {
     artifacts: [...artifacts.keys()].sort(),
     declarations: reportRows,
   };
-  artifacts.set("bindings/generated/defold-dmsdk-enum-value-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
+  artifacts.set("packages/bindings/generated/defold-dmsdk-enum-value-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
   return { artifacts, report };
 }
 

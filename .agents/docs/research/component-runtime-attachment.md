@@ -43,4 +43,4 @@ Hermes HostObject finalizers never call the Lua-owned adapter directly. `script_
 3. Recursive message/action values: the backend supports scalar Defold values and a bounded top-level string-key record. Nested records need the shared bounded recursive value arena with depth, entry-count, string-byte, cycle, ownership, and unsupported-value policy.
 4. Target providers: Static Hermes needs a component C ABI; HTML5 needs a browser-host component provider. Both remain fail-closed.
 
-The machine-readable authority is `bindings/generated/defold-component-proxy-runtime-capability.json`. It intentionally separates provider capability, native harness evidence, and packaged Defold evidence.
+The machine-readable authority is `packages/bindings/generated/defold-component-proxy-runtime-capability.json`. It intentionally separates provider capability, native harness evidence, and packaged Defold evidence.

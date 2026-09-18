@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relativeOutputs = {
-  report: "bindings/generated/defold-static-hermes-vmath.json",
+  report: "packages/bindings/generated/defold-static-hermes-vmath.json",
   header: "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
   source: "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
   typescript: "packages/static-hermes/src/generated/script-vmath.ts"
@@ -15,8 +15,8 @@ const relativeOutputs = {
 function parseArguments(argv) {
   const result = {
     check: false,
-    descriptor: path.join(repositoryRoot, "bindings/generated/defold-script-value-bindings.json"),
-    config: path.join(repositoryRoot, "bindings/overrides/static-hermes-vmath.json"),
+    descriptor: path.join(repositoryRoot, "packages/bindings/generated/defold-script-value-bindings.json"),
+    config: path.join(repositoryRoot, "packages/bindings/overrides/static-hermes-vmath.json"),
     outputRoot: repositoryRoot
   };
   for (let index = 2; index < argv.length; ++index) {

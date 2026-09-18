@@ -8,10 +8,10 @@ import { fileURLToPath } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
-const defaultPolicy = "bindings/overrides/script-route-availability-profiles.json";
-const defaultBorrowed = "bindings/generated/defold-script-borrowed-handle-classification.json";
-const defaultScriptIr = "bindings/generated/defold-script-api-ir.json";
-const defaultOutput = "bindings/generated/defold-script-route-availability-profiles.json";
+const defaultPolicy = "packages/bindings/overrides/script-route-availability-profiles.json";
+const defaultBorrowed = "packages/bindings/generated/defold-script-borrowed-handle-classification.json";
+const defaultScriptIr = "packages/bindings/generated/defold-script-api-ir.json";
+const defaultOutput = "packages/bindings/generated/defold-script-route-availability-profiles.json";
 const featureBits = { core: 1, "box2d-v2": 2, "box2d-v3": 4, bullet3d: 8 };
 
 function fail(message) {

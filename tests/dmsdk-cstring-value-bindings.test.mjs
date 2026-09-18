@@ -9,7 +9,7 @@ import test from "node:test";
 import { resolveCStringContracts } from "../scripts/generate-dmsdk-cstring-value-bindings.mjs";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
-const reportPath=path.join(root,"bindings/generated/defold-dmsdk-cstring-value-bindings.json");
+const reportPath=path.join(root,"packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json");
 const sdk=path.join(root,"upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
 const cxx=process.env.CXX||"clang++";const cc=process.env.CC||"clang";
 const run=(command,args,options={})=>execFileSync(command,args,{cwd:root,encoding:"utf8",stdio:"pipe",...options});
@@ -40,8 +40,8 @@ test("C-string/value selection is exhaustive, mechanical, and fail-closed",async
 test("C-string semantic contracts fail closed on unresolved rows, overlap, and declaration drift",async()=>{
   const [report,projection,policy]=await Promise.all([
     readFile(reportPath,"utf8").then(JSON.parse),
-    readFile(path.join(root,"bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse),
-    readFile(path.join(root,"bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse)
+    readFile(path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse),
+    readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse)
   ]);
   const ids=new Set(report.declarations.map(({id})=>id));
   const candidates=projection.rows.filter(({id})=>ids.has(id));
@@ -66,7 +66,7 @@ test("C-string semantic contracts fail closed on unresolved rows, overlap, and d
 });
 
 test("selected value algebra and generated storage are exact and census-derived",async()=>{
-  const [report,projection]=await Promise.all([readFile(reportPath,"utf8").then(JSON.parse),readFile(path.join(root,"bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse)]);
+  const [report,projection]=await Promise.all([readFile(reportPath,"utf8").then(JSON.parse),readFile(path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse)]);
   const selected=report.declarations.map(({id})=>projection.rows.find((row)=>row.id===id));
   assert.equal(selected.filter(Boolean).length,20);
   for(const row of selected){
@@ -107,7 +107,7 @@ test("selected value algebra and generated storage are exact and census-derived"
 
 test("canonical target plan keeps staged wrappers private until runtime backends emit",async()=>{
   const [report,plan,barrel,installer,cmake,native,runtime,staticHermes]=await Promise.all([
-    readFile(reportPath,"utf8").then(JSON.parse),readFile(path.join(root,"bindings/generated/defold-binding-lowering-plan.json"),"utf8").then(JSON.parse),
+    readFile(reportPath,"utf8").then(JSON.parse),readFile(path.join(root,"packages/bindings/generated/defold-binding-lowering-plan.json"),"utf8").then(JSON.parse),
     readFile(path.join(root,"packages/sdk/src/generated/dmsdk/index.ts"),"utf8"),readFile(path.join(root,"defold/defold_hermes/src/generated_jsi.cpp"),"utf8"),readFile(path.join(root,"CMakeLists.txt"),"utf8"),
     readFile(path.join(root,"defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp"),"utf8"),readFile(path.join(root,"defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp"),"utf8"),readFile(path.join(root,"packages/static-hermes/src/generated/dmsdk-cstring-value.ts"),"utf8")
   ]);
@@ -126,7 +126,7 @@ test("canonical target plan keeps staged wrappers private until runtime backends
 
 test("C-string/value artifacts regenerate deterministically",async()=>{
   const directory=await mkdtemp(path.join(tmpdir(),"deherm-cstring-generate-"));
-  try{run(process.execPath,["scripts/generate-dmsdk-cstring-value-bindings.mjs","--output-root",directory]);const report=JSON.parse(await readFile(reportPath,"utf8"));for(const artifact of [...report.artifacts,"bindings/generated/defold-dmsdk-cstring-value-bindings.json"])assert.equal(await readFile(path.join(directory,artifact),"utf8"),await readFile(path.join(root,artifact),"utf8"),artifact);}finally{await rm(directory,{recursive:true,force:true});}
+  try{run(process.execPath,["scripts/generate-dmsdk-cstring-value-bindings.mjs","--output-root",directory]);const report=JSON.parse(await readFile(reportPath,"utf8"));for(const artifact of [...report.artifacts,"packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"])assert.equal(await readFile(path.join(directory,artifact),"utf8"),await readFile(path.join(root,artifact),"utf8"),artifact);}finally{await rm(directory,{recursive:true,force:true});}
 });
 
 test("generated sources compile against the complete pinned SDK",async()=>{

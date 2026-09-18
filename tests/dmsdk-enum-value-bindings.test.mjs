@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const reportPath = join(repositoryRoot, "bindings/generated/defold-dmsdk-enum-value-bindings.json");
+const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json");
 const sdkRoot = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
 const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
@@ -30,7 +30,7 @@ test("enum-value generator is byte deterministic", async () => {
   try {
     run(process.execPath, ["scripts/generate-dmsdk-enum-value-bindings.mjs", "--out-root", output]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
-    for (const artifact of [...report.artifacts, "bindings/generated/defold-dmsdk-enum-value-bindings.json"]) {
+    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json"]) {
       assert.equal(await readFile(join(output, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
     }
     run(process.execPath, ["scripts/generate-dmsdk-enum-value-bindings.mjs", "--out-root", output, "--check"]);

@@ -8,7 +8,7 @@ import test from "node:test";
 
 const testDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(testDirectory, "..");
-const reportPath = join(repositoryRoot, "bindings/generated/defold-dmsdk-scalar-thunks.json");
+const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-scalar-thunks.json");
 const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
 
@@ -21,7 +21,7 @@ test("scalar thunk artifacts are deterministic", async () => {
   try {
     run(process.execPath, ["scripts/generate-dmsdk-scalar-thunks.mjs", "--out-root", outputRoot]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
-    for (const artifact of [...report.artifacts, "bindings/generated/defold-dmsdk-scalar-thunks.json"]) {
+    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-scalar-thunks.json"]) {
       assert.equal(await readFile(join(outputRoot, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
     }
   } finally {

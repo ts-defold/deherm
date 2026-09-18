@@ -5,13 +5,13 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
-  ir: "bindings/generated/defold-sdk-ir.json",
-  shapes: "bindings/generated/defold-dmsdk-abi-shapes.json",
-  projection: "bindings/generated/defold-dmsdk-projection-ir.json",
-  policy: "bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
+  ir: "packages/bindings/generated/defold-sdk-ir.json",
+  shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
+  policy: "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
 });
 const artifacts = Object.freeze({
-  report: "bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json",
+  report: "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json",
   header: "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out.h",
   runtime: "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp",
   jsiHeader: "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out_jsi.hpp",

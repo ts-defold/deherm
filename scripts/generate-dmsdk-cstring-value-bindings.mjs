@@ -6,10 +6,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = Object.freeze({
-  projection: "bindings/generated/defold-dmsdk-projection-ir.json",
-  sdkIr: "bindings/generated/defold-sdk-ir.json",
-  policy: "bindings/overrides/dmsdk-cstring-value-bindings.json",
-  report: "bindings/generated/defold-dmsdk-cstring-value-bindings.json",
+  projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
+  sdkIr: "packages/bindings/generated/defold-sdk-ir.json",
+  policy: "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
+  report: "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
   header: "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h",
   runtime: "defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp",
   native: "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp",

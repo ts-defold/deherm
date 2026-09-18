@@ -63,7 +63,7 @@ async function copyRelative(sourceRoot, targetRoot, relativePath) {
 
 async function sourceEvidencePaths(repositoryRoot) {
   const result = new Set();
-  for (const inputPath of scriptPinnedInputs.filter((entry) => entry.startsWith("bindings/overrides/"))) {
+  for (const inputPath of scriptPinnedInputs.filter((entry) => entry.startsWith("packages/bindings/overrides/"))) {
     const value = JSON.parse(await readFile(path.join(repositoryRoot, inputPath), "utf8"));
     if (inputPath.endsWith("script-api-semantic-overrides.json")) {
       for (const override of value.overrides ?? []) {
@@ -153,7 +153,7 @@ async function sourceEvidencePaths(repositoryRoot) {
     }
   }
   const matrix = JSON.parse(await readFile(
-    path.join(repositoryRoot, "bindings/probes/defold-script-real-engine-matrix.json"),
+    path.join(repositoryRoot, "packages/bindings/probes/defold-script-real-engine-matrix.json"),
     "utf8"
   ));
   for (const observation of matrix.observations ?? []) {
@@ -214,9 +214,9 @@ async function walkFiles(root, relative = "") {
 
 export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultRepositoryRoot) {
   const candidates = new Set();
-  for (const file of await walkFiles(path.join(repositoryRoot, "bindings/generated"))) {
+  for (const file of await walkFiles(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (/^(?:defold-script-|defold-static-hermes-|war-battles-script-)/.test(file)) {
-      candidates.add(`bindings/generated/${file}`);
+      candidates.add(`packages/bindings/generated/${file}`);
     }
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "packages/sdk/src/generated/script"))) {
@@ -298,17 +298,17 @@ function ids(rows, label) {
 async function validateRouteProvenance(cleanRoot) {
   const load = async (relativePath) => JSON.parse(await readFile(path.join(cleanRoot, relativePath), "utf8"));
   const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload, profiles, projection] = await Promise.all([
-    load("bindings/generated/defold-script-api-inventory.json"),
-    load("bindings/generated/defold-script-api-ir.json"),
-    load("bindings/generated/defold-script-api-accounting.json"),
-    load("bindings/generated/defold-script-scalar-dispatch.json"),
-    load("bindings/generated/defold-script-value-bindings.json"),
-    load("bindings/generated/defold-script-fixed-tuples.json"),
-    load("bindings/generated/defold-script-url-address-classification.json"),
-    load("bindings/generated/defold-script-value-tail-bindings.json"),
-    load("bindings/generated/defold-script-overload-dispatch.json"),
-    load("bindings/generated/defold-script-route-availability-profiles.json"),
-    load("bindings/generated/defold-script-projection-ir.json")
+    load("packages/bindings/generated/defold-script-api-inventory.json"),
+    load("packages/bindings/generated/defold-script-api-ir.json"),
+    load("packages/bindings/generated/defold-script-api-accounting.json"),
+    load("packages/bindings/generated/defold-script-scalar-dispatch.json"),
+    load("packages/bindings/generated/defold-script-value-bindings.json"),
+    load("packages/bindings/generated/defold-script-fixed-tuples.json"),
+    load("packages/bindings/generated/defold-script-url-address-classification.json"),
+    load("packages/bindings/generated/defold-script-value-tail-bindings.json"),
+    load("packages/bindings/generated/defold-script-overload-dispatch.json"),
+    load("packages/bindings/generated/defold-script-route-availability-profiles.json"),
+    load("packages/bindings/generated/defold-script-projection-ir.json")
   ]);
   assert(inventory.countsByKind?.function === 926, `Pinned inventory contains ${inventory.countsByKind?.function} functions, expected 926`);
   assert(ir.counts?.functions === 926, `Clean IR contains ${ir.counts?.functions} functions, expected 926`);

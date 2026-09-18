@@ -15,11 +15,11 @@ sources:
     title: Defold Hermes CLI
     author: team:ts-defold
   - id: script-ir
-    resource: ../../bindings/generated/defold-script-api-ir.json
+    resource: ../../packages/bindings/generated/defold-script-api-ir.json
     title: Generated Defold script API IR
     author: team:ts-defold
   - id: dmsdk-ir
-    resource: ../../bindings/generated/defold-sdk-ir.json
+    resource: ../../packages/bindings/generated/defold-sdk-ir.json
     title: Generated dmSDK IR
     author: team:ts-defold
   - id: tests

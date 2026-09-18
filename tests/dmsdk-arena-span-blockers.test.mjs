@@ -19,7 +19,7 @@ test("arena-span blocker ledger is deterministic, complete, and metadata-only", 
     stdio: "pipe"
   });
   const report = JSON.parse(await readFile(
-    new URL("bindings/generated/defold-dmsdk-arena-span-blockers.json", root),
+    new URL("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json", root),
     "utf8"
   ));
   assert.deepEqual(report.coverage, {

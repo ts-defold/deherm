@@ -370,8 +370,8 @@ test("project generation uses an input key and does not rewrite current outputs"
 });
 
 test("script context projection requires an exact route-id bijection and records unknown tokens as unresolved", async () => {
-  const scriptIr = JSON.parse(await readFile(path.resolve("bindings/generated/defold-script-api-ir.json"), "utf8"));
-  const loweringPlan = JSON.parse(await readFile(path.resolve("bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
+  const scriptIr = JSON.parse(await readFile(path.resolve("packages/bindings/generated/defold-script-api-ir.json"), "utf8"));
+  const loweringPlan = JSON.parse(await readFile(path.resolve("packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
   const scriptUnits = loweringPlan.units.filter(({ identity }) => identity.surface === "script");
   assert.throws(() => buildScriptContextCapabilities(scriptIr, { ...loweringPlan, schemaVersion: 1 }), /schema v2/);
   const duplicated = structuredClone(loweringPlan);

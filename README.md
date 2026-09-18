@@ -112,7 +112,7 @@ explicit escape hatch that conservatively retains every binding.
 
 ## Binding compiler
 
-`bindings/modules.json` is a validated prototype IR rather than a runtime
+`packages/bindings/modules.json` is a validated prototype IR rather than a runtime
 schema. One fast code-generation pass emits:
 
 * TypeScript interfaces and type-inferred module lookups;
@@ -132,7 +132,7 @@ annotations. At the current pin this accounts for 121 headers / 2,140 native
 declarations and 40 modules / 2,734 script declarations. These are inventory
 numbers, not a claim that each declaration has a finished runtime lowering.
 The status of every declaration is machine-readable under
-`bindings/generated/` and drift-gated by `pnpm check`.
+`packages/bindings/generated/` and drift-gated by `pnpm check`.
 
 The current generated execution floor is also machine-readable: all 926 script
 functions and 2,140 dmSDK declarations compile as TypeScript types; 93 script

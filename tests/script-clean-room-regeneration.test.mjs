@@ -11,9 +11,9 @@ test("generated artifact inventory rejects per-route hand-authored output", () =
   assert.throws(
     () => assertGeneratedArtifactInventory([
       ...generatedScriptArtifacts,
-      "bindings/generated/defold-script-hand-authored-route.json"
+      "packages/bindings/generated/defold-script-hand-authored-route.json"
     ]),
-    /Unexpected \(possibly hand-authored\): bindings\/generated\/defold-script-hand-authored-route\.json/
+    /Unexpected \(possibly hand-authored\): packages\/bindings\/generated\/defold-script-hand-authored-route\.json/
   );
 });
 

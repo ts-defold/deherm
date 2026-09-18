@@ -2,5 +2,9 @@
   "name": "@ts-defold/deherm-internal-telemetry",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "source": "./schema/deherm_telemetry.proto",
+  "exports": {
+    ".": "./schema/deherm_telemetry.proto"
+  }
 }

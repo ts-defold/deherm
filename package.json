@@ -8,6 +8,7 @@
   "workspaces": [
     "packages/*"
   ],
+  "source": "./packages/sdk/src/index.ts",
   "types": "./packages/sdk/src/index.ts",
   "exports": {
     ".": {
@@ -23,9 +24,6 @@
   },
   "files": [
     "bin/",
-    "bindings/generated/",
-    "bindings/overrides/",
-    "bindings/targets/",
     "packages/",
     "!packages/**/*.type-test.ts",
     "README.md"
@@ -203,7 +201,7 @@
     "test:native-defold:runtime": "node scripts/check-native-defold-runtime.mjs",
     "test:native-defold:hot-reload": "node --test tests/native-hot-reload-fixture.test.mjs && node scripts/check-native-defold-hot-reload.mjs",
     "test:extension-retention": "node --test tests/dmsdk-scalar-extension-retention.test.mjs",
-    "test:cli": "node --test tests/cli.test.mjs tests/package-smoke.test.mjs",
+    "test:cli": "node --test tests/cli.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs",
     "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs",
     "test:canonical-family-emission": "node --test tests/canonical-family-emission.test.mjs",
     "test:usage": "pnpm build:release-plan && node --test tests/usage.test.mjs tests/release-build.test.mjs tests/canonical-family-emission.test.mjs",

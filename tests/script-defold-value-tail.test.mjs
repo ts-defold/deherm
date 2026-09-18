@@ -15,7 +15,7 @@ const digest = (text) => createHash("sha256").update(text).digest("hex");
 
 test("value-tail generator covers the exact remaining Defold-value accounting tail", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-defold-value-tail.mjs", "--check"], { cwd: root, stdio: "pipe" });
-  const report = JSON.parse(await readFile(new URL("bindings/generated/defold-script-value-tail-bindings.json", root), "utf8"));
+  const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root), "utf8"));
   assert.equal(report.routeCount, 26);
   assert.equal(report.candidateCount, 16);
   assert.equal(report.blockedCount, 10);

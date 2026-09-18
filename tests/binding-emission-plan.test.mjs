@@ -7,9 +7,9 @@ import test from "node:test";
 import { generateBindingEmissionPlan, run } from "../scripts/generate-binding-emission-plan.mjs";
 
 const root = resolve(new URL("..", import.meta.url).pathname);
-const plan = JSON.parse(await readFile(join(root, "bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
-const scriptProjection = JSON.parse(await readFile(join(root, "bindings/generated/defold-script-projection-ir.json"), "utf8"));
-const profiles = JSON.parse(await readFile(join(root, "bindings/generated/defold-script-route-availability-profiles.json"), "utf8"));
+const plan = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
+const scriptProjection = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8"));
+const profiles = JSON.parse(await readFile(join(root, "packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8"));
 
 function usage(symbols, dynamicAccess = false) {
   return { schemaVersion: 1, dynamicAccess, symbols };

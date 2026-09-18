@@ -229,8 +229,8 @@ async function main(argv = process.argv.slice(2)) {
   if (unknown.length > 0) throw new Error(`Unknown argument: ${unknown[0]}`);
   const check = argv.includes("--check");
   const root = new URL("../", import.meta.url);
-  const inputUrl = new URL("bindings/generated/defold-script-api-ir.json", root);
-  const outputUrl = new URL("bindings/generated/defold-script-binding-patterns.json", root);
+  const inputUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
+  const outputUrl = new URL("packages/bindings/generated/defold-script-binding-patterns.json", root);
   const sourceText = await readFile(inputUrl, "utf8");
   const report = classifyScriptBindings(JSON.parse(sourceText), sourceText);
   const serialized = `${JSON.stringify(report, null, 2)}\n`;

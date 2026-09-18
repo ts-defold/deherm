@@ -13,16 +13,16 @@ async function text(path) {
 }
 
 async function inputs() {
-  const overrideText = await text("bindings/overrides/script-borrowed-handle-classification.json");
+  const overrideText = await text("packages/bindings/overrides/script-borrowed-handle-classification.json");
   const override = JSON.parse(overrideText);
   const sourceTexts = new Map(await Promise.all(override.sourceEvidence.map(async ({ source }) => [
     source,
     await text(`upstream/defold/${source}`)
   ])));
   return {
-    irText: await text("bindings/generated/defold-script-api-ir.json"),
-    accountingText: await text("bindings/generated/defold-script-api-accounting.json"),
-    patternsText: await text("bindings/generated/defold-script-binding-patterns.json"),
+    irText: await text("packages/bindings/generated/defold-script-api-ir.json"),
+    accountingText: await text("packages/bindings/generated/defold-script-api-accounting.json"),
+    patternsText: await text("packages/bindings/generated/defold-script-binding-patterns.json"),
     overrideText,
     sourceTexts
   };
@@ -36,7 +36,7 @@ function replaceJson(input, mutate) {
 
 const sourceInputs = await inputs();
 const generated = generateBorrowedHandleClassification(sourceInputs);
-const checked = JSON.parse(await text("bindings/generated/defold-script-borrowed-handle-classification.json"));
+const checked = JSON.parse(await text("packages/bindings/generated/defold-script-borrowed-handle-classification.json"));
 
 test("partitions all 415 borrowed-handle routes exactly once", () => {
   assert.equal(generated.routeCount, 415);

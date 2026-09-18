@@ -8,9 +8,9 @@ import test from "node:test";
 
 const root = path.resolve(import.meta.dirname, "..");
 const generator = path.join(root, "scripts/generate-static-hermes-vmath.mjs");
-const descriptorPath = path.join(root, "bindings/generated/defold-script-value-bindings.json");
+const descriptorPath = path.join(root, "packages/bindings/generated/defold-script-value-bindings.json");
 const outputFiles = [
-  "bindings/generated/defold-static-hermes-vmath.json",
+  "packages/bindings/generated/defold-static-hermes-vmath.json",
   "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
   "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
   "packages/static-hermes/src/generated/script-vmath.ts"
@@ -29,7 +29,7 @@ test("Static Hermes vmath bridge is current and covers only sound scalar results
   const report = JSON.parse(await readFile(path.join(root, outputFiles[0]), "utf8"));
   const [descriptorRaw, overrideRaw] = await Promise.all([
     readFile(descriptorPath, "utf8"),
-    readFile(path.join(root, "bindings/overrides/static-hermes-vmath.json"), "utf8")
+    readFile(path.join(root, "packages/bindings/overrides/static-hermes-vmath.json"), "utf8")
   ]);
   assert.equal(report.descriptorSha256, createHash("sha256").update(descriptorRaw).digest("hex"));
   assert.equal(report.overrideSha256, createHash("sha256").update(overrideRaw).digest("hex"));

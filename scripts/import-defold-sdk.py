@@ -25,7 +25,7 @@ from typing import Any, Iterable
 ROOT = Path(__file__).resolve().parents[1]
 DEFOLD = ROOT / "upstream" / "defold"
 ENGINE = DEFOLD / "engine"
-INVENTORY = ROOT / "bindings" / "generated" / "defold-sdk-inventory.json"
+INVENTORY = ROOT / "packages" / "bindings" / "generated" / "defold-sdk-inventory.json"
 REPORT = ROOT / ".agents" / "docs" / "research" / "sdk-coverage.md"
 
 DECL_KINDS = {
@@ -447,17 +447,17 @@ coverage gates.
 {diagnostics}
 
 The machine-readable inventory is
-`bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it
+`packages/bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it
 so new or removed upstream API cannot drift unnoticed.
-The enriched per-symbol ledger is `bindings/generated/defold-sdk-ir.json`.
+The enriched per-symbol ledger is `packages/bindings/generated/defold-sdk-ir.json`.
 
 ## Executable coverage audit
 
 The complete declaration surface is generated, but this source inventory does
 not embed mutable runtime-implementation counts. The exact generated adapter
 and blocker census lives in the SHA-bound family reports under
-`bindings/generated/defold-dmsdk-*.json`; the ABI-shape queue is
-`bindings/generated/defold-dmsdk-abi-shapes.json`. Host behavior, extension
+`packages/bindings/generated/defold-dmsdk-*.json`; the ABI-shape queue is
+`packages/bindings/generated/defold-dmsdk-abi-shapes.json`. Host behavior, extension
 retention, target compilation, and live-engine observation remain independent
 evidence stages.
 

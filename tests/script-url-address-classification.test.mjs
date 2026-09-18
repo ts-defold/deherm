@@ -101,7 +101,7 @@ test("regenerates the classification byte-identically in a temporary output", as
       "scripts/generate-script-url-address-classification.mjs", "--output", temporary
     ], { cwd: root, stdio: "pipe" });
     assert.equal(await readFile(temporary, "utf8"), await readFile(
-      new URL("bindings/generated/defold-script-url-address-classification.json", root), "utf8"));
+      new URL("packages/bindings/generated/defold-script-url-address-classification.json", root), "utf8"));
     execFileSync(process.execPath, ["scripts/generate-script-url-address-classification.mjs", "--check"], {
       cwd: root,
       stdio: "pipe"

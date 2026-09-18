@@ -9,7 +9,7 @@ import test from "node:test";
 import { build } from "../scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const reportPath = path.join(root, "bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json");
+const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json");
 const sdk = path.join(root, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
 const cxx = process.env.CXX || "clang++";
 const cc = process.env.CC || "clang";
@@ -34,8 +34,8 @@ function selected(row, policy) {
 test("scratch scalar-out census is independent, exhaustive, and symbol-agnostic", async () => {
   const [report, shapes, policy] = await Promise.all([
     readFile(reportPath, "utf8").then(JSON.parse),
-    readFile(path.join(root, "bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
-    readFile(path.join(root, "bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"), "utf8").then(JSON.parse),
+    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+    readFile(path.join(root, "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"), "utf8").then(JSON.parse),
   ]);
   const candidates = shapes.rows.filter(({ tranche }) => tranche === "scratch-out-parameters");
   const generated = candidates.filter((row) => selected(row, policy));
@@ -80,7 +80,7 @@ test("scratch scalar-out generation is clean-room deterministic and rejects drif
   try {
     run(process.execPath, ["scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs", "--output-root", directory]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
-    for (const artifact of [...report.artifacts, "bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"]) {
+    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"]) {
       assert.equal(await readFile(path.join(directory, artifact), "utf8"), await readFile(path.join(root, artifact), "utf8"), artifact);
     }
     const contents = {
@@ -161,7 +161,7 @@ test("scratch scalar-out generated IDs do not overlap prior generated families",
     "defold-dmsdk-hash-span-bindings.json",
   ];
   for (const name of priorReports) {
-    const prior = JSON.parse(await readFile(path.join(root, "bindings/generated", name), "utf8"));
+    const prior = JSON.parse(await readFile(path.join(root, "packages/bindings/generated", name), "utf8"));
     const rows = prior.declarations ?? prior.bindings ?? [];
     for (const row of rows) {
       const generated = row.emitted === true || row.disposition === "generated-provider-boundary" || row.disposition === "generated" || row.wrapper;

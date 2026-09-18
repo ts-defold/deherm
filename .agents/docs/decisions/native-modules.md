@@ -55,7 +55,7 @@ uses the same TypeScript call against an ordinary browser object. Both emit
 `module:42` in the parity transcript.
 
 The host function delegates to an `extern "C"` function, and the Defold HTML5
-adapter refers to the same symbol. `bindings/modules.json` now generates the
+adapter refers to the same symbol. `packages/bindings/modules.json` now generates the
 TypeScript interface, fixed Wasm memory layouts, C declarations and layout
 assertions, JSI installer, and Static Hermes `extern_c` projection. The Static
 Hermes compiler accepts the generated typed declarations.

@@ -5,10 +5,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 const root = new URL("../", import.meta.url);
-const sourceUrl = new URL("bindings/probes/defold-script-real-engine-probes.json", root);
-const descriptorsUrl = new URL("bindings/generated/defold-script-scalar-dispatch.json", root);
-const irUrl = new URL("bindings/generated/defold-script-api-ir.json", root);
-const reportUrl = new URL("bindings/generated/defold-script-real-engine-probes.json", root);
+const sourceUrl = new URL("packages/bindings/probes/defold-script-real-engine-probes.json", root);
+const descriptorsUrl = new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root);
+const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
+const reportUrl = new URL("packages/bindings/generated/defold-script-real-engine-probes.json", root);
 const typescriptUrl = new URL("examples/runtime-smoke/src/generated/script-real-engine-probes.ts", root);
 
 function literal(value) {

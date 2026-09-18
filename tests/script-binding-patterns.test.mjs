@@ -6,9 +6,9 @@ import test from "node:test";
 import { classifyScriptBindings } from "../scripts/classify-script-bindings.mjs";
 
 const root = new URL("../", import.meta.url);
-const irSource = await readFile(new URL("bindings/generated/defold-script-api-ir.json", root), "utf8");
+const irSource = await readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8");
 const ir = JSON.parse(irSource);
-const checkedIn = JSON.parse(await readFile(new URL("bindings/generated/defold-script-binding-patterns.json", root), "utf8"));
+const checkedIn = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-binding-patterns.json", root), "utf8"));
 const generated = classifyScriptBindings(ir, irSource);
 
 test("classifies every pending script function exactly once", () => {

@@ -13,7 +13,7 @@ import {
 const root = new URL("../", import.meta.url);
 const inputs = await loadScriptProjectionInputs();
 const generated = generateScriptProjectionIr(inputs);
-const checked = JSON.parse(await readFile(new URL("bindings/generated/defold-script-projection-ir.json", root), "utf8"));
+const checked = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-projection-ir.json", root), "utf8"));
 
 function replaceJson(text, mutate) {
   const value = JSON.parse(text);

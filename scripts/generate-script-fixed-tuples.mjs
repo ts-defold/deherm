@@ -7,12 +7,12 @@ import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  schemaOverrides: new URL("bindings/overrides/script-table-tuple-schema-overrides.json", root),
-  registrations: new URL("bindings/overrides/script-fixed-tuple-registrations.json", root),
-  report: new URL("bindings/generated/defold-script-fixed-tuples.json", root),
-  probes: new URL("bindings/generated/defold-script-fixed-tuple-probes.json", root),
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  schemaOverrides: new URL("packages/bindings/overrides/script-table-tuple-schema-overrides.json", root),
+  registrations: new URL("packages/bindings/overrides/script-fixed-tuple-registrations.json", root),
+  report: new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root),
+  probes: new URL("packages/bindings/generated/defold-script-fixed-tuple-probes.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_fixed_tuples.cpp", root),
   target: new URL("packages/sdk/src/generated/script/fixed-tuple-target-support.ts", root)

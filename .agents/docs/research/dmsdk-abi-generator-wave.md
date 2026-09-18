@@ -64,19 +64,19 @@ step chain.
 The registered steps are:
 
 1. `scripts/classify-dmsdk-bindings.mjs`
-   - input: `bindings/generated/defold-sdk-ir.json`
-   - output: `bindings/generated/defold-dmsdk-binding-patterns.json`
+   - input: `packages/bindings/generated/defold-sdk-ir.json`
+   - output: `packages/bindings/generated/defold-dmsdk-binding-patterns.json`
 2. `scripts/generate-dmsdk-scalar-thunks.mjs`
    - inputs: the SDK IR and binding-pattern report
    - outputs: scalar report, C ABI, runtime dispatcher, JSI adapter, browser adapter, TypeScript wrapper, and per-module C++ sources listed in its report
 3. `scripts/generate-dmsdk-abi-shapes.mjs`
    - inputs: the SDK IR and binding-pattern report
-   - output: `bindings/generated/defold-dmsdk-abi-shapes.json`
+   - output: `packages/bindings/generated/defold-dmsdk-abi-shapes.json`
 4. `scripts/generate-dmsdk-named-scalar-bindings.mjs`
-   - inputs: SDK IR, ABI-shape report, and `bindings/overrides/dmsdk-named-scalar-policies.json`
+   - inputs: SDK IR, ABI-shape report, and `packages/bindings/overrides/dmsdk-named-scalar-policies.json`
    - outputs: a 21-route policy report plus intentionally empty C ABI, JSI, and TypeScript surfaces
 5. `scripts/generate-dmsdk-enum-value-bindings.mjs`
-   - inputs: SDK IR, ABI-shape report, scalar-thunk report, and `bindings/overrides/dmsdk-enum-value-bindings.json`
+   - inputs: SDK IR, ABI-shape report, scalar-thunk report, and `packages/bindings/overrides/dmsdk-enum-value-bindings.json`
    - outputs: enum-value report, C ABI, runtime dispatcher, JSI adapter, TypeScript wrapper, and buffer/graphics/log/sound C++ sources listed in its report
 6. `scripts/generate-dmsdk-fixed-digest-bindings.mjs`
    - outputs: four capacity-checked digest wrappers and a dense runtime dispatcher

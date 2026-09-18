@@ -11,9 +11,9 @@ test("dmSDK artifact ownership rejects hand-authored generated output", () => {
   assert.throws(
     () => assertGeneratedDmSdkArtifactInventory([
       ...generatedDmSdkArtifacts,
-      "bindings/generated/defold-dmsdk-hand-authored-binding.json"
+      "packages/bindings/generated/defold-dmsdk-hand-authored-binding.json"
     ]),
-    /Unexpected \(possibly hand-authored\): bindings\/generated\/defold-dmsdk-hand-authored-binding\.json/
+    /Unexpected \(possibly hand-authored\): packages\/bindings\/generated\/defold-dmsdk-hand-authored-binding\.json/
   );
 });
 

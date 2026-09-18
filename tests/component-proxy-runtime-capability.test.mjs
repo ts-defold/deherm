@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
 
-const reportPath = "bindings/generated/defold-component-proxy-runtime-capability.json";
+const reportPath = "packages/bindings/generated/defold-component-proxy-runtime-capability.json";
 const headerPath = "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp";
 
 test("component proxy runtime gate regenerates deterministically", () => {

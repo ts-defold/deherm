@@ -8,12 +8,12 @@ import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  accounting: new URL("bindings/generated/defold-script-api-accounting.json", root),
-  schemas: new URL("bindings/generated/defold-script-table-tuple-schemas.json", root),
-  policy: new URL("bindings/overrides/script-table-record-bindings.json", root),
-  report: new URL("bindings/generated/defold-script-table-record-bindings.json", root),
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  accounting: new URL("packages/bindings/generated/defold-script-api-accounting.json", root),
+  schemas: new URL("packages/bindings/generated/defold-script-table-tuple-schemas.json", root),
+  policy: new URL("packages/bindings/overrides/script-table-record-bindings.json", root),
+  report: new URL("packages/bindings/generated/defold-script-table-record-bindings.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_table_record_bindings.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_table_record_bindings.cpp", root),
   target: new URL("packages/sdk/src/generated/script/table-record-bindings.ts", root)

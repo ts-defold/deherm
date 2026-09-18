@@ -135,7 +135,7 @@ FFI seam rather than JSI itself. JSI remains the development/dynamic adapter;
 the browser host reaches the ABI through Defold's Emscripten exports.
 
 The current proof generates JSI installers, Emscripten adapters, Static Hermes
-`extern_c` declarations, and direct SDK imports from `bindings/modules.json`.
+`extern_c` declarations, and direct SDK imports from `packages/bindings/modules.json`.
 `ExampleMath` reaches a native C implementation directly. `Timer` reaches the
 same C ABI first, then a second generated backend invokes cached Lua registry
 references for APIs implemented only in Defold's Lua-facing layer.

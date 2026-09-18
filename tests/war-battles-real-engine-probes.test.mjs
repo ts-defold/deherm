@@ -9,9 +9,9 @@ import { markersObserved, validateWarBattlesRuntimeReadiness } from "../scripts/
 const root = new URL("../", import.meta.url);
 const paths = {
   manifest: "examples/war-battles-online/verification/probes/script-real-engine-probes.json",
-  ir: "bindings/generated/defold-script-api-ir.json",
-  scalar: "bindings/generated/defold-script-scalar-dispatch.json",
-  value: "bindings/generated/defold-script-value-bindings.json"
+  ir: "packages/bindings/generated/defold-script-api-ir.json",
+  scalar: "packages/bindings/generated/defold-script-scalar-dispatch.json",
+  value: "packages/bindings/generated/defold-script-value-bindings.json"
 };
 const texts = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([key, path]) => [key, await readFile(new URL(path, root), "utf8")])));
 

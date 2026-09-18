@@ -21,7 +21,7 @@ const inputs = {
   dynamicHermesHarness: "native/component_runtime_hermes_e2e.cpp"
 };
 const outputs = {
-  report: "bindings/generated/defold-component-proxy-runtime-capability.json",
+  report: "packages/bindings/generated/defold-component-proxy-runtime-capability.json",
   header: "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp"
 };
 

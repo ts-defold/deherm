@@ -7,10 +7,10 @@ import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  overrides: new URL("bindings/overrides/script-dynamic-value-bindings.json", root),
-  report: new URL("bindings/generated/defold-script-dynamic-value-bindings.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  overrides: new URL("packages/bindings/overrides/script-dynamic-value-bindings.json", root),
+  report: new URL("packages/bindings/generated/defold-script-dynamic-value-bindings.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_dynamic_values.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_dynamic_values.cpp", root),
   target: new URL("packages/sdk/src/generated/script/dynamic-values.ts", root)

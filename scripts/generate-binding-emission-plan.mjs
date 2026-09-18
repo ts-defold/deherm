@@ -16,10 +16,10 @@ function compareCodeUnits(left, right) {
 
 function parseArguments(argv) {
   const options = {
-    plan: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.json"),
-    sentinel: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.sentinel.json"),
-    scriptProjection: resolve(repositoryRoot, "bindings/generated/defold-script-projection-ir.json"),
-    profiles: resolve(repositoryRoot, "bindings/generated/defold-script-route-availability-profiles.json"),
+    plan: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
+    sentinel: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"),
+    scriptProjection: resolve(repositoryRoot, "packages/bindings/generated/defold-script-projection-ir.json"),
+    profiles: resolve(repositoryRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"),
     usage: null,
     output: resolve(repositoryRoot, "build/profiles/release/defold-binding-emission-plan.json"),
     target: "dynamicHermesJsi",

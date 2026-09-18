@@ -12,7 +12,7 @@ import {
 } from "../scripts/generate-binding-lowering-plan.mjs";
 
 const repositoryRoot = resolve(new URL("..", import.meta.url).pathname);
-const reportPath = join(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.json");
+const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json");
 const inputs = await loadBindingLoweringInputs(repositoryRoot);
 const generated = generateBindingLoweringPlan(inputs);
 

@@ -1,0 +1,652 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "The classifier's overload-dispatch family, excluding the three routes already owned by the generated Defold-value adapter.",
+  "routeCount": 20,
+  "generatedFamilyCandidateCount": 8,
+  "blockedCount": 12,
+  "disjointCensus": {
+    "classifierOverloadDispatch": 23,
+    "alreadyOwnedDefoldValue": 3,
+    "selectedForThisWave": 20
+  },
+  "inputEvidence": {
+    "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
+    "reviewedPolicySha256": "9b77b1d4d4bd5079b7b509d78b996014c04a29097cf937a1b1d61681367cfa3a",
+    "alreadyOwnedReportSha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d"
+  },
+  "evidencePolicy": "Pinned source hashes and anchors record the reviewed registration surface. The eight candidates are installed in the shared native-dynamic ScriptAdapter/JSI router; real Defold Lua 5.1 tests reach every candidate descriptor and a local Bob/Extender arm64-osx bundle links the extension. Packaged-engine semantic execution, Static Hermes, and browser-host execution remain unclaimed.",
+  "allocationPolicy": "Dispatch performs a sorted static descriptor lookup, scans only reviewed fixed call shapes, and uses cached Lua references plus caller-owned frame arenas. The warmed native test observes zero C++ operator-new calls; Lua, Hermes, and engine-internal allocation is outside that claim.",
+  "blockerCounts": {
+    "box2d-handle-and-structured-fixture-codecs": 1,
+    "box2d-joint-handle-codec": 4,
+    "box2d-world-handle-and-multi-result-codecs": 4,
+    "box2d-world-handle-and-structured-result-codecs": 1,
+    "captured-instance-url-construction-context": 1,
+    "render-target-table-and-resource-lifetime-codecs": 1
+  },
+  "bindings": [
+    {
+      "id": "script:b2d.world.cast_shape",
+      "stableId": 378378773,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "cast_shape",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-world-handle-and-multi-result-codecs",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_world_v2.cpp",
+        "sha256": "2ab67f62213558bdc749114edf8a09d7a089dbe033e8761c60aa15d63b617bc5",
+        "anchor": "{\"cast_shape\", World_CastShape}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.world.cast_ray_closest",
+      "stableId": 404878944,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "cast_ray_closest",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-world-handle-and-structured-result-codecs",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_world_v2.cpp",
+        "sha256": "2ab67f62213558bdc749114edf8a09d7a089dbe033e8761c60aa15d63b617bc5",
+        "anchor": "{\"cast_ray_closest\", World_CastRayClosest}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-structured-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-structured-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-structured-result-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.world.cast_ray",
+      "stableId": 508811620,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "cast_ray",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-world-handle-and-multi-result-codecs",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_world_v2.cpp",
+        "sha256": "2ab67f62213558bdc749114edf8a09d7a089dbe033e8761c60aa15d63b617bc5",
+        "anchor": "{\"cast_ray\", World_CastRay}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.world.overlap_aabb",
+      "stableId": 634121622,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "overlap_aabb",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-world-handle-and-multi-result-codecs",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_world_v2.cpp",
+        "sha256": "2ab67f62213558bdc749114edf8a09d7a089dbe033e8761c60aa15d63b617bc5",
+        "anchor": "{\"overlap_aabb\", World_OverlapAABB}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:msg.url",
+      "stableId": 806414134,
+      "modulePath": [
+        "msg"
+      ],
+      "member": "url",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "captured-instance-url-construction-context",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_msg.cpp",
+        "sha256": "089d40349a4f6241743580801fe38d9704f0ba1bb66a666d013ab6ad850a73d2",
+        "anchor": "{SCRIPT_TYPE_NAME_URL, URL_new}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-captured-instance-url-construction-context",
+        "nativeStaticHermes": "blocked-captured-instance-url-construction-context",
+        "html5BrowserHost": "blocked-captured-instance-url-construction-context"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_motor_force",
+      "stableId": 1020113598,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "get_motor_force",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-joint-handle-codec",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_joint_v2.cpp",
+        "sha256": "2405c3ee080a993e7e0809fc8943a6370ce52f2b1197c4cfb8831fd6ec8ec97d",
+        "anchor": "{\"get_motor_force\", Joint_GetMotorForce}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:b2d.world.overlap_shape",
+      "stableId": 1130607345,
+      "modulePath": [
+        "b2d",
+        "world"
+      ],
+      "member": "overlap_shape",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-world-handle-and-multi-result-codecs",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_world_v2.cpp",
+        "sha256": "2ab67f62213558bdc749114edf8a09d7a089dbe033e8761c60aa15d63b617bc5",
+        "anchor": "{\"overlap_shape\", World_OverlapShape}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "nativeStaticHermes": "blocked-box2d-world-handle-and-multi-result-codecs",
+        "html5BrowserHost": "blocked-box2d-world-handle-and-multi-result-codecs"
+      }
+    },
+    {
+      "id": "script:vmath.matrix4",
+      "stableId": 1238853489,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "matrix4",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [],
+          "resultCodec": "Matrix4"
+        },
+        {
+          "arguments": [
+            "Matrix4"
+          ],
+          "resultCodec": "Matrix4"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{SCRIPT_TYPE_NAME_MATRIX4, Matrix4_new}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:render.render_target",
+      "stableId": 1410796854,
+      "modulePath": [
+        "render"
+      ],
+      "member": "render_target",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "render-target-table-and-resource-lifetime-codecs",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/render/src/render/render_script.cpp",
+        "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e",
+        "anchor": "{\"render_target\",                   RenderScript_RenderTarget}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-render-target-table-and-resource-lifetime-codecs",
+        "nativeStaticHermes": "blocked-render-target-table-and-resource-lifetime-codecs",
+        "html5BrowserHost": "blocked-render-target-table-and-resource-lifetime-codecs"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_motor_torque",
+      "stableId": 1729897617,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "get_motor_torque",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-joint-handle-codec",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_joint_v2.cpp",
+        "sha256": "2405c3ee080a993e7e0809fc8943a6370ce52f2b1197c4cfb8831fd6ec8ec97d",
+        "anchor": "{\"get_motor_torque\", Joint_GetMotorTorque}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:vmath.mul_per_elem",
+      "stableId": 1848085754,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "mul_per_elem",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{\"mul_per_elem\", MulPerElem}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:vmath.matrix4_scale",
+      "stableId": 2116175008,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "matrix4_scale",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [
+            "Vector3"
+          ],
+          "resultCodec": "Matrix4"
+        },
+        {
+          "arguments": [
+            "Number"
+          ],
+          "resultCodec": "Matrix4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Matrix4"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{\"matrix4_scale\", Matrix4_Scale}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:vmath.clamp",
+      "stableId": 2532589649,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "clamp",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Number"
+        },
+        {
+          "arguments": [
+            "Vector3",
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Vector4",
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{\"clamp\", Vector_Clamp}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_reaction_torque",
+      "stableId": 2623669505,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "get_reaction_torque",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-joint-handle-codec",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_joint_v2.cpp",
+        "sha256": "2405c3ee080a993e7e0809fc8943a6370ce52f2b1197c4cfb8831fd6ec8ec97d",
+        "anchor": "{\"get_reaction_torque\", Joint_GetReactionTorque}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:vmath.dot",
+      "stableId": 2708084985,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "dot",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Number"
+        },
+        {
+          "arguments": [
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Number"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{\"dot\", Dot}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:b2d.joint.get_reaction_force",
+      "stableId": 2962591790,
+      "modulePath": [
+        "b2d",
+        "joint"
+      ],
+      "member": "get_reaction_force",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-joint-handle-codec",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_joint_v2.cpp",
+        "sha256": "2405c3ee080a993e7e0809fc8943a6370ce52f2b1197c4cfb8831fd6ec8ec97d",
+        "anchor": "{\"get_reaction_force\", Joint_GetReactionForce}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-joint-handle-codec",
+        "nativeStaticHermes": "blocked-box2d-joint-handle-codec",
+        "html5BrowserHost": "blocked-box2d-joint-handle-codec"
+      }
+    },
+    {
+      "id": "script:vmath.slerp",
+      "stableId": 3033910890,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "slerp",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [
+            "Number",
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Quaternion",
+            "Quaternion"
+          ],
+          "resultCodec": "Quaternion"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{\"slerp\", Slerp}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:vmath.vector4",
+      "stableId": 3541966743,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "vector4",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Vector4"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{SCRIPT_TYPE_NAME_VECTOR4, Vector4_new}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    },
+    {
+      "id": "script:b2d.body.create_fixture",
+      "stableId": 3776606414,
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "create_fixture",
+      "strategy": "blocked",
+      "generatedFamilyExecutableCandidate": false,
+      "callShapes": [],
+      "blocker": "box2d-handle-and-structured-fixture-codecs",
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_body_v2.cpp",
+        "sha256": "b53c8f37670a3d32525445d7b58a9f979b7a7146175afcf8b517ff6613a43296",
+        "anchor": "{\"create_fixture\", Body_CreateFixture}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "blocked-box2d-handle-and-structured-fixture-codecs",
+        "nativeStaticHermes": "blocked-box2d-handle-and-structured-fixture-codecs",
+        "html5BrowserHost": "blocked-box2d-handle-and-structured-fixture-codecs"
+      }
+    },
+    {
+      "id": "script:vmath.lerp",
+      "stableId": 4026227879,
+      "modulePath": [
+        "vmath"
+      ],
+      "member": "lerp",
+      "strategy": "generated-defold-value-dispatch",
+      "generatedFamilyExecutableCandidate": true,
+      "callShapes": [
+        {
+          "arguments": [
+            "Number",
+            "Vector3",
+            "Vector3"
+          ],
+          "resultCodec": "Vector3"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Vector4",
+            "Vector4"
+          ],
+          "resultCodec": "Vector4"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Quaternion",
+            "Quaternion"
+          ],
+          "resultCodec": "Quaternion"
+        },
+        {
+          "arguments": [
+            "Number",
+            "Number",
+            "Number"
+          ],
+          "resultCodec": "Number"
+        }
+      ],
+      "blocker": null,
+      "sourceEvidence": {
+        "path": "upstream/defold/engine/script/src/script_vmath.cpp",
+        "sha256": "529c1e60211178dc28e28151f65fd27f461c35ac3aca322dacd25ef09276bdb2",
+        "anchor": "{\"lerp\", Lerp}"
+      },
+      "targetSupport": {
+        "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+        "nativeStaticHermes": "not-integrated-fail-closed",
+        "html5BrowserHost": "not-executable-no-generated-provider"
+      }
+    }
+  ]
+}

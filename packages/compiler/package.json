@@ -2,5 +2,12 @@
   "name": "@ts-defold/deherm-internal-compiler",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "source": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./binding-identity": "./src/binding-identity.mjs",
+    "./component-proxy-generator": "./src/component-proxy-generator.mjs",
+    "./binding-lowering-plan": "./src/generate-binding-lowering-plan.mjs"
+  }
 }

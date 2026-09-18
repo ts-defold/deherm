@@ -8,12 +8,12 @@ import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  accounting: new URL("bindings/generated/defold-script-api-accounting.json", root),
-  overrides: new URL("bindings/overrides/script-table-tuple-schema-overrides.json", root)
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  accounting: new URL("packages/bindings/generated/defold-script-api-accounting.json", root),
+  overrides: new URL("packages/bindings/overrides/script-table-tuple-schema-overrides.json", root)
 };
-const reportUrl = new URL("bindings/generated/defold-script-table-tuple-schemas.json", root);
+const reportUrl = new URL("packages/bindings/generated/defold-script-table-tuple-schemas.json", root);
 const documentationUrl = new URL(".agents/docs/research/script-table-tuple-schema-classification.md", root);
 
 const primitiveTypes = new Set([

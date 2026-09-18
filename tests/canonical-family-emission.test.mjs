@@ -17,9 +17,9 @@ function sha256(value) {
 
 async function authorities() {
   const [plan, projection, profiles] = await Promise.all([
-    readFile(join(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.json"), "utf8").then(JSON.parse),
-    readFile(join(repositoryRoot, "bindings/generated/defold-script-projection-ir.json"), "utf8").then(JSON.parse),
-    readFile(join(repositoryRoot, "bindings/generated/defold-script-route-availability-profiles.json"), "utf8").then(JSON.parse)
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8").then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8").then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8").then(JSON.parse)
   ]);
   return { plan, projection, profiles };
 }

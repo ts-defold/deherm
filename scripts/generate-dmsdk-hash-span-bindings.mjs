@@ -5,9 +5,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
-  ir: "bindings/generated/defold-sdk-ir.json",
-  shapes: "bindings/generated/defold-dmsdk-abi-shapes.json",
-  policy: "bindings/overrides/dmsdk-hash-span-bindings.json",
+  ir: "packages/bindings/generated/defold-sdk-ir.json",
+  shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  policy: "packages/bindings/overrides/dmsdk-hash-span-bindings.json",
 };
 const previouslyGeneratedAdapters = 43;
 
@@ -225,7 +225,7 @@ async function build(options) {
     ["defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp", renderRuntime(entries)],
   ]);
   const report = createReport(contents, ir, shapes, policy, sources, entries, selected, artifacts);
-  artifacts.set("bindings/generated/defold-dmsdk-hash-span-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
+  artifacts.set("packages/bindings/generated/defold-dmsdk-hash-span-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
   return { artifacts, report };
 }
 

@@ -10,7 +10,7 @@ status: active
 
 Status: generated classification and implementation plan, not runtime conformance evidence.
 
-The pinned Defold script API accounting contains 415 pending routes whose primary lowering family is `borrowed-handle`. The deterministic report at `bindings/generated/defold-script-borrowed-handle-classification.json` assigns every route to one mutually exclusive operation class with a stable binding ID, concrete handle kind, required engine context, ownership policy, terminal validity rule, and invalidation boundary. The generator rejects input, source, stable-ID, exception-set, or count drift.
+The pinned Defold script API accounting contains 415 pending routes whose primary lowering family is `borrowed-handle`. The deterministic report at `packages/bindings/generated/defold-script-borrowed-handle-classification.json` assigns every route to one mutually exclusive operation class with a stable binding ID, concrete handle kind, required engine context, ownership policy, terminal validity rule, and invalidation boundary. The generator rejects input, source, stable-ID, exception-set, or count drift.
 
 ## Exact partition and order
 

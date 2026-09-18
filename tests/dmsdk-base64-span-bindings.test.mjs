@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const reportPath = join(repositoryRoot, "bindings/generated/defold-dmsdk-base64-span-bindings.json");
+const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json");
 const sdkRoot = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
 const compiler = process.env.CXX || "clang++"; const cCompiler = process.env.CC || "clang";
 function run(command, args) { return execFileSync(command, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe" }); }
@@ -19,7 +19,7 @@ test("base64-span generator is deterministic, census-derived, and policy complet
     run(process.execPath, ["scripts/generate-dmsdk-base64-span-bindings.mjs", "--out-root", output]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
     assert.deepEqual(report.coverage, { baselineRuntimePending: 1361, discovered: 2, emitted: 2, policyBlocked: 0, hostBehaviorVerified: 2, remainingWithoutGeneratedAdapters: 1322 });
-    for (const artifact of [...report.artifacts, "bindings/generated/defold-dmsdk-base64-span-bindings.json"]) assert.equal(await readFile(join(output, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
+    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json"]) assert.equal(await readFile(join(output, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
     run(process.execPath, ["scripts/generate-dmsdk-base64-span-bindings.mjs", "--out-root", output, "--check"]);
   } finally { await rm(output, { recursive: true, force: true }); }
 });
@@ -27,9 +27,9 @@ test("base64-span generator is deterministic, census-derived, and policy complet
 test("base64-span generator rejects ABI provenance and policy-evidence drift", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-base64-span-drift-"));
   try {
-    const irPath = join(output, "ir.json"); await writeFile(irPath, `${await readFile(join(repositoryRoot, "bindings/generated/defold-sdk-ir.json"), "utf8")}\n`);
+    const irPath = join(output, "ir.json"); await writeFile(irPath, `${await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8")}\n`);
     assert.throws(() => run(process.execPath, ["scripts/generate-dmsdk-base64-span-bindings.mjs", "--ir", irPath, "--out-root", join(output, "out")]), /IR hash does not match ABI-shape census provenance/);
-    const policyPath = join(output, "policy.json"); await writeFile(policyPath, (await readFile(join(repositoryRoot, "bindings/overrides/dmsdk-base64-span-bindings.json"), "utf8")).replace("encoded string", "drifted string"));
+    const policyPath = join(output, "policy.json"); await writeFile(policyPath, (await readFile(join(repositoryRoot, "packages/bindings/overrides/dmsdk-base64-span-bindings.json"), "utf8")).replace("encoded string", "drifted string"));
     assert.throws(() => run(process.execPath, ["scripts/generate-dmsdk-base64-span-bindings.mjs", "--policy", policyPath, "--out-root", join(output, "out")]), /Base64-span evidence drifted/);
   } finally { await rm(output, { recursive: true, force: true }); }
 });

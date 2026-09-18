@@ -19,8 +19,8 @@ async function cacheFixture() {
   }
   return {
     root,
-    output: join(root, "bindings/generated/defold-binding-lowering-plan.json"),
-    sentinel: join(root, "bindings/generated/defold-binding-lowering-plan.sentinel.json")
+    output: join(root, "packages/bindings/generated/defold-binding-lowering-plan.json"),
+    sentinel: join(root, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json")
   };
 }
 

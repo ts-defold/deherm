@@ -5,9 +5,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
-  ir: "bindings/generated/defold-sdk-ir.json",
-  shapes: "bindings/generated/defold-dmsdk-abi-shapes.json",
-  policy: "bindings/overrides/dmsdk-fixed-digest-bindings.json",
+  ir: "packages/bindings/generated/defold-sdk-ir.json",
+  shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
 };
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const snake = (value) => value.replace(/::/g, "_").replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
@@ -80,14 +80,14 @@ async function build(options) {
   ]);
   const report = {
     schemaVersion: 1, policyVersion: policy.policyVersion, defoldRevision: ir.defoldRevision,
-    sources: { ir: "bindings/generated/defold-sdk-ir.json", shapes: "bindings/generated/defold-dmsdk-abi-shapes.json", policy: "bindings/overrides/dmsdk-fixed-digest-bindings.json" },
+    sources: { ir: "packages/bindings/generated/defold-sdk-ir.json", shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json", policy: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json" },
     sourceHashes: { ...Object.fromEntries(Object.entries(contents).map(([key, value]) => [key, sha256(value)])), headers: Object.fromEntries([...evidenceHeaders].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])) },
     policy: { candidateSelector: policy.candidateSelector, cAbi: "const uint8_t* plus uint32_t input length; caller-owned uint8_t* output plus validated uint32_t capacity", ownership: "input is borrowed for the synchronous call; output is caller-owned; no native pointer escapes", allocation: "generated wrappers and dispatcher use no allocation or ownership primitive", jsi: "not-generated: zero-copy typed-array lifetime and module installation remain an explicit later policy", html5: "not-claimed pending target compile/link matrix" },
     coverage: { baselineRuntimePending: shapes.coverage.runtimePending, discovered: candidates.length, emitted: entries.length, policyBlocked: 0, hostBehaviorVerified: entries.length, remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - 26 - 7 - entries.length },
     artifactHashes: Object.fromEntries([...artifacts].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])), artifacts: [...artifacts.keys()].sort(),
     declarations: entries.map(({ id, candidate, declaration, digestBytes, evidence, wrapper }) => ({ ...candidate, bindingId: id, wrapper, digestBytes, evidence, stages: { generated: "complete", compiled: "packaged-sdk-object-test", linked: "packaged-sdk-host-link-test", runtime: "packaged-sdk-host-behavior-test", allocation: "100000-warmed-dispatch-zero-cpp-allocations" } }))
   };
-  artifacts.set("bindings/generated/defold-dmsdk-fixed-digest-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
+  artifacts.set("packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
   return { artifacts, report };
 }
 

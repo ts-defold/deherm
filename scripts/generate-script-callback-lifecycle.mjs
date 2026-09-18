@@ -8,10 +8,10 @@ import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  policy: new URL("bindings/overrides/script-callback-lifecycle-policies.json", root),
-  output: new URL("bindings/generated/defold-script-callback-lifecycle.json", root),
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  policy: new URL("packages/bindings/overrides/script-callback-lifecycle-policies.json", root),
+  output: new URL("packages/bindings/generated/defold-script-callback-lifecycle.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_callback_lifecycle.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_callback_lifecycle.cpp", root),
   target: new URL("packages/sdk/src/generated/script/callback-lifecycle.ts", root)

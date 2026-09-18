@@ -10,7 +10,7 @@ import {
 } from "../scripts/generate-bindings.mjs";
 
 const schema = JSON.parse(
-  await readFile(new URL("../bindings/modules.json", import.meta.url), "utf8")
+  await readFile(new URL("../packages/bindings/modules.json", import.meta.url), "utf8")
 );
 
 test("the binding IR computes deterministic, C-compatible layouts", () => {
@@ -34,7 +34,7 @@ test("one IR emits every runtime binding surface", () => {
     "defold/defold_hermes/src/generated_jsi.cpp",
     "defold/defold_hermes/lib/web/generated_modules.js",
     "packages/static-hermes/src/generated/ffi.js",
-    "bindings/generated/symbol-map.json",
+    "packages/bindings/generated/symbol-map.json",
     "packages/sdk/src/generated/modules/ExampleMath.ts",
     "packages/sdk/src/generated/functions/ExampleMath/add.ts",
     "packages/sdk/src/generated/functions/ExampleMath/multiply.ts",

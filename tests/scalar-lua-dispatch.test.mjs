@@ -12,7 +12,7 @@ test("scalar Lua descriptors are deterministic and complete", async () => {
     stdio: "pipe"
   });
   const report = JSON.parse(await readFile(new URL(
-    "bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
+    "packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
   assert.equal(report.bindingCount, 90);
   assert.equal(report.bindings.length, 90);
   assert.equal(new Set(report.bindings.map((binding) => binding.stableId)).size, 90);
@@ -22,7 +22,7 @@ test("scalar Lua descriptors are deterministic and complete", async () => {
 
 test("source-validated bit.tohex optionality is explicit", async () => {
   const report = JSON.parse(await readFile(new URL(
-    "bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
+    "packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
   const binding = report.bindings.find((entry) => entry.id === "script:bit.tohex");
   assert.ok(binding);
   assert.equal(binding.requiredArgumentCount, 1);
@@ -35,7 +35,7 @@ test("source-validated bit.tohex optionality is explicit", async () => {
 
 test("descriptor report keeps allocation and coverage claims bounded", async () => {
   const report = JSON.parse(await readFile(new URL(
-    "bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
+    "packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
   assert.match(report.coverageClaim, /runtime dispatch is installed for all 90/i);
   assert.match(report.coverageClaim, /real-engine conformance is not claimed/i);
   assert.match(report.allocationClaim, /Lua may allocate/i);
@@ -47,8 +47,8 @@ test("real-engine probes are deterministic and descriptor validated", async () =
     stdio: "pipe"
   });
   const [dispatch, probes, generated] = await Promise.all([
-    readFile(new URL("bindings/generated/defold-script-scalar-dispatch.json", root), "utf8").then(JSON.parse),
-    readFile(new URL("bindings/generated/defold-script-real-engine-probes.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("packages/bindings/generated/defold-script-real-engine-probes.json", root), "utf8").then(JSON.parse),
     readFile(new URL("examples/runtime-smoke/src/generated/script-real-engine-probes.ts", root), "utf8")
   ]);
   const dispatchById = new Map(dispatch.bindings.map((binding) => [binding.id, binding]));
@@ -75,7 +75,7 @@ test("real-engine probes are deterministic and descriptor validated", async () =
 
 test("all generated TypeScript script wrappers use the descriptor stable-ID scheme", async () => {
   const [ir, modules] = await Promise.all([
-    readFile(new URL("../bindings/generated/defold-script-api-ir.json", import.meta.url), "utf8").then(JSON.parse),
+    readFile(new URL("../packages/bindings/generated/defold-script-api-ir.json", import.meta.url), "utf8").then(JSON.parse),
     readFile(new URL("../packages/sdk/src/generated/script/modules.ts", import.meta.url), "utf8")
   ]);
   const emitted = [...modules.matchAll(/callScriptApi\((0x[0-9a-f]+), args\)/gi)]

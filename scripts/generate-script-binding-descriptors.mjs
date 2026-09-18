@@ -437,9 +437,9 @@ async function main(argv = process.argv.slice(2)) {
   if (unknown.length > 0) throw new Error(`Unknown argument: ${unknown[0]}`);
   const check = argv.includes("--check");
   const root = new URL("../", import.meta.url);
-  const irUrl = new URL("bindings/generated/defold-script-api-ir.json", root);
-  const patternUrl = new URL("bindings/generated/defold-script-binding-patterns.json", root);
-  const jsonUrl = new URL("bindings/generated/defold-script-binding-descriptors.json", root);
+  const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
+  const patternUrl = new URL("packages/bindings/generated/defold-script-binding-patterns.json", root);
+  const jsonUrl = new URL("packages/bindings/generated/defold-script-binding-descriptors.json", root);
   const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp", root);
   const [irText, patternText] = await Promise.all([readFile(irUrl, "utf8"), readFile(patternUrl, "utf8")]);
   assert(sha256(irText) === JSON.parse(patternText).sourceSha256, "Pattern report is stale relative to the script IR");

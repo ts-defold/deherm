@@ -8,12 +8,12 @@ import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const inputUrls = {
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  accounting: new URL("bindings/generated/defold-script-api-accounting.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  override: new URL("bindings/overrides/script-borrowed-handle-classification.json", root)
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  accounting: new URL("packages/bindings/generated/defold-script-api-accounting.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  override: new URL("packages/bindings/overrides/script-borrowed-handle-classification.json", root)
 };
-const outputUrl = new URL("bindings/generated/defold-script-borrowed-handle-classification.json", root);
+const outputUrl = new URL("packages/bindings/generated/defold-script-borrowed-handle-classification.json", root);
 
 const OPERATION_CLASSES = [
   "checked-handle-input-terminal",

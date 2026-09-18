@@ -17,7 +17,7 @@ generated: { by: codex/gpt-5, at: 2026-09-17T00:00:00-04:00 }
   finalization.
 * Native `ExampleMath.add` is a JSI host function and returns `42` without a
   JSON/message transport; it delegates to the versioned proof C ABI.
-* `bindings/modules.json` deterministically generates the TypeScript module
+* `packages/bindings/modules.json` deterministically generates the TypeScript module
   interface and C ABI declaration; the standard check rejects stale output.
 * The real browser harness executes the same bundle, same lifecycle, and same
   typed module lookup using the browser adapter, with no Hermes Wasm payload.

@@ -13,7 +13,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 ARCHIVE = ROOT / "upstream" / "ref-doc.zip"
-OUTPUT = ROOT / "bindings" / "generated" / "defold-script-api-inventory.json"
+OUTPUT = ROOT / "packages" / "bindings" / "generated" / "defold-script-api-inventory.json"
 REPORT = ROOT / ".agents" / "docs" / "research" / "script-api-coverage.md"
 
 FUNCTION = re.compile(r"^function\s+([\w.:]+)\(([^)]*)\)\s+end\s*$")
@@ -134,17 +134,17 @@ implementation separately. A generated declaration is not automatically a
 linked or conformance-tested binding.
 
 The machine-readable inventory is
-`bindings/generated/defold-script-api-inventory.json`.
+`packages/bindings/generated/defold-script-api-inventory.json`.
 The enriched per-symbol ledger is
-`bindings/generated/defold-script-api-ir.json`.
+`packages/bindings/generated/defold-script-api-ir.json`.
 
 ## Executable coverage audit
 
 Generation covers all 926 functions and all 410 named types, including TSDoc
 and 1398 class fields. This inventory intentionally does not embed mutable
-runtime counts. `bindings/generated/defold-script-api-accounting.json` is the
+runtime counts. `packages/bindings/generated/defold-script-api-accounting.json` is the
 SHA-bound, exact partition of generated stable-ID routes, separate-module
-routes, and pending lowerings. `bindings/generated/defold-script-real-engine-matrix.json`
+routes, and pending lowerings. `packages/bindings/generated/defold-script-real-engine-matrix.json`
 independently records compile, link, and observed packaged-engine evidence.
 
 A generated signature, a generated transport route, and an engine-observed

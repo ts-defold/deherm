@@ -2,5 +2,11 @@
   "name": "@ts-defold/deherm-internal-web-adapter",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "source": "./src/host.ts",
+  "exports": {
+    ".": "./src/host.ts",
+    "./host": "./src/host.ts",
+    "./runner": "./src/runner.ts"
+  }
 }

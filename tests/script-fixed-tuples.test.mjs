@@ -10,7 +10,7 @@ const root = new URL("../", import.meta.url);
 
 test("fixed tuple generator selects the exact mechanical family", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-fixed-tuples.mjs", "--check"], { cwd: root });
-  const report = JSON.parse(await readFile(new URL("bindings/generated/defold-script-fixed-tuples.json", root)));
+  const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root)));
   assert.equal(report.bindingCount, 24);
   assert.deepEqual(report.bucketCounts, { "fixed-scalar-tuple": 17, "fixed-value-tuple": 7 });
   assert.deepEqual(report.tupleArityCounts, { 2: 17, 3: 4, 4: 3 });
@@ -35,8 +35,8 @@ test("fixed tuple generator selects the exact mechanical family", async () => {
 
 test("fixed tuple positional codecs and planned probes fail closed", async () => {
   const [report, probes, source, target] = await Promise.all([
-    readFile(new URL("bindings/generated/defold-script-fixed-tuples.json", root), "utf8").then(JSON.parse),
-    readFile(new URL("bindings/generated/defold-script-fixed-tuple-probes.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root), "utf8").then(JSON.parse),
+    readFile(new URL("packages/bindings/generated/defold-script-fixed-tuple-probes.json", root), "utf8").then(JSON.parse),
     readFile(new URL("defold/defold_hermes/src/generated_script_fixed_tuples.cpp", root), "utf8"),
     readFile(new URL("packages/sdk/src/generated/script/fixed-tuple-target-support.ts", root), "utf8")
   ]);

@@ -9,9 +9,9 @@ import {
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
 
 const root = new URL("../", import.meta.url);
-const patternsUrl = new URL("bindings/generated/defold-script-binding-patterns.json", root);
-const irUrl = new URL("bindings/generated/defold-script-api-ir.json", root);
-const reportUrl = new URL("bindings/generated/defold-script-scalar-dispatch.json", root);
+const patternsUrl = new URL("packages/bindings/generated/defold-script-binding-patterns.json", root);
+const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
+const reportUrl = new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root);
 const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp", root);
 const sourceUrl = new URL("defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp", root);
 

@@ -6,7 +6,7 @@ import { join } from "node:path";
 import test from "node:test";
 
 const root = new URL("../", import.meta.url);
-const reportPath = new URL("bindings/generated/defold-script-route-availability-profiles.json", root);
+const reportPath = new URL("packages/bindings/generated/defold-script-route-availability-profiles.json", root);
 
 function run(args, options = {}) {
   return execFileSync(process.execPath, args, { cwd: root, encoding: "utf8", stdio: "pipe", ...options });
@@ -20,7 +20,7 @@ test("availability profiles regenerate byte-identically from manifests and Lua r
   const outputRoot = await mkdtemp(join(tmpdir(), "deherm-route-profiles-"));
   try {
     run(["scripts/generate-script-route-availability-profiles.mjs", "--out-root", outputRoot]);
-    const generated = await readFile(join(outputRoot, "bindings/generated/defold-script-route-availability-profiles.json"), "utf8");
+    const generated = await readFile(join(outputRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8");
     assert.equal(generated, await readFile(reportPath, "utf8"));
     run(["scripts/generate-script-route-availability-profiles.mjs", "--check"]);
   } finally {
@@ -108,7 +108,7 @@ test("runtime capability handshake contracts are complete generated material", a
 test("source hash and census drift abort generation", async () => {
   const outputRoot = await mkdtemp(join(tmpdir(), "deherm-route-profile-drift-"));
   try {
-    const policy = await readFile(new URL("bindings/overrides/script-route-availability-profiles.json", root), "utf8");
+    const policy = await readFile(new URL("packages/bindings/overrides/script-route-availability-profiles.json", root), "utf8");
     const hashDriftPolicy = join(outputRoot, "hash-drift.json");
     await writeFile(hashDriftPolicy, policy.replace(/c898c4b8[a-f0-9]+/, "0".repeat(64)));
     assert.throws(() => run([

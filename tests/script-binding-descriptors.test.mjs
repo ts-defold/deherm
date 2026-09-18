@@ -6,9 +6,9 @@ import test from "node:test";
 import { generateScriptBindingDescriptors } from "../scripts/generate-script-binding-descriptors.mjs";
 
 const root = new URL("../", import.meta.url);
-const ir = JSON.parse(await readFile(new URL("bindings/generated/defold-script-api-ir.json", root), "utf8"));
-const patterns = JSON.parse(await readFile(new URL("bindings/generated/defold-script-binding-patterns.json", root), "utf8"));
-const checkedJsonText = await readFile(new URL("bindings/generated/defold-script-binding-descriptors.json", root), "utf8");
+const ir = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-api-ir.json", root), "utf8"));
+const patterns = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-binding-patterns.json", root), "utf8"));
+const checkedJsonText = await readFile(new URL("packages/bindings/generated/defold-script-binding-descriptors.json", root), "utf8");
 const checkedHeader = await readFile(new URL("defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp", root), "utf8");
 const checked = JSON.parse(checkedJsonText);
 const generated = generateScriptBindingDescriptors(ir, patterns);
@@ -64,7 +64,7 @@ test("keeps all hot SoA ranges compact, contiguous, and in bounds", () => {
 
 test("uses one persistent stable-ID scheme across full and scalar descriptors", async () => {
   const scalar = JSON.parse(await readFile(new URL(
-    "bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
+    "packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
   const denseByKey = new Map(checked.cold.stableKeys.map((key, index) => [key, index]));
   for (const binding of scalar.bindings) {
     const denseIndex = denseByKey.get(binding.id);

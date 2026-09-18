@@ -8,7 +8,7 @@ import test from "node:test";
 
 const testDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(testDirectory, "..");
-const reportPath = join(repositoryRoot, "bindings/generated/defold-dmsdk-abi-shapes.json");
+const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json");
 
 function run(args) {
   return execFileSync(process.execPath, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe" });

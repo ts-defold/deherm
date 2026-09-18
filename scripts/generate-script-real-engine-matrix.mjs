@@ -6,18 +6,18 @@ import { pathToFileURL } from "node:url";
 
 const root = new URL("../", import.meta.url);
 const inputUrls = {
-  manifest: new URL("bindings/probes/defold-script-real-engine-matrix.json", root),
-  scalarRoutes: new URL("bindings/generated/defold-script-scalar-dispatch.json", root),
-  valueRoutes: new URL("bindings/generated/defold-script-value-bindings.json", root),
-  tupleRoutes: new URL("bindings/generated/defold-script-fixed-tuples.json", root),
-  urlRoutes: new URL("bindings/generated/defold-script-url-address-classification.json", root),
-  valueTailRoutes: new URL("bindings/generated/defold-script-value-tail-bindings.json", root),
-  overloadRoutes: new URL("bindings/generated/defold-script-overload-dispatch.json", root),
-  scalarProbes: new URL("bindings/generated/defold-script-real-engine-probes.json", root),
-  valueProbes: new URL("bindings/generated/defold-script-value-real-engine-probes.json", root),
-  tupleProbes: new URL("bindings/generated/defold-script-fixed-tuple-probes.json", root)
+  manifest: new URL("packages/bindings/probes/defold-script-real-engine-matrix.json", root),
+  scalarRoutes: new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root),
+  valueRoutes: new URL("packages/bindings/generated/defold-script-value-bindings.json", root),
+  tupleRoutes: new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root),
+  urlRoutes: new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
+  valueTailRoutes: new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root),
+  overloadRoutes: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root),
+  scalarProbes: new URL("packages/bindings/generated/defold-script-real-engine-probes.json", root),
+  valueProbes: new URL("packages/bindings/generated/defold-script-value-real-engine-probes.json", root),
+  tupleProbes: new URL("packages/bindings/generated/defold-script-fixed-tuple-probes.json", root)
 };
-const reportUrl = new URL("bindings/generated/defold-script-real-engine-matrix.json", root);
+const reportUrl = new URL("packages/bindings/generated/defold-script-real-engine-matrix.json", root);
 const stages = ["compile", "link", "runtime"];
 const setupContextKinds = new Set(["global", "script-instance", "gui-script", "render-script", "extension"]);
 const propertyTypes = new Set(["number", "integer", "boolean", "string", "hash", "url", "vector3", "vector4", "quaternion"]);

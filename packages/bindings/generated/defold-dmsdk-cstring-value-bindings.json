@@ -1,0 +1,1348 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "projection": "packages/bindings/generated/defold-dmsdk-projection-ir.json",
+    "sdkIr": "packages/bindings/generated/defold-sdk-ir.json",
+    "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
+    "hashes": {
+      "projection": "052a5bb57b3c247abc5e0810321ed19b1cddb886b6ecc2d4348b96f44bf5e1bf",
+      "sdkIr": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
+      "policy": "706cdbe77d7d370e1335e5631765dbee210ab7512fde69dbabc60a17785cc121",
+      "semanticEvidence": {
+        "buffer-string-results": {
+          "id": "buffer-string-results",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h",
+          "sha256": "b3d3d513d1db5ad537f552d0de9116e075c87bdb54ec27b61189c8fbb3ea80b9",
+          "anchors": [
+            "const char* GetResultString(Result result);",
+            "const char* GetValueTypeString(ValueType value);"
+          ]
+        },
+        "graphics-texture-literals": {
+          "id": "graphics-texture-literals",
+          "path": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+          "sha256": "10bc2e302a8515ff0636f2cb8bdbece5a63bbd32ee0c10333e57986049ca382b",
+          "anchors": [
+            "const char* GetTextureTypeLiteral(TextureType texture_type);",
+            "const char* GetTextureFormatLiteral(TextureFormat format);"
+          ]
+        },
+        "hash-null-terminated-input": {
+          "id": "hash-null-terminated-input",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "sha256": "242aa8e2cd74382d429830884e8047b8c1db9d5b0782594253e9dcddb396abc5",
+          "anchors": [
+            "DM_DLLEXPORT uint32_t dmHashString32(const char* string);",
+            "DM_DLLEXPORT uint64_t dmHashString64(const char* string);"
+          ]
+        },
+        "resource-extension-cpp": {
+          "id": "resource-extension-cpp",
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+          "sha256": "382d79cd16296229092883822a93a41ae896103923ef05f1901202736cfc50d7",
+          "anchors": [
+            "Pointer to extension string if success (same as buffer), 0 otherwise",
+            "const char* GetExtFromPath(const char* path);"
+          ]
+        },
+        "resource-extension-c": {
+          "id": "resource-extension-c",
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
+          "sha256": "c1ea1bbdde3576040d712fe837bd074a35c86090e974a5bef92f51375a097579",
+          "anchors": [
+            "Pointer to extension string if an extension was found, 0 otherwise",
+            "const char* ResourceGetExtFromPath(const char* path);"
+          ]
+        },
+        "socket-result-string": {
+          "id": "socket-result-string",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h",
+          "sha256": "082e317d15576c42f87bdba8ff47c4b9ce90943fc24df3c00fec922ab16cb400",
+          "anchors": [
+            "const char* ResultToString(Result result);"
+          ]
+        },
+        "case-insensitive-byte-compare": {
+          "id": "case-insensitive-byte-compare",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+          "sha256": "c31d7f9f6408120e88cd0b3257720ed4cb98e6670ce9ebd15d30adbb3a8896fc",
+          "anchors": [
+            "int dmStrCaseCmp(const char *s1, const char *s2);"
+          ]
+        },
+        "filesystem-path-inputs": {
+          "id": "filesystem-path-inputs",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
+          "sha256": "0a05162524d96d340c46b03470319265f3817aaea34d786c52cc31499a0900f9",
+          "anchors": [
+            "bool Exists(const char* path);",
+            "Result Unlink(const char* path);",
+            "Result Rename(const char* dst_path, const char* src_path);"
+          ]
+        },
+        "utf8-string-input": {
+          "id": "utf8-string-input",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
+          "sha256": "b08d53d589e046eead23616d32d515966b429b661a86504a1b04accd413603fe",
+          "anchors": [
+            "@param str [type: const char*] Utf8 string",
+            "uint32_t StrLen(const char* str);"
+          ]
+        }
+      },
+      "blockerEvidence": {
+        "graphics-adapter-runtime-domain": {
+          "id": "graphics-adapter-runtime-domain",
+          "path": "upstream/defold/engine/graphics/src/graphics.cpp",
+          "contains": "assert(0 && \"Adapter type not supported?\")",
+          "sha256": "452da12536a6fc2b9c25db8a9091dd919705f7ed01ca8bf9045a9e3572c1516b"
+        },
+        "hash-borrowed-registry-result": {
+          "id": "hash-borrowed-registry-result",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "contains": "@note Do not store this pointer",
+          "sha256": "242aa8e2cd74382d429830884e8047b8c1db9d5b0782594253e9dcddb396abc5"
+        },
+        "profiler-logical-context": {
+          "id": "profiler-logical-context",
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "contains": "ProfileResult ProfileScopeEnd(const char* name, uint64_t name_hash);",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      }
+    }
+  },
+  "selector": "global pointer-family function + nonvariadic + no callback/record/template/span + const input cstrings + exact result {void,cstring,enum,bool,i32,u32,u64} + exact parameter {cstring,enum,u32,u64}; independent of lowering/evidence disposition",
+  "coverage": {
+    "candidates": 20,
+    "generated": 14,
+    "blocked": 6,
+    "nativeAbiGenerated": 14,
+    "headerObjectCompiled": 0,
+    "pinnedEngineLinked": 0,
+    "stubAbiLinkedAndRuntimeTested": 0,
+    "nativeDynamicHermesAdapterGenerated": 14,
+    "nativeStaticHermesDirectMemoryAbiGenerated": 14,
+    "browserDirectMemoryDescriptorGenerated": 14,
+    "allTargetConformant": 0
+  },
+  "stringPolicy": {
+    "input": "The staged JavaScript adapter deliberately narrows const char* inputs to non-null JavaScript strings, uses the host JSI UTF-8 conversion, rejects embedded NUL, and synthesizes the terminator. Lone-surrogate handling therefore follows the selected JSI engine and remains outside cross-target conformance until a shared UTF-16-to-UTF-8 policy is generated. The C ABI itself continues to accept exact caller-provided non-NUL byte views; this policy does not claim every native byte domain is intrinsically UTF-8.",
+    "result": "Reviewed result contracts explicitly choose nullable or non-null and decode copied null-terminated native bytes as UTF-8. Source hashes and anchors pin the declaration evidence; they do not prove arbitrary engine-returned bytes are valid Unicode.",
+    "unresolved": "A candidate without exactly one non-overlapping reviewed contract is blocked as cstring-semantic-contract-unresolved."
+  },
+  "abi": {
+    "input": "exact byte view; null data is valid only with zero length and means an empty string; embedded NUL rejected; terminator synthesized in bounded caller/TLS scratch",
+    "enumInput": "exact declared-value membership generated from pinned SDK IR; sentinel COUNT/MAX/NUM enumerators are rejected",
+    "enumDomains": {
+      "dmBuffer::Result": [
+        {
+          "name": "dmBuffer::RESULT_OK",
+          "value": 0
+        },
+        {
+          "name": "dmBuffer::RESULT_GUARD_INVALID",
+          "value": 1
+        },
+        {
+          "name": "dmBuffer::RESULT_ALLOCATION_ERROR",
+          "value": 2
+        },
+        {
+          "name": "dmBuffer::RESULT_BUFFER_INVALID",
+          "value": 3
+        },
+        {
+          "name": "dmBuffer::RESULT_BUFFER_SIZE_ERROR",
+          "value": 4
+        },
+        {
+          "name": "dmBuffer::RESULT_STREAM_SIZE_ERROR",
+          "value": 5
+        },
+        {
+          "name": "dmBuffer::RESULT_STREAM_MISSING",
+          "value": 6
+        },
+        {
+          "name": "dmBuffer::RESULT_STREAM_TYPE_MISMATCH",
+          "value": 7
+        },
+        {
+          "name": "dmBuffer::RESULT_STREAM_MISMATCH",
+          "value": 9
+        },
+        {
+          "name": "dmBuffer::RESULT_METADATA_INVALID",
+          "value": 10
+        },
+        {
+          "name": "dmBuffer::RESULT_METADATA_MISSING",
+          "value": 11
+        }
+      ],
+      "dmBuffer::ValueType": [
+        {
+          "name": "dmBuffer::VALUE_TYPE_UINT8",
+          "value": 0
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_UINT16",
+          "value": 1
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_UINT32",
+          "value": 2
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_UINT64",
+          "value": 3
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_INT8",
+          "value": 4
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_INT16",
+          "value": 5
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_INT32",
+          "value": 6
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_INT64",
+          "value": 7
+        },
+        {
+          "name": "dmBuffer::VALUE_TYPE_FLOAT32",
+          "value": 8
+        }
+      ],
+      "dmGraphics::TextureFormat": [
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_LUMINANCE",
+          "value": 0
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_LUMINANCE_ALPHA",
+          "value": 1
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB",
+          "value": 2
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA",
+          "value": 3
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB_16BPP",
+          "value": 4
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_16BPP",
+          "value": 5
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_DEPTH",
+          "value": 6
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_STENCIL",
+          "value": 7
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB_PVRTC_2BPPV1",
+          "value": 8
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB_PVRTC_4BPPV1",
+          "value": 9
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_PVRTC_2BPPV1",
+          "value": 10
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_PVRTC_4BPPV1",
+          "value": 11
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB_ETC1",
+          "value": 12
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_R_ETC2",
+          "value": 13
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RG_ETC2",
+          "value": 14
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ETC2",
+          "value": 15
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_4X4",
+          "value": 16
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB_BC1",
+          "value": 17
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_BC3",
+          "value": 18
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_R_BC4",
+          "value": 19
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RG_BC5",
+          "value": 20
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_BC7",
+          "value": 21
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB16F",
+          "value": 22
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGB32F",
+          "value": 23
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA16F",
+          "value": 24
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA32F",
+          "value": 25
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_R16F",
+          "value": 26
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RG16F",
+          "value": 27
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_R32F",
+          "value": 28
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RG32F",
+          "value": 29
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA32UI",
+          "value": 30
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_BGRA8U",
+          "value": 31
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_R32UI",
+          "value": 32
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_5X4",
+          "value": 33
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_5X5",
+          "value": 34
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_6X5",
+          "value": 35
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_6X6",
+          "value": 36
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_8X5",
+          "value": 37
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_8X6",
+          "value": 38
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_8X8",
+          "value": 39
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_10X5",
+          "value": 40
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_10X6",
+          "value": 41
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_10X8",
+          "value": 42
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_10X10",
+          "value": 43
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_12X10",
+          "value": 44
+        },
+        {
+          "name": "dmGraphics::TEXTURE_FORMAT_RGBA_ASTC_12X12",
+          "value": 45
+        }
+      ],
+      "dmGraphics::TextureType": [
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_2D",
+          "value": 0
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_2D_ARRAY",
+          "value": 1
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_3D",
+          "value": 2
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_CUBE_MAP",
+          "value": 3
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_IMAGE_2D",
+          "value": 4
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_IMAGE_3D",
+          "value": 5
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_SAMPLER",
+          "value": 6
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_TEXTURE_2D",
+          "value": 7
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_TEXTURE_2D_ARRAY",
+          "value": 8
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_TEXTURE_3D",
+          "value": 9
+        },
+        {
+          "name": "dmGraphics::TEXTURE_TYPE_TEXTURE_CUBE",
+          "value": 10
+        }
+      ],
+      "dmSocket::Result": [
+        {
+          "name": "dmSocket::RESULT_OK",
+          "value": 0
+        },
+        {
+          "name": "dmSocket::RESULT_ACCES",
+          "value": -1
+        },
+        {
+          "name": "dmSocket::RESULT_AFNOSUPPORT",
+          "value": -2
+        },
+        {
+          "name": "dmSocket::RESULT_WOULDBLOCK",
+          "value": -3
+        },
+        {
+          "name": "dmSocket::RESULT_BADF",
+          "value": -4
+        },
+        {
+          "name": "dmSocket::RESULT_CONNRESET",
+          "value": -5
+        },
+        {
+          "name": "dmSocket::RESULT_DESTADDRREQ",
+          "value": -6
+        },
+        {
+          "name": "dmSocket::RESULT_FAULT",
+          "value": -7
+        },
+        {
+          "name": "dmSocket::RESULT_HOSTUNREACH",
+          "value": -8
+        },
+        {
+          "name": "dmSocket::RESULT_INTR",
+          "value": -9
+        },
+        {
+          "name": "dmSocket::RESULT_INVAL",
+          "value": -10
+        },
+        {
+          "name": "dmSocket::RESULT_ISCONN",
+          "value": -11
+        },
+        {
+          "name": "dmSocket::RESULT_MFILE",
+          "value": -12
+        },
+        {
+          "name": "dmSocket::RESULT_MSGSIZE",
+          "value": -13
+        },
+        {
+          "name": "dmSocket::RESULT_NETDOWN",
+          "value": -14
+        },
+        {
+          "name": "dmSocket::RESULT_NETUNREACH",
+          "value": -15
+        },
+        {
+          "name": "dmSocket::RESULT_NOBUFS",
+          "value": -17
+        },
+        {
+          "name": "dmSocket::RESULT_NOTCONN",
+          "value": -20
+        },
+        {
+          "name": "dmSocket::RESULT_NOTSOCK",
+          "value": -22
+        },
+        {
+          "name": "dmSocket::RESULT_OPNOTSUPP",
+          "value": -23
+        },
+        {
+          "name": "dmSocket::RESULT_PIPE",
+          "value": -24
+        },
+        {
+          "name": "dmSocket::RESULT_PROTONOSUPPORT",
+          "value": -25
+        },
+        {
+          "name": "dmSocket::RESULT_PROTOTYPE",
+          "value": -26
+        },
+        {
+          "name": "dmSocket::RESULT_TIMEDOUT",
+          "value": -27
+        },
+        {
+          "name": "dmSocket::RESULT_ADDRNOTAVAIL",
+          "value": -28
+        },
+        {
+          "name": "dmSocket::RESULT_CONNREFUSED",
+          "value": -29
+        },
+        {
+          "name": "dmSocket::RESULT_ADDRINUSE",
+          "value": -30
+        },
+        {
+          "name": "dmSocket::RESULT_CONNABORTED",
+          "value": -31
+        },
+        {
+          "name": "dmSocket::RESULT_INPROGRESS",
+          "value": -32
+        },
+        {
+          "name": "dmSocket::RESULT_HOST_NOT_FOUND",
+          "value": -100
+        },
+        {
+          "name": "dmSocket::RESULT_TRY_AGAIN",
+          "value": -101
+        },
+        {
+          "name": "dmSocket::RESULT_NO_RECOVERY",
+          "value": -102
+        },
+        {
+          "name": "dmSocket::RESULT_NO_DATA",
+          "value": -103
+        },
+        {
+          "name": "dmSocket::RESULT_UNKNOWN",
+          "value": -1000
+        }
+      ]
+    },
+    "output": "immediate overlap-safe copy to caller-owned dst/capacity/out_required/present; capacity includes the required trailing NUL, so capacity == required is too small for a present result",
+    "browserDescriptor": "route-specific scalar/enum input kinds, exact result lane width, result nullability, memory layouts, and string policy are generated; the descriptor remains private and unregistered",
+    "status": "fixed-width uint32_t / Static Hermes c_uint",
+    "storage": {
+      "strings": 2,
+      "scalars": 1
+    },
+    "tlsScratchCapacity": 65536,
+    "reentrant": "mark/reset frames on thread-local or caller-owned scratch",
+    "allocation": "generated C ABI contains no explicit allocation primitive; an independent test observes zero warmed C++ operator-new calls. Caller-owned scratch is the strict caller-controlled capacity path; TLS scratch is a bounded convenience path. Engine implementations and JS string conversion are outside this claim"
+  },
+  "truthBoundary": "Private staging only: the TypeScript wrapper is not exported from the SDK barrel, the JSI installer is not registered, the Static Hermes artifact is not compiled into an application, the browser descriptor is not installed by a public module, and the guarded native sources are not linked into a production runtime target. This generated report claims generation only and intentionally records compile/link/runtime evidence as zero. tests/dmsdk-cstring-value-bindings.test.mjs independently object-compiles the generated native, runtime, and JSI units against pinned headers and links/runs every native adapter against ABI-compatible stubs. Pinned Defold engine linkage, extension retention, target execution, and engine-allocation observations remain unproven; generated does not mean engine-proven.",
+  "declarations": [
+    {
+      "id": "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
+      "projectionId": "dmsdk-projection:a356e91ea0258ba88522e629",
+      "stableId": 628241714,
+      "denseId": 0,
+      "symbol": "dmBuffer::GetResultString",
+      "provenance": {
+        "sourceId": "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h",
+        "line": 373,
+        "declarationKind": "function",
+        "nativeSignature": "dmBuffer::GetResultString(Result) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        },
+        "sourceEvidence": [
+          "buffer-string-results",
+          "graphics-texture-literals",
+          "socket-result-string"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
+      "projectionId": "dmsdk-projection:37acfc9a1a1b8741b70aba67",
+      "stableId": 3185040835,
+      "denseId": 1,
+      "symbol": "dmBuffer::GetValueTypeString",
+      "provenance": {
+        "sourceId": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h",
+        "line": 383,
+        "declarationKind": "function",
+        "nativeSignature": "dmBuffer::GetValueTypeString(ValueType) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        },
+        "sourceEvidence": [
+          "buffer-string-results",
+          "graphics-texture-literals",
+          "socket-result-string"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmGraphics::GetAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1721:1456",
+      "projectionId": "dmsdk-projection:846831b66fdab5ec93b9e963",
+      "stableId": 878697019,
+      "denseId": null,
+      "symbol": "dmGraphics::GetAdapterFamily",
+      "provenance": {
+        "sourceId": "dmsdk:dmGraphics::GetAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1721:1456",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+        "line": 1721,
+        "declarationKind": "function",
+        "nativeSignature": "dmGraphics::GetAdapterFamily(const char *) -> AdapterFamily",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "blocked",
+      "blocker": "restricted-string-domain-requires-validator",
+      "stringContract": null,
+      "targetDisposition": {
+        "nativeDynamicHermes": "blocked",
+        "nativeStaticHermes": "blocked",
+        "html5BrowserHost": "blocked"
+      }
+    },
+    {
+      "id": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
+      "projectionId": "dmsdk-projection:91ed46ebfd360ef480721976",
+      "stableId": 3337053143,
+      "denseId": 2,
+      "symbol": "dmGraphics::GetTextureFormatLiteral",
+      "provenance": {
+        "sourceId": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+        "line": 1388,
+        "declarationKind": "function",
+        "nativeSignature": "dmGraphics::GetTextureFormatLiteral(TextureFormat) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        },
+        "sourceEvidence": [
+          "buffer-string-results",
+          "graphics-texture-literals",
+          "socket-result-string"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
+      "projectionId": "dmsdk-projection:231779713b56f6ce6ee07c7f",
+      "stableId": 3006735102,
+      "denseId": 3,
+      "symbol": "dmGraphics::GetTextureTypeLiteral",
+      "provenance": {
+        "sourceId": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+        "line": 1380,
+        "declarationKind": "function",
+        "nativeSignature": "dmGraphics::GetTextureTypeLiteral(TextureType) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        },
+        "sourceEvidence": [
+          "buffer-string-results",
+          "graphics-texture-literals",
+          "socket-result-string"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmHashReverseSafe32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:134:218",
+      "projectionId": "dmsdk-projection:9f329df8359d3c5be687b2b4",
+      "stableId": 2781643289,
+      "denseId": null,
+      "symbol": "dmHashReverseSafe32",
+      "provenance": {
+        "sourceId": "dmsdk:dmHashReverseSafe32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:134:218",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "line": 134,
+        "declarationKind": "function",
+        "nativeSignature": "dmHashReverseSafe32(uint32_t) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "blocked",
+      "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+      "stringContract": null,
+      "targetDisposition": {
+        "nativeDynamicHermes": "blocked",
+        "nativeStaticHermes": "blocked",
+        "html5BrowserHost": "blocked"
+      }
+    },
+    {
+      "id": "dmsdk:dmHashReverseSafe64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:109:216",
+      "projectionId": "dmsdk-projection:65601bb8802e8e5723ef2f2e",
+      "stableId": 1408951733,
+      "denseId": null,
+      "symbol": "dmHashReverseSafe64",
+      "provenance": {
+        "sourceId": "dmsdk:dmHashReverseSafe64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:109:216",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "line": 109,
+        "declarationKind": "function",
+        "nativeSignature": "dmHashReverseSafe64(uint64_t) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "blocked",
+      "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+      "stringContract": null,
+      "targetDisposition": {
+        "nativeDynamicHermes": "blocked",
+        "nativeStaticHermes": "blocked",
+        "html5BrowserHost": "blocked"
+      }
+    },
+    {
+      "id": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
+      "projectionId": "dmsdk-projection:8475d4f3f294fc877bfbd3ef",
+      "stableId": 242908930,
+      "denseId": 4,
+      "symbol": "dmHashString32",
+      "provenance": {
+        "sourceId": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "line": 88,
+        "declarationKind": "function",
+        "nativeSignature": "dmHashString32(const char *) -> uint32_t",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "hash-input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null,
+        "sourceEvidence": [
+          "hash-null-terminated-input"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
+      "projectionId": "dmsdk-projection:53d2c77e57af8c8ed773fd5e",
+      "stableId": 2606373769,
+      "denseId": 5,
+      "symbol": "dmHashString64",
+      "provenance": {
+        "sourceId": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "line": 97,
+        "declarationKind": "function",
+        "nativeSignature": "dmHashString64(const char *) -> uint64_t",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "hash-input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null,
+        "sourceEvidence": [
+          "hash-null-terminated-input"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1968",
+      "projectionId": "dmsdk-projection:15f05a3fd97304eddbbb6683",
+      "stableId": 4261926893,
+      "denseId": 6,
+      "symbol": "dmResource::GetExtFromPath",
+      "provenance": {
+        "sourceId": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1968",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+        "line": 141,
+        "declarationKind": "function",
+        "nativeSignature": "dmResource::GetExtFromPath(const char *) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "resource-extension-cpp-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": {
+          "nullability": "nullable",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        },
+        "sourceEvidence": [
+          "resource-extension-cpp"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
+      "projectionId": "dmsdk-projection:07262e9d56b121403ddcc7fe",
+      "stableId": 2601716781,
+      "denseId": 7,
+      "symbol": "dmSocket::ResultToString",
+      "provenance": {
+        "sourceId": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h",
+        "line": 388,
+        "declarationKind": "function",
+        "nativeSignature": "dmSocket::ResultToString(Result) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        },
+        "sourceEvidence": [
+          "buffer-string-results",
+          "graphics-texture-literals",
+          "socket-result-string"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
+      "projectionId": "dmsdk-projection:8b17042ca3399c474fe2b584",
+      "stableId": 2710125394,
+      "denseId": 8,
+      "symbol": "dmStrCaseCmp",
+      "provenance": {
+        "sourceId": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+        "line": 155,
+        "declarationKind": "function",
+        "nativeSignature": "dmStrCaseCmp(const char *, const char *) -> int",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "case-compare-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null,
+        "sourceEvidence": [
+          "case-insensitive-byte-compare"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
+      "projectionId": "dmsdk-projection:f764cc372769ea3ac6924545",
+      "stableId": 412070535,
+      "denseId": 9,
+      "symbol": "dmSys::Exists",
+      "provenance": {
+        "sourceId": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
+        "line": 117,
+        "declarationKind": "function",
+        "nativeSignature": "dmSys::Exists(const char *) -> bool",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "filesystem-paths-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null,
+        "sourceEvidence": [
+          "filesystem-path-inputs"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
+      "projectionId": "dmsdk-projection:b78e60c5cd486e3c1d293744",
+      "stableId": 2305180704,
+      "denseId": 10,
+      "symbol": "dmSys::Rename",
+      "provenance": {
+        "sourceId": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
+        "line": 135,
+        "declarationKind": "function",
+        "nativeSignature": "dmSys::Rename(const char *, const char *) -> Result",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "filesystem-paths-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null,
+        "sourceEvidence": [
+          "filesystem-path-inputs"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
+      "projectionId": "dmsdk-projection:029cf6c251d40209d3bf013f",
+      "stableId": 1881914853,
+      "denseId": 11,
+      "symbol": "dmSys::Unlink",
+      "provenance": {
+        "sourceId": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
+        "line": 125,
+        "declarationKind": "function",
+        "nativeSignature": "dmSys::Unlink(const char *) -> Result",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "filesystem-paths-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null,
+        "sourceEvidence": [
+          "filesystem-path-inputs"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
+      "projectionId": "dmsdk-projection:01ad907038b03b065cbd792f",
+      "stableId": 4096644126,
+      "denseId": 12,
+      "symbol": "dmUtf8::StrLen",
+      "provenance": {
+        "sourceId": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
+        "line": 41,
+        "declarationKind": "function",
+        "nativeSignature": "dmUtf8::StrLen(const char *) -> uint32_t",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "utf8-length-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null,
+        "sourceEvidence": [
+          "utf8-string-input"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    },
+    {
+      "id": "dmsdk:ProfileScopeEnd@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:382:536",
+      "projectionId": "dmsdk-projection:dd8d893d86a39e42c941c33d",
+      "stableId": 3772994617,
+      "denseId": null,
+      "symbol": "ProfileScopeEnd",
+      "provenance": {
+        "sourceId": "dmsdk:ProfileScopeEnd@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:382:536",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 382,
+        "declarationKind": "function",
+        "nativeSignature": "ProfileScopeEnd(const char *, uint64_t) -> ProfileResult",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "blocked",
+      "blocker": "profiler-logical-context-unresolved",
+      "stringContract": null,
+      "targetDisposition": {
+        "nativeDynamicHermes": "blocked",
+        "nativeStaticHermes": "blocked",
+        "html5BrowserHost": "blocked"
+      }
+    },
+    {
+      "id": "dmsdk:ProfileSetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:348:532",
+      "projectionId": "dmsdk-projection:50e728091ec13ba561464803",
+      "stableId": 2196552160,
+      "denseId": null,
+      "symbol": "ProfileSetThreadName",
+      "provenance": {
+        "sourceId": "dmsdk:ProfileSetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:348:532",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 348,
+        "declarationKind": "function",
+        "nativeSignature": "ProfileSetThreadName(const char *) -> ProfileResult",
+        "primaryFamily": "pointer",
+        "families": [
+          "enum-handle",
+          "pointer"
+        ]
+      },
+      "disposition": "blocked",
+      "blocker": "profiler-logical-context-unresolved",
+      "stringContract": null,
+      "targetDisposition": {
+        "nativeDynamicHermes": "blocked",
+        "nativeStaticHermes": "blocked",
+        "html5BrowserHost": "blocked"
+      }
+    },
+    {
+      "id": "dmsdk:ProfileUnregisterProfiler@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:324:528",
+      "projectionId": "dmsdk-projection:e7849819d56c1e104a6cb673",
+      "stableId": 1854441597,
+      "denseId": null,
+      "symbol": "ProfileUnregisterProfiler",
+      "provenance": {
+        "sourceId": "dmsdk:ProfileUnregisterProfiler@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:324:528",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 324,
+        "declarationKind": "function",
+        "nativeSignature": "ProfileUnregisterProfiler(const char *) -> void",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "blocked",
+      "blocker": "profiler-logical-context-unresolved",
+      "stringContract": null,
+      "targetDisposition": {
+        "nativeDynamicHermes": "blocked",
+        "nativeStaticHermes": "blocked",
+        "html5BrowserHost": "blocked"
+      }
+    },
+    {
+      "id": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1905",
+      "projectionId": "dmsdk-projection:ae6fdb9151089284fe79c691",
+      "stableId": 1695400188,
+      "denseId": 13,
+      "symbol": "ResourceGetExtFromPath",
+      "provenance": {
+        "sourceId": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1905",
+        "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+        "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
+        "line": 314,
+        "declarationKind": "function",
+        "nativeSignature": "ResourceGetExtFromPath(const char *) -> const char *",
+        "primaryFamily": "pointer",
+        "families": [
+          "pointer"
+        ]
+      },
+      "disposition": "generated",
+      "blocker": null,
+      "stringContract": {
+        "id": "resource-extension-c-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": {
+          "nullability": "nullable",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        },
+        "sourceEvidence": [
+          "resource-extension-c"
+        ]
+      },
+      "targetDisposition": {
+        "typescriptSdk": "staged-private-not-barrel-exported",
+        "nativeDynamicHermes": "staged-private-jsi-unregistered-unlinked",
+        "nativeStaticHermes": "staged-private-c-abi-uncompiled-unlinked",
+        "html5BrowserHost": "staged-private-descriptor-unregistered-unlinked"
+      }
+    }
+  ],
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h",
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value_jsi.hpp",
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value_jsi.cpp",
+    "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js",
+    "packages/sdk/src/generated/dmsdk/cstring-value.ts",
+    "packages/static-hermes/src/generated/dmsdk-cstring-value.ts"
+  ],
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h": "408a778f12d979ead1a51c46646167803d8142edb0862fa922bedafbd4c66dbc",
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp": "6ee49f0b936b469b11160806c5343ea943666529461514b05ce96f071015d436",
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp": "3f27d13cc2c3ded7e5f788c0594b05eee55750c0c377f93d2ac209bd99dcd66f",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value_jsi.hpp": "196499429d7405c92a74ecdcf04f40a426341dbb3b10dc1a80b0661c7fc15e5b",
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value_jsi.cpp": "ea98014e301957e1252b72d6af3d32ccf26bc7523660f60abea70fcf328e3f17",
+    "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js": "72a71ae7cddea1dfefed997efba1780a53bdc08a0124c2b4c94ea626f7decc5e",
+    "packages/sdk/src/generated/dmsdk/cstring-value.ts": "4077730cac0790dc8f995ae0b211caa4290f0cd8b2f2959255fcd00d0e06b456",
+    "packages/static-hermes/src/generated/dmsdk-cstring-value.ts": "954f8335c66d82e0d37e1c97fba9b6b816ae0c7cfd3fcdbe00a1b19b27c91a47"
+  }
+}

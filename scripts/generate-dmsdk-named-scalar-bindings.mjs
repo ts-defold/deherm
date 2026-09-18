@@ -10,10 +10,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
-const defaultIrPath = "bindings/generated/defold-sdk-ir.json";
-const defaultShapesPath = "bindings/generated/defold-dmsdk-abi-shapes.json";
-const defaultPolicyPath = "bindings/overrides/dmsdk-named-scalar-policies.json";
-const outputReportPath = "bindings/generated/defold-dmsdk-named-scalar-bindings.json";
+const defaultIrPath = "packages/bindings/generated/defold-sdk-ir.json";
+const defaultShapesPath = "packages/bindings/generated/defold-dmsdk-abi-shapes.json";
+const defaultPolicyPath = "packages/bindings/overrides/dmsdk-named-scalar-policies.json";
+const outputReportPath = "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json";
 const outputPaths = Object.freeze({
   header: "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h",
   runtimeHeader: "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_runtime.h",
@@ -201,7 +201,7 @@ export async function build({ irPath = defaultIrPath, shapesPath = defaultShapes
   ]);
   const report = {
     schemaVersion: 1, policyVersion: policy.policyVersion, defoldRevision: ir.defoldRevision,
-    sourceShapeCensus: "bindings/generated/defold-dmsdk-abi-shapes.json",
+    sourceShapeCensus: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
     scope: "The 21 declarations mechanically classified as next-named-scalar-direct. This report does not claim an engine lifecycle, thread, profiler, or sound-context capability.",
     coverage: { reviewed: 21, generated: 0, policyBlocked: 21, signatureCompileCovered: 21, linked: 0, behaviorCovered: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 },
     sourceHashes: { ir: digest(irContent), shapes: digest(shapesContent), policy: digest(policyContent) },

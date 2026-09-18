@@ -164,7 +164,7 @@ export function generateLuaArtifacts(input) {
 async function main() {
   const check = process.argv.includes("--check");
   const root = new URL("../", import.meta.url);
-  const schema = JSON.parse(await readFile(new URL("bindings/lua-compat.json", root), "utf8"));
+  const schema = JSON.parse(await readFile(new URL("packages/bindings/lua-compat.json", root), "utf8"));
   for (const [path, source] of generateLuaArtifacts(schema)) {
     const output = new URL(path, root);
     if (check) {

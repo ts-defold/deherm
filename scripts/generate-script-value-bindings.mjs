@@ -7,18 +7,18 @@ import { pathToFileURL } from "node:url";
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
-const irUrl = new URL("bindings/generated/defold-script-api-ir.json", root);
-const scalarDispatchUrl = new URL("bindings/generated/defold-script-scalar-dispatch.json", root);
-const patternsUrl = new URL("bindings/generated/defold-script-binding-patterns.json", root);
+const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
+const scalarDispatchUrl = new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root);
+const patternsUrl = new URL("packages/bindings/generated/defold-script-binding-patterns.json", root);
 const definitionUrls = [
-  new URL("bindings/overrides/script-defold-value-bindings.json", root),
-  new URL("bindings/overrides/script-defold-handle-bindings.json", root),
-  new URL("bindings/overrides/script-go-current-instance-bindings.json", root),
-  new URL("bindings/overrides/script-msg-structured-bindings.json", root),
-  new URL("bindings/overrides/script-factory-structured-bindings.json", root),
-  new URL("bindings/overrides/script-gui-structured-bindings.json", root)
+  new URL("packages/bindings/overrides/script-defold-value-bindings.json", root),
+  new URL("packages/bindings/overrides/script-defold-handle-bindings.json", root),
+  new URL("packages/bindings/overrides/script-go-current-instance-bindings.json", root),
+  new URL("packages/bindings/overrides/script-msg-structured-bindings.json", root),
+  new URL("packages/bindings/overrides/script-factory-structured-bindings.json", root),
+  new URL("packages/bindings/overrides/script-gui-structured-bindings.json", root)
 ];
-const reportUrl = new URL("bindings/generated/defold-script-value-bindings.json", root);
+const reportUrl = new URL("packages/bindings/generated/defold-script-value-bindings.json", root);
 const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_script_value_bindings.hpp", root);
 const sourceUrl = new URL("defold/defold_hermes/src/generated_script_value_bindings.cpp", root);
 const targetSupportUrl = new URL("packages/sdk/src/generated/script/value-target-support.ts", root);

@@ -7,38 +7,38 @@ const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "../../..");
 
 export const inputPaths = Object.freeze({
-  scriptProjection: "bindings/generated/defold-script-projection-ir.json",
-  scriptScalarDispatch: "bindings/generated/defold-script-scalar-dispatch.json",
-  scriptValueBindings: "bindings/generated/defold-script-value-bindings.json",
-  scriptFixedTuples: "bindings/generated/defold-script-fixed-tuples.json",
-  scriptDynamicValues: "bindings/generated/defold-script-dynamic-value-bindings.json",
-  scriptValueTail: "bindings/generated/defold-script-value-tail-bindings.json",
-  scriptOverloadDispatch: "bindings/generated/defold-script-overload-dispatch.json",
-  scriptTableRecords: "bindings/generated/defold-script-table-record-bindings.json",
-  scriptCallbackLifecycle: "bindings/generated/defold-script-callback-lifecycle.json",
-  scriptCopiedValueBlockers: "bindings/generated/defold-script-copied-value-record-blockers.json",
-  scriptOpaqueRecordBlockers: "bindings/generated/defold-script-opaque-record-blockers.json",
-  scriptUrlAddress: "bindings/generated/defold-script-url-address-classification.json",
-  scriptHandleLowering: "bindings/generated/defold-script-handle-lowering.json",
-  scriptUniversalValue: "bindings/generated/defold-script-universal-value-bindings.json",
-  dmsdkProjection: "bindings/generated/defold-dmsdk-projection-ir.json",
-  dmsdkScalarThunks: "bindings/generated/defold-dmsdk-scalar-thunks.json",
-  dmsdkEnumValues: "bindings/generated/defold-dmsdk-enum-value-bindings.json",
-  dmsdkNamedScalars: "bindings/generated/defold-dmsdk-named-scalar-bindings.json",
-  dmsdkFixedDigests: "bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
-  dmsdkBase64Spans: "bindings/generated/defold-dmsdk-base64-span-bindings.json",
-  dmsdkAstcProbes: "bindings/generated/defold-dmsdk-astc-probe-bindings.json",
-  dmsdkXteaSpans: "bindings/generated/defold-dmsdk-xtea-span-bindings.json",
-  dmsdkHashSpans: "bindings/generated/defold-dmsdk-hash-span-bindings.json",
-  dmsdkArenaSpanBlockers: "bindings/generated/defold-dmsdk-arena-span-blockers.json",
-  dmsdkCStringValue: "bindings/generated/defold-dmsdk-cstring-value-bindings.json",
-  dmsdkBorrowedHandle: "bindings/generated/defold-dmsdk-borrowed-handle-bindings.json",
-  semanticPolicies: "bindings/overrides/binding-semantic-policies.json",
-  typescriptSdk: "bindings/targets/typescript-sdk.json",
-  dynamicHermesJsi: "bindings/targets/dynamic-hermes-jsi.json",
-  staticHermesCAbi: "bindings/targets/static-hermes-cabi.json",
-  luaStack: "bindings/targets/lua-stack.json",
-  browserWasmHost: "bindings/targets/browser-wasm-host.json"
+  scriptProjection: "packages/bindings/generated/defold-script-projection-ir.json",
+  scriptScalarDispatch: "packages/bindings/generated/defold-script-scalar-dispatch.json",
+  scriptValueBindings: "packages/bindings/generated/defold-script-value-bindings.json",
+  scriptFixedTuples: "packages/bindings/generated/defold-script-fixed-tuples.json",
+  scriptDynamicValues: "packages/bindings/generated/defold-script-dynamic-value-bindings.json",
+  scriptValueTail: "packages/bindings/generated/defold-script-value-tail-bindings.json",
+  scriptOverloadDispatch: "packages/bindings/generated/defold-script-overload-dispatch.json",
+  scriptTableRecords: "packages/bindings/generated/defold-script-table-record-bindings.json",
+  scriptCallbackLifecycle: "packages/bindings/generated/defold-script-callback-lifecycle.json",
+  scriptCopiedValueBlockers: "packages/bindings/generated/defold-script-copied-value-record-blockers.json",
+  scriptOpaqueRecordBlockers: "packages/bindings/generated/defold-script-opaque-record-blockers.json",
+  scriptUrlAddress: "packages/bindings/generated/defold-script-url-address-classification.json",
+  scriptHandleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
+  scriptUniversalValue: "packages/bindings/generated/defold-script-universal-value-bindings.json",
+  dmsdkProjection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
+  dmsdkScalarThunks: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
+  dmsdkEnumValues: "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
+  dmsdkNamedScalars: "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json",
+  dmsdkFixedDigests: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
+  dmsdkBase64Spans: "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
+  dmsdkAstcProbes: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
+  dmsdkXteaSpans: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
+  dmsdkHashSpans: "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
+  dmsdkArenaSpanBlockers: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
+  dmsdkCStringValue: "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
+  dmsdkBorrowedHandle: "packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json",
+  semanticPolicies: "packages/bindings/overrides/binding-semantic-policies.json",
+  typescriptSdk: "packages/bindings/targets/typescript-sdk.json",
+  dynamicHermesJsi: "packages/bindings/targets/dynamic-hermes-jsi.json",
+  staticHermesCAbi: "packages/bindings/targets/static-hermes-cabi.json",
+  luaStack: "packages/bindings/targets/lua-stack.json",
+  browserWasmHost: "packages/bindings/targets/browser-wasm-host.json"
 });
 
 const targetOrder = Object.freeze([
@@ -86,7 +86,7 @@ function sha256(value) {
 
 function parseArguments(argv) {
   const options = {
-    output: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.json"),
+    output: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
     check: false
   };
   for (let index = 0; index < argv.length; index += 1) {

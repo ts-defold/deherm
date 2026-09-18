@@ -8,12 +8,12 @@ import { stableBindingId } from "./lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
-  ir: new URL("bindings/generated/defold-script-api-ir.json", root),
-  patterns: new URL("bindings/generated/defold-script-binding-patterns.json", root),
-  value: new URL("bindings/generated/defold-script-value-bindings.json", root),
-  url: new URL("bindings/generated/defold-script-url-address-classification.json", root),
-  policy: new URL("bindings/overrides/script-defold-value-tail-bindings.json", root),
-  report: new URL("bindings/generated/defold-script-value-tail-bindings.json", root),
+  ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
+  patterns: new URL("packages/bindings/generated/defold-script-binding-patterns.json", root),
+  value: new URL("packages/bindings/generated/defold-script-value-bindings.json", root),
+  url: new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
+  policy: new URL("packages/bindings/overrides/script-defold-value-tail-bindings.json", root),
+  report: new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root),
   header: new URL("defold/defold_hermes/include/defold_hermes/generated_script_value_tail_bindings.hpp", root),
   source: new URL("defold/defold_hermes/src/generated_script_value_tail_bindings.cpp", root),
   target: new URL("packages/sdk/src/generated/script/value-tail-target-support.ts", root)

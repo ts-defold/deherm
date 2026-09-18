@@ -117,9 +117,9 @@ export async function buildWarBattlesRuntimeGate(repositoryRoot) {
   const root = path.resolve(repositoryRoot);
   const relativePaths = {
     inventory: ".agents/docs/data/war-battles-api-usage.json",
-    ir: "bindings/generated/defold-script-api-ir.json",
-    scalarDispatch: "bindings/generated/defold-script-scalar-dispatch.json",
-    valueDispatch: "bindings/generated/defold-script-value-bindings.json",
+    ir: "packages/bindings/generated/defold-script-api-ir.json",
+    scalarDispatch: "packages/bindings/generated/defold-script-scalar-dispatch.json",
+    valueDispatch: "packages/bindings/generated/defold-script-value-bindings.json",
     componentManifest: "tests/fixtures/war-battles/.deherm/generated/components/manifest.json",
     rocketProxy: "tests/fixtures/war-battles/src/scripts/rocket.script"
   };

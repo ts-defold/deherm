@@ -645,14 +645,14 @@ async function readConfinedFile(baseRoot, relative, label) {
 }
 
 async function bundledCoreSdk(requestedRevision) {
-  const scriptIrPath = path.join(packageRoot, "bindings", "generated", "defold-script-api-ir.json");
-  const dmsdkIrPath = path.join(packageRoot, "bindings", "generated", "defold-sdk-ir.json");
-  const scriptDispatchPath = path.join(packageRoot, "bindings", "generated", "defold-script-scalar-dispatch.json");
-  const scriptProfilesPath = path.join(packageRoot, "bindings", "generated", "defold-script-route-availability-profiles.json");
-  const loweringPlanPath = path.join(packageRoot, "bindings", "generated", "defold-binding-lowering-plan.json");
-  const loweringPlanSentinelPath = path.join(packageRoot, "bindings", "generated", "defold-binding-lowering-plan.sentinel.json");
+  const scriptIrPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json");
+  const dmsdkIrPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-sdk-ir.json");
+  const scriptDispatchPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-scalar-dispatch.json");
+  const scriptProfilesPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-route-availability-profiles.json");
+  const loweringPlanPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.json");
+  const loweringPlanSentinelPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.sentinel.json");
   const loweringPlanGeneratorPath = path.join(packageRoot, "packages", "compiler", "src", "generate-binding-lowering-plan.mjs");
-  const dmsdkThunksPath = path.join(packageRoot, "bindings", "generated", "defold-dmsdk-scalar-thunks.json");
+  const dmsdkThunksPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-dmsdk-scalar-thunks.json");
   const [scriptSource, dmsdkSource, scriptDispatchSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, packageSource] = await Promise.all([
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),

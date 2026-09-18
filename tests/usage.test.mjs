@@ -33,7 +33,7 @@ test("release binding generation contains only reachable symbols", async () => {
     "packages/static-hermes/src/generated/ffi.js",
     "packages/sdk/src/generated/modules.ts",
     "packages/abi/src/generated/layouts.ts",
-    "bindings/generated/symbol-map.json"
+    "packages/bindings/generated/symbol-map.json"
   ];
   const [header, jsi, web, staticHermes, sdk, layouts, symbolMap] = await Promise.all(
     paths.map((path) => readFile(new URL(`${root}${path}`, import.meta.url), "utf8"))
@@ -57,8 +57,8 @@ test("release planning joins the canonical API plan to bundler reachability", as
   const [usage, emission, lowering, scriptProjection] = await Promise.all([
     json("../dist/defold-app.defold-api-usage.json"),
     json("../build/profiles/release/defold-binding-emission-plan.json"),
-    json("../bindings/generated/defold-binding-lowering-plan.json"),
-    json("../bindings/generated/defold-script-projection-ir.json")
+    json("../packages/bindings/generated/defold-binding-lowering-plan.json"),
+    json("../packages/bindings/generated/defold-script-projection-ir.json")
   ]);
   assert.equal(usage.dynamicAccess, true);
   assert.deepEqual(usage.symbols, []);

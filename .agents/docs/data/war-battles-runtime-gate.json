@@ -9,13 +9,13 @@
     ".agents/docs/data/war-battles-api-usage.json": {
       "sha256": "6a24b142feccda910554aad48bafd5dabd786e75ed1c217e79611cbf04420366"
     },
-    "bindings/generated/defold-script-api-ir.json": {
+    "packages/bindings/generated/defold-script-api-ir.json": {
       "sha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049"
     },
-    "bindings/generated/defold-script-scalar-dispatch.json": {
+    "packages/bindings/generated/defold-script-scalar-dispatch.json": {
       "sha256": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
     },
-    "bindings/generated/defold-script-value-bindings.json": {
+    "packages/bindings/generated/defold-script-value-bindings.json": {
       "sha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d"
     },
     "tests/fixtures/war-battles/.deherm/generated/components/manifest.json": {
@@ -240,7 +240,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 2845099200,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -264,7 +264,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 1111726479,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -288,7 +288,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 3491633886,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -312,7 +312,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 3918772974,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -336,7 +336,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 608141138,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -360,7 +360,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 96184340,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -384,7 +384,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 2370510694,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -408,7 +408,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 3582341977,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -432,7 +432,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 653417741,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -482,7 +482,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 2920192283,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -506,7 +506,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 2093413559,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -530,7 +530,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 2756728049,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -554,7 +554,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 509983822,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }
@@ -578,7 +578,7 @@
       "executable": true,
       "engineContextVerified": false,
       "evidence": {
-        "artifact": "bindings/generated/defold-script-value-bindings.json",
+        "artifact": "packages/bindings/generated/defold-script-value-bindings.json",
         "stableId": 1480837389,
         "executableStatus": "generated native POD dispatch enabled; gameplay execution not yet claimed"
       }

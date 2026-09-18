@@ -15,7 +15,7 @@ sources:
     title: Defold render script instance guard and render Lua registration
     author: team:defold
   - id: lowering-plan
-    resource: ../../bindings/generated/defold-binding-lowering-plan.json
+    resource: ../../packages/bindings/generated/defold-binding-lowering-plan.json
     title: Canonical API lowering plan with execution-context contracts
     author: team:ts-defold
   - id: proxy-generator

@@ -81,7 +81,7 @@ async function statFile(path) {
 
 export function selectedTargetArtifacts(target) {
   const common = [
-    "bindings/generated/symbol-map.json",
+    "packages/bindings/generated/symbol-map.json",
     "packages/sdk/src/generated/modules.ts",
     "packages/abi/src/generated/layouts.ts"
   ];
@@ -237,11 +237,11 @@ export async function generateReleaseBuild(argv = []) {
   options.target = selection.target;
   options.profile = selection.profile;
   const paths = {
-    schema: resolve(repositoryRoot, "bindings/modules.json"),
-    plan: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.json"),
-    planSentinel: resolve(repositoryRoot, "bindings/generated/defold-binding-lowering-plan.sentinel.json"),
-    scriptProjection: resolve(repositoryRoot, "bindings/generated/defold-script-projection-ir.json"),
-    profiles: resolve(repositoryRoot, "bindings/generated/defold-script-route-availability-profiles.json"),
+    schema: resolve(repositoryRoot, "packages/bindings/modules.json"),
+    plan: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
+    planSentinel: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"),
+    scriptProjection: resolve(repositoryRoot, "packages/bindings/generated/defold-script-projection-ir.json"),
+    profiles: resolve(repositoryRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"),
     bindingsGenerator: resolve(repositoryRoot, "scripts/generate-bindings.mjs"),
     emissionGenerator: resolve(repositoryRoot, "scripts/generate-binding-emission-plan.mjs"),
     canonicalFamilyGenerator: resolve(repositoryRoot, "scripts/generate-canonical-family-sources.mjs")
@@ -315,7 +315,7 @@ export async function generateReleaseBuild(argv = []) {
     }
   );
   const canonical = generateCanonicalFamilyArtifacts(plan, emissionPlan);
-  const symbolMap = JSON.parse(generatedArtifacts.get("bindings/generated/symbol-map.json"));
+  const symbolMap = JSON.parse(generatedArtifacts.get("packages/bindings/generated/symbol-map.json"));
   const projection = releaseProjection({
     cacheKey,
     target: options.target,
@@ -348,12 +348,12 @@ export async function generateReleaseBuild(argv = []) {
     await writeFile(resolve(staging, "component-reachability.json"), serializedComponentUsage);
   }
   const sentinelContents = {
-    "bindings/generated/symbol-map.json": generatedArtifacts.get("bindings/generated/symbol-map.json"),
+    "packages/bindings/generated/symbol-map.json": generatedArtifacts.get("packages/bindings/generated/symbol-map.json"),
     "defold-binding-emission-plan.json": serializedEmission,
     "defold-build-projection.json": serializedProjection,
     ...(serializedComponentUsage ? { "component-reachability.json": serializedComponentUsage } : {}),
     ...Object.fromEntries(canonical.artifacts),
-    ...Object.fromEntries(selectedTargetArtifacts(options.target).filter((item) => item !== "bindings/generated/symbol-map.json").map((item) => [item, generatedArtifacts.get(item)]))
+    ...Object.fromEntries(selectedTargetArtifacts(options.target).filter((item) => item !== "packages/bindings/generated/symbol-map.json").map((item) => [item, generatedArtifacts.get(item)]))
   };
   const sentinelOutputs = Object.fromEntries(Object.entries(sentinelContents).map(([item, contents]) => [item, Buffer.byteLength(contents)]));
   const sentinelHashes = Object.fromEntries(Object.entries(sentinelContents).map(([item, contents]) => [item, sha256(contents)]));

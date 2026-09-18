@@ -9,7 +9,7 @@ import test from "node:test";
 import { build } from "../scripts/generate-dmsdk-borrowed-handle-bindings.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const reportPath = path.join(root, "bindings/generated/defold-dmsdk-borrowed-handle-bindings.json");
+const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json");
 const sdk = path.join(root, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
 const cxx = process.env.CXX || "clang++";
 const cc = process.env.CC || "clang";
@@ -23,8 +23,8 @@ const includes = [
 test("borrowed-handle census is independently structural, exhaustive, and provider-gated", async () => {
   const [report, shapes, policy] = await Promise.all([
     readFile(reportPath, "utf8").then(JSON.parse),
-    readFile(path.join(root, "bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
-    readFile(path.join(root, "bindings/overrides/dmsdk-borrowed-handle-bindings.json"), "utf8").then(JSON.parse),
+    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+    readFile(path.join(root, "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json"), "utf8").then(JSON.parse),
   ]);
   const candidates = shapes.rows.filter(({ tranche }) => tranche === "borrowed-handle-consumers");
   const generated = candidates.filter((row) =>
@@ -74,7 +74,7 @@ test("borrowed-handle generation is clean-room deterministic and rejects census 
   try {
     run(process.execPath, ["scripts/generate-dmsdk-borrowed-handle-bindings.mjs", "--output-root", directory]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
-    for (const artifact of [...report.artifacts, "bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"]) {
+    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"]) {
       assert.equal(await readFile(path.join(directory, artifact), "utf8"), await readFile(path.join(root, artifact), "utf8"), artifact);
     }
     const contents = {

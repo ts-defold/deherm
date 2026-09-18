@@ -9,7 +9,7 @@ const root = new URL("../", import.meta.url);
 
 test("fixed-record wave is bounded to reviewed pure ASTC and physics-version records", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-table-record-bindings.mjs", "--check"], { cwd: root, stdio: "pipe" });
-  const report = JSON.parse(await readFile(new URL("bindings/generated/defold-script-table-record-bindings.json", root), "utf8"));
+  const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-table-record-bindings.json", root), "utf8"));
   assert.equal(report.routeCount, 148);
   assert.equal(report.candidateCount, 3);
   assert.equal(report.executableCount, 3);

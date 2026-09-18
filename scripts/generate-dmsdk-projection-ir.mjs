@@ -5,19 +5,19 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
-const defaultIrPath = resolve(repositoryRoot, "bindings/generated/defold-sdk-ir.json");
-const defaultClassificationPath = resolve(repositoryRoot, "bindings/generated/defold-dmsdk-binding-patterns.json");
-const defaultOutputPath = resolve(repositoryRoot, "bindings/generated/defold-dmsdk-projection-ir.json");
+const defaultIrPath = resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json");
+const defaultClassificationPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json");
+const defaultOutputPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-projection-ir.json");
 const loweringEvidencePaths = Object.freeze({
-  scalar: "bindings/generated/defold-dmsdk-scalar-thunks.json",
-  enumValue: "bindings/generated/defold-dmsdk-enum-value-bindings.json",
-  namedScalar: "bindings/generated/defold-dmsdk-named-scalar-bindings.json",
-  fixedDigest: "bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
-  base64Span: "bindings/generated/defold-dmsdk-base64-span-bindings.json",
-  astcProbe: "bindings/generated/defold-dmsdk-astc-probe-bindings.json",
-  xteaSpan: "bindings/generated/defold-dmsdk-xtea-span-bindings.json",
-  hashSpan: "bindings/generated/defold-dmsdk-hash-span-bindings.json",
-  arenaSpan: "bindings/generated/defold-dmsdk-arena-span-blockers.json"
+  scalar: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
+  enumValue: "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
+  namedScalar: "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json",
+  fixedDigest: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
+  base64Span: "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
+  astcProbe: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
+  xteaSpan: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
+  hashSpan: "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
+  arenaSpan: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"
 });
 
 const PRIMITIVES = new Map([
@@ -545,8 +545,8 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
       unknownPolicy: "Unknown native shapes and unresolved semantics are emitted explicitly and must have a matching semantic token. There is no permissive fallback.",
     },
     sources: {
-      ir: "bindings/generated/defold-sdk-ir.json",
-      classification: "bindings/generated/defold-dmsdk-binding-patterns.json",
+      ir: "packages/bindings/generated/defold-sdk-ir.json",
+      classification: "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
       hashes: {
         ir: sha256(irContent),
         classification: sha256(classificationContent),

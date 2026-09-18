@@ -26,9 +26,9 @@
   "validatedInputs": {
     "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
     "descriptorAbiSha256": "c9436592d52ed41bdbf83833304093aa2d12e0e837ab5e0ca6a95b1aabc15e74",
-    "scriptIr": "bindings/generated/defold-script-api-ir.json",
-    "bindingPatterns": "bindings/generated/defold-script-binding-patterns.json",
-    "bindingDescriptors": "bindings/generated/defold-script-binding-descriptors.json",
+    "scriptIr": "packages/bindings/generated/defold-script-api-ir.json",
+    "bindingPatterns": "packages/bindings/generated/defold-script-binding-patterns.json",
+    "bindingDescriptors": "packages/bindings/generated/defold-script-binding-descriptors.json",
     "warBattlesUsage": ".agents/docs/data/war-battles-api-usage.json",
     "warBattlesGate": ".agents/docs/data/war-battles-runtime-gate.json",
     "sourceVerification": {

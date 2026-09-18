@@ -605,7 +605,7 @@ export function generateArtifacts(input) {
     ["defold/defold_hermes/src/generated_jsi.cpp", generateJsiSource(schema)],
     ["defold/defold_hermes/lib/web/generated_modules.js", generateEmscriptenModules(schema)],
     ["packages/static-hermes/src/generated/ffi.js", generateStaticHermes(schema)],
-    ["bindings/generated/symbol-map.json", generateSymbolMap(schema)]
+    ["packages/bindings/generated/symbol-map.json", generateSymbolMap(schema)]
   ]);
   for (const module of schema.modules) {
     artifacts.set(`packages/sdk/src/generated/modules/${module.name}.ts`, generateModuleEntry(module));
@@ -625,7 +625,7 @@ async function main() {
   };
   const root = fileURLToPath(new URL("../", import.meta.url));
   const outputRoot = resolve(root, valueAfter("--output-root") ?? ".");
-  const schema = JSON.parse(await readFile(resolve(root, "bindings/modules.json"), "utf8"));
+  const schema = JSON.parse(await readFile(resolve(root, "packages/bindings/modules.json"), "utf8"));
   const usagePath = valueAfter("--usage");
   const selectedSchema = usagePath
     ? filterSchemaForUsage(schema, JSON.parse(await readFile(resolve(root, usagePath), "utf8")))

@@ -1,0 +1,16 @@
+{
+  "name": "@ts-defold/deherm-internal-bindings",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "source": "./modules.json",
+  "exports": {
+    ".": "./modules.json",
+    "./profiles": "./profiles.json",
+    "./lua-compat": "./lua-compat.json",
+    "./generated/*": "./generated/*",
+    "./overrides/*": "./overrides/*",
+    "./probes/*": "./probes/*",
+    "./targets/*": "./targets/*"
+  }
+}

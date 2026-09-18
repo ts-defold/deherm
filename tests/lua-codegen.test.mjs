@@ -8,7 +8,7 @@ import {
 } from "../scripts/generate-lua-bridge.mjs";
 
 const schema = JSON.parse(
-  await readFile(new URL("../bindings/lua-compat.json", import.meta.url), "utf8")
+  await readFile(new URL("../packages/bindings/lua-compat.json", import.meta.url), "utf8")
 );
 
 test("Lua compatibility schema emits specialized stack thunks", () => {

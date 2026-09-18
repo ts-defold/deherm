@@ -300,7 +300,7 @@ export function buildClassification(ir) {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
     sourcePlatform: ir.platform,
-    sourceIr: "bindings/generated/defold-sdk-ir.json",
+    sourceIr: "packages/bindings/generated/defold-sdk-ir.json",
     runtimePendingDefinition: "declarations whose disposition is generated-raw-call",
     coverage: {
       runtimePendingCount: pending.length,
@@ -324,8 +324,8 @@ export function buildClassification(ir) {
 
 function parseArguments(argv) {
   const options = {
-    input: resolve(repositoryRoot, "bindings/generated/defold-sdk-ir.json"),
-    output: resolve(repositoryRoot, "bindings/generated/defold-dmsdk-binding-patterns.json"),
+    input: resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"),
+    output: resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json"),
     check: false,
   };
   for (let index = 0; index < argv.length; index += 1) {

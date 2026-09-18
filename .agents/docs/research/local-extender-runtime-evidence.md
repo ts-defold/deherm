@@ -43,11 +43,11 @@ sources:
     title: Chrome DevTools Protocol HTML5 runtime check
     author: team:ts-defold
   - id: native-script-probes
-    resource: ../../bindings/generated/defold-script-real-engine-probes.json
+    resource: ../../packages/bindings/generated/defold-script-real-engine-probes.json
     title: Descriptor-validated native script API probe report
     author: team:ts-defold
   - id: native-value-probes
-    resource: ../../bindings/generated/defold-script-value-real-engine-probes.json
+    resource: ../../packages/bindings/generated/defold-script-value-real-engine-probes.json
     title: Generated native Defold value API probe report
     author: team:ts-defold
   - id: native-runtime-check

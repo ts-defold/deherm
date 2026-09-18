@@ -7,11 +7,11 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relativePaths = Object.freeze({
-  projection: "bindings/generated/defold-script-projection-ir.json",
-  accounting: "bindings/generated/defold-script-api-accounting.json",
-  tableRecords: "bindings/generated/defold-script-table-record-bindings.json",
-  policy: "bindings/overrides/script-universal-value-bindings.json",
-  report: "bindings/generated/defold-script-universal-value-bindings.json",
+  projection: "packages/bindings/generated/defold-script-projection-ir.json",
+  accounting: "packages/bindings/generated/defold-script-api-accounting.json",
+  tableRecords: "packages/bindings/generated/defold-script-table-record-bindings.json",
+  policy: "packages/bindings/overrides/script-universal-value-bindings.json",
+  report: "packages/bindings/generated/defold-script-universal-value-bindings.json",
   header: "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",
   source: "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
   cHeader: "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h",

@@ -19,11 +19,11 @@ family without symbol-name allowlists:
 | blocked with row-local tokens | 266 | Pointer, record, enum, callback, void/handle/pointer result, unresolved value, or platform-specific ABI remains. |
 
 The generated report is
-`bindings/generated/defold-dmsdk-borrowed-handle-bindings.json`. It retains all
+`packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json`. It retains all
 348 stable declaration and projection identities. Every rejected row records
 its structural blockers plus explicit ownership/nullability/lifetime, thread,
 symbol-linkage, and target-matrix blockers. The selection policy in
-`bindings/overrides/dmsdk-borrowed-handle-bindings.json` contains only shape
+`packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json` contains only shape
 rules and expected census values; it has no declaration list or per-symbol
 exception.
 

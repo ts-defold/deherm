@@ -7,7 +7,7 @@ import test from "node:test";
 import vm from "node:vm";
 
 const root = path.resolve(import.meta.dirname, "..");
-const reportPath = path.join(root, "bindings/generated/defold-script-universal-value-bindings.json");
+const reportPath = path.join(root, "packages/bindings/generated/defold-script-universal-value-bindings.json");
 
 function run(command, args, options = {}) {
   return execFileSync(command, args, { cwd: root, stdio: "pipe", encoding: "utf8", ...options });
@@ -15,9 +15,9 @@ function run(command, args, options = {}) {
 
 test("universal-value generation is mechanical, complete for its selected families, and deterministic", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
-  const projection = JSON.parse(await readFile(path.join(root, "bindings/generated/defold-script-projection-ir.json"), "utf8"));
-  const accounting = JSON.parse(await readFile(path.join(root, "bindings/generated/defold-script-api-accounting.json"), "utf8"));
-  const tableRecords = JSON.parse(await readFile(path.join(root, "bindings/generated/defold-script-table-record-bindings.json"), "utf8"));
+  const projection = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8"));
+  const accounting = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-script-api-accounting.json"), "utf8"));
+  const tableRecords = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-script-table-record-bindings.json"), "utf8"));
   const accountingById = new Map(accounting.rows.map((row) => [row.id, row]));
   const optimized = new Set(tableRecords.bindings.map(({ id }) => id));
   const expected = projection.rows.filter((row) =>
@@ -34,7 +34,7 @@ test("universal-value generation is mechanical, complete for its selected famili
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-universal-value-"));
   try {
     run(process.execPath, ["scripts/generate-script-universal-value-bindings.mjs", "--output-root", temporary]);
-    for (const relative of [...report.artifacts, "bindings/generated/defold-script-universal-value-bindings.json"]) {
+    for (const relative of [...report.artifacts, "packages/bindings/generated/defold-script-universal-value-bindings.json"]) {
       assert.equal(await readFile(path.join(temporary, relative), "utf8"), await readFile(path.join(root, relative), "utf8"), relative);
     }
   } finally {

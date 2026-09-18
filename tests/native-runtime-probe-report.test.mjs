@@ -6,11 +6,11 @@ import { validateNativeValueProbeReport } from "../scripts/lib/native-runtime-pr
 
 const root = new URL("../", import.meta.url);
 const report = JSON.parse(await readFile(
-  new URL("bindings/generated/defold-script-value-real-engine-probes.json", root),
+  new URL("packages/bindings/generated/defold-script-value-real-engine-probes.json", root),
   "utf8"
 ));
 const bindings = JSON.parse(await readFile(
-  new URL("bindings/generated/defold-script-value-bindings.json", root),
+  new URL("packages/bindings/generated/defold-script-value-bindings.json", root),
   "utf8"
 ));
 
