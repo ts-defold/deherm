@@ -2,7 +2,7 @@ import path from "node:path";
 
 import { compileConformanceHarness, generateConformanceHarness, readConformanceReport } from "./conformance.mjs";
 import { inspectDefoldProject } from "./project.mjs";
-import { writeGeneratedProject } from "./generate.mjs";
+import { verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
 
 const help = `deherm <command> [options]
 
@@ -10,6 +10,7 @@ Commands:
   doctor       Validate the project and report discoverable extension APIs
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
+  verify-generated  Deep-verify generated IR digests and lock/manifest consistency
   dev          Run the incremental compiler, watcher, reload coordinator, and Rezi console
   conformance generate  Generate exhaustive API compile/runtime fixtures and a disposition plan
   conformance compile   Compile a generated shard and emit per-binding observations
@@ -177,6 +178,16 @@ export async function run(argv = process.argv.slice(2)) {
       else console.log("Kept existing tsconfig.json; extend tsconfig.deherm.json from your project config");
     }
     return inventory.diagnostics.some(({ severity }) => severity === "error") ? 1 : 0;
+  }
+  if (options.command === "verify-generated") {
+    const result = await verifyGeneratedProject(inventory.projectRoot, options.outDir);
+    if (options.json) console.log(JSON.stringify(result, null, 2));
+    else {
+      console.log(`ok generated project: ${result.checkedFiles} hashed IR input(s)`);
+      console.log(`ok lowering plan: ${result.planSha256}`);
+      console.log(`ok Defold API: ${result.defoldRevision}`);
+    }
+    return 0;
   }
   if (options.command === "doctor") {
     const ok = !inventory.diagnostics.some(({ severity }) => severity === "error");

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { access, cp, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { access, cp, lstat, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -333,17 +333,35 @@ async function writeIfMissing(file, contents) {
   }
 }
 
+async function readConfinedFile(baseRoot, relative, label) {
+  const target = path.resolve(baseRoot, relative);
+  const lexicalRelative = path.relative(baseRoot, target);
+  if (!lexicalRelative || lexicalRelative === ".." || lexicalRelative.startsWith(`..${path.sep}`) || path.isAbsolute(lexicalRelative)) {
+    throw new Error(`${label} is outside its verified root`);
+  }
+  const information = await lstat(target);
+  if (!information.isFile() || information.isSymbolicLink()) throw new Error(`${label} must be a regular file, not a symlink`);
+  const resolvedTarget = await realpath(target);
+  const resolvedRelative = path.relative(baseRoot, resolvedTarget);
+  if (!resolvedRelative || resolvedRelative === ".." || resolvedRelative.startsWith(`..${path.sep}`) || path.isAbsolute(resolvedRelative)) {
+    throw new Error(`${label} resolves outside its verified root`);
+  }
+  return readFile(resolvedTarget);
+}
+
 async function bundledCoreSdk(requestedRevision) {
   const scriptIrPath = path.join(packageRoot, "bindings", "generated", "defold-script-api-ir.json");
   const dmsdkIrPath = path.join(packageRoot, "bindings", "generated", "defold-sdk-ir.json");
   const scriptDispatchPath = path.join(packageRoot, "bindings", "generated", "defold-script-scalar-dispatch.json");
   const scriptProfilesPath = path.join(packageRoot, "bindings", "generated", "defold-script-route-availability-profiles.json");
+  const loweringPlanPath = path.join(packageRoot, "bindings", "generated", "defold-binding-lowering-plan.json");
   const dmsdkThunksPath = path.join(packageRoot, "bindings", "generated", "defold-dmsdk-scalar-thunks.json");
-  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptProfilesSource, dmsdkThunksSource, packageSource] = await Promise.all([
+  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptProfilesSource, loweringPlanSource, dmsdkThunksSource, packageSource] = await Promise.all([
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
     readFile(scriptDispatchPath),
     readFile(scriptProfilesPath),
+    readFile(loweringPlanPath),
     readFile(dmsdkThunksPath),
     readFile(path.join(packageRoot, "package.json"), "utf8")
   ]);
@@ -351,8 +369,9 @@ async function bundledCoreSdk(requestedRevision) {
   const dmsdkIr = JSON.parse(dmsdkSource);
   const scriptDispatch = JSON.parse(scriptDispatchSource);
   const scriptProfiles = JSON.parse(scriptProfilesSource);
+  const loweringPlan = JSON.parse(loweringPlanSource);
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
-  const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, scriptProfiles, dmsdkThunks].map(({ defoldRevision }) => defoldRevision));
+  const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, scriptProfiles, loweringPlan, dmsdkThunks].map(({ defoldRevision }) => defoldRevision));
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
@@ -368,15 +387,17 @@ async function bundledCoreSdk(requestedRevision) {
     dmsdkIr,
     scriptDispatch,
     scriptProfiles,
+    loweringPlan,
     dmsdkThunks,
     inputs: {
       scriptIrSha256: sha256(scriptSource),
       dmsdkIrSha256: sha256(dmsdkSource),
       scriptDispatchSha256: sha256(scriptDispatchSource),
       scriptProfilesSha256: sha256(scriptProfilesSource),
+      loweringPlanSha256: sha256(loweringPlanSource),
       dmsdkThunksSha256: sha256(dmsdkThunksSource)
     },
-    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptProfilesPath, dmsdkThunksPath }
+    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptProfilesPath, loweringPlanPath, dmsdkThunksPath }
   };
 }
 
@@ -456,6 +477,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(core.paths.dmsdkIrPath, path.join(irRoot, "dmsdk.json"));
   await cp(core.paths.scriptDispatchPath, path.join(irRoot, "script-scalar-dispatch.json"));
   await cp(core.paths.scriptProfilesPath, path.join(irRoot, "script-route-profiles.json"));
+  await cp(core.paths.loweringPlanPath, path.join(irRoot, "binding-lowering-plan.json"));
   await cp(core.paths.dmsdkThunksPath, path.join(irRoot, "dmsdk-scalar-thunks.json"));
   await writeFile(path.join(root, "extensions.d.ts"), generateExtensionTypes(inventory));
   const modules = bindingIr.modules;
@@ -503,6 +525,11 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
     inputs: core.inputs,
     engineProfiles,
+    loweringPlan: {
+      sha256: core.loweringPlan.planSha256,
+      units: core.loweringPlan.coverage.units,
+      backendRecords: core.loweringPlan.coverage.backendRecords
+    },
     coverage: {
       script: {
         functions: core.scriptIr.counts.functions,
@@ -568,5 +595,83 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       vscodeExtensions: createdVscodeExtensions,
       vscodeSettings: createdVscodeSettings
     }
+  };
+}
+
+export async function verifyGeneratedProject(projectRoot, outputDirectory = ".deherm") {
+  if (typeof outputDirectory !== "string" || !outputDirectory || path.isAbsolute(outputDirectory)) {
+    throw new Error("Generated output must be a relative subdirectory of the Defold project");
+  }
+  const root = path.resolve(projectRoot, outputDirectory);
+  const relativeRoot = path.relative(path.resolve(projectRoot), root);
+  if (!relativeRoot || relativeRoot === ".." || relativeRoot.startsWith(`..${path.sep}`) || path.isAbsolute(relativeRoot)) {
+    throw new Error("Generated output must be a subdirectory of the Defold project");
+  }
+  const [resolvedProjectRoot, resolvedOutputRoot] = await Promise.all([
+    realpath(projectRoot),
+    realpath(root)
+  ]);
+  const resolvedRelativeRoot = path.relative(resolvedProjectRoot, resolvedOutputRoot);
+  if (!resolvedRelativeRoot || resolvedRelativeRoot === ".." || resolvedRelativeRoot.startsWith(`..${path.sep}`) || path.isAbsolute(resolvedRelativeRoot)) {
+    throw new Error("Generated output resolves outside the Defold project");
+  }
+  const [manifestBytes, lockBytes] = await Promise.all([
+    readConfinedFile(resolvedOutputRoot, "manifest.json", "Generated manifest"),
+    readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock")
+  ]);
+  const manifest = JSON.parse(manifestBytes.toString("utf8"));
+  const lock = JSON.parse(lockBytes.toString("utf8"));
+  const core = await bundledCoreSdk(manifest.defoldRevision);
+  if (JSON.stringify(manifest.inputs) !== JSON.stringify(core.inputs)) {
+    throw new Error("Generated manifest inputs do not match this installed deherm package");
+  }
+  if (manifest.generator?.package !== "@ts-defold/deherm" || manifest.generator?.version !== core.packageVersion) {
+    throw new Error("Generated manifest names a different deherm generator package");
+  }
+  const expectedEngineProfiles = validateEngineProfiles(manifest.engineProfiles, core.scriptProfiles);
+  if (JSON.stringify(manifest.engineProfiles) !== JSON.stringify(expectedEngineProfiles)) {
+    throw new Error("Generated manifest engine-profile authority differs from the installed Defold catalog");
+  }
+  const files = {
+    scriptIrSha256: "ir/script-api.json",
+    dmsdkIrSha256: "ir/dmsdk.json",
+    scriptDispatchSha256: "ir/script-scalar-dispatch.json",
+    scriptProfilesSha256: "ir/script-route-profiles.json",
+    loweringPlanSha256: "ir/binding-lowering-plan.json",
+    dmsdkThunksSha256: "ir/dmsdk-scalar-thunks.json"
+  };
+  const verified = {};
+  const verifiedSources = {};
+  for (const [key, relative] of Object.entries(files)) {
+    const source = await readConfinedFile(resolvedOutputRoot, relative, relative);
+    const actual = createHash("sha256").update(source).digest("hex");
+    if (manifest.inputs?.[key] !== actual) throw new Error(`${relative} does not match generated manifest input ${key}`);
+    verified[relative] = actual;
+    verifiedSources[relative] = source;
+  }
+  const loweringPlan = JSON.parse(verifiedSources[files.loweringPlanSha256].toString("utf8"));
+  const { planSha256, ...planBody } = loweringPlan;
+  const calculatedPlanSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
+  if (planSha256 !== calculatedPlanSha256) throw new Error("ir/binding-lowering-plan.json has an invalid internal plan digest");
+  if (manifest.loweringPlan?.sha256 !== planSha256) throw new Error("Generated manifest names a different lowering plan");
+  if (core.loweringPlan.planSha256 !== planSha256) throw new Error("Generated lowering plan differs from this installed deherm package");
+  if (manifest.loweringPlan?.units !== loweringPlan.coverage?.units ||
+      manifest.loweringPlan?.backendRecords !== loweringPlan.coverage?.backendRecords) {
+    throw new Error("Generated manifest lowering-plan census differs from the verified plan");
+  }
+  for (const key of ["schemaVersion", "defoldRevision", "platform"]) {
+    if (lock[key] !== manifest[key]) throw new Error(`deherm.lock ${key} differs from generated manifest`);
+  }
+  if (JSON.stringify(lock.generator) !== JSON.stringify(manifest.generator) ||
+      JSON.stringify(lock.inputs) !== JSON.stringify(manifest.inputs) ||
+      JSON.stringify(lock.engineProfiles) !== JSON.stringify(manifest.engineProfiles)) {
+    throw new Error("deherm.lock does not match the generated manifest contract");
+  }
+  return {
+    root,
+    defoldRevision: manifest.defoldRevision,
+    planSha256,
+    checkedFiles: Object.keys(verified).length,
+    verified
   };
 }

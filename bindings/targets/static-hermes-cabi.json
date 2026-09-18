@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "target": "staticHermesCAbi",
+  "emitter": "static-hermes-cabi",
+  "surfaces": ["script", "dmsdk"],
+  "runtime": true,
+  "capabilities": ["sound-types", "extern-c", "caller-owned-out-storage", "bounded-scratch", "bigint-u64"],
+  "unsupportedValueKinds": ["dynamic", "unknown", "variadic"]
+}

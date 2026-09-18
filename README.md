@@ -43,6 +43,7 @@ npm run test:conformance
 npm run cli -- doctor --project defold
 npm run cli -- extensions --project defold
 npm run cli -- generate --project defold
+npm run cli -- verify-generated --project defold
 ```
 
 ## Project CLI
@@ -58,6 +59,7 @@ npm install --save-dev @ts-defold/deherm
 npx deherm doctor
 npx deherm extensions
 npx deherm generate
+npx deherm verify-generated
 ```
 
 The package has not been published yet; use `npm run cli -- ...` in this
@@ -67,6 +69,8 @@ versioned ABI and lifetime schema rather than being guessed from syntax alone.
 The generator writes a normalized `bindings.ir.json`; both declarations and
 executable SDK modules consume that IR, including collision-checked camelCase
 names and per-target lowering status.
+`verify-generated` is the explicit slow integrity path: it hashes copied IR,
+validates the canonical plan, and checks package, manifest, and lock identities.
 The generated ttsc transform entry is present but disabled until that transform
 ships; ordinary TypeScript 7 checking works now.
 

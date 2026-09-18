@@ -47,6 +47,10 @@ await writeFile(
 const symbolMap = JSON.parse(await readFile("bindings/generated/symbol-map.json", "utf8"));
 const symbolsBySource = new Map(symbolMap.symbols.map((symbol) => [symbol.source, symbol]));
 const dynamicRegistry = "packages/sdk/src/registry.ts";
+const canonicalBindingRoots = [
+  "packages/sdk/src/generated/script/",
+  "packages/sdk/src/generated/dmsdk/"
+];
 
 for (const [output, metadata] of Object.entries(result.metafile.outputs)) {
   if (!metadata.entryPoint || path.extname(output) !== ".js") continue;
@@ -69,6 +73,17 @@ for (const [output, metadata] of Object.entries(result.metafile.outputs)) {
   };
   const usagePath = output.replace(/\.js$/, ".usage.json");
   await writeFile(usagePath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+  const usesCanonicalBindings = [...retainedInputs].some((input) =>
+    canonicalBindingRoots.some((root) => input.startsWith(root))
+  );
+  const defoldApiUsage = {
+    schemaVersion: 1,
+    dynamicAccess: usesCanonicalBindings,
+    symbols: []
+  };
+  const defoldApiUsagePath = output.replace(/\.js$/, ".defold-api-usage.json");
+  await writeFile(defoldApiUsagePath, `${JSON.stringify(defoldApiUsage, null, 2)}\n`);
 }
 
 await mkdir("defold/deherm", { recursive: true });

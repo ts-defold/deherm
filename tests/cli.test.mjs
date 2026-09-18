@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, readFile, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr, generateExtensionTypes, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr, generateExtensionTypes, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 import { inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 
 async function fixture() {
@@ -176,18 +176,57 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8")).bindingCount, 90);
   const profiles = JSON.parse(await readFile(path.join(output.root, "ir", "script-route-profiles.json"), "utf8"));
+  const loweringPlan = JSON.parse(await readFile(path.join(output.root, "ir", "binding-lowering-plan.json"), "utf8"));
   assert.ok(profiles.profiles["default-legacy-bullet"]);
   assert.ok(profiles.profiles["v3-bullet"]);
   assert.equal(manifest.engineProfiles.source, "defold-default");
   assert.equal(manifest.engineProfiles.defaultProfileId, "default-legacy-bullet");
   assert.equal(manifest.engineProfiles.catalogSha256, profiles.catalogSha256);
   assert.equal(manifest.engineProfiles.handshakeSchema, "deherm.script-route-capabilities/v1");
+  assert.deepEqual(manifest.loweringPlan, {
+    sha256: loweringPlan.planSha256,
+    units: 2287,
+    backendRecords: 11435
+  });
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk-scalar-thunks.json"), "utf8")).coverage.generated, 26);
   const lock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
   assert.equal(lock.defoldRevision, manifest.defoldRevision);
   assert.equal(lock.platform, manifest.platform);
   assert.deepEqual(lock.inputs, manifest.inputs);
   assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
+  const verified = await verifyGeneratedProject(project);
+  assert.equal(verified.checkedFiles, 6);
+  assert.equal(verified.planSha256, loweringPlan.planSha256);
+  const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(verifiedCli.status, 0, `${verifiedCli.stdout}\n${verifiedCli.stderr}`);
+  assert.equal(JSON.parse(verifiedCli.stdout).planSha256, loweringPlan.planSha256);
+
+  const dispatchPath = path.join(output.root, "ir", "script-scalar-dispatch.json");
+  await writeFile(dispatchPath, `${await readFile(dispatchPath, "utf8")} `);
+  await assert.rejects(verifyGeneratedProject(project), /does not match generated manifest/);
+  await writeGeneratedProject(inventory);
+
+  const forgedManifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
+  const forgedLock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
+  forgedManifest.inputs.scriptDispatchSha256 = "0".repeat(64);
+  forgedLock.inputs.scriptDispatchSha256 = "0".repeat(64);
+  await writeFile(path.join(output.root, "manifest.json"), `${JSON.stringify(forgedManifest, null, 2)}\n`);
+  await writeFile(path.join(project, "deherm.lock"), `${JSON.stringify(forgedLock, null, 2)}\n`);
+  await assert.rejects(verifyGeneratedProject(project), /do not match this installed deherm package/);
+  await writeGeneratedProject(inventory);
+
+  const escaped = await mkdtemp(path.join(tmpdir(), "deherm-escaped-ir-"));
+  const escapedDispatch = path.join(escaped, "script-scalar-dispatch.json");
+  await writeFile(escapedDispatch, await readFile(dispatchPath));
+  await unlink(dispatchPath);
+  await symlink(escapedDispatch, dispatchPath);
+  await assert.rejects(verifyGeneratedProject(project), /must be a regular file, not a symlink/);
+  await unlink(dispatchPath);
+  await writeGeneratedProject(inventory);
+  await rm(escaped, { recursive: true, force: true });
 
   await writeFile(path.join(output.root, "sdk", "modules", "stale.ts"), "export {};\n");
   await writeFile(path.join(output.root, "sdk", "generated", "stale.ts"), "export {};\n");

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "target": "typescriptSdk",
+  "emitter": "typescript-sdk",
+  "surfaces": ["script", "dmsdk"],
+  "runtime": false,
+  "capabilities": ["documented-surface", "tsdoc", "branded-scalars", "discriminated-unions", "target-dispositions"],
+  "unsupportedValueKinds": []
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "scope": "Algebraic semantic-token resolutions shared by all lowering backends. Rules select value/effect/context shapes; route IDs are forbidden.",
+  "selectorLanguage": {
+    "fields": ["surface", "valueKindsAll", "valueKindsAny", "contexts", "semanticTokensAll", "semanticTokensAny"],
+    "identitySelectors": "forbidden",
+    "overlap": "Two matching rules may not resolve the same token for one unit"
+  },
+  "rules": []
+}

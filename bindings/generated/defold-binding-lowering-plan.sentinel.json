@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "generator": "scripts/generate-binding-lowering-plan.mjs",
+  "generatorSha256": "287a8ef709581a09043d2eba6a365937bd08f805b435dfc3e7e0923822a71208",
+  "inputPaths": {
+    "scriptProjection": "bindings/generated/defold-script-projection-ir.json",
+    "dmsdkProjection": "bindings/generated/defold-dmsdk-projection-ir.json",
+    "semanticPolicies": "bindings/overrides/binding-semantic-policies.json",
+    "typescriptSdk": "bindings/targets/typescript-sdk.json",
+    "dynamicHermesJsi": "bindings/targets/dynamic-hermes-jsi.json",
+    "staticHermesCAbi": "bindings/targets/static-hermes-cabi.json",
+    "luaStack": "bindings/targets/lua-stack.json",
+    "browserWasmHost": "bindings/targets/browser-wasm-host.json"
+  },
+  "inputHashes": {
+    "scriptProjection": "fcacad78bf4cbe0057257faa95c5f4f77cd801416189f07668d4e9eadfeb9b00",
+    "dmsdkProjection": "e3f7dfa48ed27a3af716c586492bca93264be03d34083a09c90cc37949a61836",
+    "semanticPolicies": "d082520c927e8d40deca7e7829941e55075531ec58f73730063e6064d2688906",
+    "typescriptSdk": "5d705cca934ab3f4f1cd28cffcedadb317b656c358e24321e9e38de3707caa68",
+    "dynamicHermesJsi": "7ec51a1f94925818f7877b4776a96ee0e5d0954454b8bb7ffbd0a6ceae666225",
+    "staticHermesCAbi": "df43dfc62585f40e7d74511e5c7ad7799ef54b302a4c5d31114f9ddb87e04a66",
+    "luaStack": "d967e395b2deee7830fcebb68f724620ca514c8c7d43f7fa7933b31f9a6c79b3",
+    "browserWasmHost": "4fb8d7ef7a91481c03bc4b3e675bd4faa607e9b1983df22243ce453dd43668df"
+  },
+  "cacheKey": "7b10e40234cabb1be3640cfc592fedb6e7772bdfe37e5c5716d912dedaa1d0de",
+  "output": "bindings/generated/defold-binding-lowering-plan.json",
+  "outputBytes": 6661970,
+  "outputSha256": "e61d8f80cbd970dcd2793990764abe78cfc5b8f2a37548ce3ee05621f362425e",
+  "planSha256": "b333455b6fd2df73a4013b2cb57e6401f18e03f795552cd450db4892785e0eca"
+}

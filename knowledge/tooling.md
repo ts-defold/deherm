@@ -117,6 +117,7 @@ The npm package now exposes project inspection and generation:
 npx deherm doctor
 npx deherm extensions
 npx deherm generate
+npx deherm verify-generated
 ```
 
 These are the installed-package commands verified from a local tarball. The
@@ -129,7 +130,10 @@ the command and options.
 .deherm/extensions.json       sanitized deterministic inventory
 .deherm/bindings.ir.json      normalized symbol/type/lowering IR
 .deherm/extensions.d.ts       extension interfaces
+.deherm/ir/**                 pinned complete API inputs and lowering plan
 .deherm/sdk/**                executable TypeScript compatibility SDK
+.deherm/manifest.json         package/input/profile identities
+deherm.lock                   project-side copy of the generation contract
 tsconfig.deherm.json          TS 7 + future ttsc transform configuration
 tsconfig.json                        created only when the project has none
 .vscode/extensions.json              created only when absent
@@ -140,6 +144,11 @@ Existing root `tsconfig.json` and VS Code files are never overwritten. The
 generated ttsc plugin entry is disabled until the Defold transform package is
 implemented; this keeps the scaffold type-checkable today while fixing the
 future configuration contract.
+
+Normal generation uses keyed sentinels and skips unchanged output. Run
+`npx deherm verify-generated --project <project>` when an exact integrity audit
+is wanted: it hashes all copied IR inputs, validates the canonical lowering
+plan, binds them to the installed package, and checks the manifest/lock pair.
 
 The next commands will orchestrate the internal build graph:
 

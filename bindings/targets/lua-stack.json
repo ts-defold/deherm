@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "target": "luaStack",
+  "emitter": "lua-stack",
+  "surfaces": ["script"],
+  "runtime": true,
+  "capabilities": ["lua-5.1-stack", "cached-route", "protected-call", "stack-restoration", "bounded-registry"],
+  "unsupportedValueKinds": ["unknown"]
+}

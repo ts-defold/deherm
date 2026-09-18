@@ -52,3 +52,18 @@ test("release binding generation contains only reachable symbols", async () => {
   assert.doesNotMatch(layouts, /Vec3Layout/);
   assert.deepEqual(JSON.parse(symbolMap).symbols.map(({ id }) => id), ["ExampleMath.add"]);
 });
+
+test("release planning joins the canonical API plan to bundler reachability", async () => {
+  const [usage, emission, lowering] = await Promise.all([
+    json("../dist/defold-app.defold-api-usage.json"),
+    json("../build/profiles/release/defold-binding-emission-plan.json"),
+    json("../bindings/generated/defold-binding-lowering-plan.json")
+  ]);
+  assert.equal(usage.dynamicAccess, true);
+  assert.deepEqual(usage.symbols, []);
+  assert.equal(emission.sourcePlanSha256, lowering.planSha256);
+  assert.equal(emission.sourceAuthorities.scriptProjectionSha256, lowering.inputHashes.scriptProjection);
+  assert.equal(emission.treeShaking.selectedForEmissionUnits, lowering.selectionSummary.dynamicHermesJsi.emit);
+  assert.equal(emission.evidenceBoundary.generation, "planned-not-emitted");
+  assert.equal(emission.evidenceBoundary.runtime, "not-claimed");
+});

@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "target": "browserWasmHost",
+  "emitter": "browser-wasm-host",
+  "surfaces": ["script", "dmsdk"],
+  "runtime": true,
+  "capabilities": ["browser-js-host", "wasm-bigint", "direct-memory-layout", "caller-owned-out-storage", "finalization-registry"],
+  "unsupportedValueKinds": ["unknown", "variadic", "callback"]
+}

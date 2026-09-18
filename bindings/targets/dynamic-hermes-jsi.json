@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "target": "dynamicHermesJsi",
+  "emitter": "dynamic-hermes-jsi",
+  "surfaces": ["script", "dmsdk"],
+  "runtime": true,
+  "capabilities": ["jsi", "bigint-u64", "host-objects", "finalization-registry", "caller-owned-out-storage", "bounded-scratch"],
+  "unsupportedValueKinds": ["unknown", "variadic"]
+}
