@@ -50,6 +50,7 @@ okf_version: "0.2"
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.
 * [Canonical lowering plan](research/canonical-lowering-plan.md) - All 2,287 API units across five backends, interned marshalling programs, semantic policies, and final-build reachability.
 * [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.
+* [Generated script recording engine](research/generated-script-recording-engine.md) - Generated null/observer Defold that asserts, records, and replays every callable script route through the real binding stack over each drivable transport.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Exact positional Lua tuple ABI, public reachability limits, and unpromoted engine evidence.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.
 * [TypeGPU shader lane](research/typegpu-shader-lane.md) - Build-time TypeGPU authoring, Defold shader adaptation, typed material bindings, and validation gates.

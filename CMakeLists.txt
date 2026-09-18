@@ -413,6 +413,32 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
   )
 endif()
 
+# Generated null/observer "recording engine" for the whole script surface. The
+# provider replaces the engine under the real script bridge seam; the driver
+# replays every route through the real binding stack over each drivable
+# transport. This proves contract agreement inside deherm only - never Defold
+# engine conformance.
+add_executable(defold-hermes-script-recording-engine
+  tests/fixtures/generated_script_recording_driver.cpp
+  tests/fixtures/generated_script_recording_provider.cpp
+  tests/fixtures/generated_script_recording_tables.cpp
+  defold/defold_hermes/src/generated_script_universal_value_capi.cpp
+  defold/defold_hermes/src/generated_script_universal_static_frame.cpp
+)
+target_compile_features(defold-hermes-script-recording-engine PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-recording-engine PRIVATE
+  defold/defold_hermes/include
+  tests/fixtures
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  # -pedantic is intentionally absent: the driver includes the pinned Hermes
+  # JSI headers, which use variadic-macro forms that only C++20 accepts.
+  target_compile_options(defold-hermes-script-recording-engine PRIVATE
+    -Wall -Wextra -Werror -Wno-zero-length-array
+  )
+endif()
+target_link_libraries(defold-hermes-script-recording-engine PRIVATE defold-hermes-runtime)
+
 add_executable(defold-hermes-script-handle-router-test
   native/script_handle_router_test.cpp
 )

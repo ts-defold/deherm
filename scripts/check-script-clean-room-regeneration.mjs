@@ -245,6 +245,11 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
       candidates.add(`defold/defold_hermes/lib/web/${file}`);
     }
   }
+  // The generated recording engine is a harness fixture rather than shipped
+  // extension source, so it is discovered by its own generator-owned prefix.
+  for (const file of await walkFiles(path.join(repositoryRoot, "tests/fixtures"))) {
+    if (/^generated_script_recording_/.test(file)) candidates.add(`tests/fixtures/${file}`);
+  }
   for (const documentation of [
     ".agents/docs/research/script-api-coverage.md",
     ".agents/docs/research/script-table-tuple-schema-classification.md"
