@@ -14,12 +14,7 @@ EXTENDER_REV=2a17252f657056c7705c584617c601a97c3c6a20
 HERMES_URL=https://github.com/facebook/hermes.git
 HERMES_REF=static_h
 HERMES_REV=4947871513667919bf2fe225134af3e3a1a3772c
-HERMES_MAIN_REV=378a5f023e51ec88f4ffdf4d48efe2fae51553fc
 
 EMSDK_URL=https://github.com/emscripten-core/emsdk.git
 EMSDK_VERSION=4.0.6
 EMSDK_REV=24fc909c0da13ef641d5ae75e89b5a97f25e37aa
-
-TMIKOV_HERMES_URL=https://github.com/tmikov/hermes.git
-TMIKOV_HERMES_REF=hermes-x
-TMIKOV_HERMES_REV=bacc663f7671ddec995308ac05833f87075f958d
