@@ -3,33 +3,26 @@ import { createHash } from "node:crypto";
 import { lstat, readFile, readdir, readlink, stat } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
+// The rejected-diagnostic families are owned by the compiler toolchain so the
+// development loop, this packaged harness, and the runtime bug-pool harvester
+// all classify engine output the same way.
+import { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic } from "@ts-defold/deherm/dev/runtime-diagnostics";
+
+export { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic };
+
 export const REQUIRED_MARKERS = Object.freeze([
   "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
   "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
   "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
-  "INFO:DEFOLD_HERMES: war-battles-runtime:gui-init-rendered:32:160",
-  "INFO:DEFOLD_HERMES: war-battles-runtime:first-update-rendered:32:160",
+  "INFO:DEFOLD_HERMES: war-battles:ui-init",
+  "INFO:DEFOLD_HERMES: war-battles:player-init:560.0:360.0",
+  "INFO:DEFOLD_HERMES: war-battles:player-fire:560.0:360.0:1.00:0.00",
+  "INFO:DEFOLD_HERMES: war-battles:rocket-init:1.00:0.00",
+  "INFO:DEFOLD_HERMES: war-battles:rocket-hit",
+  "INFO:DEFOLD_HERMES: war-battles:score:100",
+  "INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done",
   "INFO:DEFOLD_HERMES: Extension update entered (application initialized: false)",
 ]);
-
-export const REJECTED_DIAGNOSTICS = Object.freeze([
-  { id: "error-severity", pattern: /(?:^|\n)[^\n]*\bERROR:/i },
-  { id: "fatal-severity", pattern: /(?:^|\n)[^\n]*\bFATAL:/i },
-  { id: "script-error", pattern: /RESULT_SCRIPT_ERROR|SCRIPT ERROR/i },
-  { id: "lua-traceback", pattern: /stack traceback:/i },
-  { id: "javascript-failure", pattern: /\b(?:uncaught|unhandled)\b|\bexception\b/i },
-  { id: "bundle-rejected", pattern: /TypeScript bundle generation \d+ was rejected/i },
-  { id: "missing-lua-provider", pattern: /global '_deherm_' \(a nil value\)|Lua module is not registered/i },
-  { id: "component-runtime-unavailable", pattern: /component (?:backend )?runtime is unavailable/i },
-]);
-
-export function firstRejectedDiagnostic(transcript) {
-  for (const diagnostic of REJECTED_DIAGNOSTICS) {
-    const match = transcript.match(diagnostic.pattern);
-    if (match) return { id: diagnostic.id, text: match[0].trim() };
-  }
-  return null;
-}
 
 export function observedRequiredMarkers(transcript, requiredMarkers = REQUIRED_MARKERS) {
   const lines = transcript.replaceAll("\r", "").split("\n");

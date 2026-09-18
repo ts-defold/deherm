@@ -68,6 +68,7 @@ okf_version: "0.2"
 * [Script value-tail and overload waves](research/script-tail-generator-waves.md) - Exact candidate/blocker partitions and fail-closed dispatch tables for the remaining value and overload routes.
 * [Script Lua-table record frontier](research/script-table-record-frontier.md) - Complete 148-route table partition, three bounded record candidates, and source-pinned blocker families.
 * [Hot reload and development control plane](research/hot-reload-and-dev-tui.md) - Verified Defold resource reload semantics, remote-target flow, generation-safe Hermes swapping, and the staged Rezi operator console.
+* [Runtime bug pool](research/runtime-bug-pool.md) - Shared rejected-diagnostic classification, normalized-signature harvesting of dev and packaged runs, and the boundary that keeps it out of conformance rows.
 * [Binding compiler cookbook](examples/binding-cookbook.md) - Concrete source-to-IR-to-TypeScript examples for reviewing the public API.
 * [Risks and unknowns](risks.md) - Technical risks that the spike must retire.
 

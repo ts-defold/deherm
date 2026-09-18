@@ -25,6 +25,9 @@ export function createDevModel(options = {}) {
     engine: { status: "stopped" },
     defoldBuild: { status: "idle" },
     selectedPanel: "overview",
+    // Where this session accumulates classified runtime defects, so any console
+    // over the snapshot can read the pool without knowing the layout.
+    bugPoolFile: options.bugPoolFile,
     startedAt: options.now ?? Date.now()
   };
 }

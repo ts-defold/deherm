@@ -13,12 +13,19 @@ import {
   sha256Tree,
   transcriptEvidence,
 } from "./packaged-runtime-evidence.mjs";
+import {
+  harvestTranscript,
+  mergeOccurrences,
+  readBugPool,
+  writeBugPool,
+} from "@ts-defold/deherm/dev/bug-pool";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 const engine = resolve(exampleRoot, "defold/build/arm64-osx/dmengine");
 const runtimeCwd = resolve(exampleRoot, "defold/build/default");
 const evidencePath = resolve(exampleRoot, "evidence/packaged-runtime-arm64-macos.json");
+const bugPoolPath = resolve(exampleRoot, "defold/.deherm/dev/bug-pool.json");
 const artifactPaths = [
   "examples/war-battles-online/defold/build/arm64-osx/dmengine",
   "examples/war-battles-online/defold/build/default/game.arcd",
@@ -86,12 +93,32 @@ if (arguments_.has("--check-evidence")) {
 
 const timeoutMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_TIMEOUT_MS ?? "15000", 10);
 const settleMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_SETTLE_MS ?? "1500", 10);
-const result = await runPackagedRuntimeEvidence({
-  command: engine,
-  cwd: runtimeCwd,
-  timeoutMs,
-  settleMs,
-});
+// Every packaged run is also an observation of how this software behaved. The
+// transcript feeds the shared runtime bug pool so defects accumulate across
+// runs; the pool is behavioural evidence only and never a conformance claim.
+const harvestRun = async (transcript) => {
+  try {
+    const pool = await readBugPool(bugPoolPath);
+    mergeOccurrences(pool, harvestTranscript(transcript, { origin: "packaged-run" }));
+    await writeBugPool(bugPoolPath, pool);
+  } catch {
+    // Harvesting must never change the outcome of the runtime gate.
+  }
+};
+
+let result;
+try {
+  result = await runPackagedRuntimeEvidence({
+    command: engine,
+    cwd: runtimeCwd,
+    timeoutMs,
+    settleMs,
+  });
+} catch (error) {
+  await harvestRun(String(error?.message ?? error));
+  throw error;
+}
+await harvestRun(result.transcript);
 const evidence = buildEvidenceDocument({
   artifacts,
   sourceInputs,

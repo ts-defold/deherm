@@ -269,6 +269,23 @@ and an active selection swaps in a virtual list whose rows carry the highlight.
 The Instances view renders an explicit "requires runtime instance channel" empty
 state because `DEHERM_EVENT telemetry` reports counts, never identities.
 
+`deherm dev` also classifies every line it emits and accumulates defects into
+`<project>/.deherm/dev/bug-pool.json`, deduplicated by a normalized signature so
+one defect collapses to one entry across runs. `deherm bugs` harvests the session
+log and any packaged-run transcripts into that pool and prints it:
+
+```sh
+npx deherm bugs                        # harvest and print
+npx deherm bugs --json                 # machine-readable pool
+npx deherm bugs --no-harvest           # print what is already stored
+npx deherm bugs --transcript run.log   # fold in a packaged-run transcript
+```
+
+The pool records how deherm itself behaved during runs. It is a reporting
+surface, never a gate - it always exits 0 - and a pool entry must never be
+promoted into a completion-matrix row. See
+[Runtime bug pool](research/runtime-bug-pool.md).
+
 The next commands will orchestrate the internal build graph:
 
 ```sh

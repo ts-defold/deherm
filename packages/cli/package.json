@@ -6,6 +6,8 @@
   "source": "./src/cli.mjs",
   "exports": {
     ".": "./src/cli.mjs",
+    "./bug-pool": "./src/dev/bug-pool.mjs",
+    "./runtime-diagnostics": "./src/dev/runtime-diagnostics.mjs",
     "./conformance": "./src/conformance.mjs",
     "./dmsdk": "./src/dmsdk.mjs",
     "./generate": "./src/generate.mjs",

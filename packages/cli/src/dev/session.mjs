@@ -7,6 +7,7 @@ import {
   generateComponentProxies
 } from "../../../compiler/src/component-proxy-generator.mjs";
 import { writeProjectResourceSymbols } from "../resource-symbols.mjs";
+import { createBugPoolRecorder, defaultBugPoolFile } from "./bug-pool.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
 import { createDefoldBuilder } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
@@ -112,8 +113,25 @@ async function entryTsconfig(projectRoot, entryPoint) {
 export function createDevWatchOptions({ outputFile, sourceMirror, buildMirror }) {
   return {
     ignoredPaths: [outputFile, sourceMirror, buildMirror].flatMap((file) => [file, `${file}.map`]),
-    shouldIgnore: (_file, relative) => isComponentProxy(relative) || relative.includes(".deherm-tmp-")
+    // The watcher already drops every atomic-write scratch name, including
+    // `.deherm-tmp-*`; this only hides the proxies the session itself writes.
+    shouldIgnore: (_file, relative) => isComponentProxy(relative)
   };
+}
+
+// Prose is not a build input. A README edit must not schedule a TypeScript
+// rebuild, and it is not a Defold resource either, so a documentation-only
+// batch leaves both pipelines alone.
+const documentationSuffixes = [".md", ".markdown", ".mdx", ".mdc", ".txt", ".rst", ".adoc", ".log"];
+
+export function isDocumentationOnlyChange(file) {
+  const name = file.toLowerCase();
+  return documentationSuffixes.some((suffix) => name.endsWith(suffix)) ||
+    ["license", "licence", "notice", "authors", "changelog"].includes(name.split("/").at(-1));
+}
+
+export function buildRelevantChanges(files) {
+  return files.filter((file) => !isDocumentationOnlyChange(file));
 }
 
 function needsDefoldBuild(files) {
@@ -148,11 +166,20 @@ export async function runDevSession(options = {}) {
     : containedPath(projectRoot, resourceRelative, "resource path");
   const buildRoot = path.resolve(options.buildDir ?? path.join(projectRoot, "build", "default"));
   const buildMirror = containedPath(buildRoot, resourceRelative, "build resource path");
-  const model = createDevModel();
   const listeners = new Set();
+  // The session log is truncated per session, so defects are classified as they
+  // happen and accumulated into a pool that survives across sessions. The pool
+  // records this software's own runtime behaviour; it is never conformance
+  // evidence and must not reach a completion-matrix row.
+  const bugPool = options.bugPool === false ? undefined : createBugPoolRecorder({
+    file: path.resolve(options.bugPoolFile ?? defaultBugPoolFile(projectRoot)),
+    onError: () => { /* Harvesting must never interrupt a development session. */ }
+  });
+  const model = createDevModel({ bugPoolFile: bugPool?.file });
   const lineOutput = options.headless || (!options.json && (!process.stdin.isTTY || !process.stdout.isTTY));
   const emit = (event) => {
     applyDevEvent(model, event);
+    bugPool?.record(event);
     if (!sessionLogFailed && !sessionLog.destroyed) {
       const timestamp = new Date(event.at ?? Date.now()).toISOString();
       const line = event.type === "log"
@@ -222,6 +249,7 @@ export async function runDevSession(options = {}) {
 
   if (options.once) {
     await coordinator.close();
+    await bugPool?.close();
     await closeSessionLog();
     return snapshotDevModel(model);
   }
@@ -270,7 +298,9 @@ export async function runDevSession(options = {}) {
     }
     if (!engine.running()) await engine.launch();
   });
-  const processChanges = (files) => enqueue(async () => {
+  const processChanges = (batch) => enqueue(async () => {
+    const files = buildRelevantChanges(batch);
+    if (!files.length) return;
     await coordinator.requestBuild(files);
     if (!needsDefoldBuild(files)) return;
     const activeBuilder = await ensureBuilder();
@@ -315,6 +345,7 @@ export async function runDevSession(options = {}) {
     await coordinator.close();
     await builder?.close();
     await resourceServer?.close();
+    await bugPool?.close();
     await closeSessionLog();
   };
   if (services.runDevTui || (!options.headless && !options.json && process.stdin.isTTY && process.stdout.isTTY)) {

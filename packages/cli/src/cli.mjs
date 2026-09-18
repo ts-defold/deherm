@@ -24,6 +24,7 @@ Commands:
   typecheck    Type-check shared, game-object, GUI, and render TypeScript projects
   verify-generated  Verify packaged IR plus generated context/config output sentinels
   dev          Run the compiler/watch console; press p to launch or stop the built game
+  bugs         Harvest engine/dev output into the deduplicated runtime bug pool
   conformance generate  Generate exhaustive API compile/runtime fixtures and a disposition plan
   conformance compile   Compile a generated shard and emit per-binding observations
   conformance report    Merge generated plans with independently captured observations
@@ -49,6 +50,10 @@ Options:
   --service-port <n> Local Defold engine service port (default: 8001)
   --resource <path>  Generated typed bundle resource (default: /deherm/app.dehermc)
   --target <url>     For dev, a Defold engine service URL; may be repeated
+  --pool <path>      Runtime bug pool JSON (default: <project>/.deherm/dev/bug-pool.json)
+  --session-log <path>  Session log harvested by bugs; may be repeated
+  --transcript <path>   Packaged-run transcript harvested by bugs; may be repeated
+  --no-harvest       Print the stored bug pool without reading new output
   --once             Build one development generation and exit
   --headless         Use line-oriented output instead of the Rezi console
   --no-launch        Watch/build without automatically launching the local game
@@ -62,7 +67,15 @@ Options:
 `;
 
 export function parseArguments(argv) {
-  const options = { command: argv.length === 0 ? "ui" : "doctor", json: false, observations: [], contexts: [], targets: [] };
+  const options = {
+    command: argv.length === 0 ? "ui" : "doctor",
+    json: false,
+    observations: [],
+    contexts: [],
+    targets: [],
+    transcripts: [],
+    sessionLogs: []
+  };
   const args = [...argv];
   if (args[0] && !args[0].startsWith("-")) options.command = args.shift();
   if (options.command === "conformance" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
@@ -77,6 +90,10 @@ export function parseArguments(argv) {
     else if (value === "--headless") options.headless = true;
     else if (value === "--no-launch") options.autoLaunch = false;
     else if (value === "--no-ttsc") options.useTtsc = false;
+    else if (value === "--no-harvest") options.harvest = false;
+    else if (value === "--pool") options.pool = args.shift();
+    else if (value === "--session-log") options.sessionLogs.push(args.shift());
+    else if (value === "--transcript") options.transcripts.push(args.shift());
     else if (value === "-h" || value === "--help") options.help = true;
     else if (value === "--project") options.project = args.shift();
     else if (value === "--name") options.name = args.shift();
@@ -295,6 +312,27 @@ export async function run(argv = process.argv.slice(2)) {
     const snapshot = await runDevSession(options);
     if (options.once && options.json) console.log(JSON.stringify({ schemaVersion: 1, snapshot }, null, 2));
     return snapshot.phase === "failed" ? 1 : 0;
+  }
+  if (options.command === "bugs") {
+    // The pool reports how déherm itself behaved during real runs. It is a
+    // reporting surface, never a gate, so it always exits 0; promoting a pool
+    // entry into conformance or completion evidence is a category error.
+    const {
+      bugPoolDocument, defaultBugPoolFile, formatBugPool, harvestBugPool, readBugPool
+    } = await import("./dev/bug-pool.mjs");
+    const projectRoot = await findProjectRoot(process.cwd(), options.project).catch(() => path.resolve(options.project ?? process.cwd()));
+    const poolFile = path.resolve(options.pool ?? defaultBugPoolFile(projectRoot));
+    const result = options.harvest === false
+      ? { poolFile, sources: [], document: bugPoolDocument(await readBugPool(poolFile)) }
+      : await harvestBugPool({
+        projectRoot,
+        poolFile,
+        sessionLogs: options.sessionLogs.length ? options.sessionLogs : undefined,
+        transcripts: options.transcripts
+      });
+    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, poolFile: result.poolFile, sources: result.sources, ...result.document }, null, 2));
+    else console.log(formatBugPool(result.document, { cwd: process.cwd(), poolFile: result.poolFile }));
+    return 0;
   }
   const inventory = await inspectDefoldProject({
     project: options.project,

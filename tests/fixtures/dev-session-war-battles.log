@@ -1,0 +1,39 @@
+2026-09-18T22:36:45.998Z [INFO] dev session log: .deherm/dev/session.log
+2026-09-18T22:36:46.006Z [EVENT] build-started {"type":"build-started","generation":1,"changedSources":["main/player.script.ts"]}
+2026-09-18T22:36:47.560Z [EVENT] build-succeeded {"type":"build-succeeded","generation":1,"fingerprint":"0747bf8db1a5a0bab9e415c4a7f5802e82797e4c82c74ebb065bdd0b4c6b2fe2","resources":["/deherm/app.dehermc"]}
+2026-09-18T22:37:54.300Z [INFO] engine INFO:DEFOLD_HERMES: war-battles:rocket-expired
+2026-09-18T22:37:54.883Z [INFO] engine INFO:DEFOLD_HERMES: war-battles:rocket-expired
+2026-09-18T22:37:56.169Z [ERROR] engine ERROR:SCRIPT: Structured Lua call has no captured Defold instance
+2026-09-18T22:37:56.169Z [ERROR] engine Error: Structured Lua call has no captured Defold instance
+2026-09-18T22:37:56.169Z [INFO] engine     at call (native)
+2026-09-18T22:37:56.169Z [INFO] engine     at callScriptApi (deherm:///deherm/app.dehermc:323:26)
+2026-09-18T22:37:56.169Z [INFO] engine     at post (deherm:///deherm/app.dehermc:957:38)
+2026-09-18T22:37:56.169Z [INFO] engine     at final
+2026-09-18T22:37:56.169Z [ERROR] engine stack traceback:
+2026-09-18T22:37:56.169Z [ERROR] engine   [C]:-1: in function error
+2026-09-18T22:37:56.169Z [INFO] engine   main/player.script:32: in function <main/player.script:29>
+2026-09-18T22:37:56.227Z [INFO] engine INFO:DLIB: Flushing http cache to disk
+2026-09-18T22:37:56.231Z [EVENT] engine-stopped {"type":"engine-stopped","code":0,"signal":null}
+2026-09-18T22:38:27.201Z [EVENT] build-started {"type":"build-started","generation":27,"changedSources":["README.md","README.md.tmp.60268.8c6c1202fcc7"]}
+2026-09-18T22:38:28.605Z [EVENT] build-failed {"type":"build-failed","generation":27,"diagnostic":"Build failed with 1 error:\ndefold/main/.deherm-composed-entry.ts:2:7: ERROR: Could not resolve \"/Users/mini/Documents/defold-hermes/examples/war-battles-online/defold/main/battle.gui.ts\""}
+2026-09-18T22:38:28.605Z [EVENT] defold-build-started {"type":"defold-build-started","reason":"changed 2 file(s)"}
+2026-09-18T22:38:28.768Z [INFO] bob   0% Downloading 0 archives
+2026-09-18T22:38:54.980Z [EVENT] build-started {"type":"build-started","generation":28,"changedSources":["PLAYABLE-BLOCKERS.md","PLAYABLE-BLOCKERS.md.tmp.60268.e8799d60b951"]}
+2026-09-18T22:38:55.171Z [EVENT] build-failed {"type":"build-failed","generation":28,"diagnostic":"Build failed with 1 error:\ndefold/main/.deherm-composed-entry.ts:2:7: ERROR: Could not resolve \"/Users/mini/Documents/defold-hermes/examples/war-battles-online/defold/main/battle.gui.ts\""}
+2026-09-18T22:39:39.402Z [EVENT] build-started {"type":"build-started","generation":29,"changedSources":[".editor_settings"]}
+2026-09-18T22:39:39.555Z [EVENT] build-failed {"type":"build-failed","generation":29,"diagnostic":"Build failed with 1 error:\ndefold/main/.deherm-composed-entry.ts:2:7: ERROR: Could not resolve \"/Users/mini/Documents/defold-hermes/examples/war-battles-online/defold/main/battle.gui.ts\""}
+2026-09-18T22:39:59.851Z [INFO] bob INFO: Job job1026498228906768172 did not complete successfully.
+2026-09-18T22:39:59.856Z [INFO] bob The build failed for the following reasons:
+2026-09-18T22:39:59.856Z [ERROR] bob Job id: job1026498228906768172; traceId: 6aadbdb22a4b5d17d8ff7a873fd176d3com.defold.extender.ExtenderException: /Users/ansible/extender.macos-xcode26_5.prod/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/extender/build.yml:1: error: Cannot create property=platforms for JavaBean=com.defold.extender.Configuration@7ebcbca
+2026-09-18T22:39:59.856Z [INFO] bob  in 'string', line 1, column 1:
+2026-09-18T22:39:59.856Z [INFO] bob     context:
+2026-09-18T22:39:59.856Z [INFO] bob     ^
+2026-09-18T22:39:59.856Z [INFO] bob Cannot create property=r8Cmd for JavaBean=com.defold.extender.PlatformConfig@5a182493
+2026-09-18T22:39:59.856Z [INFO] bob 	at com.defold.extender.Extender.loadYaml(Extender.java:375)
+2026-09-18T22:39:59.856Z [INFO] bob 	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-09-18T22:40:00.193Z [EVENT] defold-build-failed {"type":"defold-build-failed","reason":"changed 1 file(s)","diagnostic":"java exited 1"}
+2026-09-18T22:40:00.193Z [ERROR] watcher java exited 1
+2026-09-18T22:41:21.894Z [EVENT] build-started {"type":"build-started","generation":30,"changedSources":["PLAYABLE-BLOCKERS.md","PLAYABLE-BLOCKERS.md.tmp.60268.f900246b9998"]}
+2026-09-18T22:41:22.036Z [EVENT] build-failed {"type":"build-failed","generation":30,"diagnostic":"Build failed with 1 error:\ndefold/main/.deherm-composed-entry.ts:2:7: ERROR: Could not resolve \"/Users/mini/Documents/defold-hermes/examples/war-battles-online/defold/main/battle.gui.ts\""}
+2026-09-18T22:41:22.036Z [EVENT] defold-build-started {"type":"defold-build-started","reason":"changed 2 file(s)"}
+2026-09-18T22:41:22.248Z [INFO] bob   0% Downloading 0 archives

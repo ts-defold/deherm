@@ -35,6 +35,14 @@
       "import": "./packages/compiler/src/native-extension-generator.mjs",
       "default": "./packages/compiler/src/native-extension-generator.mjs"
     },
+    "./dev/runtime-diagnostics": {
+      "import": "./packages/cli/src/dev/runtime-diagnostics.mjs",
+      "default": "./packages/cli/src/dev/runtime-diagnostics.mjs"
+    },
+    "./dev/bug-pool": {
+      "import": "./packages/cli/src/dev/bug-pool.mjs",
+      "default": "./packages/cli/src/dev/bug-pool.mjs"
+    },
     "./ttsc": {
       "import": "./packages/compiler/ttsc.mjs",
       "default": "./packages/compiler/ttsc.mjs"
@@ -240,7 +248,7 @@
     "test:native-defold:hot-reload": "node --test tests/native-hot-reload-fixture.test.mjs && node scripts/check-native-defold-hot-reload.mjs",
     "test:extension-retention": "node --test tests/dmsdk-scalar-extension-retention.test.mjs",
     "test:cli": "node --test tests/cli.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs",
-    "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs tests/hash-literal.test.mjs tests/installed-dev-loop.test.mjs",
+    "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs tests/hash-literal.test.mjs tests/installed-dev-loop.test.mjs tests/runtime-bug-pool.test.mjs",
     "test:canonical-family-emission": "node --test tests/canonical-family-emission.test.mjs",
     "test:usage": "pnpm build:release-plan && node --test tests/usage.test.mjs tests/release-build.test.mjs tests/canonical-family-emission.test.mjs",
     "test:native": "pnpm build && node --test tests/native.test.mjs",
