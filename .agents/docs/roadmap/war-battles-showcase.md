@@ -72,6 +72,31 @@ Reproduce the tutorial's existing behavior with no deliberate feature changes:
 Run the original and TypeScript ports from the same scripted input timeline and
 compare authoritative gameplay state rather than relying on screenshots alone.
 
+# Stage 1b: world, camera, and scale
+
+The tutorial ships a single fixed screen at its original resolution, which makes
+the pixel art read as very small on a modern display and leaves the level with
+nowhere to go. Before multiplayer is attached, the presentation moves to a
+scrolling world:
+
+* a camera component that follows the player with bounded look-ahead and
+  clamping at world edges, rather than a fixed viewport;
+* a world substantially larger than one screen, so the tilemap scrolls and the
+  level has traversable space;
+* a render and display configuration that presents the pixel art at a legible
+  scale, with an explicit integer-scale or resolution policy rather than
+  incidental stretching;
+* GUI that stays in screen space while the world scrolls beneath it.
+
+This is deliberately sequenced after the faithful port. The port establishes
+that game objects, factories, physics, sprite animation and input work through
+generated bindings; this stage changes presentation only, so any regression is
+attributable to the camera and world change rather than to the binding surface.
+
+It also widens the exercised API surface in a useful direction: camera routes,
+render-context routes, and world-space versus screen-space addressing are all
+distinct contract families that a single fixed screen never touches.
+
 # Stage 2: multiplayer simulation
 
 Build a server-authoritative 32-player simulation with a fixed tick and an
