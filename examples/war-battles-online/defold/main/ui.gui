@@ -1,0 +1,30 @@
+script: "/main/ui.gui_script"
+fonts {
+  name: "score_font"
+  font: "/main/tutorial-text.font"
+}
+nodes {
+  position {
+    x: 24.0
+    y: 696.0
+    z: 0.0
+  }
+  size {
+    x: 400.0
+    y: 32.0
+  }
+  color {
+    x: 1.0
+    y: 0.86
+    z: 0.2
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  text: "SCORE 0"
+  font: "score_font"
+  id: "score"
+  pivot: PIVOT_NW
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT
+max_nodes: 16

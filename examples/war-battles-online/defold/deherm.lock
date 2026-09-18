@@ -14,32 +14,32 @@
   },
   "generation": {
     "schemaVersion": 1,
-    "projectGeneratorSha256": "82023c6f056efe857b3009279438013d3aefe80c8e5a42bf38642defd69424eb",
-    "cacheKey": "4a2bd4245b1e2d6110da80a9aa3beb3a88d71f601b46fa280c3b90615316d7ee"
+    "projectGeneratorSha256": "6c57700fee0b7cce6df7e1fe4454c7aa436388ba911c5f5cd5462f34d39419ba",
+    "cacheKey": "bc1f3052758eaaf8bc442e2d734be910d8994f6b66fc7962e3033091f450038e"
   },
   "inputs": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "dmsdkIrSha256": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
     "scriptDispatchSha256": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "scriptAccountingSha256": "a516a54866d6bfac6a0b637685accfd25aced0a99eb36377de509001f576f7f9",
-    "scriptUniversalSha256": "5740624170f9fe0374aa0fb046daf4719e382bb3a7b20cb9d0cdc318e3063e42",
-    "scriptProfilesSha256": "6af3442ce481eff732b25db8d0e0fba7a763f7ff35de89c5c7981229397ffd7d",
-    "loweringPlanSha256": "d18d11de91535f4229b90d179d1dbd943f5eb165d10ae2ae9a063aaaeb2d6aa2",
-    "loweringPlanSentinelSha256": "28d590f059508ca42443ec07953f436c256f981a4a298d35c7baa922f77c3bc9",
+    "scriptAccountingSha256": "6455322e136ba5aba92ef3901bcaca0c33284037215ceda1e8b33fd92e6b5931",
+    "scriptUniversalSha256": "43af82038d6e390f365feccb7c259baa73579de70d1e509f48bd96600bea6648",
+    "scriptProfilesSha256": "eb99a2229d635f31e971f3ac49f0b24c1296fc83cf5df23d421cd5f6d13ca8ff",
+    "loweringPlanSha256": "ca355c81ca01d5a2515937df150d74dde1fd40813886fbfb0d021e6acdce4739",
+    "loweringPlanSentinelSha256": "b996e48903d350c52b52ece4626205fd34bedf0b909027a976fb35fa479728fb",
     "dmsdkThunksSha256": "d0d4434e4a1d9c5578058e3f12443efdf860fdd5017118a1bf5e4c464acbdb4d",
-    "dmsdkUniversalSha256": "717dd38144904f9ba7610732182782ff6dcadd3426c6ca0e78c2c8520c6154ba",
+    "dmsdkUniversalSha256": "cff89257532f6661ef563bc0f0892a31dc582a12e871b362568428deaa5d759d",
     "sdkSourceSha256": "82ae629328ba4b46e811747ac8bb401be6c8dd7d2cb5488ddc8f77d037eab679"
   },
   "generatedOutputs": {
     "output": {
-      "script-contexts.json": "28341856496c2a9a5ba45b41c774e479ccc355d41d6759c18c15515be6a07f64",
+      "script-contexts.json": "2b0acde8ab9abebaa381c12d80a2355bcc014944a2488f1cb0d9ff42f9b583cc",
       "sdk/contexts/shared.ts": "f9fbf6bad84413a3fc4da22499b431e8a1a23e787ef6082e8935a2c3ad651784",
       "sdk/contexts/game-object.ts": "f78f5740bb6eb06bf903f8de41a5ff30206b2b5eeb841c12568aa6ac00cd6ed7",
       "sdk/contexts/gui.ts": "cf03743da2030749d238eefa30eab9cd6819a5cbcc28720cd017e52749b53026",
       "sdk/contexts/render.ts": "e30bdffd3fe0499c1f05bc75952dc189df8164ca80dbd50cb90e31dd86377d29"
     },
     "project": {
-      "tsconfig.deherm.base.json": "1237e822ded3d69d458292505059680babf56a5a427ab9dc54e64c94cb934bbd",
+      "tsconfig.deherm.base.json": "b63534c7c5622444f84480ac9263b0907a677c3c5927843fd8986004d5387ed0",
       "tsconfig.deherm.shared.json": "951abfe19c322572fff092c56434e9cf8d8bcb2af2bc381127ed5f3a248b9e5b",
       "tsconfig.deherm.game-object.json": "7e53c986a39f5a90a032eb327e3fd5f53b7cacac627b2a6808fc09d3915f646b",
       "tsconfig.deherm.gui.json": "51ae66826bd3cbf531a87d8bdd20a84edfc2312b5eb78718bb04e15dea2f11b7",

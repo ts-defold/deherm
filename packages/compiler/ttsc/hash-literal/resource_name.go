@@ -93,6 +93,23 @@ var symbolTableOnce struct {
 	loaded map[string]*symbolTable
 }
 
+// reportSymbolTableRealpath publishes the physical path of a symbol table that
+// was read successfully. The descriptor side observes physical paths, so the
+// lexical spelling is resolved through EvalSymlinks; an unresolvable path
+// leaves the observation out rather than publishing a conflicting one.
+func reportSymbolTableRealpath(ctx driver.PluginContext, file string) {
+	resolved, err := filepath.Abs(file)
+	if err != nil {
+		return
+	}
+	physical, err := filepath.EvalSymlinks(resolved)
+	if err != nil {
+		return
+	}
+	cleaned := filepath.Clean(physical)
+	ctx.ReportHostInputRealpath(file, &cleaned)
+}
+
 // loadSymbolTable reads the generated project symbol table.
 //
 // Absence is not an error. A project that has not generated a table, or a
@@ -127,12 +144,17 @@ func loadSymbolTable(ctx driver.PluginContext) *symbolTable {
 	symbolTableOnce.loaded[file] = nil
 	content, err := os.ReadFile(file)
 	if err != nil {
+		// A declared host input needs both proofs. Reporting only the hash
+		// leaves the realpath observation missing, and the transform generation
+		// is then refused on every delivery.
 		ctx.ReportHostInputHash(file, nil)
+		ctx.ReportHostInputRealpath(file, nil)
 		return nil
 	}
 	digest := sha256.Sum256(content)
 	hash := hex.EncodeToString(digest[:])
 	ctx.ReportHostInputHash(file, &hash)
+	reportSymbolTableRealpath(ctx, file)
 	table := &symbolTable{}
 	if err := json.Unmarshal(content, table); err != nil {
 		return nil

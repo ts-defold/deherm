@@ -17,6 +17,7 @@
         "transform": "@ts-defold/deherm/ttsc",
         "enabled": true,
         "inventory": "./.deherm/extensions.json",
+        "resourceSymbols": "./.deherm/generated/resource-symbols.json",
         "profile": "development"
       }
     ]

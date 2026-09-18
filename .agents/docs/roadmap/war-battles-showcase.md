@@ -72,6 +72,64 @@ Reproduce the tutorial's existing behavior with no deliberate feature changes:
 Run the original and TypeScript ports from the same scripted input timeline and
 compare authoritative gameplay state rather than relying on screenshots alone.
 
+# Stage 1b: world, camera, and scale
+
+The tutorial ships a single fixed screen at its original resolution, which makes
+the pixel art read as very small on a modern display and leaves the level with
+nowhere to go. Before multiplayer is attached, the presentation moves to a
+scrolling world:
+
+* a camera component that follows the player with bounded look-ahead and
+  clamping at world edges, rather than a fixed viewport;
+* a world substantially larger than one screen, so the tilemap scrolls and the
+  level has traversable space;
+* a render and display configuration that presents the pixel art at a legible
+  scale, with an explicit integer-scale or resolution policy rather than
+  incidental stretching;
+* GUI that stays in screen space while the world scrolls beneath it.
+
+This is deliberately sequenced after the faithful port. The port establishes
+that game objects, factories, physics, sprite animation and input work through
+generated bindings; this stage changes presentation only, so any regression is
+attributable to the camera and world change rather than to the binding surface.
+
+It also widens the exercised API surface in a useful direction: camera routes,
+render-context routes, and world-space versus screen-space addressing are all
+distinct contract families that a single fixed screen never touches.
+
+## Delivered
+
+All four bullets are in `examples/war-battles-online/defold`, observed on a
+pinned local-Extender arm64-macOS engine:
+
+* `main/camera.go` carries a built-in `camera` component and
+  `main/camera.script.ts`; no third-party extension and no hand-rolled view
+  matrix. Defold 1.14's built-in render script binds an enabled camera
+  component through `camera.get_cameras()`/`render.set_camera` on its own, and
+  draws the `gui` predicate through a separate screen-space projection, so the
+  GUI needed no change.
+* `main/tutorial-world.tilemap` is 120x90 tiles (1920x1440 px) generated from a
+  fixed seed by `examples/war-battles-online/tools/generate-world-tilemap.mjs`
+  out of the tutorial's own four ground tiles and single 4x2 prop; the authored
+  51x49 map is preserved verbatim inside it and every original world coordinate
+  is unchanged.
+* The scale policy is a fixed integer camera zoom: reference display 1280x720,
+  `orthographic_projection` with `ORTHO_MODE_FIXED` and `orthographic_zoom = 2`,
+  which the engine turns into a 640x360 world-unit view. It is written down with
+  its rejected alternatives in the project README.
+* The camera script derives its clamp rectangle by reading
+  `orthographic_zoom` back off the active render camera, so the clamp and the
+  projection cannot drift apart.
+
+The stage found the binding gap it was supposed to find. World-space addressing
+is declared but not implemented: `go.get_position`, `go.set_position` and
+`go.set_rotation` all declare `String`/`Hash`/`Url` call shapes and implement
+only the current-instance shape, and `msg.url(String)` fails its universal
+descriptor. A component therefore still cannot read or write another game
+object's transform. The camera works around it with an implemented
+`msg.post(String, String, Table)` position report from the player, which is the
+honest shape of the gap rather than a fix for it.
+
 # Stage 2: multiplayer simulation
 
 Build a server-authoritative 32-player simulation with a fixed tick and an

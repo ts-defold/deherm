@@ -1,6 +1,6 @@
 [project]
-title = War Battles Online Ultimate Edition
-version = 0.2.0
+title = War Battles
+version = 0.3.0
 custom_resources = /deherm
 
 [bootstrap]
@@ -14,11 +14,14 @@ width = 1280
 height = 720
 high_dpi = 1
 
+[physics]
+scale = 0.02
+
 [script]
 shared_state = 1
 
 [tilemap]
-max_tile_count = 4096
+max_tile_count = 16384
 
 [library]
 include_dirs = defold_hermes

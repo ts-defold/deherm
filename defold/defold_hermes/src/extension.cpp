@@ -86,6 +86,54 @@ bool IsBootstrapAttachmentLive(
       attachment->attachmentGeneration == generation;
 }
 
+/**
+ * Component callbacks borrow the game object Defold is currently dispatching,
+ * so their attachment token only has to track whether the extension is live.
+ * `resolveCurrent` still revalidates generation, collection, and identifier
+ * against the terminal API before any engine pointer is read.
+ */
+struct ComponentInstanceAttachment {
+  uint32_t generation = 1;
+  bool live = false;
+};
+
+ComponentInstanceAttachment gComponentInstanceAttachment;
+
+bool IsComponentInstanceAttachmentLive(
+    void* owner,
+    uint32_t slot,
+    uint32_t generation) noexcept {
+  const auto* attachment = static_cast<const ComponentInstanceAttachment*>(owner);
+  return slot == 0 && attachment && attachment->live && attachment->generation == generation;
+}
+
+void InvalidateComponentInstanceAttachment() noexcept {
+  gComponentInstanceAttachment.live = false;
+  if (++gComponentInstanceAttachment.generation == 0) ++gComponentInstanceAttachment.generation;
+}
+
+bool BuildComponentInstanceContext(
+    void*,
+    void* luaState,
+    defold_hermes::game_object::ActiveContext* out) noexcept {
+  if (!out || !luaState || !gComponentInstanceAttachment.live) return false;
+  lua_State* state = static_cast<lua_State*>(luaState);
+  if (!dmScript::IsInstanceValid(state)) return false;
+  dmGameObject::HInstance instance = dmScript::CheckGOInstance(state);
+  if (!instance) return false;
+  out->instance = instance;
+  out->collection = dmGameObject::GetCollection(instance);
+  out->identifier = dmGameObject::GetIdentifier(instance);
+  out->instanceGeneration = dmGameObject::GetGeneration(instance);
+  out->attachment = {
+    &gComponentInstanceAttachment,
+    0,
+    gComponentInstanceAttachment.generation,
+    IsComponentInstanceAttachmentLive
+  };
+  return true;
+}
+
 bool BuildBootstrapContext(defold_hermes::game_object::ActiveContext* out) {
   if (!out || !gBootstrapAttachment.live || !gBootstrapAttachment.collection) return false;
   dmGameObject::HInstance instance = dmGameObject::GetInstanceFromIdentifier(
@@ -692,6 +740,21 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   gComponentLuaRuntime = std::make_unique<defold_hermes::component_proxy::LuaRuntime>(
       gComponentHermesBackend->api(), componentInstanceApi);
   gComponentLuaRuntime->registerLuaApi(params->m_L);
+  gComponentInstanceAttachment.live = true;
+  if (!defold_hermes::game_object::installCurrentInstanceApi(
+          {nullptr, BuildComponentInstanceContext})) {
+    dmLogError("Unable to install the component current-instance game-object resolver");
+    InvalidateComponentInstanceAttachment();
+    gComponentLuaRuntime->shutdown();
+    gComponentLuaRuntime.reset();
+    gComponentHermesBackend.reset();
+    defold_hermes::game_object::uninstallTerminalApi();
+    gLuaBridge->shutdown();
+    gLuaBridge.reset();
+    gResourceFactory = nullptr;
+    gBundlePath.clear();
+    return dmExtension::RESULT_INIT_ERROR;
+  }
 #endif
   defold_hermes::installLuaTimerCapi(LuaTimerDelay, LuaTimerCancel, LuaTimerTrigger);
 
@@ -760,8 +823,16 @@ dmExtension::Result UpdateExtension(dmExtension::Params*) {
 
 void OnEventExtension(dmExtension::Params*, const dmExtension::Event* event) {
   if (event && event->m_Event == EXTENSION_EVENT_ID_ENGINE_DELETE) {
+    // `dmEngine::Delete` dispatches this event *before* it releases the main
+    // collection and deletes every collection, so each component's `final`
+    // callback still runs after this point. The bootstrap attachment owns a
+    // game-object instance that the collection teardown is about to free, so
+    // its finalization has to happen here; the captured Lua script instances
+    // must not, because a structured script call from `final` (`msg.post`,
+    // `go.*`) binds against them. Detaching them is deferred to
+    // `FinalizeExtension`, which the engine runs after `DeleteCollections`
+    // while the Lua state is still alive.
     FinalizeAttachedApplication("engine delete event");
-    DetachCapturedLuaInstances();
     InvalidateBootstrapAttachment();
   }
 }
@@ -773,6 +844,8 @@ dmExtension::Result FinalizeExtension(dmExtension::Params*) {
   gTelemetryLastEmitMicros = 0;
   gTelemetryLastFrameMicros = 0;
   InvalidateBootstrapAttachment();
+  InvalidateComponentInstanceAttachment();
+  defold_hermes::game_object::uninstallCurrentInstanceApi();
   defold_hermes::game_object::uninstallTerminalApi();
   defold_hermes::uninstallLuaTimerCapi();
   defold_hermes::uninstallScriptBridgeApi();
