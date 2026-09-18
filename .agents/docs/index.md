@@ -28,6 +28,7 @@ okf_version: "0.2"
 * [Hybrid TypeScript toolchain](decisions/hybrid-toolchain.md) - Lua scripts plus Hermes modules, coordinated by TypeScript 7 and ttsc.
 * [Runtime profiles and reachability](decisions/runtime-profiles-and-reachability.md) - Precompiled development runtimes, release-only AOT, and cross-layer tree shaking.
 * [Delivery model](decisions/delivery-model.md) - What ships as a Defold library/native extension and what would require a fork.
+* [Layered API policy cache](decisions/layered-api-policy-cache.md) - Source-derived Lua surfaces extracted once, shipped and committed as hash-keyed policies, reparsed only on mismatch.
 * [Project extension discovery](decisions/project-extension-discovery.md) - How the npm CLI discovers local and resolved extensions and decides which binding route is safe.
 * [TypeScript game-object components](decisions/typescript-components.md) - Generated `.script` proxies now, with a compatible native component backend later.
 * [TypeScript execution contexts](decisions/typescript-execution-contexts.md) - `.script.ts`, `.gui.ts`, `.render.ts`, and shared `.ts` drive generated proxies, types, VS Code diagnostics, and runtime attachment checks.
@@ -53,9 +54,10 @@ okf_version: "0.2"
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.
 * [Transparent Defold value transport](research/transparent-defold-value-transport.md) - Pinned dmSDK value layouts, the Matrix4/URL typed frame lanes, and the structural typed-native emission rule.
 * [Canonical lowering plan](research/canonical-lowering-plan.md) - All 2,287 API units across five backends, interned marshalling programs, semantic policies, and final-build reachability.
+* [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.
+* [Generated script recording engine](research/generated-script-recording-engine.md) - Generated null/observer Defold that asserts, records, and replays every callable script route through the real binding stack over each drivable transport.
 * [Measured binding-transport overhead](research/transport-overhead-measurement.md) - The `DEHERM_PROFILE` compile switch, generated per-route transport spans, its compile-out proof, and the first measured cost of the Lua bridge.
 * [Headless engine conformance](research/headless-engine-conformance.md) - In-process headless Defold driven a tick at a time, generated per-contract fixtures, and the enumerated set of contracts a headless engine still cannot reach.
-* [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Exact positional Lua tuple ABI, public reachability limits, and unpromoted engine evidence.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.
 * [TypeGPU shader lane](research/typegpu-shader-lane.md) - Build-time TypeGPU authoring, Defold shader adaptation, typed material bindings, and validation gates.
