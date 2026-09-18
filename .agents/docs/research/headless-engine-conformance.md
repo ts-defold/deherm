@@ -3,7 +3,7 @@ type: Research Note
 title: Headless Defold conformance harness
 description: Defold's null backends, headless bundle variant, and in-process engine driving API, and what they change about how binding conformance should be proven.
 tags: [research, defold, conformance, headless, verification]
-status: verified-source
+status: verified-runtime
 generated: { by: claude/opus-5, at: 2026-09-18T21:10:00-04:00 }
 sources:
   - id: defold-engine-api
@@ -104,9 +104,95 @@ makes hard to provoke rather than as the primary instrument:
 Both instruments must remain generated from the same IR. Neither may promote
 generation evidence to runtime evidence.
 
-# Open boundary
+# Built instrument
 
-Headless removes the window, not the engine's context requirements. Contracts
-needing a physics world, a factory prototype, a render context, a loaded
-resource or a sound device still need a fixture that supplies one. Which
-contracts those are is not yet enumerated.
+`native/headless_conformance_driver.cpp` is that harness for this project. It
+links the déherm native extension against the pinned Defold SDK archives with
+the null backends the `headless` appmanifest selects, owns `main`, calls
+`dmExportedSymbols` exactly as `engine_main.cpp` does, and then runs
+create/update/destroy per case with its own tick budget. It carries no route,
+contract or API knowledge: every case is chosen by argv and every verdict
+arrives through `sys.exit` and `dmEngineGetResult`.
+
+`scripts/generate-headless-conformance.mjs` generates everything above it from
+the pinned IR - the per-contract plan, one minimal collection, game object,
+collection proxy and Lua fixture per reachable contract, and the TypeScript
+that exercises it. `scripts/check-headless-conformance.mjs` runs
+generate -> bundle -> Bob content build -> CMake link -> execute and writes the
+report. There is no per-route or per-contract hand-authored code anywhere in
+the lane.
+
+Three properties are checked, and each is selected by the contract record
+rather than by the route:
+
+| Property | Selected when | What a real engine decides |
+| --- | --- | --- |
+| `result-arity` | always | the value crossing the boundary matches the declared marshalling program, or the declared error model refused the synthesized argument |
+| `scratch-reuse` | `scratch` is `caller-owned-bounded-reentrant-scratch` | 64 sequential invocations keep the same disposition, so the arena neither leaks nor exhausts |
+| `error-model` | `errorModel` is `status-return-and-target-exception` | withholding the required arguments raises into TypeScript and leaves the boundary usable |
+
+# Observed
+
+`packages/bindings/generated/defold-headless-conformance-report.json`, at
+Defold `7f0f554`, arm64 macOS, headless:
+
+| Outcome | Contracts |
+| --- | --- |
+| observed | 15 |
+| engine fault | 1 |
+| mismatched | 0 |
+| unreachable | 66 |
+
+27 routes were exercised across 16 fixtures, producing 13 `result-arity:observed`,
+13 `result-arity:observed-as-target-exception`, 26 `scratch-reuse:observed`,
+16 `error-model:observed` and 10 `error-model:not-applicable`. A refused
+synthesized argument is recorded as `observed-as-target-exception`, not as a
+mismatch: it is evidence the declared error model holds, not evidence about the
+route's semantics.
+
+The engine fault is a real finding that only a real engine could produce.
+Contract 150's single route, `script:b2d.get_world`, segmentation-faults inside
+`dmGameSystem::B2D_GetWorld` when it is reached from a collection with no
+physics world, through déherm's generated captured-Lua handle router. The
+driver's case list is resumed after such a fault, so one crashing contract does
+not erase the evidence for the rest.
+
+# The enumerated boundary
+
+Headless removes the window, not the engine's context requirements. The 66
+unreachable contracts carry these machine-readable blocker families:
+
+| Family | Contracts | Routes |
+| --- | --- | --- |
+| `unsynthesizable-parameter-type` | 34 | 402 |
+| `context-fixture-missing` | 19 | 124 |
+| `execution-policy-destructive` | 10 | 11 |
+| `multi-result-shape-unmodelled` | 5 | 27 |
+| `no-generated-universal-adapter` | 3 | 9 |
+| `execution-policy-context-blocked` | 1 | 1 |
+| `harness-effect-guard` | 1 | 1 |
+| `lua-stack-blocked-capability` | 1 | 2 |
+| `lua-stack-omit-profile` | 1 | 2 |
+
+`unsynthesizable-parameter-type` is dominated by the physics handle algebra -
+`b2Body`, `b2World`, `b2Joint`, `b2Shape`, `b2Chain`, `btRigidBody`,
+`btCollisionObject`, `btTypedConstraint`, `btDiscreteDynamicsWorld` - each of
+which needs a fixture that first builds a physics world and a collision object.
+`context-fixture-missing` is the GUI scene, render script, window and network
+contexts: a `.gui` with a gui script, a custom render script, a real window and
+a live socket respectively. Those are the next fixtures to build, and the plan
+names exactly which contracts each one would unblock.
+
+# Remaining boundary
+
+* The fixture attaches the déherm runtime through a generated Lua game-object
+  script, which is the lane with proven runtime attachment. Driving the same
+  contracts through the `*.script.ts` / `*.gui.ts` component-proxy transport is
+  a separate lane and is not claimed here.
+* A contract's observation is drawn from at most four of its routes. The
+  canonical plan's interning is what carries that evidence to the rest of the
+  contract's routes; the harness records `exercisedRouteCount` beside
+  `routeCount` so the distinction stays visible.
+* This lane produces runtime evidence only. It never promotes generation,
+  compilation or linkage evidence, and it claims nothing for a contract it
+  recorded as unreachable, blocked or faulted.

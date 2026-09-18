@@ -483,3 +483,113 @@ target_compile_features(defold-hermes-component-runtime-e2e PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-component-runtime-e2e PRIVATE
   defold-hermes-component-runtime
 )
+
+# ---------------------------------------------------------------------------
+# Headless in-process Defold conformance driver.
+#
+# Defold exposes a complete lifecycle in engine/engine/src/engine.h, and Bob's
+# `headless` variant is backed by null graphics/sound/hid/window/gui/particle/
+# rig/profiler/engine-service backends. Linking those pinned SDK archives
+# against the déherm extension yields a driver that steps the REAL engine one
+# tick at a time, which is the only instrument that can produce runtime
+# evidence for generated bindings. It is deliberately optional: it requires the
+# pinned Defold SDK payload and the packaged Hermes archive, both of which are
+# produced by the local toolchain rather than checked in.
+# ---------------------------------------------------------------------------
+set(DEHERM_DEFOLD_SDK_DIR
+  "${CMAKE_CURRENT_SOURCE_DIR}/upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk"
+  CACHE PATH "Pinned Defold SDK payload used by the headless conformance driver")
+
+if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+  set(DEHERM_DEFOLD_SDK_PLATFORM "arm64-macos")
+  set(DEHERM_EXTENSION_LIB_PLATFORM "arm64-osx")
+endif()
+
+set(DEHERM_HEADLESS_SDK_LIB_DIR "${DEHERM_DEFOLD_SDK_DIR}/lib/${DEHERM_DEFOLD_SDK_PLATFORM}")
+set(DEHERM_HEADLESS_SDK_EXT_LIB_DIR "${DEHERM_DEFOLD_SDK_DIR}/ext/lib/${DEHERM_DEFOLD_SDK_PLATFORM}")
+set(DEHERM_PACKAGED_HERMES_ARCHIVE
+  "${CMAKE_CURRENT_SOURCE_DIR}/defold/defold_hermes/lib/${DEHERM_EXTENSION_LIB_PLATFORM}/libhermes.a")
+
+if(DEHERM_DEFOLD_SDK_PLATFORM
+   AND EXISTS "${DEHERM_HEADLESS_SDK_LIB_DIR}/libengine.a"
+   AND EXISTS "${DEHERM_PACKAGED_HERMES_ARCHIVE}")
+
+  # Every source the Extender would compile for the extension, so the driver
+  # exercises the same translation units the packaged engine does.
+  file(GLOB DEHERM_EXTENSION_SOURCES
+    "${CMAKE_CURRENT_SOURCE_DIR}/defold/defold_hermes/src/*.cpp")
+  list(SORT DEHERM_EXTENSION_SOURCES)
+
+  add_executable(defold-hermes-headless-conformance-driver
+    native/headless_conformance_driver.cpp
+    native/headless_conformance_exported_symbols.cpp
+    ${DEHERM_EXTENSION_SOURCES}
+  )
+  target_compile_features(defold-hermes-headless-conformance-driver PRIVATE cxx_std_17)
+  # Defold compiles its logging macros out under NDEBUG. The Extender's macOS
+  # flags are `-O2 -g` without it, so the packaged engine keeps extension
+  # diagnostics; the driver must match or the harness loses every marker the
+  # generated content emits.
+  target_compile_options(defold-hermes-headless-conformance-driver PRIVATE
+    -fexceptions -UNDEBUG)
+  target_compile_definitions(defold-hermes-headless-conformance-driver PRIVATE
+    DLIB_LOG_DOMAIN="DEFOLD_HERMES"
+    DM_PLATFORM_MACOS
+    DM_PLATFORM_OSX
+    DM_HEADLESS
+    DDF_EXPOSE_DESCRIPTORS
+  )
+  target_include_directories(defold-hermes-headless-conformance-driver PRIVATE
+    defold/defold_hermes/include
+    "${DEHERM_DEFOLD_SDK_DIR}/sdk/include"
+    "${DEHERM_DEFOLD_SDK_DIR}/include"
+    "${DEHERM_DEFOLD_SDK_DIR}/ext/include"
+    upstream/defold/engine/engine/src
+    upstream/hermes/API/jsi
+    upstream/hermes/API
+    upstream/hermes/public
+  )
+
+  # Library order mirrors `engineLibs` in defoldsdk/extender/build.yml for the
+  # osx platform, with the substitutions declared by
+  # defoldsdk/extender/variants/headless.appmanifest:
+  #   excludeLibs: record, vpx, sound, tremolo, graphics, hid, platform
+  #   libs:        record_null, sound_null, graphics_null, hid_null, platform_null
+  set(DEHERM_HEADLESS_ENGINE_LIBS
+    engine engine_service_null zip profile_null profilerext_null
+    record_null
+    gameobject ddf font font_richtext font_render resource
+    gamesys gamesys_gui gamesys_particle gamesys_model gamesys_rig
+    script_box2d_defold script_bullet3d
+    graphics_null graphics_transcoder_basisu basis_transcoder
+    physics BulletDynamics BulletCollision
+    platform_null
+    LinearMath box2d_defold render script luajit-5.1 extension
+    hid_null input particle rig dlib image gui crashext
+    sound_null
+    liveupdate decoder_wav decoder_ogg
+  )
+  set(DEHERM_HEADLESS_LINK_LIBS "")
+  foreach(library IN LISTS DEHERM_HEADLESS_ENGINE_LIBS)
+    if(EXISTS "${DEHERM_HEADLESS_SDK_LIB_DIR}/lib${library}.a")
+      list(APPEND DEHERM_HEADLESS_LINK_LIBS "${DEHERM_HEADLESS_SDK_LIB_DIR}/lib${library}.a")
+    elseif(EXISTS "${DEHERM_HEADLESS_SDK_EXT_LIB_DIR}/lib${library}.a")
+      list(APPEND DEHERM_HEADLESS_LINK_LIBS "${DEHERM_HEADLESS_SDK_EXT_LIB_DIR}/lib${library}.a")
+    else()
+      message(FATAL_ERROR "Pinned Defold SDK has no lib${library}.a for ${DEHERM_DEFOLD_SDK_PLATFORM}")
+    endif()
+  endforeach()
+
+  target_link_libraries(defold-hermes-headless-conformance-driver PRIVATE
+    "${DEHERM_PACKAGED_HERMES_ARCHIVE}"
+    ${DEHERM_HEADLESS_LINK_LIBS}
+    "-framework Foundation" "-framework AppKit" "-framework Cocoa"
+    "-framework IOKit" "-framework Carbon" "-framework CoreVideo"
+    "-framework QuartzCore" "-framework AVFoundation" "-framework CFNetwork"
+    "-framework Security" "-framework GameController" "-framework IOSurface"
+  )
+else()
+  message(STATUS
+    "Headless Defold conformance driver is unavailable: the pinned Defold SDK "
+    "payload or the packaged Hermes archive is missing.")
+endif()

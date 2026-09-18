@@ -1,0 +1,1798 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "target": "arm64-macos",
+  "variant": "headless",
+  "evidenceStage": "runtime",
+  "evidenceBoundary": "Observed contracts executed inside a real headless Defold engine driven one tick at a time through dmEngineUpdate. This report claims runtime behaviour only; it never promotes generation, compilation or linkage evidence, and it claims nothing for contracts recorded as unreachable or blocked.",
+  "driver": "native/headless_conformance_driver.cpp",
+  "planInputs": {
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "ca355c81ca01d5a2515937df150d74dde1fd40813886fbfb0d021e6acdce4739",
+    "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "8d16dca1aa186e974a8a43eec0b38c6ef92fc42326e4c377718a2bd1846dbe00",
+    "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
+  },
+  "contractCount": 82,
+  "summary": {
+    "observed": 15,
+    "mismatched": 0,
+    "engineFault": 1,
+    "blocked": 0,
+    "unreachable": 66
+  },
+  "propertySummary": {
+    "result-arity:observed-as-target-exception": 13,
+    "scratch-reuse:observed": 26,
+    "error-model:observed": 16,
+    "result-arity:observed": 13,
+    "error-model:not-applicable": 10
+  },
+  "contracts": [
+    {
+      "id": "contract_0139",
+      "contractIndex": 139,
+      "routeCount": 70,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 66,
+          "exampleRouteId": "script:b2d.body.apply_angular_impulse"
+        },
+        {
+          "reason": "lua-stack-omit-profile",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.body.get_user_data"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.reset_mass_data"
+        },
+        {
+          "reason": "harness-effect-guard:dump",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.dump"
+        }
+      ]
+    },
+    {
+      "id": "contract_0140",
+      "contractIndex": 140,
+      "routeCount": 78,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 26,
+          "exampleRouteId": "script:b2d.body.compute_aabb"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
+          "routeCount": 10,
+          "exampleRouteId": "script:bullet3d.world.cast_ray"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btRigidBody",
+          "routeCount": 9,
+          "exampleRouteId": "script:bullet3d.constraint.create_cone_twist"
+        },
+        {
+          "reason": "context-fixture-missing:network",
+          "routeCount": 6,
+          "exampleRouteId": "script:socket.connect"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 6,
+          "exampleRouteId": "script:b2d.shape.get_contact_data"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2World",
+          "routeCount": 6,
+          "exampleRouteId": "script:b2d.world.cast_mover"
+        },
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 5,
+          "exampleRouteId": "script:b2d.body.create_chain"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 5,
+          "exampleRouteId": "script:b2d.joint.create_gear"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.chain.get_geometry"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionShape",
+          "routeCount": 2,
+          "exampleRouteId": "script:bullet3d.shape.get_shape"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionObject",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.collision_object.get_shapes"
+        }
+      ]
+    },
+    {
+      "id": "contract_0141",
+      "contractIndex": 141,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.body.destroy_fixture"
+        }
+      ]
+    },
+    {
+      "id": "contract_0142",
+      "contractIndex": 142,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.get_next"
+        }
+      ]
+    },
+    {
+      "id": "contract_0143",
+      "contractIndex": 143,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.get_world"
+        }
+      ]
+    },
+    {
+      "id": "contract_0144",
+      "contractIndex": 144,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.chain.destroy"
+        }
+      ]
+    },
+    {
+      "id": "contract_0145",
+      "contractIndex": 145,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.chain.from_shape"
+        }
+      ]
+    },
+    {
+      "id": "contract_0146",
+      "contractIndex": 146,
+      "routeCount": 8,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "routeCount": 8,
+          "exampleRouteId": "script:b2d.chain.get_friction"
+        }
+      ]
+    },
+    {
+      "id": "contract_0147",
+      "contractIndex": 147,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.chain.get_world"
+        }
+      ]
+    },
+    {
+      "id": "contract_0148",
+      "contractIndex": 148,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0148",
+          "route": "script:b2d.get_body",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Instance deherm_conformance not found"
+        },
+        {
+          "contract": "contract_0148",
+          "route": "script:b2d.get_body",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0148",
+          "route": "script:b2d.get_body",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0149",
+      "contractIndex": 149,
+      "routeCount": 3,
+      "exercisedRouteCount": 3,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 9,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0149",
+          "route": "script:b2d.get_version",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:b2d.get_version",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:b2d.get_version",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:bullet3d.get_version",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:bullet3d.get_version",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:bullet3d.get_version",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:image.get_astc_header",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Data is not a valid .astc file"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:image.get_astc_header",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0149",
+          "route": "script:image.get_astc_header",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0150",
+      "contractIndex": 150,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "engine-fault",
+      "engine": {
+        "disposition": "engine-fault",
+        "exitCode": -1,
+        "ticks": 0,
+        "signal": "SIGSEGV",
+        "crashFrames": [
+          "_ZN12dmGameSystemL12B2D_GetWorldEP9lua_State",
+          "lj_BC_FUNCC",
+          "_ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter14dispatchUnsafeERNS1_15DispatchContextE",
+          "_ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter17ProtectedDispatchEP9lua_State",
+          "lj_BC_FUNCC",
+          "dm_lua_cpcall",
+          "_ZN13defold_hermes18dispatchScriptCallEPNS_15ScriptCallFrameE",
+          "_ZNSt3__110__function6__funcIZN13defold_hermes22installScriptJsiBridgeERN8facebook3jsi7RuntimeEE3$_0FNS4_5ValueES6_RKS8_PS9_mEEclES6_SA_OSB_Om"
+        ]
+      },
+      "observedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [],
+      "blockers": [
+        {
+          "reason": "engine-disposition:engine-fault",
+          "routeCount": 1
+        }
+      ]
+    },
+    {
+      "id": "contract_0151",
+      "contractIndex": 151,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.joint.destroy"
+        }
+      ]
+    },
+    {
+      "id": "contract_0152",
+      "contractIndex": 152,
+      "routeCount": 76,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 76,
+          "exampleRouteId": "script:b2d.joint.enable_limit"
+        }
+      ]
+    },
+    {
+      "id": "contract_0153",
+      "contractIndex": 153,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.joint.get_body_a"
+        }
+      ]
+    },
+    {
+      "id": "contract_0154",
+      "contractIndex": 154,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.joint.get_joint1"
+        }
+      ]
+    },
+    {
+      "id": "contract_0155",
+      "contractIndex": 155,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.joint.get_world"
+        }
+      ]
+    },
+    {
+      "id": "contract_0156",
+      "contractIndex": 156,
+      "routeCount": 14,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 14,
+          "exampleRouteId": "script:b2d.shape.are_contact_events_enabled"
+        }
+      ]
+    },
+    {
+      "id": "contract_0157",
+      "contractIndex": 157,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.shape.get_body"
+        }
+      ]
+    },
+    {
+      "id": "contract_0158",
+      "contractIndex": 158,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.shape.get_world"
+        }
+      ]
+    },
+    {
+      "id": "contract_0159",
+      "contractIndex": 159,
+      "routeCount": 21,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2World",
+          "routeCount": 21,
+          "exampleRouteId": "script:b2d.world.enable_continuous"
+        }
+      ]
+    },
+    {
+      "id": "contract_0160",
+      "contractIndex": 160,
+      "routeCount": 310,
+      "exercisedRouteCount": 4,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 12,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.arshift",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.arshift",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.arshift",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.bnot",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.bnot",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.bnot",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.bswap",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.bswap",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.bswap",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.lshift",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.lshift",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.lshift",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0161",
+      "contractIndex": 161,
+      "routeCount": 3,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:buffer_data",
+          "routeCount": 3,
+          "exampleRouteId": "script:buffer.copy_buffer"
+        }
+      ]
+    },
+    {
+      "id": "contract_0162",
+      "contractIndex": 162,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:buffer_stream",
+          "routeCount": 1,
+          "exampleRouteId": "script:buffer.copy_stream"
+        }
+      ]
+    },
+    {
+      "id": "contract_0163",
+      "contractIndex": 163,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:buffer_data",
+          "routeCount": 1,
+          "exampleRouteId": "script:buffer.get_stream"
+        }
+      ]
+    },
+    {
+      "id": "contract_0164",
+      "contractIndex": 164,
+      "routeCount": 79,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btRigidBody",
+          "routeCount": 41,
+          "exampleRouteId": "script:bullet3d.rigid_body.apply_central_force"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionObject",
+          "routeCount": 37,
+          "exampleRouteId": "script:bullet3d.collision_object.activate"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.rigid_body.clear_forces"
+        }
+      ]
+    },
+    {
+      "id": "contract_0165",
+      "contractIndex": 165,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionObject",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.collision_object.get_shape"
+        }
+      ]
+    },
+    {
+      "id": "contract_0166",
+      "contractIndex": 166,
+      "routeCount": 16,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 16,
+          "exampleRouteId": "script:bullet3d.collision_object.get_world_transform"
+        }
+      ]
+    },
+    {
+      "id": "contract_0167",
+      "contractIndex": 167,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.constraint.destroy"
+        }
+      ]
+    },
+    {
+      "id": "contract_0168",
+      "contractIndex": 168,
+      "routeCount": 34,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "routeCount": 34,
+          "exampleRouteId": "script:bullet3d.constraint.enable_cone_twist_motor"
+        }
+      ]
+    },
+    {
+      "id": "contract_0169",
+      "contractIndex": 169,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "routeCount": 2,
+          "exampleRouteId": "script:bullet3d.constraint.get_body_a"
+        }
+      ]
+    },
+    {
+      "id": "contract_0170",
+      "contractIndex": 170,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.constraint.get_world"
+        }
+      ]
+    },
+    {
+      "id": "contract_0171",
+      "contractIndex": 171,
+      "routeCount": 2,
+      "exercisedRouteCount": 2,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 6,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0171",
+          "route": "script:bullet3d.get_collision_object",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Instance deherm_conformance not found"
+        },
+        {
+          "contract": "contract_0171",
+          "route": "script:bullet3d.get_collision_object",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0171",
+          "route": "script:bullet3d.get_collision_object",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0171",
+          "route": "script:bullet3d.get_rigid_body",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Instance deherm_conformance not found"
+        },
+        {
+          "contract": "contract_0171",
+          "route": "script:bullet3d.get_rigid_body",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0171",
+          "route": "script:bullet3d.get_rigid_body",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0172",
+      "contractIndex": 172,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0172",
+          "route": "script:bullet3d.get_world",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0172",
+          "route": "script:bullet3d.get_world",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0172",
+          "route": "script:bullet3d.get_world",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        }
+      ]
+    },
+    {
+      "id": "contract_0173",
+      "contractIndex": 173,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btRigidBody",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.rigid_body.get_world"
+        }
+      ]
+    },
+    {
+      "id": "contract_0174",
+      "contractIndex": 174,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionShape",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.shape.get_collision_object"
+        }
+      ]
+    },
+    {
+      "id": "contract_0175",
+      "contractIndex": 175,
+      "routeCount": 4,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionShape",
+          "routeCount": 4,
+          "exampleRouteId": "script:bullet3d.shape.get_index"
+        }
+      ]
+    },
+    {
+      "id": "contract_0176",
+      "contractIndex": 176,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
+          "routeCount": 2,
+          "exampleRouteId": "script:bullet3d.world.cast_ray_async"
+        }
+      ]
+    },
+    {
+      "id": "contract_0177",
+      "contractIndex": 177,
+      "routeCount": 4,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
+          "routeCount": 4,
+          "exampleRouteId": "script:bullet3d.world.get_collision_object_count"
+        }
+      ]
+    },
+    {
+      "id": "contract_0178",
+      "contractIndex": 178,
+      "routeCount": 17,
+      "exercisedRouteCount": 4,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 12,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_projection",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0178:/contract_0178#contract_0178' not found."
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_projection",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_projection",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_view",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0178:/contract_0178#contract_0178' not found."
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_view",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_view",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_id",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "bigint"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_id",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_id",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_world_transform",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_world_transform",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_world_transform",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        }
+      ]
+    },
+    {
+      "id": "contract_0179",
+      "contractIndex": 179,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0179",
+          "route": "script:collectionfactory.load",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Argument #2 is expected to be completion function."
+        },
+        {
+          "contract": "contract_0179",
+          "route": "script:collectionfactory.load",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0179",
+          "route": "script:collectionfactory.load",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        }
+      ]
+    },
+    {
+      "id": "contract_0180",
+      "contractIndex": 180,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(self:script_instance, message_id:hash, message:collectionproxy.load_data, sender:url)",
+          "routeCount": 1,
+          "exampleRouteId": "script:collectionproxy.load"
+        }
+      ]
+    },
+    {
+      "id": "contract_0181",
+      "contractIndex": 181,
+      "routeCount": 4,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 4,
+          "exampleRouteId": "script:collectionproxy.set_collection"
+        }
+      ]
+    },
+    {
+      "id": "contract_0182",
+      "contractIndex": 182,
+      "routeCount": 2,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0182",
+          "route": "script:factory.create",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Instance deherm_conformance not found"
+        },
+        {
+          "contract": "contract_0182",
+          "route": "script:factory.create",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0182",
+          "route": "script:factory.create",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0183",
+      "contractIndex": 183,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0183",
+          "route": "script:factory.load",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Argument #2 is expected to be completion function."
+        },
+        {
+          "contract": "contract_0183",
+          "route": "script:factory.load",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0183",
+          "route": "script:factory.load",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        }
+      ]
+    },
+    {
+      "id": "contract_0184",
+      "contractIndex": 184,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 1,
+          "exampleRouteId": "script:font.prewarm_text"
+        }
+      ]
+    },
+    {
+      "id": "contract_0185",
+      "contractIndex": 185,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:go.PLAYBACK",
+          "routeCount": 1,
+          "exampleRouteId": "script:go.animate"
+        }
+      ]
+    },
+    {
+      "id": "contract_0186",
+      "contractIndex": 186,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "no-generated-universal-adapter",
+          "routeCount": 1,
+          "exampleRouteId": "script:go.property"
+        }
+      ]
+    },
+    {
+      "id": "contract_0187",
+      "contractIndex": 187,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.animate"
+        }
+      ]
+    },
+    {
+      "id": "contract_0188",
+      "contractIndex": 188,
+      "routeCount": 48,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 47,
+          "exampleRouteId": "script:gui.cancel_animations"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.reset_material"
+        }
+      ]
+    },
+    {
+      "id": "contract_0189",
+      "contractIndex": 189,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 2,
+          "exampleRouteId": "script:gui.clone"
+        }
+      ]
+    },
+    {
+      "id": "contract_0190",
+      "contractIndex": 190,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.delete_node"
+        }
+      ]
+    },
+    {
+      "id": "contract_0191",
+      "contractIndex": 191,
+      "routeCount": 5,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 4,
+          "exampleRouteId": "script:gui.get_font_resource"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.delete_texture"
+        }
+      ]
+    },
+    {
+      "id": "contract_0192",
+      "contractIndex": 192,
+      "routeCount": 41,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 41,
+          "exampleRouteId": "script:gui.get_node"
+        }
+      ]
+    },
+    {
+      "id": "contract_0193",
+      "contractIndex": 193,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 2,
+          "exampleRouteId": "script:gui.get_type"
+        }
+      ]
+    },
+    {
+      "id": "contract_0194",
+      "contractIndex": 194,
+      "routeCount": 4,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 4,
+          "exampleRouteId": "script:gui.new_box_node"
+        }
+      ]
+    },
+    {
+      "id": "contract_0195",
+      "contractIndex": 195,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.play_flipbook"
+        }
+      ]
+    },
+    {
+      "id": "contract_0196",
+      "contractIndex": 196,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.play_particlefx"
+        }
+      ]
+    },
+    {
+      "id": "contract_0197",
+      "contractIndex": 197,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-context-blocked",
+          "routeCount": 1,
+          "exampleRouteId": "script:html5.set_interaction_listener"
+        }
+      ]
+    },
+    {
+      "id": "contract_0198",
+      "contractIndex": 198,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:network",
+          "routeCount": 1,
+          "exampleRouteId": "script:http.request"
+        }
+      ]
+    },
+    {
+      "id": "contract_0199",
+      "contractIndex": 199,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(self:script_instance, name:hash, uri:string, result:liveupdate.LIVEUPDATE)",
+          "routeCount": 1,
+          "exampleRouteId": "script:liveupdate.add_mount"
+        }
+      ]
+    },
+    {
+      "id": "contract_0200",
+      "contractIndex": 200,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:go.PLAYBACK",
+          "routeCount": 1,
+          "exampleRouteId": "script:model.play_anim"
+        }
+      ]
+    },
+    {
+      "id": "contract_0201",
+      "contractIndex": 201,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0201",
+          "route": "script:msg.post",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "undefined"
+        },
+        {
+          "contract": "contract_0201",
+          "route": "script:msg.post",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0201",
+          "route": "script:msg.post",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0202",
+      "contractIndex": 202,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0202",
+          "route": "script:particlefx.play",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "undefined"
+        },
+        {
+          "contract": "contract_0202",
+          "route": "script:particlefx.play",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0202",
+          "route": "script:particlefx.play",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0203",
+      "contractIndex": 203,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0203",
+          "route": "script:physics.set_event_listener",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Physics world doesn't exist. Make sure you have at least one physics component in collection."
+        },
+        {
+          "contract": "contract_0203",
+          "route": "script:physics.set_event_listener",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0203",
+          "route": "script:physics.set_event_listener",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        }
+      ]
+    },
+    {
+      "id": "contract_0204",
+      "contractIndex": 204,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 1,
+          "exampleRouteId": "script:render.constant_buffer"
+        }
+      ]
+    },
+    {
+      "id": "contract_0205",
+      "contractIndex": 205,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:render.delete_render_target"
+        }
+      ]
+    },
+    {
+      "id": "contract_0206",
+      "contractIndex": 206,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 2,
+          "exampleRouteId": "script:render.disable_texture"
+        }
+      ]
+    },
+    {
+      "id": "contract_0207",
+      "contractIndex": 207,
+      "routeCount": 4,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 4,
+          "exampleRouteId": "script:render.enable_material"
+        }
+      ]
+    },
+    {
+      "id": "contract_0208",
+      "contractIndex": 208,
+      "routeCount": 3,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 3,
+          "exampleRouteId": "script:render.get_render_target_height"
+        }
+      ]
+    },
+    {
+      "id": "contract_0209",
+      "contractIndex": 209,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 1,
+          "exampleRouteId": "script:render.set_listener"
+        }
+      ]
+    },
+    {
+      "id": "contract_0210",
+      "contractIndex": 210,
+      "routeCount": 7,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "no-generated-universal-adapter",
+          "routeCount": 7,
+          "exampleRouteId": "script:resource.atlas"
+        }
+      ]
+    },
+    {
+      "id": "contract_0211",
+      "contractIndex": 211,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 1,
+          "exampleRouteId": "script:resource.create_texture_async"
+        }
+      ]
+    },
+    {
+      "id": "contract_0212",
+      "contractIndex": 212,
+      "routeCount": 3,
+      "exercisedRouteCount": 3,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 9,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0212",
+          "route": "script:resource.get_buffer",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Could not get bufferc type resource: deherm_conformance"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:resource.get_buffer",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:resource.get_buffer",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:resource.load",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "The resource was not found (-3): 8dacd79ab962b4f0, deherm_conformance"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:resource.load",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:resource.load",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:sys.load_buffer",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "sys.load_buffer failed to load the resource (code=-3)"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:sys.load_buffer",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0212",
+          "route": "script:sys.load_buffer",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0213",
+      "contractIndex": 213,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "lua-stack-blocked-capability",
+          "routeCount": 2,
+          "exampleRouteId": "script:socket.newtry"
+        }
+      ]
+    },
+    {
+      "id": "contract_0214",
+      "contractIndex": 214,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0214",
+          "route": "script:sound.play",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0214",
+          "route": "script:sound.play",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0214",
+          "route": "script:sound.play",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0215",
+      "contractIndex": 215,
+      "routeCount": 1,
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 2
+      },
+      "observedPropertyCount": 3,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0215",
+          "route": "script:sprite.play_flipbook",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "undefined"
+        },
+        {
+          "contract": "contract_0215",
+          "route": "script:sprite.play_flipbook",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0215",
+          "route": "script:sprite.play_flipbook",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        }
+      ]
+    },
+    {
+      "id": "contract_0216",
+      "contractIndex": 216,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(self:script_instance, request_id:integer, result:sys.load_buffer_result)",
+          "routeCount": 1,
+          "exampleRouteId": "script:sys.load_buffer_async"
+        }
+      ]
+    },
+    {
+      "id": "contract_0217",
+      "contractIndex": 217,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(source:string, message:string, traceback:string)",
+          "routeCount": 1,
+          "exampleRouteId": "script:sys.set_error_handler"
+        }
+      ]
+    },
+    {
+      "id": "contract_0218",
+      "contractIndex": 218,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "no-generated-universal-adapter",
+          "routeCount": 1,
+          "exampleRouteId": "script:timer.delay"
+        }
+      ]
+    },
+    {
+      "id": "contract_0219",
+      "contractIndex": 219,
+      "routeCount": 2,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:window",
+          "routeCount": 1,
+          "exampleRouteId": "script:window.get_size"
+        },
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 1,
+          "exampleRouteId": "script:vmath.quat_to_euler"
+        }
+      ]
+    },
+    {
+      "id": "contract_0220",
+      "contractIndex": 220,
+      "routeCount": 1,
+      "outcome": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:window",
+          "routeCount": 1,
+          "exampleRouteId": "script:window.set_listener"
+        }
+      ]
+    }
+  ]
+}

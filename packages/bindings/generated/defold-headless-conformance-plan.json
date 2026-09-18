@@ -1,0 +1,3194 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "target": "arm64-macos",
+  "variant": "headless",
+  "evidenceBoundary": "Runtime evidence only. A fixture disposition states that the harness can reach the contract from a headless engine instance; it never promotes generation, compilation or linkage evidence, and it makes no claim for a contract this plan records as unreachable.",
+  "suppliedContexts": [
+    "engine",
+    "game-object"
+  ],
+  "scratchReuseRepetitions": 64,
+  "maxExercisesPerContract": 4,
+  "inputs": {
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "ca355c81ca01d5a2515937df150d74dde1fd40813886fbfb0d021e6acdce4739",
+    "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "8d16dca1aa186e974a8a43eec0b38c6ef92fc42326e4c377718a2bd1846dbe00",
+    "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
+  },
+  "contractCount": 82,
+  "reachableContractCount": 16,
+  "unreachableContractCount": 66,
+  "exercisedRouteCount": 27,
+  "eligibleRouteCount": 178,
+  "blockerSummary": [
+    {
+      "family": "unsynthesizable-parameter-type",
+      "contractCount": 34,
+      "routeCount": 402
+    },
+    {
+      "family": "context-fixture-missing",
+      "contractCount": 19,
+      "routeCount": 124
+    },
+    {
+      "family": "execution-policy-destructive",
+      "contractCount": 10,
+      "routeCount": 11
+    },
+    {
+      "family": "multi-result-shape-unmodelled",
+      "contractCount": 5,
+      "routeCount": 27
+    },
+    {
+      "family": "no-generated-universal-adapter",
+      "contractCount": 3,
+      "routeCount": 9
+    },
+    {
+      "family": "execution-policy-context-blocked",
+      "contractCount": 1,
+      "routeCount": 1
+    },
+    {
+      "family": "harness-effect-guard",
+      "contractCount": 1,
+      "routeCount": 1
+    },
+    {
+      "family": "lua-stack-blocked-capability",
+      "contractCount": 1,
+      "routeCount": 2
+    },
+    {
+      "family": "lua-stack-omit-profile",
+      "contractCount": 1,
+      "routeCount": 2
+    }
+  ],
+  "contracts": [
+    {
+      "contractIndex": 139,
+      "id": "contract_0139",
+      "routeCount": 70,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 66,
+          "exampleRouteId": "script:b2d.body.apply_angular_impulse"
+        },
+        {
+          "reason": "lua-stack-omit-profile",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.body.get_user_data"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.reset_mass_data"
+        },
+        {
+          "reason": "harness-effect-guard:dump",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.dump"
+        }
+      ]
+    },
+    {
+      "contractIndex": 140,
+      "id": "contract_0140",
+      "routeCount": 78,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 26,
+          "exampleRouteId": "script:b2d.body.compute_aabb"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
+          "routeCount": 10,
+          "exampleRouteId": "script:bullet3d.world.cast_ray"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btRigidBody",
+          "routeCount": 9,
+          "exampleRouteId": "script:bullet3d.constraint.create_cone_twist"
+        },
+        {
+          "reason": "context-fixture-missing:network",
+          "routeCount": 6,
+          "exampleRouteId": "script:socket.connect"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 6,
+          "exampleRouteId": "script:b2d.shape.get_contact_data"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2World",
+          "routeCount": 6,
+          "exampleRouteId": "script:b2d.world.cast_mover"
+        },
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 5,
+          "exampleRouteId": "script:b2d.body.create_chain"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 5,
+          "exampleRouteId": "script:b2d.joint.create_gear"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.chain.get_geometry"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionShape",
+          "routeCount": 2,
+          "exampleRouteId": "script:bullet3d.shape.get_shape"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionObject",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.collision_object.get_shapes"
+        }
+      ]
+    },
+    {
+      "contractIndex": 141,
+      "id": "contract_0141",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "invalidate-underlying-identity",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.body.destroy_fixture"
+        }
+      ]
+    },
+    {
+      "contractIndex": 142,
+      "id": "contract_0142",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.get_next"
+        }
+      ]
+    },
+    {
+      "contractIndex": 143,
+      "id": "contract_0143",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Body",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.get_world"
+        }
+      ]
+    },
+    {
+      "contractIndex": 144,
+      "id": "contract_0144",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "invalidate-underlying-identity",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.chain.destroy"
+        }
+      ]
+    },
+    {
+      "contractIndex": 145,
+      "id": "contract_0145",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.chain.from_shape"
+        }
+      ]
+    },
+    {
+      "contractIndex": 146,
+      "id": "contract_0146",
+      "routeCount": 8,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "routeCount": 8,
+          "exampleRouteId": "script:b2d.chain.get_friction"
+        }
+      ]
+    },
+    {
+      "contractIndex": 147,
+      "id": "contract_0147",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.chain.get_world"
+        }
+      ]
+    },
+    {
+      "contractIndex": 148,
+      "id": "contract_0148",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0148.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:b2d.get_body",
+          "stableId": 1348712235,
+          "accessor": [
+            "b2d",
+            "getBody"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 149,
+      "id": "contract_0149",
+      "routeCount": 3,
+      "eligibleRouteCount": 3,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0149.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:b2d.get_version",
+          "stableId": 984377853,
+          "accessor": [
+            "b2d",
+            "getVersion"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 0,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:bullet3d.get_version",
+          "stableId": 4161320994,
+          "accessor": [
+            "bullet3d",
+            "getVersion"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 0,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:image.get_astc_header",
+          "stableId": 3935561203,
+          "accessor": [
+            "image",
+            "getAstcHeader"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 150,
+      "id": "contract_0150",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0150.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:b2d.get_world",
+          "stableId": 3600623753,
+          "accessor": [
+            "b2d",
+            "getWorld"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 0,
+          "minimumResultCount": 0,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 151,
+      "id": "contract_0151",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "invalidate-underlying-identity",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.joint.destroy"
+        }
+      ]
+    },
+    {
+      "contractIndex": 152,
+      "id": "contract_0152",
+      "routeCount": 76,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 76,
+          "exampleRouteId": "script:b2d.joint.enable_limit"
+        }
+      ]
+    },
+    {
+      "contractIndex": 153,
+      "id": "contract_0153",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.joint.get_body_a"
+        }
+      ]
+    },
+    {
+      "contractIndex": 154,
+      "id": "contract_0154",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 2,
+          "exampleRouteId": "script:b2d.joint.get_joint1"
+        }
+      ]
+    },
+    {
+      "contractIndex": 155,
+      "id": "contract_0155",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.joint.get_world"
+        }
+      ]
+    },
+    {
+      "contractIndex": 156,
+      "id": "contract_0156",
+      "routeCount": 14,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 14,
+          "exampleRouteId": "script:b2d.shape.are_contact_events_enabled"
+        }
+      ]
+    },
+    {
+      "contractIndex": 157,
+      "id": "contract_0157",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.shape.get_body"
+        }
+      ]
+    },
+    {
+      "contractIndex": 158,
+      "id": "contract_0158",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.shape.get_world"
+        }
+      ]
+    },
+    {
+      "contractIndex": 159,
+      "id": "contract_0159",
+      "routeCount": 21,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:b2World",
+          "routeCount": 21,
+          "exampleRouteId": "script:b2d.world.enable_continuous"
+        }
+      ]
+    },
+    {
+      "contractIndex": 160,
+      "id": "contract_0160",
+      "routeCount": 310,
+      "eligibleRouteCount": 150,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 43,
+          "exampleRouteId": "script:compute.get_constants"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 14,
+          "exampleRouteId": "script:camera.screen_to_world"
+        },
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 11,
+          "exampleRouteId": "script:gui.clone_tree"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 11,
+          "exampleRouteId": "script:crash.release"
+        },
+        {
+          "reason": "context-fixture-missing:network",
+          "routeCount": 8,
+          "exampleRouteId": "script:socket.dns.getaddrinfo"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:any",
+          "routeCount": 8,
+          "exampleRouteId": "script:json.encode"
+        },
+        {
+          "reason": "context-fixture-missing:window",
+          "routeCount": 7,
+          "exampleRouteId": "script:window.get_dim_mode"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:T",
+          "routeCount": 6,
+          "exampleRouteId": "script:vmath.clamp"
+        },
+        {
+          "reason": "execution-policy-interactive",
+          "routeCount": 5,
+          "exampleRouteId": "script:gui.hide_keyboard"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:quaternion",
+          "routeCount": 4,
+          "exampleRouteId": "script:go.set_rotation"
+        },
+        {
+          "reason": "variadic-argument-shape-unmodelled",
+          "routeCount": 4,
+          "exampleRouteId": "script:bit.band"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:matrix4",
+          "routeCount": 3,
+          "exampleRouteId": "script:vmath.inv"
+        },
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 2,
+          "exampleRouteId": "script:buffer.get_metadata"
+        },
+        {
+          "reason": "no-generated-universal-adapter",
+          "routeCount": 2,
+          "exampleRouteId": "script:timer.cancel"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:buffer_data",
+          "routeCount": 2,
+          "exampleRouteId": "script:buffer.set_metadata"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:crash.USERFIELD",
+          "routeCount": 2,
+          "exampleRouteId": "script:crash.get_user_field"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:resource.atlas",
+          "routeCount": 2,
+          "exampleRouteId": "script:resource.create_atlas"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:table<any, any>",
+          "routeCount": 2,
+          "exampleRouteId": "script:sys.save"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3|vector4",
+          "routeCount": 2,
+          "exampleRouteId": "script:vmath.matrix4_compose"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3|vector4|quaternion",
+          "routeCount": 2,
+          "exampleRouteId": "script:vmath.length"
+        },
+        {
+          "reason": "execution-policy-context-blocked",
+          "routeCount": 1,
+          "exampleRouteId": "script:html5.run"
+        },
+        {
+          "reason": "harness-effect-guard:dump_frame",
+          "routeCount": 1,
+          "exampleRouteId": "script:profiler.dump_frame"
+        },
+        {
+          "reason": "harness-effect-guard:write_dump",
+          "routeCount": 1,
+          "exampleRouteId": "script:crash.write_dump"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:({ name:hash|string, type:buffer.VALUE_TYPE, count:number })[]",
+          "routeCount": 1,
+          "exampleRouteId": "script:buffer.create"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:camera.ORTHO_MODE",
+          "routeCount": 1,
+          "exampleRouteId": "script:camera.set_orthographic_mode"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:crash.SYSFIELD",
+          "routeCount": 1,
+          "exampleRouteId": "script:crash.get_sys_field"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:hash",
+          "routeCount": 1,
+          "exampleRouteId": "script:resource.get_text_metrics"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:number[]",
+          "routeCount": 1,
+          "exampleRouteId": "script:vmath.vector"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:physics.JOINT_TYPE",
+          "routeCount": 1,
+          "exampleRouteId": "script:physics.create_joint"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:physics.joint_properties",
+          "routeCount": 1,
+          "exampleRouteId": "script:physics.set_joint_properties"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:physics.shape_data",
+          "routeCount": 1,
+          "exampleRouteId": "script:physics.set_shape"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:profiler.MODE",
+          "routeCount": 1,
+          "exampleRouteId": "script:profiler.set_ui_mode"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:profiler.VIEW_MODE",
+          "routeCount": 1,
+          "exampleRouteId": "script:profiler.set_ui_view_mode"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:resource.buffer_creation_params",
+          "routeCount": 1,
+          "exampleRouteId": "script:resource.create_buffer"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:resource.texture_creation_params",
+          "routeCount": 1,
+          "exampleRouteId": "script:resource.create_texture"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:resource.texture_update_params",
+          "routeCount": 1,
+          "exampleRouteId": "script:resource.set_texture"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:timer_handle",
+          "routeCount": 1,
+          "exampleRouteId": "script:timer.get_info"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:url",
+          "routeCount": 1,
+          "exampleRouteId": "script:collectionproxy.get_resources"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector4",
+          "routeCount": 1,
+          "exampleRouteId": "script:particlefx.set_constant"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:{ distance:integer }|{ frame:integer }",
+          "routeCount": 1,
+          "exampleRouteId": "script:profiler.view_recorded_frame"
+        }
+      ],
+      "collection": "/conformance/contract_0160.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:bit.arshift",
+          "stableId": 1244951420,
+          "accessor": [
+            "bit",
+            "arshift"
+          ],
+          "arguments": [
+            0,
+            0
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false
+        },
+        {
+          "routeId": "script:bit.bnot",
+          "stableId": 3772371256,
+          "accessor": [
+            "bit",
+            "bnot"
+          ],
+          "arguments": [
+            0
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false
+        },
+        {
+          "routeId": "script:bit.bswap",
+          "stableId": 1151793552,
+          "accessor": [
+            "bit",
+            "bswap"
+          ],
+          "arguments": [
+            0
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false
+        },
+        {
+          "routeId": "script:bit.lshift",
+          "stableId": 553650099,
+          "accessor": [
+            "bit",
+            "lshift"
+          ],
+          "arguments": [
+            0,
+            0
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false
+        }
+      ]
+    },
+    {
+      "contractIndex": 161,
+      "id": "contract_0161",
+      "routeCount": 3,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:buffer_data",
+          "routeCount": 3,
+          "exampleRouteId": "script:buffer.copy_buffer"
+        }
+      ]
+    },
+    {
+      "contractIndex": 162,
+      "id": "contract_0162",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:buffer_stream",
+          "routeCount": 1,
+          "exampleRouteId": "script:buffer.copy_stream"
+        }
+      ]
+    },
+    {
+      "contractIndex": 163,
+      "id": "contract_0163",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:buffer_data",
+          "routeCount": 1,
+          "exampleRouteId": "script:buffer.get_stream"
+        }
+      ]
+    },
+    {
+      "contractIndex": 164,
+      "id": "contract_0164",
+      "routeCount": 79,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btRigidBody",
+          "routeCount": 41,
+          "exampleRouteId": "script:bullet3d.rigid_body.apply_central_force"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionObject",
+          "routeCount": 37,
+          "exampleRouteId": "script:bullet3d.collision_object.activate"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.rigid_body.clear_forces"
+        }
+      ]
+    },
+    {
+      "contractIndex": 165,
+      "id": "contract_0165",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionObject",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.collision_object.get_shape"
+        }
+      ]
+    },
+    {
+      "contractIndex": 166,
+      "id": "contract_0166",
+      "routeCount": 16,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 16,
+          "exampleRouteId": "script:bullet3d.collision_object.get_world_transform"
+        }
+      ]
+    },
+    {
+      "contractIndex": 167,
+      "id": "contract_0167",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "invalidate-underlying-identity",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.constraint.destroy"
+        }
+      ]
+    },
+    {
+      "contractIndex": 168,
+      "id": "contract_0168",
+      "routeCount": 34,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "routeCount": 34,
+          "exampleRouteId": "script:bullet3d.constraint.enable_cone_twist_motor"
+        }
+      ]
+    },
+    {
+      "contractIndex": 169,
+      "id": "contract_0169",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "routeCount": 2,
+          "exampleRouteId": "script:bullet3d.constraint.get_body_a"
+        }
+      ]
+    },
+    {
+      "contractIndex": 170,
+      "id": "contract_0170",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.constraint.get_world"
+        }
+      ]
+    },
+    {
+      "contractIndex": 171,
+      "id": "contract_0171",
+      "routeCount": 2,
+      "eligibleRouteCount": 2,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0171.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:bullet3d.get_collision_object",
+          "stableId": 4240041128,
+          "accessor": [
+            "bullet3d",
+            "getCollisionObject"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:bullet3d.get_rigid_body",
+          "stableId": 986235210,
+          "accessor": [
+            "bullet3d",
+            "getRigidBody"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 172,
+      "id": "contract_0172",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0172.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:bullet3d.get_world",
+          "stableId": 1630000402,
+          "accessor": [
+            "bullet3d",
+            "getWorld"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 0,
+          "minimumResultCount": 0,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 173,
+      "id": "contract_0173",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btRigidBody",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.rigid_body.get_world"
+        }
+      ]
+    },
+    {
+      "contractIndex": 174,
+      "id": "contract_0174",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionShape",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.shape.get_collision_object"
+        }
+      ]
+    },
+    {
+      "contractIndex": 175,
+      "id": "contract_0175",
+      "routeCount": 4,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btCollisionShape",
+          "routeCount": 4,
+          "exampleRouteId": "script:bullet3d.shape.get_index"
+        }
+      ]
+    },
+    {
+      "contractIndex": 176,
+      "id": "contract_0176",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
+          "routeCount": 2,
+          "exampleRouteId": "script:bullet3d.world.cast_ray_async"
+        }
+      ]
+    },
+    {
+      "contractIndex": 177,
+      "id": "contract_0177",
+      "routeCount": 4,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
+          "routeCount": 4,
+          "exampleRouteId": "script:bullet3d.world.get_collision_object_count"
+        }
+      ]
+    },
+    {
+      "contractIndex": 178,
+      "id": "contract_0178",
+      "routeCount": 17,
+      "eligibleRouteCount": 9,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 3,
+          "exampleRouteId": "script:font.remove_font"
+        },
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 2,
+          "exampleRouteId": "script:font.add_font"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:hash",
+          "routeCount": 1,
+          "exampleRouteId": "script:hash_to_hex"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:matrix4",
+          "routeCount": 1,
+          "exampleRouteId": "script:go.world_to_local_transform"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 1,
+          "exampleRouteId": "script:physics.set_gravity"
+        }
+      ],
+      "collection": "/conformance/contract_0178.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:camera.get_projection",
+          "stableId": 2326768707,
+          "accessor": [
+            "camera",
+            "getProjection"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:camera.get_view",
+          "stableId": 986113063,
+          "accessor": [
+            "camera",
+            "getView"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:go.get_id",
+          "stableId": 1477563324,
+          "accessor": [
+            "go",
+            "getId"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:go.get_world_transform",
+          "stableId": 1495634860,
+          "accessor": [
+            "go",
+            "getWorldTransform"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 179,
+      "id": "contract_0179",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0179.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:collectionfactory.load",
+          "stableId": 4139911040,
+          "accessor": [
+            "collectionfactory",
+            "load"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 180,
+      "id": "contract_0180",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(self:script_instance, message_id:hash, message:collectionproxy.load_data, sender:url)",
+          "routeCount": 1,
+          "exampleRouteId": "script:collectionproxy.load"
+        }
+      ]
+    },
+    {
+      "contractIndex": 181,
+      "id": "contract_0181",
+      "routeCount": 4,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 4,
+          "exampleRouteId": "script:collectionproxy.set_collection"
+        }
+      ]
+    },
+    {
+      "contractIndex": 182,
+      "id": "contract_0182",
+      "routeCount": 2,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:go.delete"
+        }
+      ],
+      "collection": "/conformance/contract_0182.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:factory.create",
+          "stableId": 96184340,
+          "accessor": [
+            "factory",
+            "create"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 5,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 183,
+      "id": "contract_0183",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0183.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:factory.load",
+          "stableId": 1808015212,
+          "accessor": [
+            "factory",
+            "load"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 184,
+      "id": "contract_0184",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 1,
+          "exampleRouteId": "script:font.prewarm_text"
+        }
+      ]
+    },
+    {
+      "contractIndex": 185,
+      "id": "contract_0185",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:go.PLAYBACK",
+          "routeCount": 1,
+          "exampleRouteId": "script:go.animate"
+        }
+      ]
+    },
+    {
+      "contractIndex": 186,
+      "id": "contract_0186",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "no-generated-universal-adapter",
+          "routeCount": 1,
+          "exampleRouteId": "script:go.property"
+        }
+      ]
+    },
+    {
+      "contractIndex": 187,
+      "id": "contract_0187",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.animate"
+        }
+      ]
+    },
+    {
+      "contractIndex": 188,
+      "id": "contract_0188",
+      "routeCount": 48,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 47,
+          "exampleRouteId": "script:gui.cancel_animations"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.reset_material"
+        }
+      ]
+    },
+    {
+      "contractIndex": 189,
+      "id": "contract_0189",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 2,
+          "exampleRouteId": "script:gui.clone"
+        }
+      ]
+    },
+    {
+      "contractIndex": 190,
+      "id": "contract_0190",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "invalidate-underlying-identity",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.delete_node"
+        }
+      ]
+    },
+    {
+      "contractIndex": 191,
+      "id": "contract_0191",
+      "routeCount": 5,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 4,
+          "exampleRouteId": "script:gui.get_font_resource"
+        },
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.delete_texture"
+        }
+      ]
+    },
+    {
+      "contractIndex": 192,
+      "id": "contract_0192",
+      "routeCount": 41,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 41,
+          "exampleRouteId": "script:gui.get_node"
+        }
+      ]
+    },
+    {
+      "contractIndex": 193,
+      "id": "contract_0193",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 2,
+          "exampleRouteId": "script:gui.get_type"
+        }
+      ]
+    },
+    {
+      "contractIndex": 194,
+      "id": "contract_0194",
+      "routeCount": 4,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 4,
+          "exampleRouteId": "script:gui.new_box_node"
+        }
+      ]
+    },
+    {
+      "contractIndex": 195,
+      "id": "contract_0195",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.play_flipbook"
+        }
+      ]
+    },
+    {
+      "contractIndex": 196,
+      "id": "contract_0196",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:gui-scene",
+          "routeCount": 1,
+          "exampleRouteId": "script:gui.play_particlefx"
+        }
+      ]
+    },
+    {
+      "contractIndex": 197,
+      "id": "contract_0197",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-context-blocked",
+          "routeCount": 1,
+          "exampleRouteId": "script:html5.set_interaction_listener"
+        }
+      ]
+    },
+    {
+      "contractIndex": 198,
+      "id": "contract_0198",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:network",
+          "routeCount": 1,
+          "exampleRouteId": "script:http.request"
+        }
+      ]
+    },
+    {
+      "contractIndex": 199,
+      "id": "contract_0199",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(self:script_instance, name:hash, uri:string, result:liveupdate.LIVEUPDATE)",
+          "routeCount": 1,
+          "exampleRouteId": "script:liveupdate.add_mount"
+        }
+      ]
+    },
+    {
+      "contractIndex": 200,
+      "id": "contract_0200",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:go.PLAYBACK",
+          "routeCount": 1,
+          "exampleRouteId": "script:model.play_anim"
+        }
+      ]
+    },
+    {
+      "contractIndex": 201,
+      "id": "contract_0201",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0201.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:msg.post",
+          "stableId": 1111726479,
+          "accessor": [
+            "msg",
+            "post"
+          ],
+          "arguments": [
+            "deherm_conformance",
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 202,
+      "id": "contract_0202",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0202.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:particlefx.play",
+          "stableId": 2809933664,
+          "accessor": [
+            "particlefx",
+            "play"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 203,
+      "id": "contract_0203",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0203.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:physics.set_event_listener",
+          "stableId": 1107212821,
+          "accessor": [
+            "physics",
+            "setEventListener"
+          ],
+          "arguments": [],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 204,
+      "id": "contract_0204",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 1,
+          "exampleRouteId": "script:render.constant_buffer"
+        }
+      ]
+    },
+    {
+      "contractIndex": 205,
+      "id": "contract_0205",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "invalidate-underlying-identity",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "execution-policy-destructive",
+          "routeCount": 1,
+          "exampleRouteId": "script:render.delete_render_target"
+        }
+      ]
+    },
+    {
+      "contractIndex": 206,
+      "id": "contract_0206",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 2,
+          "exampleRouteId": "script:render.disable_texture"
+        }
+      ]
+    },
+    {
+      "contractIndex": 207,
+      "id": "contract_0207",
+      "routeCount": 4,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 4,
+          "exampleRouteId": "script:render.enable_material"
+        }
+      ]
+    },
+    {
+      "contractIndex": 208,
+      "id": "contract_0208",
+      "routeCount": 3,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 3,
+          "exampleRouteId": "script:render.get_render_target_height"
+        }
+      ]
+    },
+    {
+      "contractIndex": 209,
+      "id": "contract_0209",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:render-script",
+          "routeCount": 1,
+          "exampleRouteId": "script:render.set_listener"
+        }
+      ]
+    },
+    {
+      "contractIndex": 210,
+      "id": "contract_0210",
+      "routeCount": 7,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "no-generated-universal-adapter",
+          "routeCount": 7,
+          "exampleRouteId": "script:resource.atlas"
+        }
+      ]
+    },
+    {
+      "contractIndex": 211,
+      "id": "contract_0211",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 1,
+          "exampleRouteId": "script:resource.create_texture_async"
+        }
+      ]
+    },
+    {
+      "contractIndex": 212,
+      "id": "contract_0212",
+      "routeCount": 3,
+      "eligibleRouteCount": 3,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0212.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:resource.get_buffer",
+          "stableId": 4087860613,
+          "accessor": [
+            "resource",
+            "getBuffer"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:resource.load",
+          "stableId": 306454494,
+          "accessor": [
+            "resource",
+            "load"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        },
+        {
+          "routeId": "script:sys.load_buffer",
+          "stableId": 667618348,
+          "accessor": [
+            "sys",
+            "loadBuffer"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 213,
+      "id": "contract_0213",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "lua-stack-blocked-capability",
+          "routeCount": 2,
+          "exampleRouteId": "script:socket.newtry"
+        }
+      ]
+    },
+    {
+      "contractIndex": 214,
+      "id": "contract_0214",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0214.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:sound.play",
+          "stableId": 900417529,
+          "accessor": [
+            "sound",
+            "play"
+          ],
+          "arguments": [
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 215,
+      "id": "contract_0215",
+      "routeCount": 1,
+      "eligibleRouteCount": 1,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "fixture",
+      "blockers": [],
+      "collection": "/conformance/contract_0215.collectionc",
+      "exercises": [
+        {
+          "routeId": "script:sprite.play_flipbook",
+          "stableId": 2116188218,
+          "accessor": [
+            "sprite",
+            "playFlipbook"
+          ],
+          "arguments": [
+            "deherm_conformance",
+            "deherm_conformance"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 4,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null
+        }
+      ]
+    },
+    {
+      "contractIndex": 216,
+      "id": "contract_0216",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(self:script_instance, request_id:integer, result:sys.load_buffer_result)",
+          "routeCount": 1,
+          "exampleRouteId": "script:sys.load_buffer_async"
+        }
+      ]
+    },
+    {
+      "contractIndex": 217,
+      "id": "contract_0217",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "unsynthesizable-parameter-type:fun(source:string, message:string, traceback:string)",
+          "routeCount": 1,
+          "exampleRouteId": "script:sys.set_error_handler"
+        }
+      ]
+    },
+    {
+      "contractIndex": 218,
+      "id": "contract_0218",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "no-generated-universal-adapter",
+          "routeCount": 1,
+          "exampleRouteId": "script:timer.delay"
+        }
+      ]
+    },
+    {
+      "contractIndex": 219,
+      "id": "contract_0219",
+      "routeCount": 2,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:window",
+          "routeCount": 1,
+          "exampleRouteId": "script:window.get_size"
+        },
+        {
+          "reason": "multi-result-shape-unmodelled",
+          "routeCount": 1,
+          "exampleRouteId": "script:vmath.quat_to_euler"
+        }
+      ]
+    },
+    {
+      "contractIndex": 220,
+      "id": "contract_0220",
+      "routeCount": 1,
+      "eligibleRouteCount": 0,
+      "contract": {
+        "context": null,
+        "ownershipResult": null,
+        "lifetime": null,
+        "thread": null,
+        "callbackPresent": false,
+        "invalidation": "none",
+        "errorModel": "status-return-and-target-exception",
+        "scratch": "caller-owned-bounded-reentrant-scratch"
+      },
+      "properties": [
+        "result-arity",
+        "scratch-reuse",
+        "error-model"
+      ],
+      "disposition": "unreachable",
+      "blockers": [
+        {
+          "reason": "context-fixture-missing:window",
+          "routeCount": 1,
+          "exampleRouteId": "script:window.set_listener"
+        }
+      ]
+    }
+  ]
+}

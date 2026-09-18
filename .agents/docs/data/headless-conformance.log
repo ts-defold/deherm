@@ -1,0 +1,682 @@
+INFO:DLIB: Log server started on port 51255
+headless-conformance:driver:cases:16
+headless-conformance:case-begin	contract_0148
+INFO:GRAPHICS: Installed graphics device 'ADAPTER_FAMILY_NULL'
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=1 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0148	script:b2d.get_body	result-arity	observed-as-target-exception	Instance deherm_conformance not found
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0148	script:b2d.get_body	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0148	script:b2d.get_body	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0148:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0148	exited	0	2
+headless-conformance:case-begin	contract_0149
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=2 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:b2d.get_version	result-arity	observed	object
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:b2d.get_version	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:b2d.get_version	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:bullet3d.get_version	result-arity	observed	object
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:bullet3d.get_version	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:bullet3d.get_version	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:image.get_astc_header	result-arity	observed-as-target-exception	Data is not a valid .astc file
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:image.get_astc_header	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0149	script:image.get_astc_header	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0149:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0149	exited	0	2
+headless-conformance:case-begin	contract_0150
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=3 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+ERROR:CRASH: CALL STACK:
+
+
+ERROR:CRASH: 0   defold-hermes-headless-conformance- 0x00000001008dd050 _ZN7dmCrash7OnCrashEi + 108
+ERROR:CRASH: 1   defold-hermes-headless-conformance- 0x00000001008dd1e8 _ZN7dmCrashL7HandlerEiP9__siginfoPv + 72
+ERROR:CRASH: 2   libsystem_platform.dylib            0x000000018368b744 _sigtramp + 56
+ERROR:CRASH: 3   defold-hermes-headless-conformance- 0x00000001006f8e8c _ZN12dmGameSystemL12B2D_GetWorldEP9lua_State + 96
+ERROR:CRASH: 4   defold-hermes-headless-conformance- 0x000000010080a3cc lj_BC_FUNCC + 44
+ERROR:CRASH: 5   defold-hermes-headless-conformance- 0x00000001003183f8 _ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter14dispatchUnsafeERNS1_15DispatchContextE + 236
+ERROR:CRASH: 6   defold-hermes-headless-conformance- 0x00000001003182f8 _ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter17ProtectedDispatchEP9lua_State + 36
+ERROR:CRASH: 7   defold-hermes-headless-conformance- 0x000000010080a3cc lj_BC_FUNCC + 44
+ERROR:CRASH: 8   defold-hermes-headless-conformance- 0x0000000100822130 dm_lua_cpcall + 28
+ERROR:CRASH: 9   defold-hermes-headless-conformance- 0x000000010032ac58 _ZN13defold_hermes18dispatchScriptCallEPNS_15ScriptCallFrameE + 192
+ERROR:CRASH: 10  defold-hermes-headless-conformance- 0x000000010032cb68 _ZNSt3__110__function6__funcIZN13defold_hermes22installScriptJsiBridgeERN8facebook3jsi7RuntimeEE3$_0FNS4_5ValueES6_RKS8_PS9_mEEclES6_SA_OSB_Om + 712
+ERROR:CRASH: 11  defold-hermes-headless-conformance- 0x00000001003c8708 _ZN8facebook6hermes12_GLOBAL__N_117HermesRuntimeImpl9HFContext4funcEPvRN6hermes2vm7RuntimeE + 284
+ERROR:CRASH: 12  defold-hermes-headless-conformance- 0x00000001005b2d00 _ZN6hermes2vm25FinalizableNativeFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 68
+ERROR:CRASH: 13  defold-hermes-headless-conformance- 0x0000000100590988 _ZN6hermes2vm11Interpreter17interpretFunctionILb0ELb0EEENS0_10CallResultINS0_11HermesValueELNS0_6detail20CallResultSpecializeE2EEERNS0_7RuntimeERNS0_16InterpreterStateE + 1520
+ERROR:CRASH: 14  defold-hermes-headless-conformance- 0x00000001008e5590 _ZN6hermes2vm7Runtime17interpretFunctionEPNS0_9CodeBlockE + 32
+ERROR:CRASH: 15  defold-hermes-headless-conformance- 0x000000010057bfb8 _ZN6hermes2vm10JSFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 32
+ERROR:CRASH: 16  defold-hermes-headless-conformance- 0x00000001008fc018 _ZN6hermes2vm18hermesBuiltinApplyEPvRNS0_7RuntimeE + 1180
+ERROR:CRASH: 17  defold-hermes-headless-conformance- 0x00000001008e65d8 _ZN6hermes2vm11Interpreter15implCallBuiltinERNS0_7RuntimeEPNS0_17PinnedHermesValueEPNS0_9CodeBlockEj + 160
+ERROR:CRASH: 18  defold-hermes-headless-conformance- 0x0000000100590b64 _ZN6hermes2vm11Interpreter17interpretFunctionILb0ELb0EEENS0_10CallResultINS0_11HermesValueELNS0_6detail20CallResultSpecializeE2EEERNS0_7RuntimeERNS0_16InterpreterStateE + 1996
+ERROR:CRASH: 19  defold-hermes-headless-conformance- 0x00000001008e5590 _ZN6hermes2vm7Runtime17interpretFunctionEPNS0_9CodeBlockE + 32
+ERROR:CRASH: 20  defold-hermes-headless-conformance- 0x000000010057bfb8 _ZN6hermes2vm10JSFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 32
+ERROR:CRASH: 21  defold-hermes-headless-conformance- 0x00000001003bf468 _ZN8facebook6hermes12_GLOBAL__N_117HermesRuntimeImpl4callERKNS_3jsi8FunctionERKNS3_5ValueEPS8_m + 760
+ERROR:CRASH: 22  defold-hermes-headless-conformance- 0x0000000100326730 _ZN13defold_hermes7Runtime4Impl12callOptionalEPKcPKN8facebook3jsi5ValueEm + 356
+ERROR:CRASH: 23  defold-hermes-headless-conformance- 0x000000010030ac9c _ZN12_GLOBAL__N_116StartApplicationEv + 268
+ERROR:CRASH: 24  defold-hermes-headless-conformance- 0x000000010030a40c _ZN12_GLOBAL__N_117AttachLuaInstanceEP9lua_State + 316
+ERROR:CRASH: 25  defold-hermes-headless-conformance- 0x000000010080a3cc lj_BC_FUNCC + 44
+ERROR:CRASH: 26  defold-hermes-headless-conformance- 0x00000001008220f0 dm_lua_pcall + 148
+ERROR:CRASH: 27  defold-hermes-headless-conformance- 0x000000010065b1dc _ZN12dmGameObject9RunScriptEP9lua_StatePNS_6ScriptENS_14ScriptFunctionEPNS_14ScriptInstanceERKNS_15RunScriptParamsE + 364
+ERROR:CRASH: 28  defold-hermes-headless-conformance- 0x000000010065b300 _ZN12dmGameObject14CompScriptInitERKNS_19ComponentInitParamsE + 52
+ERROR:CRASH: 29  defold-hermes-headless-conformance- 0x0000000100660f90 _ZN12dmGameObjectL12InitInstanceEPNS_10CollectionEPNS_8InstanceE + 800
+ERROR:CRASH: 30  defold-hermes-headless-conformance- 0x0000000100662330 _ZN12dmGameObject4InitEPNS_16CollectionHandleE + 136
+ERROR:CRASH: 31  defold-hermes-headless-conformance- 0x00000001006460d8 _ZN8dmEngine4InitEPNS_6EngineEiPPc + 7384
+ERROR:CRASH: 32  defold-hermes-headless-conformance- 0x0000000100647b00 _Z14dmEngineCreateiPPc + 168
+ERROR:CRASH: 33  defold-hermes-headless-conformance- 0x00000001003059b0 main + 2304
+ERROR:CRASH: 34  dyld                                0x00000001832c3e00 start + 6992
+ERROR:CRASH: Lua Callstack:
+ERROR:CRASH:   [C]:-1: ?
+ERROR:CRASH:   [C]:-1: in function attach
+ERROR:CRASH:   conformance/contract_0150.script:5: in function <conformance/contract_0150.script:5>
+ERROR:CRASH:   [C]:-1: in function pcall
+ERROR:CRASH:   conformance/contract_0150.script:5: in function <conformance/contract_0150.script:3>
+ERROR:CRASH: 
+
+
+INFO:DLIB: Log server started on port 51256
+headless-conformance:driver:cases:13
+headless-conformance:case-begin	contract_0160
+INFO:GRAPHICS: Installed graphics device 'ADAPTER_FAMILY_NULL'
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=1 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.arshift	result-arity	observed	number
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.arshift	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.arshift	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.bnot	result-arity	observed	number
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.bnot	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.bnot	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.bswap	result-arity	observed	number
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.bswap	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.bswap	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.lshift	result-arity	observed	number
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.lshift	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0160	script:bit.lshift	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0160:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0160	exited	0	2
+headless-conformance:case-begin	contract_0171
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=2 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.get_collision_object	result-arity	observed-as-target-exception	Instance deherm_conformance not found
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.get_collision_object	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.get_collision_object	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.get_rigid_body	result-arity	observed-as-target-exception	Instance deherm_conformance not found
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.get_rigid_body	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0171	script:bullet3d.get_rigid_body	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0171:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0171	exited	0	2
+headless-conformance:case-begin	contract_0172
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=3 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0172	script:bullet3d.get_world	result-arity	observed	object
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0172	script:bullet3d.get_world	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0172	script:bullet3d.get_world	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0172:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0172	exited	0	2
+headless-conformance:case-begin	contract_0178
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=4 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:camera.get_projection	result-arity	observed-as-target-exception	Camera 'contract_0178:/contract_0178#contract_0178' not found.
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:camera.get_projection	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:camera.get_projection	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:camera.get_view	result-arity	observed-as-target-exception	Camera 'contract_0178:/contract_0178#contract_0178' not found.
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:camera.get_view	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:camera.get_view	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:go.get_id	result-arity	observed	bigint
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:go.get_id	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:go.get_id	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:go.get_world_transform	result-arity	observed	object
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:go.get_world_transform	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0178	script:go.get_world_transform	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0178:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0178	exited	0	2
+headless-conformance:case-begin	contract_0179
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=5 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0179	script:collectionfactory.load	result-arity	observed-as-target-exception	Argument #2 is expected to be completion function.
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0179	script:collectionfactory.load	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0179	script:collectionfactory.load	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0179:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0179	exited	0	2
+headless-conformance:case-begin	contract_0182
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=6 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0182	script:factory.create	result-arity	observed-as-target-exception	Instance deherm_conformance not found
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0182	script:factory.create	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0182	script:factory.create	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0182:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0182	exited	0	2
+headless-conformance:case-begin	contract_0183
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=7 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0183	script:factory.load	result-arity	observed-as-target-exception	Argument #2 is expected to be completion function.
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0183	script:factory.load	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0183	script:factory.load	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0183:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0183	exited	0	2
+headless-conformance:case-begin	contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'deherm_conformance' sent from contract_0201:/contract_0201#contract_0201
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=8 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0201	script:msg.post	result-arity	observed	undefined
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0201	script:msg.post	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0201	script:msg.post	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0201:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0201	exited	0	2
+headless-conformance:case-begin	contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+ERROR:GAMEOBJECT: Instance '<unknown:1283857951929530042>' could not be found when dispatching message 'play_particle_fx' sent from contract_0202:/contract_0202#contract_0202
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=9 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0202	script:particlefx.play	result-arity	observed	undefined
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0202	script:particlefx.play	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0202	script:particlefx.play	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0202:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0202	exited	0	2
+headless-conformance:case-begin	contract_0203
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=10 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0203	script:physics.set_event_listener	result-arity	observed-as-target-exception	Physics world doesn't exist. Make sure you have at least one physics component in collection.
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0203	script:physics.set_event_listener	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0203	script:physics.set_event_listener	error-model	not-applicable	route has no required argument to withhold
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0203:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0203	exited	0	2
+headless-conformance:case-begin	contract_0212
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+ERROR:RESOURCE: Resource path is not absolute (deherm_conformance)
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=11 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:resource.get_buffer	result-arity	observed-as-target-exception	Could not get bufferc type resource: deherm_conformance
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:resource.get_buffer	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:resource.get_buffer	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:resource.load	result-arity	observed-as-target-exception	The resource was not found (-3): 8dacd79ab962b4f0, deherm_conformance
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:resource.load	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:resource.load	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:sys.load_buffer	result-arity	observed-as-target-exception	sys.load_buffer failed to load the resource (code=-3)
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:sys.load_buffer	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0212	script:sys.load_buffer	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0212:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0212	exited	0	2
+headless-conformance:case-begin	contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_sound' sent from contract_0214:/contract_0214#contract_0214
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=12 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0214	script:sound.play	result-arity	observed	number
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0214	script:sound.play	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0214	script:sound.play	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0214:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0214	exited	0	2
+headless-conformance:case-begin	contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+ERROR:GAMEOBJECT: Instance '/deherm_conformance' could not be found when dispatching message 'play_animation' sent from contract_0215:/contract_0215#contract_0215
+INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
+INFO:ENGINE: Loading data from: archive:/Users/mini/Documents/defold-hermes/build/conformance/headless/project/build/bob/game.dmanifest
+INFO:DEFOLD_HERMES: TypeScript bundle is waiting for script instance attachment
+INFO:ENGINE: Initialised sound device 'default'
+INFO:PHYSICS: Created physics context: Box2D v2.2.1
+INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols
+INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
+INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=unavailable resource_generation=1 runtime_id=13 initial=true
+INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0215	script:sprite.play_flipbook	result-arity	observed	undefined
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0215	script:sprite.play_flipbook	scratch-reuse	observed	64 repetitions
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0215	script:sprite.play_flipbook	error-model	observed	raised and boundary remained usable
+INFO:DEFOLD_HERMES: deherm-headless-conformance:case-result:contract_0215:observed
+INFO:DEFOLD_HERMES: TypeScript application initialized after script instance attachment
+INFO:DEFOLD_HERMES: Extension update entered (application initialized: true)
+headless-conformance:case-end	contract_0215	exited	0	2
+headless-conformance:driver:failures:0

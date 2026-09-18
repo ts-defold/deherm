@@ -50,6 +50,7 @@ okf_version: "0.2"
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.
 * [Transparent Defold value transport](research/transparent-defold-value-transport.md) - Pinned dmSDK value layouts, the Matrix4/URL typed frame lanes, and the structural typed-native emission rule.
 * [Canonical lowering plan](research/canonical-lowering-plan.md) - All 2,287 API units across five backends, interned marshalling programs, semantic policies, and final-build reachability.
+* [Headless engine conformance](research/headless-engine-conformance.md) - In-process headless Defold driven a tick at a time, generated per-contract fixtures, and the enumerated set of contracts a headless engine still cannot reach.
 * [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Exact positional Lua tuple ABI, public reachability limits, and unpromoted engine evidence.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.
