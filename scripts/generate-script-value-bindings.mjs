@@ -391,6 +391,52 @@ function casePrefix(denseIndex) {
   return `    case ${denseIndex}: {`;
 }
 
+/**
+ * Reviewed backend token for the addressed (world-addressing) forms of the
+ * current-instance transform routes. An address may be a string, a hash or a
+ * url, and each of those resolves differently against the *calling* instance's
+ * collection and socket. Rather than restate that resolution natively, the
+ * addressed shapes keep the argument in its own Lua representation and re-enter
+ * the pinned `go` module, so Defold's own `ResolveInstance` performs the
+ * socket check, the relative-path resolution and the missing-instance refusal.
+ */
+const ADDRESSED_TRANSFORM_BACKEND = "pinned-resolve-instance-captured-lua";
+
+/**
+ * Pinned evidence that `ResolveInstance` still owns address resolution, still
+ * restricts the address to the calling collection, and still fails closed when
+ * the addressed instance does not exist rather than returning a default.
+ */
+const RESOLVE_INSTANCE_ANCHORS = [
+  "static Instance* ResolveInstance(lua_State* L, int instance_arg)",
+  "if (lua_gettop(L) == instance_arg && !lua_isnil(L, instance_arg))",
+  "dmScript::ResolveURL(L, instance_arg, &receiver, 0x0);",
+  "if (receiver.m_Socket != dmGameObject::GetMessageSocket(i->m_Instance->m_Collection->m_HCollection))",
+  "luaL_error(L, \"function called can only access instances within the same collection.\");",
+  "instance = GetInstanceFromIdentifier(instance->m_Collection->m_HCollection, receiver.m_Path);",
+  "luaL_error(L, \"Instance %s not found\", lua_tostring(L, instance_arg));"
+];
+
+/**
+ * Emit the addressed branch of a transform route. The current-instance shape
+ * keeps its direct native path; every other accepted shape carries an address
+ * and re-enters the pinned Lua route through the shared captured-Lua invoker.
+ */
+function addressedTransformDelegation(binding, condition) {
+  return `      if (${condition}) {
+        if (!structuredLua || !structuredLua->invoke) {
+          fail(error, errorCapacity, "Structured Lua backend is not installed");
+          return DispatchStatus::kError;
+        }
+        return structuredLua->invoke(
+            structuredLua->context,
+            kStructuredLuaOperations[${binding.structuredLuaIndex}],
+            frame,
+            error,
+            errorCapacity);
+      }`;
+}
+
 function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec) {
   return {
     validate(binding) {
@@ -823,13 +869,15 @@ const OPERATION_TEMPLATES = new Map([
     }
   }],
   ["current-instance-transform-get", {
-    validate(binding, source) {
-      exactOperationParameters(binding, [{ property: "position", kind: "Vector3" }]);
-      expectOperationContract(binding, [[]], "Vector3");
+    validate(binding, source, definition, moduleSource) {
+      exactOperationParameters(binding, [{ property: "position", kind: "Vector3", addressed: ADDRESSED_TRANSFORM_BACKEND }]);
+      expectOperationContract(binding, [[], ["String"], ["Hash"], ["Url"]], "Vector3");
       requireSourceAnchors(binding, source, ["ResolveInstance(L, 1)", "dmGameObject::GetPosition(instance)"]);
+      requireSourceAnchors(binding, moduleSource, RESOLVE_INSTANCE_ANCHORS);
     },
     render(binding, denseIndex) {
       return `${casePrefix(denseIndex)}
+${addressedTransformDelegation(binding, "frame->argumentCount != 0")}
       game_object::ResolvedCurrent current;
       if (!game_object::resolveCurrent(&current, error, errorCapacity)) return DispatchStatus::kError;
       float position[3]{};
@@ -839,24 +887,31 @@ const OPERATION_TEMPLATES = new Map([
     }
   }],
   ["current-instance-transform-set", {
-    validate(binding, source) {
-      const position = { property: "position", kind: "Vector3", rejectNaN: true };
-      const rotation = { property: "rotation", kind: "Quaternion", rejectNaN: true };
+    validate(binding, source, definition, moduleSource) {
+      const position = { property: "position", kind: "Vector3", rejectNaN: true, addressed: ADDRESSED_TRANSFORM_BACKEND };
+      const rotation = { property: "rotation", kind: "Quaternion", rejectNaN: true, addressed: ADDRESSED_TRANSFORM_BACKEND };
       exactOperationParameters(binding, [position, rotation]);
       const isPosition = equal(binding.operation.parameters, position);
-      expectOperationContract(binding, [[isPosition ? "Vector3" : "Quaternion"]], "None");
+      const value = isPosition ? "Vector3" : "Quaternion";
+      expectOperationContract(binding,
+        [[value], [value, "String"], [value, "Hash"], [value, "Url"]], "None");
       requireSourceAnchors(binding, source, isPosition
         ? ["ResolveInstance(L, 2)", "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))"]
         : ["ResolveInstance(L, 2)", "dmGameObject::SetRotation(instance, *q)"]);
+      requireSourceAnchors(binding, moduleSource, RESOLVE_INSTANCE_ANCHORS);
     },
     render(binding, denseIndex) {
       const prefix = casePrefix(denseIndex);
+      // The NaN guard runs before the address branch so both the current-instance
+      // and addressed forms refuse the same inputs at the same boundary.
+      const delegation = addressedTransformDelegation(binding, "frame->argumentCount != 1");
       if (binding.operation.parameters.property === "position") return `${prefix}
       const ScriptValue& value = frame->arguments[0];
       if (std::isnan(value.defoldValue[0]) || std::isnan(value.defoldValue[1]) || std::isnan(value.defoldValue[2])) {
         fail(error, errorCapacity, "go.setPosition rejects NaN components");
         return DispatchStatus::kError;
       }
+${delegation}
       game_object::ResolvedCurrent current;
       if (!game_object::resolveCurrent(&current, error, errorCapacity)) return DispatchStatus::kError;
       current.api->setPosition(current.api->userData, current.instance, value.defoldValue);
@@ -869,6 +924,7 @@ const OPERATION_TEMPLATES = new Map([
         fail(error, errorCapacity, "go.setRotation rejects NaN components");
         return DispatchStatus::kError;
       }
+${delegation}
       game_object::ResolvedCurrent current;
       if (!game_object::resolveCurrent(&current, error, errorCapacity)) return DispatchStatus::kError;
       current.api->setRotation(current.api->userData, current.instance, value.defoldValue);
@@ -924,13 +980,17 @@ function renderOperation(binding, denseIndex) {
 
 /* Operation renderers are selected only by reviewed template metadata above. Binding IDs
  * remain stable identity keys and never select native implementation code. */
-function validateOperation(binding, source, definition) {
-  operationTemplate(binding).validate(binding, source, definition);
+function validateOperation(binding, source, definition, moduleSource) {
+  operationTemplate(binding).validate(binding, source, definition, moduleSource);
 }
 
 function targetSupport(binding) {
   const nativeBackend = binding.operation.parameters.backend === "captured-lua"
     ? "generated-captured-lua"
+    // Addressed transform shapes keep the current-instance form on the direct
+    // native path and re-enter the pinned Lua route only to resolve an address.
+    : binding.operation.parameters.addressed === ADDRESSED_TRANSFORM_BACKEND
+    ? "generated-native-pod-with-addressed-captured-lua"
     : "generated-native-pod";
   const browserExecutable = binding.operation.template === "hash-string";
   return {
@@ -1044,14 +1104,14 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
       ownership: definition.ownership,
       targetSupport: targetSupport(entry)
     };
-    validateOperation(binding, scopedSource, definition);
+    validateOperation(binding, scopedSource, definition, sourceText);
     return binding;
     });
   }).sort((left, right) => left.stableId - right.stableId);
 
   const structuredLuaTemplates = new Set([
     "message-post", "factory-spawn", "game-object-delete", "gui-node-lookup", "gui-node-text-set",
-    "gui-node-setter"
+    "gui-node-setter", "current-instance-transform-get", "current-instance-transform-set"
   ]);
   const structuredLuaBindings = bindings.filter(({ operation }) => structuredLuaTemplates.has(operation.template));
   structuredLuaBindings.forEach((binding, index) => {
@@ -1100,7 +1160,7 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
     bindings
   };
 
-  const header = `// Generated by scripts/generate-script-value-bindings.mjs. Do not edit.\n#pragma once\n\n#include <cstddef>\n\n#include <defold_hermes/script_bridge_capi.hpp>\n\nnamespace defold_hermes::value_binding {\n\nenum class DispatchStatus { kMissing, kSuccess, kError };\nenum class StructuredLuaResultCodec : uint8_t { kNone, kHash, kHashOrUndefined, kNode };\nenum class StructuredLuaContext : uint8_t { kScriptInstance, kGuiScriptInstance, kCurrentScriptInstance };\nstruct StructuredLuaOperation {\n  uint16_t index;\n  uint32_t stableId;\n  const char* canonicalId;\n  const char* module;\n  const char* member;\n  StructuredLuaResultCodec resultCodec;\n  StructuredLuaContext context;\n};\nstruct StructuredLuaApi {\n  void* context = nullptr;\n  DispatchStatus (*invoke)(void* context, const StructuredLuaOperation& operation, ScriptCallFrame* frame, char* error, size_t errorCapacity) noexcept = nullptr;\n};\nenum class BindingId : uint32_t {\n${bindingIds}\n};\ninline constexpr size_t kBindingCount = ${bindings.length};\ninline constexpr size_t kCallShapeCount = ${shapes.length};\ninline constexpr size_t kStructuredLuaOperationCount = ${structuredLuaBindings.length};\nDispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity, const StructuredLuaApi* structuredLua = nullptr) noexcept;\n\n}  // namespace defold_hermes::value_binding\n`;
+  const header = `// Generated by scripts/generate-script-value-bindings.mjs. Do not edit.\n#pragma once\n\n#include <cstddef>\n\n#include <defold_hermes/script_bridge_capi.hpp>\n\nnamespace defold_hermes::value_binding {\n\nenum class DispatchStatus { kMissing, kSuccess, kError };\nenum class StructuredLuaResultCodec : uint8_t { kNone, kHash, kHashOrUndefined, kNode, kVector3, kQuaternion };\nenum class StructuredLuaContext : uint8_t { kScriptInstance, kGuiScriptInstance, kCurrentScriptInstance };\nstruct StructuredLuaOperation {\n  uint16_t index;\n  uint32_t stableId;\n  const char* canonicalId;\n  const char* module;\n  const char* member;\n  StructuredLuaResultCodec resultCodec;\n  StructuredLuaContext context;\n};\nstruct StructuredLuaApi {\n  void* context = nullptr;\n  DispatchStatus (*invoke)(void* context, const StructuredLuaOperation& operation, ScriptCallFrame* frame, char* error, size_t errorCapacity) noexcept = nullptr;\n};\nenum class BindingId : uint32_t {\n${bindingIds}\n};\ninline constexpr size_t kBindingCount = ${bindings.length};\ninline constexpr size_t kCallShapeCount = ${shapes.length};\ninline constexpr size_t kStructuredLuaOperationCount = ${structuredLuaBindings.length};\nDispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity, const StructuredLuaApi* structuredLua = nullptr) noexcept;\n\n}  // namespace defold_hermes::value_binding\n`;
 
   const source = `// Generated by scripts/generate-script-value-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_script_value_bindings.hpp>\n\n#include <dmsdk/dlib/hash.h>\n#include <dmsdk/dlib/vmath.h>\n\n#include <cmath>\n#include <cstdio>\n#include <cstring>\n#include <limits>\n\nnamespace defold_hermes::value_binding {\nnamespace {\nenum class Codec : uint8_t { kNumber, kString, kHash, kVector3, kVector4, kQuaternion };\nconstexpr uint32_t kStableIds[] = {\n${bindings.map(({ stableId, id }) => `  ${hexBindingId(stableId)},  // ${id}`).join("\n")}\n};\nconstexpr uint16_t kBindingShapeOffsets[] = { ${bindingShapeOffsets.join(", ")} };\nconstexpr uint16_t kShapeArgumentOffsets[] = { ${shapeArgumentOffsets.join(", ")} };\nconstexpr uint8_t kShapeArgumentCounts[] = { ${shapes.map((shape) => shape.length).join(", ")} };\nconstexpr Codec kArgumentCodecs[] = {\n${argumentCodecs.map((codec) => `  Codec::k${codec},`).join("\n")}\n};\n\nbool fail(char* error, size_t capacity, const char* message) noexcept {\n  if (error && capacity) std::snprintf(error, capacity, "%s", message);\n  return false;\n}\n\nbool matches(Codec codec, const ScriptValue& value) noexcept {\n  if (codec == Codec::kNumber) return value.tag == ScriptValueTag::kNumber;\n  if (codec == Codec::kString) return value.tag == ScriptValueTag::kString && (value.length == 0 || value.data);\n  if (codec == Codec::kHash) return value.tag == ScriptValueTag::kHandle && value.handleKind == ScriptHandleKind::kHash;\n  if (value.tag != ScriptValueTag::kDefoldValue) return false;\n  if (codec == Codec::kVector3) return value.defoldKind == ScriptDefoldValueKind::kVector3;\n  if (codec == Codec::kVector4) return value.defoldKind == ScriptDefoldValueKind::kVector4;\n  return value.defoldKind == ScriptDefoldValueKind::kQuaternion;\n}\n\nsize_t denseIndex(uint32_t stableId) noexcept {\n  for (size_t index = 0; index < kBindingCount; ++index) if (kStableIds[index] == stableId) return index;\n  return kBindingCount;\n}\n\nbool validateShape(size_t binding, const ScriptCallFrame& frame) noexcept {\n  for (size_t shape = kBindingShapeOffsets[binding]; shape < kBindingShapeOffsets[binding + 1]; ++shape) {\n    if (kShapeArgumentCounts[shape] != frame.argumentCount) continue;\n    const size_t offset = kShapeArgumentOffsets[shape];\n    bool valid = true;\n    for (size_t index = 0; index < frame.argumentCount; ++index) valid = valid && matches(kArgumentCodecs[offset + index], frame.arguments[index]);\n    if (valid) return true;\n  }\n  return false;\n}\n\nfloat number(const ScriptValue& value) noexcept {\n  const double number = value.number;\n  if (number > std::numeric_limits<float>::max()) return std::numeric_limits<float>::infinity();\n  if (number < -std::numeric_limits<float>::max()) return -std::numeric_limits<float>::infinity();\n  return static_cast<float>(number);\n}\ndmVMath::Vector3 vector3(const ScriptValue& value) noexcept { return {value.defoldValue[0], value.defoldValue[1], value.defoldValue[2]}; }\ndmVMath::Vector4 vector4(const ScriptValue& value) noexcept { return {value.defoldValue[0], value.defoldValue[1], value.defoldValue[2], value.defoldValue[3]}; }\ndmVMath::Quat quaternion(const ScriptValue& value) noexcept { return {value.defoldValue[0], value.defoldValue[1], value.defoldValue[2], value.defoldValue[3]}; }\n\nbool resultCell(ScriptCallFrame* frame, ScriptValue** out, char* error, size_t capacity) noexcept {\n  if (!frame->results || frame->resultCapacity < 1) return fail(error, capacity, "Defold value result storage is exhausted");\n  *out = &frame->results[0];\n  **out = {};\n  frame->resultCount = 1;\n  return true;\n}\n\nbool writeNumber(ScriptCallFrame* frame, double value, char* error, size_t capacity) noexcept {\n  ScriptValue* out; if (!resultCell(frame, &out, error, capacity)) return false;\n  out->tag = ScriptValueTag::kNumber; out->number = value; return true;\n}\nbool writeVector3(ScriptCallFrame* frame, const dmVMath::Vector3& value, char* error, size_t capacity) noexcept {\n  ScriptValue* out; if (!resultCell(frame, &out, error, capacity)) return false;\n  out->tag = ScriptValueTag::kDefoldValue; out->defoldKind = ScriptDefoldValueKind::kVector3;\n  out->defoldValue[0] = value.getX(); out->defoldValue[1] = value.getY(); out->defoldValue[2] = value.getZ(); return true;\n}\nbool writeVector4(ScriptCallFrame* frame, const dmVMath::Vector4& value, char* error, size_t capacity) noexcept {\n  ScriptValue* out; if (!resultCell(frame, &out, error, capacity)) return false;\n  out->tag = ScriptValueTag::kDefoldValue; out->defoldKind = ScriptDefoldValueKind::kVector4;\n  out->defoldValue[0] = value.getX(); out->defoldValue[1] = value.getY(); out->defoldValue[2] = value.getZ(); out->defoldValue[3] = value.getW(); return true;\n}\nbool writeQuaternion(ScriptCallFrame* frame, const dmVMath::Quat& value, char* error, size_t capacity) noexcept {\n  ScriptValue* out; if (!resultCell(frame, &out, error, capacity)) return false;\n  out->tag = ScriptValueTag::kDefoldValue; out->defoldKind = ScriptDefoldValueKind::kQuaternion;\n  out->defoldValue[0] = value.getX(); out->defoldValue[1] = value.getY(); out->defoldValue[2] = value.getZ(); out->defoldValue[3] = value.getW(); return true;\n}\nDispatchStatus complete(bool ok) noexcept { return ok ? DispatchStatus::kSuccess : DispatchStatus::kError; }\n}  // namespace\n\nDispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity) noexcept {\n  if (!frame) { fail(error, errorCapacity, "Defold value call frame is null"); return DispatchStatus::kError; }\n  const size_t binding = denseIndex(frame->stableId);\n  if (binding == kBindingCount) return DispatchStatus::kMissing;\n  frame->resultCount = 0;\n  if (frame->argumentCount && !frame->arguments) { fail(error, errorCapacity, "Defold value arguments are null"); return DispatchStatus::kError; }\n  if (!validateShape(binding, *frame)) { fail(error, errorCapacity, "Defold value arguments do not match a generated call shape"); return DispatchStatus::kError; }\n  switch (binding) {\n${bindings.map(renderOperation).join("\n")}\n    default: break;\n  }\n  fail(error, errorCapacity, "Generated Defold value binding has no implementation");\n  return DispatchStatus::kError;\n}\n\n}  // namespace defold_hermes::value_binding\n`;
   const sourceWithStructuredLua = source

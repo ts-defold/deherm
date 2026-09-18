@@ -26,17 +26,19 @@ export function validateNativeValueProbeReport(report, bindingReport) {
 
   if (bindingCount !== bindingReport.bindings.length ||
       uniqueBindingCount !== bindingCount ||
-      routeDispositionCount !== bindingCount ||
       probeCount !== report.probes.length ||
       plannedFamilyProbeCount !== report.plannedProbes.length ||
       probeCount + plannedFamilyProbeCount !== routeDispositionCount) {
     throw new Error("Native value probe counts do not account for every generated binding");
   }
 
+  // A binding with several implemented call shapes carries several probes, so
+  // the covering invariant is over the set of binding identities, not over the
+  // number of dispositions.
   const dispositions = [...report.probes, ...report.plannedProbes];
   const ids = dispositions.map(({ id }) => id);
   if (ids.some((id) => typeof id !== "string") || new Set(ids).size !== bindingCount) {
-    throw new Error("Native value probe dispositions must contain each binding exactly once");
+    throw new Error("Native value probe dispositions must cover each binding at least once");
   }
   const generatedIds = new Set(bindingReport.bindings.map(({ id }) => id));
   if (generatedIds.size !== bindingCount || ids.some((id) => !generatedIds.has(id))) {

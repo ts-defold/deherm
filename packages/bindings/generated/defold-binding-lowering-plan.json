@@ -12,23 +12,23 @@
     "conformance": "not-claimed"
   },
   "inputHashes": {
-    "scriptProjection": "6107f0f878a209afb8ac1b7bc20f106a735edd173b1e791070bcb3b52c2099e9",
+    "scriptProjection": "cf99a0ff41cb72628f81e139624a96bd971e0b6ce4e5780c011edf9462a9e7b2",
     "scriptScalarDispatch": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "scriptValueBindings": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d",
+    "scriptValueBindings": "d3617de137832821c331e27cefc3bb27aa01e8a7ce33baf9335c311f333153ef",
     "scriptFixedTuples": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
     "scriptDynamicValues": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "scriptValueTail": "dfbfa544eae9456ec1d51f7c08d51ab28f03e4a471eeb98dc661a0ecfa639c36",
-    "scriptOverloadDispatch": "e0f7f0cde94e9225294a8018240d325dd164790a9ea875b5e152d6d02dee5d80",
-    "scriptTableRecords": "0816b6ccc701ef8d40aaa1fd11e58357bd79cd9b91970ebbbd7962ee5c8705cf",
+    "scriptValueTail": "75aa9201d8d6bbbc9ea99527f2ca64a808e565a11ef57e383d372fdb17949474",
+    "scriptOverloadDispatch": "22466ef160c49a372e333e2e6c3dfe4b5dd98f51b21aa4ce2508e7389fd4dd6b",
+    "scriptTableRecords": "e7d3af7b93ba353204746d2519354b161ff5695aefd7e3da58ca962644d6ac40",
     "scriptCallbackLifecycle": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "scriptCopiedValueBlockers": "c829b448fe7dacf59ba091dec9bb17a9f208dc69c9e5961343e8df50d49727ac",
-    "scriptOpaqueRecordBlockers": "03a4e2a937921d46a63ccc0b73dd71d76511822e3caf469c91e849908e33f274",
+    "scriptCopiedValueBlockers": "ce0edf415cdb628929f883d4ffb8af6b143a369f743b2f47d45ebb1b579b7b0d",
+    "scriptOpaqueRecordBlockers": "2624be71dcc7c7ae15b2c9c5c05914e24dcbc0a8a06307ce29b565294f229847",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "89409242c9a6f8f1aedaaf81940c9c043ae6a05c38fdc60ab9a8d39f12ea6543",
-    "scriptUniversalValue": "8d6bf05e059d434b0ed8f6494767a08a615a69d994dc218695a21a5f39916857",
+    "scriptHandleLowering": "6978d1160295eedcc2dae6a0adb5909bb0cd9d7c57a871739c01e37b21d7f36b",
+    "scriptUniversalValue": "43e45305ee983316adf1fc6bf1089bda189896cbdeaeb9770490e5385fc3120f",
     "defoldValueLayouts": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
     "dmsdkProjection": "052a5bb57b3c247abc5e0810321ed19b1cddb886b6ecc2d4348b96f44bf5e1bf",
-    "dmsdkUniversal": "717dd38144904f9ba7610732182782ff6dcadd3426c6ca0e78c2c8520c6154ba",
+    "dmsdkUniversal": "cff89257532f6661ef563bc0f0892a31dc582a12e871b362568428deaa5d759d",
     "dmsdkScalarThunks": "d0d4434e4a1d9c5578058e3f12443efdf860fdd5017118a1bf5e4c464acbdb4d",
     "dmsdkEnumValues": "b60698b163fb60d788eebd9eccd4b114eca4bc224bc81ad2c00cf8901e84be0b",
     "dmsdkNamedScalars": "5aec02f97d635f226a99415cea2e7671b53060d2d196c7f718a833ff643ea1c6",
@@ -39,7 +39,7 @@
     "dmsdkHashSpans": "ea74cc213ee7e6f8803a5cc93edb81c44d3956be3cb4ba38ca87a5236f7e703c",
     "dmsdkArenaSpanBlockers": "93903233f19097509b68b0e5bc25fded7b62f6b57f946f5b535df0a14e82e9fd",
     "dmsdkCStringValue": "60e03716f6e074c8cb30acbdfcfe635315e2f41da04ea7d9451c124f3a52a78c",
-    "dmsdkBorrowedHandle": "6e956062424f9a3307549427b15f29f5c4f3d5888175f6095c976fcc44b9222e",
+    "dmsdkBorrowedHandle": "8a57760db790ca430ec40329b2874a3b008b324a0724660bf95404fe95d5fc95",
     "semanticPolicies": "d082520c927e8d40deca7e7829941e55075531ec58f73730063e6064d2688906",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
     "dynamicHermesJsi": "32be0b54b6bda4396d9c3bacfffa05292de96977cca1e8b17266622906751ee3",
@@ -48,23 +48,23 @@
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
   "inputCanonicalHashes": {
-    "scriptProjection": "2a862ac6d1904427569952dcdfd774d7b7066e8b4a5d025f06ed9f68beecbf64",
+    "scriptProjection": "3918c1d4364a2750ec08b65c9831e044831965fc159e16c69d02e331268aedc4",
     "scriptScalarDispatch": "098ac76471ecf7ef73d3cfdfaebcece8ac69198ae753e4bd99ad1ceee6f546cc",
-    "scriptValueBindings": "3baea4747f6a40e257a0ef08e67335cfdb1447148c6cba0f0782075e00beeef4",
+    "scriptValueBindings": "f0a060bfdf9bb235bf417756a7a929751400b2462d24febf52673479dbfbc633",
     "scriptFixedTuples": "c48aa1e3a4cd5160b781c9971017b192c7844a8dbee5701768b2fe353dc797f9",
     "scriptDynamicValues": "b987ff960b43ae0fc45d3a6d7002e2b54eca98fc26c35a421d8e7fcc74416326",
-    "scriptValueTail": "9b2046c544278369b5727f6a4af45543d3ad686ceb16f84c3744ba5415f6431a",
-    "scriptOverloadDispatch": "5eb1e370cfa9870cd42a025276399b29bcc215a6d20df2ec81fc1e4448e6ec28",
-    "scriptTableRecords": "df2ddcac79d77337e6e67e391c8daad2c12d9dc05e4afe5d2e8caf85aa3de3dc",
+    "scriptValueTail": "1500f0628b6ef2d1fb2f1618e188a76b6dc82c68ce0a8041668be135c103ff12",
+    "scriptOverloadDispatch": "6b75845a623681bbb298ae4f4ad24bf10392bea566dd7154e9c939becc7beb51",
+    "scriptTableRecords": "8ae6a93b87a2acda6badfba131654cba48fd9ab54eb713e770b2c2881460fd42",
     "scriptCallbackLifecycle": "ae1ea85b129434f31fd28655f78177ead8eab7d8d2e4ea39d19fc8f915b9c1df",
-    "scriptCopiedValueBlockers": "7aa72f1f205d78fa3bc67e9dfffdfb036def13235a20ea240db269d01737ba43",
-    "scriptOpaqueRecordBlockers": "bae01f38dd61d974ebcc625e76a3b8113f7d47a26450ca5a3a9d3e090270d4ed",
+    "scriptCopiedValueBlockers": "79d564b94b3c8b8bfeb8c325926ad9dc9ae2e4be9f85b8ca6a978719b1257479",
+    "scriptOpaqueRecordBlockers": "a57059aab262d04de59c0e329fbc91c913206feac1185782d6bba367a53122b5",
     "scriptUrlAddress": "0c30abae7994fb4f4ba13e53958732c2f5ec4814e3669afeabe379d6180f258f",
-    "scriptHandleLowering": "6ad3a38d20ea960a53bce1896301ed8e7fdb56e97bc3701f7d5e7adbba66e855",
-    "scriptUniversalValue": "7b6588bb436ca33f70bd1d7171421aa3cf9623fb185aa9e2b8cf2f7a56bb959f",
+    "scriptHandleLowering": "241d0d4d943862ffe9168d262e2e0b3c90fbc0157eb7f66d6d248f4d10004481",
+    "scriptUniversalValue": "25936b89bce4c3c6304bfc09addd16eca9e63fbfe5b49258fd685e19f77a3b72",
     "defoldValueLayouts": "3e8d4fba5bf78f6d2be3e9c7aaa4839b2c0ccb63b866611cdab88be649e914d5",
     "dmsdkProjection": "55cf215b5552622e10f546249c769853850345dcaddbc45e533382acb10eb93b",
-    "dmsdkUniversal": "e969b3d673f6f93f0149f337fb9f315403a400ba5755c965b3b37bb543d4a73b",
+    "dmsdkUniversal": "138c208e8516c3e0b27322b3c8d4ae33ef26261b479677803033ed3fbd7b4ca5",
     "dmsdkScalarThunks": "8030cadbffd643ca40e050181f7cc5b613f7dfc8f4fe381982c3112436dcec3d",
     "dmsdkEnumValues": "dba3f238a9f0d41966112447b18c177fadfc36d7a90a6fb475f657096073cb34",
     "dmsdkNamedScalars": "e650787810034e5184f6ebfefe3e8381a8ca1d4b85554c66d3515bf32a4e55d3",
@@ -75,7 +75,7 @@
     "dmsdkHashSpans": "7c1f0747727188eb7ce915f85982341ea6671d4056752b505aaea6e220a4015d",
     "dmsdkArenaSpanBlockers": "ca948c2b41231937eaf8727de07dcc4e98aaa16af9f620177e9322734d1cc8eb",
     "dmsdkCStringValue": "6df54dba7be2843fe74494595e5a75dee186dd610237bbed6cbb6dd3ce946982",
-    "dmsdkBorrowedHandle": "5849074dde34d7eb5298593d363b34eba1d40cb568214f5af2f2d5fabeb68dea",
+    "dmsdkBorrowedHandle": "ea6c35a0551fe1cfdd9ea8d7286d139cefaadaefb30afcb61bbae7aaae099890",
     "semanticPolicies": "2770f7863c5b18a4410224b0720429d2ffe79d7d6070857cd706ede3fe3a8319",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
     "dynamicHermesJsi": "2888cfa7afbc9caf7bfdc3de1771a5dd7639ff3b16a14dfe09adf44b604c7b1a",
@@ -206431,7 +206431,7 @@
           "generationIdentity": {
             "stableId": 3776606414,
             "minimumArgumentCount": 2,
-            "maximumArgumentCount": 2,
+            "maximumArgumentCount": 3,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -221286,7 +221286,7 @@
           "semanticState": "generated-runtime-codec-with-explicit-static-browser-and-packaged-engine-gates",
           "generationIdentity": {
             "stableId": 1020113598,
-            "minimumArgumentCount": 2,
+            "minimumArgumentCount": 1,
             "maximumArgumentCount": 2,
             "minimumResultCount": 1,
             "maximumResultCount": 1
@@ -221461,7 +221461,7 @@
           "semanticState": "generated-runtime-codec-with-explicit-static-browser-and-packaged-engine-gates",
           "generationIdentity": {
             "stableId": 1729897617,
-            "minimumArgumentCount": 2,
+            "minimumArgumentCount": 1,
             "maximumArgumentCount": 2,
             "minimumResultCount": 1,
             "maximumResultCount": 1
@@ -221746,7 +221746,7 @@
           "semanticState": "generated-runtime-codec-with-explicit-static-browser-and-packaged-engine-gates",
           "generationIdentity": {
             "stableId": 2962591790,
-            "minimumArgumentCount": 2,
+            "minimumArgumentCount": 1,
             "maximumArgumentCount": 2,
             "minimumResultCount": 1,
             "maximumResultCount": 1
@@ -221810,7 +221810,7 @@
           "semanticState": "generated-runtime-codec-with-explicit-static-browser-and-packaged-engine-gates",
           "generationIdentity": {
             "stableId": 2623669505,
-            "minimumArgumentCount": 2,
+            "minimumArgumentCount": 1,
             "maximumArgumentCount": 2,
             "minimumResultCount": 1,
             "maximumResultCount": 1
@@ -252562,7 +252562,8 @@
               "template": "current-instance-transform-get",
               "parameters": {
                 "property": "position",
-                "kind": "Vector3"
+                "kind": "Vector3",
+                "addressed": "pinned-resolve-instance-captured-lua"
               }
             },
             "resultCodec": "Vector3"
@@ -253258,7 +253259,8 @@
               "parameters": {
                 "property": "position",
                 "kind": "Vector3",
-                "rejectNaN": true
+                "rejectNaN": true,
+                "addressed": "pinned-resolve-instance-captured-lua"
               }
             },
             "resultCodec": "None"
@@ -253328,7 +253330,8 @@
               "parameters": {
                 "property": "rotation",
                 "kind": "Quaternion",
-                "rejectNaN": true
+                "rejectNaN": true,
+                "addressed": "pinned-resolve-instance-captured-lua"
               }
             },
             "resultCodec": "None"
@@ -265744,7 +265747,7 @@
           "generationIdentity": {
             "stableId": 806414134,
             "minimumArgumentCount": 0,
-            "maximumArgumentCount": 0,
+            "maximumArgumentCount": 3,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -269293,7 +269296,7 @@
           "generationIdentity": {
             "stableId": 1410796854,
             "minimumArgumentCount": 1,
-            "maximumArgumentCount": 1,
+            "maximumArgumentCount": 2,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -276340,7 +276343,7 @@
           "generationIdentity": {
             "stableId": 1238853489,
             "minimumArgumentCount": 0,
-            "maximumArgumentCount": 0,
+            "maximumArgumentCount": 1,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -277106,7 +277109,7 @@
           "generationIdentity": {
             "stableId": 2116175008,
             "minimumArgumentCount": 1,
-            "maximumArgumentCount": 1,
+            "maximumArgumentCount": 3,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -277489,7 +277492,7 @@
           "generationIdentity": {
             "stableId": 2756728049,
             "minimumArgumentCount": 0,
-            "maximumArgumentCount": 0,
+            "maximumArgumentCount": 4,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -278266,7 +278269,7 @@
           "generationIdentity": {
             "stableId": 3491633886,
             "minimumArgumentCount": 0,
-            "maximumArgumentCount": 0,
+            "maximumArgumentCount": 3,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -278350,7 +278353,7 @@
           "generationIdentity": {
             "stableId": 3541966743,
             "minimumArgumentCount": 0,
-            "maximumArgumentCount": 0,
+            "maximumArgumentCount": 4,
             "minimumResultCount": 1,
             "maximumResultCount": 1
           },
@@ -466523,5 +466526,5 @@
       }
     }
   ],
-  "planSha256": "228cb59de1070e0c03a3deb0602ce6ea2d302a661efe8296a8678e8a2b04ab2a"
+  "planSha256": "e02547aecda20fa13c201820061881b775a01e4206c6d266735bf59b695c90a0"
 }

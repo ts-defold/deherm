@@ -9,13 +9,13 @@
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "bindingDescriptorsSha256": "0c29d983dac6b14d4c075c1b6e9fb4018262962cd1408620c8e621c67e76b0fd",
     "scalarDispatchSha256": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "valueBindingsSha256": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d",
+    "valueBindingsSha256": "d3617de137832821c331e27cefc3bb27aa01e8a7ce33baf9335c311f333153ef",
     "fixedTupleBindingsSha256": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
     "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "valueTailBindingsSha256": "dfbfa544eae9456ec1d51f7c08d51ab28f03e4a471eeb98dc661a0ecfa639c36",
-    "overloadDispatchSha256": "e0f7f0cde94e9225294a8018240d325dd164790a9ea875b5e152d6d02dee5d80",
+    "valueTailBindingsSha256": "75aa9201d8d6bbbc9ea99527f2ca64a808e565a11ef57e383d372fdb17949474",
+    "overloadDispatchSha256": "22466ef160c49a372e333e2e6c3dfe4b5dd98f51b21aa4ce2508e7389fd4dd6b",
     "universalValuePolicySha256": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
-    "universalValueSelectionSha256": "d1ae36d2bb0191e000790c3eae1958df1ff5d0aa41ea2893115ad27143d96775",
+    "universalValueSelectionSha256": "514cd2cb3926a1a0107fa3f90968ab834383ca3257b6b17b159465a95f2acaf0",
     "valueDefinitions": [
       {
         "definitionPath": "packages/bindings/overrides/script-defold-value-bindings.json",
@@ -27,7 +27,7 @@
       },
       {
         "definitionPath": "packages/bindings/overrides/script-go-current-instance-bindings.json",
-        "definitionSha256": "a0169189028160069db94e7c02d381a79fa3bc6846c37d4d235c4bafdfc2a4b0"
+        "definitionSha256": "6023e6763a28d44cf372a06b6ecdafb2164f07bfe2364a8c58a86eb2da59300c"
       },
       {
         "definitionPath": "packages/bindings/overrides/script-msg-structured-bindings.json",
@@ -76,7 +76,7 @@
         "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
       }
     ],
-    "aggregateInputSha256": "8e416d601f35ec9f78d7157d22ad2eb232e38b017e0be3055f16a3564c1c118e"
+    "aggregateInputSha256": "9b3fc9d46c6e38951c4ef097037c9469fa23a7aaa3c647eeef5234f6621728d0"
   },
   "functionCount": 926,
   "categoryCounts": {
@@ -267,7 +267,7 @@
         "generator": "universal-value-fallback",
         "stableId": 3776606414,
         "minimumArgumentCount": 2,
-        "maximumArgumentCount": 2,
+        "maximumArgumentCount": 3,
         "resultCount": 0,
         "targetSupport": {
           "nativeDynamicHermes": "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
@@ -3437,7 +3437,7 @@
       "evidence": {
         "generator": "universal-value-fallback",
         "stableId": 1020113598,
-        "minimumArgumentCount": 2,
+        "minimumArgumentCount": 1,
         "maximumArgumentCount": 2,
         "resultCount": 0,
         "targetSupport": {
@@ -3479,7 +3479,7 @@
       "evidence": {
         "generator": "universal-value-fallback",
         "stableId": 1729897617,
-        "minimumArgumentCount": 2,
+        "minimumArgumentCount": 1,
         "maximumArgumentCount": 2,
         "resultCount": 0,
         "targetSupport": {
@@ -3542,7 +3542,7 @@
       "evidence": {
         "generator": "universal-value-fallback",
         "stableId": 2962591790,
-        "minimumArgumentCount": 2,
+        "minimumArgumentCount": 1,
         "maximumArgumentCount": 2,
         "resultCount": 0,
         "targetSupport": {
@@ -3563,7 +3563,7 @@
       "evidence": {
         "generator": "universal-value-fallback",
         "stableId": 2623669505,
-        "minimumArgumentCount": 2,
+        "minimumArgumentCount": 1,
         "maximumArgumentCount": 2,
         "resultCount": 0,
         "targetSupport": {
@@ -11037,7 +11037,16 @@
           ]
         ],
         "implementedCallShapes": [
-          []
+          [],
+          [
+            "String"
+          ],
+          [
+            "Hash"
+          ],
+          [
+            "Url"
+          ]
         ]
       }
     },
@@ -11370,6 +11379,18 @@
         "implementedCallShapes": [
           [
             "Vector3"
+          ],
+          [
+            "Vector3",
+            "String"
+          ],
+          [
+            "Vector3",
+            "Hash"
+          ],
+          [
+            "Vector3",
+            "Url"
           ]
         ]
       }
@@ -11405,6 +11426,18 @@
         "implementedCallShapes": [
           [
             "Quaternion"
+          ],
+          [
+            "Quaternion",
+            "String"
+          ],
+          [
+            "Quaternion",
+            "Hash"
+          ],
+          [
+            "Quaternion",
+            "Url"
           ]
         ]
       }
@@ -15307,7 +15340,7 @@
         "generator": "universal-value-fallback",
         "stableId": 806414134,
         "minimumArgumentCount": 0,
-        "maximumArgumentCount": 0,
+        "maximumArgumentCount": 3,
         "resultCount": 0,
         "targetSupport": {
           "nativeDynamicHermes": "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
@@ -16502,7 +16535,7 @@
         "generator": "universal-value-fallback",
         "stableId": 1410796854,
         "minimumArgumentCount": 1,
-        "maximumArgumentCount": 1,
+        "maximumArgumentCount": 2,
         "resultCount": 0,
         "targetSupport": {
           "nativeDynamicHermes": "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",

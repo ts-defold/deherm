@@ -18,6 +18,24 @@ function init(self)
        math.abs(rotation.w - 0.7071067811865476) <= 0.000001 then
         print("script-value:go.set_rotation.current:ok")
     end
+
+    -- Addressed writes are observed from outside the TypeScript boundary: the
+    -- addressed instance is a different game object in this collection, so a
+    -- plain Lua read of it witnesses that the write crossed the address.
+    local addressed = go.get_position("/probe_target")
+    if math.abs(addressed.x - 89) <= 0.000001 and
+       math.abs(addressed.y - 144) <= 0.000001 and
+       math.abs(addressed.z - 233) <= 0.000001 then
+        print("script-value:go.set_position.addressed-url:ok")
+    end
+
+    local addressed_rotation = go.get_rotation("/probe_target")
+    if math.abs(addressed_rotation.x) <= 0.000001 and
+       math.abs(addressed_rotation.y) <= 0.000001 and
+       math.abs(addressed_rotation.z - 0.7071067811865476) <= 0.000001 and
+       math.abs(addressed_rotation.w - 0.7071067811865476) <= 0.000001 then
+        print("script-value:go.set_rotation.addressed-string:ok")
+    end
 end
 
 function update(self, dt)

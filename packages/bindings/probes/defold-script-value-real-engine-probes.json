@@ -3,7 +3,7 @@
   "target": "arm64-macos-dynamic-hermes",
   "instrumentedProbeSet": {
     "marker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
-    "semanticSha256": "7a0fccc202a689ab85d6345e98277aa627d04297435b10a65e8ef4bddcaae33c"
+    "semanticSha256": "3a2a975bd72d21bc234ab703322222ffb62c2e9fd9f2a3917d68c89925781e27"
   },
   "plannedFamilyRecipes": [
     {
@@ -66,6 +66,63 @@
       "expectation": { "kind": "components", "values": [13, 21, 34], "tolerance": 0 }
     },
     {
+      "key": "go.set_position.addressed-string",
+      "id": "script:go.set_position",
+      "arguments": [
+        { "codec": "Vector3", "components": [5, 8, 13] },
+        "/probe_target"
+      ],
+      "expectation": { "kind": "void" }
+    },
+    {
+      "key": "go.get_position.addressed-string",
+      "id": "script:go.get_position",
+      "arguments": ["/probe_target"],
+      "expectation": { "kind": "components", "values": [5, 8, 13], "tolerance": 0 }
+    },
+    {
+      "key": "go.set_position.addressed-hash",
+      "id": "script:go.set_position",
+      "arguments": [
+        { "codec": "Vector3", "components": [21, 34, 55] },
+        { "codec": "Hash", "hashLiteral": "/probe_target" }
+      ],
+      "expectation": { "kind": "void" }
+    },
+    {
+      "key": "go.get_position.addressed-hash",
+      "id": "script:go.get_position",
+      "arguments": [{ "codec": "Hash", "hashLiteral": "/probe_target" }],
+      "expectation": { "kind": "components", "values": [21, 34, 55], "tolerance": 0 }
+    },
+    {
+      "key": "go.set_position.addressed-url",
+      "id": "script:go.set_position",
+      "arguments": [
+        { "codec": "Vector3", "components": [89, 144, 233] },
+        { "codec": "Url", "msgUrl": "/probe_target" }
+      ],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_position.addressed-url:ok"
+      }
+    },
+    {
+      "key": "go.get_position.addressed-url",
+      "id": "script:go.get_position",
+      "arguments": [{ "codec": "Url", "msgUrl": "/probe_target" }],
+      "expectation": { "kind": "components", "values": [89, 144, 233], "tolerance": 0 }
+    },
+    {
+      "key": "go.get_position.addressed-missing",
+      "id": "script:go.get_position",
+      "arguments": ["/deherm_no_such_instance"],
+      "expectation": {
+        "kind": "raises",
+        "reason": "An address that names no instance in the calling collection must fail closed instead of returning a default transform."
+      }
+    },
+    {
       "key": "go.set_rotation.current",
       "id": "script:go.set_rotation",
       "arguments": [{ "codec": "Quaternion", "components": [0, 0, 0.7071067811865476, 0.7071067811865476] }],
@@ -95,6 +152,36 @@
         "kind": "deferredLua",
         "marker": "DEBUG:SCRIPT: script-value:factory.create.probe:ok"
       }
+    },
+    {
+      "key": "go.set_rotation.addressed-string",
+      "id": "script:go.set_rotation",
+      "arguments": [
+        { "codec": "Quaternion", "components": [0, 0, 0.7071067811865476, 0.7071067811865476] },
+        "/probe_target"
+      ],
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_rotation.addressed-string:ok"
+      }
+    },
+    {
+      "key": "go.set_rotation.addressed-hash",
+      "id": "script:go.set_rotation",
+      "arguments": [
+        { "codec": "Quaternion", "components": [0, 0, 0.7071067811865476, 0.7071067811865476] },
+        { "codec": "Hash", "hashLiteral": "/probe_target" }
+      ],
+      "expectation": { "kind": "void" }
+    },
+    {
+      "key": "go.set_rotation.addressed-url",
+      "id": "script:go.set_rotation",
+      "arguments": [
+        { "codec": "Quaternion", "components": [0, 0, 0.7071067811865476, 0.7071067811865476] },
+        { "codec": "Url", "msgUrl": "/probe_target" }
+      ],
+      "expectation": { "kind": "void" }
     },
     {
       "key": "go.delete.factory-probe",

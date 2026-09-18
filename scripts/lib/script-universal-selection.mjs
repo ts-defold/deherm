@@ -28,6 +28,49 @@ export function validateUniversalPolicy(policy) {
 // Routes are normalized projections of the source IR. This selector is the
 // single mechanical definition of the universal fallback census; generators
 // may enrich selected rows with target-specific shape metadata afterward.
+/**
+ * Split one `fun(...)` overload token into its fixed parameter list. Pinned IR
+ * carries a route's alternative signatures as tokens beside its primary
+ * parameter list, so a route whose primary list is empty can still accept
+ * arguments. Returning `null` marks an unparsable token, which the caller
+ * refuses rather than silently under-counting.
+ */
+function overloadArity(token) {
+  if (typeof token !== "string") return null;
+  const open = token.indexOf("(");
+  if (open < 0) return null;
+  let depth = 0;
+  let close = -1;
+  for (let index = open; index < token.length; ++index) {
+    const char = token[index];
+    if (char === "(") ++depth;
+    else if (char === ")" && --depth === 0) { close = index; break; }
+  }
+  if (close < 0) return null;
+  const body = token.slice(open + 1, close).trim();
+  if (body === "") return { total: 0, required: 0 };
+  const parts = [];
+  let nesting = 0;
+  let start = 0;
+  for (let index = 0; index < body.length; ++index) {
+    const char = body[index];
+    if (char === "<" || char === "(" || char === "[") ++nesting;
+    else if (char === ">" || char === ")" || char === "]") --nesting;
+    else if (char === "," && nesting === 0) { parts.push(body.slice(start, index)); start = index + 1; }
+  }
+  parts.push(body.slice(start));
+  const parameters = parts.map((part) => part.trim()).filter((part) => part.length !== 0);
+  if (parameters.some((parameter) => parameter.startsWith("..."))) return null;
+  const name = (parameter) => {
+    const colon = parameter.indexOf(":");
+    return (colon < 0 ? parameter : parameter.slice(0, colon)).trim();
+  };
+  return {
+    total: parameters.length,
+    required: parameters.filter((parameter) => !name(parameter).endsWith("?")).length
+  };
+}
+
 export function selectUniversalRoutes(routes, policy) {
   validateUniversalPolicy(policy);
   const selectedFamilies = new Set(policy.selection.loweringFamilies);
@@ -43,8 +86,22 @@ export function selectUniversalRoutes(routes, policy) {
     }
     const variadic = route.variadic === true;
     const fixedParameters = route.parameters.filter(({ name }) => name !== "...");
-    const minimumArgumentCount = fixedParameters.filter(({ optional }) => !optional).length;
-    const maximumArgumentCount = variadic ? policy.bounds.maximumArguments : route.parameters.length;
+    // A route's accepted arity is the union of its primary parameter list and
+    // every alternative signature the pinned IR declares for it. Deriving it
+    // from the primary list alone leaves overload-only arities — `msg.url(s)`
+    // among them — declared as zero-argument and refused by their own
+    // descriptor before they reach a backend.
+    const overloads = (route.overloadTokens ?? []).map((token) => {
+      const arity = overloadArity(token);
+      assert(arity !== null, `${route.id}: unparsable overload signature ${token}`);
+      return arity;
+    });
+    const minimumArgumentCount = Math.min(
+      fixedParameters.filter(({ optional }) => !optional).length,
+      ...overloads.map(({ required }) => required));
+    const maximumArgumentCount = variadic
+      ? policy.bounds.maximumArguments
+      : Math.max(route.parameters.length, ...overloads.map(({ total }) => total));
     const returns = route.returns ?? [];
     let minimumResultCount = returns.length;
     while (minimumResultCount > 0 && returns[minimumResultCount - 1]?.value?.kind === "optional") {

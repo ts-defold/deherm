@@ -4,17 +4,25 @@
   "policy": {
     "defaultPlannedReason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet.",
     "defaultSetupId": "global-runtime",
-    "requiredEvidenceStages": ["compile", "link", "runtime"],
+    "requiredEvidenceStages": [
+      "compile",
+      "link",
+      "runtime"
+    ],
     "runtimeRequiresExactScenarioMarker": true
   },
   "setups": [
     {
       "id": "global-runtime",
-      "context": { "kind": "global" }
+      "context": {
+        "kind": "global"
+      }
     },
     {
       "id": "configured-project",
-      "context": { "kind": "global" },
+      "context": {
+        "kind": "global"
+      },
       "projectConfig": {
         "project.title": "Defold Hermes Spike",
         "deherm_conformance.boolean": "1",
@@ -33,7 +41,9 @@
     },
     {
       "id": "generated-gui-script-instance",
-      "context": { "kind": "gui-script" }
+      "context": {
+        "kind": "gui-script"
+      }
     }
   ],
   "probeImports": [
@@ -66,7 +76,7 @@
       "target": "arm64-macos-dynamic-hermes",
       "result": "passed",
       "command": "node scripts/check-native-defold-runtime.mjs --record-evidence",
-      "observedAt": "2026-09-18T05:01:33.000Z",
+      "observedAt": "2026-09-18T23:34:00.000Z",
       "routeIds": [
         "script:bit.lshift",
         "script:bit.tohex",
@@ -105,10 +115,6 @@
         "scalar:bit.lshift.number",
         "scalar:bit.tohex.default-width",
         "scalar:bit.tohex.explicit-width",
-        "value:go.get_position.current",
-        "value:go.set_position.current",
-        "value:go.set_rotation.current",
-        "value:builtins.hash.my_hash",
         "scalar:profiler.scope_begin.void",
         "scalar:profiler.scope_end.void",
         "scalar:sys.exists.false",
@@ -120,26 +126,40 @@
         "scalar:sys.get_config_string.present",
         "scalar:sys.get_connectivity.integer-enum",
         "scalar:sys.get_save_file",
+        "value:builtins.hash.my_hash",
+        "value:go.get_position.addressed-hash",
+        "value:go.get_position.addressed-missing",
+        "value:go.get_position.addressed-string",
+        "value:go.get_position.addressed-url",
+        "value:go.get_position.current",
+        "value:go.set_position.addressed-hash",
+        "value:go.set_position.addressed-string",
+        "value:go.set_position.addressed-url",
+        "value:go.set_position.current",
+        "value:go.set_rotation.addressed-hash",
+        "value:go.set_rotation.addressed-string",
+        "value:go.set_rotation.addressed-url",
+        "value:go.set_rotation.current",
         "value:vmath-fixed-pod.conj",
         "value:vmath-fixed-pod.cross",
         "value:vmath-fixed-pod.euler-to-quat",
-        "value:vmath.length.vector3",
         "value:vmath-fixed-pod.length-sqr",
-        "value:vmath.normalize.vector3",
         "value:vmath-fixed-pod.project",
-        "value:vmath.quat.identity",
         "value:vmath-fixed-pod.quat-axis-angle",
         "value:vmath-fixed-pod.quat-basis",
         "value:vmath-fixed-pod.quat-from-to",
         "value:vmath-fixed-pod.quat-rotation-x",
         "value:vmath-fixed-pod.quat-rotation-y",
-        "value:vmath.quat_rotation_z.pi",
         "value:vmath-fixed-pod.rotate",
+        "value:vmath.length.vector3",
+        "value:vmath.normalize.vector3",
+        "value:vmath.quat.identity",
+        "value:vmath.quat_rotation_z.pi",
         "value:vmath.vector3.zero"
       ],
       "artifact": {
         "path": ".agents/docs/data/native-defold-runtime.log",
-        "sha256": "f52a4571d78860c5d86e64e018e703e4e6c8b797ffc36fc969e3146a1835261b"
+        "sha256": "3e9bb2cbdcde820b9640c3f58980e61d493f29d658220cbd3e39b84038b57939"
       },
       "requiredMarkers": [
         "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",

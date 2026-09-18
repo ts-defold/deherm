@@ -17,7 +17,7 @@ test("Defold value and handle bindings are deterministic structured descriptors"
   const report = JSON.parse(await readFile(new URL(
     "packages/bindings/generated/defold-script-value-bindings.json", root), "utf8"));
   assert.equal(report.bindingCount, 78);
-  assert.equal(report.callShapeCount, 112);
+  assert.equal(report.callShapeCount, 121);
   const familyBindings = report.bindings.filter(({ generatedFamily }) => generatedFamily === "gui-node-setters");
   assert.equal(familyBindings.length, 39);
   const vmathFamily = report.bindings.filter(({ generatedFamily }) => generatedFamily === "vmath-fixed-pod");
@@ -299,10 +299,14 @@ test("every generated value binding has a deterministic packaged-engine probe di
   ]);
   assert.equal(report.target, "arm64-macos-dynamic-hermes");
   assert.equal(report.uniqueBindingCount, bindings.bindingCount);
-  assert.equal(report.routeDispositionCount, bindings.bindingCount);
-  assert.equal(report.probeCount, 39);
+  // One binding may carry several probes: every implemented call shape of an
+  // addressed route is probed separately, so dispositions exceed bindings.
+  assert.equal(report.routeDispositionCount, report.probeCount + report.plannedFamilyProbeCount);
+  assert.equal(new Set([...report.probes, ...report.plannedProbes].map(({ id }) => id)).size,
+    bindings.bindingCount);
+  assert.equal(report.probeCount, 49);
   assert.equal(report.generatedProbeCount, 25);
-  assert.equal(report.instrumentedProbeCount, 20);
+  assert.equal(report.instrumentedProbeCount, 30);
   assert.equal(report.explicitPlannedProbeCount, 19);
   assert.equal(report.plannedFamilyProbeCount, 39);
   assert.equal(report.plannedProbeCount, 58);
@@ -335,7 +339,9 @@ test("value probes reject unimplemented overloads and marker aliases", async () 
     readFile(new URL("packages/bindings/generated/defold-script-value-bindings.json", root), "utf8")
   ]);
   const addressed = JSON.parse(probeText);
-  addressed.probes.find(({ id }) => id === "script:go.set_position").arguments.push("other_go");
+  // One trailing address is an implemented shape; two are not.
+  addressed.probes.find(({ id }) => id === "script:go.set_position")
+    .arguments.push("other_go", "another_go");
   assert.throws(
     () => generateScriptValueRealEngineProbes(`${JSON.stringify(addressed)}\n`, bindingsText),
     /do not match an implemented call shape/

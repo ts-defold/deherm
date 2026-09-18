@@ -1921,6 +1921,7 @@ export function generateUniversalValueBindings(inputs) {
       loweringFamily: row.loweringFamily,
       contextToken: row.context.token,
       parameters: row.signature.parameters,
+      overloadTokens: row.signature.overloadTokens,
       returns: row.signature.returns,
       variadic: variadicToken === "runtime-arity",
       shapeKinds: collectShapeKinds(row.signature),

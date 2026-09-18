@@ -25,6 +25,11 @@ function argumentCodec(argument, label) {
     return "Number";
   }
   if (argument?.codec === "Hash" && typeof argument.factoryCreate === "string") return "Hash";
+  // A literal address hash and a constructed URL are the other two accepted
+  // Defold address representations; a route that declares an address shape must
+  // be probeable in each of them, not only as a string.
+  if (argument?.codec === "Hash" && typeof argument.hashLiteral === "string") return "Hash";
+  if (argument?.codec === "Url" && typeof argument.msgUrl === "string") return "Url";
   if (argument?.codec === "Node" && typeof argument.guiGetNode === "string") return "Node";
   if (!argument || typeof argument !== "object" || !["Vector3", "Vector4", "Quaternion", "Matrix4"].includes(argument.codec)) {
     throw new Error(`${label} must be a number or supported generated Defold value`);
@@ -40,7 +45,11 @@ function argumentCodec(argument, label) {
 function argumentExpression(argument) {
   if (typeof argument === "string") return JSON.stringify(argument);
   if (typeof argument === "number") return JSON.stringify(argument);
+  if (argument.codec === "Hash" && typeof argument.hashLiteral === "string") {
+    return `${publicScriptRootName("builtins")}.hash(${JSON.stringify(argument.hashLiteral)})`;
+  }
   if (argument.codec === "Hash") return `factory.create(${JSON.stringify(argument.factoryCreate)})`;
+  if (argument.codec === "Url") return `msg.url(${JSON.stringify(argument.msgUrl)})`;
   if (argument.codec === "Node") return `gui.getNode(${JSON.stringify(argument.guiGetNode)})`;
   if (argument.codec === "Matrix4") return `[${argument.components.map(JSON.stringify).join(", ")}] as const`;
   const call = argument.codec === "Vector3" ? "vmath.vector3" : argument.codec === "Vector4" ? "vmath.vector4" : "vmath.quat";
@@ -56,6 +65,13 @@ function expectationExpression(expectation, resultName, resultCodec, key) {
     if (resultCodec === "Hash") return `typeof ${resultName} === "bigint"`;
     if (resultCodec === "Node") return `typeof ${resultName} === "object" && ${resultName} !== null`;
     throw new Error(`${key}: deferredLua has no generated predicate for ${resultCodec}`);
+  }
+  // A route with no result and an effect that a later probe observes directly
+  // needs no deferred Lua witness: the call itself is asserted here and the
+  // effect is asserted by the probe that reads it back.
+  if (expectation.kind === "void") {
+    if (resultCodec !== "None") throw new Error(`${key}: void expectation requires a None result`);
+    return `${resultName} === undefined`;
   }
   if (expectation.kind === "hashHex") {
     if (resultCodec !== "Hash" || typeof expectation.value !== "string" || !/^[0-9a-f]{16}$/i.test(expectation.value)) {
@@ -151,8 +167,25 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
     const callable = binding.id === "script:hash"
       ? `${publicScriptRootName("builtins")}.${binding.jsName}`
       : `${publicScriptRootName(binding.rawName.split(".")[0])}.${binding.jsName}`;
-    const predicate = expectationExpression(probe.expectation, resultName, resultCodec, probe.key);
-    if (state === "instrumented") {
+    // A `raises` probe asserts the negative half of a route's contract: the
+    // call must fail closed at the boundary rather than produce a default.
+    const raises = probe.expectation?.kind === "raises";
+    const predicate = raises ? null
+      : expectationExpression(probe.expectation, resultName, resultCodec, probe.key);
+    if (state === "instrumented" && raises) {
+      if (typeof probe.expectation.reason !== "string" || !probe.expectation.reason) {
+        throw new Error(`${probe.key}: raises expectation requires a reason`);
+      }
+      const raisedName = `raised_${index}`;
+      lines.push(`  let ${raisedName} = false;`);
+      lines.push("  try {");
+      lines.push(`    ${callable}(${probe.arguments.map(argumentExpression).join(", ")});`);
+      lines.push(`  } catch {`);
+      lines.push(`    ${raisedName} = true;`);
+      lines.push("  }");
+      lines.push(`  if (!${raisedName}) throw new Error(${JSON.stringify(`${probe.id} probe ${probe.key} failed`)});`);
+      lines.push(`  log(${JSON.stringify(`script-value:${probe.key}:ok`)});`);
+    } else if (state === "instrumented") {
       lines.push(`  const ${resultName} = ${callable}(${probe.arguments.map(argumentExpression).join(", ")});`);
       lines.push(`  if (!(${predicate})) throw new Error(${JSON.stringify(`${probe.id} probe ${probe.key} failed`)});`);
       if (probe.expectation.kind !== "deferredLua") {

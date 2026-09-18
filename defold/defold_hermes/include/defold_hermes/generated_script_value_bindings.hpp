@@ -8,7 +8,7 @@
 namespace defold_hermes::value_binding {
 
 enum class DispatchStatus { kMissing, kSuccess, kError };
-enum class StructuredLuaResultCodec : uint8_t { kNone, kHash, kHashOrUndefined, kNode };
+enum class StructuredLuaResultCodec : uint8_t { kNone, kHash, kHashOrUndefined, kNode, kVector3, kQuaternion };
 enum class StructuredLuaContext : uint8_t { kScriptInstance, kGuiScriptInstance, kCurrentScriptInstance };
 struct StructuredLuaOperation {
   uint16_t index;
@@ -104,8 +104,8 @@ enum class BindingId : uint32_t {
   VmathMatrix4Frustum = 0xfd08fe38u
 };
 inline constexpr size_t kBindingCount = 78;
-inline constexpr size_t kCallShapeCount = 112;
-inline constexpr size_t kStructuredLuaOperationCount = 44;
+inline constexpr size_t kCallShapeCount = 121;
+inline constexpr size_t kStructuredLuaOperationCount = 47;
 DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity, const StructuredLuaApi* structuredLua = nullptr) noexcept;
 
 }  // namespace defold_hermes::value_binding

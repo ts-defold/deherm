@@ -105,48 +105,51 @@ constexpr StructuredLuaOperation kStructuredLuaOperations[] = {
   {3, 0x1e65bc4eu, "script:gui.get_node", "gui", "get_node", StructuredLuaResultCodec::kNode, StructuredLuaContext::kGuiScriptInstance},
   {4, 0x1e7031d3u, "script:gui.set_id", "gui", "set_id", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
   {5, 0x23c064c1u, "script:gui.set_inner_radius", "gui", "set_inner_radius", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {6, 0x25d5351eu, "script:gui.set_particlefx", "gui", "set_particlefx", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {7, 0x289cacf1u, "script:gui.set_color", "gui", "set_color", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {8, 0x32ce9520u, "script:gui.set_outline", "gui", "set_outline", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {9, 0x4243998fu, "script:msg.post", "msg", "post", StructuredLuaResultCodec::kNone, StructuredLuaContext::kCurrentScriptInstance},
-  {10, 0x4f947bcfu, "script:gui.set_size", "gui", "set_size", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {11, 0x54f686f4u, "script:gui.set_leading", "gui", "set_leading", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {12, 0x57e22c89u, "script:gui.set_position", "gui", "set_position", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {13, 0x5843c90du, "script:gui.set_text", "gui", "set_text", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {14, 0x585da72eu, "script:gui.set_shadow", "gui", "set_shadow", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {15, 0x5bc90651u, "script:gui.set_texture", "gui", "set_texture", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {16, 0x6242e72au, "script:gui.set_clipping_mode", "gui", "set_clipping_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {17, 0x660d000fu, "script:gui.set_outer_bounds", "gui", "set_outer_bounds", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {18, 0x67c26aa3u, "script:gui.set_tracking", "gui", "set_tracking", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {19, 0x6fb95e6du, "script:gui.set_blend_mode", "gui", "set_blend_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {20, 0x732bf56fu, "script:gui.set_fill_angle", "gui", "set_fill_angle", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {21, 0x79c29e24u, "script:gui.set_yanchor", "gui", "set_yanchor", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {22, 0x7d719a83u, "script:gui.set_size_mode", "gui", "set_size_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {23, 0x7e9ed985u, "script:gui.set_adjust_mode", "gui", "set_adjust_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {24, 0x87940683u, "script:gui.set_flipbook_playback_rate", "gui", "set_flipbook_playback_rate", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {25, 0xa3e81d16u, "script:gui.set_alpha", "gui", "set_alpha", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {26, 0xa4d2c3b9u, "script:gui.set_clipping_visible", "gui", "set_clipping_visible", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {27, 0xa9209d54u, "script:gui.set_screen_position", "gui", "set_screen_position", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {28, 0xae0e991bu, "script:go.delete", "go", "delete", StructuredLuaResultCodec::kNone, StructuredLuaContext::kScriptInstance},
-  {29, 0xaeb03c66u, "script:gui.set_inherit_alpha", "gui", "set_inherit_alpha", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {30, 0xb2771603u, "script:gui.set_xanchor", "gui", "set_xanchor", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {31, 0xbc410d97u, "script:gui.set_flipbook_cursor", "gui", "set_flipbook_cursor", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {32, 0xc016e42du, "script:gui.set_perimeter_vertices", "gui", "set_perimeter_vertices", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {33, 0xcd6b042fu, "script:gui.set_font", "gui", "set_font", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {34, 0xdff4f6e0u, "script:gui.set_visible", "gui", "set_visible", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {35, 0xe0106b74u, "script:gui.set_rotation", "gui", "set_rotation", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {36, 0xe0d3fb9fu, "script:gui.set_slice9", "gui", "set_slice9", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {37, 0xe9adddd7u, "script:gui.set_euler", "gui", "set_euler", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {38, 0xe9d9ed2cu, "script:gui.set_scale", "gui", "set_scale", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {39, 0xeced08c3u, "script:gui.set_layer", "gui", "set_layer", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {40, 0xecfca9feu, "script:gui.set_parent", "gui", "set_parent", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {41, 0xedea9856u, "script:gui.set_pivot", "gui", "set_pivot", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {42, 0xf4805144u, "script:gui.set_line_break", "gui", "set_line_break", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {43, 0xf575bad3u, "script:gui.set_material", "gui", "set_material", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {6, 0x243f7f52u, "script:go.set_position", "go", "set_position", StructuredLuaResultCodec::kNone, StructuredLuaContext::kScriptInstance},
+  {7, 0x25d5351eu, "script:gui.set_particlefx", "gui", "set_particlefx", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {8, 0x289cacf1u, "script:gui.set_color", "gui", "set_color", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {9, 0x32ce9520u, "script:gui.set_outline", "gui", "set_outline", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {10, 0x4243998fu, "script:msg.post", "msg", "post", StructuredLuaResultCodec::kNone, StructuredLuaContext::kCurrentScriptInstance},
+  {11, 0x4f947bcfu, "script:gui.set_size", "gui", "set_size", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {12, 0x54f686f4u, "script:gui.set_leading", "gui", "set_leading", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {13, 0x57e22c89u, "script:gui.set_position", "gui", "set_position", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {14, 0x5843c90du, "script:gui.set_text", "gui", "set_text", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {15, 0x585da72eu, "script:gui.set_shadow", "gui", "set_shadow", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {16, 0x5bc90651u, "script:gui.set_texture", "gui", "set_texture", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {17, 0x6242e72au, "script:gui.set_clipping_mode", "gui", "set_clipping_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {18, 0x660d000fu, "script:gui.set_outer_bounds", "gui", "set_outer_bounds", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {19, 0x67c26aa3u, "script:gui.set_tracking", "gui", "set_tracking", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {20, 0x6fb95e6du, "script:gui.set_blend_mode", "gui", "set_blend_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {21, 0x732bf56fu, "script:gui.set_fill_angle", "gui", "set_fill_angle", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {22, 0x79c29e24u, "script:gui.set_yanchor", "gui", "set_yanchor", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {23, 0x7cc6f4b7u, "script:go.set_rotation", "go", "set_rotation", StructuredLuaResultCodec::kNone, StructuredLuaContext::kScriptInstance},
+  {24, 0x7d719a83u, "script:gui.set_size_mode", "gui", "set_size_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {25, 0x7e9ed985u, "script:gui.set_adjust_mode", "gui", "set_adjust_mode", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {26, 0x87940683u, "script:gui.set_flipbook_playback_rate", "gui", "set_flipbook_playback_rate", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {27, 0xa3e81d16u, "script:gui.set_alpha", "gui", "set_alpha", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {28, 0xa4d2c3b9u, "script:gui.set_clipping_visible", "gui", "set_clipping_visible", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {29, 0xa9209d54u, "script:gui.set_screen_position", "gui", "set_screen_position", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {30, 0xae0e991bu, "script:go.delete", "go", "delete", StructuredLuaResultCodec::kNone, StructuredLuaContext::kScriptInstance},
+  {31, 0xaeb03c66u, "script:gui.set_inherit_alpha", "gui", "set_inherit_alpha", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {32, 0xb2771603u, "script:gui.set_xanchor", "gui", "set_xanchor", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {33, 0xbc410d97u, "script:gui.set_flipbook_cursor", "gui", "set_flipbook_cursor", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {34, 0xc016e42du, "script:gui.set_perimeter_vertices", "gui", "set_perimeter_vertices", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {35, 0xcd6b042fu, "script:gui.set_font", "gui", "set_font", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {36, 0xdff4f6e0u, "script:gui.set_visible", "gui", "set_visible", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {37, 0xe0106b74u, "script:gui.set_rotation", "gui", "set_rotation", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {38, 0xe0d3fb9fu, "script:gui.set_slice9", "gui", "set_slice9", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {39, 0xe993baeeu, "script:go.get_position", "go", "get_position", StructuredLuaResultCodec::kVector3, StructuredLuaContext::kScriptInstance},
+  {40, 0xe9adddd7u, "script:gui.set_euler", "gui", "set_euler", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {41, 0xe9d9ed2cu, "script:gui.set_scale", "gui", "set_scale", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {42, 0xeced08c3u, "script:gui.set_layer", "gui", "set_layer", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {43, 0xecfca9feu, "script:gui.set_parent", "gui", "set_parent", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {44, 0xedea9856u, "script:gui.set_pivot", "gui", "set_pivot", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {45, 0xf4805144u, "script:gui.set_line_break", "gui", "set_line_break", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
+  {46, 0xf575bad3u, "script:gui.set_material", "gui", "set_material", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
 };
-constexpr uint16_t kBindingShapeOffsets[] = { 0, 2, 3, 4, 5, 7, 8, 9, 10, 11, 13, 14, 16, 18, 20, 21, 23, 24, 26, 28, 29, 30, 32, 34, 36, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 53, 55, 56, 57, 58, 59, 60, 63, 64, 65, 66, 67, 69, 70, 71, 74, 75, 76, 77, 78, 79, 80, 82, 86, 87, 90, 91, 92, 94, 95, 96, 98, 100, 102, 105, 106, 107, 109, 110, 111, 112 };
-constexpr uint16_t kShapeArgumentOffsets[] = { 0, 1, 5, 7, 9, 10, 12, 14, 16, 17, 18, 19, 21, 23, 24, 26, 28, 30, 32, 33, 34, 38, 40, 43, 44, 45, 48, 50, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 87, 89, 91, 94, 96, 97, 98, 99, 102, 105, 106, 107, 108, 110, 112, 112, 113, 117, 119, 125, 127, 128, 128, 129, 131, 134, 135, 136, 137, 139, 141, 142, 144, 146, 147, 149, 151, 151, 152, 153, 156, 157, 158, 159, 160, 162, 164, 166, 168, 170, 170, 172, 174, 176, 178, 180, 182, 183, 185, 188, 190, 192, 194, 196, 198, 199, 205 };
-constexpr uint8_t kShapeArgumentCounts[] = { 1, 4, 2, 2, 1, 2, 2, 2, 1, 1, 1, 2, 2, 1, 2, 2, 2, 2, 1, 1, 4, 2, 3, 1, 1, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 3, 2, 1, 1, 1, 3, 3, 1, 1, 1, 2, 2, 0, 1, 4, 2, 6, 2, 1, 0, 1, 2, 3, 1, 1, 1, 2, 2, 1, 2, 2, 1, 2, 2, 0, 1, 1, 3, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 1, 2, 3, 2, 2, 2, 2, 2, 1, 6 };
+constexpr uint16_t kBindingShapeOffsets[] = { 0, 2, 3, 4, 5, 7, 8, 9, 13, 14, 16, 17, 19, 21, 23, 24, 26, 27, 29, 31, 32, 33, 35, 37, 39, 41, 42, 43, 44, 45, 46, 47, 48, 52, 53, 54, 55, 56, 59, 61, 62, 63, 64, 65, 66, 69, 70, 71, 72, 73, 75, 76, 77, 80, 81, 82, 83, 84, 85, 86, 88, 92, 93, 96, 97, 98, 100, 101, 105, 107, 109, 111, 114, 115, 116, 118, 119, 120, 121 };
+constexpr uint16_t kShapeArgumentOffsets[] = { 0, 1, 5, 7, 9, 10, 12, 14, 16, 17, 18, 20, 22, 24, 25, 27, 29, 30, 32, 34, 36, 38, 39, 40, 44, 46, 49, 50, 51, 54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 93, 95, 97, 99, 101, 103, 106, 108, 109, 110, 111, 114, 117, 118, 119, 120, 122, 124, 124, 125, 129, 131, 137, 139, 140, 140, 141, 143, 146, 147, 148, 149, 151, 153, 154, 156, 158, 159, 161, 163, 163, 164, 165, 168, 169, 170, 171, 172, 174, 176, 178, 180, 182, 182, 183, 184, 185, 187, 189, 191, 193, 195, 197, 198, 200, 203, 205, 207, 209, 211, 213, 214, 220 };
+constexpr uint8_t kShapeArgumentCounts[] = { 1, 4, 2, 2, 1, 2, 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 1, 1, 4, 2, 3, 1, 1, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 3, 2, 1, 1, 1, 3, 3, 1, 1, 1, 2, 2, 0, 1, 4, 2, 6, 2, 1, 0, 1, 2, 3, 1, 1, 1, 2, 2, 1, 2, 2, 1, 2, 2, 0, 1, 1, 3, 1, 1, 1, 1, 2, 2, 2, 2, 2, 0, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 3, 2, 2, 2, 2, 2, 1, 6 };
 constexpr Codec kArgumentCodecs[] = {
   Codec::kString,
   Codec::kString,
@@ -166,6 +169,12 @@ constexpr Codec kArgumentCodecs[] = {
   Codec::kNumber,
   Codec::kNumber,
   Codec::kVector3,
+  Codec::kVector3,
+  Codec::kString,
+  Codec::kVector3,
+  Codec::kHash,
+  Codec::kVector3,
+  Codec::kUrl,
   Codec::kNumber,
   Codec::kNode,
   Codec::kHash,
@@ -235,6 +244,12 @@ constexpr Codec kArgumentCodecs[] = {
   Codec::kNode,
   Codec::kNumber,
   Codec::kQuaternion,
+  Codec::kQuaternion,
+  Codec::kString,
+  Codec::kQuaternion,
+  Codec::kHash,
+  Codec::kQuaternion,
+  Codec::kUrl,
   Codec::kNode,
   Codec::kNumber,
   Codec::kNode,
@@ -318,6 +333,9 @@ constexpr Codec kArgumentCodecs[] = {
   Codec::kVector4,
   Codec::kNode,
   Codec::kVector4,
+  Codec::kString,
+  Codec::kHash,
+  Codec::kUrl,
   Codec::kNode,
   Codec::kVector3,
   Codec::kNode,
@@ -568,6 +586,18 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
         fail(error, errorCapacity, "go.setPosition rejects NaN components");
         return DispatchStatus::kError;
       }
+      if (frame->argumentCount != 1) {
+        if (!structuredLua || !structuredLua->invoke) {
+          fail(error, errorCapacity, "Structured Lua backend is not installed");
+          return DispatchStatus::kError;
+        }
+        return structuredLua->invoke(
+            structuredLua->context,
+            kStructuredLuaOperations[6],
+            frame,
+            error,
+            errorCapacity);
+      }
       game_object::ResolvedCurrent current;
       if (!game_object::resolveCurrent(&current, error, errorCapacity)) return DispatchStatus::kError;
       current.api->setPosition(current.api->userData, current.instance, value.defoldValue);
@@ -591,7 +621,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[6],
+          kStructuredLuaOperations[7],
           frame,
           error,
           errorCapacity);
@@ -606,7 +636,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[7],
+          kStructuredLuaOperations[8],
           frame,
           error,
           errorCapacity);
@@ -618,7 +648,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[8],
+          kStructuredLuaOperations[9],
           frame,
           error,
           errorCapacity);
@@ -662,7 +692,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[9],
+          kStructuredLuaOperations[10],
           frame,
           error,
           errorCapacity);
@@ -701,7 +731,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[10],
+          kStructuredLuaOperations[11],
           frame,
           error,
           errorCapacity);
@@ -713,7 +743,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[11],
+          kStructuredLuaOperations[12],
           frame,
           error,
           errorCapacity);
@@ -737,7 +767,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[12],
+          kStructuredLuaOperations[13],
           frame,
           error,
           errorCapacity);
@@ -749,7 +779,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[13],
+          kStructuredLuaOperations[14],
           frame,
           error,
           errorCapacity);
@@ -761,7 +791,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[14],
+          kStructuredLuaOperations[15],
           frame,
           error,
           errorCapacity);
@@ -773,7 +803,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[15],
+          kStructuredLuaOperations[16],
           frame,
           error,
           errorCapacity);
@@ -785,7 +815,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[16],
+          kStructuredLuaOperations[17],
           frame,
           error,
           errorCapacity);
@@ -797,7 +827,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[17],
+          kStructuredLuaOperations[18],
           frame,
           error,
           errorCapacity);
@@ -822,7 +852,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[18],
+          kStructuredLuaOperations[19],
           frame,
           error,
           errorCapacity);
@@ -834,7 +864,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[19],
+          kStructuredLuaOperations[20],
           frame,
           error,
           errorCapacity);
@@ -846,7 +876,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[20],
+          kStructuredLuaOperations[21],
           frame,
           error,
           errorCapacity);
@@ -858,7 +888,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[21],
+          kStructuredLuaOperations[22],
           frame,
           error,
           errorCapacity);
@@ -869,6 +899,18 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
           std::isnan(value.defoldValue[2]) || std::isnan(value.defoldValue[3])) {
         fail(error, errorCapacity, "go.setRotation rejects NaN components");
         return DispatchStatus::kError;
+      }
+      if (frame->argumentCount != 1) {
+        if (!structuredLua || !structuredLua->invoke) {
+          fail(error, errorCapacity, "Structured Lua backend is not installed");
+          return DispatchStatus::kError;
+        }
+        return structuredLua->invoke(
+            structuredLua->context,
+            kStructuredLuaOperations[23],
+            frame,
+            error,
+            errorCapacity);
       }
       game_object::ResolvedCurrent current;
       if (!game_object::resolveCurrent(&current, error, errorCapacity)) return DispatchStatus::kError;
@@ -882,7 +924,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[22],
+          kStructuredLuaOperations[24],
           frame,
           error,
           errorCapacity);
@@ -894,7 +936,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[23],
+          kStructuredLuaOperations[25],
           frame,
           error,
           errorCapacity);
@@ -921,7 +963,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[24],
+          kStructuredLuaOperations[26],
           frame,
           error,
           errorCapacity);
@@ -1019,7 +1061,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[25],
+          kStructuredLuaOperations[27],
           frame,
           error,
           errorCapacity);
@@ -1041,7 +1083,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[26],
+          kStructuredLuaOperations[28],
           frame,
           error,
           errorCapacity);
@@ -1068,7 +1110,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[27],
+          kStructuredLuaOperations[29],
           frame,
           error,
           errorCapacity);
@@ -1094,7 +1136,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[28],
+          kStructuredLuaOperations[30],
           frame,
           error,
           errorCapacity);
@@ -1106,7 +1148,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[29],
+          kStructuredLuaOperations[31],
           frame,
           error,
           errorCapacity);
@@ -1149,7 +1191,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[30],
+          kStructuredLuaOperations[32],
           frame,
           error,
           errorCapacity);
@@ -1185,7 +1227,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[31],
+          kStructuredLuaOperations[33],
           frame,
           error,
           errorCapacity);
@@ -1197,7 +1239,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[32],
+          kStructuredLuaOperations[34],
           frame,
           error,
           errorCapacity);
@@ -1222,7 +1264,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[33],
+          kStructuredLuaOperations[35],
           frame,
           error,
           errorCapacity);
@@ -1279,7 +1321,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[34],
+          kStructuredLuaOperations[36],
           frame,
           error,
           errorCapacity);
@@ -1291,7 +1333,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[35],
+          kStructuredLuaOperations[37],
           frame,
           error,
           errorCapacity);
@@ -1303,12 +1345,24 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[36],
+          kStructuredLuaOperations[38],
           frame,
           error,
           errorCapacity);
     }
     case 67: {
+      if (frame->argumentCount != 0) {
+        if (!structuredLua || !structuredLua->invoke) {
+          fail(error, errorCapacity, "Structured Lua backend is not installed");
+          return DispatchStatus::kError;
+        }
+        return structuredLua->invoke(
+            structuredLua->context,
+            kStructuredLuaOperations[39],
+            frame,
+            error,
+            errorCapacity);
+      }
       game_object::ResolvedCurrent current;
       if (!game_object::resolveCurrent(&current, error, errorCapacity)) return DispatchStatus::kError;
       float position[3]{};
@@ -1322,7 +1376,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[37],
+          kStructuredLuaOperations[40],
           frame,
           error,
           errorCapacity);
@@ -1334,7 +1388,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[38],
+          kStructuredLuaOperations[41],
           frame,
           error,
           errorCapacity);
@@ -1346,7 +1400,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[39],
+          kStructuredLuaOperations[42],
           frame,
           error,
           errorCapacity);
@@ -1358,7 +1412,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[40],
+          kStructuredLuaOperations[43],
           frame,
           error,
           errorCapacity);
@@ -1370,7 +1424,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[41],
+          kStructuredLuaOperations[44],
           frame,
           error,
           errorCapacity);
@@ -1382,7 +1436,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[42],
+          kStructuredLuaOperations[45],
           frame,
           error,
           errorCapacity);
@@ -1394,7 +1448,7 @@ DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacit
       }
       return structuredLua->invoke(
           structuredLua->context,
-          kStructuredLuaOperations[43],
+          kStructuredLuaOperations[46],
           frame,
           error,
           errorCapacity);

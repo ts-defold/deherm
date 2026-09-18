@@ -11,9 +11,9 @@
   "scratchReuseRepetitions": 64,
   "maxExercisesPerContract": 4,
   "inputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "ca355c81ca01d5a2515937df150d74dde1fd40813886fbfb0d021e6acdce4739",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "4e25823968f903d41d1450ea2666e1978897dbadcfa491ec02316f41ece8176c",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "8d16dca1aa186e974a8a43eec0b38c6ef92fc42326e4c377718a2bd1846dbe00",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "43e45305ee983316adf1fc6bf1089bda189896cbdeaeb9770490e5385fc3120f",
     "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
   },
   "contractCount": 82,

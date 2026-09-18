@@ -2,12 +2,12 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "63053c33c01346c8c9e9f77e0316c0642502ee50aa8d5d09ddd0b2f90062b490",
+  "inputSha256": "3628053db4f7bd97a054fe45795fc53b401a9038fbdda9982fb19f59c162c638",
   "evidencePolicy": "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
   "coverageClaim": "All 286 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
   "routeCount": 286,
-  "scenarioCount": 288,
-  "instrumentedScenarioCount": 34,
+  "scenarioCount": 298,
+  "instrumentedScenarioCount": 44,
   "plannedScenarioCount": 254,
   "instrumentedRouteCount": 32,
   "plannedOnlyRouteCount": 254,
@@ -610,6 +610,81 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "value:go.get_position.addressed-hash",
+      "routeId": "script:go.get_position",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.get_position.addressed-hash",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-hash:ok",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          21,
+          34,
+          55
+        ],
+        "tolerance": 0
+      }
+    },
+    {
+      "key": "value:go.get_position.addressed-missing",
+      "routeId": "script:go.get_position",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.get_position.addressed-missing",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-missing:ok",
+      "expectation": {
+        "kind": "raises",
+        "reason": "An address that names no instance in the calling collection must fail closed instead of returning a default transform."
+      }
+    },
+    {
+      "key": "value:go.get_position.addressed-string",
+      "routeId": "script:go.get_position",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.get_position.addressed-string",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-string:ok",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          5,
+          8,
+          13
+        ],
+        "tolerance": 0
+      }
+    },
+    {
+      "key": "value:go.get_position.addressed-url",
+      "routeId": "script:go.get_position",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.get_position.addressed-url",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-url:ok",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          89,
+          144,
+          233
+        ],
+        "tolerance": 0
+      }
+    },
+    {
       "key": "value:go.get_position.current",
       "routeId": "script:go.get_position",
       "state": "instrumented",
@@ -693,6 +768,49 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "value:go.set_position.addressed-hash",
+      "routeId": "script:go.set_position",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.set_position.addressed-hash",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_position.addressed-hash:ok",
+      "expectation": {
+        "kind": "void"
+      }
+    },
+    {
+      "key": "value:go.set_position.addressed-string",
+      "routeId": "script:go.set_position",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.set_position.addressed-string",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_position.addressed-string:ok",
+      "expectation": {
+        "kind": "void"
+      }
+    },
+    {
+      "key": "value:go.set_position.addressed-url",
+      "routeId": "script:go.set_position",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.set_position.addressed-url",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "DEBUG:SCRIPT: script-value:go.set_position.addressed-url:ok",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_position.addressed-url:ok"
+      }
+    },
+    {
       "key": "value:go.set_position.current",
       "routeId": "script:go.set_position",
       "state": "instrumented",
@@ -705,6 +823,49 @@
       "expectation": {
         "kind": "deferredLua",
         "marker": "DEBUG:SCRIPT: script-value:go.set_position.current:ok"
+      }
+    },
+    {
+      "key": "value:go.set_rotation.addressed-hash",
+      "routeId": "script:go.set_rotation",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.set_rotation.addressed-hash",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_rotation.addressed-hash:ok",
+      "expectation": {
+        "kind": "void"
+      }
+    },
+    {
+      "key": "value:go.set_rotation.addressed-string",
+      "routeId": "script:go.set_rotation",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.set_rotation.addressed-string",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "DEBUG:SCRIPT: script-value:go.set_rotation.addressed-string:ok",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_rotation.addressed-string:ok"
+      }
+    },
+    {
+      "key": "value:go.set_rotation.addressed-url",
+      "routeId": "script:go.set_rotation",
+      "state": "instrumented",
+      "setupId": "global-runtime",
+      "probeSource": "value",
+      "probeKey": "go.set_rotation.addressed-url",
+      "probeSetInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
+      "markerKind": "exact-line",
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_rotation.addressed-url:ok",
+      "expectation": {
+        "kind": "void"
       }
     },
     {
@@ -2850,7 +3011,7 @@
       "target": "arm64-macos-dynamic-hermes",
       "result": "passed",
       "command": "node scripts/check-native-defold-runtime.mjs --record-evidence",
-      "observedAt": "2026-09-18T05:01:33.000Z",
+      "observedAt": "2026-09-18T23:34:00.000Z",
       "routeIds": [
         "script:bit.lshift",
         "script:bit.tohex",
@@ -2901,8 +3062,18 @@
         "scalar:sys.get_connectivity.integer-enum",
         "scalar:sys.get_save_file",
         "value:builtins.hash.my_hash",
+        "value:go.get_position.addressed-hash",
+        "value:go.get_position.addressed-missing",
+        "value:go.get_position.addressed-string",
+        "value:go.get_position.addressed-url",
         "value:go.get_position.current",
+        "value:go.set_position.addressed-hash",
+        "value:go.set_position.addressed-string",
+        "value:go.set_position.addressed-url",
         "value:go.set_position.current",
+        "value:go.set_rotation.addressed-hash",
+        "value:go.set_rotation.addressed-string",
+        "value:go.set_rotation.addressed-url",
         "value:go.set_rotation.current",
         "value:vmath-fixed-pod.conj",
         "value:vmath-fixed-pod.cross",
@@ -2923,7 +3094,7 @@
       ],
       "artifact": {
         "path": ".agents/docs/data/native-defold-runtime.log",
-        "sha256": "f52a4571d78860c5d86e64e018e703e4e6c8b797ffc36fc969e3146a1835261b"
+        "sha256": "3e9bb2cbdcde820b9640c3f58980e61d493f29d658220cbd3e39b84038b57939"
       },
       "requiredMarkers": [
         "INFO:DEFOLD_HERMES: final:ok",
@@ -4809,6 +4980,10 @@
       "source": "doc/go.lua",
       "line": 601,
       "scenarios": [
+        "value:go.get_position.addressed-hash",
+        "value:go.get_position.addressed-missing",
+        "value:go.get_position.addressed-string",
+        "value:go.get_position.addressed-url",
         "value:go.get_position.current"
       ],
       "scenarioState": "instrumented",
@@ -5071,6 +5246,9 @@
       "source": "doc/go.lua",
       "line": 943,
       "scenarios": [
+        "value:go.set_position.addressed-hash",
+        "value:go.set_position.addressed-string",
+        "value:go.set_position.addressed-url",
         "value:go.set_position.current"
       ],
       "scenarioState": "instrumented",
@@ -5099,6 +5277,9 @@
       "source": "doc/go.lua",
       "line": 966,
       "scenarios": [
+        "value:go.set_rotation.addressed-hash",
+        "value:go.set_rotation.addressed-string",
+        "value:go.set_rotation.addressed-url",
         "value:go.set_rotation.current"
       ],
       "scenarioState": "instrumented",

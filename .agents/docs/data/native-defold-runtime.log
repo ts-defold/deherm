@@ -1,7 +1,7 @@
 INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)
 INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'
 INFO:DEFOLD_HERMES: init:hermes
-INFO:DEFOLD_HERMES: bundle:1f1baf76d98ad2295510a596b11ed89582bf3fc1fc9de8b2dae40025b7e792a3
+INFO:DEFOLD_HERMES: bundle:664a0abc0b87edb3baf0cd7b9e65e37eedc0ed089c6581da21c77571ce375d69
 INFO:DEFOLD_HERMES: module:42
 INFO:DEFOLD_HERMES: script-api-probes:30e0fc542abf0832c1c44defec7483412b4ff8076177de1a981ec1347dbc0c11
 INFO:DEFOLD_HERMES: script-api:bit.tohex.explicit-width:0021
@@ -27,7 +27,17 @@ INFO:DEFOLD_HERMES: script-value:vmath.quat_rotation_z.pi:ok
 INFO:DEFOLD_HERMES: script-value:vmath.quat.identity:ok
 DEBUG:SCRIPT: script-value:go.set_position.current:ok
 INFO:DEFOLD_HERMES: script-value:go.get_position.current:ok
+INFO:DEFOLD_HERMES: script-value:go.set_position.addressed-string:ok
+INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-string:ok
+INFO:DEFOLD_HERMES: script-value:go.set_position.addressed-hash:ok
+INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-hash:ok
+DEBUG:SCRIPT: script-value:go.set_position.addressed-url:ok
+INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-url:ok
+INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-missing:ok
 DEBUG:SCRIPT: script-value:go.set_rotation.current:ok
+DEBUG:SCRIPT: script-value:go.set_rotation.addressed-string:ok
+INFO:DEFOLD_HERMES: script-value:go.set_rotation.addressed-hash:ok
+INFO:DEFOLD_HERMES: script-value:go.set_rotation.addressed-url:ok
 INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-rotation-y:ok
 INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.quat-rotation-x:ok
 INFO:DEFOLD_HERMES: script-value:vmath-fixed-pod.euler-to-quat:ok

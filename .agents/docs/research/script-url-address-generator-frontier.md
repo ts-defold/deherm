@@ -22,8 +22,10 @@ accounting-independent partition is:
 
 - 20 Matrix4 routes owned by the Matrix4 generator;
 - 73 URL-bearing candidates;
-- 3 URL-bearing current-instance routes already owned by direct native bindings
-  (`go.get_position`, `go.set_position`, `go.set_rotation`);
+- 3 URL-bearing transform routes owned by direct native bindings
+  (`go.get_position`, `go.set_position`, `go.set_rotation`), which keep their
+  current-instance form on the direct native path and lower their addressed
+  forms through the shared captured-Lua invoker (see below);
 - 70 URL/address routes owned by this generator;
 - 2 binary-string routes (`gui.set_texture_data`, `resource.set_sound`);
 - 32 other non-Matrix, non-URL routes.
@@ -76,3 +78,36 @@ host remain `fail-closed-unverified` for structured URLs because their current
 ABI has only one `u64` payload lane. String/hash shorthand may traverse that
 ABI, but the target is not marked executable until all four lanes are carried
 without JavaScript `number` coercion.
+
+## Addressed game-object transforms
+
+`go.get_position`, `go.set_position` and `go.set_rotation` each declare a
+current-instance form plus `string`, `hash` and `url` addressed forms. They are
+one route with two lowerings, selected by argument count inside the generated
+value-binding dispatcher:
+
+* no address - the direct native path through `game_object::resolveCurrent`,
+  which validates the borrowed instance's generation, collection and identifier
+  before any engine pointer read;
+* an address - the generated captured-Lua invoker, which keeps a string a Lua
+  string, a hash a Lua hash and a url a pushed `dmMessage::URL`, so Defold's own
+  `ResolveInstance` performs socket checking, relative-path resolution and the
+  missing-instance refusal.
+
+Restating that resolution natively would duplicate semantics that depend on the
+*calling* instance's collection and socket. The generator therefore pins the
+pieces of `ResolveInstance` it relies on - the `lua_gettop(L) == instance_arg`
+gate, `dmScript::ResolveURL(L, instance_arg, &receiver, 0x0)`, the
+same-collection socket check, `GetInstanceFromIdentifier`, and the
+`Instance %s not found` refusal - as source anchors, so a change to any of them
+fails generation rather than silently changing behaviour.
+
+The NaN guard on the setters runs before the address branch, so both forms
+refuse the same inputs at the same boundary.
+
+Observed on a packaged arm64 macOS engine at Defold `7f0f554`
+(`.agents/docs/data/native-defold-runtime.log`): all nine addressed shapes
+execute against a second game object in the calling collection, and
+`go.get_position("/deherm_no_such_instance")` fails closed into TypeScript
+instead of returning a default transform. `msg.url(string)` is exercised as the
+url-address producer in the same run.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "b565043a742a1f8db1db1631f61de53a059eda973f0f41f4b4d5b9ec0c43d50e",
+  "inputSha256": "7a55f2845f3c44c9e87b293b589fcaf9351576f9987488827b1ff666bfe31b32",
   "sourceEvidence": [
     {
       "path": "upstream/defold/engine/script/src/script_vmath.cpp",
@@ -56,8 +56,8 @@
   "allocationClaim": "POD dispatch uses inline ScriptValue cells, bounded context stacks, stack-local dmVMath values, and a fixed-capacity generation-checked Matrix4 frame arena with no heap fallback. Structured calls use fixed-capacity table staging and a 256-slot generational node pool; Lua registry growth and the documented engine operations may allocate. Debug dmHashBuffer64 may allocate once to register a previously unseen short string in Defold's reverse-hash table.",
   "floatPolicy": "Numeric constructor arguments follow Lua-number conversion, including NaN and infinity; finite values outside float32 range deterministically become signed infinity. Defold-value and Matrix4 inputs reject NaN components through pinned CheckVector3/CheckVector4/CheckQuat/CheckMatrix4 semantics, while normalize and unchanged degenerate dmVMath operations may produce NaN from otherwise valid inputs.",
   "bindingCount": 78,
-  "callShapeCount": 112,
-  "argumentCodecCount": 205,
+  "callShapeCount": 121,
+  "argumentCodecCount": 220,
   "bindings": [
     {
       "id": "script:factory.create",
@@ -599,7 +599,8 @@
         "parameters": {
           "property": "position",
           "kind": "Vector3",
-          "rejectNaN": true
+          "rejectNaN": true,
+          "addressed": "pinned-resolve-instance-captured-lua"
         }
       },
       "callShapes": [
@@ -622,6 +623,18 @@
       "implementedCallShapes": [
         [
           "Vector3"
+        ],
+        [
+          "Vector3",
+          "String"
+        ],
+        [
+          "Vector3",
+          "Hash"
+        ],
+        [
+          "Vector3",
+          "Url"
         ]
       ],
       "resultCodec": "None",
@@ -634,7 +647,7 @@
       "targetSupport": {
         "arm64DynamicHermes": {
           "status": "generated-executable",
-          "backend": "generated-native-pod",
+          "backend": "generated-native-pod-with-addressed-captured-lua",
           "evidence": "native-focused-test-not-packaged-engine-proof"
         },
         "html5BrowserHost": {
@@ -2449,7 +2462,8 @@
         "parameters": {
           "property": "rotation",
           "kind": "Quaternion",
-          "rejectNaN": true
+          "rejectNaN": true,
+          "addressed": "pinned-resolve-instance-captured-lua"
         }
       },
       "callShapes": [
@@ -2472,6 +2486,18 @@
       "implementedCallShapes": [
         [
           "Quaternion"
+        ],
+        [
+          "Quaternion",
+          "String"
+        ],
+        [
+          "Quaternion",
+          "Hash"
+        ],
+        [
+          "Quaternion",
+          "Url"
         ]
       ],
       "resultCodec": "None",
@@ -2484,7 +2510,7 @@
       "targetSupport": {
         "arm64DynamicHermes": {
           "status": "generated-executable",
-          "backend": "generated-native-pod",
+          "backend": "generated-native-pod-with-addressed-captured-lua",
           "evidence": "native-focused-test-not-packaged-engine-proof"
         },
         "html5BrowserHost": {
@@ -4992,7 +5018,8 @@
         "template": "current-instance-transform-get",
         "parameters": {
           "property": "position",
-          "kind": "Vector3"
+          "kind": "Vector3",
+          "addressed": "pinned-resolve-instance-captured-lua"
         }
       },
       "callShapes": [
@@ -5008,7 +5035,16 @@
         ]
       ],
       "implementedCallShapes": [
-        []
+        [],
+        [
+          "String"
+        ],
+        [
+          "Hash"
+        ],
+        [
+          "Url"
+        ]
       ],
       "resultCodec": "Vector3",
       "stableId": 3918772974,
@@ -5020,7 +5056,7 @@
       "targetSupport": {
         "arm64DynamicHermes": {
           "status": "generated-executable",
-          "backend": "generated-native-pod",
+          "backend": "generated-native-pod-with-addressed-captured-lua",
           "evidence": "native-focused-test-not-packaged-engine-proof"
         },
         "html5BrowserHost": {

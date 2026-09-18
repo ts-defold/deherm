@@ -98,9 +98,14 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-fixed-pod").length, 11);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-matrix4").length, 14);
   assert.equal(new Set(executable.map(({ evidence }) => evidence.stableId)).size, executable.length);
+  // go.get_position implements its current-instance form and all three
+  // addressed forms, so its declared and implemented shapes now agree.
   const currentPosition = executable.find(({ id }) => id === "script:go.get_position");
-  assert.deepEqual(currentPosition.evidence.implementedCallShapes, [[]]);
-  assert.equal(currentPosition.evidence.callShapes.length > currentPosition.evidence.implementedCallShapes.length, true);
+  assert.deepEqual(currentPosition.evidence.implementedCallShapes, [[], ["String"], ["Hash"], ["Url"]]);
+  assert.deepEqual(currentPosition.evidence.callShapes, currentPosition.evidence.implementedCallShapes);
+  // A route whose declared shapes still exceed its implemented ones stays visible.
+  const deleteRoute = executable.find(({ id }) => id === "script:go.delete");
+  assert.equal(deleteRoute.evidence.callShapes.length > deleteRoute.evidence.implementedCallShapes.length, true);
   assert.deepEqual(
     generated.rows.filter(({ category }) => category === "separate-module").map(({ id }) => id),
     ["script:timer.cancel", "script:timer.delay", "script:timer.trigger"]

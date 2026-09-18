@@ -22,21 +22,21 @@
   "inputHashes": {
     "ir": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "patterns": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "accounting": "6455322e136ba5aba92ef3901bcaca0c33284037215ceda1e8b33fd92e6b5931",
-    "values": "7c3f58e0d49e448b0af6b99776a117a6a7638af4359b486f64953bce6253040d",
+    "accounting": "75369da9d5d5f00c99ba41d65476216840c854bc57341f1c2d25075d3cfe03fa",
+    "values": "d3617de137832821c331e27cefc3bb27aa01e8a7ce33baf9335c311f333153ef",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "handles": "d5067c7df8d1e9c15b9960876621b97dd825f671d26ed86b5bb9bbf43b513e94",
+    "handles": "032ce2e670aa8781d6cc95e652ff6fe3af0f1b0c9c082edd02cee81ee646c7c6",
     "urls": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
     "tuples": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
     "dynamics": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "tails": "dfbfa544eae9456ec1d51f7c08d51ab28f03e4a471eeb98dc661a0ecfa639c36",
-    "overloads": "e0f7f0cde94e9225294a8018240d325dd164790a9ea875b5e152d6d02dee5d80",
-    "tableSchemas": "33247e42b999d2098adfcddb7d3c454d5fa3836c3f6744f5f9d9e3df1bd57619",
-    "tableRecords": "0816b6ccc701ef8d40aaa1fd11e58357bd79cd9b91970ebbbd7962ee5c8705cf",
-    "copiedRecords": "c829b448fe7dacf59ba091dec9bb17a9f208dc69c9e5961343e8df50d49727ac",
-    "opaqueRecords": "03a4e2a937921d46a63ccc0b73dd71d76511822e3caf469c91e849908e33f274",
-    "engineMatrix": "d6bca958a59c0806657790882966b9113b439e3e4114a323226d80e12821a69e",
-    "availabilityProfiles": "eb99a2229d635f31e971f3ac49f0b24c1296fc83cf5df23d421cd5f6d13ca8ff"
+    "tails": "75aa9201d8d6bbbc9ea99527f2ca64a808e565a11ef57e383d372fdb17949474",
+    "overloads": "22466ef160c49a372e333e2e6c3dfe4b5dd98f51b21aa4ce2508e7389fd4dd6b",
+    "tableSchemas": "e1288d5cdd2513213aebe4c3ecb43827f97ddff742ae29c6b3227277bfa10d2a",
+    "tableRecords": "e7d3af7b93ba353204746d2519354b161ff5695aefd7e3da58ca962644d6ac40",
+    "copiedRecords": "ce0edf415cdb628929f883d4ffb8af6b143a369f743b2f47d45ebb1b579b7b0d",
+    "opaqueRecords": "2624be71dcc7c7ae15b2c9c5c05914e24dcbc0a8a06307ce29b565294f229847",
+    "engineMatrix": "c23d73361cc94ab3e90aeed56fe8a2de6760c33dbc7eed51649094f4c8b8c2b1",
+    "availabilityProfiles": "c454b9d1343a517da9ec223caaecab248edb118ba21913017a48deb0f88be4cf"
   },
   "routeCount": 926,
   "generationCounts": {
@@ -70719,7 +70719,7 @@
             "support": {
               "arm64DynamicHermes": {
                 "status": "generated-executable",
-                "backend": "generated-native-pod",
+                "backend": "generated-native-pod-with-addressed-captured-lua",
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
@@ -72434,7 +72434,7 @@
             "support": {
               "arm64DynamicHermes": {
                 "status": "generated-executable",
-                "backend": "generated-native-pod",
+                "backend": "generated-native-pod-with-addressed-captured-lua",
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
@@ -72572,7 +72572,7 @@
             "support": {
               "arm64DynamicHermes": {
                 "status": "generated-executable",
-                "backend": "generated-native-pod",
+                "backend": "generated-native-pod-with-addressed-captured-lua",
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {

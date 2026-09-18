@@ -19,7 +19,11 @@ test("native runtime accepts complete emitted and planned-only value disposition
   assert.equal(instrumented.length, report.instrumentedProbeCount);
   assert.ok(instrumented.every(({ state, expectedMarker }) =>
     state === "instrumented" && typeof expectedMarker === "string"));
-  assert.equal(report.routeDispositionCount, bindings.bindingCount);
+  assert.equal(report.routeDispositionCount, report.probeCount + report.plannedFamilyProbeCount);
+  // Dispositions cover every binding; a binding with several implemented call
+  // shapes legitimately carries several probes.
+  assert.equal(new Set([...report.probes, ...report.plannedProbes].map(({ id }) => id)).size,
+    bindings.bindingCount);
 });
 
 test("native runtime rejects missing, duplicate, and promoted dispositions", () => {
@@ -31,7 +35,7 @@ test("native runtime rejects missing, duplicate, and promoted dispositions", () 
   duplicate.plannedProbes[0].id = duplicate.probes[0].id;
   assert.throws(
     () => validateNativeValueProbeReport(duplicate, bindings),
-    /each binding exactly once/
+    /cover each binding at least once/
   );
   const promoted = structuredClone(report);
   promoted.plannedProbes[0].state = "instrumented";

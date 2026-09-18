@@ -1017,6 +1017,23 @@ bool ScriptAdapter::readStructuredResult(
     output.handleKind = ScriptHandleKind::kGuiNode;
     output.length = handle.runtime;
     output.payload = packHandle(handle);
+  } else if (codec == value_binding::StructuredLuaResultCodec::kVector3) {
+    dmVMath::Vector3* value = dmScript::ToVector3(state_, -1);
+    if (!value) return fail("Structured Lua result is not vector3");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kVector3;
+    output.defoldValue[0] = value->getX();
+    output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ();
+  } else if (codec == value_binding::StructuredLuaResultCodec::kQuaternion) {
+    dmVMath::Quat* value = dmScript::ToQuat(state_, -1);
+    if (!value) return fail("Structured Lua result is not quaternion");
+    output.tag = ScriptValueTag::kDefoldValue;
+    output.defoldKind = ScriptDefoldValueKind::kQuaternion;
+    output.defoldValue[0] = value->getX();
+    output.defoldValue[1] = value->getY();
+    output.defoldValue[2] = value->getZ();
+    output.defoldValue[3] = value->getW();
   } else {
     return fail("Structured Lua result codec is unsupported");
   }

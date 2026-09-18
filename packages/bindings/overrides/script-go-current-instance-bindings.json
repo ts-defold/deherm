@@ -11,10 +11,10 @@
       "sourceOperation": "dmGameObject::GetPosition(instance)",
       "operation": {
         "template": "current-instance-transform-get",
-        "parameters": { "property": "position", "kind": "Vector3" }
+        "parameters": { "property": "position", "kind": "Vector3", "addressed": "pinned-resolve-instance-captured-lua" }
       },
       "callShapes": [[], ["String"], ["Hash"], ["Url"]],
-      "implementedCallShapes": [[]],
+      "implementedCallShapes": [[], ["String"], ["Hash"], ["Url"]],
       "resultCodec": "Vector3"
     },
     {
@@ -23,10 +23,10 @@
       "sourceOperation": "dmGameObject::SetPosition(instance, dmVMath::Point3(*v))",
       "operation": {
         "template": "current-instance-transform-set",
-        "parameters": { "property": "position", "kind": "Vector3", "rejectNaN": true }
+        "parameters": { "property": "position", "kind": "Vector3", "rejectNaN": true, "addressed": "pinned-resolve-instance-captured-lua" }
       },
       "callShapes": [["Vector3"], ["Vector3", "String"], ["Vector3", "Hash"], ["Vector3", "Url"]],
-      "implementedCallShapes": [["Vector3"]],
+      "implementedCallShapes": [["Vector3"], ["Vector3", "String"], ["Vector3", "Hash"], ["Vector3", "Url"]],
       "resultCodec": "None"
     },
     {
@@ -35,10 +35,10 @@
       "sourceOperation": "dmGameObject::SetRotation(instance, *q)",
       "operation": {
         "template": "current-instance-transform-set",
-        "parameters": { "property": "rotation", "kind": "Quaternion", "rejectNaN": true }
+        "parameters": { "property": "rotation", "kind": "Quaternion", "rejectNaN": true, "addressed": "pinned-resolve-instance-captured-lua" }
       },
       "callShapes": [["Quaternion"], ["Quaternion", "String"], ["Quaternion", "Hash"], ["Quaternion", "Url"]],
-      "implementedCallShapes": [["Quaternion"]],
+      "implementedCallShapes": [["Quaternion"], ["Quaternion", "String"], ["Quaternion", "Hash"], ["Quaternion", "Url"]],
       "resultCodec": "None"
     },
     {

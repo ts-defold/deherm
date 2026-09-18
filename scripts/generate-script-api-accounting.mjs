@@ -440,6 +440,7 @@ export function generateScriptApiAccounting(inputs) {
       loweringFamily: pattern.loweringFamily,
       contextToken: componentPropertyCompilerIds.has(fn.id) ? "component-property-compiler" : "runtime-context-selected-later",
       parameters: fn.parameters,
+      overloadTokens: fn.overloads,
       resultCount: fn.returns.length,
       variadic: pattern.traits.includes("variable-arguments") || pattern.traits.includes("variable-results")
     }];

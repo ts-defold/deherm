@@ -2,17 +2,17 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "29268804321484580c0bb1b863ab40559c7e3b222b3c3e8461c6733da6c259de",
+  "inputSha256": "11f01674e61c8ff26506738cbe167b1384a7b564eb10f9046fe1244599fe8781",
   "expectedInputMarker": "INFO:DEFOLD_HERMES: script-value-probes:159d527aa0407886a9f2c2dc4a7eecc22ff6d07f85674adf734810e5c8b24e58",
-  "instrumentedSemanticSha256": "7a0fccc202a689ab85d6345e98277aa627d04297435b10a65e8ef4bddcaae33c",
+  "instrumentedSemanticSha256": "3a2a975bd72d21bc234ab703322222ffb62c2e9fd9f2a3917d68c89925781e27",
   "coverageClaim": "All 78 generated native value bindings have a deterministic packaged-engine probe disposition for dynamic Hermes on arm64 macOS; 39 family routes are planned-only and are neither emitted nor claimed as observed.",
-  "probeCount": 39,
+  "probeCount": 49,
   "generatedProbeCount": 25,
-  "instrumentedProbeCount": 20,
+  "instrumentedProbeCount": 30,
   "explicitPlannedProbeCount": 19,
   "plannedProbeCount": 58,
   "plannedFamilyProbeCount": 39,
-  "routeDispositionCount": 78,
+  "routeDispositionCount": 88,
   "uniqueBindingCount": 78,
   "probes": [
     {
@@ -158,6 +158,127 @@
       "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.current:ok"
     },
     {
+      "key": "go.set_position.addressed-string",
+      "id": "script:go.set_position",
+      "stableId": 608141138,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "String"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "void"
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_position.addressed-string:ok"
+    },
+    {
+      "key": "go.get_position.addressed-string",
+      "id": "script:go.get_position",
+      "stableId": 3918772974,
+      "state": "instrumented",
+      "callShape": [
+        "String"
+      ],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          5,
+          8,
+          13
+        ],
+        "tolerance": 0
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-string:ok"
+    },
+    {
+      "key": "go.set_position.addressed-hash",
+      "id": "script:go.set_position",
+      "stableId": 608141138,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "Hash"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "void"
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_position.addressed-hash:ok"
+    },
+    {
+      "key": "go.get_position.addressed-hash",
+      "id": "script:go.get_position",
+      "stableId": 3918772974,
+      "state": "instrumented",
+      "callShape": [
+        "Hash"
+      ],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          21,
+          34,
+          55
+        ],
+        "tolerance": 0
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-hash:ok"
+    },
+    {
+      "key": "go.set_position.addressed-url",
+      "id": "script:go.set_position",
+      "stableId": 608141138,
+      "state": "instrumented",
+      "callShape": [
+        "Vector3",
+        "Url"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_position.addressed-url:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:go.set_position.addressed-url:ok"
+    },
+    {
+      "key": "go.get_position.addressed-url",
+      "id": "script:go.get_position",
+      "stableId": 3918772974,
+      "state": "instrumented",
+      "callShape": [
+        "Url"
+      ],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "components",
+        "values": [
+          89,
+          144,
+          233
+        ],
+        "tolerance": 0
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-url:ok"
+    },
+    {
+      "key": "go.get_position.addressed-missing",
+      "id": "script:go.get_position",
+      "stableId": 3918772974,
+      "state": "instrumented",
+      "callShape": [
+        "String"
+      ],
+      "resultCodec": "Vector3",
+      "expectation": {
+        "kind": "raises",
+        "reason": "An address that names no instance in the calling collection must fail closed instead of returning a default transform."
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.get_position.addressed-missing:ok"
+    },
+    {
       "key": "go.set_rotation.current",
       "id": "script:go.set_rotation",
       "stableId": 2093413559,
@@ -204,6 +325,52 @@
         "marker": "DEBUG:SCRIPT: script-value:factory.create.probe:ok"
       },
       "expectedMarker": "DEBUG:SCRIPT: script-value:factory.create.probe:ok"
+    },
+    {
+      "key": "go.set_rotation.addressed-string",
+      "id": "script:go.set_rotation",
+      "stableId": 2093413559,
+      "state": "instrumented",
+      "callShape": [
+        "Quaternion",
+        "String"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "deferredLua",
+        "marker": "DEBUG:SCRIPT: script-value:go.set_rotation.addressed-string:ok"
+      },
+      "expectedMarker": "DEBUG:SCRIPT: script-value:go.set_rotation.addressed-string:ok"
+    },
+    {
+      "key": "go.set_rotation.addressed-hash",
+      "id": "script:go.set_rotation",
+      "stableId": 2093413559,
+      "state": "instrumented",
+      "callShape": [
+        "Quaternion",
+        "Hash"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "void"
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_rotation.addressed-hash:ok"
+    },
+    {
+      "key": "go.set_rotation.addressed-url",
+      "id": "script:go.set_rotation",
+      "stableId": 2093413559,
+      "state": "instrumented",
+      "callShape": [
+        "Quaternion",
+        "Url"
+      ],
+      "resultCodec": "None",
+      "expectation": {
+        "kind": "void"
+      },
+      "expectedMarker": "INFO:DEFOLD_HERMES: script-value:go.set_rotation.addressed-url:ok"
     },
     {
       "key": "go.delete.factory-probe",
