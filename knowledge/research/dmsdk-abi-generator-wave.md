@@ -1,7 +1,7 @@
 ---
 type: Research
 title: dmSDK ABI generator wave
-description: Reproduced scalar blocker audit, exact ABI-shape census, and generated enum-value bindings.
+description: Reproduced scalar blocker audit, exact ABI-shape census, and generated scalar, enum, and bounded-span bindings.
 tags: [research, generated, dmsdk, bindings, abi, conformance]
 status: active
 ---
@@ -11,6 +11,24 @@ status: active
 The dmSDK runtime queue is now decomposed mechanically rather than by a hand-written function list. `scripts/generate-dmsdk-abi-shapes.mjs` resolves aliases, enums, records, handles, pointers, callbacks, direction, and fixed ABI scalars for all 1,361 runtime-pending declarations. The resulting ledger contains 881 exact signature shapes grouped into 15 implementation tranches. Every row retains its source declaration ID and header, plus explicit blockers; no tranche is promoted as runtime evidence merely because it was classified. The next 21 named-scalar declarations have now been reviewed: all 21 remain policy-blocked—two need engine/audio context, five need thread/TLS ownership and lifecycle capabilities, and 14 require a provenance-carrying profiler-property handle. The empty generated family deliberately exports and installs no callable surface.
 
 The first derived follow-on family is `next-enum-value-direct`: ten functions whose arguments and results contain only ABI scalars or resolved enums. A small reviewed policy manifest blocks three lifecycle/registry mutations and emits seven normal calls. The generated ABI uses `int32_t` for enums, exact generated input-domain checks, `uint64_t` plus JSI `bigint` for hashes, dense integer IDs, and stack-only fixed slots. Four buffer/log calls link and execute against the pinned packaged dmSDK. Three graphics/sound calls compile against the complete SDK but remain `engine-context-pending` until exercised in a real Defold process.
+
+Four additional context-free families are now generated from exact ABI-census
+selectors plus source-pinned semantic policies:
+
+- four fixed digests with caller-provided capacity and fixed 16/20/32/64-byte outputs;
+- two Base64 span operations with explicit capacity/query semantics and strict
+  padded alphabet, padding-position, and canonical discarded-bit validation
+  before platform-native decode;
+- two bounded ASTC header probes returning a caller-owned three-`uint32_t`
+  record; and
+- XTEA encrypt/decrypt specialized to `ALGORITHM_XTEA`, with non-null spans and
+  the pinned 16-byte key maximum checked before the native assertion.
+
+All ten compile and link against pinned Defold code or packaged SDK libraries
+and pass known-behavior and rejection tests. Warmed harnesses observe zero C++
+`operator new` calls through the generated glue. That is not a claim that every
+platform-native implementation is allocation-free: the Apple Base64 path uses
+Foundation, so Objective-C/native allocations remain unmeasured.
 
 ## Corrected blocker claim
 
@@ -33,7 +51,7 @@ registry for this focused runtime-lowering pipeline. The clean-room checker
 copies only the registered generator sources, pinned inputs, and referenced
 Defold evidence into a new temporary directory, executes the steps in order,
 discovers generated dmSDK files independently, rejects unowned output, and
-compares all 34 artifacts byte-for-byte with the repository.
+compares all 55 artifacts byte-for-byte with the repository.
 `scripts/generate-dmsdk-runtime.mjs` is the thin public orchestrator; both its
 generate and `--check` modes consume this registry rather than restating the
 step chain.
@@ -55,11 +73,19 @@ The registered steps are:
 5. `scripts/generate-dmsdk-enum-value-bindings.mjs`
    - inputs: SDK IR, ABI-shape report, scalar-thunk report, and `bindings/overrides/dmsdk-enum-value-bindings.json`
    - outputs: enum-value report, C ABI, runtime dispatcher, JSI adapter, TypeScript wrapper, and buffer/graphics/log/sound C++ sources listed in its report
+6. `scripts/generate-dmsdk-fixed-digest-bindings.mjs`
+   - outputs: four capacity-checked digest wrappers and a dense runtime dispatcher
+7. `scripts/generate-dmsdk-base64-span-bindings.mjs`
+   - outputs: canonical padded Base64 span wrappers and query/dispatch metadata
+8. `scripts/generate-dmsdk-astc-probe-bindings.mjs`
+   - outputs: two bounded ASTC probes with a fixed caller-owned result record
+9. `scripts/generate-dmsdk-xtea-span-bindings.mjs`
+   - outputs: specialized XTEA encrypt/decrypt span wrappers and dispatcher
 
 Focused gates are `npm run check:dmsdk-runtime`,
 `npm run check:dmsdk-clean-room`, `npm run test:dmsdk-runtime-codegen`, and
 `npm run test:dmsdk-clean-room`. The clean-room input fingerprint for this
-wave is `b15928c87caed6584bd79cc0941bc2bcdd00c713245fb2390713953ab135354e`.
+wave is `44d9b2f3c3d2036b644862798cb480e0c07bd5402d86c24f3f1080096ac24588`.
 
 The enum-value runtime and JSI dispatcher are now installed by the generated
 module installer and exported by the generated SDK barrel. The standalone host
