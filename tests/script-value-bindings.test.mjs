@@ -308,7 +308,7 @@ test("every generated value binding has a deterministic packaged-engine probe di
   assert.equal(report.plannedProbeCount, 58);
   assert.equal(report.probes.every(({ expectedMarker }) => expectedMarker.endsWith(":ok")), true);
   const source = await readFile(new URL(
-    "sample/src/generated/script-value-real-engine-probes.ts", root), "utf8");
+    "examples/runtime-smoke/src/generated/script-value-real-engine-probes.ts", root), "utf8");
   assert.match(source, /Math\.abs\(result_3\.x - 0\.6\) <= 0\.000001/);
   assert.match(source, /vmath\.quatRotationZ\(3\.141592653589793\)/);
   assert.match(source, /builtins\.hash\("my_hash"\)/);

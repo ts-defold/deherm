@@ -8,7 +8,7 @@ const root = new URL("../", import.meta.url);
 const sourceUrl = new URL("bindings/probes/defold-script-value-real-engine-probes.json", root);
 const bindingsUrl = new URL("bindings/generated/defold-script-value-bindings.json", root);
 const reportUrl = new URL("bindings/generated/defold-script-value-real-engine-probes.json", root);
-const typescriptUrl = new URL("sample/src/generated/script-value-real-engine-probes.ts", root);
+const typescriptUrl = new URL("examples/runtime-smoke/src/generated/script-value-real-engine-probes.ts", root);
 
 const componentNames = ["x", "y", "z", "w"];
 

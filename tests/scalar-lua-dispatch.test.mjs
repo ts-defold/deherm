@@ -49,7 +49,7 @@ test("real-engine probes are deterministic and descriptor validated", async () =
   const [dispatch, probes, generated] = await Promise.all([
     readFile(new URL("bindings/generated/defold-script-scalar-dispatch.json", root), "utf8").then(JSON.parse),
     readFile(new URL("bindings/generated/defold-script-real-engine-probes.json", root), "utf8").then(JSON.parse),
-    readFile(new URL("sample/src/generated/script-real-engine-probes.ts", root), "utf8")
+    readFile(new URL("examples/runtime-smoke/src/generated/script-real-engine-probes.ts", root), "utf8")
   ]);
   const dispatchById = new Map(dispatch.bindings.map((binding) => [binding.id, binding]));
   assert.equal(probes.probeCount, 14);

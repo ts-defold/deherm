@@ -15,7 +15,7 @@
   },
   "include": [
     "packages/**/*.ts",
-    "sample/**/*.ts",
+    "examples/runtime-smoke/**/*.ts",
     "benchmarks/**/*.ts",
     "examples/war-battles-online/verification/generated/**/*.ts"
   ]

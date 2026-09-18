@@ -18,6 +18,12 @@ This repository is an architecture spike. Start with the
 [implementation plan](.agents/docs/plan.md) and
 [runtime strategy](.agents/docs/decisions/runtime-strategy.md).
 
+Repository boundaries are intentional: `packages/*` contains internal product
+modules that compose the single published `@ts-defold/deherm` package, while
+`examples/*` contains runnable consumers and integration fixtures. Examples
+only join the pnpm workspace when they have an actual `package.json` and need
+workspace dependency or script orchestration.
+
 The working developer experience is:
 
 ```sh

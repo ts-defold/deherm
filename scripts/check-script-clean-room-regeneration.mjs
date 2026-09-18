@@ -232,8 +232,8 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
       candidates.add(`defold/defold_hermes/src/${file}`);
     }
   }
-  for (const file of await walkFiles(path.join(repositoryRoot, "sample/src/generated"))) {
-    if (file.endsWith("real-engine-probes.ts")) candidates.add(`sample/src/generated/${file}`);
+  for (const file of await walkFiles(path.join(repositoryRoot, "examples/runtime-smoke/src/generated"))) {
+    if (file.endsWith("real-engine-probes.ts")) candidates.add(`examples/runtime-smoke/src/generated/${file}`);
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "packages/static-hermes/src/generated"))) {
     if (file === "script-vmath.ts" || file === "script-universal-value.ts") {

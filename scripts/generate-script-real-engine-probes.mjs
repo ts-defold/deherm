@@ -9,7 +9,7 @@ const sourceUrl = new URL("bindings/probes/defold-script-real-engine-probes.json
 const descriptorsUrl = new URL("bindings/generated/defold-script-scalar-dispatch.json", root);
 const irUrl = new URL("bindings/generated/defold-script-api-ir.json", root);
 const reportUrl = new URL("bindings/generated/defold-script-real-engine-probes.json", root);
-const typescriptUrl = new URL("sample/src/generated/script-real-engine-probes.ts", root);
+const typescriptUrl = new URL("examples/runtime-smoke/src/generated/script-real-engine-probes.ts", root);
 
 function literal(value) {
   return JSON.stringify(value);

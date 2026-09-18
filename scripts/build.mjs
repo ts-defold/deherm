@@ -16,8 +16,8 @@ const pendingFingerprint = "0".repeat(64);
 
 const result = await build({
   entryPoints: {
-    sample: "sample/src/standalone.ts",
-    "defold-app": "sample/src/main.ts",
+    sample: "examples/runtime-smoke/src/standalone.ts",
+    "defold-app": "examples/runtime-smoke/src/main.ts",
     "binding-benchmark": "benchmarks/binding.ts",
     "web-host": "packages/web-adapter/src/host.ts",
     "web-runner": "packages/web-adapter/src/runner.ts"
