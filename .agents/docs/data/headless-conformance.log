@@ -1,4 +1,4 @@
-INFO:DLIB: Log server started on port 51255
+INFO:DLIB: Log server started on port <ephemeral>
 headless-conformance:driver:cases:16
 headless-conformance:case-begin	contract_0148
 INFO:GRAPHICS: Installed graphics device 'ADAPTER_FAMILY_NULL'
@@ -54,41 +54,41 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance:harness:82:16
 ERROR:CRASH: CALL STACK:
 
 
-ERROR:CRASH: 0   defold-hermes-headless-conformance- 0x00000001008dd050 _ZN7dmCrash7OnCrashEi + 108
-ERROR:CRASH: 1   defold-hermes-headless-conformance- 0x00000001008dd1e8 _ZN7dmCrashL7HandlerEiP9__siginfoPv + 72
-ERROR:CRASH: 2   libsystem_platform.dylib            0x000000018368b744 _sigtramp + 56
-ERROR:CRASH: 3   defold-hermes-headless-conformance- 0x00000001006f8e8c _ZN12dmGameSystemL12B2D_GetWorldEP9lua_State + 96
-ERROR:CRASH: 4   defold-hermes-headless-conformance- 0x000000010080a3cc lj_BC_FUNCC + 44
-ERROR:CRASH: 5   defold-hermes-headless-conformance- 0x00000001003183f8 _ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter14dispatchUnsafeERNS1_15DispatchContextE + 236
-ERROR:CRASH: 6   defold-hermes-headless-conformance- 0x00000001003182f8 _ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter17ProtectedDispatchEP9lua_State + 36
-ERROR:CRASH: 7   defold-hermes-headless-conformance- 0x000000010080a3cc lj_BC_FUNCC + 44
-ERROR:CRASH: 8   defold-hermes-headless-conformance- 0x0000000100822130 dm_lua_cpcall + 28
-ERROR:CRASH: 9   defold-hermes-headless-conformance- 0x000000010032ac58 _ZN13defold_hermes18dispatchScriptCallEPNS_15ScriptCallFrameE + 192
-ERROR:CRASH: 10  defold-hermes-headless-conformance- 0x000000010032cb68 _ZNSt3__110__function6__funcIZN13defold_hermes22installScriptJsiBridgeERN8facebook3jsi7RuntimeEE3$_0FNS4_5ValueES6_RKS8_PS9_mEEclES6_SA_OSB_Om + 712
-ERROR:CRASH: 11  defold-hermes-headless-conformance- 0x00000001003c8708 _ZN8facebook6hermes12_GLOBAL__N_117HermesRuntimeImpl9HFContext4funcEPvRN6hermes2vm7RuntimeE + 284
-ERROR:CRASH: 12  defold-hermes-headless-conformance- 0x00000001005b2d00 _ZN6hermes2vm25FinalizableNativeFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 68
-ERROR:CRASH: 13  defold-hermes-headless-conformance- 0x0000000100590988 _ZN6hermes2vm11Interpreter17interpretFunctionILb0ELb0EEENS0_10CallResultINS0_11HermesValueELNS0_6detail20CallResultSpecializeE2EEERNS0_7RuntimeERNS0_16InterpreterStateE + 1520
-ERROR:CRASH: 14  defold-hermes-headless-conformance- 0x00000001008e5590 _ZN6hermes2vm7Runtime17interpretFunctionEPNS0_9CodeBlockE + 32
-ERROR:CRASH: 15  defold-hermes-headless-conformance- 0x000000010057bfb8 _ZN6hermes2vm10JSFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 32
-ERROR:CRASH: 16  defold-hermes-headless-conformance- 0x00000001008fc018 _ZN6hermes2vm18hermesBuiltinApplyEPvRNS0_7RuntimeE + 1180
-ERROR:CRASH: 17  defold-hermes-headless-conformance- 0x00000001008e65d8 _ZN6hermes2vm11Interpreter15implCallBuiltinERNS0_7RuntimeEPNS0_17PinnedHermesValueEPNS0_9CodeBlockEj + 160
-ERROR:CRASH: 18  defold-hermes-headless-conformance- 0x0000000100590b64 _ZN6hermes2vm11Interpreter17interpretFunctionILb0ELb0EEENS0_10CallResultINS0_11HermesValueELNS0_6detail20CallResultSpecializeE2EEERNS0_7RuntimeERNS0_16InterpreterStateE + 1996
-ERROR:CRASH: 19  defold-hermes-headless-conformance- 0x00000001008e5590 _ZN6hermes2vm7Runtime17interpretFunctionEPNS0_9CodeBlockE + 32
-ERROR:CRASH: 20  defold-hermes-headless-conformance- 0x000000010057bfb8 _ZN6hermes2vm10JSFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 32
-ERROR:CRASH: 21  defold-hermes-headless-conformance- 0x00000001003bf468 _ZN8facebook6hermes12_GLOBAL__N_117HermesRuntimeImpl4callERKNS_3jsi8FunctionERKNS3_5ValueEPS8_m + 760
-ERROR:CRASH: 22  defold-hermes-headless-conformance- 0x0000000100326730 _ZN13defold_hermes7Runtime4Impl12callOptionalEPKcPKN8facebook3jsi5ValueEm + 356
-ERROR:CRASH: 23  defold-hermes-headless-conformance- 0x000000010030ac9c _ZN12_GLOBAL__N_116StartApplicationEv + 268
-ERROR:CRASH: 24  defold-hermes-headless-conformance- 0x000000010030a40c _ZN12_GLOBAL__N_117AttachLuaInstanceEP9lua_State + 316
-ERROR:CRASH: 25  defold-hermes-headless-conformance- 0x000000010080a3cc lj_BC_FUNCC + 44
-ERROR:CRASH: 26  defold-hermes-headless-conformance- 0x00000001008220f0 dm_lua_pcall + 148
-ERROR:CRASH: 27  defold-hermes-headless-conformance- 0x000000010065b1dc _ZN12dmGameObject9RunScriptEP9lua_StatePNS_6ScriptENS_14ScriptFunctionEPNS_14ScriptInstanceERKNS_15RunScriptParamsE + 364
-ERROR:CRASH: 28  defold-hermes-headless-conformance- 0x000000010065b300 _ZN12dmGameObject14CompScriptInitERKNS_19ComponentInitParamsE + 52
-ERROR:CRASH: 29  defold-hermes-headless-conformance- 0x0000000100660f90 _ZN12dmGameObjectL12InitInstanceEPNS_10CollectionEPNS_8InstanceE + 800
-ERROR:CRASH: 30  defold-hermes-headless-conformance- 0x0000000100662330 _ZN12dmGameObject4InitEPNS_16CollectionHandleE + 136
-ERROR:CRASH: 31  defold-hermes-headless-conformance- 0x00000001006460d8 _ZN8dmEngine4InitEPNS_6EngineEiPPc + 7384
-ERROR:CRASH: 32  defold-hermes-headless-conformance- 0x0000000100647b00 _Z14dmEngineCreateiPPc + 168
-ERROR:CRASH: 33  defold-hermes-headless-conformance- 0x00000001003059b0 main + 2304
-ERROR:CRASH: 34  dyld                                0x00000001832c3e00 start + 6992
+ERROR:CRASH: 0   defold-hermes-headless-conformance- 0x<address> _ZN7dmCrash7OnCrashEi + 108
+ERROR:CRASH: 1   defold-hermes-headless-conformance- 0x<address> _ZN7dmCrashL7HandlerEiP9__siginfoPv + 72
+ERROR:CRASH: 2   libsystem_platform.dylib            0x<address> _sigtramp + 56
+ERROR:CRASH: 3   defold-hermes-headless-conformance- 0x<address> _ZN12dmGameSystemL12B2D_GetWorldEP9lua_State + 96
+ERROR:CRASH: 4   defold-hermes-headless-conformance- 0x<address> lj_BC_FUNCC + 44
+ERROR:CRASH: 5   defold-hermes-headless-conformance- 0x<address> _ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter14dispatchUnsafeERNS1_15DispatchContextE + 236
+ERROR:CRASH: 6   defold-hermes-headless-conformance- 0x<address> _ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter17ProtectedDispatchEP9lua_State + 36
+ERROR:CRASH: 7   defold-hermes-headless-conformance- 0x<address> lj_BC_FUNCC + 44
+ERROR:CRASH: 8   defold-hermes-headless-conformance- 0x<address> dm_lua_cpcall + 28
+ERROR:CRASH: 9   defold-hermes-headless-conformance- 0x<address> _ZN13defold_hermes18dispatchScriptCallEPNS_15ScriptCallFrameE + 192
+ERROR:CRASH: 10  defold-hermes-headless-conformance- 0x<address> _ZNSt3__110__function6__funcIZN13defold_hermes22installScriptJsiBridgeERN8facebook3jsi7RuntimeEE3$_0FNS4_5ValueES6_RKS8_PS9_mEEclES6_SA_OSB_Om + 712
+ERROR:CRASH: 11  defold-hermes-headless-conformance- 0x<address> _ZN8facebook6hermes12_GLOBAL__N_117HermesRuntimeImpl9HFContext4funcEPvRN6hermes2vm7RuntimeE + 284
+ERROR:CRASH: 12  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm25FinalizableNativeFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 68
+ERROR:CRASH: 13  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm11Interpreter17interpretFunctionILb0ELb0EEENS0_10CallResultINS0_11HermesValueELNS0_6detail20CallResultSpecializeE2EEERNS0_7RuntimeERNS0_16InterpreterStateE + 1520
+ERROR:CRASH: 14  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm7Runtime17interpretFunctionEPNS0_9CodeBlockE + 32
+ERROR:CRASH: 15  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm10JSFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 32
+ERROR:CRASH: 16  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm18hermesBuiltinApplyEPvRNS0_7RuntimeE + 1180
+ERROR:CRASH: 17  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm11Interpreter15implCallBuiltinERNS0_7RuntimeEPNS0_17PinnedHermesValueEPNS0_9CodeBlockEj + 160
+ERROR:CRASH: 18  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm11Interpreter17interpretFunctionILb0ELb0EEENS0_10CallResultINS0_11HermesValueELNS0_6detail20CallResultSpecializeE2EEERNS0_7RuntimeERNS0_16InterpreterStateE + 1996
+ERROR:CRASH: 19  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm7Runtime17interpretFunctionEPNS0_9CodeBlockE + 32
+ERROR:CRASH: 20  defold-hermes-headless-conformance- 0x<address> _ZN6hermes2vm10JSFunction9_callImplENS0_6HandleINS0_8CallableEEERNS0_7RuntimeE + 32
+ERROR:CRASH: 21  defold-hermes-headless-conformance- 0x<address> _ZN8facebook6hermes12_GLOBAL__N_117HermesRuntimeImpl4callERKNS_3jsi8FunctionERKNS3_5ValueEPS8_m + 760
+ERROR:CRASH: 22  defold-hermes-headless-conformance- 0x<address> _ZN13defold_hermes7Runtime4Impl12callOptionalEPKcPKN8facebook3jsi5ValueEm + 356
+ERROR:CRASH: 23  defold-hermes-headless-conformance- 0x<address> _ZN12_GLOBAL__N_116StartApplicationEv + 268
+ERROR:CRASH: 24  defold-hermes-headless-conformance- 0x<address> _ZN12_GLOBAL__N_117AttachLuaInstanceEP9lua_State + 316
+ERROR:CRASH: 25  defold-hermes-headless-conformance- 0x<address> lj_BC_FUNCC + 44
+ERROR:CRASH: 26  defold-hermes-headless-conformance- 0x<address> dm_lua_pcall + 148
+ERROR:CRASH: 27  defold-hermes-headless-conformance- 0x<address> _ZN12dmGameObject9RunScriptEP9lua_StatePNS_6ScriptENS_14ScriptFunctionEPNS_14ScriptInstanceERKNS_15RunScriptParamsE + 364
+ERROR:CRASH: 28  defold-hermes-headless-conformance- 0x<address> _ZN12dmGameObject14CompScriptInitERKNS_19ComponentInitParamsE + 52
+ERROR:CRASH: 29  defold-hermes-headless-conformance- 0x<address> _ZN12dmGameObjectL12InitInstanceEPNS_10CollectionEPNS_8InstanceE + 800
+ERROR:CRASH: 30  defold-hermes-headless-conformance- 0x<address> _ZN12dmGameObject4InitEPNS_16CollectionHandleE + 136
+ERROR:CRASH: 31  defold-hermes-headless-conformance- 0x<address> _ZN8dmEngine4InitEPNS_6EngineEiPPc + 7384
+ERROR:CRASH: 32  defold-hermes-headless-conformance- 0x<address> _Z14dmEngineCreateiPPc + 168
+ERROR:CRASH: 33  defold-hermes-headless-conformance- 0x<address> main + 2304
+ERROR:CRASH: 34  dyld                                0x<address> start + 6992
 ERROR:CRASH: Lua Callstack:
 ERROR:CRASH:   [C]:-1: ?
 ERROR:CRASH:   [C]:-1: in function attach
@@ -98,7 +98,7 @@ ERROR:CRASH:   conformance/contract_0150.script:5: in function <conformance/cont
 ERROR:CRASH: 
 
 
-INFO:DLIB: Log server started on port 51256
+INFO:DLIB: Log server started on port <ephemeral>
 headless-conformance:driver:cases:13
 headless-conformance:case-begin	contract_0160
 INFO:GRAPHICS: Installed graphics device 'ADAPTER_FAMILY_NULL'

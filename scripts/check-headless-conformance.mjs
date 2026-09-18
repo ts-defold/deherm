@@ -131,6 +131,15 @@ async function runDriver(projectFile, remaining) {
   });
 }
 
+// Ephemeral ports and ASLR addresses are the only run-to-run variation in the
+// transcript. Normalising them keeps the recorded evidence reproducible while
+// leaving every symbol, marker and verdict intact.
+function normalizeEvidence(transcript) {
+  return transcript
+    .replace(/(Log server started on port )\d+/g, "$1<ephemeral>")
+    .replace(/0x[0-9a-f]{8,16}/g, "0x<address>");
+}
+
 export async function checkHeadlessConformance({ skipBuild = false } = {}) {
   const documents = await loadHeadlessConformanceInputs(root);
   const plan = buildHeadlessConformancePlan(documents);
@@ -263,7 +272,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
 
   await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`);
   await mkdir(path.dirname(evidencePath), { recursive: true });
-  await writeFile(evidencePath, transcripts.join("\n"));
+  await writeFile(evidencePath, normalizeEvidence(transcripts.join("\n")));
   return report;
 }
 
