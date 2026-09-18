@@ -11,7 +11,13 @@ importers:
       '@rezi-ui/core':
         specifier: 0.1.0-beta.2
         version: 0.1.0-beta.2
+      '@rezi-ui/jsx':
+        specifier: 0.1.0-beta.2
+        version: 0.1.0-beta.2
       '@rezi-ui/node':
+        specifier: 0.1.0-beta.2
+        version: 0.1.0-beta.2
+      '@rezi-ui/testkit':
         specifier: 0.1.0-beta.2
         version: 0.1.0-beta.2
       '@ttsc/unplugin':
@@ -254,12 +260,20 @@ packages:
     resolution: {integrity: sha512-XWr4Qf1fp02rAEYZQDYS4FEK3UH4pSsC7c5xDJa7KrS7rHJNyvbLKf14iNRPAhTgWK95RRJcMSBb0PlfImL6XQ==}
     engines: {bun: '>=1.3.0', node: '>=18'}
 
+  '@rezi-ui/jsx@0.1.0-beta.2':
+    resolution: {integrity: sha512-yyzgeRnUXK0ciL1e5T1lmjEqIY4DqkY3Tqi4KELzzY2jIaBb4B74AFlbd7p/0Igc4f3VaTXq9hDMBctbBndJWg==}
+    engines: {bun: '>=1.3.0', node: '>=18'}
+
   '@rezi-ui/native@0.1.0-beta.2':
     resolution: {integrity: sha512-kvxYDIa/Ai1a1fRzoQZEgDdHFMc7/jojWhYxALFnmAfREIQyxr8ViBhgPpHO91ZIizLh2KTbV6KMg079I9ItTQ==}
     engines: {bun: '>=1.3.0', node: '>=18'}
 
   '@rezi-ui/node@0.1.0-beta.2':
     resolution: {integrity: sha512-0Jz3M+gJgeg48C8bAR6kLroBYMjdelxU6BAStKN2t3s4saq4JSaaCh1OxZFZUeNTaD9hfapFqx4p4Uc9vQ85TA==}
+    engines: {bun: '>=1.3.0', node: '>=18'}
+
+  '@rezi-ui/testkit@0.1.0-beta.2':
+    resolution: {integrity: sha512-pUgsy9t22v7V2RDkSRq7VOEN8CUh9odquDEcD1R6TIdJ+uI16HY/iEj+z5VZtxKJoE9sF/rC60YdpP3SBV2tPQ==}
     engines: {bun: '>=1.3.0', node: '>=18'}
 
   '@ttsc/darwin-arm64@0.30.4':
@@ -579,6 +593,10 @@ snapshots:
 
   '@rezi-ui/core@0.1.0-beta.2': {}
 
+  '@rezi-ui/jsx@0.1.0-beta.2':
+    dependencies:
+      '@rezi-ui/core': 0.1.0-beta.2
+
   '@rezi-ui/native@0.1.0-beta.2': {}
 
   '@rezi-ui/node@0.1.0-beta.2':
@@ -587,6 +605,8 @@ snapshots:
       '@rezi-ui/native': 0.1.0-beta.2
       '@xterm/headless': 6.0.0
       node-pty: 1.1.0
+
+  '@rezi-ui/testkit@0.1.0-beta.2': {}
 
   '@ttsc/darwin-arm64@0.30.4':
     optional: true

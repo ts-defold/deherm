@@ -234,6 +234,31 @@ changes restart an engine that the operator launched manually. The watcher
 excludes `.internal`, `.deherm`, build outputs, and generated proxies so editor
 cache churn and self-authored outputs do not form rebuild loops.
 
+The console itself is declarative. `packages/cli/src/dev/tui/` is authored in
+TSX against `@rezi-ui/jsx`; `packages/cli/src/dev/tsx-loader.mjs` registers a
+synchronous esbuild module hook before those views are imported, so no build
+step or new toolchain enters the published package. Every panel wraps one
+focusable Rezi widget, which is what gives the console its focus ring,
+Tab/Shift-Tab traversal, click-to-focus, wheel scrolling, table row selection,
+and the draggable edit-loop/targets divider without hand-written input code.
+
+`packages/cli/src/dev/tui/keymap.mjs` is the single source of truth for the
+input surface: the footer strip, the `?` help overlay, the `:` command palette,
+and the bindings registered with Rezi are all projections of that one table, so
+an advertised key cannot drift away from a key that works. Rezi's chord trie
+holds one binding per sequence, so a sequence a panel owns (`up`, `pageup`,
+`home`) is registered once with a focus-scope guard; when the guard rejects, the
+event is left unconsumed and reaches the focused widget's own router instead.
+
+`o`/`t`/`g`/`i` select the Overview, Targets, Generations, and Instances views;
+`Escape` unwinds one overlay at a time; `y` copies the focused panel's selection
+over OSC 52 (so copy works across SSH) with a local `pbcopy`/`clip`/`wl-copy`/
+`xclip` fallback; `/` filters the log stream and accepts a paste. Dragging in
+the log viewport selects text: the log console keeps tailing and wheel handling,
+and an active selection swaps in a virtual list whose rows carry the highlight.
+The Instances view renders an explicit "requires runtime instance channel" empty
+state because `DEHERM_EVENT telemetry` reports counts, never identities.
+
 The next commands will orchestrate the internal build graph:
 
 ```sh

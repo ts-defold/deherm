@@ -352,6 +352,62 @@ Before making it the default interactive view, benchmark idle CPU, key-to-paint
 latency, resize behavior, 10,000-line log ingestion, RSS growth, and install
 fallbacks on each supported Deherm host.
 
+## Implemented console shape
+
+The operator console is now declarative rather than a fixed grid of static
+text. `packages/cli/src/dev/tui/` is authored in TSX against `@rezi-ui/jsx`
+(pinned to the same `0.1.0-beta.2` as core and node), imported through an
+esbuild module hook registered by `packages/cli/src/dev/tsx-loader.mjs`. esbuild
+is already a first-class dependency of the compiler pipeline, so the published
+package gains no new toolchain and no build step.
+
+Four properties follow from making every panel wrap exactly one focusable Rezi
+widget rather than drawing text:
+
+* **Focus and layers.** Panel focus is Rezi's own focus list, so Tab/Shift-Tab
+  traversal and click-to-focus are the framework's. The focused panel's border
+  switches to a double rule. Overlays (palette, help, log filter, target and
+  generation detail) live on `createLayerStackState`, and `Escape` pops exactly
+  one.
+* **Panel-owned keys.** Rezi's chord trie stores one binding per sequence and
+  evaluates `when` after the match; a rejected guard leaves the event unconsumed
+  so it falls through to widget routing. Scoped keys are therefore registered
+  once with a focus-scope guard: `up` scrolls the log panel when the log panel
+  holds focus and otherwise reaches the focused table's row navigation.
+* **Pointer.** Click-to-focus, wheel scrolling of logs and tables, table row
+  activation, and the draggable edit-loop/targets divider are all the widget
+  runtime's (`routeWheel`, `hitTestDivider`, `handleDividerDrag` inside
+  `splitPane` mouse routing). No pointer code is hand-written except log
+  selection.
+* **Keymap as one source of truth.** `keymap.mjs` declares every key once; the
+  footer, the fuzzy command palette, the `?` help overlay, and the registered
+  bindings are projections of it. Entries the runtime routes rather than the
+  console (Tab traversal, table `Enter`) are declared with their router instead
+  of a handler so help stays complete without claiming a binding that does not
+  exist.
+
+Selection is the one place the framework is deliberately left behind.
+`LogsConsole` has no selection model, so a drag in the log viewport computes a
+caret range against the measured rect and swaps in a `VirtualList` whose rows
+carry the highlight - windowing, wheel, and keyboard navigation stay with the
+framework, and only the caret arithmetic and row painting are hand-written. The
+copied text is produced from the same line array that is rendered, so what is
+highlighted is byte-for-byte what is copied. Copy is written with OSC 52 through
+the backend's raw-write marker so it reaches the operator's clipboard across
+SSH, with a local `pbcopy`/`clip`/`wl-copy`/`xclip` fallback; a copy is only
+reported when a transport actually accepted it.
+
+The Targets view lists generation, bundle fingerprint, phase, and per-target
+telemetry with drill-in; the Generations view is the build timeline with bytes,
+module delta, duration, and activation outcome, where `built` means produced and
+`activated` means a runtime acknowledged that exact fingerprint. The Instances
+view renders an explicit "requires runtime instance channel" empty state: the
+engine emits `DEHERM_EVENT telemetry` once a second carrying
+`component_instances`, `callback_roots`, and `lua_handles` as counts and nothing
+that identifies an individual instance, so per-instance rows here could only be
+fabricated. Listing identities needs a runtime instance channel, and that
+protocol change is owned outside this console.
+
 # `deherm dev` control plane
 
 ## Daemon/controller core
@@ -548,6 +604,9 @@ unproven. Native local activation now has a structured, fingerprint-bound log
 acknowledgement, but the packaged War Battles reload must still be rerun against
 the rebuilt extension before that product path is claimed.
 The Rezi console exists and has deterministic renderer fixtures, but still
-needs PTY/performance/platform evidence. The native swap and init-throw
+needs PTY/performance/platform evidence. Its focus, layer, pointer, selection,
+and keymap behavior is covered by deterministic renderer and lifecycle tests
+only; no run against a real PTY has been recorded, so mouse reporting, OSC 52
+acceptance, and divider dragging are unobserved on an actual terminal. The native swap and init-throw
 rejection recovery are proven for one sample bundle, not yet for the whole API
 or War Battles.

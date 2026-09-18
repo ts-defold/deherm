@@ -353,7 +353,10 @@ export async function runDevSession(options = {}) {
               diagnostic: error instanceof Error ? error.message : String(error)
             }));
           }
-          else emit({ type: "log", source: "tui", message: `${intent.type} panel is staged but not implemented` });
+          // Targets, generations, instances, the palette, and help are console
+          // views over this session's own snapshot; they need no session work.
+          // Anything else reaching here is a console/session contract drift.
+          else emit({ type: "log", level: "warn", source: "tui", message: `unhandled console intent: ${intent.type}` });
         }
       });
     } finally {
