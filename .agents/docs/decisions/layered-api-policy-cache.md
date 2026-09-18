@@ -69,6 +69,51 @@ A policy is only valid for the exact bytes it was derived from.
 * A policy that cannot be reparsed because source is absent, and whose hash does
   not match, is a hard failure. Stale source-derived truth is worse than none.
 
+# Merkle over the native input set
+
+A single hash per extension is not sufficient, because the *set* of inputs is
+not fixed: a user adds, removes, upgrades or vendors an extension at any time,
+and the engine revision moves independently. The cache key must be a tree, not a
+flat digest.
+
+Each native input is a leaf keyed by its own content: a dependency archive, a
+local extension tree, a `.script_api` file, a public header, the pinned engine
+revision. Leaves combine into per-extension nodes, those into a project node,
+and the root is the key the generation as a whole is stamped with.
+
+Structuring it this way buys three things a concatenated digest does not:
+
+* **Localised invalidation.** Adding one extension changes only the leaves it
+  owns and the path to the root. Every other extension's policy stays valid and
+  is not reparsed.
+* **Attributable drift.** A root mismatch resolves down the tree to the exact
+  leaf that moved, so the diagnostic can name the file or archive rather than
+  reporting that "something changed".
+* **Independent verification.** One extension's policy can be checked against
+  its own subtree without rehashing the project.
+
+Leaf and node ordering is canonical and path-sorted, so the root is a function
+of content and structure only - never of filesystem traversal order, resolution
+order, or timestamps.
+
+## Which hash, and where
+
+Two different jobs, deliberately not conflated:
+
+* **Cache keys use Murmur2-64A.** It is fast, and this repository already
+  implements Defold's exact `dmHashBufferNoReverse64` in
+  `packages/compiler/src/defold-hash.mjs`, verified against pinned native
+  vectors. A cache key answers "did this input change", where speed matters and
+  a non-cryptographic hash is appropriate.
+* **Evidence and provenance keep SHA-256.** Vendored artifact digests, recorded
+  runtime evidence, clean-room comparisons and the licence/provenance records
+  are claims that must remain checkable by a third party. Those do not move.
+
+The boundary is that a Murmur root decides whether to *do work*, while SHA-256
+decides what we *assert*. A collision in the former costs a missed reparse; a
+collision in the latter would corrupt evidence, which is why the two are not
+interchangeable.
+
 # What a policy records
 
 Not only what was resolved, but what was refused. Each entry carries its
