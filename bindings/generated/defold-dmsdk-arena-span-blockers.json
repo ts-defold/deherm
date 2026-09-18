@@ -10,29 +10,31 @@
       "bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
       "bindings/generated/defold-dmsdk-base64-span-bindings.json",
       "bindings/generated/defold-dmsdk-astc-probe-bindings.json",
-      "bindings/generated/defold-dmsdk-xtea-span-bindings.json"
+      "bindings/generated/defold-dmsdk-xtea-span-bindings.json",
+      "bindings/generated/defold-dmsdk-hash-span-bindings.json"
     ]
   },
   "sourceHashes": {
     "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
     "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
-    "policy": "67d8c0a539bf5fb08063d796e71fa7343772b7dfaf261979173e9da41b9c0a1a",
+    "policy": "e75c6b0cdb78029fc551b29ca5535523a0b1031880259a1af231c333def2ccfb",
     "priorWaveReports": {
       "bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "6d718ff01c2bfa14650f0d83853e2c3fc12bde2315868e4febe2382531629427",
       "bindings/generated/defold-dmsdk-base64-span-bindings.json": "ff7571c1d8f7ee5450ccc8102cd3b808908a9b07906d638b0ce0f422a834906c",
       "bindings/generated/defold-dmsdk-astc-probe-bindings.json": "5846d60384b34787bf3880b1723dc3f1caead05b68ef2172b0e4819c72450268",
-      "bindings/generated/defold-dmsdk-xtea-span-bindings.json": "04ec59105959ddf53419e9c66320da1d30b5d5e249d1254bdd0a3250232d7134"
+      "bindings/generated/defold-dmsdk-xtea-span-bindings.json": "04ec59105959ddf53419e9c66320da1d30b5d5e249d1254bdd0a3250232d7134",
+      "bindings/generated/defold-dmsdk-hash-span-bindings.json": "fdf8d14a83f605059630902d46b4998f2fb8492aef782906fb039f05033b3092"
     }
   },
-  "scope": "Complete arena-backed-spans census after the four generated prior waves",
+  "scope": "Complete arena-backed-spans census after the five generated prior waves",
   "policy": {
     "disposition": "blocked-metadata-only",
     "reason": "No executable adapter is emitted by this ledger. Every remaining row lacks at least one reviewed ABI, ownership, runtime-behavior, or allocation-safety contract required for promotion."
   },
   "coverage": {
     "arenaSpanCensus": 79,
-    "coveredByPriorWaves": 10,
-    "blocked": 69,
+    "coveredByPriorWaves": 12,
+    "blocked": 67,
     "executableAdaptersEmitted": 0,
     "overlap": 0,
     "unaccounted": 0
@@ -60,6 +62,12 @@
       "report": "bindings/generated/defold-dmsdk-xtea-span-bindings.json",
       "policyVersion": "xtea-span-v1",
       "sha256": "04ec59105959ddf53419e9c66320da1d30b5d5e249d1254bdd0a3250232d7134",
+      "declarationCount": 2
+    },
+    {
+      "report": "bindings/generated/defold-dmsdk-hash-span-bindings.json",
+      "policyVersion": "hash-span-v1",
+      "sha256": "fdf8d14a83f605059630902d46b4998f2fb8492aef782906fb039f05033b3092",
       "declarationCount": 2
     }
   ],
@@ -105,6 +113,16 @@
       "sourceReport": "bindings/generated/defold-dmsdk-fixed-digest-bindings.json"
     },
     {
+      "id": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
+      "symbol": "dmHashBuffer32",
+      "sourceReport": "bindings/generated/defold-dmsdk-hash-span-bindings.json"
+    },
+    {
+      "id": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
+      "symbol": "dmHashBuffer64",
+      "sourceReport": "bindings/generated/defold-dmsdk-hash-span-bindings.json"
+    },
+    {
       "id": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
       "symbol": "dmImage::GetAstcBlockSize",
       "sourceReport": "bindings/generated/defold-dmsdk-astc-probe-bindings.json"
@@ -118,7 +136,6 @@
   "partitionSummary": {
     "cstring-termination-or-capacity-policy": 5,
     "handle-provenance-or-engine-context": 33,
-    "hash-buffer-runtime-and-allocation-evidence": 2,
     "opaque-byte-pointee-unit-or-lifetime": 4,
     "record-layout-or-borrowed-record-lifetime": 19,
     "template-element-layout-or-specialization": 6
@@ -1839,106 +1856,6 @@
       "disposition": "blocked",
       "blocker": "handle-provenance-or-engine-context",
       "blockerReason": "The ABI consumes or returns an engine handle whose provenance, context, ownership, nullability, or teardown contract is not encoded by the arena.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
-      "id": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
-      "symbol": "dmHashBuffer32",
-      "kind": "function",
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
-      "line": 69,
-      "primaryFamily": "pointer-span",
-      "families": [
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:u32(in:opaque-pointer,value:scalar:u32)",
-      "result": {
-        "role": "scalar:u32",
-        "direction": "value",
-        "nativeType": "uint32_t"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "buffer",
-          "role": "opaque-pointer",
-          "direction": "in",
-          "nativeType": "const void *"
-        },
-        {
-          "position": 1,
-          "name": "buffer_len",
-          "role": "scalar:u32",
-          "direction": "value",
-          "nativeType": "uint32_t"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "hash-buffer-runtime-and-allocation-evidence",
-      "blockerReason": "The bounded hash-buffer shape still lacks a generated wrapper with packaged-link, parity, warmed-allocation, and runtime-behavior evidence.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
-      "id": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
-      "symbol": "dmHashBuffer64",
-      "kind": "function",
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
-      "line": 79,
-      "primaryFamily": "pointer-span",
-      "families": [
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:u64(in:opaque-pointer,value:scalar:u32)",
-      "result": {
-        "role": "scalar:u64",
-        "direction": "value",
-        "nativeType": "uint64_t"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "buffer",
-          "role": "opaque-pointer",
-          "direction": "in",
-          "nativeType": "const void *"
-        },
-        {
-          "position": 1,
-          "name": "buffer_len",
-          "role": "scalar:u32",
-          "direction": "value",
-          "nativeType": "uint32_t"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "hash-buffer-runtime-and-allocation-evidence",
-      "blockerReason": "The bounded hash-buffer shape still lacks a generated wrapper with packaged-link, parity, warmed-allocation, and runtime-behavior evidence.",
       "stages": {
         "generated": "not-applicable",
         "compiled": "not-claimed",

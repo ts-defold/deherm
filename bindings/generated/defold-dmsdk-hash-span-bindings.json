@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "hash-span-v1",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "bindings/generated/defold-sdk-ir.json",
+    "shapes": "bindings/generated/defold-dmsdk-abi-shapes.json",
+    "policy": "bindings/overrides/dmsdk-hash-span-bindings.json"
+  },
+  "sourceHashes": {
+    "ir": "70cb64c1c6177ca32bcfe10bb87f99ec77d6d91cea455c33d9aaafdf3df90d87",
+    "shapes": "03ac92298314cbf9157fa8adf71cdc3ff7b8cf56e694b58db54208b00d03db50",
+    "policy": "357676505afcb47db07fed2d0bf919715850208b83d71f5b5e06947ea2c63eea",
+    "evidence": {
+      "upstream/defold/engine/dlib/src/dlib/hash.cpp": "fb3577778af004b43b0585fafb5369bd18b89b0a0aa4b7eb322555ccda9a8c51",
+      "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h": "242aa8e2cd74382d429830884e8047b8c1db9d5b0782594253e9dcddb396abc5"
+    }
+  },
+  "policy": {
+    "candidateSelector": {
+      "tranche": "arena-backed-spans",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "symbolPattern": "^dmHashBuffer(?:32|64)$",
+      "rationale": "The public dmSDK functions consume a borrowed byte buffer paired with an explicit uint32_t byte length and synchronously return a fixed-width scalar hash."
+    },
+    "cAbi": "borrowed const uint8_t* plus explicit uint32_t byte length; scalar result written to caller-owned uint64_t storage",
+    "ownership": "input and output are borrowed only for the synchronous call; no pointer escapes generated glue",
+    "allocation": "generated glue has no heap primitive; native dmHashBuffer may malloc only when Defold reverse hashing is globally enabled, as pinned implementation evidence records",
+    "jsi": "not-generated pending typed-array lifetime and installer policy",
+    "html5": "not-claimed pending target compile/link matrix"
+  },
+  "coverage": {
+    "baselineRuntimePending": 1361,
+    "previouslyGeneratedAdapters": 43,
+    "discovered": 2,
+    "emitted": 2,
+    "policyBlocked": 0,
+    "hostBehaviorVerified": 2,
+    "remainingWithoutGeneratedAdapters": 1316
+  },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h": "ebf2489cc8cc9c93579e5dc4c889f07c92db9a36e5b2cad66d1f9a8298ba4d5b",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span.h": "4a0f0c60db40b5207c713988c01ad6fe209958412b4c54de0ce304ab4a236e98",
+    "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp": "e97cbcc47351193c0bbbad746df52c4e1cd62f5583253efe153625ba0dc1aa46",
+    "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp": "f067e4acda8dbb912857d7631c947bc348f6a69d5b16ca44486859e9822f3697"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h",
+    "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp"
+  ],
+  "declarations": [
+    {
+      "id": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
+      "symbol": "dmHashBuffer32",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 69,
+      "primaryFamily": "pointer-span",
+      "families": [
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:u32(in:opaque-pointer,value:scalar:u32)",
+      "result": {
+        "role": "scalar:u32",
+        "direction": "value",
+        "nativeType": "uint32_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "buffer",
+          "role": "opaque-pointer",
+          "direction": "in",
+          "nativeType": "const void *"
+        },
+        {
+          "position": 1,
+          "name": "buffer_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 0,
+      "resultBits": 32,
+      "evidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 65,
+          "text": " * @param buffer [type:const void*] Buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 66,
+          "text": " * @param buffer_len [type:uint32_t] Length of buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 69,
+          "text": "DM_DLLEXPORT uint32_t dmHashBuffer32(const void* buffer, uint32_t buffer_len);"
+        }
+      ],
+      "implementationEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 320,
+          "text": "uint32_t dmHashBuffer32(const void * key, uint32_t len)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 324,
+          "text": "    if (dmHashContainer().m_Enabled && len <= DMHASH_MAX_REVERSE_LENGTH)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 59,
+          "text": "        m_Enabled = false;"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 334,
+          "text": "            char* copy = (char*) malloc(len + 1);"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_hash_span_dm_hash_buffer32",
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-behavior-test",
+        "allocation": "100000-warmed-dispatch-zero-cpp-operator-new-with-reverse-hashing-default-disabled"
+      }
+    },
+    {
+      "id": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
+      "symbol": "dmHashBuffer64",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 79,
+      "primaryFamily": "pointer-span",
+      "families": [
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:u64(in:opaque-pointer,value:scalar:u32)",
+      "result": {
+        "role": "scalar:u64",
+        "direction": "value",
+        "nativeType": "uint64_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "buffer",
+          "role": "opaque-pointer",
+          "direction": "in",
+          "nativeType": "const void *"
+        },
+        {
+          "position": 1,
+          "name": "buffer_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "bindingId": 1,
+      "resultBits": 64,
+      "evidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 75,
+          "text": " * @param buffer [type:const void*] Buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 76,
+          "text": " * @param buffer_len [type:uint32_t] Length of buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 79,
+          "text": "DM_DLLEXPORT uint64_t dmHashBuffer64(const void* buffer, uint32_t buffer_len);"
+        }
+      ],
+      "implementationEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 397,
+          "text": "uint64_t dmHashBuffer64(const void * key, uint32_t len)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 401,
+          "text": "    if (dmHashContainer().m_Enabled && len <= DMHASH_MAX_REVERSE_LENGTH)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 59,
+          "text": "        m_Enabled = false;"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 411,
+          "text": "            char* copy = (char*) malloc(len + 1);"
+        }
+      ],
+      "wrapper": "deherm_dmsdk_hash_span_dm_hash_buffer64",
+      "stages": {
+        "generated": "complete",
+        "compiled": "packaged-sdk-object-test",
+        "linked": "packaged-sdk-host-link-test",
+        "runtime": "packaged-sdk-host-behavior-test",
+        "allocation": "100000-warmed-dispatch-zero-cpp-operator-new-with-reverse-hashing-default-disabled"
+      }
+    }
+  ]
+}

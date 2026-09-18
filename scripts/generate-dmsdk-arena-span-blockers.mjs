@@ -42,7 +42,6 @@ function blockerFor(row) {
   const roles = [row.result, ...row.parameters].map(({ role }) => role);
   if (roles.some((role) => role.startsWith("handle:"))) return "handle-provenance-or-engine-context";
   if (roles.some((role) => role.includes("record:"))) return "record-layout-or-borrowed-record-lifetime";
-  if (row.symbol.startsWith("dmHashBuffer")) return "hash-buffer-runtime-and-allocation-evidence";
   if (roles.some((role) => role.includes("opaque-pointer"))) return "opaque-byte-pointee-unit-or-lifetime";
   if (roles.some((role) => role.includes("cstring"))) return "cstring-termination-or-capacity-policy";
   if (roles.some((role) => role.includes("unknown:") || role.includes("template:"))) return "template-element-layout-or-specialization";
@@ -58,8 +57,8 @@ function validatePolicy(policy) {
   assert(policy.policyVersion === "arena-span-blockers-v1", "arena-span blocker policyVersion is unsupported");
   assert(/^[0-9a-f]{40}$/.test(policy.defoldRevision), "arena-span blocker policy must pin a Defold revision");
   assert(policy.tranche === "arena-backed-spans", "arena-span blocker policy tranche is unsupported");
-  assert(Array.isArray(policy.priorWaveReports) && policy.priorWaveReports.length === 4,
-    "arena-span blocker policy must name exactly four prior-wave reports");
+  assert(Array.isArray(policy.priorWaveReports) && policy.priorWaveReports.length === 5,
+    "arena-span blocker policy must name exactly five prior-wave reports");
   assert(Array.isArray(policy.coveredByPriorWaves), "coveredByPriorWaves must be an array");
   uniqueBy(policy.priorWaveReports, ({ path }) => path, "priorWaveReports");
   uniqueBy(policy.coveredByPriorWaves.map((symbol) => ({ symbol })), ({ symbol }) => symbol,
@@ -226,7 +225,7 @@ export function generate(inputs) {
       policy: sha256(inputs.policyText),
       priorWaveReports: Object.fromEntries(priorWaves.map(({ report, sha256: hash }) => [report, hash]))
     },
-    scope: "Complete arena-backed-spans census after the four generated prior waves",
+    scope: "Complete arena-backed-spans census after the five generated prior waves",
     policy: {
       disposition: "blocked-metadata-only",
       reason: "No executable adapter is emitted by this ledger. Every remaining row lacks at least one reviewed ABI, ownership, runtime-behavior, or allocation-safety contract required for promotion."

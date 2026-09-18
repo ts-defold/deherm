@@ -19,6 +19,10 @@
     {
       "path": "bindings/generated/defold-dmsdk-xtea-span-bindings.json",
       "policyVersion": "xtea-span-v1"
+    },
+    {
+      "path": "bindings/generated/defold-dmsdk-hash-span-bindings.json",
+      "policyVersion": "hash-span-v1"
     }
   ],
   "coveredByPriorWaves": [
@@ -31,17 +35,18 @@
     "dmImage::GetAstcBlockSize",
     "dmImage::GetAstcDimensions",
     "dmCrypt::Encrypt",
-    "dmCrypt::Decrypt"
+    "dmCrypt::Decrypt",
+    "dmHashBuffer32",
+    "dmHashBuffer64"
   ],
   "expectedCoverage": {
     "arenaSpanCensus": 79,
-    "coveredByPriorWaves": 10,
-    "blocked": 69
+    "coveredByPriorWaves": 12,
+    "blocked": 67
   },
   "expectedPartitionSummary": {
     "cstring-termination-or-capacity-policy": 5,
     "handle-provenance-or-engine-context": 33,
-    "hash-buffer-runtime-and-allocation-evidence": 2,
     "opaque-byte-pointee-unit-or-lifetime": 4,
     "record-layout-or-borrowed-record-lifetime": 19,
     "template-element-layout-or-specialization": 6
@@ -49,7 +54,6 @@
   "blockerDefinitions": {
     "cstring-termination-or-capacity-policy": "The ABI needs a reviewed distinction between bounded byte count, writable capacity, and C-string termination on success and failure.",
     "handle-provenance-or-engine-context": "The ABI consumes or returns an engine handle whose provenance, context, ownership, nullability, or teardown contract is not encoded by the arena.",
-    "hash-buffer-runtime-and-allocation-evidence": "The bounded hash-buffer shape still lacks a generated wrapper with packaged-link, parity, warmed-allocation, and runtime-behavior evidence.",
     "opaque-byte-pointee-unit-or-lifetime": "The void pointer's pointee unit, mutability, returned lifetime, allocation source, or ownership is not fully represented by the mechanical span shape.",
     "record-layout-or-borrowed-record-lifetime": "The ABI crosses a record pointer whose exact layout, nested fields, borrowed lifetime, or engine-context relationship is not yet verified.",
     "template-element-layout-or-specialization": "The template element type or specialization is unresolved, so the arena cannot prove element size, alignment, copying, or native linkage."

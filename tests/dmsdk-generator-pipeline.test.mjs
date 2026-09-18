@@ -43,6 +43,7 @@ test("dmSDK generator pipeline has one deterministic ownership registry", () => 
     "scripts/generate-dmsdk-base64-span-bindings.mjs",
     "scripts/generate-dmsdk-astc-probe-bindings.mjs",
     "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+    "scripts/generate-dmsdk-hash-span-bindings.mjs",
     "scripts/generate-dmsdk-arena-span-blockers.mjs",
   ]);
   for (const step of dmSdkGenerationSteps) {

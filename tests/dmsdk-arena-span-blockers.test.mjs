@@ -24,8 +24,8 @@ test("arena-span blocker ledger is deterministic, complete, and metadata-only", 
   ));
   assert.deepEqual(report.coverage, {
     arenaSpanCensus: 79,
-    coveredByPriorWaves: 10,
-    blocked: 69,
+    coveredByPriorWaves: 12,
+    blocked: 67,
     executableAdaptersEmitted: 0,
     overlap: 0,
     unaccounted: 0
@@ -33,17 +33,16 @@ test("arena-span blocker ledger is deterministic, complete, and metadata-only", 
   assert.deepEqual(report.partitionSummary, {
     "cstring-termination-or-capacity-policy": 5,
     "handle-provenance-or-engine-context": 33,
-    "hash-buffer-runtime-and-allocation-evidence": 2,
     "opaque-byte-pointee-unit-or-lifetime": 4,
     "record-layout-or-borrowed-record-lifetime": 19,
     "template-element-layout-or-specialization": 6
   });
   const priorIds = new Set(report.coveredByPriorWaves.map(({ id }) => id));
   const blockedIds = new Set(report.declarations.map(({ id }) => id));
-  assert.equal(priorIds.size, 10);
-  assert.equal(blockedIds.size, 69);
+  assert.equal(priorIds.size, 12);
+  assert.equal(blockedIds.size, 67);
   assert.equal([...priorIds].some((id) => blockedIds.has(id)), false);
-  assert.equal(Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0), 69);
+  assert.equal(Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0), 67);
   for (const declaration of report.declarations) {
     assert.equal(declaration.disposition, "blocked");
     assert.equal(declaration.stages.generated, "not-applicable");

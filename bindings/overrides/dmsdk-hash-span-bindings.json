@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "hash-span-v1",
+  "family": "arena-backed-spans",
+  "candidateSelector": {
+    "tranche": "arena-backed-spans",
+    "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+    "symbolPattern": "^dmHashBuffer(?:32|64)$",
+    "rationale": "The public dmSDK functions consume a borrowed byte buffer paired with an explicit uint32_t byte length and synchronously return a fixed-width scalar hash."
+  },
+  "entries": {
+    "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212": {
+      "status": "emit",
+      "resultBits": 32,
+      "expectedShape": "scalar:u32(in:opaque-pointer,value:scalar:u32)",
+      "evidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 65,
+          "text": " * @param buffer [type:const void*] Buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 66,
+          "text": " * @param buffer_len [type:uint32_t] Length of buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 69,
+          "text": "DM_DLLEXPORT uint32_t dmHashBuffer32(const void* buffer, uint32_t buffer_len);"
+        }
+      ],
+      "implementationEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 320,
+          "text": "uint32_t dmHashBuffer32(const void * key, uint32_t len)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 324,
+          "text": "    if (dmHashContainer().m_Enabled && len <= DMHASH_MAX_REVERSE_LENGTH)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 59,
+          "text": "        m_Enabled = false;"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 334,
+          "text": "            char* copy = (char*) malloc(len + 1);"
+        }
+      ]
+    },
+    "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213": {
+      "status": "emit",
+      "resultBits": 64,
+      "expectedShape": "scalar:u64(in:opaque-pointer,value:scalar:u32)",
+      "evidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 75,
+          "text": " * @param buffer [type:const void*] Buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 76,
+          "text": " * @param buffer_len [type:uint32_t] Length of buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "line": 79,
+          "text": "DM_DLLEXPORT uint64_t dmHashBuffer64(const void* buffer, uint32_t buffer_len);"
+        }
+      ],
+      "implementationEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 397,
+          "text": "uint64_t dmHashBuffer64(const void * key, uint32_t len)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 401,
+          "text": "    if (dmHashContainer().m_Enabled && len <= DMHASH_MAX_REVERSE_LENGTH)"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 59,
+          "text": "        m_Enabled = false;"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dlib/hash.cpp",
+          "line": 411,
+          "text": "            char* copy = (char*) malloc(len + 1);"
+        }
+      ]
+    }
+  }
+}

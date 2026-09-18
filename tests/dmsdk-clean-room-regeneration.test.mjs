@@ -26,14 +26,15 @@ test("all generated dmSDK runtime artifacts regenerate byte-for-byte from pinned
   assert.equal(report.base64SpanGeneratedCount, 2);
   assert.equal(report.astcProbeGeneratedCount, 2);
   assert.equal(report.xteaSpanGeneratedCount, 2);
+  assert.equal(report.hashSpanGeneratedCount, 2);
   assert.equal(report.arenaSpanCensusCount, 79);
-  assert.equal(report.arenaSpanPriorWaveCount, 10);
-  assert.equal(report.arenaSpanBlockedCount, 69);
+  assert.equal(report.arenaSpanPriorWaveCount, 12);
+  assert.equal(report.arenaSpanBlockedCount, 67);
   assert.equal(report.arenaSpanExecutableCount, 0);
   assert.equal(report.namedScalarReviewedCount, 21);
   assert.equal(report.namedScalarGeneratedCount, 0);
   assert.equal(report.namedScalarBlockedCount, 21);
-  assert.equal(report.remainingWithoutGeneratedAdapters, 1318);
+  assert.equal(report.remainingWithoutGeneratedAdapters, 1316);
   assert.equal(report.uniqueShapeCount, 881);
   assert.equal(report.trancheCount, 15);
   assert.equal(report.artifactCount, generatedDmSdkArtifacts.length);

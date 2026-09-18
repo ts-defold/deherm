@@ -12,6 +12,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-base64-span-bindings.mjs",
   "scripts/generate-dmsdk-astc-probe-bindings.mjs",
   "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+  "scripts/generate-dmsdk-hash-span-bindings.mjs",
   "scripts/generate-dmsdk-arena-span-blockers.mjs",
   "scripts/generate-dmsdk-runtime.mjs",
   "scripts/lib/dmsdk-generator-pipeline.mjs"
@@ -26,6 +27,7 @@ export const dmSdkPinnedInputs = Object.freeze([
   "bindings/overrides/dmsdk-base64-span-bindings.json",
   "bindings/overrides/dmsdk-astc-probe-bindings.json",
   "bindings/overrides/dmsdk-xtea-span-bindings.json",
+  "bindings/overrides/dmsdk-hash-span-bindings.json",
   "bindings/overrides/dmsdk-arena-span-blockers.json"
 ]);
 
@@ -84,6 +86,11 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span_runtime.h",
   "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp",
   "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp",
+  "bindings/generated/defold-dmsdk-hash-span-bindings.json",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h",
+  "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp",
   "bindings/generated/defold-dmsdk-arena-span-blockers.json"
 ]);
 
@@ -98,5 +105,6 @@ export const dmSdkGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-base64-span-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-astc-probe-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-xtea-span-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-hash-span-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-arena-span-blockers.mjs" })
 ]);
