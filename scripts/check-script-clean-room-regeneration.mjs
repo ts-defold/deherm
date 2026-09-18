@@ -30,6 +30,7 @@ const generatorSources = [
   "scripts/generate-scalar-lua-dispatch.mjs",
   "scripts/generate-script-value-bindings.mjs",
   "scripts/generate-script-fixed-tuples.mjs",
+  "scripts/generate-static-hermes-vmath.mjs",
   "scripts/generate-script-real-engine-probes.mjs",
   "scripts/generate-script-value-real-engine-probes.mjs",
   "scripts/generate-script-api-accounting.mjs",
@@ -60,6 +61,7 @@ const pinnedInputs = [
   "bindings/overrides/script-msg-structured-bindings.json",
   "bindings/overrides/script-table-tuple-schema-overrides.json",
   "bindings/overrides/script-url-address-classification.json",
+  "bindings/overrides/static-hermes-vmath.json",
   "bindings/probes/defold-script-real-engine-matrix.json",
   "bindings/probes/defold-script-real-engine-probes.json",
   "bindings/probes/defold-script-value-real-engine-probes.json",
@@ -84,6 +86,10 @@ export const generatedScriptArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_script_value_bindings.hpp",
   "defold/defold_hermes/src/generated_script_value_bindings.cpp",
   "packages/sdk/src/generated/script/value-target-support.ts",
+  "bindings/generated/defold-static-hermes-vmath.json",
+  "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h",
+  "defold/defold_hermes/src/generated_static_hermes_vmath.cpp",
+  "packages/static-hermes/src/generated/script-vmath.ts",
   "bindings/generated/defold-script-fixed-tuples.json",
   "bindings/generated/defold-script-fixed-tuple-probes.json",
   "defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp",
@@ -110,6 +116,7 @@ const generationSteps = [
   [process.execPath, ["scripts/generate-script-binding-descriptors.mjs"]],
   [process.execPath, ["scripts/generate-scalar-lua-dispatch.mjs"]],
   [process.execPath, ["scripts/generate-script-value-bindings.mjs"]],
+  [process.execPath, ["scripts/generate-static-hermes-vmath.mjs"]],
   [process.execPath, ["scripts/generate-script-fixed-tuples.mjs"]],
   [process.execPath, ["scripts/generate-script-real-engine-probes.mjs"]],
   [process.execPath, ["scripts/generate-script-value-real-engine-probes.mjs"]],
@@ -249,23 +256,28 @@ async function walkFiles(root, relative = "") {
 export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultRepositoryRoot) {
   const candidates = new Set();
   for (const file of await walkFiles(path.join(repositoryRoot, "bindings/generated"))) {
-    if (/^(?:defold-script-|war-battles-script-)/.test(file)) candidates.add(`bindings/generated/${file}`);
+    if (/^(?:defold-script-|defold-static-hermes-|war-battles-script-)/.test(file)) {
+      candidates.add(`bindings/generated/${file}`);
+    }
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "packages/sdk/src/generated/script"))) {
     candidates.add(`packages/sdk/src/generated/script/${file}`);
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "defold/defold_hermes/include/defold_hermes"))) {
-    if (/^generated_(?:script_|scalar_lua_)/.test(file)) {
+    if (/^generated_(?:script_|scalar_lua_|static_hermes_)/.test(file)) {
       candidates.add(`defold/defold_hermes/include/defold_hermes/${file}`);
     }
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "defold/defold_hermes/src"))) {
-    if (/^generated_(?:script_|scalar_lua_)/.test(file)) {
+    if (/^generated_(?:script_|scalar_lua_|static_hermes_)/.test(file)) {
       candidates.add(`defold/defold_hermes/src/${file}`);
     }
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "sample/src/generated"))) {
     if (file.endsWith("real-engine-probes.ts")) candidates.add(`sample/src/generated/${file}`);
+  }
+  for (const file of await walkFiles(path.join(repositoryRoot, "packages/static-hermes/src/generated"))) {
+    if (file === "script-vmath.ts") candidates.add(`packages/static-hermes/src/generated/${file}`);
   }
   for (const documentation of [
     "knowledge/research/script-api-coverage.md",

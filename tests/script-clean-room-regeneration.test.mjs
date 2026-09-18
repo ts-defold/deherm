@@ -26,5 +26,8 @@ test("all 926 script routes regenerate byte-for-byte from pinned inputs", async 
   assert.match(report.aggregateInputSha256, /^[0-9a-f]{64}$/);
   assert.equal(report.pinnedGroundTruth.defoldRevision, report.defoldRevision);
   assert.match(report.pinnedGroundTruth.refDocSha256, /^[0-9a-f]{64}$/);
-  assert.equal(report.executableRouteCount, report.scalarRouteCount + report.valueRouteCount);
+  assert.equal(
+    report.executableRouteCount,
+    report.scalarRouteCount + report.valueRouteCount + report.fixedTupleRouteCount
+  );
 });
