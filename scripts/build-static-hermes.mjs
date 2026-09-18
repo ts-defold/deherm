@@ -31,7 +31,32 @@ const universalInput = path.join(outputDirectory, "static-universal.ts");
 const universalOutput = path.join(outputDirectory, "static-universal.c");
 await writeFile(typedInput, typedSource);
 await writeFile(vmathInput, `${generatedVmath}\n\nconst __ffi_deherm_static_vmath_report = $SHBuiltin.extern_c(\n  {include: "defold_hermes/static_probe.h"},\n  function defold_hermes_static_vmath_report(stage: c_u32, value: c_f64): void { throw 0; }\n);\n\n__ffi_deherm_static_vmath_report(1, vmathLengthVector3(3, 4, 12));\n__ffi_deherm_static_vmath_report(2, vmathLengthVector4(1, 2, 2, 4));\n__ffi_deherm_static_vmath_report(3, vmathLengthQuaternion(0, 0, 0, 1));\n__ffi_deherm_static_vmath_report(4, vmathProjectVector3Vector3(2, 4, 6, 1, 2, 3));\n__ffi_deherm_static_vmath_report(5, vmathLengthSqrVector3(3, 4, 12));\n__ffi_deherm_static_vmath_report(6, vmathLengthSqrVector4(1, 2, 3, 4));\n__ffi_deherm_static_vmath_report(7, vmathLengthSqrQuaternion(1, 2, 2, 0));\nlet projectZeroTargetRejected: number = 0;\ntry {\n  vmathProjectVector3Vector3(1, 2, 3, 0, 0, 0);\n} catch (error) {\n  projectZeroTargetRejected = 1;\n}\n__ffi_deherm_static_vmath_report(8, projectZeroTargetRejected);\n`);
-await writeFile(universalInput, `${generatedUniversal}\n\nconst __ffi_deherm_static_universal_report=$SHBuiltin.extern_c({include:"defold_hermes/static_probe.h"},function defold_hermes_static_universal_report(results:c_u32,recordEntries:c_u32):void{});\nlet nestedValues:Array<DehermStaticValue>=[new DehermStaticBoolean(true),new DehermStaticNull()];\nlet recordValues:Array<DehermStaticValue>=[new DehermStaticNumber(42),new DehermStaticString("basalt \\u2764"),new DehermStaticArray(nestedValues),new DehermStaticHandle(1,0,0,0x89abcdef,0x01234567),new DehermStaticDefoldValue(1,1,2,3,0)];\nlet universalInputValues:Array<DehermStaticValue>=[new DehermStaticRecord(["scalar","text","array","handle","vector"],recordValues)];\nlet universalResults:Array<DehermStaticValue>=dispatchScriptUniversalValue(${universalProbe.stableId},universalInputValues);\n__ffi_deherm_static_universal_report(universalResults.length,universalResults.length===1?universalResults[0].probeSize():0);\n`);
+const universalProbeSource = [
+  generatedUniversal,
+  "",
+  `const __ffi_deherm_static_universal_report=$SHBuiltin.extern_c({include:"defold_hermes/static_probe.h"},function defold_hermes_static_universal_report(results:c_u32,recordEntries:c_u32):void{});`,
+  `const __ffi_deherm_static_universal_value_report=$SHBuiltin.extern_c({include:"defold_hermes/static_probe.h"},function defold_hermes_static_universal_value_report(stage:c_u32,checksum:c_f64):void{});`,
+  `let nestedValues:Array<DehermStaticValue>=[new DehermStaticBoolean(true),new DehermStaticNull()];`,
+  `let matrixElements:Array<number>=[];`,
+  `for(let element=0;element<16;++element)matrixElements.push(element+1);`,
+  `let recordValues:Array<DehermStaticValue>=[new DehermStaticNumber(42),new DehermStaticString("basalt \\u2764"),new DehermStaticArray(nestedValues),new DehermStaticHandle(1,0,0,0x89abcdef,0x01234567),new DehermStaticDefoldValue(1,1,2,3,0),new DehermStaticMatrix4(matrixElements),new DehermStaticUrl(0x89abcdef,0x01234567,0,0,0xcafebabe,0xdeadbeef,0xff,0)];`,
+  `let universalInputValues:Array<DehermStaticValue>=[new DehermStaticRecord(["scalar","text","array","hash","vector","matrix","url"],recordValues)];`,
+  `let universalResults:Array<DehermStaticValue>=dispatchScriptUniversalValue(${universalProbe.stableId},universalInputValues);`,
+  `__ffi_deherm_static_universal_report(universalResults.length,universalResults.length===1?universalResults[0].probeSize():0);`,
+  // Each transparent Defold value record round-trips on its own so the reported
+  // checksum proves the exact float32 and 64-bit lanes survived the typed frame.
+  `let matrixResults:Array<DehermStaticValue>=dispatchScriptUniversalValue(${universalProbe.stableId},[new DehermStaticMatrix4(matrixElements)]);`,
+  `__ffi_deherm_static_universal_value_report(1,matrixResults[0].probeChecksum());`,
+  `let urlResults:Array<DehermStaticValue>=dispatchScriptUniversalValue(${universalProbe.stableId},[new DehermStaticUrl(0x89abcdef,0x01234567,0,0,0xcafebabe,0xdeadbeef,0xff,0)]);`,
+  `__ffi_deherm_static_universal_value_report(2,urlResults[0].probeChecksum());`,
+  `let hashResults:Array<DehermStaticValue>=dispatchScriptUniversalValue(${universalProbe.stableId},[new DehermStaticHandle(1,0,0,0x89abcdef,0x01234567)]);`,
+  `__ffi_deherm_static_universal_value_report(3,hashResults[0].probeChecksum());`,
+  `let vectorResults:Array<DehermStaticValue>=dispatchScriptUniversalValue(${universalProbe.stableId},[new DehermStaticDefoldValue(1,1.5,2.25,3.125,0)]);`,
+  `__ffi_deherm_static_universal_value_report(4,vectorResults[0].probeChecksum());`,
+  `__ffi_deherm_static_universal_value_report(5,matrixResults[0].probeSize()+urlResults[0].probeSize());`,
+  ""
+].join("\n");
+await writeFile(universalInput, universalProbeSource);
 
 function compile(arguments_) {
   const result = spawnSync(shermes, arguments_, {

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callbacks are promoted only when the generated lifecycle ledger marks them registry-eligible, and optimized lanes remain preferred at runtime.",
-  "evidenceBoundary": "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the non-callback/non-handle/non-Defold-value shape subset; packaged Defold and packaged browser execution remain unverified.",
+  "evidenceBoundary": "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no Lua closure or retained Lua handle and whose Defold value types all have a pinned transparent layout; packaged Defold and packaged browser execution remain unverified.",
   "selection": {
     "loweringFamilies": [
       "borrowed-handle",
@@ -60,10 +60,34 @@
     "nativeStaticHermes": {
       "cAbiCompileLinkRuntime": "proven",
       "staticCompiler": "proven",
-      "staticHermesRuntime": "proven-representative-recursive-value-graph",
-      "emittedRouteCount": 138,
-      "emittedShapeRule": "no-callback-no-handle-no-defold-value",
-      "retainedHandleAndHashHarness": "native-frame-proven-not-route-promoted",
+      "staticHermesRuntime": "proven-representative-recursive-value-graph-with-transparent-defold-value-records",
+      "emittedRouteCount": 325,
+      "emittedShapeRule": "no-callback-no-lua-handle-and-every-defold-value-type-transparent",
+      "transparentValueTypes": [
+        "hash",
+        "matrix4",
+        "quaternion",
+        "url",
+        "vector3",
+        "vector4"
+      ],
+      "opaqueValueTypes": [
+        "buffer_data",
+        "buffer_stream",
+        "constant_buffer",
+        "go.EASING",
+        "gui.EASING",
+        "gui.PROP",
+        "node",
+        "render_predicate",
+        "render_target",
+        "resource_data",
+        "texture",
+        "timer_handle",
+        "vector"
+      ],
+      "defoldValueLayoutSource": "packages/bindings/generated/defold-value-layouts.json",
+      "retainedLuaHandleHarness": "native-frame-proven-not-route-promoted",
       "framePool": {
         "reentrancyMacro": "DEHERM_SCRIPT_STATIC_FRAME_REENTRANCY",
         "defaultDepth": 4,
@@ -87,9 +111,10 @@
     }
   },
   "inputHashes": {
-    "projection": "2f17d99c003b0381b4fd68a900d3af21597df7c6b8c8c79822f4fc07d07ec189",
+    "projection": "6107f0f878a209afb8ac1b7bc20f106a735edd173b1e791070bcb3b52c2099e9",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b"
+    "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
+    "layouts": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14"
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",
@@ -107,10 +132,10 @@
     "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": "ef7246a84965ee82ee9ce2d9875581ac73c1680d9d9b737fcdc3fc61a1f2a09f",
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": "4e6b3204a8cc7bb76ade0e451c6e39555432ff199ac3756bf5f87d1df98585d1",
     "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "6b6725a0defa990084ff6d2ea965da3ddba0548034a665129f8f1f7c2e2afddb",
-    "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": "5bf6089f938c694e8432fd4134ccddcc71336e16d871faf8419fe0103e65b091",
-    "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "a8bfd532536e5dfa981fa2b87d9cd03c8ff57362b0ae7b064dd1533c00e57b11",
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": "ab423b90ed7c9166abb5a9ef238ac0d37a1e951fc03d2dc7d17836406b86cb0e",
+    "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "d0f6c13c8dcda6e800db098369b4e47b576f2d30ec7298f134e3206c3d14bc9c",
     "packages/sdk/src/generated/script/universal-value-bindings.ts": "f280d627dc8750dd357415209388b773132b4a89eeafc1632dde4c1f84c6f9e6",
-    "packages/static-hermes/src/generated/script-universal-value.ts": "51b65aee5bd24bad53202c94f68e1bdc0b55c1507090372821c54185e5b335c4",
+    "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
     "defold/defold_hermes/lib/web/generated_script_universal_value.js": "6e0bba955d31d3073907a9c1a941f3d7bdc63a0065702bb2da56eb8f896f8730"
   },
   "bindings": [
@@ -132,6 +157,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -158,6 +187,10 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -182,6 +215,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -203,6 +240,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -225,6 +263,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -249,6 +291,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -271,6 +316,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -291,6 +337,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -315,6 +364,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -338,6 +388,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -362,6 +413,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -385,6 +439,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -408,6 +463,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -430,6 +486,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -455,6 +512,9 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -479,6 +539,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -502,6 +563,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -524,6 +586,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -550,6 +615,12 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "quaternion",
+        "url",
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -575,6 +646,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "texture"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -598,6 +673,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -621,6 +697,9 @@
         "defold-value",
         "record-ref",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -646,6 +725,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -669,6 +749,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -694,6 +775,9 @@
         "named",
         "record-ref",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -725,6 +809,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -748,6 +833,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -769,6 +855,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -794,6 +881,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -819,6 +907,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -843,6 +932,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -864,6 +954,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -887,6 +978,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -910,6 +1002,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -933,6 +1026,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -957,6 +1051,7 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -981,6 +1076,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1002,6 +1098,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1025,6 +1122,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1047,6 +1145,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1071,6 +1172,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1090,6 +1192,7 @@
       "resultCount": 0,
       "variadic": false,
       "shapeKinds": [],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1112,6 +1215,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1140,6 +1246,9 @@
         "record-ref",
         "scalar",
         "sequence"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -1173,6 +1282,9 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1197,6 +1309,15 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "gui.PROP",
+        "hash",
+        "node",
+        "quaternion",
+        "url",
+        "vector3",
+        "vector4"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -1218,6 +1339,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1242,6 +1367,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1263,6 +1391,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1290,6 +1419,7 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1311,6 +1441,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "buffer_data"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1335,6 +1468,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1357,6 +1491,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1381,6 +1519,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1401,6 +1540,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1425,6 +1568,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1448,6 +1592,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1471,6 +1616,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1494,6 +1640,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1515,6 +1664,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1538,6 +1688,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1561,6 +1712,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1583,6 +1737,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "buffer_data"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1604,6 +1761,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1625,6 +1783,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1648,6 +1807,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1671,6 +1831,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1693,6 +1854,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1717,6 +1881,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1740,6 +1905,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1762,6 +1928,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1783,6 +1952,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1807,6 +1979,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1829,6 +2002,9 @@
         "defold-value",
         "optional",
         "record-ref"
+      ],
+      "defoldValueTypes": [
+        "timer_handle"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -1854,6 +2030,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1877,6 +2054,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -1901,6 +2079,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -1925,6 +2104,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -1947,6 +2129,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -1972,6 +2157,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -1999,6 +2185,9 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2022,6 +2211,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "quaternion",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2043,6 +2237,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2065,6 +2260,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2091,6 +2289,9 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2113,6 +2314,7 @@
         "callback",
         "dynamic"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -2143,6 +2345,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2166,6 +2369,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2188,6 +2392,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2212,6 +2419,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2235,6 +2443,10 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -2261,6 +2473,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -2284,6 +2497,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2309,6 +2525,9 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2331,6 +2550,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2355,6 +2579,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2378,6 +2603,7 @@
         "map",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -2401,6 +2627,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2422,6 +2649,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2444,6 +2672,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2468,6 +2699,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2491,6 +2723,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2513,6 +2746,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2540,6 +2776,9 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -2564,6 +2803,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2585,6 +2825,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2611,6 +2852,9 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2633,6 +2877,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2657,6 +2905,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -2681,6 +2930,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2704,6 +2957,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2726,6 +2980,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -2750,6 +3007,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -2775,6 +3033,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2798,6 +3060,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2821,6 +3084,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2843,6 +3107,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2866,6 +3131,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2888,6 +3154,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2909,6 +3176,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2932,6 +3200,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -2956,6 +3225,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -2980,6 +3250,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3005,6 +3276,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3029,6 +3301,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3050,6 +3325,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3075,6 +3351,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "vector4"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3099,6 +3378,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3120,6 +3403,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3143,6 +3429,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "quaternion"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3164,6 +3453,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3187,6 +3477,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3209,6 +3500,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3233,6 +3529,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3254,6 +3551,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3275,6 +3573,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3302,6 +3603,10 @@
         "record",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -3335,6 +3640,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3359,6 +3668,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3382,6 +3692,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3407,6 +3718,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3429,6 +3741,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3453,6 +3769,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3474,6 +3793,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3498,6 +3820,10 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3520,6 +3846,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3544,6 +3873,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3568,6 +3898,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3589,6 +3923,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "buffer_data"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3613,6 +3950,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3634,6 +3972,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3659,6 +4002,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "gui.PROP",
+        "hash",
+        "node"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3683,6 +4031,9 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3705,6 +4056,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3729,6 +4083,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3751,6 +4106,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3775,6 +4133,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -3797,6 +4156,10 @@
       "shapeKinds": [
         "defold-value"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3818,6 +4181,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3841,6 +4205,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3864,6 +4229,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3884,6 +4250,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "constant_buffer"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3906,6 +4275,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3930,6 +4302,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3952,6 +4325,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -3976,6 +4354,10 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -3999,6 +4381,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4021,6 +4404,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4044,6 +4428,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4067,6 +4452,9 @@
         "enum",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4092,6 +4480,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "render_target"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -4116,6 +4508,7 @@
         "map",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -4142,6 +4535,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4162,6 +4559,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4186,6 +4586,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4209,6 +4610,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4230,6 +4634,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4252,6 +4657,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4276,6 +4685,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4299,6 +4711,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4322,6 +4735,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4345,6 +4759,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -4367,6 +4782,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4388,6 +4804,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4412,6 +4829,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -4434,6 +4855,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4458,6 +4884,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4481,6 +4908,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4501,6 +4929,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4525,6 +4957,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4548,6 +4981,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4568,6 +5002,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4590,6 +5027,10 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4614,6 +5055,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4635,6 +5077,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "matrix4",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4661,6 +5108,10 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4690,6 +5141,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4714,6 +5166,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -4739,6 +5192,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -4763,6 +5217,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4786,6 +5241,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4809,6 +5265,10 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4830,6 +5290,7 @@
       "shapeKinds": [
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -4853,6 +5314,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "matrix4",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -4879,6 +5344,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4900,6 +5369,9 @@
       "shapeKinds": [
         "defold-value",
         "sequence"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -4925,6 +5397,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4948,6 +5421,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4971,6 +5445,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -4992,6 +5467,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5014,6 +5490,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -5038,6 +5517,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5063,6 +5543,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5087,6 +5570,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5108,6 +5592,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5129,6 +5614,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5152,6 +5638,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5175,6 +5662,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5197,6 +5688,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "matrix4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5216,6 +5710,7 @@
       "resultCount": 0,
       "variadic": false,
       "shapeKinds": [],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5241,6 +5736,9 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5262,6 +5760,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -5285,6 +5787,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -5310,6 +5815,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5333,6 +5839,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "render_target"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -5358,6 +5868,7 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5383,6 +5894,7 @@
         "optional",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5417,6 +5929,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5441,6 +5957,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5465,6 +5982,9 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5487,6 +6007,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5509,6 +6030,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -5535,6 +6061,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5556,6 +6083,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5578,6 +6106,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5602,6 +6131,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5627,6 +6157,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5650,6 +6181,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5671,6 +6203,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5694,6 +6227,7 @@
         "named",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -5723,6 +6257,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5747,6 +6282,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5769,6 +6308,7 @@
         "enum",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5792,6 +6332,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5815,6 +6356,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5836,6 +6378,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -5861,6 +6406,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -5885,6 +6434,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5908,6 +6458,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5929,6 +6480,9 @@
       "shapeKinds": [
         "defold-value"
       ],
+      "defoldValueTypes": [
+        "matrix4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5949,6 +6503,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -5973,6 +6530,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -5996,6 +6554,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -6020,6 +6579,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6043,6 +6605,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6064,6 +6630,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6088,6 +6655,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6111,6 +6679,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6133,6 +6702,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -6157,6 +6730,7 @@
         "map",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -6179,6 +6753,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6203,6 +6778,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -6224,6 +6800,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -6251,6 +6830,10 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -6283,6 +6866,7 @@
         "named",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -6311,6 +6895,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6335,6 +6920,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6358,6 +6944,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6382,6 +6969,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6405,6 +6993,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6425,6 +7014,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "matrix4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -6449,6 +7041,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6471,6 +7066,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -6495,6 +7091,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6520,6 +7117,7 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6545,6 +7143,15 @@
         "named",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "go.EASING",
+        "hash",
+        "quaternion",
+        "url",
+        "vector",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -6577,6 +7184,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6599,6 +7207,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -6623,6 +7235,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6644,6 +7260,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -6668,6 +7289,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6690,6 +7312,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6713,6 +7336,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6737,6 +7361,9 @@
         "scalar",
         "sequence",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -6764,6 +7391,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6787,6 +7418,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6810,6 +7442,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6832,6 +7465,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6855,6 +7489,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6878,6 +7513,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6899,6 +7537,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6921,6 +7560,9 @@
         "defold-value",
         "enum"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6942,6 +7584,7 @@
       "shapeKinds": [
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -6965,6 +7608,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -6988,6 +7632,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7009,6 +7654,9 @@
       "shapeKinds": [
         "defold-value",
         "record-ref"
+      ],
+      "defoldValueTypes": [
+        "render_target"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7032,6 +7680,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7053,6 +7704,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7074,6 +7726,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7099,6 +7754,9 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7121,6 +7779,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7145,6 +7807,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7168,6 +7831,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7189,6 +7855,9 @@
       "shapeKinds": [
         "defold-value",
         "record-ref"
+      ],
+      "defoldValueTypes": [
+        "render_predicate"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -7215,6 +7884,7 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -7237,6 +7907,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7260,6 +7931,9 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [
+        "vector"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -7281,6 +7955,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7305,6 +7983,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7326,6 +8005,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7350,6 +8034,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7371,6 +8056,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7395,6 +8083,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7416,6 +8107,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7439,6 +8133,11 @@
         "defold-value",
         "union"
       ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7460,6 +8159,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7483,6 +8183,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7504,6 +8205,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7527,6 +8229,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7549,6 +8252,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "matrix4",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7573,6 +8281,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7595,6 +8307,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7619,6 +8334,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7641,6 +8359,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7665,6 +8386,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7685,6 +8409,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7709,6 +8436,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7732,6 +8462,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7754,6 +8485,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7778,6 +8513,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7800,6 +8536,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7824,6 +8564,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7847,6 +8588,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7872,6 +8614,16 @@
         "named",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "gui.EASING",
+        "gui.PROP",
+        "hash",
+        "node",
+        "quaternion",
+        "vector",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7902,6 +8654,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7925,6 +8678,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7948,6 +8702,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -7968,6 +8723,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -7990,6 +8749,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8012,6 +8772,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8035,6 +8796,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8057,6 +8819,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8078,6 +8843,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8100,6 +8866,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8124,6 +8894,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8146,6 +8917,7 @@
         "handle",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8169,6 +8941,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8192,6 +8965,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8215,6 +8989,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8238,6 +9013,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8259,6 +9035,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8283,6 +9062,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8306,6 +9088,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8329,6 +9112,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -8353,6 +9137,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -8374,6 +9159,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8397,6 +9186,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8423,6 +9215,10 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -8445,6 +9241,10 @@
       "shapeKinds": [
         "defold-value",
         "map"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -8470,6 +9270,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8492,6 +9295,7 @@
         "enum",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8515,6 +9319,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8538,6 +9343,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8559,6 +9368,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8583,6 +9395,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8604,6 +9419,7 @@
       "shapeKinds": [
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -8628,6 +9444,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8649,6 +9466,10 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "matrix4",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8673,6 +9494,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8694,6 +9516,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8718,6 +9543,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8741,6 +9567,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8764,6 +9591,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8784,6 +9612,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8808,6 +9640,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8831,6 +9664,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8854,6 +9688,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8877,6 +9712,7 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -8901,6 +9737,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -8926,6 +9763,10 @@
         "named",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -8957,6 +9798,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -8980,6 +9822,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9003,6 +9846,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9025,6 +9871,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -9049,6 +9896,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9070,6 +9918,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9093,6 +9942,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9116,6 +9966,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -9140,6 +9991,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9161,6 +10015,7 @@
       "shapeKinds": [
         "dynamic"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9185,6 +10040,7 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -9209,6 +10065,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9231,6 +10088,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9255,6 +10115,9 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -9282,6 +10145,10 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9313,6 +10180,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9334,6 +10205,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9358,6 +10232,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9380,6 +10257,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9405,6 +10285,9 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9426,6 +10309,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9448,6 +10332,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9472,6 +10359,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9495,6 +10383,7 @@
         "handle",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9517,6 +10406,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9541,6 +10434,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9566,6 +10460,9 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -9590,6 +10487,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9614,6 +10512,7 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -9637,6 +10536,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9658,6 +10560,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9680,6 +10583,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -9702,6 +10606,9 @@
       "shapeKinds": [
         "defold-value"
       ],
+      "defoldValueTypes": [
+        "render_target"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9723,6 +10630,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9747,6 +10657,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9769,6 +10680,9 @@
         "defold-value",
         "record-ref",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -9794,6 +10708,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9815,6 +10730,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9835,6 +10751,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9858,6 +10778,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9878,6 +10799,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "matrix4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9900,6 +10824,7 @@
       "shapeKinds": [
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -9924,6 +10849,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9944,6 +10870,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -9966,6 +10896,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -9988,6 +10919,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10012,6 +10946,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10033,6 +10968,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10056,6 +10992,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10078,6 +11015,9 @@
         "defold-value",
         "enum"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10099,6 +11039,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10122,6 +11063,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10144,6 +11086,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -10168,6 +11111,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10191,6 +11137,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "quaternion",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10211,6 +11162,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "matrix4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10235,6 +11189,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10256,6 +11211,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10281,6 +11239,7 @@
         "named",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -10307,6 +11266,7 @@
       "resultCount": 0,
       "variadic": false,
       "shapeKinds": [],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10327,6 +11287,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "matrix4",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10353,6 +11317,10 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10383,6 +11351,9 @@
         "defold-value",
         "enum"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10405,6 +11376,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10428,6 +11400,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10447,6 +11420,7 @@
       "resultCount": 0,
       "variadic": false,
       "shapeKinds": [],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10470,6 +11444,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10490,6 +11465,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "matrix4",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10512,6 +11491,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10534,6 +11514,9 @@
         "defold-value",
         "enum"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10555,6 +11538,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10577,6 +11561,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10601,6 +11589,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10624,6 +11613,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10647,6 +11637,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -10669,6 +11660,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10691,6 +11683,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10715,6 +11712,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10739,6 +11737,9 @@
         "scalar",
         "sequence",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -10765,6 +11766,9 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -10786,6 +11790,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -10810,6 +11818,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10831,6 +11840,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10853,6 +11863,7 @@
         "callback",
         "dynamic"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -10883,6 +11894,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10906,6 +11920,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -10930,6 +11945,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10953,6 +11969,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10976,6 +11993,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -10997,6 +12017,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "buffer_stream"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -11021,6 +12044,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11045,6 +12069,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -11069,6 +12094,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "matrix4",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11092,6 +12122,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11113,6 +12144,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -11137,6 +12171,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11159,6 +12194,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -11183,6 +12221,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11208,6 +12247,9 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -11232,6 +12274,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11255,6 +12298,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11277,6 +12323,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11300,6 +12347,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11322,6 +12370,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -11346,6 +12398,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11371,6 +12424,9 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -11395,6 +12451,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "matrix4",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11417,6 +12477,10 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -11441,6 +12505,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11464,6 +12529,10 @@
         "map",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -11489,6 +12558,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11510,6 +12582,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11533,6 +12606,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11556,6 +12630,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11578,6 +12655,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -11603,6 +12685,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -11625,6 +12708,9 @@
       "shapeKinds": [
         "defold-value",
         "optional"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -11649,6 +12735,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11673,6 +12760,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -11696,6 +12787,9 @@
         "defold-value",
         "record-ref"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -11718,6 +12812,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11741,6 +12836,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11763,6 +12862,9 @@
         "defold-value",
         "record-ref",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -11788,6 +12890,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11810,6 +12913,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11833,6 +12937,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11852,6 +12957,7 @@
       "resultCount": 0,
       "variadic": false,
       "shapeKinds": [],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11875,6 +12981,7 @@
         "handle",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11896,6 +13003,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -11919,6 +13027,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -11943,6 +13052,7 @@
         "named",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -11975,6 +13085,10 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -12004,6 +13118,9 @@
         "defold-value",
         "sequence"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -12026,6 +13143,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12051,6 +13171,14 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "quaternion",
+        "resource_data",
+        "url",
+        "vector3",
+        "vector4"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -12075,6 +13203,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12096,6 +13225,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12117,6 +13247,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12140,6 +13271,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12161,6 +13296,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12183,6 +13319,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12207,6 +13348,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12230,6 +13372,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12251,6 +13394,12 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "matrix4",
+        "quaternion",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12274,6 +13423,9 @@
         "defold-value",
         "enum"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12295,6 +13447,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "matrix4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12319,6 +13474,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12342,6 +13498,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12365,6 +13522,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12385,6 +13545,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12409,6 +13573,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "texture"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12431,6 +13599,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "matrix4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12452,6 +13623,7 @@
       "shapeKinds": [
         "dynamic"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12474,6 +13646,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12498,6 +13675,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12521,6 +13699,7 @@
         "handle",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -12545,6 +13724,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12566,6 +13746,7 @@
       "shapeKinds": [
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -12590,6 +13771,7 @@
         "handle",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -12614,6 +13796,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12636,6 +13821,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "matrix4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12657,6 +13845,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12681,6 +13872,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12701,6 +13893,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12725,6 +13921,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -12749,6 +13946,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12771,6 +13971,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12795,6 +13998,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12817,6 +14021,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12840,6 +14045,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12863,6 +14069,7 @@
         "scalar",
         "variadic"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12886,6 +14093,12 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "node",
+        "vector3",
+        "vector4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12908,6 +14121,7 @@
         "enum",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12929,6 +14143,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12951,6 +14166,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -12975,6 +14193,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -12998,6 +14219,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13019,6 +14241,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13043,6 +14270,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13064,6 +14294,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13088,6 +14321,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13110,6 +14344,10 @@
         "defold-value",
         "scalar",
         "sequence"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "vector3"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -13135,6 +14373,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -13159,6 +14398,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13182,6 +14422,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13203,6 +14444,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13224,6 +14466,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13247,6 +14492,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13272,6 +14520,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -13296,6 +14545,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13317,6 +14567,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13340,6 +14593,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13365,6 +14619,9 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -13388,6 +14645,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13411,6 +14669,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13432,6 +14691,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13454,6 +14714,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13478,6 +14741,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -13502,6 +14766,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13523,6 +14790,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13549,6 +14819,9 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "quaternion"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13572,6 +14845,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13594,6 +14868,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13616,6 +14891,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13636,6 +14914,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13660,6 +14941,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13681,6 +14963,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13704,6 +14989,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13730,6 +15020,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -13753,6 +15048,7 @@
         "callback",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       },
@@ -13782,6 +15078,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "matrix4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13805,6 +15104,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13830,6 +15130,9 @@
         "record-ref",
         "scalar",
         "sequence"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -13857,6 +15160,10 @@
         "named",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13888,6 +15195,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13911,6 +15222,7 @@
         "handle",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13933,6 +15245,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -13957,6 +15272,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "quaternion",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -13980,6 +15300,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14002,6 +15323,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14028,6 +15352,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14048,6 +15375,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14071,6 +15402,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14092,6 +15426,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14116,6 +15451,9 @@
         "named",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14147,6 +15485,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14168,6 +15507,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14192,6 +15534,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14215,6 +15558,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14240,6 +15584,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14263,6 +15610,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14283,6 +15634,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14308,6 +15663,10 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "render_predicate"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14332,6 +15691,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14355,6 +15715,10 @@
         "scalar",
         "sequence",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -14380,6 +15744,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14402,6 +15767,10 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14427,6 +15796,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "texture"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14451,6 +15824,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14472,6 +15846,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14496,6 +15873,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14520,6 +15898,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14543,6 +15925,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14570,6 +15955,9 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14593,6 +15981,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14616,6 +16005,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14639,6 +16029,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14665,6 +16056,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14690,6 +16082,14 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "quaternion",
+        "resource_data",
+        "url",
+        "vector3",
+        "vector4"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -14714,6 +16114,10 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14737,6 +16141,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14757,6 +16164,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14782,6 +16193,9 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14806,6 +16220,9 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14827,6 +16244,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14848,6 +16266,7 @@
       "shapeKinds": [
         "dynamic"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14870,6 +16289,10 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14894,6 +16317,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3",
+        "vector4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14917,6 +16345,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14938,6 +16367,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -14962,6 +16394,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -14984,6 +16417,10 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15008,6 +16445,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -15030,6 +16468,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15055,6 +16494,9 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -15076,6 +16518,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15100,6 +16545,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15120,6 +16566,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15144,6 +16593,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15166,6 +16619,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15187,6 +16641,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15211,6 +16668,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15234,6 +16694,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15255,6 +16718,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15277,6 +16741,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15302,6 +16769,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -15326,6 +16797,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15349,6 +16825,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15370,6 +16847,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15391,6 +16869,10 @@
       "shapeKinds": [
         "defold-value",
         "map"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -15417,6 +16899,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -15439,6 +16922,10 @@
       "shapeKinds": [
         "defold-value"
       ],
+      "defoldValueTypes": [
+        "matrix4",
+        "quaternion"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15460,6 +16947,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15482,6 +16970,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15506,6 +16997,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -15529,6 +17021,11 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "buffer_stream",
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15555,6 +17052,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -15579,6 +17079,9 @@
         "map",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -15605,6 +17108,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15626,6 +17130,9 @@
       "shapeKinds": [
         "defold-value",
         "optional"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15650,6 +17157,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15673,6 +17183,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15697,6 +17208,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15718,6 +17233,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15742,6 +17260,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15764,6 +17286,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15788,6 +17314,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15811,6 +17338,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15832,6 +17360,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15855,6 +17384,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15874,6 +17404,7 @@
       "resultCount": 0,
       "variadic": false,
       "shapeKinds": [],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15896,6 +17427,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -15920,6 +17455,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15943,6 +17479,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15964,6 +17504,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -15988,6 +17529,7 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -16012,6 +17554,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16033,6 +17576,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16059,6 +17605,9 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -16084,6 +17633,7 @@
         "record-ref",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -16105,6 +17655,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16128,6 +17681,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16150,6 +17704,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16173,6 +17728,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -16195,6 +17751,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16218,6 +17775,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16240,6 +17798,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16264,6 +17825,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16287,6 +17849,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16308,6 +17873,10 @@
       "shapeKinds": [
         "defold-value"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16328,6 +17897,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "matrix4",
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16352,6 +17925,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16375,6 +17949,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16397,6 +17972,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16419,6 +17995,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16443,6 +18022,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16465,6 +18045,7 @@
         "enum",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16489,6 +18070,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -16511,6 +18096,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16533,6 +18119,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16557,6 +18146,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16579,6 +18169,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16601,6 +18192,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16628,6 +18222,10 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -16653,6 +18251,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -16674,6 +18276,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16698,6 +18304,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16719,6 +18326,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16743,6 +18353,10 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16766,6 +18380,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16787,6 +18402,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16811,6 +18429,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16832,6 +18451,9 @@
       "shapeKinds": [
         "defold-value",
         "optional"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16856,6 +18478,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16879,6 +18504,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16902,6 +18528,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16924,6 +18551,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -16948,6 +18579,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16971,6 +18605,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -16992,6 +18627,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17015,6 +18653,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17038,6 +18677,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17062,6 +18702,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17083,6 +18726,10 @@
       "shapeKinds": [
         "defold-value"
       ],
+      "defoldValueTypes": [
+        "node",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17103,6 +18750,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17127,6 +18777,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17150,6 +18805,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17170,6 +18828,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "matrix4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17192,6 +18853,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17219,6 +18881,9 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -17244,6 +18909,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17268,6 +18937,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17288,6 +18961,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17310,6 +18987,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17335,6 +19013,12 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "quaternion",
+        "url",
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -17359,6 +19043,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17382,6 +19067,10 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "render_target"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -17407,6 +19096,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "quaternion"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17431,6 +19123,7 @@
         "optional",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -17455,6 +19148,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17475,6 +19169,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17499,6 +19196,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17522,6 +19220,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17544,6 +19243,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17568,6 +19270,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17592,6 +19295,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -17615,6 +19321,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17637,6 +19344,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17661,6 +19372,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -17685,6 +19397,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17706,6 +19419,7 @@
       "shapeKinds": [
         "dynamic"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17727,6 +19441,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17750,6 +19465,10 @@
         "scalar",
         "sequence",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -17775,6 +19494,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17797,6 +19517,7 @@
         "handle",
         "optional"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17819,6 +19540,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -17843,6 +19565,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17864,6 +19589,7 @@
       "shapeKinds": [
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -17888,6 +19614,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -17909,6 +19636,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17932,6 +19662,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -17960,6 +19694,9 @@
         "record-ref",
         "scalar",
         "sequence"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -17991,6 +19728,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18013,6 +19751,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -18037,6 +19779,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18058,6 +19801,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18078,6 +19822,10 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -18104,6 +19852,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -18127,6 +19878,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -18152,6 +19906,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "render_target"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18175,6 +19933,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18199,6 +19958,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18220,6 +19983,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18243,6 +20007,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18266,6 +20031,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18289,6 +20055,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18310,6 +20077,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18333,6 +20101,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18355,6 +20124,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18376,6 +20148,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "quaternion",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -18400,6 +20177,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18423,6 +20203,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -18445,6 +20226,10 @@
       "shapeKinds": [
         "defold-value"
       ],
+      "defoldValueTypes": [
+        "node",
+        "vector4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18466,6 +20251,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18489,6 +20275,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18511,6 +20298,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -18535,6 +20325,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18558,6 +20349,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18580,6 +20372,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18601,6 +20396,7 @@
       "shapeKinds": [
         "enum"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18624,6 +20420,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -18648,6 +20445,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18674,6 +20472,10 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -18698,6 +20500,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18721,6 +20526,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18744,6 +20550,9 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -18769,6 +20578,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18791,6 +20603,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18814,6 +20627,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18837,6 +20651,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18856,6 +20671,7 @@
       "resultCount": 0,
       "variadic": false,
       "shapeKinds": [],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18879,6 +20695,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18900,6 +20717,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -18924,6 +20744,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18947,6 +20770,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -18969,6 +20793,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -18993,6 +20820,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19014,6 +20842,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19039,6 +20870,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19061,6 +20896,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19086,6 +20922,9 @@
         "named",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19117,6 +20956,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19141,6 +20981,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19163,6 +21004,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19187,6 +21031,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url",
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19208,6 +21057,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19234,6 +21088,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19256,6 +21111,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19281,6 +21141,10 @@
         "enum",
         "named",
         "optional"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19312,6 +21176,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19335,6 +21203,7 @@
         "record-ref",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19359,6 +21228,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19380,6 +21250,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19403,6 +21274,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19424,6 +21296,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19445,6 +21318,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19466,6 +21340,10 @@
       "shapeKinds": [
         "defold-value",
         "map"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "vector3"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -19491,6 +21369,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19514,6 +21396,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19535,6 +21421,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19559,6 +21448,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19581,6 +21471,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19604,6 +21495,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19627,6 +21519,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19650,6 +21543,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19672,6 +21566,9 @@
         "defold-value",
         "enum"
       ],
+      "defoldValueTypes": [
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19693,6 +21590,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19716,6 +21614,7 @@
         "map",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19743,6 +21642,9 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19767,6 +21669,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19790,6 +21693,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19815,6 +21719,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19838,6 +21743,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19861,6 +21767,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19884,6 +21791,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19905,6 +21815,7 @@
       "shapeKinds": [
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -19928,6 +21839,10 @@
         "enum",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "render_target"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -19954,6 +21869,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -19978,6 +21896,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20000,6 +21921,9 @@
         "defold-value",
         "scalar",
         "sequence"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -20027,6 +21951,7 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20050,6 +21975,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20072,6 +22000,9 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20097,6 +22028,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -20121,6 +22055,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20144,6 +22079,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20167,6 +22103,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "buffer_data",
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20189,6 +22129,9 @@
         "defold-value",
         "record-ref",
         "sequence"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -20214,6 +22157,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20237,6 +22181,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20258,6 +22203,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20282,6 +22230,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20304,6 +22255,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20328,6 +22283,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20349,6 +22308,10 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "quaternion",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20372,6 +22335,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20397,6 +22364,7 @@
         "optional",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20419,6 +22387,9 @@
       "shapeKinds": [
         "defold-value",
         "handle"
+      ],
+      "defoldValueTypes": [
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20444,6 +22415,10 @@
         "named",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20476,6 +22451,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20499,6 +22477,9 @@
         "record-ref",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash"
       ],
       "recursive": {
         "token": "recursive-value-graph",
@@ -20526,6 +22507,10 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -20550,6 +22535,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20573,6 +22561,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20595,6 +22584,7 @@
       "shapeKinds": [
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20617,6 +22607,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20641,6 +22635,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20662,6 +22659,7 @@
       "shapeKinds": [
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -20686,6 +22684,9 @@
         "defold-value",
         "handle"
       ],
+      "defoldValueTypes": [
+        "vector3"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20709,6 +22710,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20732,6 +22734,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20755,6 +22758,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20780,6 +22784,10 @@
         "sequence",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -20804,6 +22812,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20826,6 +22835,7 @@
         "dynamic",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20848,6 +22858,10 @@
         "defold-value",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "url",
+        "vector3"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20872,6 +22886,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20893,6 +22911,9 @@
       "shapeKinds": [
         "defold-value",
         "enum"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20917,6 +22938,11 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "gui.PROP",
+        "hash",
+        "node"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20937,6 +22963,9 @@
       "variadic": false,
       "shapeKinds": [
         "defold-value"
+      ],
+      "defoldValueTypes": [
+        "quaternion"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -20961,6 +22990,9 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -20984,6 +23016,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -21007,6 +23040,10 @@
         "enum",
         "scalar",
         "union"
+      ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -21033,6 +23070,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -21056,6 +23097,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -21078,6 +23120,9 @@
         "defold-value",
         "scalar"
       ],
+      "defoldValueTypes": [
+        "matrix4"
+      ],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -21099,6 +23144,11 @@
       "shapeKinds": [
         "defold-value",
         "union"
+      ],
+      "defoldValueTypes": [
+        "node",
+        "vector3",
+        "vector4"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -21123,6 +23173,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -21148,6 +23199,7 @@
         "scalar",
         "sequence"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -21172,6 +23224,7 @@
         "enum",
         "handle"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -21195,6 +23248,7 @@
         "handle",
         "record-ref"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -21219,6 +23273,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }
@@ -21240,6 +23295,9 @@
       "shapeKinds": [
         "defold-value",
         "scalar"
+      ],
+      "defoldValueTypes": [
+        "node"
       ],
       "recursive": {
         "token": "acyclic-value-shape"
@@ -21266,6 +23324,10 @@
         "scalar",
         "union"
       ],
+      "defoldValueTypes": [
+        "hash",
+        "url"
+      ],
       "recursive": {
         "token": "recursive-value-graph",
         "cyclePolicy": "policy-unresolved"
@@ -21290,6 +23352,7 @@
         "handle",
         "scalar"
       ],
+      "defoldValueTypes": [],
       "recursive": {
         "token": "acyclic-value-shape"
       }

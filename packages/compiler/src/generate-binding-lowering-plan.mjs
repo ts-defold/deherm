@@ -21,6 +21,7 @@ export const inputPaths = Object.freeze({
   scriptUrlAddress: "packages/bindings/generated/defold-script-url-address-classification.json",
   scriptHandleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
   scriptUniversalValue: "packages/bindings/generated/defold-script-universal-value-bindings.json",
+  defoldValueLayouts: "packages/bindings/generated/defold-value-layouts.json",
   dmsdkProjection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   dmsdkUniversal: "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
   dmsdkScalarThunks: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
@@ -430,6 +431,7 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
         maximumResultCount: binding.maximumResultCount
       },
       shapeKinds: binding.shapeKinds,
+      defoldValueTypes: binding.defoldValueTypes,
       bounds: scriptUniversalValue.bounds,
       tablePolicy: scriptUniversalValue.tablePolicy,
       browserCallback: binding.browserCallback ?? null,
@@ -689,7 +691,19 @@ function applySemanticPolicies(units, policies) {
   return { resolutions, ruleMatches };
 }
 
-function backendRecord(unit, target, resolutions, implementationLanes) {
+/**
+ * A transport carries a Defold value type only when the pinned layout report
+ * models it with a transport this backend declares. Everything else is an
+ * engine-owned value that must fail closed rather than reach a typed unit.
+ */
+function transparentValueTypes(target, layouts) {
+  const supported = new Set(target.transparentValueTransports ?? []);
+  return new Set(Object.entries(layouts.transparent)
+    .filter(([, layout]) => supported.has(layout.transport))
+    .map(([name]) => name));
+}
+
+function backendRecord(unit, target, resolutions, implementationLanes, valueTypes) {
   const missingKinds = unit.shapeKinds.filter((kind) => target.unsupportedValueKinds.includes(kind));
   const resolved = new Map(resolutions.get(unit.identity.id) ?? []);
   const implementations = implementationLanes.get(unit.identity.id) ?? [];
@@ -700,9 +714,17 @@ function backendRecord(unit, target, resolutions, implementationLanes) {
     target.target !== "dynamicHermesJsi";
   const universalCallbackTransport = !unit.shapeKinds.includes("callback") ||
     universalImplementation?.browserCallback?.registryEligible === true;
+  const opaqueShapeKinds = new Set(target.opaqueShapeKinds ?? []);
+  const staticTransportBlockers = target.target === "staticHermesCAbi" && universalImplementation
+    ? [...new Set([
+        ...universalImplementation.shapeKinds.filter((kind) => opaqueShapeKinds.has(kind))
+          .map((kind) => `shape-kind:${kind}`),
+        ...(universalImplementation.defoldValueTypes ?? [])
+          .filter((name) => !valueTypes.has(name)).map((name) => `value-type:${name}`)
+      ])].sort(compareCodeUnits)
+    : [];
   const universalStaticTransport = target.target === "staticHermesCAbi" &&
-    !universalImplementation?.shapeKinds.some((kind) =>
-      ["callback", "handle", "defold-value"].includes(kind));
+    Boolean(universalImplementation) && staticTransportBlockers.length === 0;
   const universalScriptTarget = Boolean(universalImplementation) && (
     (target.target === "dynamicHermesJsi" &&
       (universalCallbackTransport || higherOrderClosure)) ||
@@ -763,6 +785,7 @@ function backendRecord(unit, target, resolutions, implementationLanes) {
     selection = "blocked-semantic";
     blockers.push(`lowering:${unit.sourceState.loweringState}`);
   }
+  if (selection !== "emit" && staticTransportBlockers.length > 0) blockers.push(...staticTransportBlockers);
   if (target.runtime && selection === "emit" && unresolved.length > 0) {
     throw new Error(`${unit.identity.id}/${target.target}: runtime emission escaped unresolved semantics`);
   }
@@ -939,9 +962,16 @@ export function generateBindingLoweringPlan(inputs) {
   const { resolutions, ruleMatches } = applySemanticPolicies(units, semanticPolicies);
   const implementationLanes = implementationLaneIndex(
     units, parsed, scriptProjection.defoldRevision);
+  const { defoldValueLayouts } = parsed;
+  if (defoldValueLayouts.schemaVersion !== 1 ||
+      defoldValueLayouts.defoldRevision !== scriptProjection.defoldRevision) {
+    throw new Error("Defold value layout report schema or Defold revision drifted");
+  }
+  const valueTypesByTarget = new Map(targets.map((target) =>
+    [target.target, transparentValueTypes(target, defoldValueLayouts)]));
   for (const unit of units) {
     unit.backends = Object.fromEntries(targets.map((target) => [target.target, backendRecord(
-      unit, target, resolutions, implementationLanes)]));
+      unit, target, resolutions, implementationLanes, valueTypesByTarget.get(target.target))]));
     if (Object.keys(unit.backends).join(",") !== targetOrder.join(",")) throw new Error(`${unit.identity.id}: incomplete backend matrix`);
   }
   const compact = compactUnits(units, implementationLanes);

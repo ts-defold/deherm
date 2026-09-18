@@ -69,6 +69,10 @@ export function selectUniversalRoutes(routes, policy) {
       resultCount: maximumResultCount,
       variadic,
       shapeKinds: [...(route.shapeKinds ?? [])].sort(compare),
+      // Exact Defold value constructor names, including names reachable only
+      // inside union variants. Transports that copy fixed-layout records need
+      // the type identity, not just the `defold-value` shape kind.
+      defoldValueTypes: [...(route.defoldValueTypes ?? [])].sort(compare),
       recursive: route.recursive ?? { token: "shape-metadata-unavailable" }
     });
   }

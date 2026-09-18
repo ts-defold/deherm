@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "Fixed-layout Defold script value types derived from the pinned dmSDK headers, plus explicit blockers for the engine-owned value types that have no pinned public layout. Layout only; this is not compile, link, runtime, or conformance evidence.",
+  "policySha256": "134b506a020dd65dbd14fd4406c5e570cbebbd2bfdfe6d498fe0d4684297850c",
+  "sourceSha256": {
+    "hash": {
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "sha256": "242aa8e2cd74382d429830884e8047b8c1db9d5b0782594253e9dcddb396abc5"
+    },
+    "message": {
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/message.h",
+      "sha256": "43e902a798cee4ac4f8f2b839c756678963506aa025a272ef1cf010fb2c014c5"
+    },
+    "vmath": {
+      "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
+      "sha256": "1980a4b159e8010db4af2621d9a47e1a82165ddd2ab64d57b5a39f316c3bc790"
+    }
+  },
+  "coverage": {
+    "projectedValueTypes": 19,
+    "transparent": 6,
+    "opaque": 13
+  },
+  "transports": {
+    "float-lanes": "Copied as exact float32 lanes through the typed frame. No arena and no ownership.",
+    "float-arena": "Copied through the caller-owned bounded float arena because the record exceeds the four inline lanes.",
+    "u64-scalar": "Copied as an exact 64-bit value split into two uint32 halves; the typed frontend never narrows it to a double.",
+    "u64-lane-quad": "Copied as four exact 64-bit lanes through the caller-owned bounded URL arena."
+  },
+  "transparent": {
+    "hash": {
+      "transport": "u64-scalar",
+      "element": "uint64_t",
+      "semanticLanes": 1,
+      "storageElements": 1,
+      "byteSize": 8,
+      "alignment": 8,
+      "ordering": "scalar",
+      "typedefChain": [
+        "dmhash_t=uint64_t"
+      ],
+      "evidence": {
+        "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "declaration": "dmhash_t"
+      }
+    },
+    "matrix4": {
+      "transport": "float-arena",
+      "element": "f32",
+      "semanticLanes": 16,
+      "storageElements": 16,
+      "byteSize": 64,
+      "alignment": 16,
+      "ordering": "column-major",
+      "composedOf": {
+        "count": 4,
+        "declaration": "Vector4"
+      },
+      "evidence": {
+        "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
+        "line": 102,
+        "declaration": "Matrix4"
+      }
+    },
+    "quaternion": {
+      "transport": "float-lanes",
+      "element": "f32",
+      "semanticLanes": 4,
+      "storageElements": 4,
+      "byteSize": 16,
+      "alignment": 16,
+      "ordering": "lane-order",
+      "evidence": {
+        "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
+        "line": 77,
+        "declaration": "Quat"
+      }
+    },
+    "url": {
+      "transport": "u64-lane-quad",
+      "element": "uint64_t",
+      "semanticLanes": 4,
+      "storageElements": 4,
+      "byteSize": 32,
+      "alignment": 8,
+      "ordering": "declaration-order",
+      "fields": [
+        {
+          "name": "m_Socket",
+          "declared": "HSocket"
+        },
+        {
+          "name": "_reserved",
+          "declared": "dmhash_t"
+        },
+        {
+          "name": "m_Path",
+          "declared": "dmhash_t"
+        },
+        {
+          "name": "m_Fragment",
+          "declared": "dmhash_t"
+        }
+      ],
+      "evidence": {
+        "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/message.h",
+        "declaration": "URL",
+        "line": 72
+      }
+    },
+    "vector3": {
+      "transport": "float-lanes",
+      "element": "f32",
+      "semanticLanes": 3,
+      "storageElements": 4,
+      "byteSize": 16,
+      "alignment": 16,
+      "ordering": "lane-order",
+      "evidence": {
+        "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
+        "line": 47,
+        "declaration": "Vector3"
+      }
+    },
+    "vector4": {
+      "transport": "float-lanes",
+      "element": "f32",
+      "semanticLanes": 4,
+      "storageElements": 4,
+      "byteSize": 16,
+      "alignment": 16,
+      "ordering": "lane-order",
+      "evidence": {
+        "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
+        "line": 62,
+        "declaration": "Vector4"
+      }
+    }
+  },
+  "opaque": {
+    "buffer_data": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "buffer_stream": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "constant_buffer": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "go.EASING": {
+      "reason": "enum-token-domain",
+      "note": "The value is an engine-defined constant domain, not a value record. It needs an explicit enum lowering before a typed unit may carry it."
+    },
+    "gui.EASING": {
+      "reason": "enum-token-domain",
+      "note": "The value is an engine-defined constant domain, not a value record. It needs an explicit enum lowering before a typed unit may carry it."
+    },
+    "gui.PROP": {
+      "reason": "enum-token-domain",
+      "note": "The value is an engine-defined constant domain, not a value record. It needs an explicit enum lowering before a typed unit may carry it."
+    },
+    "node": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "render_predicate": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "render_target": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "resource_data": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "texture": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "timer_handle": {
+      "reason": "retained-engine-handle",
+      "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport."
+    },
+    "vector": {
+      "reason": "variable-length-value",
+      "note": "The value carries a runtime-determined element count, so it has no fixed-capacity typed record."
+    }
+  }
+}

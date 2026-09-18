@@ -146,8 +146,10 @@ functions and 2,140 dmSDK declarations compile as TypeScript types. One bounded
 universal value-graph ABI covers all 915 stable-ID script routes and composes
 with the specialized scalar, value, tuple, URL, handle, overload, and callback
 families. The canonical plan currently emits 911 profile-available routes for
-Dynamic Hermes, the Lua compatibility bridge, and the browser host; Static
-Hermes emits the 138 routes whose complete recursive value shapes are proven.
+Dynamic Hermes, the Lua compatibility bridge, and the browser host; the
+Static Hermes typed-native transport emits the 325 routes that cross no Lua
+closure, no retained engine handle, and only Defold value records whose fixed
+layout is derived from the pinned dmSDK headers.
 The two `luasocket` routes that manufacture captured Lua closures fail closed.
 
 Every one of the 1,361 runtime dmSDK declarations has a deterministic universal

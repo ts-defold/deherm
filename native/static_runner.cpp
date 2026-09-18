@@ -51,6 +51,7 @@ double gLifecycleFinalUpdates = 0.0;
 double gVmathResults[8]{};
 uint32_t gUniversalResults = 0;
 uint32_t gUniversalRecordEntries = 0;
+double gUniversalValueChecksums[5]{};
 
 bool StaticUniversalDispatch(void*, defold_hermes::ScriptCallFrame* frame) {
   if (!frame || frame->argumentCount != 1 || frame->resultCapacity < 1) return false;
@@ -104,6 +105,12 @@ extern "C" void defold_hermes_static_universal_report(
   gUniversalRecordEntries = recordEntries;
 }
 
+extern "C" void defold_hermes_static_universal_value_report(
+    uint32_t stage,
+    double checksum) {
+  if (stage >= 1 && stage <= 5) gUniversalValueChecksums[stage - 1] = checksum;
+}
+
 int main() {
   try {
     ConsoleHost host;
@@ -145,10 +152,20 @@ int main() {
     std::cout << "static.vmath:3-bindings,7-shapes\n";
     std::cout << "static.vmath.project-zero-target:rejected\n";
     std::cout << "static.vmath.allocations:0\n";
-    if (gUniversalResults != 1 || gUniversalRecordEntries != 5) {
+    if (gUniversalResults != 1 || gUniversalRecordEntries != 7) {
       throw std::runtime_error("Sound-typed Static Hermes universal marshaller returned an unexpected value graph");
     }
-    std::cout << "static.universal:scalar,string,array,record,handle,defold-value\n";
+    // Column-major Matrix4 weighted lane sum, the four exact dmMessage::URL
+    // 64-bit lanes split into uint32 halves, an exact dmhash_t, a float32
+    // Vector3 lane sum, and the two record arities.
+    const double expectedUniversalValues[] = {1496.0, 9470447106.0, 2328826710.0, 6.875, 20.0};
+    for (size_t index = 0; index < 5; ++index) {
+      if (gUniversalValueChecksums[index] != expectedUniversalValues[index]) {
+        throw std::runtime_error("Transparent Defold value record did not survive the sound-typed frame");
+      }
+    }
+    std::cout << "static.universal:scalar,string,array,record,hash,vector3,matrix4,url\n";
+    std::cout << "static.universal.transparent-defold-values:matrix4,url,hash,vector3\n";
     runtime.init();
     runtime.update(1.0 / 60.0);
     runtime.onMessage("hello-from-static-hermes");

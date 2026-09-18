@@ -48,6 +48,7 @@ okf_version: "0.2"
 * [Native extension header generator](research/native-extension-header-generator.md) - Clang-driven C header ingestion, deterministic extension IR/TypeScript/C glue, explicit layout blockers, and the typed browser dmSDK arena.
 * [Compile-time Defold hash literals](research/compile-time-hash-literals.md) - Checker-bound `hashLiteral("#name")` lowering, native Defold vectors, and target-separated bigint evidence.
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.
+* [Transparent Defold value transport](research/transparent-defold-value-transport.md) - Pinned dmSDK value layouts, the Matrix4/URL typed frame lanes, and the structural typed-native emission rule.
 * [Canonical lowering plan](research/canonical-lowering-plan.md) - All 2,287 API units across five backends, interned marshalling programs, semantic policies, and final-build reachability.
 * [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.
 * [Generated script recording engine](research/generated-script-recording-engine.md) - Generated null/observer Defold that asserts, records, and replays every callable script route through the real binding stack over each drivable transport.
