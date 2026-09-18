@@ -130,6 +130,21 @@ async function sourceEvidencePaths(repositoryRoot) {
       }
       continue;
     }
+    if (inputPath.endsWith("script-route-availability-profiles.json")) {
+      for (const evidence of value.buildEvidence ?? []) {
+        result.add(confinedRelativePath(evidence.path, `${inputPath}.buildEvidence.path`));
+      }
+      for (const evidence of Object.values(value.manifests ?? {})) {
+        result.add(confinedRelativePath(evidence.path, `${inputPath}.manifests.path`));
+      }
+      for (const evidence of value.registrations ?? []) {
+        result.add(confinedRelativePath(evidence.path, `${inputPath}.registrations.path`));
+      }
+      for (const evidence of value.documentedButUnregistered ?? []) {
+        result.add(confinedRelativePath(evidence.source, `${inputPath}.documentedButUnregistered.source`));
+      }
+      continue;
+    }
     if (!value.source) continue;
     result.add(`upstream/defold/${confinedRelativePath(value.source, `${inputPath}.source`)}`);
     for (const evidence of value.additionalSourceEvidence ?? []) {
@@ -274,7 +289,7 @@ function ids(rows, label) {
 
 async function validateRouteProvenance(cleanRoot) {
   const load = async (relativePath) => JSON.parse(await readFile(path.join(cleanRoot, relativePath), "utf8"));
-  const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload] = await Promise.all([
+  const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload, profiles, projection] = await Promise.all([
     load("bindings/generated/defold-script-api-inventory.json"),
     load("bindings/generated/defold-script-api-ir.json"),
     load("bindings/generated/defold-script-api-accounting.json"),
@@ -283,21 +298,33 @@ async function validateRouteProvenance(cleanRoot) {
     load("bindings/generated/defold-script-fixed-tuples.json"),
     load("bindings/generated/defold-script-url-address-classification.json"),
     load("bindings/generated/defold-script-value-tail-bindings.json"),
-    load("bindings/generated/defold-script-overload-dispatch.json")
+    load("bindings/generated/defold-script-overload-dispatch.json"),
+    load("bindings/generated/defold-script-route-availability-profiles.json"),
+    load("bindings/generated/defold-script-projection-ir.json")
   ]);
   assert(inventory.countsByKind?.function === 926, `Pinned inventory contains ${inventory.countsByKind?.function} functions, expected 926`);
   assert(ir.counts?.functions === 926, `Clean IR contains ${ir.counts?.functions} functions, expected 926`);
   assert(accounting.functionCount === 926, `Clean accounting contains ${accounting.functionCount} functions, expected 926`);
+  assert(projection.routeCount === 926 && projection.generationCounts?.projected === 926,
+    "Clean projection IR does not project all 926 script routes");
+  assert(projection.defoldRevision === ir.defoldRevision && profiles.defoldRevision === ir.defoldRevision,
+    "Script projection/profile revision differs from the imported IR");
+  assert(profiles.profiles?.["default-legacy-bullet"]?.availableRouteCount === 343 &&
+    profiles.profiles?.["v3-bullet"]?.availableRouteCount === 417 &&
+    profiles.profiles?.["no-physics"]?.availableRouteCount === 26,
+  "Script route profile catalog does not retain the pinned runtime census");
   const inventoryNames = new Set(inventory.declarations
     .filter(({ kind }) => kind === "function")
     .map(({ name }) => name));
   const irIds = ids(ir.functions, "script IR");
   const accountingIds = ids(accounting.rows, "script accounting");
+  const projectionIds = ids(projection.rows, "script projection");
   const irRawNames = new Set(ir.functions.map(({ rawName }) => rawName));
   assert(inventoryNames.size === 926 && irRawNames.size === 926, "Pinned inventory and IR must each contain 926 unique raw function names");
   for (const name of inventoryNames) assert(irRawNames.has(name), `Script IR is missing pinned function ${name}`);
   assert(irIds.size === 926 && accountingIds.size === 926, "Full script route ledger must contain exactly 926 unique IDs");
   for (const id of irIds) assert(accountingIds.has(id), `Accounting is missing generated route ${id}`);
+  for (const id of irIds) assert(projectionIds.has(id), `Projection IR is missing generated route ${id}`);
   const executableIds = [
     ...ids(scalar.bindings, "scalar routes"),
     ...ids(value.bindings, "value routes"),
@@ -329,6 +356,8 @@ async function validateRouteProvenance(cleanRoot) {
     urlRouteCount: url.routeCount,
     valueTailRouteCount: valueTail.candidateCount,
     overloadRouteCount: overload.generatedFamilyCandidateCount,
+    projectedRouteCount: projection.routeCount,
+    defaultProfileRouteCount: profiles.profiles["default-legacy-bullet"].availableRouteCount,
     defoldRevision: ir.defoldRevision
   };
 }

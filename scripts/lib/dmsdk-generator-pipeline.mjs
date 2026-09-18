@@ -14,6 +14,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-xtea-span-bindings.mjs",
   "scripts/generate-dmsdk-hash-span-bindings.mjs",
   "scripts/generate-dmsdk-arena-span-blockers.mjs",
+  "scripts/generate-dmsdk-projection-ir.mjs",
   "scripts/generate-dmsdk-runtime.mjs",
   "scripts/lib/dmsdk-generator-pipeline.mjs"
 ]);
@@ -91,7 +92,8 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h",
   "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp",
   "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp",
-  "bindings/generated/defold-dmsdk-arena-span-blockers.json"
+  "bindings/generated/defold-dmsdk-arena-span-blockers.json",
+  "bindings/generated/defold-dmsdk-projection-ir.json"
 ]);
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.
@@ -106,5 +108,6 @@ export const dmSdkGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-astc-probe-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-xtea-span-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-hash-span-bindings.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-arena-span-blockers.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-arena-span-blockers.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-projection-ir.mjs" })
 ]);

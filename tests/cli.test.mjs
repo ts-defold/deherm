@@ -8,7 +8,7 @@ import test from "node:test";
 import { strToU8, zipSync } from "fflate";
 
 import { buildProjectBindingIr, generateExtensionTypes, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
-import { inspectDefoldProject, parseGameProject } from "../packages/cli/src/project.mjs";
+import { inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "defold-hermes-cli-"));
@@ -83,6 +83,13 @@ test("project inspection finds local and resolved dependency extensions", async 
     ["dependency", "XMath"]
   ]);
   assert.deepEqual(inventory.dependencyUrls, ["https://example.com/math.zip"]);
+  assert.deepEqual(inventory.engineProfiles, {
+    source: "defold-default",
+    manifest: null,
+    manifestSha256: null,
+    defaultProfileId: "default-legacy-bullet",
+    platforms: {}
+  });
   assert.deepEqual(inventory.extensions[0].publicHeaders, ["camera/include/camera.h"]);
   assert.deepEqual(inventory.extensions[0].sourceFiles, ["camera/src/camera.cpp"]);
   assert.deepEqual(inventory.extensions[1].publicHeaders, ["math.zip:math/include/xmath.h"]);
@@ -168,11 +175,19 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "script", "types.ts"), "utf8"), /export interface MsgApi/);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8")).bindingCount, 90);
+  const profiles = JSON.parse(await readFile(path.join(output.root, "ir", "script-route-profiles.json"), "utf8"));
+  assert.ok(profiles.profiles["default-legacy-bullet"]);
+  assert.ok(profiles.profiles["v3-bullet"]);
+  assert.equal(manifest.engineProfiles.source, "defold-default");
+  assert.equal(manifest.engineProfiles.defaultProfileId, "default-legacy-bullet");
+  assert.equal(manifest.engineProfiles.catalogSha256, profiles.catalogSha256);
+  assert.equal(manifest.engineProfiles.handshakeSchema, "deherm.script-route-capabilities/v1");
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk-scalar-thunks.json"), "utf8")).coverage.generated, 26);
   const lock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
   assert.equal(lock.defoldRevision, manifest.defoldRevision);
   assert.equal(lock.platform, manifest.platform);
   assert.deepEqual(lock.inputs, manifest.inputs);
+  assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
 
   await writeFile(path.join(output.root, "sdk", "modules", "stale.ts"), "export {};\n");
   await writeFile(path.join(output.root, "sdk", "generated", "stale.ts"), "export {};\n");
@@ -241,4 +256,100 @@ test("project generation rejects output outside the project", async () => {
     writeGeneratedProject(inventory, "../outside"),
     /subdirectory of the Defold project/
   );
+});
+
+test("project inspection derives per-platform engine profiles from Defold's app manifest", async () => {
+  const project = await fixture();
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Fixture\n[native_extension]\napp_manifest = /game.appmanifest\n`);
+  await writeFile(path.join(project, "game.appmanifest"), `
+platforms:
+  arm64-ios:
+    context:
+      excludeLibs: [physics, box2d_defold, script_box2d_defold]
+      libs: [physics_2d, box2d, script_box2d, physics_3d]
+  wasm-web:
+    context:
+      excludeLibs: [physics, box2d, box2d_defold, script_box2d, script_box2d_defold]
+      excludeSymbols: [ScriptBox2DExt]
+      libs: [physics_3d]
+  x86_64-linux:
+    context:
+      excludeLibs: [physics, LinearMath, BulletDynamics, BulletCollision]
+      libs: [physics_2d_defold]
+`);
+
+  const inventory = await inspectDefoldProject({ project });
+  assert.equal(inventory.engineProfiles.source, "app-manifest");
+  assert.equal(inventory.engineProfiles.manifest, "game.appmanifest");
+  assert.match(inventory.engineProfiles.manifestSha256, /^[a-f0-9]{64}$/);
+  assert.equal(inventory.engineProfiles.defaultProfileId, "default-legacy-bullet");
+  assert.deepEqual(inventory.engineProfiles.platforms, {
+    "arm64-ios": "v3-bullet",
+    "wasm-web": "bullet-only",
+    "x86_64-linux": "legacy-no-bullet"
+  });
+
+  const output = await writeGeneratedProject(inventory);
+  const manifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
+  assert.deepEqual(manifest.engineProfiles.platforms, inventory.engineProfiles.platforms);
+});
+
+test("project inspection rejects contradictory app-manifest physics selections", async () => {
+  const project = await fixture();
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Fixture\n[native_extension]\napp_manifest = /game.appmanifest\n`);
+  await writeFile(path.join(project, "game.appmanifest"), `
+platforms:
+  arm64-ios:
+    context:
+      excludeLibs: []
+      libs: [physics_2d_defold, physics_2d, script_box2d]
+`);
+  await assert.rejects(inspectDefoldProject({ project }), /both legacy Box2D and Box2D v3/);
+});
+
+test("project profile resolution respects extension-symbol removal and rejects partial Box2D replacement", async () => {
+  const project = await fixture();
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Fixture\n[native_extension]\napp_manifest = /game.appmanifest\n`);
+  await writeFile(path.join(project, "game.appmanifest"), `
+platforms:
+  arm64-ios:
+    context:
+      excludeSymbols: [ScriptBullet3DExt]
+      excludeLibs: []
+      libs: []
+`);
+  let inventory = await inspectDefoldProject({ project });
+  assert.equal(inventory.engineProfiles.platforms["arm64-ios"], "legacy-no-bullet");
+
+  await writeFile(path.join(project, "game.appmanifest"), `
+platforms:
+  arm64-ios:
+    context:
+      excludeLibs: [script_box2d_defold]
+      libs: []
+`);
+  await assert.rejects(inspectDefoldProject({ project }), /without selecting Box2D v3/);
+});
+
+test("project inspection rejects app manifests outside the project", async () => {
+  const project = await fixture();
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Fixture\n[native_extension]\napp_manifest = ../outside.appmanifest\n`);
+  await assert.rejects(inspectDefoldProject({ project }), /inside the Defold project/);
+});
+
+test("project profile resolution agrees with all six pinned Defold app-manifest choices", async () => {
+  const root = path.resolve("upstream/defold/editor/test/resources/test_project/app_manifest");
+  const fixtures = {
+    "default.appmanifest": "default-legacy-bullet",
+    "physics_box2dv3_3d.appmanifest": "v3-bullet",
+    "exclude_physics_3d.appmanifest": "legacy-no-bullet",
+    "physics_2d_box2dv3.appmanifest": "v3-no-bullet",
+    "exclude_physics_2d.appmanifest": "bullet-only",
+    "exclude_physics.appmanifest": "no-physics"
+  };
+  for (const [manifest, expected] of Object.entries(fixtures)) {
+    const resolved = await resolveEngineProfiles(root, { native_extension: { app_manifest: manifest } });
+    assert.ok(Object.keys(resolved.platforms).length > 0, `${manifest} has no resolved platforms`);
+    assert.deepEqual(new Set(Object.values(resolved.platforms)), new Set([expected]), manifest);
+  }
 });

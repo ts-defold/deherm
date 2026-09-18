@@ -126,7 +126,7 @@ async function walk(root, relative = "") {
 export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositoryRootDefault) {
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "bindings/generated"))) {
-    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers)\.json$/.test(file)) {
+    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir)\.json$/.test(file)) {
       result.add(`bindings/generated/${file}`);
     }
   }
@@ -186,7 +186,7 @@ async function compareArtifacts(cleanRoot, repositoryRoot) {
 
 async function validateReports(root) {
   const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
-  const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, arenaSpan] = await Promise.all([
+  const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, arenaSpan, projection] = await Promise.all([
     load("bindings/generated/defold-dmsdk-binding-patterns.json"),
     load("bindings/generated/defold-dmsdk-scalar-thunks.json"),
     load("bindings/generated/defold-dmsdk-abi-shapes.json"),
@@ -197,10 +197,21 @@ async function validateReports(root) {
     load("bindings/generated/defold-dmsdk-astc-probe-bindings.json"),
     load("bindings/generated/defold-dmsdk-xtea-span-bindings.json"),
     load("bindings/generated/defold-dmsdk-hash-span-bindings.json"),
-    load("bindings/generated/defold-dmsdk-arena-span-blockers.json")
+    load("bindings/generated/defold-dmsdk-arena-span-blockers.json"),
+    load("bindings/generated/defold-dmsdk-projection-ir.json")
   ]);
   assert(patterns.coverage.runtimePendingCount === 1361 && patterns.coverage.classifiedCount === 1361,
     "dmSDK classifier did not account for all 1,361 runtime-pending declarations");
+  assert(projection.coverage?.classifiedDeclarations === 1361 &&
+    projection.coverage?.projectedDeclarations === 1361 &&
+    projection.coverage?.unprojectedDeclarations === 0 &&
+    projection.coverage?.silentUnknowns === 0 &&
+    projection.coverage?.generatedAdapters === 45 &&
+    projection.coverage?.policyBlocked === 96 &&
+    projection.coverage?.mechanicallyProjected === 1361 &&
+      projection.coverage?.projectionGaps === 0 &&
+      projection.coverage?.loweringPending === 1220,
+  "dmSDK projection IR does not have a complete fail-closed 1,361-declaration projection");
   assert(scalar.coverage.reviewed === 31 && scalar.coverage.generated === 26 && scalar.coverage.blocked === 5,
     "scalar report does not have the pinned 26/31 disposition");
   assert(shapes.coverage.runtimePending === 1361 && shapes.coverage.shaped === 1361 &&
@@ -322,6 +333,7 @@ async function validateReports(root) {
     remainingWithoutGeneratedAdapters: hashSpan.coverage.remainingWithoutGeneratedAdapters,
     uniqueShapeCount: shapes.coverage.uniqueShapes,
     trancheCount: shapes.coverage.tranches,
+    projectedDeclarationCount: projection.coverage.projectedDeclarations,
     defoldRevision: shapes.defoldRevision
   };
 }

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile, readdir, realpath, stat } from "node:fs/promises";
 import path from "node:path";
 
@@ -6,6 +7,11 @@ import { parse as parseYaml } from "yaml";
 
 const ignoredDirectories = new Set([".git", ".internal", "build", "node_modules"]);
 const textDecoder = new TextDecoder();
+const defaultEngineProfileId = "default-legacy-bullet";
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
 
 function portable(value) {
   return value.split(path.sep).join("/");
@@ -142,6 +148,129 @@ function parseManifest(source, sourcePath, diagnostics) {
   }
 }
 
+function normalizeLibraryName(value) {
+  return String(value)
+    .trim()
+    .replace(/\.lib$/i, "")
+    .replace(/^lib(?=(?:box2d|Bullet|LinearMath))/i, "");
+}
+
+function stringSet(value) {
+  return new Set((Array.isArray(value) ? value : []).map(normalizeLibraryName));
+}
+
+function includesAny(values, names) {
+  return names.some((name) => values.has(name));
+}
+
+function inferPlatformEngineProfile(platform, context = {}) {
+  const libs = stringSet(context.libs);
+  const excludes = stringSet(context.excludeLibs);
+  const excludedSymbols = new Set(Array.isArray(context.excludeSymbols) ? context.excludeSymbols.map(String) : []);
+  const v2Libraries = ["box2d_defold", "script_box2d_defold", "physics_2d_defold"];
+  const v3Libraries = ["box2d", "script_box2d", "physics_2d"];
+  const bulletLibraries = ["BulletDynamics", "BulletCollision", "LinearMath", "physics_3d"];
+  const includeV2 = includesAny(libs, v2Libraries);
+  const includeV3 = includesAny(libs, v3Libraries);
+  const includeBullet = includesAny(libs, bulletLibraries);
+  const nullPhysics = libs.has("physics_null");
+
+  if (includeV2 && includeV3) {
+    throw new Error(`${platform}: app manifest includes both legacy Box2D and Box2D v3 libraries`);
+  }
+  if (nullPhysics && (includeV2 || includeV3 || includeBullet)) {
+    throw new Error(`${platform}: app manifest includes physics_null together with concrete physics libraries`);
+  }
+
+  const excludesV2Script = excludes.has("script_box2d_defold");
+  const excludesV3Script = excludes.has("script_box2d");
+  const excludesBothBox2dScripts = excludesV2Script && excludesV3Script;
+  const box2dDisabled = nullPhysics || excludesBothBox2dScripts || excludedSymbols.has("ScriptBox2DExt");
+  const bulletLibrariesDisabled = excludes.has("BulletDynamics") && excludes.has("BulletCollision");
+  const bulletDisabled = nullPhysics || bulletLibrariesDisabled || excludedSymbols.has("ScriptBullet3DExt");
+
+  if (excludesBothBox2dScripts && (includeV2 || includeV3)) {
+    throw new Error(`${platform}: app manifest both disables and includes Box2D`);
+  }
+  if (bulletLibrariesDisabled && includeBullet) {
+    throw new Error(`${platform}: app manifest both disables and includes Bullet physics`);
+  }
+  if (includeV3 && !excludesV2Script) {
+    throw new Error(`${platform}: Box2D v3 is linked without excluding the legacy script_box2d_defold library`);
+  }
+  if (includeV2 && excludesV2Script && !box2dDisabled) {
+    throw new Error(`${platform}: legacy Box2D is linked while its script library is excluded`);
+  }
+  if (includeV3 && excludesV3Script && !box2dDisabled) {
+    throw new Error(`${platform}: Box2D v3 is linked while its script library is excluded`);
+  }
+  if (excludesV2Script && !includeV3 && !box2dDisabled) {
+    throw new Error(`${platform}: legacy Box2D script library is excluded without selecting Box2D v3`);
+  }
+
+  if (box2dDisabled && bulletDisabled) return "no-physics";
+  if (box2dDisabled) return "bullet-only";
+  const box2d = includeV3 ? "v3" : "legacy";
+  if (box2d === "v3") return bulletDisabled ? "v3-no-bullet" : "v3-bullet";
+  return bulletDisabled ? "legacy-no-bullet" : defaultEngineProfileId;
+}
+
+function projectRelativeResourcePath(projectRoot, configuredPath) {
+  const portablePath = configuredPath.replaceAll("\\", "/").replace(/^\/+/, "");
+  const absolute = path.resolve(projectRoot, portablePath);
+  const relative = path.relative(projectRoot, absolute);
+  if (!relative || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error(`native_extension.app_manifest must resolve to a file inside the Defold project: ${configuredPath}`);
+  }
+  return { absolute, relative: portable(relative) };
+}
+
+export async function resolveEngineProfiles(projectRoot, properties) {
+  const configuredPath = properties.native_extension?.app_manifest?.trim();
+  if (!configuredPath) {
+    return {
+      source: "defold-default",
+      manifest: null,
+      manifestSha256: null,
+      defaultProfileId: defaultEngineProfileId,
+      platforms: {}
+    };
+  }
+  const resolved = projectRelativeResourcePath(projectRoot, configuredPath);
+  const source = await readFile(resolved.absolute, "utf8");
+  let parsed;
+  try {
+    parsed = parseYaml(source) ?? {};
+  } catch (error) {
+    throw new Error(`${resolved.relative}: invalid app manifest YAML: ${error.message}`);
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error(`${resolved.relative}: expected the app manifest to contain a YAML object`);
+  }
+  const platformEntries = Object.entries(parsed.platforms ?? {});
+  if (!platformEntries.length) {
+    throw new Error(`${resolved.relative}: app manifest contains no platform contexts`);
+  }
+  const platforms = {};
+  for (const [platform, value] of platformEntries.sort(([left], [right]) => left.localeCompare(right))) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new Error(`${resolved.relative}: ${platform} must contain a platform object`);
+    }
+    const context = value.context ?? {};
+    if (!context || typeof context !== "object" || Array.isArray(context)) {
+      throw new Error(`${resolved.relative}: ${platform}.context must be an object`);
+    }
+    platforms[platform] = inferPlatformEngineProfile(platform, context);
+  }
+  return {
+    source: "app-manifest",
+    manifest: resolved.relative,
+    manifestSha256: sha256(source),
+    defaultProfileId: defaultEngineProfileId,
+    platforms
+  };
+}
+
 function isPublicHeader(relative) {
   return /(^|\/)include\/.*\.(?:h|hh|hpp|hxx)$/i.test(relative);
 }
@@ -265,6 +394,7 @@ async function dependencyExtensions(projectRoot, diagnostics) {
 export async function inspectDefoldProject(options = {}) {
   const projectRoot = await findProjectRoot(options.cwd, options.project);
   const properties = parseGameProject(await readFile(path.join(projectRoot, "game.project"), "utf8"));
+  const engineProfiles = await resolveEngineProfiles(projectRoot, properties);
   const diagnostics = [];
   const manifestPaths = await walk(projectRoot, (file) => path.basename(file) === "ext.manifest", false, diagnostics);
   const local = [];
@@ -281,6 +411,7 @@ export async function inspectDefoldProject(options = {}) {
     projectRoot,
     projectFile: "game.project",
     dependencyUrls: dependencyUrls(properties),
+    engineProfiles,
     extensions,
     summary: {
       localExtensions: local.length,

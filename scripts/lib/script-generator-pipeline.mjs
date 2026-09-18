@@ -25,6 +25,8 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-table-tuple-schemas.mjs",
   "scripts/generate-script-url-address-classification.mjs",
   "scripts/generate-script-real-engine-matrix.mjs",
+  "scripts/generate-script-route-availability-profiles.mjs",
+  "scripts/generate-script-projection-ir.mjs",
   "scripts/generate-war-battles-real-engine-probes.mjs",
   "scripts/generate-script-runtime.mjs",
   "scripts/lib/binding-identity.mjs",
@@ -57,6 +59,7 @@ export const scriptPinnedInputs = Object.freeze([
   "bindings/overrides/script-msg-structured-bindings.json",
   "bindings/overrides/script-table-tuple-schema-overrides.json",
   "bindings/overrides/script-url-address-classification.json",
+  "bindings/overrides/script-route-availability-profiles.json",
   "bindings/overrides/static-hermes-vmath.json",
   "bindings/probes/defold-script-real-engine-matrix.json",
   "bindings/probes/defold-script-real-engine-probes.json",
@@ -128,6 +131,8 @@ export const generatedScriptArtifacts = Object.freeze([
   "defold/defold_hermes/src/generated_script_url_bindings.cpp",
   "packages/sdk/src/generated/script/url-target-support.ts",
   "bindings/generated/defold-script-real-engine-matrix.json",
+  "bindings/generated/defold-script-route-availability-profiles.json",
+  "bindings/generated/defold-script-projection-ir.json",
   "bindings/generated/war-battles-script-real-engine-probes.json",
   "sample/src/generated/war-battles-script-real-engine-probes.ts"
 ]);
@@ -155,5 +160,7 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-copied-value-record-blockers.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-opaque-record-blockers.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-real-engine-matrix.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-route-availability-profiles.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-projection-ir.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-war-battles-real-engine-probes.mjs" })
 ]);

@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "expectedFeatureCounts": {
+    "core": 8,
+    "box2d-v2": 114,
+    "box2d-v3": 181,
+    "bullet3d": 131
+  },
+  "expectedAvailableFeatureCounts": {
+    "core": 8,
+    "box2d-v2": 114,
+    "box2d-v3": 179,
+    "bullet3d": 131
+  },
+  "expectedRouteFeatureCounts": {
+    "core": 26,
+    "box2d-v2": 145,
+    "box2d-v3": 221,
+    "bullet3d": 172
+  },
+  "expectedAvailableRouteFeatureCounts": {
+    "core": 26,
+    "box2d-v2": 145,
+    "box2d-v3": 219,
+    "bullet3d": 172
+  },
+  "expectedRegisteredDocumentedCounts": {
+    "core": 26,
+    "box2d-v2": 145,
+    "box2d-v3": 219,
+    "bullet3d": 172
+  },
+  "expectedRegistrationOnlyCounts": {
+    "core": 0,
+    "box2d-v2": 0,
+    "box2d-v3": 14,
+    "bullet3d": 0
+  },
+  "expectedProfileCounts": {
+    "default-legacy-bullet": 253,
+    "v3-bullet": 320,
+    "legacy-no-bullet": 122,
+    "v3-no-bullet": 189,
+    "bullet-only": 139,
+    "no-physics": 8
+  },
+  "expectedRuntimeProfileCounts": {
+    "default-legacy-bullet": 253,
+    "v3-bullet": 318,
+    "legacy-no-bullet": 122,
+    "v3-no-bullet": 187,
+    "bullet-only": 139,
+    "no-physics": 8
+  },
+  "expectedRouteProfileCounts": {
+    "default-legacy-bullet": 343,
+    "v3-bullet": 419,
+    "legacy-no-bullet": 171,
+    "v3-no-bullet": 247,
+    "bullet-only": 198,
+    "no-physics": 26
+  },
+  "expectedRuntimeRouteProfileCounts": {
+    "default-legacy-bullet": 343,
+    "v3-bullet": 417,
+    "legacy-no-bullet": 171,
+    "v3-no-bullet": 245,
+    "bullet-only": 198,
+    "no-physics": 26
+  },
+  "documentedButUnregistered": [
+    {
+      "feature": "box2d-v3",
+      "id": "script:b2d.body.get_user_data",
+      "stableId": 366616171,
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+      "anchor": "//{\"get_user_data\", Body_GetUserData}, - could return the game object id ? ur url?",
+      "reason": "Documented by Defold, but its Lua registration entry is commented out and therefore unavailable at runtime."
+    },
+    {
+      "feature": "box2d-v3",
+      "id": "script:b2d.body.set_user_data",
+      "stableId": 2241017567,
+      "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+      "anchor": "//{\"set_user_data\", Body_SetUserData}, - could attach the body to a game object?",
+      "reason": "Documented by Defold, but its Lua registration entry is commented out and therefore unavailable at runtime."
+    }
+  ],
+  "buildEvidence": [
+    {
+      "path": "upstream/defold/engine/gamesys/src/gamesys/wscript",
+      "sha256": "c898c4b8a9a6674732674bbb627b152825f22a15b511380a6435c69153b8854f",
+      "anchors": [
+        "target = 'script_box2d'",
+        "scripts/box2d/v3/script_box2d_chain_v3.cpp",
+        "target = 'script_box2d_defold'",
+        "scripts/box2d/v2/script_box2d_fixture_v2.cpp"
+      ]
+    },
+    {
+      "path": "upstream/defold/engine/engine/wscript",
+      "sha256": "095c85d908370aabdbcb78f4cf6dbe3784d090c5ea83cad5668afb69fbde5479",
+      "anchors": [
+        "if 'box2dv3' in waflib.Options.options.enable_features:",
+        "gamesys_libs = 'gamesys gamesys_model gamesys_rig script_box2d'.split()",
+        "gamesys_libs = 'gamesys gamesys_model gamesys_rig script_box2d_defold'.split()"
+      ]
+    }
+  ],
+  "manifests": {
+    "default-legacy-bullet": {
+      "path": "upstream/defold/editor/test/resources/test_project/app_manifest/default.appmanifest",
+      "sha256": "81a173293c71d9f61b031762dd3b60ff5799941566d4798280ff7553c6b21475",
+      "features": ["core", "box2d-v2", "bullet3d"],
+      "anchors": ["# Settings: OpenGL", "excludeLibs: []", "libs: []"]
+    },
+    "v3-bullet": {
+      "path": "upstream/defold/editor/test/resources/test_project/app_manifest/physics_box2dv3_3d.appmanifest",
+      "sha256": "87fb398ec89458e31b65e36303331633a4e43301470c508a92e9f8f5bb941264",
+      "features": ["core", "box2d-v3", "bullet3d"],
+      "anchors": [
+        "excludeLibs: [physics, box2d_defold, script_box2d_defold]",
+        "libs: [physics_2d, box2d, script_box2d, physics_3d]"
+      ]
+    },
+    "legacy-no-bullet": {
+      "path": "upstream/defold/editor/test/resources/test_project/app_manifest/exclude_physics_3d.appmanifest",
+      "sha256": "e1a7bb0edcbc9a2c252682a82b3f1ff406153286101d3789931882288d187dd3",
+      "features": ["core", "box2d-v2"],
+      "anchors": [
+        "excludeLibs: [\"physics\",\"LinearMath\",\"BulletDynamics\",\"BulletCollision\"]",
+        "libs: [\"physics_2d_defold\"]"
+      ]
+    },
+    "v3-no-bullet": {
+      "path": "upstream/defold/editor/test/resources/test_project/app_manifest/physics_2d_box2dv3.appmanifest",
+      "sha256": "5af3d2a865da5c7d1df2cf2a833029aee50eb04b1f7b043fdf329a27942974c1",
+      "features": ["core", "box2d-v3"],
+      "anchors": [
+        "excludeLibs: [physics, LinearMath, BulletDynamics, BulletCollision, box2d_defold, script_box2d_defold]",
+        "libs: [physics_2d, box2d, script_box2d]"
+      ]
+    },
+    "bullet-only": {
+      "path": "upstream/defold/editor/test/resources/test_project/app_manifest/exclude_physics_2d.appmanifest",
+      "sha256": "074a55568b685685bf1695845c6577ab8d5687a43f68fad37f7a04ef32d60c7d",
+      "features": ["core", "bullet3d"],
+      "anchors": [
+        "excludeLibs: [physics, box2d, box2d_defold, script_box2d, script_box2d_defold]",
+        "libs: [physics_3d]"
+      ]
+    },
+    "no-physics": {
+      "path": "upstream/defold/editor/test/resources/test_project/app_manifest/exclude_physics.appmanifest",
+      "sha256": "88ff4ec4e0441c90a72f217e8aa61b68646dd03ed8d74b76eced42c7b771db44",
+      "features": ["core"],
+      "anchors": [
+        "excludeSymbols: [\"ScriptBox2DExt\"]",
+        "libs: [\"physics_null\"]"
+      ]
+    }
+  },
+  "registrations": [
+    {"feature":"core","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/script_buffer.cpp","sha256":"9c74a08b7aa39afe4f88c26f78b9bf11fd162b67bc5b0c270f85a523568f7b22","array":"Module_methods","namespace":"buffer"},
+    {"feature":"core","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/script_resource.cpp","sha256":"0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e","array":"Module_methods","namespace":"resource"},
+    {"feature":"core","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/script_sys_gamesys.cpp","sha256":"fb7496dad015c2d13505dcf60089a4456d7fa68c5a0bc3c0e19b38292931e5b7","array":"ScriptImage_methods","namespace":"sys"},
+
+    {"feature":"box2d-v2","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/script_box2d.cpp","sha256":"7f52762fa051c3ddcd4cd26ee1e5727475bd6830f95d163b9cb84ba26e88d822","array":"BOX2D_FUNCTIONS","namespace":"b2d"},
+    {"feature":"box2d-v2","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_body_v2.cpp","sha256":"b53c8f37670a3d32525445d7b58a9f979b7a7146175afcf8b517ff6613a43296","array":"Body_functions","namespace":"b2d.body"},
+    {"feature":"box2d-v2","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_fixture_v2.cpp","sha256":"9db6c1e5ecc0ad0bd4203e065eb960c25a9508be0368cfbf1749bfabb8d3d7a4","array":"Fixture_functions","namespace":"b2d.fixture"},
+    {"feature":"box2d-v2","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_joint_v2.cpp","sha256":"2405c3ee080a993e7e0809fc8943a6370ce52f2b1197c4cfb8831fd6ec8ec97d","array":"Joint_functions","namespace":"b2d.joint"},
+    {"feature":"box2d-v2","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_world_v2.cpp","sha256":"2ab67f62213558bdc749114edf8a09d7a089dbe033e8761c60aa15d63b617bc5","array":"World_functions","namespace":"b2d.world"},
+
+    {"feature":"box2d-v3","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/script_box2d.cpp","sha256":"7f52762fa051c3ddcd4cd26ee1e5727475bd6830f95d163b9cb84ba26e88d822","array":"BOX2D_FUNCTIONS","namespace":"b2d"},
+    {"feature":"box2d-v3","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp","sha256":"ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95","array":"Body_functions","namespace":"b2d.body"},
+    {"feature":"box2d-v3","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_chain_v3.cpp","sha256":"9769cc82a9fe93c92c2a08ca9a092c5051f235d09f4b80885ffa5c1a39fc72e2","array":"Chain_functions","namespace":"b2d.chain"},
+    {"feature":"box2d-v3","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_joint_v3.cpp","sha256":"071739e89c148fce85b78fb5c9dfbb05870b11c34d87c99a56870f996a0df5f4","array":"Joint_functions","namespace":"b2d.joint"},
+    {"feature":"box2d-v3","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_shape_v3.cpp","sha256":"5cb292452bdaa01e3b43a772912ee6bd5f2cc61dd5c36ce3f2b9d9ddaf01ee79","array":"Shape_functions","namespace":"b2d.shape"},
+    {"feature":"box2d-v3","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_world_v3.cpp","sha256":"9a9f8517256cc928c05e7838c782f1d82266a01e0d32f05f97447458197d32b0","array":"World_functions","namespace":"b2d.world"},
+
+    {"feature":"bullet3d","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp","sha256":"50c51d3d802eaa495eb7c66ffc87b1e9deb31ec7126001c44652c8f5cefd8996","array":"BULLET3D_FUNCTIONS","namespace":"bullet3d"},
+    {"feature":"bullet3d","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp","sha256":"c90f5f10b5b2ccbeb5f77ec3cf986d1dfe36a93eb2a0f79ce9e858e7f35aaf2b","array":"CollisionObject_functions","namespace":"bullet3d.collision_object"},
+    {"feature":"bullet3d","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp","sha256":"5c162bcb9ef4952fc90c785940d115fd8ed1101f60cdb5d403b5de520d3447f7","array":"Constraint_functions","namespace":"bullet3d.constraint"},
+    {"feature":"bullet3d","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_rigid_body.cpp","sha256":"7fe92ecb9e32332bd612aabaf3e1276f5e78bb83e17cd08667116ab3c1928e1b","array":"RigidBody_functions","namespace":"bullet3d.rigid_body"},
+    {"feature":"bullet3d","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp","sha256":"c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285","array":"CollisionObjectShape_functions","namespace":"bullet3d.collision_object"},
+    {"feature":"bullet3d","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp","sha256":"c64c4c5ba44421c40e17fe0603ec25e5f2bb6b8c6b64f132d4a402675a572285","array":"Shape_functions","namespace":"bullet3d.shape"},
+    {"feature":"bullet3d","path":"upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_world.cpp","sha256":"a0e72844d9e70b1aa580271e62181edeea39bbc43f8a5d9f81aa20814ad909fc","array":"World_functions","namespace":"bullet3d.world"}
+  ]
+}

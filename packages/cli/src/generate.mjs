@@ -337,19 +337,22 @@ async function bundledCoreSdk(requestedRevision) {
   const scriptIrPath = path.join(packageRoot, "bindings", "generated", "defold-script-api-ir.json");
   const dmsdkIrPath = path.join(packageRoot, "bindings", "generated", "defold-sdk-ir.json");
   const scriptDispatchPath = path.join(packageRoot, "bindings", "generated", "defold-script-scalar-dispatch.json");
+  const scriptProfilesPath = path.join(packageRoot, "bindings", "generated", "defold-script-route-availability-profiles.json");
   const dmsdkThunksPath = path.join(packageRoot, "bindings", "generated", "defold-dmsdk-scalar-thunks.json");
-  const [scriptSource, dmsdkSource, scriptDispatchSource, dmsdkThunksSource, packageSource] = await Promise.all([
+  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptProfilesSource, dmsdkThunksSource, packageSource] = await Promise.all([
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
     readFile(scriptDispatchPath),
+    readFile(scriptProfilesPath),
     readFile(dmsdkThunksPath),
     readFile(path.join(packageRoot, "package.json"), "utf8")
   ]);
   const scriptIr = JSON.parse(scriptSource);
   const dmsdkIr = JSON.parse(dmsdkSource);
   const scriptDispatch = JSON.parse(scriptDispatchSource);
+  const scriptProfiles = JSON.parse(scriptProfilesSource);
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
-  const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, dmsdkThunks].map(({ defoldRevision }) => defoldRevision));
+  const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, scriptProfiles, dmsdkThunks].map(({ defoldRevision }) => defoldRevision));
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
@@ -364,14 +367,35 @@ async function bundledCoreSdk(requestedRevision) {
     scriptIr,
     dmsdkIr,
     scriptDispatch,
+    scriptProfiles,
     dmsdkThunks,
     inputs: {
       scriptIrSha256: sha256(scriptSource),
       dmsdkIrSha256: sha256(dmsdkSource),
       scriptDispatchSha256: sha256(scriptDispatchSource),
+      scriptProfilesSha256: sha256(scriptProfilesSource),
       dmsdkThunksSha256: sha256(dmsdkThunksSource)
     },
-    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, dmsdkThunksPath }
+    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptProfilesPath, dmsdkThunksPath }
+  };
+}
+
+function validateEngineProfiles(engineProfiles, catalog) {
+  if (!engineProfiles || typeof engineProfiles !== "object") {
+    throw new Error("Project inventory has no Defold engine profile resolution");
+  }
+  const known = new Set(Object.keys(catalog.profiles ?? {}));
+  const selected = new Set([
+    engineProfiles.defaultProfileId,
+    ...Object.values(engineProfiles.platforms ?? {})
+  ].filter(Boolean));
+  for (const profileId of selected) {
+    if (!known.has(profileId)) throw new Error(`Defold project resolved unknown engine profile '${profileId}'`);
+  }
+  return {
+    ...engineProfiles,
+    catalogSha256: catalog.catalogSha256,
+    handshakeSchema: catalog.handshakeContract?.schema ?? null
   };
 }
 
@@ -421,6 +445,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     throw new Error("Generated output resolves outside the Defold project");
   }
   const core = await bundledCoreSdk(options.defoldSdk);
+  const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const portableInventory = { ...inventory, projectRoot: "." };
   await writeFile(path.join(root, "extensions.json"), `${JSON.stringify(portableInventory, null, 2)}\n`);
   const bindingIr = buildProjectBindingIr(inventory);
@@ -430,6 +455,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(core.paths.scriptIrPath, path.join(irRoot, "script-api.json"));
   await cp(core.paths.dmsdkIrPath, path.join(irRoot, "dmsdk.json"));
   await cp(core.paths.scriptDispatchPath, path.join(irRoot, "script-scalar-dispatch.json"));
+  await cp(core.paths.scriptProfilesPath, path.join(irRoot, "script-route-profiles.json"));
   await cp(core.paths.dmsdkThunksPath, path.join(irRoot, "dmsdk-scalar-thunks.json"));
   await writeFile(path.join(root, "extensions.d.ts"), generateExtensionTypes(inventory));
   const modules = bindingIr.modules;
@@ -476,6 +502,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
     inputs: core.inputs,
+    engineProfiles,
     coverage: {
       script: {
         functions: core.scriptIr.counts.functions,
@@ -507,7 +534,8 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     defoldRevision: core.revision,
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
-    inputs: core.inputs
+    inputs: core.inputs,
+    engineProfiles
   }, null, 2)}\n`);
 
   const relativeOutput = path.relative(inventory.projectRoot, root) || ".deherm";
