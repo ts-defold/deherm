@@ -1,0 +1,16 @@
+animations {
+  id: "walk"
+  images {
+    image: "/assets/walk1.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 8
+}
+animations {
+  id: "idle"
+  images {
+    image: "/assets/idle1.png"
+  }
+  playback: PLAYBACK_NONE
+  fps: 1
+}

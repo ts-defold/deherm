@@ -1,0 +1,23 @@
+script: "/main/typo.gui_script"
+fonts {
+  name: "hud_font"
+  font: "/builtins/fonts/default.font"
+}
+layers {
+  name: "overlay"
+}
+layouts {
+  name: "Landscape"
+}
+nodes {
+  type: TYPE_BOX
+  id: "backdrop"
+}
+nodes {
+  type: TYPE_TEXT
+  text: "SCORE 0"
+  font: "hud_font"
+  id: "score"
+}
+material: "/builtins/materials/gui.material"
+max_nodes: 16

@@ -1,0 +1,4 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": ["main/hud.gui.ts", "main/player.script.ts"]
+}

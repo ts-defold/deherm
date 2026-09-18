@@ -1,0 +1,9 @@
+name: "fixture"
+instances {
+  id: "player"
+  prototype: "/main/player.go"
+}
+instances {
+  id: "hud"
+  prototype: "/main/hud.go"
+}

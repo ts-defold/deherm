@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "@ts-defold/deherm": ["../../../packages/sdk/src/index.ts"],
+      "@ts-defold/deherm/component": ["../../../packages/sdk/src/component.ts"]
+    },
+    "plugins": [
+      {
+        "transform": "../../../packages/compiler/ttsc.mjs",
+        "enabled": true,
+        "resourceSymbols": "./.deherm/generated/resource-symbols.json"
+      }
+    ]
+  }
+}

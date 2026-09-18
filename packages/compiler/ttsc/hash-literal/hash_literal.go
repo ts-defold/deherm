@@ -130,9 +130,22 @@ func contextualHashLiteral(program *driver.Program, node *ast.Node) (uint64, boo
 	return hashString64(strings.TrimPrefix(literal, "#")), true, nil
 }
 
-func (plugin) ApplyProgram(program *driver.Program, _ driver.PluginContext) error {
+func (plugin) ApplyProgram(program *driver.Program, ctx driver.PluginContext) error {
 	if program == nil || program.TSProgram == nil {
 		return fmt.Errorf("deherm hash literal plugin received a nil TypeScript program")
+	}
+	// Resource names are resolved against the unmutated tree, before hash
+	// lowering replaces literals and invalidates source positions.
+	table := loadSymbolTable(ctx)
+	var findings []string
+	for _, sourceFile := range program.TSProgram.SourceFiles() {
+		if sourceFile == nil || sourceFile.IsDeclarationFile {
+			continue
+		}
+		findings = append(findings, checkResourceNames(program, table, sourceFile)...)
+	}
+	if len(findings) > 0 {
+		return fmt.Errorf("%s", strings.Join(findings, "\n"))
 	}
 	factory := ast.NewNodeFactory(ast.NodeFactoryHooks{})
 	for _, sourceFile := range program.TSProgram.SourceFiles() {

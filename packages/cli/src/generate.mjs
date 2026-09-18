@@ -598,6 +598,7 @@ function projectBaseConfig(outputDirectory) {
         transform: "@ts-defold/deherm/ttsc",
         enabled: true,
         inventory: `./${generated}/extensions.json`,
+        resourceSymbols: `./${generated}/generated/resource-symbols.json`,
         profile: "development"
       }]
     }

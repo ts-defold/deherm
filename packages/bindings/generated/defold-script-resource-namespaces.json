@@ -1,0 +1,5429 @@
+{
+  "schemaVersion": 1,
+  "generator": "scripts/generate-script-resource-namespace-classification.mjs",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "resourceSchemaVersion": 1,
+  "derivation": [
+    "value shape decides whether a parameter carries a name or a Defold address",
+    "the documented noun selects the declaration namespace kind",
+    "the module's own resource, or a sibling address parameter, selects the resource",
+    "everything else carries an explicit unresolved marker and is never checked"
+  ],
+  "counts": {
+    "resolved": 24,
+    "unresolved": 139,
+    "address": 92
+  },
+  "runtimeExtensibleNamespaces": [
+    "gui:texture"
+  ],
+  "unresolvedReasons": {
+    "ambiguous-module-namespace": 1,
+    "declaring-route-introduces-the-name": 1,
+    "no-address-parameter-to-scope-the-name": 3,
+    "no-documented-declaration-noun": 131,
+    "runtime-extensible-namespace": 3
+  },
+  "namespaceCounts": {
+    "atlas:animation": 2,
+    "collection:instance": 92,
+    "font:style": 2,
+    "go:component": 92,
+    "gui:font": 2,
+    "gui:layer": 1,
+    "gui:layout": 1,
+    "gui:material": 1,
+    "gui:node": 1,
+    "gui:particlefx": 1,
+    "material:constant": 5,
+    "particlefx:emitter": 2,
+    "render:material": 1,
+    "tilemap:layer": 5,
+    "tileset:animation": 2,
+    "tilesource:animation": 2
+  },
+  "routes": [
+    {
+      "id": "script:b2d.body.set_name",
+      "rawName": "b2d.body.set_name",
+      "modulePath": [
+        "b2d",
+        "body"
+      ],
+      "member": "set_name",
+      "jsName": "setName",
+      "declaringInterface": "B2dApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "name",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "name"
+        }
+      ]
+    },
+    {
+      "id": "script:b2d.get_body",
+      "rawName": "b2d.get_body",
+      "modulePath": [
+        "b2d"
+      ],
+      "member": "get_body",
+      "jsName": "getBody",
+      "declaringInterface": "B2dApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:buffer.get_metadata",
+      "rawName": "buffer.get_metadata",
+      "modulePath": [
+        "buffer"
+      ],
+      "member": "get_metadata",
+      "jsName": "getMetadata",
+      "declaringInterface": "BufferApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "metadata_name",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "metadataName"
+        }
+      ]
+    },
+    {
+      "id": "script:buffer.get_stream",
+      "rawName": "buffer.get_stream",
+      "modulePath": [
+        "buffer"
+      ],
+      "member": "get_stream",
+      "jsName": "getStream",
+      "declaringInterface": "BufferApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "stream_name",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "streamName"
+        }
+      ]
+    },
+    {
+      "id": "script:buffer.set_metadata",
+      "rawName": "buffer.set_metadata",
+      "modulePath": [
+        "buffer"
+      ],
+      "member": "set_metadata",
+      "jsName": "setMetadata",
+      "declaringInterface": "BufferApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "metadata_name",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "metadataName"
+        }
+      ]
+    },
+    {
+      "id": "script:bullet3d.constraint.get_slider_motor",
+      "rawName": "bullet3d.constraint.get_slider_motor",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "get_slider_motor",
+      "jsName": "getSliderMotor",
+      "declaringInterface": "Bullet3dApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "motor",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "motor"
+        }
+      ]
+    },
+    {
+      "id": "script:bullet3d.constraint.set_slider_motor",
+      "rawName": "bullet3d.constraint.set_slider_motor",
+      "modulePath": [
+        "bullet3d",
+        "constraint"
+      ],
+      "member": "set_slider_motor",
+      "jsName": "setSliderMotor",
+      "declaringInterface": "Bullet3dApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "motor",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "motor"
+        }
+      ]
+    },
+    {
+      "id": "script:bullet3d.get_collision_object",
+      "rawName": "bullet3d.get_collision_object",
+      "modulePath": [
+        "bullet3d"
+      ],
+      "member": "get_collision_object",
+      "jsName": "getCollisionObject",
+      "declaringInterface": "Bullet3dApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:bullet3d.get_rigid_body",
+      "rawName": "bullet3d.get_rigid_body",
+      "modulePath": [
+        "bullet3d"
+      ],
+      "member": "get_rigid_body",
+      "jsName": "getRigidBody",
+      "declaringInterface": "Bullet3dApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:collectionfactory.create",
+      "rawName": "collectionfactory.create",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "create",
+      "jsName": "create",
+      "declaringInterface": "CollectionfactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:collectionfactory.get_status",
+      "rawName": "collectionfactory.get_status",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "get_status",
+      "jsName": "getStatus",
+      "declaringInterface": "CollectionfactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:collectionfactory.load",
+      "rawName": "collectionfactory.load",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "load",
+      "jsName": "load",
+      "declaringInterface": "CollectionfactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:collectionfactory.set_prototype",
+      "rawName": "collectionfactory.set_prototype",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "set_prototype",
+      "jsName": "setPrototype",
+      "declaringInterface": "CollectionfactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "prototype",
+          "rawType": "string|nil",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "prototype"
+        }
+      ]
+    },
+    {
+      "id": "script:collectionfactory.unload",
+      "rawName": "collectionfactory.unload",
+      "modulePath": [
+        "collectionfactory"
+      ],
+      "member": "unload",
+      "jsName": "unload",
+      "declaringInterface": "CollectionfactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:collectionproxy.load",
+      "rawName": "collectionproxy.load",
+      "modulePath": [
+        "collectionproxy"
+      ],
+      "member": "load",
+      "jsName": "load",
+      "declaringInterface": "CollectionproxyApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:collectionproxy.set_collection",
+      "rawName": "collectionproxy.set_collection",
+      "modulePath": [
+        "collectionproxy"
+      ],
+      "member": "set_collection",
+      "jsName": "setCollection",
+      "declaringInterface": "CollectionproxyApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "prototype",
+          "rawType": "string|nil",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "prototype"
+        }
+      ]
+    },
+    {
+      "id": "script:compute.get_constants",
+      "rawName": "compute.get_constants",
+      "modulePath": [
+        "compute"
+      ],
+      "member": "get_constants",
+      "jsName": "getConstants",
+      "declaringInterface": "ComputeApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:compute.get_samplers",
+      "rawName": "compute.get_samplers",
+      "modulePath": [
+        "compute"
+      ],
+      "member": "get_samplers",
+      "jsName": "getSamplers",
+      "declaringInterface": "ComputeApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:compute.get_textures",
+      "rawName": "compute.get_textures",
+      "modulePath": [
+        "compute"
+      ],
+      "member": "get_textures",
+      "jsName": "getTextures",
+      "declaringInterface": "ComputeApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:compute.set_constants",
+      "rawName": "compute.set_constants",
+      "modulePath": [
+        "compute"
+      ],
+      "member": "set_constants",
+      "jsName": "setConstants",
+      "declaringInterface": "ComputeApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:compute.set_samplers",
+      "rawName": "compute.set_samplers",
+      "modulePath": [
+        "compute"
+      ],
+      "member": "set_samplers",
+      "jsName": "setSamplers",
+      "declaringInterface": "ComputeApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:compute.set_textures",
+      "rawName": "compute.set_textures",
+      "modulePath": [
+        "compute"
+      ],
+      "member": "set_textures",
+      "jsName": "setTextures",
+      "declaringInterface": "ComputeApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:crash.set_file_path",
+      "rawName": "crash.set_file_path",
+      "modulePath": [
+        "crash"
+      ],
+      "member": "set_file_path",
+      "jsName": "setFilePath",
+      "declaringInterface": "CrashApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:crash.set_user_field",
+      "rawName": "crash.set_user_field",
+      "modulePath": [
+        "crash"
+      ],
+      "member": "set_user_field",
+      "jsName": "setUserField",
+      "declaringInterface": "CrashApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "value",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "value"
+        }
+      ]
+    },
+    {
+      "id": "script:factory.create",
+      "rawName": "factory.create",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "create",
+      "jsName": "create",
+      "declaringInterface": "FactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:factory.get_status",
+      "rawName": "factory.get_status",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "get_status",
+      "jsName": "getStatus",
+      "declaringInterface": "FactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:factory.load",
+      "rawName": "factory.load",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "load",
+      "jsName": "load",
+      "declaringInterface": "FactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:factory.set_prototype",
+      "rawName": "factory.set_prototype",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "set_prototype",
+      "jsName": "setPrototype",
+      "declaringInterface": "FactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "prototype",
+          "rawType": "string|nil",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "prototype"
+        }
+      ]
+    },
+    {
+      "id": "script:factory.unload",
+      "rawName": "factory.unload",
+      "modulePath": [
+        "factory"
+      ],
+      "member": "unload",
+      "jsName": "unload",
+      "declaringInterface": "FactoryApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:font.add_font",
+      "rawName": "font.add_font",
+      "modulePath": [
+        "font"
+      ],
+      "member": "add_font",
+      "jsName": "addFont",
+      "declaringInterface": "FontApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "fontc",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "fontc"
+        },
+        {
+          "position": 1,
+          "parameter": "font",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-address-parameter-to-scope-the-name"
+          },
+          "jsParameter": "font"
+        }
+      ]
+    },
+    {
+      "id": "script:font.get_info",
+      "rawName": "font.get_info",
+      "modulePath": [
+        "font"
+      ],
+      "member": "get_info",
+      "jsName": "getInfo",
+      "declaringInterface": "FontApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "fontc",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "fontc"
+        }
+      ]
+    },
+    {
+      "id": "script:font.prewarm_text",
+      "rawName": "font.prewarm_text",
+      "modulePath": [
+        "font"
+      ],
+      "member": "prewarm_text",
+      "jsName": "prewarmText",
+      "declaringInterface": "FontApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "fontc",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "fontc"
+        },
+        {
+          "position": 1,
+          "parameter": "text",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "text"
+        }
+      ]
+    },
+    {
+      "id": "script:font.remove_font",
+      "rawName": "font.remove_font",
+      "modulePath": [
+        "font"
+      ],
+      "member": "remove_font",
+      "jsName": "removeFont",
+      "declaringInterface": "FontApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "fontc",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "fontc"
+        },
+        {
+          "position": 1,
+          "parameter": "font",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-address-parameter-to-scope-the-name"
+          },
+          "jsParameter": "font"
+        }
+      ]
+    },
+    {
+      "id": "script:font.set_style",
+      "rawName": "font.set_style",
+      "modulePath": [
+        "font"
+      ],
+      "member": "set_style",
+      "jsName": "setStyle",
+      "declaringInterface": "FontApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "fontc",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "fontc"
+        },
+        {
+          "position": 1,
+          "parameter": "name",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "font:style"
+            ]
+          },
+          "jsParameter": "name"
+        },
+        {
+          "position": 2,
+          "parameter": "style",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "font:style"
+            ]
+          },
+          "jsParameter": "style"
+        }
+      ]
+    },
+    {
+      "id": "script:go.animate",
+      "rawName": "go.animate",
+      "modulePath": [
+        "go"
+      ],
+      "member": "animate",
+      "jsName": "animate",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "property",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "property"
+        }
+      ]
+    },
+    {
+      "id": "script:go.cancel_animations",
+      "rawName": "go.cancel_animations",
+      "modulePath": [
+        "go"
+      ],
+      "member": "cancel_animations",
+      "jsName": "cancelAnimations",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "property",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "property"
+        }
+      ]
+    },
+    {
+      "id": "script:go.exists",
+      "rawName": "go.exists",
+      "modulePath": [
+        "go"
+      ],
+      "member": "exists",
+      "jsName": "exists",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get",
+      "rawName": "go.get",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get",
+      "jsName": "get",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "property",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "property"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_id",
+      "rawName": "go.get_id",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_id",
+      "jsName": "getId",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_parent",
+      "rawName": "go.get_parent",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_parent",
+      "jsName": "getParent",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_position",
+      "rawName": "go.get_position",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_position",
+      "jsName": "getPosition",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_rotation",
+      "rawName": "go.get_rotation",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_rotation",
+      "jsName": "getRotation",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_scale",
+      "rawName": "go.get_scale",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_scale",
+      "jsName": "getScale",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_scale_uniform",
+      "rawName": "go.get_scale_uniform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_scale_uniform",
+      "jsName": "getScaleUniform",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_world_position",
+      "rawName": "go.get_world_position",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_position",
+      "jsName": "getWorldPosition",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_world_rotation",
+      "rawName": "go.get_world_rotation",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_rotation",
+      "jsName": "getWorldRotation",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_world_scale",
+      "rawName": "go.get_world_scale",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_scale",
+      "jsName": "getWorldScale",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_world_scale_uniform",
+      "rawName": "go.get_world_scale_uniform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_scale_uniform",
+      "jsName": "getWorldScaleUniform",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.get_world_transform",
+      "rawName": "go.get_world_transform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "get_world_transform",
+      "jsName": "getWorldTransform",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.property",
+      "rawName": "go.property",
+      "modulePath": [
+        "go"
+      ],
+      "member": "property",
+      "jsName": "property",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "name",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "name"
+        }
+      ]
+    },
+    {
+      "id": "script:go.set",
+      "rawName": "go.set",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set",
+      "jsName": "set",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "property",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "property"
+        }
+      ]
+    },
+    {
+      "id": "script:go.set_parent",
+      "rawName": "go.set_parent",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_parent",
+      "jsName": "setParent",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        },
+        {
+          "position": 1,
+          "parameter": "parent_id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "parentId"
+        }
+      ]
+    },
+    {
+      "id": "script:go.set_position",
+      "rawName": "go.set_position",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_position",
+      "jsName": "setPosition",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.set_rotation",
+      "rawName": "go.set_rotation",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_rotation",
+      "jsName": "setRotation",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.set_scale",
+      "rawName": "go.set_scale",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_scale",
+      "jsName": "setScale",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.set_scale_xy",
+      "rawName": "go.set_scale_xy",
+      "modulePath": [
+        "go"
+      ],
+      "member": "set_scale_xy",
+      "jsName": "setScaleXy",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.update_world_transform",
+      "rawName": "go.update_world_transform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "update_world_transform",
+      "jsName": "updateWorldTransform",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:go.world_to_local_position",
+      "rawName": "go.world_to_local_position",
+      "modulePath": [
+        "go"
+      ],
+      "member": "world_to_local_position",
+      "jsName": "worldToLocalPosition",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:go.world_to_local_transform",
+      "rawName": "go.world_to_local_transform",
+      "modulePath": [
+        "go"
+      ],
+      "member": "world_to_local_transform",
+      "jsName": "worldToLocalTransform",
+      "declaringInterface": "GoApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.delete_texture",
+      "rawName": "gui.delete_texture",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "delete_texture",
+      "jsName": "deleteTexture",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "texture",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "runtime-extensible-namespace"
+          },
+          "jsParameter": "texture"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.get_font_resource",
+      "rawName": "gui.get_font_resource",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_font_resource",
+      "jsName": "getFontResource",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "font_name",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "gui:font"
+            ]
+          },
+          "jsParameter": "fontName"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.get_node",
+      "rawName": "gui.get_node",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "get_node",
+      "jsName": "getNode",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "gui:node"
+            ]
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.new_particlefx_node",
+      "rawName": "gui.new_particlefx_node",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "new_particlefx_node",
+      "jsName": "newParticlefxNode",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "particlefx",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "ambiguous-module-namespace"
+          },
+          "jsParameter": "particlefx"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.new_text_node",
+      "rawName": "gui.new_text_node",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "new_text_node",
+      "jsName": "newTextNode",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "text",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "text"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.new_texture",
+      "rawName": "gui.new_texture",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "new_texture",
+      "jsName": "newTexture",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "texture_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "declaring-route-introduces-the-name",
+            "declares": [
+              "gui:texture"
+            ]
+          },
+          "jsParameter": "textureId"
+        },
+        {
+          "position": 4,
+          "parameter": "buffer",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buffer"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.play_flipbook",
+      "rawName": "gui.play_flipbook",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "play_flipbook",
+      "jsName": "playFlipbook",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "animation",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-address-parameter-to-scope-the-name"
+          },
+          "jsParameter": "animation"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_font",
+      "rawName": "gui.set_font",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_font",
+      "jsName": "setFont",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "font",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "gui:font"
+            ]
+          },
+          "jsParameter": "font"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_id",
+      "rawName": "gui.set_id",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_id",
+      "jsName": "setId",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_layer",
+      "rawName": "gui.set_layer",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_layer",
+      "jsName": "setLayer",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "layer",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "gui:layer"
+            ]
+          },
+          "jsParameter": "layer"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_layout",
+      "rawName": "gui.set_layout",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_layout",
+      "jsName": "setLayout",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "layout",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "gui:layout"
+            ]
+          },
+          "jsParameter": "layout"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_material",
+      "rawName": "gui.set_material",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_material",
+      "jsName": "setMaterial",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "material",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "gui:material"
+            ]
+          },
+          "jsParameter": "material"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_particlefx",
+      "rawName": "gui.set_particlefx",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_particlefx",
+      "jsName": "setParticlefx",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "particlefx",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "gui:particlefx"
+            ]
+          },
+          "jsParameter": "particlefx"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_texture",
+      "rawName": "gui.set_texture",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_texture",
+      "jsName": "setTexture",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "texture",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "runtime-extensible-namespace"
+          },
+          "jsParameter": "texture"
+        }
+      ]
+    },
+    {
+      "id": "script:gui.set_texture_data",
+      "rawName": "gui.set_texture_data",
+      "modulePath": [
+        "gui"
+      ],
+      "member": "set_texture_data",
+      "jsName": "setTextureData",
+      "declaringInterface": "GuiApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "texture",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "runtime-extensible-namespace"
+          },
+          "jsParameter": "texture"
+        },
+        {
+          "position": 4,
+          "parameter": "buffer",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buffer"
+        }
+      ]
+    },
+    {
+      "id": "script:hash",
+      "rawName": "hash",
+      "modulePath": [
+        "builtins"
+      ],
+      "member": "hash",
+      "jsName": "hash",
+      "declaringInterface": "DefoldApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "s",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "s"
+        }
+      ]
+    },
+    {
+      "id": "script:html5.run",
+      "rawName": "html5.run",
+      "modulePath": [
+        "html5"
+      ],
+      "member": "run",
+      "jsName": "run",
+      "declaringInterface": "Html5Api",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "code",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "code"
+        }
+      ]
+    },
+    {
+      "id": "script:http.request",
+      "rawName": "http.request",
+      "modulePath": [
+        "http"
+      ],
+      "member": "request",
+      "jsName": "request",
+      "declaringInterface": "HttpApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "method",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "method"
+        },
+        {
+          "position": 4,
+          "parameter": "post_data",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "postData"
+        }
+      ]
+    },
+    {
+      "id": "script:image.get_astc_header",
+      "rawName": "image.get_astc_header",
+      "modulePath": [
+        "image"
+      ],
+      "member": "get_astc_header",
+      "jsName": "getAstcHeader",
+      "declaringInterface": "ImageApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "buffer",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buffer"
+        }
+      ]
+    },
+    {
+      "id": "script:image.load",
+      "rawName": "image.load",
+      "modulePath": [
+        "image"
+      ],
+      "member": "load",
+      "jsName": "load",
+      "declaringInterface": "ImageApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "buffer",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buffer"
+        }
+      ]
+    },
+    {
+      "id": "script:image.load_buffer",
+      "rawName": "image.load_buffer",
+      "modulePath": [
+        "image"
+      ],
+      "member": "load_buffer",
+      "jsName": "loadBuffer",
+      "declaringInterface": "ImageApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "buffer",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buffer"
+        }
+      ]
+    },
+    {
+      "id": "script:json.decode",
+      "rawName": "json.decode",
+      "modulePath": [
+        "json"
+      ],
+      "member": "decode",
+      "jsName": "decode",
+      "declaringInterface": "JsonApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "json",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "json"
+        }
+      ]
+    },
+    {
+      "id": "script:label.get_layout_objects",
+      "rawName": "label.get_layout_objects",
+      "modulePath": [
+        "label"
+      ],
+      "member": "get_layout_objects",
+      "jsName": "getLayoutObjects",
+      "declaringInterface": "LabelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:label.get_text",
+      "rawName": "label.get_text",
+      "modulePath": [
+        "label"
+      ],
+      "member": "get_text",
+      "jsName": "getText",
+      "declaringInterface": "LabelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:label.set_text",
+      "rawName": "label.set_text",
+      "modulePath": [
+        "label"
+      ],
+      "member": "set_text",
+      "jsName": "setText",
+      "declaringInterface": "LabelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:liveupdate.add_mount",
+      "rawName": "liveupdate.add_mount",
+      "modulePath": [
+        "liveupdate"
+      ],
+      "member": "add_mount",
+      "jsName": "addMount",
+      "declaringInterface": "LiveupdateApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "name",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "name"
+        },
+        {
+          "position": 1,
+          "parameter": "uri",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "uri"
+        }
+      ]
+    },
+    {
+      "id": "script:liveupdate.remove_mount",
+      "rawName": "liveupdate.remove_mount",
+      "modulePath": [
+        "liveupdate"
+      ],
+      "member": "remove_mount",
+      "jsName": "removeMount",
+      "declaringInterface": "LiveupdateApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "name",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "name"
+        }
+      ]
+    },
+    {
+      "id": "script:material.get_constants",
+      "rawName": "material.get_constants",
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_constants",
+      "jsName": "getConstants",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:material.get_samplers",
+      "rawName": "material.get_samplers",
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_samplers",
+      "jsName": "getSamplers",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:material.get_textures",
+      "rawName": "material.get_textures",
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_textures",
+      "jsName": "getTextures",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:material.get_vertex_attributes",
+      "rawName": "material.get_vertex_attributes",
+      "modulePath": [
+        "material"
+      ],
+      "member": "get_vertex_attributes",
+      "jsName": "getVertexAttributes",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:material.set_constants",
+      "rawName": "material.set_constants",
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_constants",
+      "jsName": "setConstants",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:material.set_samplers",
+      "rawName": "material.set_samplers",
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_samplers",
+      "jsName": "setSamplers",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:material.set_textures",
+      "rawName": "material.set_textures",
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_textures",
+      "jsName": "setTextures",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:material.set_vertex_attributes",
+      "rawName": "material.set_vertex_attributes",
+      "modulePath": [
+        "material"
+      ],
+      "member": "set_vertex_attributes",
+      "jsName": "setVertexAttributes",
+      "declaringInterface": "MaterialApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:model.cancel",
+      "rawName": "model.cancel",
+      "modulePath": [
+        "model"
+      ],
+      "member": "cancel",
+      "jsName": "cancel",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:model.get_aabb",
+      "rawName": "model.get_aabb",
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_aabb",
+      "jsName": "getAabb",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:model.get_blend_weights",
+      "rawName": "model.get_blend_weights",
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_blend_weights",
+      "jsName": "getBlendWeights",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:model.get_go",
+      "rawName": "model.get_go",
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_go",
+      "jsName": "getGo",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "bone_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "boneId"
+        }
+      ]
+    },
+    {
+      "id": "script:model.get_mesh_aabb",
+      "rawName": "model.get_mesh_aabb",
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_mesh_aabb",
+      "jsName": "getMeshAabb",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:model.get_mesh_enabled",
+      "rawName": "model.get_mesh_enabled",
+      "modulePath": [
+        "model"
+      ],
+      "member": "get_mesh_enabled",
+      "jsName": "getMeshEnabled",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "mesh_id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "meshId"
+        }
+      ]
+    },
+    {
+      "id": "script:model.play_anim",
+      "rawName": "model.play_anim",
+      "modulePath": [
+        "model"
+      ],
+      "member": "play_anim",
+      "jsName": "playAnim",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "anim_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "atlas:animation",
+              "tileset:animation",
+              "tilesource:animation"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "animId"
+        }
+      ]
+    },
+    {
+      "id": "script:model.reset_constant",
+      "rawName": "model.reset_constant",
+      "modulePath": [
+        "model"
+      ],
+      "member": "reset_constant",
+      "jsName": "resetConstant",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "constant",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "material:constant"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "constant"
+        }
+      ]
+    },
+    {
+      "id": "script:model.set_blend_weights",
+      "rawName": "model.set_blend_weights",
+      "modulePath": [
+        "model"
+      ],
+      "member": "set_blend_weights",
+      "jsName": "setBlendWeights",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:model.set_mesh_enabled",
+      "rawName": "model.set_mesh_enabled",
+      "modulePath": [
+        "model"
+      ],
+      "member": "set_mesh_enabled",
+      "jsName": "setMeshEnabled",
+      "declaringInterface": "ModelApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "mesh_id",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "meshId"
+        }
+      ]
+    },
+    {
+      "id": "script:msg.post",
+      "rawName": "msg.post",
+      "modulePath": [
+        "msg"
+      ],
+      "member": "post",
+      "jsName": "post",
+      "declaringInterface": "MsgApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "receiver",
+          "rawType": "string|url|hash",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "receiver"
+        },
+        {
+          "position": 1,
+          "parameter": "message_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "messageId"
+        }
+      ]
+    },
+    {
+      "id": "script:particlefx.play",
+      "rawName": "particlefx.play",
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "play",
+      "jsName": "play",
+      "declaringInterface": "ParticlefxApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:particlefx.reset_constant",
+      "rawName": "particlefx.reset_constant",
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "reset_constant",
+      "jsName": "resetConstant",
+      "declaringInterface": "ParticlefxApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "emitter",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "particlefx:emitter"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "emitter"
+        },
+        {
+          "position": 2,
+          "parameter": "constant",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "material:constant"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "constant"
+        }
+      ]
+    },
+    {
+      "id": "script:particlefx.set_constant",
+      "rawName": "particlefx.set_constant",
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "set_constant",
+      "jsName": "setConstant",
+      "declaringInterface": "ParticlefxApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "emitter",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "particlefx:emitter"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "emitter"
+        },
+        {
+          "position": 2,
+          "parameter": "constant",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "material:constant"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "constant"
+        }
+      ]
+    },
+    {
+      "id": "script:particlefx.stop",
+      "rawName": "particlefx.stop",
+      "modulePath": [
+        "particlefx"
+      ],
+      "member": "stop",
+      "jsName": "stop",
+      "declaringInterface": "ParticlefxApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.create_joint",
+      "rawName": "physics.create_joint",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "create_joint",
+      "jsName": "createJoint",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "collisionobject_a",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobjectA"
+        },
+        {
+          "position": 2,
+          "parameter": "joint_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "jointId"
+        },
+        {
+          "position": 4,
+          "parameter": "collisionobject_b",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobjectB"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.destroy_joint",
+      "rawName": "physics.destroy_joint",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "destroy_joint",
+      "jsName": "destroyJoint",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "collisionobject",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobject"
+        },
+        {
+          "position": 1,
+          "parameter": "joint_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "jointId"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.get_group",
+      "rawName": "physics.get_group",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_group",
+      "jsName": "getGroup",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.get_joint_properties",
+      "rawName": "physics.get_joint_properties",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_joint_properties",
+      "jsName": "getJointProperties",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "collisionobject",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobject"
+        },
+        {
+          "position": 1,
+          "parameter": "joint_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "jointId"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.get_joint_reaction_force",
+      "rawName": "physics.get_joint_reaction_force",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_joint_reaction_force",
+      "jsName": "getJointReactionForce",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "collisionobject",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobject"
+        },
+        {
+          "position": 1,
+          "parameter": "joint_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "jointId"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.get_joint_reaction_torque",
+      "rawName": "physics.get_joint_reaction_torque",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_joint_reaction_torque",
+      "jsName": "getJointReactionTorque",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "collisionobject",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobject"
+        },
+        {
+          "position": 1,
+          "parameter": "joint_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "jointId"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.get_maskbit",
+      "rawName": "physics.get_maskbit",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_maskbit",
+      "jsName": "getMaskbit",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "group",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.get_shape",
+      "rawName": "physics.get_shape",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "get_shape",
+      "jsName": "getShape",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "shape",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "shape"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.set_group",
+      "rawName": "physics.set_group",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_group",
+      "jsName": "setGroup",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "group",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.set_hflip",
+      "rawName": "physics.set_hflip",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_hflip",
+      "jsName": "setHflip",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.set_joint_properties",
+      "rawName": "physics.set_joint_properties",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_joint_properties",
+      "jsName": "setJointProperties",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "collisionobject",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobject"
+        },
+        {
+          "position": 1,
+          "parameter": "joint_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "jointId"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.set_maskbit",
+      "rawName": "physics.set_maskbit",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_maskbit",
+      "jsName": "setMaskbit",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "group",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.set_shape",
+      "rawName": "physics.set_shape",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_shape",
+      "jsName": "setShape",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "shape",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "shape"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.set_vflip",
+      "rawName": "physics.set_vflip",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "set_vflip",
+      "jsName": "setVflip",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.update_mass",
+      "rawName": "physics.update_mass",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "update_mass",
+      "jsName": "updateMass",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "collisionobject",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "collisionobject"
+        }
+      ]
+    },
+    {
+      "id": "script:physics.wakeup",
+      "rawName": "physics.wakeup",
+      "modulePath": [
+        "physics"
+      ],
+      "member": "wakeup",
+      "jsName": "wakeup",
+      "declaringInterface": "PhysicsApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:profiler.log_text",
+      "rawName": "profiler.log_text",
+      "modulePath": [
+        "profiler"
+      ],
+      "member": "log_text",
+      "jsName": "logText",
+      "declaringInterface": "ProfilerApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "text",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "text"
+        }
+      ]
+    },
+    {
+      "id": "script:profiler.scope_begin",
+      "rawName": "profiler.scope_begin",
+      "modulePath": [
+        "profiler"
+      ],
+      "member": "scope_begin",
+      "jsName": "scopeBegin",
+      "declaringInterface": "ProfilerApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "name",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "name"
+        }
+      ]
+    },
+    {
+      "id": "script:render.enable_material",
+      "rawName": "render.enable_material",
+      "modulePath": [
+        "render"
+      ],
+      "member": "enable_material",
+      "jsName": "enableMaterial",
+      "declaringInterface": "RenderApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "material_id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "attached-resource",
+            "namespaces": [
+              "render:material"
+            ]
+          },
+          "jsParameter": "materialId"
+        }
+      ]
+    },
+    {
+      "id": "script:render.set_compute",
+      "rawName": "render.set_compute",
+      "modulePath": [
+        "render"
+      ],
+      "member": "set_compute",
+      "jsName": "setCompute",
+      "declaringInterface": "RenderApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "compute",
+          "rawType": "string|hash|nil",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "compute"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.atlas",
+      "rawName": "resource.atlas",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "atlas",
+      "jsName": "atlas",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.buffer",
+      "rawName": "resource.buffer",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "buffer",
+      "jsName": "buffer",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.create_atlas",
+      "rawName": "resource.create_atlas",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_atlas",
+      "jsName": "createAtlas",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.create_buffer",
+      "rawName": "resource.create_buffer",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_buffer",
+      "jsName": "createBuffer",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.create_sound_data",
+      "rawName": "resource.create_sound_data",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_sound_data",
+      "jsName": "createSoundData",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.create_texture",
+      "rawName": "resource.create_texture",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_texture",
+      "jsName": "createTexture",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.create_texture_async",
+      "rawName": "resource.create_texture_async",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "create_texture_async",
+      "jsName": "createTextureAsync",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.font",
+      "rawName": "resource.font",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "font",
+      "jsName": "font",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.get_atlas",
+      "rawName": "resource.get_atlas",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_atlas",
+      "jsName": "getAtlas",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.get_buffer",
+      "rawName": "resource.get_buffer",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_buffer",
+      "jsName": "getBuffer",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.get_text_metrics",
+      "rawName": "resource.get_text_metrics",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "get_text_metrics",
+      "jsName": "getTextMetrics",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 1,
+          "parameter": "text",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "text"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.load",
+      "rawName": "resource.load",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "load",
+      "jsName": "load",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.material",
+      "rawName": "resource.material",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "material",
+      "jsName": "material",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.release",
+      "rawName": "resource.release",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "release",
+      "jsName": "release",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.render_target",
+      "rawName": "resource.render_target",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "render_target",
+      "jsName": "renderTarget",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.set",
+      "rawName": "resource.set",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set",
+      "jsName": "set",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.set_atlas",
+      "rawName": "resource.set_atlas",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_atlas",
+      "jsName": "setAtlas",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.set_buffer",
+      "rawName": "resource.set_buffer",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_buffer",
+      "jsName": "setBuffer",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.set_sound",
+      "rawName": "resource.set_sound",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_sound",
+      "jsName": "setSound",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        },
+        {
+          "position": 1,
+          "parameter": "buffer",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buffer"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.set_texture",
+      "rawName": "resource.set_texture",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "set_texture",
+      "jsName": "setTexture",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "hash|string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.texture",
+      "rawName": "resource.texture",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "texture",
+      "jsName": "texture",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:resource.tile_source",
+      "rawName": "resource.tile_source",
+      "modulePath": [
+        "resource"
+      ],
+      "member": "tile_source",
+      "jsName": "tileSource",
+      "declaringInterface": "ResourceApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:socket.connect",
+      "rawName": "socket.connect",
+      "modulePath": [
+        "socket"
+      ],
+      "member": "connect",
+      "jsName": "connect",
+      "declaringInterface": "SocketApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "address",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "address"
+        },
+        {
+          "position": 2,
+          "parameter": "locaddr",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "locaddr"
+        },
+        {
+          "position": 4,
+          "parameter": "family",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "family"
+        }
+      ]
+    },
+    {
+      "id": "script:socket.dns.getaddrinfo",
+      "rawName": "socket.dns.getaddrinfo",
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "getaddrinfo",
+      "jsName": "getaddrinfo",
+      "declaringInterface": "SocketApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "address",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "address"
+        }
+      ]
+    },
+    {
+      "id": "script:socket.dns.getnameinfo",
+      "rawName": "socket.dns.getnameinfo",
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "getnameinfo",
+      "jsName": "getnameinfo",
+      "declaringInterface": "SocketApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "address",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "address"
+        }
+      ]
+    },
+    {
+      "id": "script:socket.dns.tohostname",
+      "rawName": "socket.dns.tohostname",
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "tohostname",
+      "jsName": "tohostname",
+      "declaringInterface": "SocketApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "address",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "address"
+        }
+      ]
+    },
+    {
+      "id": "script:socket.dns.toip",
+      "rawName": "socket.dns.toip",
+      "modulePath": [
+        "socket",
+        "dns"
+      ],
+      "member": "toip",
+      "jsName": "toip",
+      "declaringInterface": "SocketApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "address",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "address"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.get_group_gain",
+      "rawName": "sound.get_group_gain",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_group_gain",
+      "jsName": "getGroupGain",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "group",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.get_group_name",
+      "rawName": "sound.get_group_name",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_group_name",
+      "jsName": "getGroupName",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "group",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.get_peak",
+      "rawName": "sound.get_peak",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_peak",
+      "jsName": "getPeak",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "group",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.get_rms",
+      "rawName": "sound.get_rms",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "get_rms",
+      "jsName": "getRms",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "group",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.pause",
+      "rawName": "sound.pause",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "pause",
+      "jsName": "pause",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.play",
+      "rawName": "sound.play",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "play",
+      "jsName": "play",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.set_gain",
+      "rawName": "sound.set_gain",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "set_gain",
+      "jsName": "setGain",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.set_group_gain",
+      "rawName": "sound.set_group_gain",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "set_group_gain",
+      "jsName": "setGroupGain",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "group",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "group"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.set_pan",
+      "rawName": "sound.set_pan",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "set_pan",
+      "jsName": "setPan",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sound.stop",
+      "rawName": "sound.stop",
+      "modulePath": [
+        "sound"
+      ],
+      "member": "stop",
+      "jsName": "stop",
+      "declaringInterface": "SoundApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sprite.play_flipbook",
+      "rawName": "sprite.play_flipbook",
+      "modulePath": [
+        "sprite"
+      ],
+      "member": "play_flipbook",
+      "jsName": "playFlipbook",
+      "declaringInterface": "SpriteApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "id",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "atlas:animation",
+              "tileset:animation",
+              "tilesource:animation"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "id"
+        }
+      ]
+    },
+    {
+      "id": "script:sprite.reset_constant",
+      "rawName": "sprite.reset_constant",
+      "modulePath": [
+        "sprite"
+      ],
+      "member": "reset_constant",
+      "jsName": "resetConstant",
+      "declaringInterface": "SpriteApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "constant",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "material:constant"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "constant"
+        }
+      ]
+    },
+    {
+      "id": "script:sprite.set_hflip",
+      "rawName": "sprite.set_hflip",
+      "modulePath": [
+        "sprite"
+      ],
+      "member": "set_hflip",
+      "jsName": "setHflip",
+      "declaringInterface": "SpriteApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sprite.set_vflip",
+      "rawName": "sprite.set_vflip",
+      "modulePath": [
+        "sprite"
+      ],
+      "member": "set_vflip",
+      "jsName": "setVflip",
+      "declaringInterface": "SpriteApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.deserialize",
+      "rawName": "sys.deserialize",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "deserialize",
+      "jsName": "deserialize",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "buffer",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buffer"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.exists",
+      "rawName": "sys.exists",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "exists",
+      "jsName": "exists",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.get_application_info",
+      "rawName": "sys.get_application_info",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_application_info",
+      "jsName": "getApplicationInfo",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "app_string",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "appString"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.get_config_boolean",
+      "rawName": "sys.get_config_boolean",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_config_boolean",
+      "jsName": "getConfigBoolean",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "key",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "key"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.get_config_int",
+      "rawName": "sys.get_config_int",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_config_int",
+      "jsName": "getConfigInt",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "key",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "key"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.get_config_number",
+      "rawName": "sys.get_config_number",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_config_number",
+      "jsName": "getConfigNumber",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "key",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "key"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.get_config_string",
+      "rawName": "sys.get_config_string",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_config_string",
+      "jsName": "getConfigString",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "key",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "key"
+        },
+        {
+          "position": 1,
+          "parameter": "default_value",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "defaultValue"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.get_host_path",
+      "rawName": "sys.get_host_path",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_host_path",
+      "jsName": "getHostPath",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "filename",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "filename"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.get_save_file",
+      "rawName": "sys.get_save_file",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "get_save_file",
+      "jsName": "getSaveFile",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "application_id",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "applicationId"
+        },
+        {
+          "position": 1,
+          "parameter": "file_name",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "fileName"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.load",
+      "rawName": "sys.load",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "load",
+      "jsName": "load",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "filename",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "filename"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.load_buffer",
+      "rawName": "sys.load_buffer",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "load_buffer",
+      "jsName": "loadBuffer",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.load_buffer_async",
+      "rawName": "sys.load_buffer_async",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "load_buffer_async",
+      "jsName": "loadBufferAsync",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "path",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "path"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.load_resource",
+      "rawName": "sys.load_resource",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "load_resource",
+      "jsName": "loadResource",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "filename",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "filename"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.open_url",
+      "rawName": "sys.open_url",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "open_url",
+      "jsName": "openUrl",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.reboot",
+      "rawName": "sys.reboot",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "reboot",
+      "jsName": "reboot",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "arg1",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "arg1"
+        },
+        {
+          "position": 1,
+          "parameter": "arg2",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "arg2"
+        },
+        {
+          "position": 2,
+          "parameter": "arg3",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "arg3"
+        },
+        {
+          "position": 3,
+          "parameter": "arg4",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "arg4"
+        },
+        {
+          "position": 4,
+          "parameter": "arg5",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "arg5"
+        },
+        {
+          "position": 5,
+          "parameter": "arg6",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "arg6"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.save",
+      "rawName": "sys.save",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "save",
+      "jsName": "save",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "filename",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "filename"
+        }
+      ]
+    },
+    {
+      "id": "script:sys.set_connectivity_host",
+      "rawName": "sys.set_connectivity_host",
+      "modulePath": [
+        "sys"
+      ],
+      "member": "set_connectivity_host",
+      "jsName": "setConnectivityHost",
+      "declaringInterface": "SysApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "host",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "host"
+        }
+      ]
+    },
+    {
+      "id": "script:tilemap.get_bounds",
+      "rawName": "tilemap.get_bounds",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_bounds",
+      "jsName": "getBounds",
+      "declaringInterface": "TilemapApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        }
+      ]
+    },
+    {
+      "id": "script:tilemap.get_tile",
+      "rawName": "tilemap.get_tile",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_tile",
+      "jsName": "getTile",
+      "declaringInterface": "TilemapApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "layer",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "tilemap:layer"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "layer"
+        }
+      ]
+    },
+    {
+      "id": "script:tilemap.get_tile_info",
+      "rawName": "tilemap.get_tile_info",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_tile_info",
+      "jsName": "getTileInfo",
+      "declaringInterface": "TilemapApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "layer",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "tilemap:layer"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "layer"
+        }
+      ]
+    },
+    {
+      "id": "script:tilemap.get_tiles",
+      "rawName": "tilemap.get_tiles",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "get_tiles",
+      "jsName": "getTiles",
+      "declaringInterface": "TilemapApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "layer",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "tilemap:layer"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "layer"
+        }
+      ]
+    },
+    {
+      "id": "script:tilemap.reset_constant",
+      "rawName": "tilemap.reset_constant",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "reset_constant",
+      "jsName": "resetConstant",
+      "declaringInterface": "TilemapApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "constant",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "material:constant"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "constant"
+        }
+      ]
+    },
+    {
+      "id": "script:tilemap.set_tile",
+      "rawName": "tilemap.set_tile",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "set_tile",
+      "jsName": "setTile",
+      "declaringInterface": "TilemapApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "layer",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "tilemap:layer"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "layer"
+        }
+      ]
+    },
+    {
+      "id": "script:tilemap.set_visible",
+      "rawName": "tilemap.set_visible",
+      "modulePath": [
+        "tilemap"
+      ],
+      "member": "set_visible",
+      "jsName": "setVisible",
+      "declaringInterface": "TilemapApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "url",
+          "rawType": "string|hash|url",
+          "valueShape": "address",
+          "resourceNamespace": {
+            "scope": "component-address",
+            "namespaces": [
+              "go:component",
+              "collection:instance"
+            ]
+          },
+          "jsParameter": "url"
+        },
+        {
+          "position": 1,
+          "parameter": "layer",
+          "rawType": "string|hash",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "scope": "addressed-component-resource",
+            "namespaces": [
+              "tilemap:layer"
+            ],
+            "addressParameter": 0
+          },
+          "jsParameter": "layer"
+        }
+      ]
+    },
+    {
+      "id": "script:window.set_title",
+      "rawName": "window.set_title",
+      "modulePath": [
+        "window"
+      ],
+      "member": "set_title",
+      "jsName": "setTitle",
+      "declaringInterface": "WindowApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "title",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "title"
+        }
+      ]
+    },
+    {
+      "id": "script:zlib.deflate",
+      "rawName": "zlib.deflate",
+      "modulePath": [
+        "zlib"
+      ],
+      "member": "deflate",
+      "jsName": "deflate",
+      "declaringInterface": "ZlibApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "buf",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buf"
+        }
+      ]
+    },
+    {
+      "id": "script:zlib.inflate",
+      "rawName": "zlib.inflate",
+      "modulePath": [
+        "zlib"
+      ],
+      "member": "inflate",
+      "jsName": "inflate",
+      "declaringInterface": "ZlibApi",
+      "parameters": [
+        {
+          "position": 0,
+          "parameter": "buf",
+          "rawType": "string",
+          "valueShape": "name",
+          "resourceNamespace": {
+            "unresolved": "no-documented-declaration-noun"
+          },
+          "jsParameter": "buf"
+        }
+      ]
+    }
+  ]
+}

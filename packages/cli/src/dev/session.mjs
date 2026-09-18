@@ -6,6 +6,7 @@ import {
   componentProxyConstants,
   generateComponentProxies
 } from "../../../compiler/src/component-proxy-generator.mjs";
+import { writeProjectResourceSymbols } from "../resource-symbols.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
 import { createDefoldBuilder } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
@@ -198,6 +199,7 @@ export async function runDevSession(options = {}) {
     beforeRebuild: options.components === false ? undefined : async (changedSources) => {
       if (generatedComponents && !changedSources.some(isComponentSource)) return;
       await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
+      await writeProjectResourceSymbols(projectRoot, path.join(projectRoot, ".deherm"));
       generatedComponents = true;
     }
   });

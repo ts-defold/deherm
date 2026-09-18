@@ -1,0 +1,8 @@
+key_trigger {
+  input: KEY_SPACE
+  action: "fire"
+}
+key_trigger {
+  input: KEY_LEFT
+  action: "left"
+}
