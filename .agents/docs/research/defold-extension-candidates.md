@@ -384,6 +384,16 @@ being linked into the game.
 
 # Generator gaps this survey exposes
 
+> **Status update.** All four gaps below were confirmed by executing
+> `deherm generate` over the real xMath and defold-astar files and are now
+> fixed, with a regression test each. Ingestion also surfaced three further
+> defects this reading did not predict - a member declaring a call signature
+> without `type: function`, optionality spelled as a trailing `[optional]` name
+> marker, and SCREAMING_SNAKE constants camel-cased into potential collisions.
+> See [Real third-party extension ingestion](real-extension-ingestion.md) for
+> the evidence, the blocker taxonomy that replaced silent degradation, and the
+> pinned fixture. The text below is preserved as the prediction it was.
+
 Reading real `.script_api` files against
 `packages/cli/src/generate.mjs`'s `normalizeType` surfaced four concrete defects.
 They are recorded here because they are the actual reason to adopt a real
@@ -430,8 +440,10 @@ revision `17a1f3d8a3f50e7840fbb6677465d1cb7799a15e` and was only trusted where
 the repository corroborated it - the `defold-astar` licence discrepancy is the
 one case where it did not.
 
-No extension was fetched into a project, no `ext.manifest` was resolved through
-Bob, no inventory was generated, and no engine was relinked. The generator gaps
-in the previous section were derived by reading real `.script_api` sources
-against the projection code, not by executing `deherm generate` over them.
-Confirming them is the first task of whichever adoption is approved.
+At the time this survey was written no extension had been fetched into a
+project, no `ext.manifest` had been resolved through Bob, no inventory had been
+generated, and no engine had been relinked; the generator gaps were derived by
+reading real `.script_api` sources against the projection code. That confirming
+step has since been done for xMath and defold-astar - see
+[Real third-party extension ingestion](real-extension-ingestion.md). No engine
+has been relinked for either, and neither has been adopted into the game.

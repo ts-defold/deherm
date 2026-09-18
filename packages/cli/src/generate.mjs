@@ -18,6 +18,31 @@ const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const require = createRequire(import.meta.url);
 const generatedContextExportNames = new Set(["projectExtensions"]);
 
+// `.script_api` names Defold's engine value types by their Lua spelling. The
+// binding compiler already derives exact layouts for those types from the
+// pinned dmSDK headers, so the extension lane joins to that generated evidence
+// instead of degrading every vmath-shaped parameter to `unknown`. Value types
+// that have a layout but no TypeScript projection fail this module at load
+// time rather than silently losing their shape.
+const defoldValueLayouts = require("../../bindings/generated/defold-value-layouts.json");
+const defoldValueTypeScriptNames = new Map([
+  ["hash", "DefoldHash"],
+  ["matrix4", "Matrix4"],
+  ["quaternion", "Quaternion"],
+  ["url", "DefoldUrl"],
+  ["vector3", "Vector3"],
+  ["vector4", "Vector4"]
+]);
+const transparentDefoldValueTypes = new Map(Object.keys(defoldValueLayouts.transparent).sort(compareCodeUnits).map((name) => {
+  const ts = defoldValueTypeScriptNames.get(name);
+  if (!ts) throw new Error(`Transparent Defold value type '${name}' has no TypeScript projection in the extension lane`);
+  return [name, ts];
+}));
+const opaqueDefoldValueTypes = new Set(Object.keys(defoldValueLayouts.opaque));
+// Imported into every generated extension declaration file so a resolved value
+// type renders as the same TypeScript type the core SDK emits.
+const defoldValueTypeImports = ["Matrix4", "Quaternion", "Vector3", "Vector4"];
+
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
@@ -82,6 +107,10 @@ function valueIdentifier(name) {
 }
 
 function memberIdentifier(name) {
+  // Extension constants are conventionally SCREAMING_SNAKE. Camel-casing them
+  // is lossy (`DIRECTION_FOUR` and `DIRECTIONFOUR` would collide) and disagrees
+  // with the generated core SDK, which exports `go.EASING_LINEAR` verbatim.
+  if (/^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$/.test(String(name))) return String(name);
   const words = String(name).split(/[^A-Za-z0-9$]+|_+/).filter(Boolean);
   if (!words.length) return "anonymous";
   const first = words[0][0].toLowerCase() + words[0].slice(1);
@@ -96,46 +125,113 @@ function fileName(name) {
   return (value || "anonymous").toLowerCase();
 }
 
-function normalizeType(value) {
-  const raw = typeof value?.type === "string" ? value.type : typeof value === "string" ? value : "any";
-  if (raw.includes("|")) {
-    let types = raw.split("|").map((part) => normalizeType(part.trim()));
-    if (types.some(({ kind }) => kind === "url") && types.some(({ kind }) => kind === "string")) {
-      types = types.map((type) => type.kind === "string" ? { kind: "address-literal", raw: type.raw } : type);
-    }
-    const unique = [...new Map(types.map((type) => [JSON.stringify(type), type])).values()];
-    return unique.length === 1 ? unique[0] : { kind: "union", types: unique, raw };
+function unionType(types, raw) {
+  let members = types;
+  if (members.some((type) => type.kind === "defold-value" && type.name === "url") && members.some(({ kind }) => kind === "string")) {
+    members = members.map((type) => type.kind === "string" ? { kind: "address-literal", raw: type.raw } : type);
   }
-  if (raw.toLowerCase() === "table" && Array.isArray(value?.parameters)) {
+  const unique = [...new Map(members.map((type) => [JSON.stringify(type), type])).values()];
+  return unique.length === 1 ? unique[0] : { kind: "union", types: unique, raw };
+}
+
+// A field or parameter may declare its nested table shape under either
+// `parameters` or `members`. Defold's own editor resolves them in that order
+// (editor/src/clj/editor/script_api.clj), so the generator does the same
+// instead of dropping every `members:` table.
+function nestedDeclarations(value) {
+  if (Array.isArray(value?.parameters)) return value.parameters;
+  if (Array.isArray(value?.members)) return value.members;
+  return null;
+}
+
+/**
+ * Splits a declared `.script_api` name into its projected name and optionality.
+ *
+ * Defold's editor treats a fully bracketed name as documentation sugar. Real
+ * published extensions also append a bracketed `[optional]` marker. Any other
+ * bracketed marker is unrepresentable and becomes a blocker rather than a
+ * silently mangled identifier.
+ */
+function declaredName(rawName, fallback) {
+  const value = typeof rawName === "string" ? rawName.trim() : "";
+  if (!value) return { name: fallback, optional: false, spelling: "missing" };
+  const wrapped = /^\[(.+)\]$/.exec(value);
+  if (wrapped) return { name: wrapped[1].trim(), optional: true, spelling: "bracketed-name" };
+  const marked = /^([^[\]]+)\[([^[\]]*)\]$/.exec(value);
+  if (marked) {
+    const marker = marked[2].trim().toLowerCase();
+    if (marker === "optional") return { name: marked[1].trim(), optional: true, spelling: "trailing-optional-marker" };
+    return { name: value, optional: false, spelling: "unrecognized-marker", blocker: `unrecognized-name-marker:${marked[2].trim()}` };
+  }
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) {
+    return { name: value, optional: false, spelling: "not-an-identifier", blocker: `name-is-not-a-lua-identifier:${value}` };
+  }
+  return { name: value, optional: false, spelling: "plain" };
+}
+
+function normalizeType(value) {
+  if (Array.isArray(value?.type)) {
+    // YAML sequence unions: `type: [vector3, vector4]`. The Defold editor joins
+    // the same sequence with `|`, so it is an alternation, not a tuple.
+    const raw = value.type.map((entry) => typeof entry === "string" ? entry.trim() : String(entry)).join("|");
+    if (!value.type.length) return { kind: "unprojectable", code: "empty-type-union", raw };
+    return unionType(value.type.map((entry) => normalizeType(typeof entry === "string" ? entry : { ...value, type: entry })), raw);
+  }
+  if (typeof value === "string") return normalizeNamedType(value, value);
+  if (typeof value?.type !== "string") {
+    return { kind: "unprojectable", code: "missing-type", raw: null };
+  }
+  const raw = value.type;
+  if (raw.includes("|")) {
+    return unionType(raw.split("|").map((part) => normalizeType({ ...value, type: part.trim() })), raw);
+  }
+  const nested = raw.trim().toLowerCase() === "table" ? nestedDeclarations(value) : null;
+  if (nested) {
     return {
       kind: "record",
-      fields: value.parameters.map((field, index) => ({
-        name: typeof field?.name === "string" ? field.name : `field${index + 1}`,
-        optional: field?.optional === true,
-        type: normalizeType(field)
-      })),
+      fields: nested.map((field, index) => {
+        const declared = declaredName(field?.name, `field${index + 1}`);
+        const entry = {
+          name: declared.name,
+          optional: declared.optional || field?.optional === true,
+          type: declared.blocker
+            ? { kind: "unprojectable", code: declared.blocker, raw: typeof field?.name === "string" ? field.name : null }
+            : normalizeType(field)
+        };
+        if (declared.spelling !== "plain") entry.nameSpelling = declared.spelling;
+        return entry;
+      }),
       raw
     };
   }
-  switch (raw.trim().toLowerCase()) {
+  return normalizeNamedType(raw, raw);
+}
+
+function normalizeNamedType(raw, original) {
+  const name = raw.trim().toLowerCase();
+  switch (name) {
     case "bool":
-    case "boolean": return { kind: "boolean", raw };
+    case "boolean": return { kind: "boolean", raw: original };
     case "number":
     case "float":
     case "int":
     case "integer":
-    case "constant": return { kind: "number", raw };
-    case "string": return { kind: "string", raw };
-    case "hash": return { kind: "hash", raw };
-    case "url": return { kind: "url", raw };
-    case "nil": return { kind: "null", raw };
-    case "table": return { kind: "record", fields: [], raw };
-    case "function": return { kind: "function", raw };
+    case "constant": return { kind: "number", raw: original };
+    case "string": return { kind: "string", raw: original };
+    case "nil": return { kind: "null", raw: original };
+    case "table": return { kind: "record", fields: [], raw: original };
+    case "function": return { kind: "function", raw: original };
     case "object":
     case "userdata":
-    case "any": return { kind: "unknown", raw };
-    default: return { kind: "named", name: raw.trim(), raw };
+    case "any": return { kind: "unknown", raw: original };
+    default: break;
   }
+  const transparent = transparentDefoldValueTypes.get(name);
+  if (transparent) return { kind: "defold-value", name, ts: transparent, raw: original };
+  if (opaqueDefoldValueTypes.has(name)) {
+    return { kind: "unprojectable", code: `opaque-defold-value-type:${name}`, raw: original };
+  }
+  return { kind: "unprojectable", code: `unresolved-named-type:${raw.trim()}`, raw: original };
 }
 
 function renderType(type) {
@@ -144,19 +240,30 @@ function renderType(type) {
     case "boolean": return "boolean";
     case "number": return "number";
     case "string": return "string";
-    case "hash": return "DefoldHash";
-    case "url": return "DefoldUrl";
     case "address-literal": return "DefoldAddressLiteral | DefoldRelativeAddress";
     case "null": return "null";
+    case "defold-value": return type.ts;
     case "record": return type.fields.length
       ? `Readonly<{ ${type.fields.map((field) => `${property(field.name)}${field.optional ? "?" : ""}: ${renderType(field.type)}`).join("; ")} }>`
       : "Readonly<Record<string, unknown>>";
     case "function": return "(...args: unknown[]) => unknown";
     case "union": return type.types.map(renderType).join(" | ");
     case "tuple": return `[${type.types.map(renderType).join(", ")}]`;
-    case "named":
+    // Fail closed: an unprojectable shape is uninhabited, never `any`.
+    case "unprojectable": return "never";
     case "unknown": return "unknown";
     default: throw new Error(`Unknown binding IR type: ${type.kind}`);
+  }
+}
+
+/** Walks a normalized type and reports every shape the lane cannot project. */
+function typeBlockers(type, site) {
+  switch (type.kind) {
+    case "unprojectable": return [{ site, code: type.code, raw: type.raw }];
+    case "union": return type.types.flatMap((member, index) => typeBlockers(member, `${site}.union[${index}]`));
+    case "tuple": return type.types.flatMap((member, index) => typeBlockers(member, `${site}[${index}]`));
+    case "record": return type.fields.flatMap((field) => typeBlockers(field.type, `${site}.${field.name}`));
+    default: return [];
   }
 }
 
@@ -212,15 +319,36 @@ function normalizeMember(moduleName, member) {
     }
   };
   if (typeof member.desc === "string") common.description = member.desc;
-  if (member.type !== "function") return { ...common, kind: "value", type: normalizeType(member.type) };
+  if (member.type !== "function") {
+    // A declaration that carries a call signature but no `type: function` is
+    // ambiguous at the source. Projecting it as a value would erase the call
+    // signature without saying so, so it fails closed instead.
+    if (Array.isArray(member.parameters) || Array.isArray(member.returns) || member.return) {
+      return withBlockers({
+        ...common,
+        kind: "value",
+        type: { kind: "unprojectable", code: "call-signature-without-function-type", raw: typeof member.type === "string" ? member.type : null }
+      }, [{ site: "value", code: "call-signature-without-function-type", raw: typeof member.type === "string" ? member.type : null }]);
+    }
+    const type = normalizeType(member);
+    return withBlockers({ ...common, kind: "value", type }, typeBlockers(type, "value"));
+  }
+  const blockers = [];
   const parameters = (Array.isArray(member.parameters) ? member.parameters : []).map((parameter, index) => {
-    const rawParameterName = typeof parameter?.name === "string" ? parameter.name : `arg${index + 1}`;
-    return {
-      rawName: rawParameterName,
-      jsName: safeParameterIdentifier(memberIdentifier(rawParameterName), index),
-      optional: parameter?.optional === true,
-      type: normalizeType(parameter)
+    const declared = declaredName(parameter?.name, `arg${index + 1}`);
+    const site = `parameter[${index}]:${declared.name}`;
+    const type = declared.blocker
+      ? { kind: "unprojectable", code: declared.blocker, raw: typeof parameter?.name === "string" ? parameter.name : null }
+      : normalizeType(parameter);
+    blockers.push(...typeBlockers(type, site));
+    const entry = {
+      rawName: declared.name,
+      jsName: safeParameterIdentifier(memberIdentifier(declared.name), index),
+      optional: declared.optional || parameter?.optional === true,
+      type
     };
+    if (declared.spelling !== "plain") entry.nameSpelling = declared.spelling;
+    return entry;
   });
   const parameterNames = new Set();
   for (const parameter of parameters) {
@@ -233,9 +361,28 @@ function normalizeMember(moduleName, member) {
   const returns = !result
     ? { kind: "void" }
     : Array.isArray(result)
-      ? { kind: "tuple", types: result.map(normalizeType) }
+      // A one-entry `returns:` sequence is a single Lua return value, not a
+      // one-element tuple.
+      ? (result.length === 1 ? normalizeType(result[0]) : { kind: "tuple", types: result.map(normalizeType) })
       : normalizeType(result);
-  return { ...common, kind: "function", parameters, returns };
+  blockers.push(...typeBlockers(returns, "return"));
+  return withBlockers({ ...common, kind: "function", parameters, returns }, blockers);
+}
+
+function withBlockers(normalized, blockers) {
+  const unique = [...new Map(blockers.map((blocker) => [`${blocker.site}\0${blocker.code}`, blocker])).values()]
+    .sort((left, right) => compareCodeUnits(left.site, right.site) || compareCodeUnits(left.code, right.code));
+  if (!unique.length) return { ...normalized, disposition: "projected" };
+  return {
+    ...normalized,
+    disposition: "blocked",
+    blockers: unique.map((blocker) => ({
+      id: `${normalized.id}#${blocker.site}`,
+      site: blocker.site,
+      code: blocker.code,
+      ...(blocker.raw === null || blocker.raw === undefined ? {} : { declared: blocker.raw })
+    }))
+  };
 }
 
 export function buildProjectBindingIr(inventory) {
@@ -291,12 +438,42 @@ export function buildProjectBindingIr(inventory) {
       fileName: `${module.fileName}-${suffix}`
     };
   });
+  const blocked = modules.flatMap((module) => module.members
+    .filter(({ disposition }) => disposition === "blocked")
+    .flatMap((member) => member.blockers.map((blocker) => ({
+      module: module.runtimeName,
+      member: member.rawName,
+      ...blocker
+    }))));
+  const memberCount = modules.reduce((count, module) => count + module.members.length, 0);
+  const blockedMembers = modules.reduce((count, module) =>
+    count + module.members.filter(({ disposition }) => disposition === "blocked").length, 0);
+  const codes = {};
+  for (const blocker of blocked) codes[blocker.code] = (codes[blocker.code] ?? 0) + 1;
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     abiVersion: 1,
     source: "defold-project-extensions",
+    coverage: {
+      modules: modules.length,
+      members: memberCount,
+      projected: memberCount - blockedMembers,
+      blocked: blockedMembers,
+      blockerCodes: Object.fromEntries(Object.entries(codes).sort(([left], [right]) => compareCodeUnits(left, right)))
+    },
+    blockers: blocked.sort((left, right) => compareCodeUnits(left.id, right.id)),
     modules
   };
+}
+
+function blockedMemberComment(member, indent = "") {
+  return [
+    `${indent}/** blocked: ${member.blockers.map(({ site, code }) => `${site}=${code}`).join(", ")} */`
+  ];
+}
+
+function blockedMemberMessage(module, member) {
+  return `deherm: ${module.runtimeName}.${member.rawName} is not projectable from .script_api (${member.blockers.map(({ site, code }) => `${site}=${code}`).join(", ")})`;
 }
 
 function generatedModuleSource(module) {
@@ -304,14 +481,19 @@ function generatedModuleSource(module) {
   const exportName = module.jsName;
   const lines = [
     "// Generated by deherm. Do not edit.",
-    `import type { ${interfaceName}, DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl } from "../../extensions.js";`,
+    `import type { ${interfaceName}, DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl, ${defoldValueTypeImports.join(", ")} } from "../../extensions.js";`,
     'import { callExtension, getExtensionValue } from "../runtime.js";',
     "",
     `export const ${exportName}: ${interfaceName} = {`
   ];
   for (const member of module.members) {
     lines.push(...description(member.description, "  "));
-    if (member.kind === "function") {
+    if (member.disposition === "blocked") {
+      lines.push(...blockedMemberComment(member, "  "));
+      lines.push(`  get ${property(member.jsName)}(): never {`);
+      lines.push(`    throw new Error(${JSON.stringify(blockedMemberMessage(module, member))});`);
+      lines.push("  },");
+    } else if (member.kind === "function") {
       const args = member.parameters.map((parameter) => parameter.jsName);
       lines.push(`  ${property(member.jsName)}(${parameters(member)}): ${renderType(member.returns)} {`);
       lines.push(`    return callExtension(${JSON.stringify(module.runtimeName)}, ${JSON.stringify(member.rawName)}, [${args.join(", ")}]) as ${renderType(member.returns)};`);
@@ -824,10 +1006,13 @@ function validateEngineProfiles(engineProfiles, catalog) {
 
 export function generateExtensionTypes(inventory) {
   const modules = buildProjectBindingIr(inventory).modules;
+  const valueTypes = defoldValueTypeImports.join(", ");
   const lines = [
     "// Generated by deherm. Do not edit.",
     'import type { DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl } from "./sdk/address.js";',
     'export type { DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl } from "./sdk/address.js";',
+    `import type { ${valueTypes} } from "./sdk/generated/script/types.js";`,
+    `export type { ${valueTypes} } from "./sdk/generated/script/types.js";`,
     ""
   ];
   for (const module of modules) {
@@ -835,7 +1020,10 @@ export function generateExtensionTypes(inventory) {
     lines.push(`export interface ${module.typeName} {`);
     for (const member of module.members) {
       lines.push(...description(member.description, "  "));
-      if (member.kind === "function") {
+      if (member.disposition === "blocked") {
+        lines.push(...blockedMemberComment(member, "  "));
+        lines.push(`  readonly ${property(member.jsName)}: never;`);
+      } else if (member.kind === "function") {
         lines.push(`  ${property(member.jsName)}(${parameters(member)}): ${renderType(member.returns)};`);
       } else {
         lines.push(`  readonly ${property(member.jsName)}: ${renderType(member.type)};`);
@@ -974,6 +1162,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
           root,
           defoldRevision: core.revision,
           moduleCount: bindingIr.modules.length,
+          projection: bindingIr.coverage,
           typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),
           cached: true,
           generationKey,
@@ -1126,7 +1315,11 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
           usageMaterializedFallback: core.dmsdkUniversal.coverage.usageMaterializedFallback,
           projectMaterialized: 0
         }
-      }
+      },
+      // Third-party `.script_api` projection is measured, not assumed: every
+      // shape the lane cannot represent is counted here and enumerated in
+      // bindings.ir.json.
+      projectExtensions: bindingIr.coverage
     }
   }, null, 2)}\n`);
   await writeFile(path.join(inventory.projectRoot, "deherm.lock"), `${JSON.stringify({
@@ -1161,6 +1354,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     root,
     defoldRevision: core.revision,
     moduleCount: modules.length,
+    projection: bindingIr.coverage,
     cached: false,
     generationKey,
     typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),

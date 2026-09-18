@@ -47,6 +47,7 @@ okf_version: "0.2"
 * [dmSDK universal fallback](research/dmsdk-universal-fallback.md) - All-declaration cross-target recipes, fixed caller-owned ABI frames, and usage-driven native thunk materialization.
 * [Native extension header generator](research/native-extension-header-generator.md) - Clang-driven C header ingestion, deterministic extension IR/TypeScript/C glue, explicit layout blockers, and the typed browser dmSDK arena.
 * [Real Defold extension candidates](research/defold-extension-candidates.md) - Ecosystem survey against the ingestion paths, pinned candidate revisions, platform/license/provenance filters, and the `.script_api` projection gaps real extensions expose.
+* [Real third-party extension ingestion](research/real-extension-ingestion.md) - End-to-end xMath and defold-astar ingestion at pinned revisions, the fail-closed `.script_api` blocker taxonomy, and the licence provenance recorded per source.
 * [Compile-time Defold hash literals](research/compile-time-hash-literals.md) - Checker-bound `hashLiteral("#name")` lowering, native Defold vectors, and target-separated bigint evidence.
 * [Resource name resolution](research/resource-name-resolution.md) - Proto-derived declaration namespaces, a generated project symbol table, and checker-bound literal name diagnostics that stay silent for dynamic names.
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.

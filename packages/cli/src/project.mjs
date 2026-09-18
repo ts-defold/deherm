@@ -394,12 +394,18 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
 }
 
 function zipEntries(bytes) {
-  return unzipSync(new Uint8Array(bytes), {
+  // Discovery only decompresses the extension-defining files, but it keeps the
+  // full entry listing so an archive that defines no extension can say what it
+  // actually contained instead of yielding nothing.
+  const listing = [];
+  const entries = unzipSync(new Uint8Array(bytes), {
     filter(file) {
+      listing.push(file.name);
       return file.name.endsWith("/ext.manifest") || file.name === "ext.manifest" || file.name.endsWith(".script_api") ||
         isPublicHeader(file.name) || isNativeSource(file.name);
     }
   });
+  return { entries, listing };
 }
 
 async function dependencyExtensions(projectRoot, diagnostics) {
@@ -411,20 +417,41 @@ async function dependencyExtensions(projectRoot, diagnostics) {
       .map((entry) => entry.name)
       .sort();
   } catch {
-    return [];
+    return { extensions: [], archivesWithoutManifest: [] };
   }
 
   const extensions = [];
+  const archivesWithoutManifest = [];
   for (const archive of archives) {
     let entries;
+    let listing;
     try {
-      entries = zipEntries(await readFile(path.join(libraryRoot, archive)));
+      ({ entries, listing } = zipEntries(await readFile(path.join(libraryRoot, archive))));
     } catch (error) {
       diagnostics.push({ severity: "error", path: `.internal/lib/${archive}`, message: error.message });
       continue;
     }
     const names = Object.keys(entries).sort();
-    for (const manifestPath of names.filter((name) => path.posix.basename(name) === "ext.manifest")) {
+    const manifestPaths = names.filter((name) => path.posix.basename(name) === "ext.manifest");
+    if (!manifestPaths.length) {
+      // A resolved dependency that declares no native extension is invisible to
+      // the rest of the pipeline. Report it rather than returning silence: most
+      // published Defold libraries are pure Lua and land here.
+      const files = listing.filter((name) => !name.endsWith("/"));
+      const luaModules = files.filter((name) => name.endsWith(".lua")).length;
+      archivesWithoutManifest.push({
+        archive: `.internal/lib/${archive}`,
+        files: files.length,
+        luaModules
+      });
+      diagnostics.push({
+        severity: "warning",
+        path: `.internal/lib/${archive}`,
+        message: `Resolved dependency archive declares no ext.manifest, so no extension was discovered from it (${files.length} files, ${luaModules} Lua modules). Lua-only Defold libraries have no ingestible binding surface today.`
+      });
+      continue;
+    }
+    for (const manifestPath of manifestPaths) {
       const root = path.posix.dirname(manifestPath) === "." ? "" : path.posix.dirname(manifestPath);
       const displayManifest = `${archive}:${manifestPath}`;
       const manifest = parseManifest(textDecoder.decode(entries[manifestPath]), displayManifest, diagnostics);
@@ -456,7 +483,7 @@ async function dependencyExtensions(projectRoot, diagnostics) {
       });
     }
   }
-  return extensions;
+  return { extensions, archivesWithoutManifest };
 }
 
 export async function inspectDefoldProject(options = {}) {
@@ -475,7 +502,7 @@ export async function inspectDefoldProject(options = {}) {
     if (await exists(path.join(path.dirname(manifestPath), ".deherm-managed.json"))) continue;
     local.push(await localExtension(projectRoot, manifestPath, diagnostics));
   }
-  const dependencies = await dependencyExtensions(projectRoot, diagnostics);
+  const { extensions: dependencies, archivesWithoutManifest } = await dependencyExtensions(projectRoot, diagnostics);
   const extensions = [...local, ...dependencies]
     .sort((left, right) => left.name.localeCompare(right.name) || left.manifestPath.localeCompare(right.manifestPath));
   const scriptModuleCount = extensions.reduce((count, extension) =>
@@ -494,8 +521,10 @@ export async function inspectDefoldProject(options = {}) {
       scriptModules: scriptModuleCount,
       publicHeaders: extensions.reduce((count, extension) => count + extension.publicHeaders.length, 0),
       extensionsRequiringNativeSchema: extensions.filter(({ publicHeaders }) => publicHeaders.length > 0).length,
-      extensionsWithoutApiMetadata: extensions.filter(({ bindingStatus: status }) => status === "no-public-api-metadata").length
+      extensionsWithoutApiMetadata: extensions.filter(({ bindingStatus: status }) => status === "no-public-api-metadata").length,
+      dependencyArchivesWithoutManifest: archivesWithoutManifest.length
     },
+    dependencyArchivesWithoutManifest: archivesWithoutManifest,
     diagnostics
   };
 }

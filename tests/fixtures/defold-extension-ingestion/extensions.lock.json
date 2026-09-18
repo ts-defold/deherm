@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "scope": "Pinned third-party Defold extensions used to prove real .script_api ingestion end to end. Interface description only: no third-party native source or headers are vendored.",
+  "verifiedAt": "2026-09-18",
+  "extensions": [
+    {
+      "id": "defold-xmath",
+      "name": "xMath",
+      "repository": "https://github.com/thejustinwalsh/defold-xmath",
+      "revision": "f1f27eff87d66e11521aff310e0522ac6cd7c5d6",
+      "release": "v1.0.1",
+      "dependencyUrl": "https://github.com/thejustinwalsh/defold-xmath/archive/f1f27eff87d66e11521aff310e0522ac6cd7c5d6.zip",
+      "archiveEntryPrefix": "defold-xmath-f1f27eff87d66e11521aff310e0522ac6cd7c5d6",
+      "bobCacheArchive": "d93b83f8c00e3f8e2c19b8fc236408ac6528ed7f-ZjFmMjdlZmY4N2Q2NmUxMTUyMWFmZjMxMGUwNTIyYWM2Y2Q3YzVkNg.zip",
+      "licence": {
+        "repositoryFile": "LICENSE",
+        "repositoryClaim": "MIT License",
+        "assetPortalClaim": "MIT License",
+        "assetPortalSource": "defold/asset-portal@17a1f3d8a3f50e7840fbb6677465d1cb7799a15e assets/xmath.json",
+        "agreement": "repository-and-portal-agree",
+        "recordedAt": "licenses/defold-xmath-MIT.txt"
+      },
+      "vendoredFiles": [
+        {
+          "path": "vendor/defold-xmath-f1f27eff87d66e11521aff310e0522ac6cd7c5d6/xmath/ext.manifest",
+          "upstream": "xmath/ext.manifest",
+          "sha256": "9479c85ca453fffb9dae9f4dffc169c1bd9db70c1fa5730f4b110830a758f198"
+        },
+        {
+          "path": "vendor/defold-xmath-f1f27eff87d66e11521aff310e0522ac6cd7c5d6/xmath/api/xMath.script_api",
+          "upstream": "xmath/api/xMath.script_api",
+          "sha256": "1e2fc9dae6ca02b225fcae934314dad27368faa60cda514c1302ee92d833f045"
+        }
+      ],
+      "notVendored": [],
+      "upstreamBindingStatus": "script-api",
+      "fixtureBindingStatus": "script-api",
+      "bindingStatusDeviation": null
+    },
+    {
+      "id": "defold-astar",
+      "name": "astar",
+      "repository": "https://github.com/selimanac/defold-astar",
+      "revision": "1471c5445b0c0376bd23c377e8ef8d84e52b43bf",
+      "release": "v1.2.3",
+      "dependencyUrl": "https://github.com/selimanac/defold-astar/archive/1471c5445b0c0376bd23c377e8ef8d84e52b43bf.zip",
+      "archiveEntryPrefix": "defold-astar-1471c5445b0c0376bd23c377e8ef8d84e52b43bf",
+      "bobCacheArchive": "76ea1320fe200dbf402dbc9730f636fedc555c61-MTQ3MWM1NDQ1YjBjMDM3NmJkMjNjMzc3ZThlZjhkODRlNTJiNDNiZg.zip",
+      "licence": {
+        "repositoryFile": null,
+        "repositoryClaim": "none - the tree contains no LICENSE file and README.md states no terms",
+        "githubLicenceApi": "HTTP 404 at https://api.github.com/repos/selimanac/defold-astar/license",
+        "assetPortalClaim": "MIT License",
+        "assetPortalSource": "defold/asset-portal@17a1f3d8a3f50e7840fbb6677465d1cb7799a15e assets/apathfinding.json",
+        "vendoredDependency": {
+          "name": "MicroPather",
+          "author": "Lee Thomason",
+          "claim": "zlib",
+          "recordedAt": "licenses/micropather-zlib.txt"
+        },
+        "agreement": "unresolved - sources disagree; recorded separately, not collapsed",
+        "resolution": "Asking the author to add a LICENSE file to the repository would resolve this cleanly.",
+        "recordedAt": "licenses/defold-astar-PROVENANCE.txt"
+      },
+      "vendoredFiles": [
+        {
+          "path": "vendor/defold-astar-1471c5445b0c0376bd23c377e8ef8d84e52b43bf/astar/ext.manifest",
+          "upstream": "astar/ext.manifest",
+          "sha256": "b468e137f9135818be70f24fa31cb73d37dd643c1693c3823164ed89c3a01bdb"
+        },
+        {
+          "path": "vendor/defold-astar-1471c5445b0c0376bd23c377e8ef8d84e52b43bf/astar/api/astar.script_api",
+          "upstream": "astar/api/astar.script_api",
+          "sha256": "50c5e145ad3e77e1c4a1319925d8f3b0be7c89210f4332745eb94eef044c59fb"
+        }
+      ],
+      "notVendored": [
+        {
+          "upstream": "astar/include/pather.h",
+          "reason": "third-party source under unresolved licence terms; not required by the .script_api lane"
+        },
+        {
+          "upstream": "astar/include/micropather/*.h",
+          "reason": "vendored zlib-licensed MicroPather headers; not required by the .script_api lane"
+        },
+        {
+          "upstream": "astar/src/*.cpp",
+          "reason": "third-party source under unresolved licence terms; not required by the .script_api lane"
+        }
+      ],
+      "upstreamBindingStatus": "script-api+native-schema-required",
+      "fixtureBindingStatus": "script-api",
+      "bindingStatusDeviation": "Upstream ships public headers under astar/include, which discovery would classify script-api+native-schema-required. This fixture vendors no headers, so it classifies script-api. The header lane is exercised by its own fixtures; this one exercises the .script_api lane."
+    }
+  ],
+  "bobCacheNaming": "Bob writes each resolved dependency to .internal/lib as sha1hex(dependencyUrl) + - + base64url(etag) + .zip. See Library.java at upstream.lock DEFOLD_REV. This fixture uses the pinned revision as the etag so the cache filename is reproducible."
+}

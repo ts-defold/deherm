@@ -56,6 +56,13 @@ Local project files exclude build output, dependency caches, VCS metadata, and
 paths and output ordering are normalized so the generated inventory is suitable
 for source control comparisons and cache keys.
 
+Because discovery begins at `ext.manifest`, a resolved dependency that ships no
+manifest contributes nothing. That is reported rather than silent: the inventory
+records each such archive with its file and Lua-module counts, a warning
+diagnostic names it, and both `deherm extensions` and `deherm doctor` print it.
+Most published Defold libraries are pure Lua and land here; whether they gain an
+ingestion route is a separate decision.
+
 Dependency URLs are metadata, not identities. User information, passwords,
 query strings, and fragments are removed before an inventory is printed or
 persisted. This prevents signed URLs and private library credentials from
@@ -67,6 +74,16 @@ leaking into generated artifacts or CI logs.
 Lua-facing names and documentation, so it can immediately produce useful
 TypeScript declarations. It does not define C symbols, ownership, thread
 affinity, userdata lifetime, callback reentrancy, or fixed memory layout.
+
+Projection from `.script_api` fails closed. A declared shape the lane cannot
+represent produces a machine-readable blocker in `.deherm/bindings.ir.json`,
+marks its member `disposition: "blocked"`, and emits that member as an
+uninhabited `never` with its reason, never as `any` or `unknown`. Named Defold
+value types resolve against the generated transparent value layouts rather than
+being guessed, and a transparent value type with no declared TypeScript
+projection fails generation. See
+[Real third-party extension ingestion](../research/real-extension-ingestion.md)
+for the blocker taxonomy and the pinned ingestion evidence.
 
 Likewise, finding a C/C++ header does not make it safe to expose through JSI or
 Static Hermes automatically. Public headers enter the Clang ingestion lane, but

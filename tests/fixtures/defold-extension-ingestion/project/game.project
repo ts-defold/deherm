@@ -1,0 +1,17 @@
+[project]
+title = Deherm extension ingestion fixture
+custom_resources = /deherm
+dependencies#0 = https://github.com/thejustinwalsh/defold-xmath/archive/f1f27eff87d66e11521aff310e0522ac6cd7c5d6.zip
+dependencies#1 = https://github.com/selimanac/defold-astar/archive/1471c5445b0c0376bd23c377e8ef8d84e52b43bf.zip
+
+[bootstrap]
+main_collection = /main/main.collectionc
+
+[script]
+shared_state = 1
+
+[library]
+include_dirs = defold_hermes
+
+[defold_hermes]
+app = /deherm/app.dehermc

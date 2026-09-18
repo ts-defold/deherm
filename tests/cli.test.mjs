@@ -192,8 +192,10 @@ test("project inspection finds local and resolved dependency extensions", async 
     scriptModules: 2,
     publicHeaders: 2,
     extensionsRequiringNativeSchema: 2,
-    extensionsWithoutApiMetadata: 0
+    extensionsWithoutApiMetadata: 0,
+    dependencyArchivesWithoutManifest: 0
   });
+  assert.deepEqual(inventory.dependencyArchivesWithoutManifest, []);
   assert.deepEqual(inventory.extensions.map(({ kind, name }) => [kind, name]), [
     ["local", "Camera"],
     ["dependency", "XMath"]

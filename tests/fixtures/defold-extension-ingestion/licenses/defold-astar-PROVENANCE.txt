@@ -1,0 +1,58 @@
+defold-astar - licence provenance, unresolved
+
+This file records what each source actually says about the licence of
+https://github.com/selimanac/defold-astar at revision
+1471c5445b0c0376bd23c377e8ef8d84e52b43bf. The sources disagree, so they
+are recorded separately rather than collapsed into a single claim. This
+follows the same house rule used for the War Battles art provenance in
+.agents/docs/research/war-battles-port-map.md. It is a source-provenance
+record, not legal advice.
+
+The project owner reviewed this discrepancy and decided to proceed with
+ingestion of the extension's .script_api interface description.
+
+1. The repository itself states nothing.
+   The tree at 1471c5445b0c0376bd23c377e8ef8d84e52b43bf contains no
+   LICENSE, LICENCE, COPYING, or equivalent file at any path, and
+   README.md contains no licence statement. GitHub's licence API
+   (https://api.github.com/repos/selimanac/defold-astar/license) returns
+   HTTP 404, which is what that endpoint returns when it can detect no
+   licence file. Verified 2026-09-18.
+
+2. The Defold asset portal claims MIT.
+   assets/apathfinding.json in defold/asset-portal at revision
+   17a1f3d8a3f50e7840fbb6677465d1cb7799a15e records:
+
+       "name": "A* Path Finding"
+       "license": "MIT License"
+       "project_url": "https://github.com/selimanac/defold-astar"
+
+   That is the portal's own metadata claim. It is not corroborated by
+   any file in the repository, and no MIT copyright line or permission
+   text exists upstream to transcribe here.
+
+3. The vendored pathfinder is zlib, not MIT.
+   defold-astar vendors MicroPather (Lee Thomason) under
+   astar/include/micropather/ and astar/src/. Its notice is the zlib
+   licence and is reproduced verbatim in micropather-zlib.txt in this
+   directory. That notice requires the origin of the software not be
+   misrepresented and that the notice not be removed, so it carries its
+   own attribution obligation independently of whatever terms cover
+   defold-astar's own code.
+
+Resolution
+   Asking the author to add a LICENSE file to the repository would
+   resolve this cleanly: it would replace the portal's second-hand claim
+   with a first-party statement, and it would make the relationship
+   between defold-astar's own terms and MicroPather's zlib terms
+   explicit. Until that happens, the discrepancy stands as recorded
+   above and must not be summarised as "MIT".
+
+What this repository vendors from defold-astar
+   Only astar/ext.manifest and astar/api/astar.script_api - the
+   extension's interface description, checked in under
+   tests/fixtures/defold-extension-ingestion/vendor/ so the ingestion
+   test is offline, pinned, and reproducible. No defold-astar or
+   MicroPather source code or headers are vendored. See
+   extensions.lock.json in the fixture root for the exact file list,
+   digests, and the upstream files that were deliberately not vendored.

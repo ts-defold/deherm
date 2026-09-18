@@ -162,13 +162,16 @@ async function scaffoldProject(options) {
 }
 
 function printExtensions(inventory) {
-  if (!inventory.extensions.length) {
-    console.log("No native extensions found.");
-    return;
-  }
+  if (!inventory.extensions.length) console.log("No native extensions found.");
   for (const extension of inventory.extensions) {
     const moduleCount = extension.scriptApis.reduce((count, api) => count + api.declarations.length, 0);
     console.log(`${extension.name}  ${extension.kind}  ${extension.bindingStatus}  ${moduleCount} script module(s)  ${extension.publicHeaders.length} public header(s)  ${extension.manifestPath}`);
+  }
+  // Discovery is rooted at ext.manifest, so a resolved dependency without one
+  // contributes nothing. Saying so is the difference between "no bindings" and
+  // "nothing was there".
+  for (const archive of inventory.dependencyArchivesWithoutManifest ?? []) {
+    console.log(`--  dependency  no-ext-manifest  ${archive.files} file(s), ${archive.luaModules} Lua module(s)  ${archive.archive}`);
   }
 }
 
@@ -360,6 +363,10 @@ export async function run(argv = process.argv.slice(2)) {
       console.log(`${output.cached ? "Current" : "Generated"} extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
       console.log(`${nativeExtension.installed ? "Installed" : "Current"} native extension in ${path.relative(process.cwd(), nativeExtension.root) || "."}`);
       console.log(`Generated ${componentCount} TypeScript component proxy resource(s)`);
+      if (output.projection?.blocked) {
+        console.log(`-- extension projection: ${output.projection.blocked} of ${output.projection.members} .script_api member(s) failed closed; see ${path.join(path.relative(process.cwd(), output.root) || ".", "bindings.ir.json")}`);
+        for (const [code, count] of Object.entries(output.projection.blockerCodes)) console.log(`   ${code}: ${count}`);
+      }
       console.log(`Indexed ${resourceSymbols.table.resourceCount} Defold resource(s) for compile-time name resolution`);
       console.log(`Pinned Defold API: ${output.defoldRevision}`);
       if (output.created.tsconfig) console.log("Created tsconfig.json referencing all generated TypeScript context projects");
@@ -402,6 +409,9 @@ export async function run(argv = process.argv.slice(2)) {
     console.log(`ok native APIs: ${summary.publicHeaders} public header(s), ${summary.extensionsRequiringNativeSchema} schema(s) required`);
     if (summary.extensionsWithoutApiMetadata) {
       console.log(`-- metadata: ${summary.extensionsWithoutApiMetadata} extension(s) expose no discoverable API metadata`);
+    }
+    if (summary.dependencyArchivesWithoutManifest) {
+      console.log(`-- dependencies: ${summary.dependencyArchivesWithoutManifest} resolved archive(s) declare no ext.manifest and contribute no bindings`);
     }
     for (const diagnostic of inventory.diagnostics) {
       console.log(`${diagnostic.severity === "error" ? "!!" : "--"} ${diagnostic.path}: ${diagnostic.message}`);
