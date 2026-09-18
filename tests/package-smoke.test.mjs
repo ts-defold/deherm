@@ -20,6 +20,13 @@ function run(command, args, options = {}) {
 }
 
 test("command-specific target parsing keeps dev endpoints separate from conformance targets", () => {
+  assert.equal(parseArguments([]).command, "ui");
+  const creation = parseArguments(["create", "my-game", "--name", "My Game"]);
+  assert.deepEqual(
+    { command: creation.command, directory: creation.directory, name: creation.name },
+    { command: "create", directory: "my-game", name: "My Game" }
+  );
+
   const development = parseArguments([
     "dev",
     "--target", "http://127.0.0.1:8001",
@@ -111,21 +118,38 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   ], { cwd: consumer });
 
   const project = path.join(root, "project");
-  const entry = path.join(project, "src", "main.ts");
-  await mkdir(path.dirname(entry), { recursive: true });
-  await writeFile(path.join(project, "game.project"), "[project]\ntitle = Packed smoke test\n");
-  await writeFile(path.join(project, "tsconfig.json"), `${JSON.stringify({
-    compilerOptions: { target: "ES2020", module: "ESNext", moduleResolution: "Bundler", strict: true },
-    include: ["src/**/*.ts"]
-  }, null, 2)}\n`);
-  await writeFile(entry, "declare const __DEFOLD_HERMES_BUILD_FINGERPRINT__: string; console.log(`packed deherm:${__DEFOLD_HERMES_BUILD_FINGERPRINT__}`);\n");
+  const created = run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "create", project,
+    "--name", "Packed smoke test",
+    "--json"
+  ], { cwd: root });
+  assert.equal(JSON.parse(created.stdout).projectRoot, project);
+  assert.match(await readFile(path.join(project, "game.project"), "utf8"), /title = Packed smoke test/);
+  assert.match(await readFile(path.join(project, "src", "main.script.ts"), "utf8"), /defineComponent/);
+
+  const verified = run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "verify-generated",
+    "--project", project,
+    "--json"
+  ], { cwd: project });
+  assert.ok(JSON.parse(verified.stdout).checkedFiles > 0);
+
+  const checked = run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "typecheck",
+    "--project", project,
+    "--json"
+  ], { cwd: project });
+  assert.equal(JSON.parse(checked.stdout).passed, true);
+
   const development = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),
     "dev",
     "--project", project,
-    "--entry", entry,
-    "--no-ttsc",
-    "--once"
+    "--once",
+    "--headless"
   ], { cwd: project });
   assert.match(development.stdout, /\[deherm\] build-succeeded generation=1/);
   await readFile(path.join(project, ".deherm", "dev", "app.dehermc"), "utf8");

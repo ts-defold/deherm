@@ -9,7 +9,7 @@ import test from "node:test";
 import { strToU8, zipSync } from "fflate";
 
 import { buildProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
-import { inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
+import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "defold-hermes-cli-"));
@@ -65,6 +65,27 @@ test("game.project parser preserves indexed dependency keys", () => {
   const parsed = parseGameProject("[project]\ndependencies#0 = a\ndependencies#1 = b\n");
   assert.equal(parsed.project["dependencies#0"], "a");
   assert.equal(parsed.project["dependencies#1"], "b");
+});
+
+test("project discovery resolves nearest and bounded descendant projects deterministically", async () => {
+  const workspace = await mkdtemp(path.join(tmpdir(), "deherm-project-discovery-"));
+  const alpha = path.join(workspace, "games", "alpha");
+  const beta = path.join(workspace, "games", "beta");
+  await mkdir(path.join(alpha, "src", "nested"), { recursive: true });
+  await mkdir(beta, { recursive: true });
+  await writeFile(path.join(alpha, "game.project"), "[project]\ntitle = Alpha\n");
+  await writeFile(path.join(beta, "game.project"), "[project]\ntitle = Beta\n");
+
+  assert.equal(await findProjectRoot(path.join(alpha, "src", "nested")), alpha);
+  assert.deepEqual(await discoverProjectRoots(workspace), [alpha, beta]);
+  await assert.rejects(findProjectRoot(workspace), /Multiple Defold projects found/);
+  assert.equal(await findProjectRoot(workspace, path.join(alpha, "game.project")), alpha);
+
+  const single = await mkdtemp(path.join(tmpdir(), "deherm-single-project-"));
+  const game = path.join(single, "nested", "game");
+  await mkdir(game, { recursive: true });
+  await writeFile(path.join(game, "game.project"), "[project]\ntitle = Single\n");
+  assert.equal(await findProjectRoot(single), game);
 });
 
 test("project inspection finds local and resolved dependency extensions", async () => {

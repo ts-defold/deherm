@@ -30,6 +30,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-projection-ir.mjs",
   "scripts/generate-script-handle-lowering.mjs",
   "scripts/generate-script-runtime.mjs",
+  "scripts/lib/binding-identity.mjs",
   "packages/compiler/src/binding-identity.mjs",
   "scripts/lib/script-generator-pipeline.mjs",
   "scripts/lib/script-semantic-overrides.mjs",
@@ -38,7 +39,7 @@ export const scriptGeneratorSources = Object.freeze([
 
 export const scriptPinnedInputs = Object.freeze([
   "package.json",
-  "package-lock.json",
+  "pnpm-lock.yaml",
   "upstream.lock",
   "upstream/ref-doc.zip",
   "bindings/lua-compat.json",

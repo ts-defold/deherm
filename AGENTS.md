@@ -10,7 +10,7 @@ and Hermes runtime integration for Defold.
   research, roadmap, evidence, and log links.
 - Put new project knowledge under `.agents/docs/`.
 - When behavior, evidence, or an architectural decision changes, update the
-  relevant OKF document in the same change. Run `npm run check:knowledge`.
+  relevant OKF document in the same change. Run `pnpm check:knowledge`.
 
 ## Generated code and evidence
 
@@ -28,7 +28,7 @@ and Hermes runtime integration for Defold.
 
 ## Verification
 
-- Use `npm run check` for generated-state, type, clean-room, and OKF checks.
+- Use `pnpm check` for generated-state, type, clean-room, and OKF checks.
 - Use focused runtime and sanitizer scripts from `package.json` for changed
   native families; passing metadata tests alone is not runtime evidence.
 - Preserve unrelated user changes and keep target-specific capability gaps

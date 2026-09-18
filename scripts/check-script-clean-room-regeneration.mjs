@@ -16,6 +16,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { promisify } from "node:util";
+import { parse as parseYaml } from "yaml";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
 import {
@@ -387,11 +388,11 @@ export async function runScriptCleanRoomRegeneration(options = {}) {
     const pinnedGroundTruth = await validatePinnedGroundTruth(repositoryRoot, evidencePaths);
     const cleanInputs = [...scriptGeneratorSources, ...scriptPinnedInputs, ...evidencePaths];
     for (const relativePath of cleanInputs) await copyRelative(repositoryRoot, cleanRoot, relativePath);
-    const locked = JSON.parse(await readFile(path.join(repositoryRoot, "package-lock.json"), "utf8"));
+    const locked = parseYaml(await readFile(path.join(repositoryRoot, "pnpm-lock.yaml"), "utf8"));
     const installedFflate = JSON.parse(await readFile(path.join(repositoryRoot, "node_modules/fflate/package.json"), "utf8"));
-    const lockedFflate = locked.packages?.["node_modules/fflate"]?.version;
+    const lockedFflate = locked.importers?.["."]?.dependencies?.fflate?.version;
     assert(installedFflate.version === lockedFflate,
-      `Installed fflate ${installedFflate.version} does not match package-lock ${lockedFflate}`);
+      `Installed fflate ${installedFflate.version} does not match pnpm lockfile ${lockedFflate}`);
     await mkdir(path.join(cleanRoot, "node_modules"), { recursive: true });
     await cp(path.join(repositoryRoot, "node_modules/fflate"), path.join(cleanRoot, "node_modules/fflate"), { recursive: true });
     for (const relativePath of generatedScriptArtifacts) {

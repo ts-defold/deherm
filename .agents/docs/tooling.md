@@ -22,10 +22,10 @@ Hermes and Defold source revisions are pinned in `upstream.lock`. The first
 checkout setup is:
 
 ```sh
-npm install
-npm run bootstrap
-npm run doctor
-npm run check
+pnpm install
+pnpm bootstrap
+pnpm doctor
+pnpm check
 ```
 
 `bootstrap` is a toolchain/materialization operation. It is not part of the
@@ -35,27 +35,28 @@ ordinary edit loop.
 
 | Intent | Command | Result |
 | --- | --- | --- |
-| Validate generated sources, inventories, types, and OKF | `npm run check` | No native rebuild |
-| Inspect a Defold project | `npm run cli -- doctor --project <path>` | Finds local and resolved extensions |
-| List extension binding inputs | `npm run cli -- extensions --project <path>` | Reports script API, headers, and schema gaps |
-| Generate a project SDK | `npm run cli -- generate --project <path>` | Writes types, executable TS modules, tsconfig, and VS Code setup |
-| Bundle TypeScript | `npm run build:js` | `dist/sample.js` plus its symbol-usage manifest |
-| Build the standalone embedded-Hermes runner | `npm run build:native` | Native test runner, not a Defold game |
-| Compile and run JS source in Hermes | `npm run run:native` | Fast source-interpreter development proof |
-| Compile and run matched Hermes bytecode | `npm run run:device-dev` | `hermesc` produces `dist/sample.hbc` |
-| Run the browser-host contract | `npm run run:web` | Local URL using the browser VM, not Hermes Wasm |
-| Generate reachable-only release bindings | `npm run build:release-plan` | Filtered artifacts under `build/profiles/release` |
-| Check Static Hermes declarations/export unit | `npm run check:static-hermes` | Parses `extern_c` and proves a library-shaped exported unit without `main` |
-| Exercise the cached Lua bridge | `npm run test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
-| Stage the native extension | `npm run package:defold` | Defold package directory/archive inputs |
-| Prepare pinned local Extender | `npm run extender:prepare` | Builds the pinned jars and maps the installed Xcode SDK |
-| Start/inspect local Extender | `npm run extender:start`; `npm run extender:status`; `npm run extender:logs` | Standalone macOS service on port 9010 |
-| Compile the real Defold project | `npm run bob:local:build` | Starts a temporary pinned Extender when needed, then builds with Bob |
-| Produce a desktop app bundle | `npm run bob:local:bundle` | Writes `build/bundle/Defold Hermes Spike.app` |
-| Prove the bundled native runtime | `npm run test:native-defold:runtime` | Rejects stale archives, launches the app, and checks real Hermes, Lua-API, and update-lifecycle markers |
-| Build/bundle the HTML5 game | `npm run bob:web:build`; `npm run bob:web:bundle` | Uses pinned emsdk 4.0.6 through local Extender |
-| Verify a running HTML5 bundle | `npm run test:html5:runtime` | Reload-synchronized CDP lifecycle and binding proof |
-| Reuse a running local Extender | `npm run bob:build`; `npm run bob:bundle` | Local port 9010 is the default |
+| Launch the project/scaffold TUI | `pnpm cli` | Discovers projects; starts dev, doctor, or scaffolding |
+| Validate generated sources, inventories, types, and OKF | `pnpm check` | No native rebuild |
+| Inspect a Defold project | `pnpm cli -- doctor --project <path>` | Finds local and resolved extensions |
+| List extension binding inputs | `pnpm cli -- extensions --project <path>` | Reports script API, headers, and schema gaps |
+| Generate a project SDK | `pnpm cli -- generate --project <path>` | Writes types, executable TS modules, tsconfig, and VS Code setup |
+| Bundle TypeScript | `pnpm build:js` | `dist/sample.js` plus its symbol-usage manifest |
+| Build the standalone embedded-Hermes runner | `pnpm build:native` | Native test runner, not a Defold game |
+| Compile and run JS source in Hermes | `pnpm run:native` | Fast source-interpreter development proof |
+| Compile and run matched Hermes bytecode | `pnpm run:device-dev` | `hermesc` produces `dist/sample.hbc` |
+| Run the browser-host contract | `pnpm run:web` | Local URL using the browser VM, not Hermes Wasm |
+| Generate reachable-only release bindings | `pnpm build:release-plan` | Filtered artifacts under `build/profiles/release` |
+| Check Static Hermes declarations/export unit | `pnpm check:static-hermes` | Parses `extern_c` and proves a library-shaped exported unit without `main` |
+| Exercise the cached Lua bridge | `pnpm test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
+| Stage the native extension | `pnpm package:defold` | Defold package directory/archive inputs |
+| Prepare pinned local Extender | `pnpm extender:prepare` | Builds the pinned jars and maps the installed Xcode SDK |
+| Start/inspect local Extender | `pnpm extender:start`; `pnpm extender:status`; `pnpm extender:logs` | Standalone macOS service on port 9010 |
+| Compile the real Defold project | `pnpm bob:local:build` | Starts a temporary pinned Extender when needed, then builds with Bob |
+| Produce a desktop app bundle | `pnpm bob:local:bundle` | Writes `build/bundle/Defold Hermes Spike.app` |
+| Prove the bundled native runtime | `pnpm test:native-defold:runtime` | Rejects stale archives, launches the app, and checks real Hermes, Lua-API, and update-lifecycle markers |
+| Build/bundle the HTML5 game | `pnpm bob:web:build`; `pnpm bob:web:bundle` | Uses pinned emsdk 4.0.6 through local Extender |
+| Verify a running HTML5 bundle | `pnpm test:html5:runtime` | Reload-synchronized CDP lifecycle and binding proof |
+| Reuse a running local Extender | `pnpm bob:build`; `pnpm bob:bundle` | Local port 9010 is the default |
 
 `build:release-plan` emits canonical route glue under
 `build/profiles/release/canonical/<target>/`. For a native Dynamic-Hermes
@@ -71,27 +72,27 @@ are not yet proven dead-stripped.
 The strongest local verification is one command:
 
 ```sh
-npm run verify
+pnpm verify
 ```
 
-`npm test` remains the faster generator/type/browser loop. `verify` additionally
+`pnpm test` remains the faster generator/type/browser loop. `verify` additionally
 builds and runs native Hermes source and bytecode, the Lua bridge, Static Hermes
 parsing, extension syntax checks, and Defold extension packaging.
 
 # Local Bob and Extender
 
-Pinned Bob is downloaded and checksum-verified by `npm run bootstrap:bob`.
+Pinned Bob is downloaded and checksum-verified by `pnpm bootstrap:bob`.
 Pinned Extender is checked out from `upstream.lock`. On macOS, the one-command
 paths prepare its jars, detect the installed Xcode SDK/clang/Swift ABI, create
 repo-local SDK links, start Extender for the duration of the build, and stop it:
 
 ```sh
-npm run bob:local:build
-npm run bob:local:bundle
+pnpm bob:local:build
+pnpm bob:local:bundle
 ```
 
-For a persistent edit loop, run `npm run extender:start` once and then use
-`npm run bob:build` or `npm run bob:bundle`. `npm run extender:foreground` is
+For a persistent edit loop, run `pnpm extender:start` once and then use
+`pnpm bob:build` or `pnpm bob:bundle`. `pnpm extender:foreground` is
 the inspectable foreground form. The current proofs cover arm64 macOS and
 `wasm-web`; other native target toolchains still need their Extender builders.
 
@@ -101,7 +102,7 @@ does not require an upload opt-in. A remote server is deliberately explicit:
 
 ```sh
 DEFOLD_HERMES_BUILD_SERVER=https://build.defold.com \
-DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 npm run bob:build
+DEFOLD_HERMES_ALLOW_REMOTE_BUILD=1 pnpm bob:build
 ```
 
 Google Cloud CLI is only needed if a developer chooses Defold's Docker setup
@@ -120,21 +121,24 @@ The runtime smoke emitted `init:hermes` and `module:42`. Full platform support,
 automated launch/termination, and the complete generated API remain separate
 work; a successful custom-engine link does not imply complete API coverage.
 
-# npm CLI
+# Published npm CLI
 
 The npm package now exposes project inspection and generation:
 
 ```sh
-npx deherm doctor
-npx deherm extensions
-npx deherm generate
-npx deherm typecheck
-npx deherm verify-generated
+pnpm exec deherm
+pnpm exec deherm create my-game --name "My Game"
+pnpm exec deherm doctor
+pnpm exec deherm extensions
+pnpm exec deherm generate
+pnpm exec deherm typecheck
+pnpm exec deherm verify-generated
 ```
 
 These are the installed-package commands verified from a local tarball. The
-package name is not published yet; in this checkout use `npm run cli --` before
-the command and options.
+package name is not published yet; in this checkout use `pnpm cli --` before
+the command and options. No arguments launches the TUI; `create` works before
+any `game.project` exists.
 
 `generate` reads local extensions and Bob-resolved ZIPs, then writes:
 
