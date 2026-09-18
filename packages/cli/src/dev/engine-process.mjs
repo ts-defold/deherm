@@ -117,7 +117,15 @@ export function createEngineController(options) {
     if (child) return false;
     const resolved = await (options.resolveEngine ?? resolveBuiltEngine)(options.projectRoot);
     emit({ type: "engine-starting", executable: resolved.executable });
-    const next = spawn(resolved.executable, [], {
+    // Without an explicit content root the engine resolves every resource from
+    // the archive it was built with, so a hot-reload request re-reads the same
+    // bytes and the development bundle never crosses the boundary. Point it at
+    // the development resource server when one is running.
+    const resourceUri = typeof options.resourceUri === "function"
+      ? options.resourceUri()
+      : options.resourceUri;
+    const launchArguments = resourceUri ? [`--config=resource.uri=${resourceUri}`] : [];
+    const next = spawn(resolved.executable, launchArguments, {
       cwd: resolved.runtimeRoot,
       env: { ...process.env, ...(options.env ?? {}) },
       stdio: ["ignore", "pipe", "pipe"]

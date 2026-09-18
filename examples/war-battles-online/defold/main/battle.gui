@@ -1851,7 +1851,7 @@ nodes {
   id: "projectile_160"
   enabled: 0
 }
-+nodes {
+nodes {
   position { x: -160.0 y: -100.0 z: 0.72 }
   size { x: 122.0 y: 71.0 }
   color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }

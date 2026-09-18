@@ -40,7 +40,8 @@ uint64_t gRejectedBundleGeneration = 0;
 uint64_t gPendingRejectedBundleGeneration = 0;
 bool gApplicationInitialized = false;
 bool gLoggedFirstExtensionUpdate = false;
-double gTelemetryElapsedSeconds = 0.0;
+uint64_t gTelemetryLastEmitMicros = 0;
+uint64_t gTelemetryLastFrameMicros = 0;
 dmResource::HFactory gResourceFactory = nullptr;
 void* gBundleResource = nullptr;
 std::string gBundlePath;
@@ -601,32 +602,6 @@ int UpdateLuaInstance(lua_State* state) {
     return luaL_error(state, "TypeScript update failed: %s", error.what());
   }
 #endif
-#if !defined(DM_PLATFORM_HTML5)
-  gTelemetryElapsedSeconds += dt;
-  if (gRuntime && gTelemetryElapsedSeconds >= 1.0) {
-    gTelemetryElapsedSeconds = 0.0;
-    const auto runtime = gRuntime->telemetry();
-    const auto handles = gLuaBridge
-        ? gLuaBridge->handles().stats()
-        : defold_hermes::lua_bridge::HandlePoolStats{};
-    const auto scratch = gLuaBridge
-        ? gLuaBridge->scratch().stats()
-        : defold_hermes::lua_bridge::ScratchArenaStats{};
-    dmLogInfo(
-        "DEHERM_EVENT telemetry runtime_id=%u frame_dt_us=%llu heap_available=%s heap_bytes=%llu heap_size_bytes=%llu heap_peak_bytes=%llu callback_roots=%u component_instances=%u lua_handles=%u lua_handle_capacity=%u arena_high_water_bytes=%llu",
-        gRuntime->identity(),
-        static_cast<unsigned long long>(dt * 1000000.0),
-        runtime.heapAvailable ? "true" : "false",
-        static_cast<unsigned long long>(runtime.heapAllocatedBytes),
-        static_cast<unsigned long long>(runtime.heapSizeBytes),
-        static_cast<unsigned long long>(runtime.peakAllocatedBytes),
-        runtime.callbackRoots,
-        runtime.componentInstances,
-        handles.live + handles.queued,
-        handles.capacity,
-        static_cast<unsigned long long>(scratch.highWater));
-  }
-#endif
   if (gPendingRejectedBundleGeneration != 0) {
     dmLogInfo(
         "TypeScript bundle generation %llu remained active after rejecting generation %llu",
@@ -724,6 +699,52 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   return dmExtension::RESULT_OK;
 }
 
+#if !defined(DM_PLATFORM_HTML5)
+// Telemetry is emitted from the engine-driven extension update rather than the
+// bootstrap script's Lua update, because component-only projects never attach a
+// bootstrap script and would otherwise report nothing. Wall-clock timing keeps
+// this independent of whichever Defold context is currently driving TypeScript.
+void EmitTelemetry() {
+  if (!gRuntime) return;
+  const uint64_t now = dmTime::GetTime();
+  const uint64_t frameDeltaMicros =
+      gTelemetryLastFrameMicros && now > gTelemetryLastFrameMicros
+          ? now - gTelemetryLastFrameMicros
+          : 0;
+  gTelemetryLastFrameMicros = now;
+  if (!gTelemetryLastEmitMicros) {
+    gTelemetryLastEmitMicros = now;
+    return;
+  }
+  if (now - gTelemetryLastEmitMicros < 1000000u) return;
+  gTelemetryLastEmitMicros = now;
+
+  const auto runtime = gRuntime->telemetry();
+  // Report the adapter pool that GUI/userdata routes actually consume; the
+  // generic lua_bridge pool stays near zero and would hide exhaustion.
+  const auto handles = gScriptBridge
+      ? gScriptBridge->handleStats()
+      : (gLuaBridge ? gLuaBridge->handles().stats()
+                    : defold_hermes::lua_bridge::HandlePoolStats{});
+  const auto scratch = gLuaBridge
+      ? gLuaBridge->scratch().stats()
+      : defold_hermes::lua_bridge::ScratchArenaStats{};
+  dmLogInfo(
+      "DEHERM_EVENT telemetry runtime_id=%u frame_dt_us=%llu heap_available=%s heap_bytes=%llu heap_size_bytes=%llu heap_peak_bytes=%llu callback_roots=%u component_instances=%u lua_handles=%u lua_handle_capacity=%u arena_high_water_bytes=%llu",
+      gRuntime->identity(),
+      static_cast<unsigned long long>(frameDeltaMicros),
+      runtime.heapAvailable ? "true" : "false",
+      static_cast<unsigned long long>(runtime.heapAllocatedBytes),
+      static_cast<unsigned long long>(runtime.heapSizeBytes),
+      static_cast<unsigned long long>(runtime.peakAllocatedBytes),
+      runtime.callbackRoots,
+      runtime.componentInstances,
+      handles.live + handles.queued,
+      handles.capacity,
+      static_cast<unsigned long long>(scratch.highWater));
+}
+#endif
+
 dmExtension::Result UpdateExtension(dmExtension::Params*) {
   if (!gLoggedFirstExtensionUpdate) {
     dmLogInfo("Extension update entered (application initialized: %s)",
@@ -731,6 +752,9 @@ dmExtension::Result UpdateExtension(dmExtension::Params*) {
     gLoggedFirstExtensionUpdate = true;
   }
   if (gBundleResource) ActivateBundle(false);
+#if !defined(DM_PLATFORM_HTML5)
+  EmitTelemetry();
+#endif
   return dmExtension::RESULT_OK;
 }
 
@@ -746,7 +770,8 @@ dmExtension::Result FinalizeExtension(dmExtension::Params*) {
   FinalizeAttachedApplication("extension finalize");
   DetachCapturedLuaInstances();
   gLoggedFirstExtensionUpdate = false;
-  gTelemetryElapsedSeconds = 0.0;
+  gTelemetryLastEmitMicros = 0;
+  gTelemetryLastFrameMicros = 0;
   InvalidateBootstrapAttachment();
   defold_hermes::game_object::uninstallTerminalApi();
   defold_hermes::uninstallLuaTimerCapi();

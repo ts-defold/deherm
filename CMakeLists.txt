@@ -61,6 +61,10 @@ add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/generated_dmsdk_universal.cpp
   defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp
   defold/defold_hermes/src/generated_jsi.cpp
+  # script_jsi_bridge.cpp reads the generated universal operation catalog to
+  # decide result arity. The catalog has no Lua dependency, so it belongs to the
+  # standalone runtime rather than only to the Lua-facing libraries.
+  defold/defold_hermes/src/generated_script_universal_value_bindings.cpp
   defold/defold_hermes/src/lua_bridge_core.cpp
   defold/defold_hermes/src/runtime.cpp
   defold/defold_hermes/src/script_bridge_capi.cpp

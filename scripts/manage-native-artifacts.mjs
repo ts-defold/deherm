@@ -68,6 +68,26 @@ async function install(downloadRoot) {
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
+// The macOS host artifact is produced locally by
+// scripts/package-defold-extension.sh, so the manifest must describe the
+// archive that script just wrote. Recording it there keeps the pinned digest a
+// statement about the artifact actually present instead of one that goes stale
+// the moment Hermes is rebuilt, while `verify` still rejects a missing, foreign,
+// or corrupted library.
+async function record(target) {
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const artifact = manifest.targets[target];
+  if (!artifact) throw new Error(`Unknown native artifact target ${target}`);
+  if (artifact.status === "vendored-source") throw new Error(`${target} is a source artifact and carries no digest`);
+  const bytes = await readFile(path.join(root, artifact.library));
+  if (bytes.byteLength < 1_000_000) throw new Error(`${target} artifact is implausibly small (${bytes.byteLength} bytes)`);
+  artifact.status = "vendored";
+  artifact.sha256 = digest(bytes);
+  artifact.bytes = bytes.byteLength;
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  return artifact.sha256;
+}
+
 async function verify(complete) {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
   const required = ["arm64-osx", "x86_64-osx", "x86_64-linux", "arm64-linux", "x86_64-win32", "wasm-web"];
@@ -102,6 +122,9 @@ if (command === "fingerprint") console.log(await fingerprint());
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
   await install(args[0]);
+} else if (command === "record") {
+  if (!args[0]) throw new Error("record requires a target, for example arm64-osx");
+  console.log(`recorded ${args[0]} ${await record(args[0])}`);
 } else if (command === "verify") await verify(args.includes("--complete"));
 else if (command === "pull") {
   const runIndex = args.indexOf("--run");

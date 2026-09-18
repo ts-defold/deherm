@@ -43,6 +43,11 @@ class ScriptAdapter {
   void popComponentContext() noexcept;
   bool componentContextActive() const noexcept { return componentContextDepth_ != 0; }
   void detachInstance() noexcept;
+  /** Lua handle occupancy for this adapter's own pool, which is distinct from
+   *  the generic lua_bridge pool and is the one GUI/userdata routes consume. */
+  const ::defold_hermes::lua_bridge::HandlePoolStats& handleStats() const noexcept {
+    return luaHandles_.stats();
+  }
   bool dispatch(ScriptCallFrame* frame) noexcept;
 
   const char* lastError() const noexcept;
@@ -201,7 +206,12 @@ class ScriptAdapter {
   void releaseHandle(ScriptHandleKind kind, uint32_t runtime, uint64_t payload) noexcept;
   bool fail(const char* message) noexcept;
 
-  static constexpr uint32_t kLuaHandleCapacity = 256;
+  // Every retained GUI node, Lua userdata, and semantic handle occupies one
+  // slot for as long as TypeScript holds it, so this bounds the number of
+  // engine objects a scene may reference at once. A pooled GUI scene routinely
+  // retains several hundred nodes; 256 was below what a single tutorial-sized
+  // scene needs. The pool is still fixed-capacity and allocation-free.
+  static constexpr uint32_t kLuaHandleCapacity = 4096;
   Dispatcher dispatcher_;
   lua_State* state_ = nullptr;
   InstanceApi instanceApi_{};

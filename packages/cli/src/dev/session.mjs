@@ -206,10 +206,14 @@ export async function runDevSession(options = {}) {
     : new HotReloadCoordinator({ compiler, targets, emit });
   const servicePort = options.servicePort ?? 8001;
   const localTargetUrl = `http://127.0.0.1:${servicePort}`;
+  // The resource server starts later in this function, so the engine resolves
+  // its content root lazily at launch time.
+  let resourceServer;
   const engine = (services.createEngineController ?? createEngineController)({
     projectRoot,
     emit,
     targetId: "local-engine",
+    resourceUri: () => resourceServer?.baseUrl,
     env: { DM_SERVICE_PORT: String(servicePort) }
   });
   await coordinator.requestBuild([path.relative(projectRoot, entryPoint).split(path.sep).join("/") || path.basename(entryPoint)]);
@@ -229,12 +233,18 @@ export async function runDevSession(options = {}) {
   let builder;
   let builderPromise;
   let developmentLoop = Promise.resolve();
+  // A rejected promise must not be cached: a transient failure (a busy port, a
+  // temporary filesystem error) would otherwise make every later build and
+  // launch rethrow the same stale error for the lifetime of the session.
   const ensureBuilder = () => builderPromise ??= (services.createDefoldBuilder ?? createDefoldBuilder)({
     projectRoot,
     outputRoot: buildRoot,
     buildServer: options.buildServer,
     emit
-  }).then((value) => (builder = value));
+  }).then((value) => (builder = value), (error) => {
+    builderPromise = undefined;
+    throw error;
+  });
   const enqueue = (operation) => {
     const current = developmentLoop.then(operation);
     developmentLoop = current.catch(() => {});
@@ -273,7 +283,7 @@ export async function runDevSession(options = {}) {
   });
 
   await mkdir(buildRoot, { recursive: true });
-  const resourceServer = options.serve === false ? undefined : await (services.startResourceServer ?? startResourceServer)({
+  resourceServer = options.serve === false ? undefined : await (services.startResourceServer ?? startResourceServer)({
     root: buildRoot,
     host: options.serveHost,
     port: options.servePort,

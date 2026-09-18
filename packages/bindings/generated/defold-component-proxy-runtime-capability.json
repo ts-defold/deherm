@@ -104,7 +104,7 @@
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
-      "sha256": "f0fac791d62b01fd8bb4ca42476477070096f1fb449a60f5badd7aca4bcb4911"
+      "sha256": "fd6eb69c28ebc6584b0818f4be797bf45d454385d9eb46cb78975850a24a3dc3"
     },
     "luaProvider": {
       "path": "defold/defold_hermes/include/defold_hermes/component_proxy_lua_gate.hpp",

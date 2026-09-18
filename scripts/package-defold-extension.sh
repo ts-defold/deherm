@@ -44,10 +44,17 @@ if ar -t "$hermes_vm_archive" | grep -q '^zip\.c\.o$'; then
   exit 1
 fi
 
-libtool -static -o "$library_dir/libhermes.a" \
+# -D zeroes archive member mtime/uid/gid/mode. Without it libtool stamps the
+# current time into every member, so repackaging identical objects produces a
+# different file and the pinned native-artifact digest can never hold.
+libtool -static -D -o "$library_dir/libhermes.a" \
   "$hermes_vm_archive" \
   "$hermes_build/jsi/libjsi.a" \
   "$hermes_build/external/boost/boost_1_86_0/libs/context/libboost_context.a"
+
+# The pinned native-artifact digest must describe the archive this script just
+# produced; otherwise every local Hermes rebuild breaks `deherm dev`.
+node "$repo_root/scripts/manage-native-artifacts.mjs" record arm64-osx
 
 mkdir -p "$extension_root/include/hermes/Public" "$extension_root/include/jsi"
 cp "$hermes_source/API/hermes/hermes.h" "$extension_root/include/hermes/hermes.h"

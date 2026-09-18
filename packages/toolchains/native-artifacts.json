@@ -4,32 +4,48 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "targets": {
     "arm64-osx": {
-      "host": { "platform": "darwin", "architecture": "arm64" },
+      "host": {
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
       "builder": "macos-native",
       "status": "vendored",
       "library": "defold/defold_hermes/lib/arm64-osx/libhermes.a",
-      "sha256": "819d3935f1983d06bbf25702ca859729793baf985aa599be2770e1b3c4f78b2f"
+      "sha256": "becf8dcd973056b4c4694ed8159d0a1928b7ec9200b67e7e549af0e0be0f35c9",
+      "bytes": 10729000
     },
     "x86_64-osx": {
-      "host": { "platform": "darwin", "architecture": "x64" },
+      "host": {
+        "platform": "darwin",
+        "architecture": "x64"
+      },
       "builder": "macos-native",
       "status": "required-missing",
       "library": "defold/defold_hermes/lib/x86_64-osx/libhermes.a"
     },
     "x86_64-linux": {
-      "host": { "platform": "linux", "architecture": "x64" },
+      "host": {
+        "platform": "linux",
+        "architecture": "x64"
+      },
       "builder": "docker-linux-amd64",
       "status": "required-missing",
       "library": "defold/defold_hermes/lib/x86_64-linux/libhermes.a"
     },
     "arm64-linux": {
-      "host": { "platform": "linux", "architecture": "arm64" },
+      "host": {
+        "platform": "linux",
+        "architecture": "arm64"
+      },
       "builder": "docker-linux-arm64",
       "status": "required-missing",
       "library": "defold/defold_hermes/lib/arm64-linux/libhermes.a"
     },
     "x86_64-win32": {
-      "host": { "platform": "win32", "architecture": "x64" },
+      "host": {
+        "platform": "win32",
+        "architecture": "x64"
+      },
       "builder": "docker-defold-winsdk-2026",
       "status": "required-missing",
       "library": "defold/defold_hermes/lib/x86_64-win32/hermes.lib"
