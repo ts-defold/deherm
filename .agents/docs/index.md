@@ -46,6 +46,7 @@ okf_version: "0.2"
 * [dmSDK scalar out-parameter wave](research/dmsdk-scratch-scalar-out-wave.md) - Complete 79-row structural partition, seven provider-gated scalar outputs, and exact evidence boundaries.
 * [dmSDK universal fallback](research/dmsdk-universal-fallback.md) - All-declaration cross-target recipes, fixed caller-owned ABI frames, and usage-driven native thunk materialization.
 * [Native extension header generator](research/native-extension-header-generator.md) - Clang-driven C header ingestion, deterministic extension IR/TypeScript/C glue, explicit layout blockers, and the typed browser dmSDK arena.
+* [Real Defold extension candidates](research/defold-extension-candidates.md) - Ecosystem survey against the ingestion paths, pinned candidate revisions, platform/license/provenance filters, and the `.script_api` projection gaps real extensions expose.
 * [Compile-time Defold hash literals](research/compile-time-hash-literals.md) - Checker-bound `hashLiteral("#name")` lowering, native Defold vectors, and target-separated bigint evidence.
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.
 * [Transparent Defold value transport](research/transparent-defold-value-transport.md) - Pinned dmSDK value layouts, the Matrix4/URL typed frame lanes, and the structural typed-native emission rule.
