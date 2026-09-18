@@ -39,6 +39,8 @@ test("command-specific target parsing keeps dev endpoints separate from conforma
   const conformance = parseArguments(["conformance", "generate", "--target", "js-web"]);
   assert.equal(conformance.target, "js-web");
   assert.deepEqual(conformance.targets, []);
+  assert.equal(parseArguments(["materialize-dmsdk", "--check"]).check, true);
+  assert.throws(() => parseArguments(["generate", "--check"]), /Unknown option: --check/);
 });
 
 test("packed npm artifact loads its CLI and one-shot dev compiler", async () => {
@@ -105,10 +107,11 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
     include: ["component.script.ts"]
   }, null, 2)}\n`);
   await writeFile(path.join(consumer, "component.script.ts"), [
-    'import { builtins, type DefoldHash } from "@ts-defold/deherm";',
+    'import { defold, type DefoldHash } from "@ts-defold/deherm";',
     'import { defineComponent, property } from "@ts-defold/deherm/component";',
-    'const id: DefoldHash = builtins.hash("packed-component");',
-    'export default defineComponent({ properties: { speed: property.number(1) }, init() { void id; } });',
+    'import { add } from "@ts-defold/deherm/modules/ExampleMath";',
+    'const id: DefoldHash = defold.hash("packed-component");',
+    'export default defineComponent({ properties: { speed: property.number(add(0, 1)) }, init() { void id; } });',
     ""
   ].join("\n"));
   run(process.execPath, [
@@ -124,6 +127,16 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
     "--name", "Packed smoke test",
     "--json"
   ], { cwd: root });
+  // Generated projects enable the `@ts-defold/deherm/ttsc` transform, which the
+  // TypeScript plugin loader resolves from the project itself. Reproduce the
+  // layout a real `npm install` produces so the transform actually loads.
+  await mkdir(path.join(project, "node_modules", "@ts-defold"), { recursive: true });
+  await symlink(packageRoot, path.join(project, "node_modules", "@ts-defold", "deherm"), "dir");
+  await symlink(
+    path.join(repositoryRoot, "node_modules", "typescript"),
+    path.join(project, "node_modules", "typescript"),
+    "dir"
+  );
   assert.equal(JSON.parse(created.stdout).projectRoot, project);
   assert.match(await readFile(path.join(project, "game.project"), "utf8"), /title = Packed smoke test/);
   assert.match(await readFile(path.join(project, "src", "main.script.ts"), "utf8"), /defineComponent/);
@@ -135,6 +148,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
     "--json"
   ], { cwd: project });
   assert.ok(JSON.parse(verified.stdout).checkedFiles > 0);
+  assert.equal(JSON.parse(verified.stdout).componentCount, 1);
 
   const checked = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),

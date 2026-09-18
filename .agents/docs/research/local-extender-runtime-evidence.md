@@ -26,6 +26,14 @@ sources:
     resource: ../../scripts/bob.sh
     title: Pinned Bob and local-build-server runner
     author: team:ts-defold
+  - id: war-battles-runtime-harness
+    resource: ../../examples/war-battles-online/integration/check-packaged-runtime.mjs
+    title: Fail-closed War Battles packaged runtime harness
+    author: team:ts-defold
+  - id: war-battles-runtime-evidence
+    resource: ../../examples/war-battles-online/evidence/packaged-runtime-arm64-macos.json
+    title: Artifact-bound War Battles packaged runtime observation
+    author: team:ts-defold
   - id: extension-manifest
     resource: ../../defold/defold_hermes/ext.manifest
     title: Defold Hermes extension manifest
@@ -84,7 +92,7 @@ JavaScript resource, initialize dynamic Hermes on native or the browser host
 on HTML5, and traverse generated bridges. The native run proves 14
 descriptor-validated calls across 12 generated scalar bindings in the live
 Defold Lua API plus five generated fixed-layout `vmath` routes and the exact
-64-bit `builtins.hash` route. They do not
+64-bit `defold.hash` public route (raw Defold source module `builtins`). They do not
 certify Static
 Hermes AOT inside Defold, release builds, bytecode, iOS, Android, Windows,
 Linux, every generated binding, long-running stability, leak freedom, hot
@@ -98,7 +106,7 @@ decoding; optional-argument omission; zero-, one-, and two-argument calls; and
 real project configuration/path queries. A second generated fixture asserts
 `vmath.vector3`, `vmath.length`, `vmath.normalize`,
 `vmath.quat_rotation_z`, and `vmath.quat` through the dynamic-Hermes JSI path.
-The same fixture proves `builtins.hash` as a branded JavaScript `bigint` with
+The same fixture proves `defold.hash` as a branded JavaScript `bigint` with
 all 64 bits preserved. A reentrant, generational active-instance context then
 proves `go.get_position`, `go.set_position`, and `go.set_rotation`; Lua reads
 back the actual position and rotation before emitting the setter markers. At
@@ -287,7 +295,8 @@ It also captured the application transcript `init:browser`, `module:42`, all
 14 scalar script-probe markers (including
 `script-api:bit.lshift.number:256`), `clock-ready:true`, and at least one
 `update` callback, with no JavaScript exception or non-favicon browser error.
-The browser sample additionally called `builtins.hash("my_hash")`, crossed the
+The browser sample additionally called the route now exposed as
+`defold.hash("my_hash")`, crossed the
 real Emscripten flat C ABI into generated native code, reconstructed the exact
 64-bit `bigint`, and emitted `script-value:builtins.hash.my_hash:ok`. This
 proves calls through the installed raw Wasm script bridge as well as a
@@ -531,6 +540,39 @@ the Defold-facing Hermes archive.
 A fresh local Extender build then linked without any duplicate-symbol warning;
 archive inspection found no `zip.c.o`, `_defold_hermes` remained exported, and
 the rebuilt bundle repeated `init:hermes` and `module:42` at runtime.
+
+# Scoped War Battles GUI component observation
+
+The War Battles example now has a separate, fail-closed arm64-macOS observation
+that does not promote the global component capability manifest. Bob and the
+local Extender built the current example custom engine; the harness launched it
+from the archive directory and required exact markers for Defold 1.14.0, the
+`default-legacy-bullet` 253-symbol profile, bundle generation 1, the first
+TypeScript GUI render, the first TypeScript update/render, and the first
+extension update. The game-owned markers are emitted only after its generated
+GUI proxy has attached the TypeScript
+component, resolved the fixed node pools, completed all first-render
+`gui`/`vmath` calls, posted input focus, and completed the next update/render.
+
+After the update marker, the process remained free of error/fatal/script/traceback,
+bundle-rejection, missing-provider, and component-runtime diagnostics for a
+1.5-second settling window, then reported an actual `SIGTERM` process exit. The
+checked JSON records the complete packaged extension and authored project tree,
+source locks/plans, engine, archive data/index, compiled project, manifest, and
+bundled JavaScript hashes, plus a canonical 20-line transcript digest and
+deterministic aggregate keys; it intentionally contains no timestamp. The scope
+excludes Static Hermes, HTML5, other component contexts and lifecycle
+combinations, whole-API conformance, allocation/leak evidence, and multiplayer
+transport.
+
+This run does not measure thread-local storage. The repository's separate
+367,872-byte Static Hermes universal-frame TLS figure is an exact observation
+for its tested native host configuration and is platform/toolchain/ABI scoped;
+it is neither a cross-target constant nor evidence from this Dynamic Hermes
+War Battles run.
+
+The harness is available as `pnpm runtime:packaged`, with explicit record and
+stale-artifact check variants in the War Battles workspace package.
 
 # Open evidence gaps
 

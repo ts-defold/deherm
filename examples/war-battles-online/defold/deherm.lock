@@ -6,37 +6,49 @@
     "package": "@ts-defold/deherm",
     "version": "0.0.0"
   },
+  "toolchain": {
+    "bob": {
+      "url": "https://d.defold.com/archive/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/bob/bob.jar",
+      "sha256": "8a8a8c4ebc725279d8ddae17c4eb3d72d6db90a498302960ca341e61fa489cb8"
+    }
+  },
   "generation": {
     "schemaVersion": 1,
-    "projectGeneratorSha256": "960a410f09d74fc94b9e1027fad730e5c81575b610eaa04a32a1ae01f539fff3",
-    "cacheKey": "5acb2df1795c4e4c85e1ca228dba18116d3c0641cc7472428284d3d5abf49e48"
+    "projectGeneratorSha256": "717619f4f510ee2ce42ac5bd0112dee066a7ea6676dcb926bcf00bc43e346bac",
+    "cacheKey": "c41f684da468aef5717ab855b9ec7dfb20ffd8a81334aac74eadcd5015d589cd"
   },
   "inputs": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "dmsdkIrSha256": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
     "scriptDispatchSha256": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "scriptProfilesSha256": "d5d52d591bc6352f3151d0f926585efdadcbfe070455ab9067a245c115f8e4f8",
-    "loweringPlanSha256": "308a58918170d4471e7a6d736bf6a9d5aa791d4bb565bcbf31de2ad27ee3e0a0",
-    "loweringPlanSentinelSha256": "ea428ebcc1efe8fa10e2dd6537a94719593262326ff5ffc8aead0afc1583a5fe",
-    "dmsdkThunksSha256": "397c5dfa370fcbb2fc35ca793f9c60b71b9159d11c8a35029845affb047d9e7a"
+    "scriptAccountingSha256": "6c2ac2547257c5d9365be84c5da15a54ae70915c51b6de50f627bb3dd0908cd7",
+    "scriptUniversalSha256": "55ab12a42447b2d1e39aae6888504aee9d11561a0f08ec3cf9cad6cacc13a00e",
+    "scriptProfilesSha256": "2634e4f2f7cd0058d32846e0350a897d672a7ada18761529e095b3b1aac45278",
+    "loweringPlanSha256": "e5a651fadfc7474ed77c3f4472dc282215d8789dba0b033c42f4a0bb8ec0905a",
+    "loweringPlanSentinelSha256": "c355229f2b725204888f64799189afe21eda84af1d96e031338b1a12513a7f2e",
+    "dmsdkThunksSha256": "d0d4434e4a1d9c5578058e3f12443efdf860fdd5017118a1bf5e4c464acbdb4d",
+    "dmsdkUniversalSha256": "717dd38144904f9ba7610732182782ff6dcadd3426c6ca0e78c2c8520c6154ba",
+    "sdkSourceSha256": "f1ab1988fb338bced2b07b3f52b013c7c8f98e1a9ad9fe38f5465644b5a94719"
   },
   "generatedOutputs": {
     "output": {
-      "script-contexts.json": "bf64f31676ce52325142c05db25ac4751ff066c8dc29885214ed6f1e03e457c7",
-      "sdk/contexts/shared.ts": "5832a5fd9d6d7a557c7c1341effe27267b49c0a3ca6b1738677af11dde7e39da",
-      "sdk/contexts/game-object.ts": "fd9f4f23bbd9de39a81597b9087f5c952b8cf00af027005ccb48d8e8a2fbb711",
-      "sdk/contexts/gui.ts": "f23f826d92881938c79726c895d244546fc62f325fe25c199bef85b2bc1cf007",
-      "sdk/contexts/render.ts": "33214afeae6b3a447054c20a6fc3d093cb5d23510bed4a8d0d0c1d560735952a"
+      "script-contexts.json": "3307fe97f4faa77daa35ec2e397d835c93ae238c454bc2dc30e4bdf3f0b1c7f9",
+      "sdk/contexts/shared.ts": "9c226c4efcb1b109a0b0b3c51f7a76e1310477c93c74e3dc9aac0c6350854d7d",
+      "sdk/contexts/game-object.ts": "79ae4da4f39336ad71e8df6121b8830c833a8d64080073dfdeec46a33fefb776",
+      "sdk/contexts/gui.ts": "8b59369a0716d662ca837f69161d866f61817b464ade792ceea2ae4b4919a6fa",
+      "sdk/contexts/render.ts": "5514029ceb89f9973b60d93fad05a8560522a8d37abe1f526085aa48f2c6e64e"
     },
     "project": {
       "tsconfig.deherm.base.json": "1fd3f85079e7dcd540e0efeab04255f99c760cc490ba49ce39159079291c4aa2",
-      "tsconfig.deherm.shared.json": "0e6dee2fc337dd517701acc2df948242c14acf7079625f07dbe89c06dbf92d2f",
-      "tsconfig.deherm.game-object.json": "87b514ba2a55b526518e86bd8db0ae9dcd74e101cb29d83505c441b3e3bc6baf",
-      "tsconfig.deherm.gui.json": "f5fe8db72cad4221e113b25367e7f0a3a707a49af1587dcf8134eaa8a473bd67",
-      "tsconfig.deherm.render.json": "d60ab6859b9dcc76f79c0d43e76e04738fbb9dc21b1b7f918e24573515e63fb4",
+      "tsconfig.deherm.shared.json": "951abfe19c322572fff092c56434e9cf8d8bcb2af2bc381127ed5f3a248b9e5b",
+      "tsconfig.deherm.game-object.json": "7e53c986a39f5a90a032eb327e3fd5f53b7cacac627b2a6808fc09d3915f646b",
+      "tsconfig.deherm.gui.json": "51ae66826bd3cbf531a87d8bdd20a84edfc2312b5eb78718bb04e15dea2f11b7",
+      "tsconfig.deherm.render.json": "0c7badeaf96234c7fc13f0842279c47bc0ba4507304b1bad9b0436ce0fa71d9a",
+      "tsconfig.deherm.bundle.json": "2d59f71834abc8d93dc3fb6b4fc8d22a628b6e7840b6196113930d0eaa26b09b",
       "tsconfig.deherm.json": "0666a9440af963a2797ddb9ecea8cebd95783bfe0ce2f6a6b8c614b25ce4c6ba"
     }
   },
+  "generatedSdkSha256": "ddc41d43cbeb3cdfa9de31c1bbc74696e960ecf8f7a27a292b7aa9c91d50152e",
   "engineProfiles": {
     "source": "defold-default",
     "manifest": null,

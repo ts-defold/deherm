@@ -1,0 +1,22 @@
+{
+  "name": "@deherm/example-runtime-smoke",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "source": "./src/main.ts",
+  "exports": {
+    ".": "./src/main.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build": "pnpm --workspace-root build:js",
+    "run:native": "pnpm --workspace-root run:native",
+    "run:web": "pnpm --workspace-root run:web"
+  },
+  "dependencies": {
+    "@ts-defold/deherm": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

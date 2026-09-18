@@ -3,6 +3,7 @@ export type LogLevel = "debug" | "info" | "warn" | "error";
 export {
   address,
   defoldUrl,
+  hashLiteral,
   relativeAddress,
   type DefoldAbsolutePath,
   type DefoldAddress,
@@ -10,6 +11,7 @@ export {
   type DefoldAddressShorthand,
   type DefoldFragmentAddress,
   type DefoldHash,
+  type DefoldHashLiteral,
   type DefoldRelativeAddress,
   type DefoldSocketAddress,
   type DefoldUrl

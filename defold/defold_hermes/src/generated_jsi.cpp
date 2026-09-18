@@ -5,6 +5,7 @@
 #include <defold_hermes/callback_registry.hpp>
 #include <defold_hermes/generated_dmsdk_enum_value_jsi.hpp>
 #include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>
+#include <defold_hermes/generated_dmsdk_universal_jsi.hpp>
 #include <defold_hermes/generated_modules.h>
 
 #include <cmath>
@@ -145,6 +146,7 @@ void installGeneratedModules(jsi::Runtime& runtime, jsi::Object& modules, Callba
 
   installDmSdkScalarModule(runtime, modules);
   installDmSdkEnumValueModule(runtime, modules);
+  installDmSdkUniversalModule(runtime, modules);
 }
 
 }  // namespace defold_hermes

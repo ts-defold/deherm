@@ -33,6 +33,29 @@ importers:
         specifier: 2.8.3
         version: 2.8.3
 
+  examples/runtime-smoke:
+    dependencies:
+      '@ts-defold/deherm':
+        specifier: workspace:*
+        version: link:../..
+    devDependencies:
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
+  examples/war-battles-online:
+    dependencies:
+      '@ts-defold/deherm':
+        specifier: workspace:*
+        version: link:../..
+    devDependencies:
+      esbuild:
+        specifier: 0.25.10
+        version: 0.25.10
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
   packages/abi: {}
 
   packages/bindings: {}
@@ -48,6 +71,8 @@ importers:
   packages/static-hermes: {}
 
   packages/telemetry: {}
+
+  packages/toolchains: {}
 
   packages/web-adapter: {}
 

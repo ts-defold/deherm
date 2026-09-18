@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -21,6 +22,7 @@ namespace {
 
 int gCurrentInstance = 7;
 int gObservedCalls = 0;
+int gCallbackArgumentGc = 0;
 std::string gTitle;
 
 [[noreturn]] void Fail(const char* message) {
@@ -98,6 +100,60 @@ int Load(lua_State* state) {
   return 1;
 }
 
+int LoadResource(lua_State* state) {
+  CheckInstance(state);
+  const std::string path = luaL_checkstring(state, 1);
+  if (path == "/exists") {
+    lua_pushstring(state, "resource-data");
+    return 1;
+  }
+  lua_pushnil(state);
+  lua_pushstring(state, "resource-missing");
+  return 2;
+}
+
+int SocketTry(lua_State* state) {
+  CheckInstance(state);
+  if (lua_toboolean(state, 1)) return lua_gettop(state);
+  lua_pushvalue(state, lua_upvalueindex(1));
+  if (lua_pcall(state, 0, 0, 0) != 0) lua_pop(state, 1);
+  lua_settop(state, 2);
+  lua_createtable(state, 1, 0);
+  lua_pushvalue(state, 2);
+  lua_rawseti(state, -2, 1);
+  return lua_error(state);
+}
+
+int SocketNewTry(lua_State* state) {
+  CheckInstance(state);
+  luaL_checktype(state, 1, LUA_TFUNCTION);
+  lua_settop(state, 1);
+  lua_pushcclosure(state, SocketTry, 1);
+  return 1;
+}
+
+int SocketProtected(lua_State* state) {
+  CheckInstance(state);
+  lua_pushvalue(state, lua_upvalueindex(1));
+  lua_insert(state, 1);
+  if (lua_pcall(state, lua_gettop(state) - 1, LUA_MULTRET, 0) == 0) {
+    return lua_gettop(state);
+  }
+  if (!lua_istable(state, -1)) return lua_error(state);
+  lua_rawgeti(state, -1, 1);
+  lua_pushnil(state);
+  lua_insert(state, -2);
+  return 2;
+}
+
+int SocketProtect(lua_State* state) {
+  CheckInstance(state);
+  luaL_checktype(state, 1, LUA_TFUNCTION);
+  lua_settop(state, 1);
+  lua_pushcclosure(state, SocketProtected, 1);
+  return 1;
+}
+
 int GetWidth(lua_State* state) {
   CheckInstance(state);
   lua_pushnumber(state, 128);
@@ -117,6 +173,29 @@ int ToHex(lua_State* state) {
 int SetTitle(lua_State* state) {
   CheckInstance(state);
   gTitle = luaL_checkstring(state, 1);
+  return 0;
+}
+
+int SetWindowListener(lua_State* state) {
+  CheckInstance(state);
+  luaL_checktype(state, 1, LUA_TFUNCTION);
+  lua_pushvalue(state, 1);
+  lua_setglobal(state, "__dehermRetainedJsCallback");
+  lua_pushvalue(state, 1);
+  lua_pushnumber(state, 42);
+  lua_pushnumber(state, 1);
+  lua_createtable(state, 0, 2);
+  lua_pushnumber(state, 1920);
+  lua_setfield(state, -2, "width");
+  lua_pushnumber(state, 1080);
+  lua_setfield(state, -2, "height");
+  lua_newuserdata(state, 8);
+  if (luaL_newmetatable(state, "deherm.callback_argument_test")) {
+    lua_pushcfunction(state, [](lua_State*) -> int { ++gCallbackArgumentGc; return 0; });
+    lua_setfield(state, -2, "__gc");
+  }
+  lua_setmetatable(state, -2);
+  if (lua_pcall(state, 4, 0, 0) != 0) return lua_error(state);
   return 0;
 }
 
@@ -163,6 +242,10 @@ class TestHost final : public defold_hermes::Host {
   std::vector<std::string> transcript;
 };
 
+bool NeverInvoke(void*, const defold_hermes::ScriptCallFrame*, void*,
+    defold_hermes::ScriptCallbackConsume, char*, size_t) noexcept { return false; }
+void NoopReference(void*) noexcept {}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -177,14 +260,20 @@ int main(int argc, char** argv) {
   luaL_openlibs(state);
   const luaL_Reg sys[] = {
     {"get_config_int", GetConfigInt}, {"exists", Exists},
-    {"save", Save}, {"load", Load}, {nullptr, nullptr}
+    {"save", Save}, {"load", Load}, {"load_resource", LoadResource},
+    {nullptr, nullptr}
   };
   const luaL_Reg render[] = {{"get_width", GetWidth}, {nullptr, nullptr}};
   const luaL_Reg bit[] = {{"tohex", ToHex}, {nullptr, nullptr}};
-  const luaL_Reg window[] = {{"set_title", SetTitle}, {nullptr, nullptr}};
+  const luaL_Reg window[] = {
+    {"set_title", SetTitle}, {"set_listener", SetWindowListener}, {nullptr, nullptr}
+  };
   const luaL_Reg sound[] = {{"get_group_gain", GetGroupGain}, {nullptr, nullptr}};
   const luaL_Reg vmath[] = {{"dot", Dot}, {nullptr, nullptr}};
   const luaL_Reg b2d[] = {{"get_body", GetBody}, {nullptr, nullptr}};
+  const luaL_Reg socket[] = {
+    {"newtry", SocketNewTry}, {"protect", SocketProtect}, {nullptr, nullptr}
+  };
   Register(state, "sys", sys);
   Register(state, "render", render);
   Register(state, "bit", bit);
@@ -192,6 +281,7 @@ int main(int argc, char** argv) {
   Register(state, "sound", sound);
   Register(state, "vmath", vmath);
   Register(state, "b2d", b2d);
+  Register(state, "socket", socket);
   lua_getglobal(state, "b2d");
   lua_newtable(state);
   lua_pushcfunction(state, DumpBody);
@@ -209,12 +299,78 @@ int main(int argc, char** argv) {
   const int baseTop = lua_gettop(state);
   defold_hermes::installScriptBridgeApi(adapter.api());
 
-  TestHost host;
-  defold_hermes::Runtime runtime(host);
-  runtime.load(source.str(), "defold-hermes://script-api-e2e.js");
-  runtime.init();
+  defold_hermes::ScriptCallback ineligibleCallback{
+    nullptr, NeverInvoke, NoopReference, NoopReference};
+  defold_hermes::ScriptValue ineligibleValue{};
+  ineligibleValue.tag = defold_hermes::ScriptValueTag::kCallback;
+  ineligibleValue.data = &ineligibleCallback;
+  defold_hermes::ScriptCallFrame ineligibleFrame{};
+  ineligibleFrame.stableId = UINT32_C(407150266);
+  ineligibleFrame.arguments = &ineligibleValue;
+  ineligibleFrame.argumentCount = 1;
+  defold_hermes::ScriptValue ineligibleResult{};
+  ineligibleFrame.results = &ineligibleResult;
+  ineligibleFrame.resultCapacity = 1;
+  if (!adapter.api().dispatch(adapter.api().context, &ineligibleFrame)) {
+    Fail(adapter.lastError());
+  }
+  if (ineligibleFrame.resultCount != 1 ||
+      ineligibleResult.tag != defold_hermes::ScriptValueTag::kCallback ||
+      !ineligibleResult.data) {
+    Fail("higher-order Lua closure was not returned through the universal ABI");
+  }
+  auto* returnedClosure = const_cast<defold_hermes::ScriptCallback*>(
+      static_cast<const defold_hermes::ScriptCallback*>(ineligibleResult.data));
+  adapter.shutdown();
+  defold_hermes::ScriptCallFrame destroyedLuaClosureFrame{};
+  char destroyedLuaClosureError[256]{};
+  if (returnedClosure->invoke(returnedClosure->context, &destroyedLuaClosureFrame,
+          nullptr, nullptr, destroyedLuaClosureError, sizeof(destroyedLuaClosureError)) ||
+      std::string(destroyedLuaClosureError).find("destroyed Defold script runtime") == std::string::npos) {
+    Fail("returned Lua closure did not fail closed after adapter shutdown");
+  }
+  returnedClosure->release(returnedClosure->context);
+  if (!adapter.initialize(state, {GetInstance, SetInstance},
+      defold_hermes::script_handle_lowering::runtimeProfileHandshake(*runtimeProfile))) Fail(adapter.lastError());
+  lua_pushnumber(state, 42);
+  if (!adapter.captureInstance(-1)) Fail(adapter.lastError());
+  lua_pop(state, 1);
+  defold_hermes::installScriptBridgeApi(adapter.api());
 
-  if (host.transcript.size() != 14) Fail("unexpected TypeScript transcript size");
+  const char savePath[] = "state";
+  defold_hermes::ScriptTableEntry invalidMapEntry{};
+  invalidMapEntry.key.tag = defold_hermes::ScriptValueTag::kNumber;
+  invalidMapEntry.key.number = std::numeric_limits<double>::quiet_NaN();
+  invalidMapEntry.value.tag = defold_hermes::ScriptValueTag::kNumber;
+  invalidMapEntry.value.number = 1;
+  defold_hermes::ScriptValue invalidMapArguments[2]{};
+  invalidMapArguments[0].tag = defold_hermes::ScriptValueTag::kString;
+  invalidMapArguments[0].data = savePath;
+  invalidMapArguments[0].length = 5;
+  invalidMapArguments[1].tag = defold_hermes::ScriptValueTag::kTable;
+  invalidMapArguments[1].reserved = static_cast<uint8_t>(defold_hermes::ScriptTableKind::kMap);
+  invalidMapArguments[1].data = &invalidMapEntry;
+  invalidMapArguments[1].length = 1;
+  defold_hermes::ScriptCallFrame invalidMapFrame{};
+  invalidMapFrame.stableId = UINT32_C(798578280);
+  invalidMapFrame.arguments = invalidMapArguments;
+  invalidMapFrame.argumentCount = 2;
+  if (adapter.api().dispatch(adapter.api().context, &invalidMapFrame)) {
+    Fail("non-finite map key reached unprotected lua_settable");
+  }
+  if (std::string(adapter.lastError()).find("table key must be finite") == std::string::npos) {
+    Fail("non-finite map key rejection was not explicit");
+  }
+
+  TestHost host;
+  {
+    defold_hermes::Runtime runtime(host);
+    runtime.load(source.str(), "defold-hermes://script-api-e2e.js");
+    runtime.init();
+    lua_gc(state, LUA_GCCOLLECT, 0);
+    if (gCallbackArgumentGc != 1) Fail("successful callback argument userdata root was not released");
+
+  if (host.transcript.size() != 20) Fail("unexpected TypeScript transcript size");
   if (host.transcript[0] != "info:values:42:128:00ff:true") Fail("scalar values did not cross the full bridge");
   if (host.transcript[1] != "info:vmath:3:5:0.600000:0.800000:1.000000:4") Fail("Defold values did not cross the full Hermes bridge");
   if (host.transcript[2] != "info:overload-dot:25") Fail("overload route did not cross dynamic Hermes and Lua");
@@ -229,21 +385,53 @@ int main(int argc, char** argv) {
   if (host.transcript[8] != "info:universal:42:ok:3") Fail("recursive universal value graph did not cross Hermes and Lua");
   if (host.transcript[9] != "info:universal-cycle:true") Fail("recursive universal value graph did not reject a JS cycle");
   if (host.transcript[10] != "info:universal-lua-cycle:true") Fail("recursive universal value graph did not reject a Lua cycle");
-  if (host.transcript[11].find("not executable yet") == std::string::npos &&
-      host.transcript[11].find("not in the executable scalar family") == std::string::npos &&
-      host.transcript[11].find("handles, tables, and callbacks are not executable yet") == std::string::npos &&
-      host.transcript[11].find("no generated kind tag") == std::string::npos &&
-      host.transcript[11].find("Universal-value Lua function is unavailable") == std::string::npos) {
+  if (host.transcript[11] != "info:callback:42:1:1920:1080") Fail("retained JavaScript callback did not cross Lua");
+  if (host.transcript[12] != "info:closure-success:true:payload") Fail("returned Lua closure lost multi-results");
+  if (host.transcript[13] != "info:closure-error:true:1") Fail("returned Lua closure lost error/finalizer semantics");
+  if (host.transcript[14] != "info:protect-success:ok:7") Fail("protected Lua closure lost callback multi-results");
+  if (host.transcript[15] != "info:protect-error:true:protected-boom:2") Fail("protected Lua closure lost tagged error semantics");
+  if (host.transcript[16] != "info:load-resource:resource-data:true:resource-missing") Fail("variable Lua result arity was not normalized for the SDK tuple");
+  if (host.transcript[17].find("not executable yet") == std::string::npos &&
+      host.transcript[17].find("not in the executable scalar family") == std::string::npos &&
+      host.transcript[17].find("handles, tables, and callbacks are not executable yet") == std::string::npos &&
+      host.transcript[17].find("no generated kind tag") == std::string::npos &&
+      host.transcript[17].find("Universal-value Lua function is unavailable") == std::string::npos) {
     Fail("unsupported family was not explicit");
   }
-  if (host.transcript[12].find("forced config error") == std::string::npos) Fail("Lua error was not propagated");
-  if (host.transcript[13] != "info:after-error:36") Fail("dispatch did not recover after Lua error");
+  if (host.transcript[18].find("forced config error") == std::string::npos) Fail("Lua error was not propagated");
+  if (host.transcript[19] != "info:after-error:36") Fail("dispatch did not recover after Lua error");
   if (gCurrentInstance != 7) Fail("Defold script instance was not restored");
   if (lua_gettop(state) != baseTop) Fail("Lua stack was not restored");
-  if (gObservedCalls != 14) Fail("unexpected number of Lua calls");
+  if (gObservedCalls != 27) Fail("unexpected number of Lua calls");
   if (gTitle != "deherm") Fail("void scalar call did not execute");
 
-  runtime.finalize();
+    runtime.finalize();
+  }
+
+  // The Lua closure deliberately outlives Hermes. Invocation must fail from
+  // the invalidated native root without touching the destroyed JSI runtime,
+  // and its later __gc release must remain safe.
+  lua_getglobal(state, "__dehermRetainedJsCallback");
+  if (!lua_isfunction(state, -1)) Fail("retained JavaScript callback was not rooted in Lua");
+  lua_pushnumber(state, 42);
+  lua_pushnumber(state, 1);
+  lua_newtable(state);
+  lua_newuserdata(state, 8);
+  luaL_getmetatable(state, "deherm.callback_argument_test");
+  lua_setmetatable(state, -2);
+  if (lua_pcall(state, 4, 0, 0) == 0) Fail("destroyed-runtime callback invocation did not fail closed");
+  const char* destroyedRuntimeError = lua_tostring(state, -1);
+  if (!destroyedRuntimeError ||
+      std::string(destroyedRuntimeError).find("destroyed Hermes runtime") == std::string::npos) {
+    Fail("destroyed-runtime callback failure was not explicit");
+  }
+  lua_pop(state, 1);
+  lua_pushnil(state);
+  lua_setglobal(state, "__dehermRetainedJsCallback");
+  lua_gc(state, LUA_GCCOLLECT, 0);
+  lua_gc(state, LUA_GCCOLLECT, 0);
+  if (gCallbackArgumentGc != 2) Fail("failed callback argument userdata root was not released");
+  if (lua_gettop(state) != baseTop) Fail("destroyed-runtime callback cleanup leaked Lua stack");
   defold_hermes::uninstallScriptBridgeApi();
   adapter.shutdown();
   lua_close(state);

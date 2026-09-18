@@ -1,15 +1,18 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, readFile, rm, stat, symlink, unlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes, installNativeExtension, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
 import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
+import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
+import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "defold-hermes-cli-"));
@@ -61,10 +64,101 @@ async function fixture() {
   return root;
 }
 
+test("managed native extension install is content-keyed and replaces through a staged tree", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-managed-extension-project-"));
+  const source = await mkdtemp(path.join(tmpdir(), "deherm-managed-extension-source-"));
+  await mkdir(path.join(source, "src"));
+  await writeFile(path.join(source, "ext.manifest"), 'name: "defold_hermes"\n');
+  await writeFile(path.join(source, "src", "extension.cpp"), "// v1\n");
+  await writeFile(path.join(project, "game.project"), "[project]\ntitle = Managed fixture\n");
+
+  const first = await installNativeExtension(project, { source });
+  assert.equal(first.installed, true);
+  const sentinelPath = path.join(project, "defold_hermes", ".deherm-managed.json");
+  const firstIdentity = JSON.parse(await readFile(sentinelPath, "utf8"));
+  assert.equal(firstIdentity.schemaVersion, 2);
+  assert.match(firstIdentity.extensionTreeSha256, /^[a-f0-9]{64}$/);
+  assert.equal((await installNativeExtension(project, { source })).installed, false);
+
+  await writeFile(path.join(source, "src", "extension.cpp"), "// v2\n");
+  assert.equal((await installNativeExtension(project, { source })).installed, true);
+  const secondIdentity = JSON.parse(await readFile(sentinelPath, "utf8"));
+  assert.notEqual(secondIdentity.extensionTreeSha256, firstIdentity.extensionTreeSha256);
+  assert.equal(await readFile(path.join(project, "defold_hermes", "src", "extension.cpp"), "utf8"), "// v2\n");
+  assert.deepEqual((await readdir(project)).filter((name) => name.includes(".deherm-stage-") || name.includes(".deherm-backup-")), []);
+  assert.equal((await inspectDefoldProject({ project })).extensions.length, 0, "managed runtime must not feed its own project API inventory");
+});
+
 test("game.project parser preserves indexed dependency keys", () => {
   const parsed = parseGameProject("[project]\ndependencies#0 = a\ndependencies#1 = b\n");
   assert.equal(parsed.project["dependencies#0"], "a");
   assert.equal(parsed.project["dependencies#1"], "b");
+  const adversarial = parseGameProject("[__proto__]\npolluted = no\n");
+  assert.equal(Object.prototype.polluted, undefined);
+  assert.equal(adversarial.__proto__.polluted, "no");
+});
+
+test("runtime configuration validation fails closed until the Defold project exposes the deherm resource", async () => {
+  const project = await fixture();
+  const invalid = await inspectDefoldProject({ project, requireDehermRuntime: true });
+  assert.deepEqual(invalid.diagnostics.filter(({ path: file }) => file === "game.project").map(({ message }) => message), [
+    "[project] custom_resources must include /deherm",
+    "[script] shared_state must be 1",
+    "[library] include_dirs must include defold_hermes",
+    "[defold_hermes] app must be /deherm/app.dehermc"
+  ]);
+  await writeFile(path.join(project, "game.project"), [
+    "[project]",
+    "title = Fixture",
+    "custom_resources = /assets, /deherm",
+    "[script]",
+    "shared_state = 1",
+    "[library]",
+    "include_dirs = other, defold_hermes",
+    "[defold_hermes]",
+    "app = /deherm/app.dehermc",
+    ""
+  ].join("\n"));
+  const valid = await inspectDefoldProject({ project, requireDehermRuntime: true });
+  assert.deepEqual(valid.diagnostics.filter(({ path: file }) => file === "game.project"), []);
+});
+
+test("dmSDK usage materialization is deterministic and checkable", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-materialize-"));
+  const recipe = dmSdkUniversalRecipes.find(({ symbol, declarationKind, abi }) =>
+    symbol === "dmEndian::ToNetwork" && declarationKind === "function" && abi.parameters[0]?.nativeType === "uint32_t");
+  assert.ok(recipe);
+  const usage = path.join(root, "dmsdk-usage.json");
+  const output = path.join(root, "generated", "dmsdk-provider.cpp");
+  await writeFile(usage, `${JSON.stringify({
+    schemaVersion: 1,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+    usages: [{
+      declarationId: recipe.declarationId,
+      wrapper: "fixture_to_network",
+      nativeSymbol: "dmEndian::ToNetwork",
+      acknowledgements: { generatedAdapterBypass: { reason: "CLI fixture", evidence: "compiled materializer test" } }
+    }]
+  }, null, 2)}\n`);
+  const generated = await materializeDmSdkUsageFile({ usage, output });
+  assert.equal(generated.materializedCount, 1);
+  assert.equal(generated.provider.install, "deherm_dmsdk_generated_provider_install");
+  assert.match(await readFile(output, "utf8"), /fixture_to_network/);
+  const report = JSON.parse(await readFile(`${output}.json`, "utf8"));
+  assert.equal(report.materializedCount, 1);
+  assert.equal(report.declarations[0].declarationId, recipe.declarationId);
+  const checked = await materializeDmSdkUsageFile({ usage, output, check: true });
+  assert.equal(checked.checked, true);
+  await writeFile(output, "// stale\n");
+  await assert.rejects(materializeDmSdkUsageFile({ usage, output, check: true }), /is stale/);
+  const cliOutput = path.join(root, "generated", "dmsdk-provider-cli.cpp");
+  const cli = spawnSync(process.execPath, [
+    path.resolve("bin/deherm.mjs"), "materialize-dmsdk",
+    "--usage", usage, "--output", cliOutput, "--json"
+  ], { cwd: process.cwd(), encoding: "utf8" });
+  assert.equal(cli.status, 0, `${cli.stdout}\n${cli.stderr}`);
+  assert.equal(JSON.parse(cli.stdout).materializedCount, 1);
+  assert.match(await readFile(cliOutput, "utf8"), /fixture_to_network/);
 });
 
 test("project discovery resolves nearest and bounded descendant projects deterministically", async () => {
@@ -165,6 +259,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(ir.modules[0].members[1].jsName, "focusTarget");
 
   const output = await writeGeneratedProject(inventory);
+  await generateComponentProxies({ projectRoot: project, outputRoot: project });
   const saved = await readFile(path.join(output.root, "extensions.d.ts"), "utf8");
   assert.equal(saved, types);
   assert.deepEqual(JSON.parse(await readFile(path.join(output.root, "bindings.ir.json"), "utf8")), ir);
@@ -181,22 +276,53 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(manifest.defoldRevision, /^[a-f0-9]{40}$/);
   assert.equal(manifest.coverage.script.functions, 926);
   assert.equal(manifest.coverage.script.typeSurfaceUnresolved, 0);
-  assert.equal(manifest.coverage.script.runtimeImplemented, 93);
-  assert.equal(manifest.coverage.script.runtimePending, 833);
+  assert.equal(manifest.coverage.script.universalRecipes, 915);
+  assert.equal(manifest.coverage.script.universalExclusions, 8);
+  assert.deepEqual(manifest.coverage.script.accounting, {
+    "executable-stable-id": 915,
+    "component-property-compiler": 8,
+    "separate-module": 3,
+    pending: 0
+  });
+  // Dynamic Hermes roots Lua-owned closure results, so it alone reaches 913 by
+  // promoting socket.newtry/socket.protect. Browser and raw Lua-stack transport
+  // keep those two routes blocked below.
+  assert.deepEqual(manifest.coverage.script.targetMatrix.dynamicHermesJsi, {
+    emit: 913,
+    "omit-profile": 2,
+    "compile-time-intrinsic": 8,
+    "separate-module": 3
+  });
+  assert.deepEqual(manifest.coverage.script.targetMatrix.browserWasmHost, {
+    emit: 911,
+    "omit-profile": 2,
+    "blocked-capability": 2,
+    "compile-time-intrinsic": 8,
+    "separate-module": 3
+  });
   assert.deepEqual(manifest.coverage.script.runtimeLanes, {
-    specializedLuaCompatibility: 3,
-    generatedScalarDispatch: 90
+    generatedScalarDispatch: 90,
+    universalStableId: 915
   });
   assert.equal(manifest.coverage.dmsdk.declarations, 2140);
   assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, 0);
-  assert.equal(manifest.coverage.dmsdk.runtimeImplemented, 26);
-  assert.equal(manifest.coverage.dmsdk.runtimePending, 1335);
-  assert.deepEqual(manifest.coverage.dmsdk.runtimeLanes, { generatedScalarThunks: 26 });
+  assert.equal(manifest.coverage.dmsdk.runtimeDeclarations, 1361);
+  assert.equal(manifest.coverage.dmsdk.universalRecipes, 1361);
+  assert.equal(manifest.coverage.dmsdk.silentlyOmitted, 0);
+  assert.deepEqual(manifest.coverage.dmsdk.runtimeLanes, {
+    generatedScalarThunks: 26,
+    preferredSpecialized: 148,
+    usageMaterializedFallback: 1213,
+    projectMaterialized: 0
+  });
   assert.equal(manifest.platform, "arm64-macos");
   assert.equal(manifest.coverage.dmsdk.diagnosticHeaders, 35);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "script", "types.ts"), "utf8"), /export interface MsgApi/);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8")).bindingCount, 90);
+  assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-api-accounting.json"), "utf8")).categoryCounts.pending, 0);
+  assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-universal-value-bindings.json"), "utf8")).candidateCount, 915);
+  assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk-universal-bindings.json"), "utf8")).coverage.recipes, 1361);
   const profiles = JSON.parse(await readFile(path.join(output.root, "ir", "script-route-profiles.json"), "utf8"));
   const loweringPlan = JSON.parse(await readFile(path.join(output.root, "ir", "binding-lowering-plan.json"), "utf8"));
   assert.ok(profiles.profiles["default-legacy-bullet"]);
@@ -218,7 +344,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.deepEqual(lock.generatedOutputs, manifest.generatedOutputs);
   assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
   const verified = await verifyGeneratedProject(project);
-  assert.equal(verified.checkedFiles, 19);
+  assert.equal(verified.checkedFiles, 23);
   assert.equal(verified.planSha256, loweringPlan.planSha256);
   const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
     cwd: process.cwd(),
@@ -267,6 +393,10 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   await writeFile(guiConfigPath, `${await readFile(guiConfigPath, "utf8")} `);
   await assert.rejects(verifyGeneratedProject(project), /tsconfig\.deherm\.gui\.json does not match generated output sentinel/);
   await writeGeneratedProject(inventory, ".deherm", { force: true });
+  const generatedAddressPath = path.join(output.root, "sdk", "address.ts");
+  await writeFile(generatedAddressPath, `${await readFile(generatedAddressPath, "utf8")} `);
+  await assert.rejects(verifyGeneratedProject(project), /Generated SDK tree does not match its output sentinel/);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
 
   const config = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.json"), "utf8"));
   assert.deepEqual(config.references.map(({ path: reference }) => reference), [
@@ -277,11 +407,14 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   ]);
   const baseConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.base.json"), "utf8"));
   assert.equal(baseConfig.compilerOptions.plugins[0].transform, "@ts-defold/deherm/ttsc");
-  assert.equal(baseConfig.compilerOptions.plugins[0].enabled, false);
+  assert.equal(baseConfig.compilerOptions.plugins[0].enabled, true);
   const guiConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.gui.json"), "utf8"));
   assert.deepEqual(guiConfig.include, ["**/*.ts", ".deherm/**/*.ts"]);
   assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts"]);
   assert.deepEqual(guiConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/contexts/gui.ts"]);
+  const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
+  assert.deepEqual(bundleConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
+  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**"]);
   const contextManifest = JSON.parse(await readFile(path.join(output.root, "script-contexts.json"), "utf8"));
   assert.equal(contextManifest.source, "defold-binding-lowering-plan.contract.context");
   assert.equal(contextManifest.routeCount, 926);

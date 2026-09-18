@@ -1,5 +1,5 @@
 {
-  "name": "@ts-defold/deherm-internal-telemetry",
+  "name": "@deherm/telemetry",
   "version": "0.0.0",
   "private": true,
   "type": "module",

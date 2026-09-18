@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.deherm.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@deherm/project": [
+        "./.deherm/sdk/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    ".deherm/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**",
+    ".internal/**",
+    "build/**",
+    "dist/**"
+  ]
+}

@@ -15,6 +15,8 @@ import {
 const fixtureRoot = path.resolve("tests/fixtures/component-proxy");
 const fixtureSource = path.join(fixtureRoot, "player.script.ts");
 const fixtureRenderSource = path.join(fixtureRoot, "render.render.ts");
+const classFixtureRoot = path.resolve("tests/fixtures/component-class");
+const classFixtureSource = path.join(classFixtureRoot, "class-player.script.ts");
 const warBattlesRoot = path.resolve("tests/fixtures/war-battles");
 
 async function temporaryProject(name = "deherm-component-") {
@@ -79,7 +81,7 @@ test("typed .script.ts source generates exact Lua, manifest, and native speciali
   const proxy = await readFile(path.join(outputRoot, "player.script"), "utf8");
   assert.match(proxy, /local COMPONENT_CONTEXT = "game-object"/);
   assert.match(proxy, /\{ "speed", 1 \}/);
-  assert.match(proxy, /function on_reload\(self\)\n    defold_hermes\.dispatchReload\(self, COMPONENT_ID\)\nend/);
+  assert.match(proxy, /function on_reload\(self\)\n    _deherm_\.dispatchReload\(self, COMPONENT_ID\)\nend/);
   assert.doesNotMatch(proxy.match(/function on_reload[\s\S]*?\nend/)?.[0] ?? "", /attachComponent|detachComponent/);
   const registry = await readFile(path.join(outputRoot, ".deherm/generated/components/registry.ts"), "utf8");
   assert.match(registry, /import component0 from "\.\.\/\.\.\/\.\.\/player\.script\.js";/);
@@ -102,6 +104,96 @@ test("render source generates the exact supported proxy without an unavailable f
   assert.equal(render.teardownPolicy, "provider-required-unimplemented-no-final-callback");
   assert.equal(renderSpecialization.teardownPolicy, "provider-required-unimplemented-no-final-callback");
   assert.equal(result.specializations.proxyRuntimeCapability.state, "native-dynamic-hermes-harness-executable");
+});
+
+test("class authoring lowers through the same proxy ABI with static properties and lifecycle slots", async () => {
+  const outputRoot = await temporaryProject();
+  const result = await generateComponentProxies({
+    projectRoot: classFixtureRoot,
+    sourceFiles: [classFixtureSource],
+    outputRoot
+  });
+  const component = result.manifest.components[0];
+  const specialization = result.specializations.components[0];
+  assert.equal(component.authoringStyle, "class");
+  assert.equal(component.className, "ClassPlayer");
+  assert.equal(component.lifecycleMask, 0b11_0011);
+  assert.deepEqual(component.properties.map(({ name, kind }) => ({ name, kind })), [
+    { name: "speed", kind: "number" },
+    { name: "team", kind: "hash" }
+  ]);
+  assert.equal(specialization.authoringStyle, "class");
+  assert.equal(specialization.className, "ClassPlayer");
+  const proxy = await readFile(path.join(outputRoot, "class-player.script"), "utf8");
+  assert.match(proxy, /go\.property\("speed", 90\)/);
+  assert.match(proxy, /dispatchLifecycle\(self, COMPONENT_ID, "update", dt\)/);
+  assert.match(proxy, /dispatchInput\(self, COMPONENT_ID, action_id, action\)/);
+  assert.match(proxy, /dispatchReload\(self, COMPONENT_ID\)/);
+
+  const checked = spawnSync(process.execPath, [
+    path.resolve("node_modules/typescript/bin/tsc"),
+    "--ignoreConfig", "--noEmit", "--strict", "--skipLibCheck",
+    "--target", "ES2020", "--module", "ESNext", "--moduleResolution", "Bundler",
+    classFixtureSource,
+    path.resolve("packages/sdk/src/component.ts")
+  ], { cwd: process.cwd(), encoding: "utf8" });
+  assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
+});
+
+test("class authoring rejects context mismatch, allocating lifecycle fields, and constructor arguments", async (t) => {
+  const cases = [
+    {
+      name: "wrong context base",
+      body: `
+        import { component, GuiComponent } from "@ts-defold/deherm/component";
+        class Player extends GuiComponent {}
+        export default component(Player);
+      `,
+      error: /class components must extend ScriptComponent/
+    },
+    {
+      name: "lifecycle instance field",
+      body: `
+        import { component, ScriptComponent } from "@ts-defold/deherm/component";
+        class Player extends ScriptComponent { update = (_dt: number): void => {}; }
+        export default component(Player);
+      `,
+      error: /lifecycle "update" must be a prototype method/
+    },
+    {
+      name: "constructor arguments",
+      body: `
+        import { component, ScriptComponent } from "@ts-defold/deherm/component";
+        class Player extends ScriptComponent { constructor(_value: number) { super(); } }
+        export default component(Player);
+      `,
+      error: /constructor must accept zero arguments/
+    }
+  ];
+  for (const fixture of cases) await t.test(fixture.name, async () => {
+    const projectRoot = await temporaryProject();
+    const source = await componentSource(projectRoot, "player.script.ts", fixture.body);
+    await assert.rejects(compileComponentSources({ projectRoot, sourceFiles: [source] }), fixture.error);
+  });
+});
+
+test("class authoring always emits the attach-time initializer needed to construct per-instance state", async () => {
+  const projectRoot = await temporaryProject();
+  const source = await componentSource(projectRoot, "constructor-only.script.ts", `
+    import { component, ScriptComponent } from "@ts-defold/deherm/component";
+    class ConstructorOnly extends ScriptComponent { value = 1; }
+    export default component(ConstructorOnly);
+  `);
+  const [compiled] = await compileComponentSources({ projectRoot, sourceFiles: [source] });
+  assert.equal(compiled.authoringStyle, "class");
+  assert.equal(compiled.lifecycles.init, true);
+  assert.equal(compiled.lifecycleMask, 1);
+  const outputRoot = await temporaryProject();
+  await generateComponentProxies({ projectRoot, outputRoot });
+  assert.match(
+    await readFile(path.join(outputRoot, "constructor-only.script"), "utf8"),
+    /dispatchLifecycle\(self, COMPONENT_ID, "init"\)/
+  );
 });
 
 test("GUI and render lifecycle contracts match pinned Defold function tables", async () => {

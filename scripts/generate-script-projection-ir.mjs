@@ -287,6 +287,7 @@ function rawTargetSupport(...rows) {
 }
 
 function normalizedDisposition(category, target) {
+  if (category === "component-property-compiler") return "compile-time-intrinsic";
   if (category === "separate-module") return "separate-module";
   if (category === "pending") return "projection-emitted-lowering-pending";
   if (target === "native-dynamic-hermes") return "backend-emitted";
@@ -394,14 +395,16 @@ export function generateScriptProjectionIr(textInputs) {
       sourceType: rawType
     }));
     const facts = shapeFacts([...parameters.map(({ value }) => value), ...returns.map(({ value }) => value)]);
-    const context = selectContext({
-      handle: related.handles,
-      callback: related.callbacks,
-      tail: related.tails,
-      tuple: related.tuples,
-      tableRecord: related.tableRecords,
-      value: related.values
-    });
+    const context = account.category === "component-property-compiler"
+      ? { token: "component-property-compiler", source: "component-proxy-generator" }
+      : selectContext({
+          handle: related.handles,
+          callback: related.callbacks,
+          tail: related.tails,
+          tuple: related.tuples,
+          tableRecord: related.tableRecords,
+          value: related.values
+        });
     const invalidation = related.handles?.invalidatedIdentity
       ? { token: "invalidate-underlying-identity", identity: related.handles.invalidatedIdentity, hostHandle: related.handles.hostHandleEffect }
       : { token: "none" };

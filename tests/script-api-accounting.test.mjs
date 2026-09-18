@@ -52,6 +52,7 @@ async function inputs() {
     urlText: await text("packages/bindings/generated/defold-script-url-address-classification.json"),
     valueTailText: await text("packages/bindings/generated/defold-script-value-tail-bindings.json"),
     overloadText: await text("packages/bindings/generated/defold-script-overload-dispatch.json"),
+    universalPolicyText: await text("packages/bindings/overrides/script-universal-value-bindings.json"),
     urlOverrideText,
     urlSourceTexts,
     valueDefinitions
@@ -71,21 +72,14 @@ function replaceJson(input, mutate) {
 test("accounts for all 926 APIs in one and only one category", () => {
   assert.equal(generated.functionCount, 926);
   assert.deepEqual(generated.categoryCounts, {
-    "executable-stable-id": 286,
+    "executable-stable-id": 915,
+    "component-property-compiler": 8,
     "separate-module": 3,
-    pending: 637
+    pending: 0
   });
-  assert.deepEqual(generated.pendingByLoweringFamily, {
-    "borrowed-handle": 415,
-    "callback-lifecycle": 25,
-    "defold-value": 10,
-    "dynamic-values": 14,
-    "lua-table": 148,
-    "multi-result": 13,
-    "overload-dispatch": 12
-  });
+  assert.deepEqual(generated.pendingByLoweringFamily, {});
   assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 926);
-  assert.equal(generated.rows.filter(({ category }) => category === "pending").length, 637);
+  assert.equal(generated.rows.filter(({ category }) => category === "pending").length, 0);
   assert.ok(generated.rows.filter(({ category }) => category === "pending")
     .every(({ reason }) => reason.code && reason.loweringFamily));
   assert.deepEqual(checked, generated);
@@ -99,6 +93,7 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "url-lua-dispatch").length, 70);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "captured-lua-value-tail-dispatch").length, 16);
   assert.equal(executable.filter(({ evidence }) => evidence.generator === "captured-lua-overload-dispatch").length, 8);
+  assert.equal(executable.filter(({ evidence }) => evidence.generator === "universal-value-fallback").length, 629);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "gui-node-setters").length, 39);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-fixed-pod").length, 11);
   assert.equal(executable.filter(({ evidence }) => evidence.generatedFamily === "vmath-matrix4").length, 14);
@@ -110,7 +105,20 @@ test("keeps stable-ID and separate-module evidence explicit and bounded", () => 
     generated.rows.filter(({ category }) => category === "separate-module").map(({ id }) => id),
     ["script:timer.cancel", "script:timer.delay", "script:timer.trigger"]
   );
-  assert.match(generated.coverageClaim, /does not claim per-target or per-function engine conformance/);
+  assert.deepEqual(
+    generated.rows.filter(({ category }) => category === "component-property-compiler").map(({ id }) => id),
+    [
+      "script:go.property",
+      "script:resource.atlas",
+      "script:resource.buffer",
+      "script:resource.font",
+      "script:resource.material",
+      "script:resource.render_target",
+      "script:resource.texture",
+      "script:resource.tile_source"
+    ]
+  );
+  assert.match(generated.coverageClaim, /neither category claims per-target or per-function engine conformance/);
 });
 
 test("is invariant to harmless generated-family row ordering", () => {

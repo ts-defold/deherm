@@ -35,6 +35,7 @@ test("all generated dmSDK runtime artifacts regenerate byte-for-byte from pinned
   assert.equal(report.namedScalarGeneratedCount, 0);
   assert.equal(report.namedScalarBlockedCount, 21);
   assert.equal(report.remainingWithoutGeneratedAdapters, 1316);
+  assert.equal(report.universalRecipeCount, 1361);
   assert.equal(report.uniqueShapeCount, 881);
   assert.equal(report.trancheCount, 15);
   assert.equal(report.artifactCount, generatedDmSdkArtifacts.length);

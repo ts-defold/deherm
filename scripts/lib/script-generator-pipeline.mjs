@@ -32,7 +32,10 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-runtime.mjs",
   "scripts/lib/binding-identity.mjs",
   "packages/compiler/src/binding-identity.mjs",
+  "packages/compiler/src/component-proxy-contract.mjs",
   "scripts/lib/script-generator-pipeline.mjs",
+  "packages/compiler/src/script-public-api-policy.mjs",
+  "scripts/lib/script-universal-selection.mjs",
   "scripts/lib/script-semantic-overrides.mjs",
   "packages/cli/src/names.mjs"
 ]);
@@ -122,6 +125,8 @@ export const generatedScriptArtifacts = Object.freeze([
   "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp",
   "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h",
   "defold/defold_hermes/src/generated_script_universal_value_capi.cpp",
+  "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h",
+  "defold/defold_hermes/src/generated_script_universal_static_frame.cpp",
   "packages/sdk/src/generated/script/universal-value-bindings.ts",
   "packages/static-hermes/src/generated/script-universal-value.ts",
   "defold/defold_hermes/lib/web/generated_script_universal_value.js",

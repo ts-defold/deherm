@@ -33,6 +33,7 @@ struct Backend {
   uint32_t attaches = 0;
   uint32_t dispatches = 0;
   uint32_t reloads = 0;
+  uint32_t rebindInitializations = 0;
   uint32_t detaches = 0;
   uint32_t propertyRows = 0;
   bool failNextAttach = false;
@@ -72,6 +73,10 @@ bool Dispatch(void* opaque, const component::DispatchRequest& request, bool* con
   if (!hasInstance) { std::snprintf(error, capacity, "component instance scope is nil"); return false; }
   if (backend.failNext) { backend.failNext = false; std::snprintf(error, capacity, "injected component failure"); return false; }
   if (request.event == component::EventKind::kReload) ++backend.reloads;
+  if (backend.revision > 1 && request.event == component::EventKind::kLifecycle &&
+      request.lifecycle && std::strcmp(request.lifecycle, "init") == 0) {
+    ++backend.rebindInitializations;
+  }
   if (request.event == component::EventKind::kInput && consumed) *consumed = true;
   ++backend.dispatches;
   return true;
@@ -102,14 +107,14 @@ int main() {
     goSelf = { speed = 120, enabled = true }
     guiSelf = {}
     renderSelf = {}
-    assert(defold_hermes.attachComponent(goSelf, "go", "0123456789012345678901234567890123456789012345678901234567890123", "game-object", {{"speed",1},{"enabled",2}}))
-    assert(defold_hermes.attachComponent(guiSelf, "gui", "1123456789012345678901234567890123456789012345678901234567890123", "gui-scene", {}))
-    assert(defold_hermes.attachComponent(renderSelf, "render", "2123456789012345678901234567890123456789012345678901234567890123", "render-instance+graphics", {}))
-    defold_hermes.dispatchLifecycle(goSelf, "go", "init")
-    defold_hermes.dispatchLifecycle(guiSelf, "gui", "update", 0.25)
-    defold_hermes.dispatchMessage(renderSelf, "render", 17, { value = 4 }, "sender")
-    assert(defold_hermes.dispatchInput(goSelf, "go", 19, { pressed = true }))
-    defold_hermes.dispatchReload(goSelf, "go")
+    assert(_deherm_.attachComponent(goSelf, "go", "0123456789012345678901234567890123456789012345678901234567890123", "game-object", {{"speed",1},{"enabled",2}}))
+    assert(_deherm_.attachComponent(guiSelf, "gui", "1123456789012345678901234567890123456789012345678901234567890123", "gui-scene", {}))
+    assert(_deherm_.attachComponent(renderSelf, "render", "2123456789012345678901234567890123456789012345678901234567890123", "render-instance+graphics", {}))
+    _deherm_.dispatchLifecycle(goSelf, "go", "init")
+    _deherm_.dispatchLifecycle(guiSelf, "gui", "update", 0.25)
+    _deherm_.dispatchMessage(renderSelf, "render", 17, { value = 4 }, "sender")
+    assert(_deherm_.dispatchInput(goSelf, "go", 19, { pressed = true }))
+    _deherm_.dispatchReload(goSelf, "go")
   )LUA"));
   CHECK(runtime.live() == 3 && backend.attaches == 3 && backend.propertyRows == 2);
   CHECK(backend.dispatches == 5 && backend.reloads == 1);
@@ -117,24 +122,37 @@ int main() {
 
   backend.failNext = true;
   CHECK(Run(state, R"LUA(
-    local ok, error = pcall(defold_hermes.dispatchLifecycle, goSelf, "go", "update", 0.5)
+    local ok, error = pcall(_deherm_.dispatchLifecycle, goSelf, "go", "update", 0.5)
     assert(not ok and string.find(error, "injected component failure", 1, true))
-    defold_hermes.dispatchLifecycle(goSelf, "go", "update", 0.5)
+    _deherm_.dispatchLifecycle(goSelf, "go", "update", 0.5)
   )LUA"));
   CHECK(CurrentIsNil(state));
 
   backend.revision = 2;
   backend.failNextAttach = true;
   CHECK(Run(state, R"LUA(
-    local ok, error = pcall(defold_hermes.dispatchReload, goSelf, "go")
+    local ok, error = pcall(_deherm_.dispatchLifecycle, goSelf, "go", "update", 0.5)
     assert(not ok and string.find(error, "injected rebind failure", 1, true))
-    defold_hermes.dispatchReload(goSelf, "go")
-    defold_hermes.dispatchLifecycle(goSelf, "go", "update", 0.5)
+    _deherm_.dispatchLifecycle(goSelf, "go", "update", 0.5)
   )LUA"));
   CHECK(backend.attaches == 4 && backend.propertyRows == 4 && backend.reloads == 2);
+  CHECK(backend.rebindInitializations == 1);
   CHECK(CurrentIsNil(state));
 
-  CHECK(Run(state, "function warmedDispatch() defold_hermes.dispatchLifecycle(goSelf, 'go', 'update', 0.1) end; warmedDispatch()"));
+  backend.revision = 3;
+  backend.failNext = true;
+  const uint32_t detachBeforeFailedReload = backend.detaches;
+  CHECK(Run(state, R"LUA(
+    local ok, error = pcall(_deherm_.dispatchLifecycle, goSelf, "go", "update", 0.5)
+    assert(not ok and string.find(error, "injected component failure", 1, true))
+    _deherm_.dispatchLifecycle(goSelf, "go", "update", 0.5)
+  )LUA"));
+  CHECK(backend.attaches == 6 && backend.reloads == 3);
+  CHECK(backend.rebindInitializations == 2);
+  CHECK(backend.detaches == detachBeforeFailedReload + 1);
+  CHECK(CurrentIsNil(state));
+
+  CHECK(Run(state, "function warmedDispatch() _deherm_.dispatchLifecycle(goSelf, 'go', 'update', 0.1) end; warmedDispatch()"));
   const uint64_t before = allocator.calls;
   allocator.track = true;
   for (uint32_t index = 0; index < 1024; ++index) {
@@ -148,8 +166,8 @@ int main() {
     churnSelf = {}
     churnProperties = {}
     function warmedAttachDetach()
-      assert(defold_hermes.attachComponent(churnSelf, "churn", "3123456789012345678901234567890123456789012345678901234567890123", "game-object", churnProperties))
-      assert(defold_hermes.detachComponent(churnSelf, "churn"))
+      assert(_deherm_.attachComponent(churnSelf, "churn", "3123456789012345678901234567890123456789012345678901234567890123", "game-object", churnProperties))
+      assert(_deherm_.detachComponent(churnSelf, "churn"))
     end
     warmedAttachDetach()
   )LUA"));
@@ -166,10 +184,10 @@ int main() {
 
   const uint32_t detachBeforeFinal = backend.detaches;
   CHECK(Run(state, R"LUA(
-    assert(defold_hermes.detachComponent(goSelf, "go"))
-    assert(defold_hermes.detachComponent(goSelf, "go"))
-    assert(defold_hermes.detachComponent(guiSelf, "gui"))
-    assert(defold_hermes.detachComponent(renderSelf, "render"))
+    assert(_deherm_.detachComponent(goSelf, "go"))
+    assert(_deherm_.detachComponent(goSelf, "go"))
+    assert(_deherm_.detachComponent(guiSelf, "gui"))
+    assert(_deherm_.detachComponent(renderSelf, "render"))
   )LUA"));
   CHECK(runtime.live() == 0 && backend.detaches == detachBeforeFinal + 1);
   runtime.shutdown();
@@ -177,7 +195,7 @@ int main() {
   std::puts("component-proxy-lua-runtime:contexts:3:ok");
   std::puts("component-proxy-lua-runtime:lifecycle-message-input-reload-detach:ok");
   std::puts("component-proxy-lua-runtime:nil-scope-recovery:ok");
-  std::puts("component-proxy-lua-runtime:runtime-rebind-retry:ok");
+  std::puts("component-proxy-lua-runtime:automatic-runtime-rebind-retry:ok");
   std::puts("component-proxy-lua-runtime:lua-allocations-warmed:0");
   std::puts("component-proxy-lua-runtime:attachment-churn-lua-allocations:0");
   return 0;

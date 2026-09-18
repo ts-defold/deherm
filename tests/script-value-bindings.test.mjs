@@ -311,7 +311,7 @@ test("every generated value binding has a deterministic packaged-engine probe di
     "examples/runtime-smoke/src/generated/script-value-real-engine-probes.ts", root), "utf8");
   assert.match(source, /Math\.abs\(result_3\.x - 0\.6\) <= 0\.000001/);
   assert.match(source, /vmath\.quatRotationZ\(3\.141592653589793\)/);
-  assert.match(source, /builtins\.hash\("my_hash"\)/);
+  assert.match(source, /defold\.hash\("my_hash"\)/);
   assert.match(source, /BigInt\("0xa2bc06d97f580aab"\)/);
   assert.match(source, /go\.setPosition\(vmath\.vector3\(13, 21, 34\)\)/);
   assert.match(source, /go\.setRotation\(vmath\.quat\(0, 0, 0\.7071067811865476, 0\.7071067811865476\)\)/);

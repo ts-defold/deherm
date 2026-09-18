@@ -32,4 +32,5 @@ test("all 926 script routes regenerate byte-for-byte from pinned inputs", async 
       report.valueTailRouteCount + report.overloadRouteCount
   );
   assert.equal(report.executableRouteCount, 286);
+  assert.equal(report.universalRouteCount, 915);
 });

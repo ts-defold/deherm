@@ -1,6 +1,7 @@
 [project]
-title = War Battles Online Capability-Gated Skeleton
-version = 0.1.0
+title = War Battles Online Ultimate Edition
+version = 0.2.0
+custom_resources = /deherm
 
 [bootstrap]
 main_collection = /main/main.collectionc
@@ -14,4 +15,10 @@ height = 720
 high_dpi = 1
 
 [script]
-shared_state = 0
+shared_state = 1
+
+[library]
+include_dirs = defold_hermes
+
+[defold_hermes]
+app = /deherm/app.dehermc

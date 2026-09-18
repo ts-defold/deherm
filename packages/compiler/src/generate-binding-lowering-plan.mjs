@@ -22,6 +22,7 @@ export const inputPaths = Object.freeze({
   scriptHandleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
   scriptUniversalValue: "packages/bindings/generated/defold-script-universal-value-bindings.json",
   dmsdkProjection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
+  dmsdkUniversal: "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
   dmsdkScalarThunks: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
   dmsdkEnumValues: "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
   dmsdkNamedScalars: "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json",
@@ -174,12 +175,18 @@ function scriptUnit(row, rowIndex) {
       scratch: { token: "caller-owned-bounded-reentrant-scratch" }
     },
     abi: {
-      state: row.evidence.accountingCategory === "executable-stable-id" ? "existing-generated-entry" : "planned",
+      state: row.evidence.accountingCategory === "executable-stable-id"
+        ? "existing-generated-entry"
+        : row.evidence.accountingCategory === "component-property-compiler"
+          ? "compile-time-intrinsic"
+          : "planned",
       symbol: `deherm_script_route_${row.stableId.toString(16).padStart(8, "0")}`,
       version: 1,
       callingConvention: "extern-c",
       statusReturn: "i32",
-      invoker: { kind: "cached-lua-route", stableId: row.stableId }
+      invoker: row.evidence.accountingCategory === "component-property-compiler"
+        ? { kind: "component-property-compiler" }
+        : { kind: "cached-lua-route", stableId: row.stableId }
     },
     shapeKinds: shapeKinds(row.signature),
     unresolvedTokens,
@@ -378,21 +385,28 @@ function genericImplementationRecord(definition, entry, reportRow) {
 }
 
 function implementationLaneIndex(units, inputs, defoldRevision) {
-  const { scriptHandleLowering, scriptUniversalValue, dmsdkCStringValue, dmsdkBorrowedHandle } = inputs;
+  const { scriptHandleLowering, scriptUniversalValue, dmsdkUniversal, dmsdkCStringValue, dmsdkBorrowedHandle } = inputs;
   const unitsById = new Map(units.map((unit) => [unit.identity.id, unit]));
   const lanes = new Map(units.map((unit) => [unit.identity.id, []]));
   const laneIds = new Set();
+  const fallbackLanes = new Set(["script-universal-value", "dmsdk-universal"]);
 
   function add(unitId, implementation) {
     const unit = unitsById.get(unitId);
     if (!unit) throw new Error(`${implementation.lane}: implementation references unknown unit ${unitId}`);
     const key = `${implementation.lane}:${unitId}`;
     if (laneIds.has(key)) throw new Error(`${implementation.lane}: duplicate implementation for ${unitId}`);
-    if (lanes.get(unitId).length > 0) {
-      throw new Error(`${unitId}: implementation lane overlap between ${lanes.get(unitId)[0].lane} and ${implementation.lane}`);
+    const existing = lanes.get(unitId);
+    const existingSpecialized = existing.find(({ lane }) => !fallbackLanes.has(lane));
+    if (existingSpecialized && !fallbackLanes.has(implementation.lane)) {
+      throw new Error(`${unitId}: implementation lane overlap between ${existingSpecialized.lane} and ${implementation.lane}`);
     }
     laneIds.add(key);
-    lanes.get(unitId).push(implementation);
+    const fallback = existing.find(({ lane }) => fallbackLanes.has(lane));
+    if (fallback && !fallbackLanes.has(implementation.lane)) {
+      fallback.supersededLanes.push(implementation.lane);
+    }
+    existing.push(implementation);
     return unit;
   }
 
@@ -412,16 +426,54 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
         stableId: binding.stableId,
         minimumArgumentCount: binding.minimumArgumentCount,
         maximumArgumentCount: binding.maximumArgumentCount,
-        resultCount: binding.resultCount
+        minimumResultCount: binding.minimumResultCount,
+        maximumResultCount: binding.maximumResultCount
       },
+      shapeKinds: binding.shapeKinds,
       bounds: scriptUniversalValue.bounds,
       tablePolicy: scriptUniversalValue.tablePolicy,
+      browserCallback: binding.browserCallback ?? null,
       targetClaims: scriptUniversalValue.targetSupport,
       evidenceBoundary: scriptUniversalValue.evidenceBoundary,
       supersededLanes: []
     });
     if (unit.identity.surface !== "script" || unit.identity.stableId !== binding.stableId) {
       throw new Error(`script-universal-value: identity drift for ${binding.id}`);
+    }
+  }
+
+  if (dmsdkUniversal.schemaVersion !== 1 ||
+      dmsdkUniversal.defoldRevision !== defoldRevision ||
+      dmsdkUniversal.coverage.declarations !== 1361 ||
+      dmsdkUniversal.coverage.recipes !== 1361 ||
+      dmsdkUniversal.recipes.length !== 1361) {
+    throw new Error("dmSDK universal implementation lane schema, revision, or census drifted");
+  }
+  for (let reportRow = 0; reportRow < dmsdkUniversal.recipes.length; ++reportRow) {
+    const recipe = dmsdkUniversal.recipes[reportRow];
+    const unit = add(recipe.declarationId, {
+      lane: "dmsdk-universal",
+      reportRow,
+      disposition: "generated-usage-materializable-recipe",
+      semanticState: "generated-all-target-metadata-with-link-and-policy-requirements-preserved",
+      generationIdentity: {
+        numericId: recipe.numericId,
+        projectionId: recipe.projectionId,
+        symbol: recipe.symbol,
+        declarationKind: recipe.declarationKind,
+        argumentCount: recipe.abi.argumentCount,
+        resultKind: recipe.abi.resultKind
+      },
+      invocation: recipe.invocation,
+      abi: recipe.abi,
+      targets: recipe.targets,
+      preferredLowering: recipe.preferredLowering,
+      fallback: recipe.fallback,
+      supersededLanes: []
+    });
+    if (unit.identity.surface !== "dmsdk" ||
+        unit.identity.projectionId !== recipe.projectionId) {
+      throw new Error(`dmsdk-universal: identity drift for ${recipe.declarationId}`);
     }
   }
 
@@ -640,10 +692,25 @@ function applySemanticPolicies(units, policies) {
 function backendRecord(unit, target, resolutions, implementationLanes) {
   const missingKinds = unit.shapeKinds.filter((kind) => target.unsupportedValueKinds.includes(kind));
   const resolved = new Map(resolutions.get(unit.identity.id) ?? []);
-  const implementation = implementationLanes.get(unit.identity.id)?.[0];
-  const universalDynamic = implementation?.lane === "script-universal-value" &&
-      (target.target === "dynamicHermesJsi" || target.target === "luaStack");
-  if (universalDynamic) {
+  const implementations = implementationLanes.get(unit.identity.id) ?? [];
+  const universalImplementation = implementations.find(({ lane }) => lane === "script-universal-value");
+  const higherOrderClosure = unit.shapeKinds.includes("callback") &&
+    universalImplementation?.browserCallback?.registryEligible === false;
+  const unsupportedHigherOrderClosure = higherOrderClosure &&
+    target.target !== "dynamicHermesJsi";
+  const universalCallbackTransport = !unit.shapeKinds.includes("callback") ||
+    universalImplementation?.browserCallback?.registryEligible === true;
+  const universalStaticTransport = target.target === "staticHermesCAbi" &&
+    !universalImplementation?.shapeKinds.some((kind) =>
+      ["callback", "handle", "defold-value"].includes(kind));
+  const universalScriptTarget = Boolean(universalImplementation) && (
+    (target.target === "dynamicHermesJsi" &&
+      (universalCallbackTransport || higherOrderClosure)) ||
+    (target.target === "luaStack" && universalCallbackTransport) ||
+    (target.target === "browserWasmHost" && universalCallbackTransport) ||
+    universalStaticTransport
+  );
+  if (universalScriptTarget) {
     for (const token of unit.unresolvedTokens) {
       resolved.set(token, {
         rule: "generated:script-universal-value",
@@ -662,16 +729,22 @@ function backendRecord(unit, target, resolutions, implementationLanes) {
   } else if (unit.identity.surface === "script" && unit.availability.runtimeAvailable === false) {
     selection = "omit-profile";
     blockers.push("unavailable-in-all-pinned-runtime-profiles");
+  } else if (unit.sourceState.accountingCategory === "component-property-compiler") {
+    selection = "compile-time-intrinsic";
+    blockers.push("erased-to-generated-lua-property-declaration");
   } else if (unit.sourceState.accountingCategory === "separate-module") {
     selection = "separate-module";
     blockers.push("separate-module-owned-lifecycle");
-  } else if (missingKinds.length > 0) {
+  } else if (unsupportedHigherOrderClosure) {
+    selection = "blocked-capability";
+    blockers.push("higher-order-lua-closure-result-transport-unavailable");
+  } else if (missingKinds.length > 0 && !universalScriptTarget) {
     selection = "blocked-capability";
     blockers.push(...missingKinds.map((kind) => `value-kind:${kind}`));
   } else if (unresolved.length > 0) {
     selection = "blocked-semantic";
     blockers.push(...unresolved);
-  } else if (universalDynamic) {
+  } else if (universalScriptTarget) {
     selection = "emit";
   } else if (unit.identity.surface === "script") {
     const current = target.target === "dynamicHermesJsi" || target.target === "luaStack"
@@ -693,7 +766,9 @@ function backendRecord(unit, target, resolutions, implementationLanes) {
   if (target.runtime && selection === "emit" && unresolved.length > 0) {
     throw new Error(`${unit.identity.id}/${target.target}: runtime emission escaped unresolved semantics`);
   }
-  const program = target.runtime ? marshallingProgram(unit.publicSignature, unit.abi.invoker.kind) : [];
+  const program = target.runtime && selection === "emit"
+    ? marshallingProgram(unit.publicSignature, unit.abi.invoker.kind)
+    : [];
   return {
     selection,
     marshallingProgram: program,
@@ -837,7 +912,7 @@ export function generateBindingLoweringPlan(inputs) {
     scope: "Canonical generation plan for every Defold script route and dmSDK runtime declaration. It describes emission decisions and marshalling only; it is not compile, link, runtime, allocation, or conformance evidence.",
     evidenceBoundary: {
       generation: "A backend selection of emit means the plan permits an emitter to produce source.",
-      implementationLanes: "Generated implementation records are descriptive overlays. They never promote a backend selection or erase unresolved semantic tokens.",
+      implementationLanes: "A generated universal fallback may resolve the semantic tokens its bounded codec owns for explicitly supported targets. Specialized overlays are preferred implementations but cannot erase unrelated semantic tokens or target gates.",
       compilation: "not-claimed",
       linkage: "not-claimed",
       runtime: "not-claimed",
@@ -868,6 +943,10 @@ export function generateBindingLoweringPlan(inputs) {
       "script-universal-value": {
         source: inputPaths.scriptUniversalValue,
         scope: "Generated bounded recursive Lua/JS value-graph descriptors and native Dynamic Hermes adapter."
+      },
+      "dmsdk-universal": {
+        source: inputPaths.dmsdkUniversal,
+        scope: "Generated all-declaration dmSDK recipes, caller-owned C ABI frames, target metadata, and usage-driven native materialization requirements."
       },
       "dmsdk-cstring-value": {
         source: inputPaths.dmsdkCStringValue,

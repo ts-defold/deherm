@@ -443,15 +443,31 @@ confirmation and name the exact target.
    `.dehermc` type, load it through the typed factory, modify served bytes, send
    the standard DDF reload, and prove generation 2 executes. Editor-command
    integration and stable proxy/self state are still open.
-2. **Headless edit loop:** implement the event model, watcher coalescing,
-   resident ttsc/bundler rebuild, artifact cache, structured JSON output, and
-   deterministic failure behavior. No TUI is required for this gate.
+2. **Headless edit loop — implemented floor:** the event model, coalescing
+   incremental bundler, generated-output/cache exclusions, resource-reload
+   transport, line/JSON output, Bob change classification, and TUI controller
+   intents are implemented. A process test runs these paths from an extracted
+   npm artifact: one plain TypeScript edit produces one bundle reload without
+   Bob; asset and component edits each produce a bundle reload, Bob build, and
+   compiled-resource reload; `.internal/cache` produces no work; and
+   `--no-launch` suppresses startup while the `p` intent still launches. The
+   process fixture substitutes bounded Bob/engine adapters, so it proves the
+   installed controller and compiler flow, not packaged-engine activation.
+   Native runtime acknowledgements are now fingerprint-bound: the compiler
+   embeds the exact SHA-256 in the bundle, the extension reports that same
+   fingerprint only after candidate evaluation, `init`, and atomic commit, and
+   the controller joins it back to the corresponding build generation. The TUI
+   remains at `awaiting-activation` after HTTP 200 and moves to `ready` only for
+   that exact runtime acknowledgement; it displays runtime id, Defold resource
+   generation, and the fingerprint prefix. Rejected candidates report a
+   separate structured event and cannot acknowledge a newer pending build.
 3. **Runtime transaction:** add candidate runtime slots, state capture/restore,
    schema validation, atomic commit, rollback, old-generation callback rejection,
    root drain, and bounded arenas.
 4. **Native transports:** prove editor-command integration, then direct DDF
-   reload against a remote device with SHA negotiation, log-based activation
-   acknowledgements, disconnect/reconnect, and stale-build suppression.
+   reload against a remote device. Local-engine fingerprint-bound log
+   acknowledgements and stale-build suppression are implemented; remote log
+   acquisition, disconnect/reconnect, and device identity remain open.
 5. **Rezi adapter:** implement Stages 1 and 2 over recorded controller fixtures;
    test its reducer and keybindings with Rezi's deterministic renderer, then run
    PTY/install/performance measurements before enabling it by default.
@@ -524,10 +540,13 @@ activation or rollback evidence.
 
 # Boundaries still to prove
 
-The editor command adapter, mDNS discovery client, browser activation
-transaction, state capture/restore, component rebind/migration, structured
-telemetry acknowledgement, rollback of native side effects performed before a
-candidate init failure, and long-run memory/leak limits remain unproven.
+The editor command adapter, mDNS discovery client, remote-device log transport,
+browser activation transaction, state capture/restore, broader component state
+migration, protobuf telemetry stream, rollback of native side effects performed
+before a candidate init failure, and long-run memory/leak limits remain
+unproven. Native local activation now has a structured, fingerprint-bound log
+acknowledgement, but the packaged War Battles reload must still be rerun against
+the rebuilt extension before that product path is claimed.
 The Rezi console exists and has deterministic renderer fixtures, but still
 needs PTY/performance/platform evidence. The native swap and init-throw
 rejection recovery are proven for one sample bundle, not yet for the whole API

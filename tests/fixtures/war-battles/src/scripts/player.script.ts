@@ -1,5 +1,5 @@
 import {
-  builtins,
+  defold,
   factory,
   go,
   msg,
@@ -19,11 +19,11 @@ interface PlayerSelf {
   speed: number;
 }
 
-const UP = builtins.hash("up");
-const DOWN = builtins.hash("down");
-const LEFT = builtins.hash("left");
-const RIGHT = builtins.hash("right");
-const FIRE = builtins.hash("fire");
+const UP = defold.hash("up");
+const DOWN = defold.hash("down");
+const LEFT = defold.hash("left");
+const RIGHT = defold.hash("right");
+const FIRE = defold.hash("fire");
 
 function scaledAdd(position: Vector3, direction: Vector3, scale: number): Vector3 {
   return vmath.vector3(

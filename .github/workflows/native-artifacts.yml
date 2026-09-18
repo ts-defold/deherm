@@ -1,0 +1,42 @@
+name: native-artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - upstream.lock
+      - toolchains/hermes/**
+      - scripts/package-defold-extension.sh
+
+jobs:
+  linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            docker_platform: linux/amd64
+            defold_platform: x86_64-linux
+          - runner: ubuntu-24.04-arm
+            docker_platform: linux/arm64
+            defold_platform: arm64-linux
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - run: docker buildx build --platform ${{ matrix.docker_platform }} --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} -f toolchains/hermes/Dockerfile.linux .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hermes-${{ matrix.defold_platform }}
+          path: build/artifacts/${{ matrix.defold_platform }}/libhermes.a
+
+  windows:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hermes-x86_64-win32-parts
+          path: build/artifacts/x86_64-win32/

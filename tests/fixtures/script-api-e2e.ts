@@ -1,4 +1,4 @@
-import { b2d, bit, builtins, render, sound, sys, vmath, window } from "../../packages/sdk/src/generated/script/index";
+import { b2d, bit, defold, render, socket, sound, sys, vmath, window } from "../../packages/sdk/src/generated/script/index";
 
 declare global {
   var __defoldAppV1: { init(): void } | undefined;
@@ -33,7 +33,7 @@ globalThis.__defoldAppV1 = {
     }
     globalThis.__defoldHostV1.log("info", `vmath-nan-rejected:${rejectedNaN}`);
 
-    const hash = builtins.hash("my_hash");
+    const hash = defold.hash("my_hash");
     globalThis.__defoldHostV1.log("info", `hash:${typeof hash}:${hash === 0xa2bc06d97f580aabn}`);
 
     const body = b2d.getBody(".")! as NonNullable<ReturnType<typeof b2d.getBody>> & {
@@ -83,6 +83,55 @@ globalThis.__defoldAppV1 = {
       luaCycleRejected = true;
     }
     globalThis.__defoldHostV1.log("info", `universal-lua-cycle:${luaCycleRejected}`);
+
+    window.setListener((self, event, data) => {
+      globalThis.__defoldHostV1.log(
+        "info",
+        `callback:${String(self)}:${event}:${data.width}:${data.height}`,
+      );
+    });
+
+    let finalized = 0;
+    const attempt = socket.newtry(() => { ++finalized; });
+    const closureSuccess = attempt(true, "payload") as readonly [boolean, string];
+    globalThis.__defoldHostV1.log(
+      "info",
+      `closure-success:${closureSuccess[0]}:${closureSuccess[1]}`,
+    );
+    let directClosureError = false;
+    try {
+      attempt(null, "direct-boom");
+    } catch (error) {
+      directClosureError = String(error).includes("direct-boom") &&
+        !String(error).includes("__deherm_lua_error_table_v1__");
+    }
+    globalThis.__defoldHostV1.log(
+      "info",
+      `closure-error:${directClosureError}:${finalized}`,
+    );
+
+    const protectedCall = socket.protect((mode: unknown) => {
+      const nested = socket.newtry(() => { ++finalized; });
+      if (mode === "bad") return nested(null, "protected-boom");
+      return { __dehermCallbackResultsV1: true, values: [mode, 7] };
+    });
+    const protectedSuccess = protectedCall("ok") as readonly [string, number];
+    const protectedError = protectedCall("bad") as readonly [null, string];
+    globalThis.__defoldHostV1.log(
+      "info",
+      `protect-success:${protectedSuccess[0]}:${protectedSuccess[1]}`,
+    );
+    globalThis.__defoldHostV1.log(
+      "info",
+      `protect-error:${protectedError[0] === null}:${protectedError[1]}:${finalized}`,
+    );
+
+    const loadedResource = sys.loadResource("/exists");
+    const missingResource = sys.loadResource("/missing");
+    globalThis.__defoldHostV1.log(
+      "info",
+      `load-resource:${loadedResource[0]}:${loadedResource[1] === undefined}:${missingResource[1]}`,
+    );
 
     try {
       render.clear({} as never);

@@ -26,8 +26,8 @@ test("projects all 926 script APIs exactly once independently of evidence state"
   assert.deepEqual(generated.generationCounts, { projected: 926 });
   assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 926);
   assert.deepEqual(generated.accountingCounts, {
-    "executable-stable-id": 286,
-    pending: 637,
+    "component-property-compiler": 8,
+    "executable-stable-id": 915,
     "separate-module": 3
   });
   assert.ok(generated.rows.every(({ generation, evidence }) =>

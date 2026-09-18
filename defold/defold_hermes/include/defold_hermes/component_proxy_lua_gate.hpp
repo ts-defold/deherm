@@ -85,7 +85,7 @@ class LuaRuntime {
       lua_pushboolean(state, 0); lua_rawseti(state, -2, 2);
       slot.rootReference = luaL_ref(state, LUA_REGISTRYINDEX);
     }
-    lua_getglobal(state, "defold_hermes");
+    lua_getglobal(state, kLuaModuleName);
     if (!lua_istable(state, -1)) { lua_pop(state, 1); lua_newtable(state); }
     struct Method { const char* name; lua_CFunction function; lua_CFunction protectedFunction; uint8_t index; };
     const Method methods[] = {
@@ -104,7 +104,7 @@ class LuaRuntime {
       lua_pushcclosure(state, method.function, 1);
       lua_setfield(state, -2, method.name);
     }
-    lua_pushvalue(state, -1); lua_setglobal(state, "defold_hermes"); lua_pop(state, 1);
+    lua_pushvalue(state, -1); lua_setglobal(state, kLuaModuleName); lua_pop(state, 1);
     state_ = state;
   }
 
@@ -199,10 +199,6 @@ class LuaRuntime {
       return false;
     }
     if (revision != slot.backendRevision) {
-      if (request.event != EventKind::kReload) {
-        std::snprintf(error, errorCapacity, "component runtime generation changed; dispatchReload is required");
-        return false;
-      }
       const int rebindTop = lua_gettop(state_);
       lua_rawgeti(state_, LUA_REGISTRYINDEX, slot.rootReference);
       lua_rawgeti(state_, -1, 1);
@@ -215,10 +211,34 @@ class LuaRuntime {
           backend_.context, attachRequest, &replacement, error, errorCapacity);
       lua_settop(state_, rebindTop);
       if (!rebound || !replacement) return false;
+      // A Hermes generation owns its component `self` objects. Reattaching to
+      // a replacement runtime therefore creates a fresh JS instance even
+      // though Defold's Lua-side instance remains live. Initialize that fresh
+      // instance before delivering the reload hook; otherwise the first
+      // update after HMR observes only editor properties and loses every field
+      // established by init().
+      DispatchRequest initRequest{state_, replacement, slot.componentId, slot.context,
+          EventKind::kLifecycle, "init", 0, 0};
+      if (!dispatchWithInstance(slot, initRequest, nullptr, error, errorCapacity)) {
+        backend_.detach(backend_.context, replacement);
+        return false;
+      }
+      DispatchRequest reloadRequest{state_, replacement, slot.componentId, slot.context,
+          EventKind::kReload, "onReload", 0, 0};
+      if (!dispatchWithInstance(slot, reloadRequest, nullptr, error, errorCapacity)) {
+        backend_.detach(backend_.context, replacement);
+        return false;
+      }
       slot.backendHandle = replacement;
       slot.backendRevision = revision;
       request.handle = replacement;
+      if (request.event == EventKind::kReload) return true;
     }
+    return dispatchWithInstance(slot, request, consumed, error, errorCapacity);
+  }
+
+  bool dispatchWithInstance(Slot& slot, DispatchRequest& request, bool* consumed,
+      char* error, size_t errorCapacity) noexcept {
     const int top = lua_gettop(state_);
     instanceApi_.get(state_); // Nil is a valid previous instance.
     const int previous = lua_gettop(state_);
@@ -341,10 +361,10 @@ class LuaRuntime {
 
 inline int rejectUnavailable(lua_State* state) { return luaL_error(state, "%s", kDiagnostic.data()); }
 inline void registerUnavailableLuaApi(lua_State* state) {
-  lua_getglobal(state, "defold_hermes");
+  lua_getglobal(state, kLuaModuleName);
   if (!lua_istable(state, -1)) { lua_pop(state, 1); lua_newtable(state); }
   for (const char* method : kRequiredLuaMethods) { lua_pushcfunction(state, rejectUnavailable); lua_setfield(state, -2, method); }
-  lua_pushvalue(state, -1); lua_setglobal(state, "defold_hermes"); lua_pop(state, 1);
+  lua_pushvalue(state, -1); lua_setglobal(state, kLuaModuleName); lua_pop(state, 1);
 }
 
 }  // namespace defold_hermes::component_proxy

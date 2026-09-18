@@ -80,6 +80,22 @@ Emscripten library to install the generated modules and application lifecycle.
 Extender discovers `.js` files under `lib/wasm-web` and the shared `lib/web`
 directory automatically and passes them to Emscripten as `--js-library` inputs.
 
+The browser bootstrap now installs `DEFOLD_HERMES_SCRIPT_UNIVERSAL`, not the
+legacy six-argument scalar provider. That generated provider projects the same
+bounded recursive value graph used by native code directly into Wasm memory,
+supports strings, arrays, records, maps, Defold POD values, URLs, retained
+handles, and the 23 lifecycle-ledger callbacks that fit a generational
+registry. Callback tokens use the same direct Wasm memory cells and a
+fixed-capacity native trampoline; there is no Embind path. The bridge restores
+scratch under bounded reentrancy, uses the caller's handle arenas for Matrix4
+and URL callback values, normalizes signed Wasm callback token parts to u32,
+and rejects cycles, stale tokens, or exhausted bounds. The canonical plan consequently emits 911 profile-available routes for
+`browserWasmHost`: 888 non-callback routes plus 23 retained callbacks.
+`socket.newtry` and `socket.protect` remain gated because they return Lua
+higher-order closures with varargs/pcall semantics rather than registering an
+engine callback. A fresh packaged HTML5 run is still required before promoting
+the prior scalar/hash browser evidence to this wider provider.
+
 The current spike evaluates the archived IIFE. That is acceptable for proving
 the bridge but is not the final production loader because strict Content
 Security Policy may reject dynamic evaluation. The production browser-host

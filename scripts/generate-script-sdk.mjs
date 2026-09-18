@@ -6,6 +6,11 @@ import { fileURLToPath } from "node:url";
 import { strFromU8, unzipSync } from "fflate";
 import { reservedParameterSynonyms, safeParameterIdentifier } from "../packages/cli/src/names.mjs";
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
+import {
+  assertUniquePublicScriptRoots,
+  publicScriptModulePath,
+  rawScriptRootName
+} from "../packages/compiler/src/script-public-api-policy.mjs";
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -385,7 +390,7 @@ function treeNode() {
 function buildApiTrees(model) {
   const roots = new Map();
   const nodeAt = (segments) => {
-    const [rootName, ...rest] = segments;
+    const [rootName, ...rest] = publicScriptModulePath(segments);
     if (!roots.has(rootName)) roots.set(rootName, treeNode());
     let node = roots.get(rootName);
     for (const segment of rest) {
@@ -550,7 +555,8 @@ function generateModules(trees) {
   const lines = [banner, 'import { callScriptApi, getScriptApiValue } from "./runtime";', 'import type * as Types from "./types";', ""];
   for (const [rootName, node] of [...trees].sort(([left], [right]) => left.localeCompare(right))) {
     const interfaceName = `${pascal(rootName)}Api`;
-    const rendered = renderNodeValue(rootName, [rootName], node, `Types.${interfaceName}`);
+    const rawRootName = rawScriptRootName(rootName);
+    const rendered = renderNodeValue(rootName, [rawRootName], node, `Types.${interfaceName}`);
     lines.push(`export const ${property(camel(rootName))}: Types.${interfaceName} = ${rendered[0]}`, ...rendered.slice(1));
     lines[lines.length - 1] += ";";
     lines.push("");
@@ -653,6 +659,12 @@ for (const fn of model.functions) {
     : "requires-universal-lua-bridge";
 }
 const renderer = createTypeRenderer(model);
+assertUniquePublicScriptRoots(new Set([
+  ...model.functions.map(({ modulePath }) => modulePath[0]),
+  ...model.classes
+    .filter(({ name }) => name.startsWith("defold_api."))
+    .map(({ name }) => name.slice("defold_api.".length).split(".")[0])
+]));
 const trees = buildApiTrees(model);
 for (const rawType of semanticHandleTypes.keys()) {
   assert.ok(model.aliases.some(({ name }) => name === rawType), `${rawType}: reviewed semantic handle type is absent from the script API aliases`);

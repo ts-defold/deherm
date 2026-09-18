@@ -94,6 +94,29 @@ struct ScriptCallFrame {
   ScriptUrlArena<32>* urlArena = nullptr;
 };
 
+/**
+ * Runtime-neutral retained callback. The producer owns one reference while a
+ * call frame is live; Lua closures retain their own reference. invoke must
+ * consume results synchronously so every pointed-to scratch region remains
+ * caller-owned and bounded.
+ */
+using ScriptCallbackConsume = bool (*)(
+    void* context,
+    const ScriptCallFrame* results) noexcept;
+
+struct ScriptCallback {
+  void* context = nullptr;
+  bool (*invoke)(
+      void* context,
+      const ScriptCallFrame* arguments,
+      void* consumeContext,
+      ScriptCallbackConsume consume,
+      char* error,
+      size_t errorCapacity) noexcept = nullptr;
+  void (*retain)(void* context) noexcept = nullptr;
+  void (*release)(void* context) noexcept = nullptr;
+};
+
 struct ScriptBridgeApi {
   void* context = nullptr;
   bool (*dispatch)(void* context, ScriptCallFrame* frame) = nullptr;

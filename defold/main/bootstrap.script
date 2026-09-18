@@ -3,7 +3,7 @@
 function init(self)
     self.deherm_test_exit = sys.get_config_int("deherm.test_exit", 0) ~= 0
     self.deherm_test_updates = 0
-    assert(defold_hermes.attach(self))
+    assert(_deherm_.attach(self))
     local position = go.get_position()
     if math.abs(position.x - 13) <= 0.000001 and
        math.abs(position.y - 21) <= 0.000001 and
@@ -21,7 +21,7 @@ function init(self)
 end
 
 function update(self, dt)
-    defold_hermes.update(self, dt)
+    _deherm_.update(self, dt)
     if self.deherm_test_exit then
         self.deherm_test_updates = self.deherm_test_updates + 1
         if self.deherm_test_updates >= 2 then
@@ -31,5 +31,5 @@ function update(self, dt)
 end
 
 function final(self)
-    defold_hermes.detach(self)
+    _deherm_.detach(self)
 end

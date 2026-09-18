@@ -93,7 +93,7 @@ export async function findProjectRoot(start = process.cwd(), explicit, options =
 }
 
 export function parseGameProject(source) {
-  const result = {};
+  const result = Object.create(null);
   let section = "";
   for (const original of source.split(/\r?\n/)) {
     const line = original.trim();
@@ -101,17 +101,30 @@ export function parseGameProject(source) {
     const heading = /^\[([^\]]+)\]$/.exec(line);
     if (heading) {
       section = heading[1];
-      result[section] ??= {};
+      result[section] ??= Object.create(null);
       continue;
     }
     const separator = line.indexOf("=");
     if (separator < 0) continue;
     const key = line.slice(0, separator).trim();
     const value = line.slice(separator + 1).trim();
-    result[section] ??= {};
+    result[section] ??= Object.create(null);
     result[section][key] = value;
   }
   return result;
+}
+
+function commaValues(value) {
+  return String(value ?? "").split(",").map((item) => item.trim()).filter(Boolean);
+}
+
+function appendDehermRuntimeDiagnostics(properties, diagnostics) {
+  const missing = [];
+  if (!commaValues(properties.project?.custom_resources).includes("/deherm")) missing.push("[project] custom_resources must include /deherm");
+  if (properties.script?.shared_state !== "1") missing.push("[script] shared_state must be 1");
+  if (!commaValues(properties.library?.include_dirs).includes("defold_hermes")) missing.push("[library] include_dirs must include defold_hermes");
+  if (properties.defold_hermes?.app !== "/deherm/app.dehermc") missing.push("[defold_hermes] app must be /deherm/app.dehermc");
+  for (const message of missing) diagnostics.push({ severity: "error", path: "game.project", message });
 }
 
 function dependencyUrls(properties) {
@@ -451,9 +464,15 @@ export async function inspectDefoldProject(options = {}) {
   const properties = parseGameProject(await readFile(path.join(projectRoot, "game.project"), "utf8"));
   const engineProfiles = await resolveEngineProfiles(projectRoot, properties);
   const diagnostics = [];
+  if (options.requireDehermRuntime === true) appendDehermRuntimeDiagnostics(properties, diagnostics);
   const manifestPaths = await walk(projectRoot, (file) => path.basename(file) === "ext.manifest", false, diagnostics);
   const local = [];
   for (const manifestPath of manifestPaths) {
+    // The CLI-managed déherm runtime is a compiler output, not a project API
+    // input. Including it makes the first generate/install/generate cycle
+    // change its own cache key and lets packaged build artifacts perturb SDK
+    // generation. User-authored and dependency extensions remain inventoried.
+    if (await exists(path.join(path.dirname(manifestPath), ".deherm-managed.json"))) continue;
     local.push(await localExtension(projectRoot, manifestPath, diagnostics));
   }
   const dependencies = await dependencyExtensions(projectRoot, diagnostics);

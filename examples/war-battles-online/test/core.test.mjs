@@ -7,6 +7,8 @@ import {
   INPUT_BUTTON_FIRE,
   INPUT_PACKET_BYTES,
   MAX_PLAYERS,
+  PlayableBattle,
+  projectWorldToScreen,
   SNAPSHOT_BYTES,
   TRANSPORT_CHANNEL_CONTROL,
   TRANSPORT_CHANNEL_SESSION,
@@ -17,6 +19,7 @@ import {
   sendTickInput,
   writeInputPacket,
 } from "../core/index.ts";
+import { UPGRADE_MOBILITY } from "../core/content.ts";
 
 function command(playerId, tick, overrides = {}) {
   return {
@@ -182,6 +185,43 @@ test("fixed stores retain identity through a sustained 32-player run", () => {
   assert.equal(world.playerX, playerX);
   assert.equal(world.projectileX, projectiles);
   assert.equal(world.playerX.byteLength, MAX_PLAYERS * Int32Array.BYTES_PER_ELEMENT);
+});
+
+test("playable orchestration drives 31 deterministic bots and supports restart/upgrades", () => {
+  const first = new PlayableBattle();
+  const second = new PlayableBattle();
+  let observedProjectile = false;
+  for (let tick = 0; tick < 900; tick += 1) {
+    const controls = {
+      moveX: tick < 240 ? 1 : tick < 480 ? 0 : -1,
+      moveY: tick < 300 ? 1 : tick < 600 ? -1 : 0,
+      fire: tick % 3 !== 0,
+    };
+    first.setControls(controls);
+    second.setControls(controls);
+    first.step();
+    second.step();
+    observedProjectile ||= first.world.projectileActive.some((value) => value !== 0);
+  }
+  assert.equal(first.world.stateHash(), second.world.stateHash());
+  assert.equal(first.round, second.round);
+  assert.equal(first.world.tick, second.world.tick);
+  assert.ok(first.round > 1, "the defeated local player should exercise automatic restart");
+  assert.equal(observedProjectile, true);
+  assert.equal(first.buyUpgrade(UPGRADE_MOBILITY), true);
+  const priorRound = first.round;
+  first.restart();
+  assert.equal(first.round, priorRound + 1);
+  assert.equal(first.world.tick, 0);
+  assert.equal(first.world.playerActive.reduce((sum, value) => sum + value, 0), MAX_PLAYERS);
+});
+
+test("camera projection keeps the followed tank centered", () => {
+  const point = { x: 0, y: 0 };
+  projectWorldToScreen(1200, -900, 1200, -900, 1280, 720, 0.035, point);
+  assert.deepEqual(point, { x: 640, y: 360 });
+  projectWorldToScreen(2200, 100, 1200, -900, 1280, 720, 0.035, point);
+  assert.deepEqual(point, { x: 675, y: 395 });
 });
 
 test("the in-memory transport preserves reliable messages and models datagram loss", async () => {

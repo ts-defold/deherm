@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
+import path from "node:path";
 import test from "node:test";
 
 import { runReplay } from "../headless/match.ts";
@@ -14,6 +15,11 @@ import {
   COMPONENT_PROXY_CAPABILITY,
   WAR_BATTLES_ENGINE_CAPABILITY,
 } from "../defold/src/capability-snapshot.ts";
+
+const exampleRoot = path.resolve(import.meta.dirname, "..");
+const repositoryRoot = path.resolve(exampleRoot, "../..");
+const fromExample = (...segments) => path.join(exampleRoot, ...segments);
+const fromRepository = (...segments) => path.join(repositoryRoot, ...segments);
 
 test("32-bot replay is byte-reproducible and detects corruption", () => {
   const options = { players: 32, ticks: 300, seed: 0xc0ffee, matchId: 77 };
@@ -46,7 +52,7 @@ test("32-player ten-minute simulated soak remains deterministic across rollback"
   assert.equal(baseline.players, 32);
   assert.equal(baseline.ticks, 36_000);
   const evidence = JSON.parse(await readFile(
-    "examples/war-battles-online/evidence/headless-soak.json",
+    fromExample("evidence/headless-soak.json"),
     "utf8",
   ));
   assert.equal(evidence.stateHash, baseline.stateHash);
@@ -81,12 +87,12 @@ test("transport selection exhausts honestly when every fallback is disabled", ()
 
 test("Defold attachment consumes generated proxy evidence and the independent engine gate", async () => {
   const fixtureManifest = JSON.parse(await readFile(
-    "tests/fixtures/war-battles/.deherm/generated/components/manifest.json",
+    fromRepository("tests/fixtures/war-battles/.deherm/generated/components/manifest.json"),
     "utf8",
   ));
-  const runtimeGate = JSON.parse(await readFile(".agents/docs/data/war-battles-runtime-gate.json", "utf8"));
+  const runtimeGate = JSON.parse(await readFile(fromRepository(".agents/docs/data/war-battles-runtime-gate.json"), "utf8"));
   const exampleManifest = JSON.parse(await readFile(
-    "examples/war-battles-online/defold/.deherm/generated/components/manifest.json",
+    fromExample("defold/.deherm/generated/components/manifest.json"),
     "utf8",
   ));
   const staleFixtureDecision = evaluateEngineAttachment(fixtureManifest, runtimeGate);
@@ -115,17 +121,20 @@ test("Defold attachment consumes generated proxy evidence and the independent en
     exampleManifest.proxyRuntimeCapability.state,
     "native-dynamic-hermes-harness-executable",
   );
-  assert.equal(exampleManifest.components[0].source, "src/controller.script.ts");
+  assert.equal(exampleManifest.components.length, 1);
+  assert.equal(exampleManifest.components[0].source, "main/battle.gui.ts");
+  assert.equal(exampleManifest.components[0].proxy, "main/battle.gui_script");
+  assert.equal(exampleManifest.components[0].contextKind, "gui-scene");
 });
 
 test("checked bundle evidence is reproducible from the measurement command", async () => {
   const observed = JSON.parse(execFileSync(
     process.execPath,
-    ["examples/war-battles-online/headless/measure-bundles.mjs"],
-    { encoding: "utf8" },
+    [fromExample("headless/measure-bundles.mjs")],
+    { cwd: repositoryRoot, encoding: "utf8" },
   ));
   const checked = JSON.parse(await readFile(
-    "examples/war-battles-online/evidence/bundle-size.json",
+    fromExample("evidence/bundle-size.json"),
     "utf8",
   ));
   assert.deepEqual(observed, checked);
@@ -134,17 +143,62 @@ test("checked bundle evidence is reproducible from the measurement command", asy
 test("checked Defold capability snapshot is fresh against both generated reports", () => {
   const result = execFileSync(
     process.execPath,
-    ["examples/war-battles-online/integration/generate-capability-snapshot.mjs", "--check"],
-    { encoding: "utf8" },
+    [fromExample("integration/generate-capability-snapshot.mjs"), "--check"],
+    { cwd: repositoryRoot, encoding: "utf8" },
   );
   assert.match(result, /fresh/);
+});
+
+test("packaged runtime evidence remains bound to current extension and project sources", () => {
+  const result = execFileSync(
+    process.execPath,
+    [fromExample("integration/check-packaged-runtime.mjs"), "--check-sources"],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  );
+  assert.match(result, /war-battles-packaged-runtime-sources:fresh/);
 });
 
 test("Defold-local deterministic sources are fresh copies of the canonical core", () => {
   const result = execFileSync(
     process.execPath,
-    ["examples/war-battles-online/integration/sync-defold-sources.mjs", "--check"],
-    { encoding: "utf8" },
+    [fromExample("integration/sync-defold-sources.mjs"), "--check"],
+    { cwd: repositoryRoot, encoding: "utf8" },
   );
-  assert.match(result, /8 generated Defold sources are fresh/);
+  assert.match(result, /9 generated Defold sources are fresh/);
+});
+
+test("playable GUI uses fixed render pools and the generated proxy flow", async () => {
+  const [scene, proxy, collection, authored, blockers, packagedEvidence] = await Promise.all([
+    readFile(fromExample("defold/main/battle.gui"), "utf8"),
+    readFile(fromExample("defold/main/battle.gui_script"), "utf8"),
+    readFile(fromExample("defold/main/main.collection"), "utf8"),
+    readFile(fromExample("defold/main/battle.gui.ts"), "utf8"),
+    readFile(fromExample("defold/PLAYABLE-BLOCKERS.md"), "utf8"),
+    readFile(fromExample("evidence/packaged-runtime-arm64-macos.json"), "utf8").then(JSON.parse),
+  ]);
+  assert.equal((scene.match(/id: "tank_body_/g) ?? []).length, 32);
+  assert.equal((scene.match(/id: "tank_turret_/g) ?? []).length, 32);
+  assert.equal((scene.match(/id: "projectile_/g) ?? []).length, 160);
+  assert.match(scene, /script: "\/main\/battle\.gui_script"/);
+  assert.match(proxy, /@generated by @ts-defold\/deherm/);
+  assert.match(proxy, /COMPONENT_CONTEXT = "gui-scene"/);
+  assert.match(collection, /prototype: "\/main\/battle\.go"/);
+  assert.match(authored, /gui\.getNode/);
+  assert.doesNotMatch(authored, /gui\.new(?:Box|Text)Node/);
+  assert.match(blockers, /script:gui\.new_box_node.*0xfdb31d1e/);
+  assert.match(blockers, /global '_deherm_' \(a nil value\)/);
+  assert.match(authored, /war-battles-runtime:gui-init-rendered/);
+  assert.equal(packagedEvidence.status, "observed-clean");
+  assert.equal(packagedEvidence.schemaVersion, 2);
+  assert.equal(packagedEvidence.scope, "war-battles-packaged-gui-typescript-dynamic-hermes");
+  assert.equal(packagedEvidence.observation.requiredMarkers.includes(
+    "INFO:DEFOLD_HERMES: war-battles-runtime:gui-init-rendered:32:160",
+  ), true);
+  assert.equal(packagedEvidence.observation.requiredMarkers.includes(
+    "INFO:DEFOLD_HERMES: war-battles-runtime:first-update-rendered:32:160",
+  ), true);
+  assert.match(packagedEvidence.sourceKey, /^[0-9a-f]{64}$/);
+  assert.match(packagedEvidence.observation.transcript.canonicalSha256, /^[0-9a-f]{64}$/);
+  assert.deepEqual(packagedEvidence.observation.termination, { method: "sigterm", exitCode: null, signal: "SIGTERM" });
+  assert.equal(Object.hasOwn(packagedEvidence, "timestamp"), false);
 });

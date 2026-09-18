@@ -1,13 +1,18 @@
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
-import { access, cp, lstat, mkdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { access, cp, lstat, mkdir, readFile, readdir, realpath, rename, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { API as TypeScriptApi } from "typescript/unstable/sync";
 
+import {
+  assertUniquePublicScriptRoots,
+  publicScriptModulePath
+} from "../../compiler/src/script-public-api-policy.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
+import { defoldToolchain } from "./toolchains.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const require = createRequire(import.meta.url);
@@ -15,6 +20,32 @@ const generatedContextExportNames = new Set(["projectExtensions"]);
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+async function directoryDigest(root, options = {}) {
+  const hash = createHash("sha256");
+  async function visit(directory, prefix = "") {
+    const entries = await readdir(directory, { withFileTypes: true });
+    entries.sort((left, right) => compareCodeUnits(left.name, right.name));
+    for (const entry of entries) {
+      if (options.ignore?.has(entry.name)) continue;
+      const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const absolute = path.join(directory, entry.name);
+      if (entry.isSymbolicLink()) throw new Error(`Refusing to hash symlink in managed tree: ${relative}`);
+      if (entry.isDirectory()) {
+        hash.update(`d\0${relative}\0`);
+        await visit(absolute, relative);
+      } else if (entry.isFile()) {
+        const bytes = await readFile(absolute);
+        hash.update(`f\0${relative}\0${bytes.byteLength}\0`);
+        hash.update(bytes);
+      } else {
+        throw new Error(`Refusing to hash unsupported managed-tree entry: ${relative}`);
+      }
+    }
+  }
+  await visit(path.resolve(root));
+  return hash.digest("hex");
 }
 
 async function projectGenerationIdentity({ inventory, outputDirectory, core, engineProfiles }) {
@@ -339,6 +370,7 @@ function generatedOutputPaths() {
     project: [
       "tsconfig.deherm.base.json",
       ...authoredContexts.map(({ id }) => `tsconfig.deherm.${id}.json`),
+      "tsconfig.deherm.bundle.json",
       "tsconfig.deherm.json"
     ]
   };
@@ -429,7 +461,10 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
       }
       return {
         id: unit.identity.id,
-        modulePath: fn.modulePath,
+        // Context projection is a TypeScript-surface concern, so it must use the
+        // same public root names the generated SDK publishes. The raw Lua module
+        // path stays authoritative for stable IDs and bridge lookup.
+        modulePath: publicScriptModulePath(fn.modulePath),
         member: fn.jsName,
         token,
         directContext: mappedContext ?? (sharedContextTokens.has(token) ? "shared" : "unresolved")
@@ -459,6 +494,7 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
     ...route,
     context: namespaceContexts.get(route.modulePath[0]) ?? route.directContext
   }));
+  assertUniquePublicScriptRoots(scriptIr.functions.map(({ modulePath }) => modulePath[0]));
   const namespaces = [...new Set(classified.map(({ modulePath }) => modulePath[0]))].sort();
   const contexts = {};
   for (const context of authoredContexts) {
@@ -560,7 +596,7 @@ function projectBaseConfig(outputDirectory) {
       verbatimModuleSyntax: true,
       plugins: [{
         transform: "@ts-defold/deherm/ttsc",
-        enabled: false,
+        enabled: true,
         inventory: `./${generated}/extensions.json`,
         profile: "development"
       }]
@@ -583,6 +619,21 @@ function contextProjectConfig(outputDirectory, context) {
     },
     include: [...context.includes, `${generated}/**/*.ts`],
     exclude: excludes
+  };
+}
+
+function bundleProjectConfig(outputDirectory) {
+  const generated = outputDirectory.split(path.sep).join("/");
+  return {
+    extends: "./tsconfig.deherm.base.json",
+    compilerOptions: {
+      noEmit: true,
+      paths: {
+        "@deherm/project": [`./${generated}/sdk/index.ts`]
+      }
+    },
+    include: ["**/*.ts", `${generated}/**/*.ts`],
+    exclude: ignoredAuthoredGlobs
   };
 }
 
@@ -645,33 +696,43 @@ async function readConfinedFile(baseRoot, relative, label) {
 }
 
 async function bundledCoreSdk(requestedRevision) {
+  const sdkSourceRoot = path.join(packageRoot, "packages", "sdk", "src");
   const scriptIrPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json");
   const dmsdkIrPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-sdk-ir.json");
   const scriptDispatchPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-scalar-dispatch.json");
+  const scriptAccountingPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-accounting.json");
+  const scriptUniversalPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-universal-value-bindings.json");
   const scriptProfilesPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-route-availability-profiles.json");
   const loweringPlanPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.json");
   const loweringPlanSentinelPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.sentinel.json");
   const loweringPlanGeneratorPath = path.join(packageRoot, "packages", "compiler", "src", "generate-binding-lowering-plan.mjs");
   const dmsdkThunksPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-dmsdk-scalar-thunks.json");
-  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, packageSource] = await Promise.all([
+  const dmsdkUniversalPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-dmsdk-universal-bindings.json");
+  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, dmsdkUniversalSource, packageSource] = await Promise.all([
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
     readFile(scriptDispatchPath),
+    readFile(scriptAccountingPath),
+    readFile(scriptUniversalPath),
     readFile(scriptProfilesPath),
     readFile(loweringPlanPath),
     readFile(loweringPlanSentinelPath),
     readFile(loweringPlanGeneratorPath),
     readFile(dmsdkThunksPath),
+    readFile(dmsdkUniversalPath),
     readFile(path.join(packageRoot, "package.json"), "utf8")
   ]);
   const scriptIr = JSON.parse(scriptSource);
   const dmsdkIr = JSON.parse(dmsdkSource);
   const scriptDispatch = JSON.parse(scriptDispatchSource);
+  const scriptAccounting = JSON.parse(scriptAccountingSource);
+  const scriptUniversal = JSON.parse(scriptUniversalSource);
   const scriptProfiles = JSON.parse(scriptProfilesSource);
   const loweringPlan = JSON.parse(loweringPlanSource);
   const loweringPlanSentinel = JSON.parse(loweringPlanSentinelSource);
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
-  const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, scriptProfiles, loweringPlan, dmsdkThunks].map(({ defoldRevision }) => defoldRevision));
+  const dmsdkUniversal = JSON.parse(dmsdkUniversalSource);
+  const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
@@ -695,6 +756,7 @@ async function bundledCoreSdk(requestedRevision) {
       JSON.stringify(loweringPlanSentinel.inputHashes) !== JSON.stringify(loweringPlan.inputHashes)) {
     throw new Error("Packaged canonical lowering-plan sentinel is stale or invalid");
   }
+  const sdkSourceSha256 = await directoryDigest(sdkSourceRoot);
   return {
     revision: scriptIr.defoldRevision,
     packageVersion: JSON.parse(packageSource).version,
@@ -702,21 +764,42 @@ async function bundledCoreSdk(requestedRevision) {
     scriptIr,
     dmsdkIr,
     scriptDispatch,
+    scriptAccounting,
+    scriptUniversal,
     scriptProfiles,
     loweringPlan,
     loweringPlanSentinel,
     dmsdkThunks,
+    dmsdkUniversal,
     inputs: {
       scriptIrSha256: sha256(scriptSource),
       dmsdkIrSha256: sha256(dmsdkSource),
       scriptDispatchSha256: sha256(scriptDispatchSource),
+      scriptAccountingSha256: sha256(scriptAccountingSource),
+      scriptUniversalSha256: sha256(scriptUniversalSource),
       scriptProfilesSha256: sha256(scriptProfilesSource),
       loweringPlanSha256: sha256(loweringPlanSource),
       loweringPlanSentinelSha256: sha256(loweringPlanSentinelSource),
-      dmsdkThunksSha256: sha256(dmsdkThunksSource)
+      dmsdkThunksSha256: sha256(dmsdkThunksSource),
+      dmsdkUniversalSha256: sha256(dmsdkUniversalSource),
+      sdkSourceSha256
     },
-    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath }
+    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath }
   };
+}
+
+function loweringTargetMatrix(plan, surface) {
+  const matrix = {};
+  const units = plan.units.filter((unit) => unit.identity.surface === surface);
+  for (const target of plan.targetOrder) {
+    const selections = {};
+    for (const unit of units) {
+      const selection = unit.backends[target].selection;
+      selections[selection] = (selections[selection] ?? 0) + 1;
+    }
+    matrix[target] = selections;
+  }
+  return matrix;
 }
 
 function validateEngineProfiles(engineProfiles, catalog) {
@@ -765,6 +848,87 @@ export function generateExtensionTypes(inventory) {
   return `${lines.join("\n")}\n`;
 }
 
+export async function installNativeExtension(projectRoot, options = {}) {
+  const source = path.resolve(options.source ?? path.join(packageRoot, "defold", "defold_hermes"));
+  const destination = path.join(path.resolve(projectRoot), "defold_hermes");
+  if (path.resolve(source) === path.resolve(destination)) {
+    return { root: destination, installed: false, source: "workspace" };
+  }
+  try {
+    const [resolvedSource, resolvedDestination] = await Promise.all([realpath(source), realpath(destination)]);
+    if (resolvedSource === resolvedDestination) {
+      return { root: destination, installed: false, source: "workspace-link" };
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  try {
+    const destinationInformation = await lstat(destination);
+    if (destinationInformation.isSymbolicLink()) {
+      throw new Error(`Refusing to replace native-extension symlink that does not target this package: ${destination}`);
+    }
+    if (!destinationInformation.isDirectory()) {
+      throw new Error(`Refusing to replace non-directory native extension at ${destination}`);
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  const packageManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
+  const extensionManifest = await readFile(path.join(source, "ext.manifest"), "utf8");
+  const extensionTreeSha256 = await directoryDigest(source, { ignore: new Set([".deherm-managed.json"]) });
+  const identity = {
+    schemaVersion: 2,
+    package: packageManifest.name,
+    version: packageManifest.version,
+    extensionManifestSha256: sha256(extensionManifest),
+    extensionTreeSha256
+  };
+  const sentinelName = ".deherm-managed.json";
+  let current = null;
+  try {
+    current = JSON.parse(await readFile(path.join(destination, sentinelName), "utf8"));
+  } catch (error) {
+    if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
+    try {
+      await lstat(destination);
+      throw new Error(`Refusing to replace unmanaged native extension at ${destination}`);
+    } catch (destinationError) {
+      if (destinationError?.code !== "ENOENT") throw destinationError;
+    }
+  }
+  if (options.force !== true && current && JSON.stringify(current) === JSON.stringify(identity)) {
+    return { root: destination, installed: false, source: "package" };
+  }
+  const nonce = `${process.pid}-${randomBytes(8).toString("hex")}`;
+  const stage = `${destination}.deherm-stage-${nonce}`;
+  const backup = `${destination}.deherm-backup-${nonce}`;
+  let movedCurrent = false;
+  try {
+    await cp(source, stage, { recursive: true, errorOnExist: true, force: false });
+    await writeFile(path.join(stage, sentinelName), `${JSON.stringify(identity, null, 2)}\n`, { flag: "wx" });
+    if (current) {
+      await rename(destination, backup);
+      movedCurrent = true;
+    }
+    await rename(stage, destination);
+    if (movedCurrent) await rm(backup, { recursive: true, force: true });
+  } catch (error) {
+    await rm(stage, { recursive: true, force: true });
+    if (movedCurrent) {
+      try {
+        await lstat(destination);
+      } catch (destinationError) {
+        if (destinationError?.code === "ENOENT") await rename(backup, destination);
+      }
+    }
+    throw error;
+  } finally {
+    await rm(stage, { recursive: true, force: true });
+    await rm(backup, { recursive: true, force: true });
+  }
+  return { root: destination, installed: true, source: "package" };
+}
+
 export async function writeGeneratedProject(inventory, outputDirectory = ".deherm", options = {}) {
   if (typeof outputDirectory !== "string" || !outputDirectory || path.isAbsolute(outputDirectory)) {
     throw new Error("Generated output must be a relative subdirectory of the Defold project");
@@ -784,6 +948,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     throw new Error("Generated output resolves outside the Defold project");
   }
   const core = await bundledCoreSdk(options.defoldSdk);
+  const toolchain = defoldToolchain(core.revision);
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const portableInventory = { ...inventory, projectRoot: "." };
   const bindingIr = buildProjectBindingIr(inventory);
@@ -826,10 +991,13 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(core.paths.scriptIrPath, path.join(irRoot, "script-api.json"));
   await cp(core.paths.dmsdkIrPath, path.join(irRoot, "dmsdk.json"));
   await cp(core.paths.scriptDispatchPath, path.join(irRoot, "script-scalar-dispatch.json"));
+  await cp(core.paths.scriptAccountingPath, path.join(irRoot, "script-api-accounting.json"));
+  await cp(core.paths.scriptUniversalPath, path.join(irRoot, "script-universal-value-bindings.json"));
   await cp(core.paths.scriptProfilesPath, path.join(irRoot, "script-route-profiles.json"));
   await cp(core.paths.loweringPlanPath, path.join(irRoot, "binding-lowering-plan.json"));
   await cp(core.paths.loweringPlanSentinelPath, path.join(irRoot, "binding-lowering-plan.sentinel.json"));
   await cp(core.paths.dmsdkThunksPath, path.join(irRoot, "dmsdk-scalar-thunks.json"));
+  await cp(core.paths.dmsdkUniversalPath, path.join(irRoot, "dmsdk-universal-bindings.json"));
   await writeFile(path.join(root, "extensions.d.ts"), generateExtensionTypes(inventory));
   const modules = bindingIr.modules;
   const sdkRoot = path.join(root, "sdk");
@@ -888,6 +1056,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       `tsconfig.deherm.${context.id}.json`,
       `${JSON.stringify(contextProjectConfig(relativeOutput, context), null, 2)}\n`
     ])),
+    "tsconfig.deherm.bundle.json": `${JSON.stringify(bundleProjectConfig(relativeOutput), null, 2)}\n`,
     "tsconfig.deherm.json": `${JSON.stringify(rootProjectConfig(), null, 2)}\n`
   };
   for (const [relative, source] of Object.entries(projectConfigSources)) {
@@ -900,19 +1069,18 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     }).map(([relative, source]) => [relative, sha256(source)])),
     project: Object.fromEntries(Object.entries(projectConfigSources).map(([relative, source]) => [relative, sha256(source)]))
   };
-  const scriptDispatchableIds = new Set([
-    ...core.scriptIr.functions.filter(({ runtimeStatus }) => runtimeStatus === "implemented-generated-lua-bridge").map(({ id }) => id),
-    ...core.scriptDispatch.bindings.map(({ id }) => id)
-  ]);
+  const generatedSdkSha256 = await directoryDigest(sdkRoot);
   const generatedDmSdkThunkIds = new Set(core.dmsdkThunks.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   await writeFile(path.join(root, "manifest.json"), `${JSON.stringify({
     schemaVersion: 1,
     defoldRevision: core.revision,
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
+    toolchain,
     generation,
     inputs: core.inputs,
     generatedOutputs,
+    generatedSdkSha256,
     engineProfiles,
     loweringPlan: {
       sha256: core.loweringPlan.planSha256,
@@ -932,11 +1100,13 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
         functions: core.scriptIr.counts.functions,
         types: core.scriptIr.counts.classes + core.scriptIr.counts.aliases + core.scriptIr.counts.enums,
         typeSurfaceUnresolved: core.scriptIr.typeSurfaceUnresolvedCount,
-        runtimeImplemented: scriptDispatchableIds.size,
-        runtimePending: core.scriptIr.counts.functions - scriptDispatchableIds.size,
+        universalRecipes: core.scriptUniversal.candidateCount,
+        universalExclusions: core.scriptUniversal.excludedCount,
+        accounting: core.scriptAccounting.categoryCounts,
+        targetMatrix: loweringTargetMatrix(core.loweringPlan, "script"),
         runtimeLanes: {
-          specializedLuaCompatibility: core.scriptIr.runtimeImplementedCount,
-          generatedScalarDispatch: core.scriptDispatch.bindingCount
+          generatedScalarDispatch: core.scriptDispatch.bindingCount,
+          universalStableId: core.scriptUniversal.candidateCount
         }
       },
       dmsdk: {
@@ -944,11 +1114,16 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
         parsedHeaders: core.dmsdkIr.parsedHeaderCount,
         diagnosticHeaders: core.dmsdkIr.diagnosticHeaderCount,
         declarations: core.dmsdkIr.declarationCount,
+        runtimeDeclarations: core.dmsdkUniversal.coverage.declarations,
         typeSurfaceUnresolved: core.dmsdkIr.typeSurfaceUnresolvedCount,
-        runtimeImplemented: generatedDmSdkThunkIds.size,
-        runtimePending: core.dmsdkIr.runtimeUnimplementedCount - generatedDmSdkThunkIds.size,
+        universalRecipes: core.dmsdkUniversal.coverage.recipes,
+        silentlyOmitted: core.dmsdkUniversal.coverage.silentlyOmitted,
+        targetMatrix: loweringTargetMatrix(core.loweringPlan, "dmsdk"),
         runtimeLanes: {
-          generatedScalarThunks: generatedDmSdkThunkIds.size
+          generatedScalarThunks: generatedDmSdkThunkIds.size,
+          preferredSpecialized: core.dmsdkUniversal.coverage.preferredSpecialized,
+          usageMaterializedFallback: core.dmsdkUniversal.coverage.usageMaterializedFallback,
+          projectMaterialized: 0
         }
       }
     }
@@ -958,9 +1133,11 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     defoldRevision: core.revision,
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
+    toolchain,
     generation,
     inputs: core.inputs,
     generatedOutputs,
+    generatedSdkSha256,
     engineProfiles
   }, null, 2)}\n`);
   const tsconfigState = await migrateLegacyGeneratedTsconfig(
@@ -1027,6 +1204,9 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   if (manifest.generator?.package !== "@ts-defold/deherm" || manifest.generator?.version !== core.packageVersion) {
     throw new Error("Generated manifest names a different deherm generator package");
   }
+  if (JSON.stringify(manifest.toolchain) !== JSON.stringify(defoldToolchain(core.revision))) {
+    throw new Error("Generated manifest names a different or unverified Defold toolchain");
+  }
   const expectedEngineProfiles = validateEngineProfiles(manifest.engineProfiles, core.scriptProfiles);
   if (JSON.stringify(manifest.engineProfiles) !== JSON.stringify(expectedEngineProfiles)) {
     throw new Error("Generated manifest engine-profile authority differs from the installed Defold catalog");
@@ -1046,10 +1226,13 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     scriptIrSha256: "ir/script-api.json",
     dmsdkIrSha256: "ir/dmsdk.json",
     scriptDispatchSha256: "ir/script-scalar-dispatch.json",
+    scriptAccountingSha256: "ir/script-api-accounting.json",
+    scriptUniversalSha256: "ir/script-universal-value-bindings.json",
     scriptProfilesSha256: "ir/script-route-profiles.json",
     loweringPlanSha256: "ir/binding-lowering-plan.json",
     loweringPlanSentinelSha256: "ir/binding-lowering-plan.sentinel.json",
-    dmsdkThunksSha256: "ir/dmsdk-scalar-thunks.json"
+    dmsdkThunksSha256: "ir/dmsdk-scalar-thunks.json",
+    dmsdkUniversalSha256: "ir/dmsdk-universal-bindings.json"
   };
   const verified = {};
   verified["extensions.json"] = sha256(inventorySource);
@@ -1078,6 +1261,10 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
       verified[`${rootName}:${relative}`] = actual;
     }
   }
+  const generatedSdkSha256 = await directoryDigest(path.join(resolvedOutputRoot, "sdk"));
+  if (manifest.generatedSdkSha256 !== generatedSdkSha256) {
+    throw new Error("Generated SDK tree does not match its output sentinel; regenerate the project");
+  }
   const loweringPlan = JSON.parse(verifiedSources[files.loweringPlanSha256].toString("utf8"));
   const loweringPlanSentinel = JSON.parse(verifiedSources[files.loweringPlanSentinelSha256].toString("utf8"));
   if (loweringPlan.schemaVersion !== 2) throw new Error("ir/binding-lowering-plan.json must use schema v2");
@@ -1099,9 +1286,11 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     if (lock[key] !== manifest[key]) throw new Error(`deherm.lock ${key} differs from generated manifest`);
   }
   if (JSON.stringify(lock.generator) !== JSON.stringify(manifest.generator) ||
+      JSON.stringify(lock.toolchain) !== JSON.stringify(manifest.toolchain) ||
       JSON.stringify(lock.generation) !== JSON.stringify(manifest.generation) ||
       JSON.stringify(lock.inputs) !== JSON.stringify(manifest.inputs) ||
       JSON.stringify(lock.generatedOutputs) !== JSON.stringify(manifest.generatedOutputs) ||
+      lock.generatedSdkSha256 !== manifest.generatedSdkSha256 ||
       JSON.stringify(lock.engineProfiles) !== JSON.stringify(manifest.engineProfiles)) {
     throw new Error("deherm.lock does not match the generated manifest contract");
   }
@@ -1174,7 +1363,7 @@ async function validateAuthoredImportBoundaries(root) {
             continue;
           }
           if (specifier === "@ts-defold/deherm" || specifier.startsWith("@ts-defold/deherm/") ||
-              specifier === "@defold-hermes/sdk" || specifier.startsWith("@defold-hermes/sdk/")) {
+              specifier === "@deherm/sdk" || specifier.startsWith("@deherm/sdk/")) {
             diagnostics.push(`${location} deherm context boundary: import '${specifier}' bypasses the context-filtered '@deherm/project' SDK`);
             continue;
           }

@@ -17,6 +17,8 @@ struct Operation {
   const char* member;
   uint8_t minimumArgumentCount;
   uint8_t maximumArgumentCount;
+  uint8_t minimumResultCount;
+  uint8_t maximumResultCount;
   uint8_t resultCount;
 };
 
@@ -25,9 +27,9 @@ struct LuaApi {
   DispatchStatus (*invoke)(void*, const Operation&, ScriptCallFrame*, char*, size_t) noexcept = nullptr;
 };
 
-inline constexpr size_t kOperationCount = 158;
-inline constexpr size_t kMaximumArgumentCount = 7;
-inline constexpr size_t kMaximumResultCount = 3;
+inline constexpr size_t kOperationCount = 915;
+inline constexpr size_t kMaximumArgumentCount = 32;
+inline constexpr size_t kMaximumResultCount = 4;
 inline constexpr uint32_t kMaximumDepth = 8;
 inline constexpr uint32_t kMaximumEntries = 256;
 inline constexpr uint32_t kMaximumStringBytes = 65536;

@@ -2,7 +2,7 @@ import { watch } from "node:fs";
 import { readdir } from "node:fs/promises";
 import path from "node:path";
 
-const defaultIgnored = new Set([".deherm", ".git", "build", "dist", "node_modules", "upstream"]);
+const defaultIgnored = new Set([".deherm", ".git", ".internal", "build", "dist", "node_modules", "upstream"]);
 
 function ignored(relative, ignoredNames) {
   return relative.split(path.sep).some((part) => ignoredNames.has(part));

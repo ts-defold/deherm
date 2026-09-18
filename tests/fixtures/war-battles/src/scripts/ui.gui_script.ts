@@ -1,4 +1,4 @@
-import { builtins, gui, type DefoldHash } from "@ts-defold/deherm";
+import { defold, gui, type DefoldHash } from "@ts-defold/deherm";
 import { defineComponent } from "@ts-defold/deherm/component";
 
 interface UiSelf {
@@ -9,7 +9,7 @@ interface AddScore {
   readonly score: number;
 }
 
-const ADD_SCORE = builtins.hash("add_score");
+const ADD_SCORE = defold.hash("add_score");
 
 export default defineComponent({
   init(self: UiSelf): void {

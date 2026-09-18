@@ -393,6 +393,7 @@ function generateJsiSource(schema) {
     "#include <defold_hermes/callback_registry.hpp>",
     "#include <defold_hermes/generated_dmsdk_enum_value_jsi.hpp>",
     "#include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>",
+    "#include <defold_hermes/generated_dmsdk_universal_jsi.hpp>",
     "#include <defold_hermes/generated_modules.h>",
     "",
     "#include <cmath>",
@@ -472,6 +473,7 @@ function generateJsiSource(schema) {
   lines.push(
     "  installDmSdkScalarModule(runtime, modules);",
     "  installDmSdkEnumValueModule(runtime, modules);",
+    "  installDmSdkUniversalModule(runtime, modules);",
     "}",
     "",
     "}  // namespace defold_hermes",
@@ -521,6 +523,7 @@ function generateEmscriptenModules(schema) {
     `  $DEFOLD_HERMES_GENERATED_MODULES__deps: [${[
       ...symbols,
       "'$DEFOLD_HERMES_DMSDK_SCALAR'",
+      "'$DEFOLD_HERMES_DMSDK_UNIVERSAL'",
       ...(schema.modules.some((module) => module.functions.some((fn) => fn.parameters.some(({ type }) => type === "callback")))
         ? ["'$DEFOLD_HERMES_WEB_CALLBACKS'"]
         : [])
@@ -581,7 +584,8 @@ function generateEmscriptenModules(schema) {
     lines.push("        },");
   }
   lines.push(
-    "        DmSdkScalar: DEFOLD_HERMES_DMSDK_SCALAR.install()",
+    "        DmSdkScalar: DEFOLD_HERMES_DMSDK_SCALAR.install(),",
+    "        DmSdkUniversalRaw: DEFOLD_HERMES_DMSDK_UNIVERSAL",
     "      };",
     "    }",
     "  }",

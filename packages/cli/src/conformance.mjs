@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "../../compiler/src/binding-identity.mjs";
+import { publicScriptModulePath } from "../../compiler/src/script-public-api-policy.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const packageRequire = createRequire(import.meta.url);
@@ -227,9 +228,9 @@ function applySelectionPolicy(basePolicy, requiredContexts, selectedContexts, ta
 }
 
 function scriptTypeAccess(item) {
-  const [root, ...nested] = item.modulePath;
+  const [root, ...nested] = publicScriptModulePath(item.modulePath.length ? item.modulePath : ["builtins"]);
   return {
-    moduleType: `${pascal(root ?? "builtins")}Api`,
+    moduleType: `${pascal(root)}Api`,
     path: [...nested.map(camel), item.jsName]
   };
 }

@@ -1,11 +1,36 @@
-declare const defoldHashBrand: unique symbol;
 declare const defoldUrlBrand: unique symbol;
 declare const defoldRelativeAddressBrand: unique symbol;
 
-/** Exact unsigned 64-bit engine hash represented as a JavaScript bigint. */
-export type DefoldHash<Name extends string = string> = bigint & {
-  readonly [defoldHashBrand]: Name;
-};
+/** Authoring spelling accepted by the compile-time hash intrinsic. */
+export type DefoldHashLiteral<Name extends string = string> =
+  Name extends "" ? never : `#${Name}`;
+
+/**
+ * A Defold hash in authored TypeScript.
+ *
+ * At runtime this is always an exact unsigned 64-bit bigint. The `#name`
+ * branch is source-language syntax accepted only so ttsc can contextually
+ * replace a literal with that bigint before JavaScript is emitted.
+ */
+export type DefoldHash<Name extends string = string> =
+  | (bigint & { readonly __dehermHashV1: Name })
+  | (DefoldHashLiteral<Name> & { readonly __dehermHashV1?: Name });
+
+type HashLiteralName<Value extends DefoldHashLiteral> =
+  Value extends `#${infer Name}` ? Name : never;
+
+/**
+ * Compile-time-only Defold hash intrinsic.
+ *
+ * The ttsc transform replaces `hashLiteral("#name")` with the exact unsigned
+ * 64-bit bigint produced by Defold for `hash("name")`. The `#` is a sigil and
+ * is not hashed. A dynamic string is deliberately rejected by the type.
+ */
+export function hashLiteral<const Value extends DefoldHashLiteral>(
+  _value: Value & (Value extends "#" ? never : unknown)
+): DefoldHash<HashLiteralName<Value>> {
+  throw new Error("hashLiteral() must be compiled by the deherm ttsc transform");
+}
 
 /** Parsed Defold URL value with exact-width engine hashes. */
 export interface DefoldUrl {

@@ -67,16 +67,18 @@ test("release generation is keyed, idempotent, and emits the canonical dynamic f
   }
 });
 
-test("release generation fails closed for targets with no canonical emit authority", async () => {
+test("release generation emits exact canonical authority for Static Hermes and browser targets", async () => {
   const temporary = await mkdtemp(join(tmpdir(), "deherm-release-blocked-targets-"));
   try {
     for (const target of ["staticHermesCAbi", "browserWasmHost"]) {
       const output = join(temporary, target);
       const result = await generateReleaseBuild(["--output-root", output, "--target", target]);
-      assert.equal(result.projection.canonicalDefoldApi.status, "blocked-by-canonical-plan");
-      assert.equal(result.projection.canonicalDefoldApi.generatedRoutes, 0);
+      assert.equal(result.projection.canonicalDefoldApi.status, "family-source-emitted");
+      assert.ok(result.projection.canonicalDefoldApi.generatedRoutes > 0);
       const requirements = JSON.parse(await readFile(join(output, `canonical/${target}/requirements.json`), "utf8"));
-      assert.equal(requirements.status, "blocked-by-canonical-plan");
+      const manifest = JSON.parse(await readFile(join(output, `canonical/${target}/manifest.json`), "utf8"));
+      assert.equal(requirements.status, "authority-satisfied-for-selected-script-units");
+      assert.equal(manifest.routeCount, result.projection.canonicalDefoldApi.generatedRoutes);
       assert.ok(Object.keys(requirements.selectionCounts).length > 0);
       assert.equal(requirements.requiredAuthorityForAdditionalUnits.backendSelection, "emit");
     }

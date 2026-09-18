@@ -1,0 +1,22 @@
+{
+  :code {
+    :breakpoints [
+    ]
+  }
+  :workflow {
+    :open-tabs [
+      [
+        [
+          "/main/battle.gui"
+          :scene
+        ]
+      ]
+    ]
+    :recent-files [
+      [
+        "/main/battle.gui"
+        :scene
+      ]
+    ]
+  }
+}

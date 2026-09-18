@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "scope": "Reviewed first-wave fixed-record candidates from the accounting-pending lua-table ledger",
-  "expectedPendingLuaTableRouteCount": 148,
+  "scope": "Reviewed fixed-record candidates from the structural lua-table ledger, excluding routes owned by native value dispatch",
+  "expectedLuaTableRouteCount": 148,
   "expectedCandidateCount": 3,
   "expectedBlockerCounts": {
     "copied-defold-value-record": 9,

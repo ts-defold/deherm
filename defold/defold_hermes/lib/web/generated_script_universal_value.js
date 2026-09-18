@@ -2,16 +2,18 @@
 var LibraryDefoldHermesScriptUniversalValue = {
   $DEFOLD_HERMES_SCRIPT_UNIVERSAL__deps: [
     'deherm_script_universal_dispatch', 'deherm_script_universal_release',
+    '$DEFOLD_HERMES_WEB_CALLBACKS',
     '$stackSave', '$stackAlloc', '$stackRestore', '$UTF8ToString', '$stringToUTF8', '$lengthBytesUTF8'
   ],
   $DEFOLD_HERMES_SCRIPT_UNIVERSAL: {
     depth: 0,
     maximumDepth: 8,
     maximumArguments: 32,
-    maximumResults: 3,
+    maximumResults: 4,
     maximumEntries: 256,
-    maximumValues: 547,
+    maximumValues: 548,
     maximumStringBytes: 65536,
+    tupleResultArities: {"19395531":2,"51420040":3,"74788897":3,"238271325":3,"378378773":2,"508811620":2,"557192288":2,"628130855":2,"634121622":2,"764766037":2,"803274747":2,"1054417193":2,"1130607345":2,"1298827590":2,"1362876804":3,"1431438690":2,"1432460324":2,"1576371206":2,"2038251318":4,"2136912702":2,"2158702312":4,"2254437809":2,"2308150026":2,"2327634387":2,"2463011221":2,"2635085856":2,"2641296689":3,"2653029218":2,"2722214421":2,"2832050683":2,"2928762044":2,"2979094901":2,"3105177886":2,"3116923594":2,"3303829155":2,"3373475968":2,"3392355731":4,"3428878228":2,"3495086682":2,"3950716894":2,"4017512905":2,"4052701394":2},
     valueStride: 48,
     entryStride: 8,
     finalizers: null,
@@ -53,27 +55,187 @@ var LibraryDefoldHermesScriptUniversalValue = {
         _deherm_script_universal_release(value);
       } finally { stackRestore(checkpoint); }
     },
-    makeHandle: function(kind, auxiliary, runtime, payload) {
+    makeHandle: function(kind, auxiliary, runtime, payload, borrowed) {
       var bridge = this;
       var token = {kind: kind, auxiliary: auxiliary, runtime: runtime, payload: payload, released: false};
       var handle = {
         __dehermHandleV1: true,
+        borrowed: borrowed === true,
         kind: kind,
         semanticKind: auxiliary,
         runtime: runtime,
         payload: payload,
         dispose: function() {
+          if (borrowed === true) return;
           bridge.releaseToken(token);
           if (bridge.finalizers) bridge.finalizers.unregister(handle);
         }
       };
-      if (typeof FinalizationRegistry === 'function') {
+      if (borrowed !== true && typeof FinalizationRegistry === 'function') {
         if (!this.finalizers) this.finalizers = new FinalizationRegistry(function(held) {
           DEFOLD_HERMES_SCRIPT_UNIVERSAL.releaseToken(held);
         });
         this.finalizers.register(handle, token, handle);
       }
       return Object.freeze(handle);
+    },
+    decodeWireRoots: function(values, valueCount, entries, entryCount, strings, stringCount,
+        floats, floatCount, urls, urlCount, roots, rootCount, borrowedHandles) {
+      var bridge = this;
+      var decoding = [];
+      function decode(index, depth) {
+        if (index >= valueCount || depth > bridge.maximumDepth) throw new Error('Universal browser callback value graph is invalid');
+        if (decoding.indexOf(index) !== -1) throw new Error('Universal browser callback value graph contains a cycle');
+        var pointer = values + index * 48;
+        var tag = HEAPU8[pointer];
+        if (tag === 0) return undefined;
+        if (tag === 1) return null;
+        if (tag === 2) return HEAPF64[(pointer + 8) >> 3] !== 0;
+        if (tag === 3) return HEAPF64[(pointer + 8) >> 3];
+        if (tag === 4) {
+          var length = HEAPU32[(pointer + 4) >> 2], offset = HEAPU32[(pointer + 24) >> 2];
+          if (offset > stringCount || length > stringCount - offset) throw new Error('Universal browser callback string span is invalid');
+          return UTF8ToString(strings + offset, length);
+        }
+        if (tag === 5) {
+          var kind = HEAPU8[pointer + 1], auxiliary = HEAPU8[pointer + 3];
+          if (kind === 1) return bridge.readU64(pointer + 16);
+          if (kind === 2) {
+            var urlIndex = HEAPU32[(pointer + 24) >> 2];
+            if (urlIndex >= urlCount) throw new Error('Universal browser callback URL index is invalid');
+            var urlPointer = urls + urlIndex * 32;
+            return Object.freeze({__dehermUrlV1:true, socket:bridge.readU64(urlPointer), reserved:bridge.readU64(urlPointer + 8), path:bridge.readU64(urlPointer + 16), fragment:bridge.readU64(urlPointer + 24)});
+          }
+          return bridge.makeHandle(kind, auxiliary, HEAPU32[(pointer + 28) >> 2],
+              bridge.readU64(pointer + 16), borrowedHandles === true);
+        }
+        if (tag === 8) {
+          var defoldKind = HEAPU8[pointer + 2];
+          if (defoldKind === 4) {
+            var floatOffset = HEAPU32[(pointer + 24) >> 2];
+            if (floatOffset > floatCount || 16 > floatCount - floatOffset) throw new Error('Universal browser callback Matrix4 span is invalid');
+            var elements = new Array(16);
+            for (var lane = 0; lane < 16; ++lane) elements[lane] = HEAPF32[(floats >> 2) + floatOffset + lane];
+            return {__dehermValueKind:'matrix4', elements:elements};
+          }
+          if (defoldKind < 1 || defoldKind > 3) throw new Error('Universal browser callback Defold value kind is invalid');
+          var result = {__dehermValueKind:defoldKind === 1 ? 'vector3' : defoldKind === 2 ? 'vector4' : 'quaternion'};
+          var names = ['x', 'y', 'z', 'w'];
+          for (var component = 0; component < (defoldKind === 1 ? 3 : 4); ++component) result[names[component]] = HEAPF32[((pointer + 32) >> 2) + component];
+          return result;
+        }
+        if (tag === 7) {
+          if (depth >= bridge.maximumDepth) throw new Error('Universal browser callback table exceeds depth');
+          var tableKind = HEAPU8[pointer + 3], count = HEAPU32[(pointer + 4) >> 2], start = HEAPU32[(pointer + 24) >> 2];
+          if (start > entryCount || count > entryCount - start) throw new Error('Universal browser callback table span is invalid');
+          decoding.push(index);
+          var table = tableKind === 1 ? new Array(count) : tableKind === 3 ? new Map() : Object.create(null);
+          for (var item = 0; item < count; ++item) {
+            var entryPointer = entries + (start + item) * 8;
+            var key = decode(HEAPU32[entryPointer >> 2], depth + 1);
+            var child = decode(HEAPU32[(entryPointer + 4) >> 2], depth + 1);
+            if (tableKind === 1) {
+              if (key !== item + 1) throw new Error('Universal browser callback sequence is not dense');
+              table[item] = child;
+            } else if (tableKind === 3) table.set(key, child);
+            else { if (typeof key !== 'string') throw new Error('Universal browser callback record key is not a string'); table[key] = child; }
+          }
+          decoding.pop();
+          return table;
+        }
+        throw new Error('Universal browser callback input tag is unsupported');
+      }
+      var decoded = new Array(rootCount);
+      for (var root = 0; root < rootCount; ++root) decoded[root] = decode(HEAPU32[(roots >> 2) + root], 0);
+      return decoded;
+    },
+    encodeWireRoots: function(items, values, valueCapacity, entries, entryCapacity,
+        strings, stringCapacity, floats, floatCapacity, urls, urlCapacity, roots, rootCapacity) {
+      if (!Array.isArray(items) || items.length > rootCapacity) throw new RangeError('Universal browser callback result count is exhausted');
+      var bridge = this;
+      var state = {value:0, entry:0, string:0, float:0, url:0, ancestors:[], callbacks:[]};
+      function reserveValue() {
+        if (state.value >= valueCapacity) throw new RangeError('Universal browser callback value arena is exhausted');
+        var index = state.value++;
+        HEAPU8.fill(0, values + index * 48, values + (index + 1) * 48);
+        return index;
+      }
+      function writeValue(value, depth) {
+        if (depth > bridge.maximumDepth) throw new RangeError('Universal browser callback value graph exceeds depth');
+        var index = reserveValue(), pointer = values + index * 48;
+        if (value === undefined) HEAPU8[pointer] = 0;
+        else if (value === null) HEAPU8[pointer] = 1;
+        else if (typeof value === 'boolean') { HEAPU8[pointer] = 2; HEAPF64[(pointer + 8) >> 3] = value ? 1 : 0; }
+        else if (typeof value === 'number') { HEAPU8[pointer] = 3; HEAPF64[(pointer + 8) >> 3] = value; }
+        else if (typeof value === 'bigint') {
+          if (value < BigInt(0) || value > BigInt('0xffffffffffffffff')) throw new RangeError('Universal callback hash is outside u64');
+          HEAPU8[pointer] = 5; HEAPU8[pointer + 1] = 1; bridge.writeU64(pointer + 16, value);
+        } else if (typeof value === 'string') {
+          value = bridge.normalizeString(value);
+          var length = lengthBytesUTF8(value);
+          if (length >= stringCapacity - state.string) throw new RangeError('Universal browser callback string arena is exhausted (one byte is reserved for UTF-8 termination)');
+          stringToUTF8(value, strings + state.string, length + 1);
+          HEAPU8[pointer] = 4; HEAPU32[(pointer + 4) >> 2] = length; HEAPU32[(pointer + 24) >> 2] = state.string; state.string += length;
+        } else if (typeof value === 'function') {
+          var callback = DEFOLD_HERMES_WEB_CALLBACKS.acquire(value);
+          state.callbacks.push(callback);
+          HEAPU8[pointer] = 6; HEAPU8[pointer + 3] = callback.type; HEAPU32[(pointer + 28) >> 2] = callback.runtime;
+          bridge.writeU64(pointer + 16, (BigInt(callback.generation) << BigInt(32)) | BigInt(callback.slot));
+        } else if (typeof value === 'object') {
+          if (value.__dehermHandleV1 === true) {
+            if (!Number.isInteger(value.kind) || value.kind < 1 || value.kind > 5 || !Number.isInteger(value.runtime) || value.runtime < 0 || typeof value.payload !== 'bigint') throw new TypeError('Universal callback handle is malformed');
+            HEAPU8[pointer] = 5; HEAPU8[pointer + 1] = value.kind; HEAPU8[pointer + 3] = value.semanticKind || 0;
+            HEAPU32[(pointer + 28) >> 2] = value.runtime; bridge.writeU64(pointer + 16, value.payload);
+          } else if (value.__dehermUrlV1 === true) {
+            if (state.url >= urlCapacity) throw new RangeError('Universal browser callback URL arena is exhausted');
+            var urlPointer = urls + state.url * 32, lanes = [value.socket, value.reserved, value.path, value.fragment];
+            for (var lane = 0; lane < 4; ++lane) {
+              if (typeof lanes[lane] !== 'bigint' || lanes[lane] < BigInt(0) || lanes[lane] > BigInt('0xffffffffffffffff')) throw new TypeError('Universal callback URL lane is not u64');
+              bridge.writeU64(urlPointer + lane * 8, lanes[lane]);
+            }
+            HEAPU8[pointer] = 5; HEAPU8[pointer + 1] = 2; HEAPU32[(pointer + 24) >> 2] = state.url++;
+          } else if (typeof value.__dehermValueKind === 'string') {
+            var kind = value.__dehermValueKind;
+            HEAPU8[pointer] = 8;
+            if (kind === 'vector3') HEAPU8[pointer + 2] = 1;
+            else if (kind === 'vector4') HEAPU8[pointer + 2] = 2;
+            else if (kind === 'quaternion') HEAPU8[pointer + 2] = 3;
+            else if (kind === 'matrix4') {
+              if (!Array.isArray(value.elements) || value.elements.length !== 16 || state.float + 16 > floatCapacity) throw new TypeError('Universal callback Matrix4 is malformed or exhausts scratch');
+              HEAPU8[pointer + 2] = 4; HEAPU32[(pointer + 4) >> 2] = 16; HEAPU32[(pointer + 24) >> 2] = state.float;
+              for (var matrixLane = 0; matrixLane < 16; ++matrixLane) HEAPF32[(floats >> 2) + state.float++] = value.elements[matrixLane];
+              return index;
+            } else throw new TypeError('Universal callback Defold value kind is unknown');
+            var names = ['x', 'y', 'z', 'w'], count = kind === 'vector3' ? 3 : 4;
+            for (var component = 0; component < count; ++component) HEAPF32[((pointer + 32) >> 2) + component] = value[names[component]];
+          } else {
+            if (state.ancestors.indexOf(value) !== -1) throw new TypeError('Universal browser callback value graph contains a cycle');
+            if (depth >= bridge.maximumDepth) throw new RangeError('Universal browser callback table exceeds depth');
+            state.ancestors.push(value);
+            var tableKind = Array.isArray(value) ? 1 : value instanceof Map ? 3 : 2;
+            var count = tableKind === 1 ? value.length : tableKind === 3 ? value.size : 0;
+            if (tableKind === 2) for (var countKey in value) if (Object.prototype.hasOwnProperty.call(value, countKey)) ++count;
+            if (count > entryCapacity - state.entry) throw new RangeError('Universal browser callback entry arena is exhausted');
+            var start = state.entry; state.entry += count;
+            HEAPU8[pointer] = 7; HEAPU8[pointer + 3] = tableKind; HEAPU32[(pointer + 4) >> 2] = count; HEAPU32[(pointer + 24) >> 2] = start;
+            var item = 0;
+            function append(key, child) { var entryPointer = entries + (start + item++) * 8; HEAPU32[entryPointer >> 2] = writeValue(key, depth + 1); HEAPU32[(entryPointer + 4) >> 2] = writeValue(child, depth + 1); }
+            if (tableKind === 1) for (var arrayIndex = 0; arrayIndex < count; ++arrayIndex) append(arrayIndex + 1, value[arrayIndex]);
+            else if (tableKind === 3) value.forEach(function(child, key) { append(key, child); });
+            else for (var key in value) if (Object.prototype.hasOwnProperty.call(value, key)) append(key, value[key]);
+            state.ancestors.pop();
+            if (item !== count) throw new TypeError('Universal browser callback table changed while encoding');
+          }
+        } else throw new TypeError('Universal browser callback result kind is unsupported');
+        return index;
+      }
+      try {
+        for (var root = 0; root < items.length; ++root) HEAPU32[(roots >> 2) + root] = writeValue(items[root], 0);
+        return state;
+      } catch (error) {
+        for (var callbackIndex = 0; callbackIndex < state.callbacks.length; ++callbackIndex) DEFOLD_HERMES_WEB_CALLBACKS.release(state.callbacks[callbackIndex]);
+        throw error;
+      }
     },
     call: function(stableId, args) {
       if (!Number.isInteger(stableId) || stableId < 0 || stableId > 0xffffffff) throw new TypeError('Universal stable ID must be a u32');
@@ -82,6 +244,8 @@ var LibraryDefoldHermesScriptUniversalValue = {
       ++this.depth;
       var checkpoint = stackSave();
       var bridge = this;
+      var callbackHandles = [];
+      var callbacksTransferred = false;
       try {
         var values = stackAlloc(this.maximumValues * 48);
         var entries = stackAlloc(this.maximumEntries * 8);
@@ -97,7 +261,7 @@ var LibraryDefoldHermesScriptUniversalValue = {
         var resultRoots = stackAlloc(this.maximumResults * 4);
         var counts = stackAlloc(6 * 4);
         var error = stackAlloc(512);
-        var state = {value: 0, entry: 0, string: 0, float: 0, url: 0, ancestors: []};
+        var state = {value: 0, entry: 0, string: 0, float: 0, url: 0, ancestors: [], callbacks: callbackHandles};
         function reserveValue() {
           if (state.value >= bridge.maximumValues) throw new RangeError('Universal browser value arena is exhausted');
           var index = state.value++;
@@ -118,12 +282,17 @@ var LibraryDefoldHermesScriptUniversalValue = {
           } else if (typeof value === 'string') {
             value = bridge.normalizeString(value);
             var length = lengthBytesUTF8(value);
-            if (length > bridge.maximumStringBytes - state.string) throw new RangeError('Universal browser string arena is exhausted');
+            if (length >= bridge.maximumStringBytes - state.string) throw new RangeError('Universal browser string arena is exhausted (one byte is reserved for UTF-8 termination)');
             stringToUTF8(value, strings + state.string, length + 1);
             HEAPU8[pointer] = 4;
             HEAPU32[(pointer + 4) >> 2] = length;
             HEAPU32[(pointer + 24) >> 2] = state.string;
             state.string += length;
+          } else if (typeof value === 'function') {
+            var callback = DEFOLD_HERMES_WEB_CALLBACKS.acquire(value);
+            state.callbacks.push(callback);
+            HEAPU8[pointer] = 6; HEAPU8[pointer + 3] = callback.type; HEAPU32[(pointer + 28) >> 2] = callback.runtime;
+            bridge.writeU64(pointer + 16, (BigInt(callback.generation) << BigInt(32)) | BigInt(callback.slot));
           } else if (typeof value === 'object') {
             if (value.__dehermHandleV1 === true) {
               if (!Number.isInteger(value.kind) || value.kind < 1 || value.kind > 5 || !Number.isInteger(value.runtime) || value.runtime < 0 || typeof value.payload !== 'bigint') throw new TypeError('Universal handle is malformed');
@@ -199,6 +368,7 @@ var LibraryDefoldHermesScriptUniversalValue = {
           resultRoots, this.maximumResults, counts + 20,
           error, 512);
         if (status !== 0) throw new Error(UTF8ToString(error));
+        callbacksTransferred = true;
         var outputValueCount = HEAPU32[counts >> 2];
         var outputEntryCount = HEAPU32[(counts + 4) >> 2];
         var outputStringCount = HEAPU32[(counts + 8) >> 2];
@@ -277,13 +447,75 @@ var LibraryDefoldHermesScriptUniversalValue = {
           }
           throw decodeError;
         }
+        var declaredTupleArity = this.tupleResultArities[stableId >>> 0] || 0;
+        if (declaredTupleArity > 1) {
+          decoded.length = declaredTupleArity;
+          return decoded;
+        }
         return outputResultCount === 0 ? undefined : outputResultCount === 1 ? decoded[0] : decoded;
       } finally {
+        if (!callbacksTransferred) {
+          for (var callbackIndex = 0; callbackIndex < callbackHandles.length; ++callbackIndex) DEFOLD_HERMES_WEB_CALLBACKS.release(callbackHandles[callbackIndex]);
+        }
         stackRestore(checkpoint);
         --this.depth;
       }
     },
     install: function() { return {target:'html5-browser-host', call:this.call.bind(this)}; }
+  },
+  defoldHermesWebInvokeUniversalCallback__deps: [
+    '$DEFOLD_HERMES_SCRIPT_UNIVERSAL', '$DEFOLD_HERMES_WEB_CALLBACKS',
+    '$UTF8ToString', '$stringToUTF8', '$lengthBytesUTF8'
+  ],
+  defoldHermesWebInvokeUniversalCallback: function(
+      runtime, slot, generation, type,
+      inputValues, inputValueCount, inputEntries, inputEntryCount,
+      inputStrings, inputStringBytes, inputFloats, inputFloatCount,
+      inputUrls, inputUrlCount, argumentRoots, argumentCount,
+      outputValues, outputValueCapacity, outputValueCount,
+      outputEntries, outputEntryCapacity, outputEntryCount,
+      outputStrings, outputStringCapacity, outputStringBytes,
+      outputFloats, outputFloatCapacity, outputFloatCount,
+      outputUrls, outputUrlCapacity, outputUrlCount,
+      resultRoots, resultCapacity, resultCount, error, errorCapacity) {
+    HEAPU32[outputValueCount >> 2] = 0;
+    HEAPU32[outputEntryCount >> 2] = 0;
+    HEAPU32[outputStringBytes >> 2] = 0;
+    HEAPU32[outputFloatCount >> 2] = 0;
+    HEAPU32[outputUrlCount >> 2] = 0;
+    HEAPU32[resultCount >> 2] = 0;
+    if (errorCapacity) HEAPU8[error] = 0;
+    var callback = DEFOLD_HERMES_WEB_CALLBACKS.resolveParts(runtime, slot, generation, type);
+    if (!callback) {
+      if (errorCapacity) stringToUTF8('Universal browser callback is stale', error, errorCapacity);
+      return 0;
+    }
+    try {
+      var args = DEFOLD_HERMES_SCRIPT_UNIVERSAL.decodeWireRoots(
+        inputValues, inputValueCount, inputEntries, inputEntryCount,
+        inputStrings, inputStringBytes, inputFloats, inputFloatCount,
+        inputUrls, inputUrlCount, argumentRoots, argumentCount, true);
+      var returned = callback.apply(undefined, args);
+      if (returned && typeof returned.then === 'function') throw new TypeError('Universal browser callbacks must return synchronously');
+      var results = returned && returned.__dehermCallbackResultsV1 === true
+        ? returned.values
+        : returned === undefined ? [] : [returned];
+      var encoded = DEFOLD_HERMES_SCRIPT_UNIVERSAL.encodeWireRoots(
+        results, outputValues, outputValueCapacity, outputEntries, outputEntryCapacity,
+        outputStrings, outputStringCapacity, outputFloats, outputFloatCapacity,
+        outputUrls, outputUrlCapacity, resultRoots, resultCapacity);
+      HEAPU32[outputValueCount >> 2] = encoded.value;
+      HEAPU32[outputEntryCount >> 2] = encoded.entry;
+      HEAPU32[outputStringBytes >> 2] = encoded.string;
+      HEAPU32[outputFloatCount >> 2] = encoded.float;
+      HEAPU32[outputUrlCount >> 2] = encoded.url;
+      HEAPU32[resultCount >> 2] = results.length;
+      return 1;
+    } catch (callbackError) {
+      var message = callbackError && callbackError.message ? callbackError.message : String(callbackError);
+      if (errorCapacity) stringToUTF8(message, error, errorCapacity);
+      return 0;
+    }
   }
 };
 autoAddDeps(LibraryDefoldHermesScriptUniversalValue, '$DEFOLD_HERMES_SCRIPT_UNIVERSAL');

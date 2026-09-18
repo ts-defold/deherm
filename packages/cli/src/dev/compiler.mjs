@@ -1,11 +1,16 @@
-import { createHash, randomBytes } from "node:crypto";
 import { mkdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { context } from "esbuild";
 import ttsc from "@ttsc/unplugin/esbuild";
 
-const fingerprintGlobal = "__DEFOLD_HERMES_BUILD_FINGERPRINT__";
+import {
+  BUNDLE_FINGERPRINT_GLOBAL as fingerprintGlobal,
+  applyBundleFingerprint,
+  bundleFingerprintBanner,
+  createBundleFingerprintPlaceholder
+} from "../../../compiler/src/bundle-fingerprint.mjs";
+
 let temporarySequence = 0;
 
 async function writeAtomically(file, contents) {
@@ -26,16 +31,29 @@ function normalizeResourcePath(value) {
 
 export async function createIncrementalCompiler(options) {
   const entryPoint = path.resolve(options.entryPoint);
+  const preludeEntries = [...new Set((options.preludeEntries ?? []).map((file) => path.resolve(file)))];
   const outputFile = path.resolve(options.outputFile);
   const mirrors = [...new Set((options.mirrors ?? []).map((file) => path.resolve(file)))];
   const resourcePath = normalizeResourcePath(options.resourcePath ?? path.basename(outputFile));
   const tsconfig = options.tsconfig ? path.resolve(options.tsconfig) : undefined;
-  const fingerprintPlaceholder = randomBytes(32).toString("hex");
+  const fingerprintPlaceholder = createBundleFingerprintPlaceholder();
   if (Object.hasOwn(options.define ?? {}, fingerprintGlobal)) {
     throw new Error(`${fingerprintGlobal} is reserved by the deherm compiler`);
   }
+  const input = preludeEntries.length
+    ? {
+        stdin: {
+          contents: [...preludeEntries, entryPoint]
+            .map((file) => `import ${JSON.stringify(file)};`)
+            .join("\n"),
+          resolveDir: path.dirname(entryPoint),
+          sourcefile: ".deherm-composed-entry.ts",
+          loader: "ts"
+        }
+      }
+    : { entryPoints: [entryPoint] };
   const buildContext = await context({
-    entryPoints: [entryPoint],
+    ...input,
     outfile: outputFile,
     bundle: true,
     format: "iife",
@@ -44,7 +62,7 @@ export async function createIncrementalCompiler(options) {
     plugins: options.useTtsc === false ? [] : [ttsc(tsconfig ? { project: tsconfig } : {})],
     ...(tsconfig ? { tsconfig } : {}),
     define: options.define,
-    banner: { js: `var ${fingerprintGlobal} = "${fingerprintPlaceholder}";` },
+    banner: { js: bundleFingerprintBanner(fingerprintPlaceholder) },
     sourcemap: options.sourcemap ?? true,
     sourcesContent: true,
     legalComments: "none",
@@ -59,18 +77,33 @@ export async function createIncrementalCompiler(options) {
       await options.beforeRebuild?.(changedSources);
       await mkdir(path.dirname(outputFile), { recursive: true });
       const startedAt = performance.now();
-      const result = await buildContext.rebuild();
+      const diagnosticChunks = [];
+      const originalStderrWrite = process.stderr.write;
+      if (options.captureDiagnostics !== false) {
+        process.stderr.write = function capturedDiagnostic(chunk, encoding, callback) {
+          diagnosticChunks.push(Buffer.isBuffer(chunk) ? chunk.toString(encoding) : String(chunk));
+          if (typeof encoding === "function") queueMicrotask(encoding);
+          else if (typeof callback === "function") queueMicrotask(callback);
+          return true;
+        };
+      }
+      let result;
+      try {
+        result = await buildContext.rebuild();
+      } catch (error) {
+        const diagnostics = diagnosticChunks.join("").trim();
+        if (diagnostics) {
+          const message = `${error instanceof Error ? error.message : String(error)}\n${diagnostics}`;
+          throw new Error(message, { cause: error });
+        }
+        throw error;
+      } finally {
+        process.stderr.write = originalStderrWrite;
+      }
       const bundledOutput = result.outputFiles.find(({ path: file }) => path.resolve(file) === outputFile);
       if (!bundledOutput) throw new Error(`esbuild did not produce expected output: ${outputFile}`);
-      const source = bundledOutput.text;
-      const occurrences = source.split(fingerprintPlaceholder).length - 1;
-      if (occurrences !== 1) {
-        throw new Error(`expected one build fingerprint placeholder, found ${occurrences}`);
-      }
-      const placeholderIndex = source.indexOf(fingerprintPlaceholder);
-      const canonicalSource = `${source.slice(0, placeholderIndex)}${"0".repeat(64)}${source.slice(placeholderIndex + 64)}`;
-      const fingerprint = createHash("sha256").update(canonicalSource).digest("hex");
-      const finalSource = `${source.slice(0, placeholderIndex)}${fingerprint}${source.slice(placeholderIndex + 64)}`;
+      const { fingerprint, source: finalSource } =
+          applyBundleFingerprint(bundledOutput.text, fingerprintPlaceholder);
       for (const artifact of result.outputFiles.filter(({ path: file }) => path.resolve(file) !== outputFile)) {
         await writeAtomically(artifact.path, artifact.contents);
       }

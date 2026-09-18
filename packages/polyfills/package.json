@@ -1,5 +1,5 @@
 {
-  "name": "@ts-defold/deherm-internal-polyfills",
+  "name": "@deherm/polyfills",
   "version": "0.0.0",
   "private": true,
   "type": "module",

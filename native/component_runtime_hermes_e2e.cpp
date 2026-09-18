@@ -2,6 +2,8 @@
 #include <defold_hermes/component_proxy_lua_gate.hpp>
 #include <defold_hermes/runtime.hpp>
 
+#include <dmsdk/dlib/hash.h>
+
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -15,6 +17,7 @@ extern "C" {
 }
 
 namespace component = defold_hermes::component_proxy;
+namespace dmScript { void PushHash(lua_State*, dmhash_t); }
 namespace {
 
 int gCurrentInstance = LUA_NOREF;
@@ -91,25 +94,57 @@ int main(int argc, char** argv) {
   gRuntime = &runtime;
   runtime.load(componentSource, "deherm://compiler-generated-components.js");
   runtime.init();
+  if (runtime.bundleFingerprint().size() != 64)
+    Fail("compiler bundle fingerprint was not observable through the runtime");
+  // Hermes derives peakAllocatedBytes from cumulative collection statistics
+  // (GCBase::cumStats_.usedBefore.max()), so it is legitimately zero until the
+  // first collection runs and must never be compared against live bytes.
+  const auto initialTelemetry = runtime.telemetry();
+  if (!initialTelemetry.heapAvailable || initialTelemetry.heapAllocatedBytes == 0 ||
+      initialTelemetry.heapSizeBytes < initialTelemetry.heapAllocatedBytes ||
+      initialTelemetry.callbackRoots != 0 || initialTelemetry.componentInstances != 0) {
+    std::fprintf(stderr,
+        "component-runtime-hermes-e2e:telemetry:available=%d allocated=%llu size=%llu peak=%llu "
+        "callbackRoots=%u componentInstances=%u\n",
+        initialTelemetry.heapAvailable ? 1 : 0,
+        static_cast<unsigned long long>(initialTelemetry.heapAllocatedBytes),
+        static_cast<unsigned long long>(initialTelemetry.heapSizeBytes),
+        static_cast<unsigned long long>(initialTelemetry.peakAllocatedBytes),
+        initialTelemetry.callbackRoots, initialTelemetry.componentInstances);
+    Fail("initial Hermes telemetry snapshot is inconsistent");
+  }
 
   component::HermesBackend backend(nullptr, CurrentRuntime);
   component::LuaRuntime luaRuntime(backend.api(), {GetInstance, SetInstance});
   luaRuntime.registerLuaApi(state);
+  dmScript::PushHash(state, 0x1234u);
+  lua_setglobal(state, "complexActionId");
   const int baseTop = lua_gettop(state);
 
   const std::string attachAll = std::string(R"LUA(
     local function attach(id, schema, context, speed)
       local self = { speed = speed }
       local properties = context == "game-object" and {{"speed", 1}} or {}
-      assert(defold_hermes.attachComponent(self, id, schema, context, properties))
-      defold_hermes.dispatchLifecycle(self, id, "init")
-      defold_hermes.dispatchLifecycle(self, id, "update", 0.25)
-      defold_hermes.dispatchMessage(self, id, "hit", {damage = 7}, "sender")
-      defold_hermes.dispatchInput(self, id, "fire", {pressed = true})
-      defold_hermes.dispatchReload(self, id)
-      defold_hermes.dispatchLifecycle(self, id, "final")
-      assert(defold_hermes.detachComponent(self, id))
-      assert(defold_hermes.detachComponent(self, id))
+      assert(_deherm_.attachComponent(self, id, schema, context, properties))
+      _deherm_.dispatchLifecycle(self, id, "init")
+      _deherm_.dispatchLifecycle(self, id, "update", 0.25)
+      _deherm_.dispatchMessage(self, id, "hit", {damage = 7}, "sender")
+      _deherm_.dispatchInput(self, id, "fire", {pressed = true})
+      if context == "game-object" then
+        assert(_deherm_.dispatchInput(self, id, complexActionId, {
+          pressed = true,
+          f01 = 1, f02 = 2, f03 = 3, f04 = 4, f05 = 5,
+          f06 = 6, f07 = 7, f08 = 8, f09 = 9, f10 = 10,
+          f11 = 11, f12 = 12, f13 = 13, f14 = 14, f15 = 15,
+          f16 = 16, f17 = 17, f18 = 18, f19 = 19, f20 = 20,
+          nested = { label = "deep" },
+          samples = { 3, 5, 8 }
+        }))
+      end
+      _deherm_.dispatchReload(self, id)
+      _deherm_.dispatchLifecycle(self, id, "final")
+      assert(_deherm_.detachComponent(self, id))
+      assert(_deherm_.detachComponent(self, id))
     end
     attach()LUA") + LuaString(argv[2]) + "," + LuaString(argv[3]) + R"LUA(,"game-object",120)
     attach()LUA" + LuaString(argv[4]) + "," + LuaString(argv[5]) + R"LUA(,"gui-scene",0)
@@ -117,10 +152,14 @@ int main(int argc, char** argv) {
   )LUA";
   Run(state, attachAll);
 
-  Run(state, std::string("rebindSelf={speed=42}; assert(defold_hermes.attachComponent(rebindSelf,") +
+  Run(state, std::string("rebindSelf={speed=42}; assert(_deherm_.attachComponent(rebindSelf,") +
       LuaString(argv[2]) + "," + LuaString(argv[3]) +
-      ",\"game-object\",{{\"speed\",1}})); defold_hermes.dispatchLifecycle(rebindSelf," +
+      ",\"game-object\",{{\"speed\",1}})); _deherm_.dispatchLifecycle(rebindSelf," +
       LuaString(argv[2]) + ",\"init\")");
+  const auto attachedTelemetry = runtime.telemetry();
+  if (attachedTelemetry.componentInstances != 1 ||
+      attachedTelemetry.heapAllocatedBytes < initialTelemetry.heapAllocatedBytes)
+    Fail("attached component was not reflected in runtime telemetry");
   runtime.finalize();
   if (runtime.liveComponents() != 0 || luaRuntime.live() != 1)
     Fail("old Runtime finalization did not preserve only the Lua attachment");
@@ -128,21 +167,24 @@ int main(int argc, char** argv) {
   defold_hermes::Runtime replacement(host);
   replacement.load(componentSource, "deherm://compiler-generated-components-replacement.js");
   gRuntime = &replacement;
-  Run(state, std::string("defold_hermes.dispatchReload(rebindSelf,") + LuaString(argv[2]) +
-      "); defold_hermes.dispatchLifecycle(rebindSelf," + LuaString(argv[2]) +
-      ",\"update\",0.5); defold_hermes.dispatchLifecycle(rebindSelf," + LuaString(argv[2]) +
-      ",\"final\"); assert(defold_hermes.detachComponent(rebindSelf," + LuaString(argv[2]) + "))");
+  Run(state, std::string("_deherm_.dispatchReload(rebindSelf,") + LuaString(argv[2]) +
+      "); _deherm_.dispatchLifecycle(rebindSelf," + LuaString(argv[2]) +
+      ",\"update\",0.5); _deherm_.dispatchLifecycle(rebindSelf," + LuaString(argv[2]) +
+      ",\"final\"); assert(_deherm_.detachComponent(rebindSelf," + LuaString(argv[2]) + "))");
 
   if (gCurrentInstance != LUA_NOREF && gCurrentInstance != LUA_REFNIL) Fail("nil current instance was not restored");
   if (lua_gettop(state) != baseTop) Fail("Lua stack was not restored");
   if (luaRuntime.live() != 0 || replacement.liveComponents() != 0) Fail("component roots leaked");
-  if (luaRuntime.attachments() != 4 || luaRuntime.dispatches() != 22) Fail("component event census drifted");
-  if (host.transcript.size() != 21) Fail("Hermes callback transcript census drifted");
+  if (luaRuntime.attachments() != 4 || luaRuntime.dispatches() != 24) Fail("component event census drifted");
+  if (host.transcript.size() != 24) Fail("Hermes callback transcript census drifted");
   if (host.transcript.front() != "info:game:init:120") Fail("editor property did not materialize into Hermes self");
-  if (host.transcript[4] != "info:game:reload:1") Fail("reload did not preserve Hermes instance state");
-  if (host.transcript[15] != "info:render:reload:1") Fail("render context did not execute through Hermes");
-  if (host.transcript[18] != "info:game:reload:1" || host.transcript[19] != "info:game:update:0.50")
-    Fail("Runtime-generation rebind did not restore properties and dispatch reload");
+  if (host.transcript[4] != "info:game:complex:deep:5" || host.transcript[5] != "info:game:input:4660:true")
+    Fail("bounded recursive component codec did not preserve wide nested input");
+  if (host.transcript[6] != "info:game:reload:1") Fail("reload did not preserve Hermes instance state");
+  if (host.transcript[17] != "info:render:reload:1") Fail("render context did not execute through Hermes");
+  if (host.transcript[20] != "info:game:init:42" || host.transcript[21] != "info:game:reload:1" ||
+      host.transcript[22] != "info:game:update:0.50")
+    Fail("Runtime-generation rebind did not initialize replacement state and dispatch reload");
 
   replacement.finalize();
   luaRuntime.shutdown();
@@ -151,7 +193,9 @@ int main(int argc, char** argv) {
   std::puts("component-runtime-hermes-e2e:compiler-registry-component-only-bootstrap:ok");
   std::puts("component-runtime-hermes-e2e:contexts:3:ok");
   std::puts("component-runtime-hermes-e2e:properties-lifecycle-message-input-reload-detach:ok");
+  std::puts("component-runtime-hermes-e2e:bounded-recursive-event-codec:ok");
   std::puts("component-runtime-hermes-e2e:runtime-generation-rebind:ok");
+  std::puts("component-runtime-hermes-e2e:fingerprint-and-heap-telemetry:ok");
   std::puts("component-runtime-hermes-e2e:packaged-defold-engine:unverified");
   return 0;
 }

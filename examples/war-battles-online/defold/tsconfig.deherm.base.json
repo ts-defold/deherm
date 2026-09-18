@@ -15,7 +15,7 @@
     "plugins": [
       {
         "transform": "@ts-defold/deherm/ttsc",
-        "enabled": false,
+        "enabled": true,
         "inventory": "./.deherm/extensions.json",
         "profile": "development"
       }

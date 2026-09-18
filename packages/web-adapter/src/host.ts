@@ -1,4 +1,4 @@
-import type { DefoldApiV1, LogLevel } from "@defold-hermes/sdk";
+import type { DefoldApiV1, LogLevel } from "@deherm/sdk";
 
 declare global {
   var __defoldTranscript: string[] | undefined;

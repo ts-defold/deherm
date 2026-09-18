@@ -118,16 +118,10 @@ test("keeps declaration tokens out of runtime handle capture", () => {
 test("fails closed on census, exception, stable-ID, kind, and source drift", () => {
   const censusDrift = structuredClone(sourceInputs);
   censusDrift.accountingText = replaceJson(censusDrift.accountingText, (value) => {
-    value.rows.push({
-      id: "script:fake.borrowed",
-      rawName: "fake.borrowed",
-      modulePath: "fake",
-      member: "borrowed",
-      source: "doc/fake.lua",
-      line: 1,
-      category: "pending",
-      reason: { code: "test", loweringFamily: "borrowed-handle", traits: [], unresolvedTypes: [] }
-    });
+    const borrowed = new Set(JSON.parse(censusDrift.patternsText).bindings
+      .filter(({ loweringFamily }) => loweringFamily === "borrowed-handle")
+      .map(({ id }) => id));
+    value.rows = value.rows.filter(({ id }) => !borrowed.has(id) || id !== [...borrowed][0]);
   });
   assert.throws(() => generateBorrowedHandleClassification(censusDrift), /route count drifted/);
 

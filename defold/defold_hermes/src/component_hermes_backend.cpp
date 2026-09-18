@@ -14,6 +14,11 @@
 #include <stdexcept>
 
 namespace dmScript {
+bool IsHash(lua_State*, int);
+bool IsURL(lua_State*, int);
+bool IsVector3(lua_State*, int);
+bool IsVector4(lua_State*, int);
+bool IsQuat(lua_State*, int);
 dmhash_t* ToHash(lua_State*, int);
 dmMessage::URL* ToURL(lua_State*, int);
 dmVMath::Vector3* ToVector3(lua_State*, int);
@@ -43,6 +48,52 @@ bool encodeLeaf(lua_State* state, int index, uint8_t codec, Value* output) noexc
     if (!lua_isstring(state, index)) return false; size_t length = 0; output->string = lua_tolstring(state, index, &length);
     if (length > UINT32_MAX) return false; output->kind = Kind::kString; output->stringLength = static_cast<uint32_t>(length); return true;
   }
+  if (codec == 0 && dmScript::IsHash(state, index)) {
+    auto* hash = dmScript::ToHash(state, index);
+    if (!hash) return false;
+    output->kind = Kind::kHash;
+    output->lanes64[0] = *hash;
+    return true;
+  }
+  if (codec == 0 && dmScript::IsURL(state, index)) {
+    auto* url = dmScript::ToURL(state, index);
+    if (!url) return false;
+    output->kind = Kind::kUrl;
+    output->lanes64[0] = url->m_Socket;
+    output->lanes64[1] = url->_reserved;
+    output->lanes64[2] = url->m_Path;
+    output->lanes64[3] = url->m_Fragment;
+    return true;
+  }
+  if (codec == 0 && dmScript::IsVector3(state, index)) {
+    auto* value = dmScript::ToVector3(state, index);
+    if (!value) return false;
+    output->kind = Kind::kVector3;
+    output->lanes32[0] = value->getX();
+    output->lanes32[1] = value->getY();
+    output->lanes32[2] = value->getZ();
+    return true;
+  }
+  if (codec == 0 && dmScript::IsVector4(state, index)) {
+    auto* value = dmScript::ToVector4(state, index);
+    if (!value) return false;
+    output->kind = Kind::kVector4;
+    output->lanes32[0] = value->getX();
+    output->lanes32[1] = value->getY();
+    output->lanes32[2] = value->getZ();
+    output->lanes32[3] = value->getW();
+    return true;
+  }
+  if (codec == 0 && dmScript::IsQuat(state, index)) {
+    auto* value = dmScript::ToQuat(state, index);
+    if (!value) return false;
+    output->kind = Kind::kQuaternion;
+    output->lanes32[0] = value->getX();
+    output->lanes32[1] = value->getY();
+    output->lanes32[2] = value->getZ();
+    output->lanes32[3] = value->getW();
+    return true;
+  }
   if (codec == 4 || codec == 9) {
     if (auto* hash = dmScript::ToHash(state, index)) { output->kind = Kind::kHash; output->lanes64[0] = *hash; return true; }
     if (lua_isstring(state, index)) { size_t length = 0; output->string = lua_tolstring(state, index, &length); output->kind = Kind::kString; output->stringLength = static_cast<uint32_t>(length); return true; }
@@ -67,18 +118,90 @@ bool encodeLeaf(lua_State* state, int index, uint8_t codec, Value* output) noexc
   return false;
 }
 
-bool encodeArgument(lua_State* state, int index, Runtime::ComponentArgument* output,
-    Runtime::ComponentField* fields, uint8_t capacity) noexcept {
+struct EventCodecScratch {
+  static constexpr size_t kFieldCapacity = 256;
+  static constexpr size_t kElementCapacity = 256;
+  static constexpr uint8_t kDepthCapacity = 8;
+  std::array<Runtime::ComponentField, kFieldCapacity> fields{};
+  std::array<Value, kElementCapacity> elements{};
+  size_t fieldsUsed = 0;
+  size_t elementsUsed = 0;
+};
+
+bool encodeValue(lua_State* state, int index, Value* output,
+    EventCodecScratch* scratch, uint8_t depth) noexcept {
   *output = {};
-  if (!lua_istable(state, index)) return encodeLeaf(state, index, 0, &output->value);
+  if (!lua_istable(state, index)) return encodeLeaf(state, index, 0, output);
+  if (!scratch || depth == EventCodecScratch::kDepthCapacity) return false;
+
   const int absolute = index > 0 ? index : lua_gettop(state) + index + 1;
-  uint8_t count = 0; lua_pushnil(state);
+  size_t count = 0;
+  bool stringKeys = true;
+  bool arrayKeys = true;
+  lua_pushnil(state);
   while (lua_next(state, absolute) != 0) {
-    if (count == capacity || !lua_isstring(state, -2) || lua_type(state, -1) == LUA_TTABLE ||
-        !encodeLeaf(state, -1, 0, &fields[count].value)) { lua_pop(state, 2); return false; }
-    fields[count].name = lua_tostring(state, -2); ++count; lua_pop(state, 1);
+    ++count;
+    stringKeys = stringKeys && lua_type(state, -2) == LUA_TSTRING;
+    if (lua_type(state, -2) != LUA_TNUMBER) {
+      arrayKeys = false;
+    } else {
+      const lua_Number numeric = lua_tonumber(state, -2);
+      const lua_Integer integer = lua_tointeger(state, -2);
+      if (numeric != static_cast<lua_Number>(integer) || integer < 1) arrayKeys = false;
+    }
+    lua_pop(state, 1);
   }
-  output->fields = fields; output->fieldCount = count; return true;
+  if (count > UINT16_MAX || (!stringKeys && !arrayKeys)) return false;
+
+  if (arrayKeys && count != 0) {
+    if (scratch->elementsUsed > scratch->elements.size() ||
+        count > scratch->elements.size() - scratch->elementsUsed) return false;
+    Value* elements = scratch->elements.data() + scratch->elementsUsed;
+    scratch->elementsUsed += count;
+    for (size_t child = 0; child < count; ++child) {
+      lua_rawgeti(state, absolute, static_cast<int>(child + 1));
+      if (lua_isnil(state, -1) || !encodeValue(state, -1, &elements[child], scratch, depth + 1)) {
+        lua_pop(state, 1);
+        return false;
+      }
+      lua_pop(state, 1);
+    }
+    output->kind = Kind::kArray;
+    output->elements = elements;
+    output->childCount = static_cast<uint16_t>(count);
+    return true;
+  }
+
+  if (scratch->fieldsUsed > scratch->fields.size() ||
+      count > scratch->fields.size() - scratch->fieldsUsed) return false;
+  Runtime::ComponentField* fields = scratch->fields.data() + scratch->fieldsUsed;
+  scratch->fieldsUsed += count;
+  size_t child = 0;
+  lua_pushnil(state);
+  while (lua_next(state, absolute) != 0) {
+    fields[child].name = lua_tostring(state, -2);
+    if (!fields[child].name || !encodeValue(state, -1, &fields[child].value, scratch, depth + 1)) {
+      lua_pop(state, 2);
+      return false;
+    }
+    ++child;
+    lua_pop(state, 1);
+  }
+  output->kind = Kind::kObject;
+  output->fields = fields;
+  output->childCount = static_cast<uint16_t>(count);
+  return true;
+}
+
+bool encodeArgument(lua_State* state, int index, Runtime::ComponentArgument* output,
+    EventCodecScratch* scratch) noexcept {
+  *output = {};
+  if (!encodeValue(state, index, &output->value, scratch, 0)) return false;
+  if (output->value.kind == Kind::kObject) {
+    output->fields = output->value.fields;
+    output->fieldCount = output->value.childCount;
+  }
+  return true;
 }
 
 Runtime::ComponentContext context(ContextKind value) noexcept {
@@ -162,11 +285,11 @@ bool HermesBackend::Dispatch(void* opaque, const DispatchRequest& request, bool*
       return true;
     }
     std::array<Runtime::ComponentArgument, 4> arguments{};
-    std::array<std::array<Runtime::ComponentField, 16>, 4> fields{};
+    EventCodecScratch scratch{};
     if (request.argumentCount > arguments.size()) throw std::runtime_error("Component event has too many arguments");
     for (uint8_t index = 0; index < request.argumentCount; ++index)
-      if (!encodeArgument(request.state, request.argumentStart + index, &arguments[index], fields[index].data(), fields[index].size()))
-        throw std::runtime_error("Component event value exceeds the bounded leaf-table codec");
+      if (!encodeArgument(request.state, request.argumentStart + index, &arguments[index], &scratch))
+        throw std::runtime_error("Component event value exceeds the bounded recursive codec (256 fields, 256 elements, depth 8)");
     const bool result = runtime->dispatchComponent(handle, request.lifecycle, arguments.data(), request.argumentCount);
     if (adapter) adapter->popComponentContext();
     if (consumed) *consumed = result;

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { readdir, readFile } from "node:fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 
@@ -13,7 +13,7 @@ const headless = await bundle(join(root, "headless/run-match.mjs"), {
   target: "node22",
   external: [],
 });
-const defold = await bundle(join(root, "defold/src/controller.script.ts"), {
+const defold = await bundle(join(root, "defold/main/battle.gui.ts"), {
   platform: "neutral",
   target: "es2020",
   external: ["@deherm/project"],
@@ -22,7 +22,7 @@ const sourceFiles = await collectFiles(root, ["core", "integration", "headless",
 let sourceBytes = 0;
 for (const path of sourceFiles) sourceBytes += (await readFile(path)).byteLength;
 
-process.stdout.write(`${JSON.stringify({
+const report = {
   schemaVersion: 1,
   observedOn: "2026-09-18",
   esbuildVersion,
@@ -31,9 +31,14 @@ process.stdout.write(`${JSON.stringify({
   sourceBytes,
   artifacts: {
     headlessNodeBundle: metrics(headless),
-    defoldControllerDiagnosticBundle: metrics(defold),
+    defoldGuiDiagnosticBundle: metrics(defold),
   },
-}, null, 2)}\n`);
+};
+const serialized = `${JSON.stringify(report, null, 2)}\n`;
+if (process.argv.includes("--write")) {
+  await writeFile(new URL("../evidence/bundle-size.json", import.meta.url), serialized);
+}
+process.stdout.write(serialized);
 
 async function bundle(entryPoint, options) {
   const result = await build({
@@ -68,9 +73,10 @@ async function collectFiles(base, directories) {
 
 async function walk(directory, output) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.isDirectory() && entry.name === ".deherm") continue;
+    if (entry.isDirectory() && [".deherm", ".internal", "build", "deherm"].includes(entry.name)) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) await walk(path, output);
+    else if (entry.isSymbolicLink()) continue;
     else output.push(path);
   }
 }

@@ -47,7 +47,7 @@ test("the canonical plan contains every API unit and all five backend dispositio
   assert.deepEqual(JSON.parse(await readFile(reportPath, "utf8")), generated);
 });
 
-test("generated implementation lanes are joined by exact identity and only explicit target-scoped codecs promote selection", () => {
+test("generated implementation lanes join by exact identity and universal fallbacks compose with one specialized lane", () => {
   const handleReport = JSON.parse(inputs.scriptHandleLowering);
   const cstringReport = JSON.parse(inputs.dmsdkCStringValue);
   const implementations = generated.units.flatMap((unit) => {
@@ -76,7 +76,7 @@ test("generated implementation lanes are joined by exact identity and only expli
 
   const handle = generated.units.find(({ identity }) => identity.id === "script:b2d.body.apply_force");
   const handleImplementation = generated.tables.implementationSets[handle.implementationSet][0];
-  assert.equal(handle.backends.dynamicHermesJsi.selection, "blocked-semantic");
+  assert.equal(handle.backends.dynamicHermesJsi.selection, "emit");
   assert.equal(handleImplementation.disposition, "generated-private-runtime");
   assert.equal(handleImplementation.targets.nativeDynamicHermes, "captured-lua-router-harness-proven-jsi-unverified");
   assert.equal(handleImplementation.evidence.defoldEngineBehavior, "unverified");
@@ -89,20 +89,24 @@ test("generated implementation lanes are joined by exact identity and only expli
   assert.equal(cstringImplementation.targets.nativeStaticHermes, "staged-private-c-abi-uncompiled-unlinked");
   assert.equal(cstringImplementation.evidence.runtime, "unclaimed-by-canonical-plan");
 
-  assert.equal(Object.keys(generated.implementationLanes).length, 26);
+  assert.equal(Object.keys(generated.implementationLanes).length, 27);
   for (const { source } of Object.values(generated.implementationLanes)) {
     const input = Object.entries(inputPaths).find(([, path]) => path === source)?.[0];
     assert.ok(input, `implementation lane source is not a declared plan input: ${source}`);
     assert.match(generated.inputHashes[input], /^[a-f0-9]{64}$/);
   }
-  assert.ok(generated.units.every((unit) => generated.tables.implementationSets[unit.implementationSet].length === 1));
+  assert.ok(generated.units.every((unit) => {
+    const set = generated.tables.implementationSets[unit.implementationSet];
+    return set.length >= 1 && set.length <= 2 &&
+      set.filter(({ lane }) => !["script-universal-value", "dmsdk-universal"].includes(lane)).length <= 1;
+  }));
 
   const dynamic = generated.units.find(({ identity }) => identity.id === "script:bit.band");
   const dynamicImplementation = generated.tables.implementationSets[dynamic.implementationSet][0];
   assert.equal(dynamicImplementation.lane, "script-dynamic-values");
   assert.equal(dynamicImplementation.reportState.generatedFamilyExecutableCandidate, true);
   assert.equal(dynamicImplementation.targetClaims.nativeDynamicHermes, "candidate-awaits-shared-router-integration");
-  assert.equal(dynamic.backends.dynamicHermesJsi.selection, "blocked-semantic");
+  assert.equal(dynamic.backends.dynamicHermesJsi.selection, "emit");
 
   const digestId = "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160";
   const digest = generated.units.find(({ identity }) => identity.id === digestId);
@@ -118,7 +122,23 @@ test("generated implementation lanes are joined by exact identity and only expli
   assert.equal(universal.backends.dynamicHermesJsi.selection, "emit");
   assert.equal(universal.backends.luaStack.selection, "emit");
   assert.equal(universal.backends.staticHermesCAbi.selection, "blocked-semantic");
-  assert.equal(universal.backends.browserWasmHost.selection, "blocked-semantic");
+  assert.equal(universal.backends.browserWasmHost.selection, "emit");
+
+  const retainedCallback = generated.units.find(({ identity }) => identity.id === "script:http.request");
+  assert.equal(retainedCallback.backends.dynamicHermesJsi.selection, "emit");
+  assert.equal(retainedCallback.backends.luaStack.selection, "emit");
+  assert.equal(retainedCallback.backends.browserWasmHost.selection, "emit");
+  for (const id of ["script:socket.newtry", "script:socket.protect"]) {
+    const closureResult = generated.units.find(({ identity }) => identity.id === id);
+    assert.equal(closureResult.backends.dynamicHermesJsi.selection, "emit", `${id}/dynamicHermesJsi`);
+    for (const target of ["staticHermesCAbi", "luaStack", "browserWasmHost"]) {
+      assert.equal(closureResult.backends[target].selection, "blocked-capability", `${id}/${target}`);
+      assert.deepEqual(
+        generated.tables.blockerSets[closureResult.backends[target].blockerSet],
+        ["higher-order-lua-closure-result-transport-unavailable"],
+        `${id}/${target}`);
+    }
+  }
 
   const borrowedId = "dmsdk:dmBuffer::IsBufferValid@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:227:93";
   const borrowed = generated.units.find(({ identity }) => identity.id === borrowedId);
@@ -233,7 +253,7 @@ test("marshalling is an interned data-oriented opcode algebra rather than route 
     "call-cached-lua",
     "restore-scratch"
   ]);
-  assert.equal(route.backends.dynamicHermesJsi.selection, "blocked-semantic");
+  assert.equal(route.backends.dynamicHermesJsi.selection, "emit");
 });
 
 test("interned contracts preserve every dmSDK composite effect record", () => {

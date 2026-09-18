@@ -1,4 +1,8 @@
-import type { DefoldHash, DefoldUrl, Quaternion, Vector3, Vector4 } from "./index";
+import type { DefoldHash, DefoldUrl } from "./address";
+import type { Quaternion, Vector3, Vector4 } from "./generated/script/types";
+
+export type { DefoldHash, DefoldUrl } from "./address";
+export type { Quaternion, Vector3, Vector4 } from "./generated/script/types";
 
 export interface PropertyDescriptor<Value, Kind extends string> {
   readonly __value?: Value;
@@ -11,6 +15,13 @@ export interface DefoldResource<Kind extends string> {
 
 export type PropertyMap = Readonly<Record<string, PropertyDescriptor<unknown, string>>>;
 
+export type PropertyValue<Descriptor> =
+  Descriptor extends PropertyDescriptor<infer Value, string> ? Value : never;
+
+export type ComponentSelf<Properties extends PropertyMap> = {
+  -readonly [Name in keyof Properties]: PropertyValue<Properties[Name]>;
+};
+
 export interface ComponentDefinition {
   readonly properties?: PropertyMap;
   init?(self: any): void;
@@ -19,6 +30,56 @@ export interface ComponentDefinition {
   onMessage?(self: any, messageId: DefoldHash, message: any, sender: DefoldUrl): void;
   onInput?(self: any, actionId: DefoldHash, action: any): boolean;
   onReload?(self: any): void;
+}
+
+/**
+ * Base lifecycle contract for a class-authored game-object component.
+ *
+ * Editor properties are copied onto the instance before `init`. Declare their
+ * direct fields for ergonomic `this.speed` access, or supply the property map
+ * generic and use the allocation-free `this.props.speed` view.
+ */
+export class ScriptComponent<Properties extends PropertyMap = PropertyMap> {
+  get props(): ComponentSelf<Properties> {
+    return this as unknown as ComponentSelf<Properties>;
+  }
+}
+
+export interface ScriptComponent<Properties extends PropertyMap = PropertyMap> {
+  init?(): void;
+  update?(dt: number): void;
+  final?(): void;
+  onMessage?(messageId: DefoldHash, message: unknown, sender: DefoldUrl): void;
+  onInput?(actionId: DefoldHash, action: unknown): boolean;
+  onReload?(): void;
+}
+
+/** Class authoring contract for a `*.gui.ts` component. */
+export class GuiComponent<Properties extends PropertyMap = PropertyMap> extends ScriptComponent<Properties> {}
+
+/** Class authoring contract for a `*.render.ts` component. */
+export class RenderComponent<Properties extends PropertyMap = PropertyMap> {
+  get props(): ComponentSelf<Properties> {
+    return this as unknown as ComponentSelf<Properties>;
+  }
+}
+
+export interface RenderComponent<Properties extends PropertyMap = PropertyMap> {
+  init?(): void;
+  update?(dt: number): void;
+  onMessage?(messageId: DefoldHash, message: unknown, sender: DefoldUrl): void;
+  onReload?(): void;
+}
+
+export type ComponentClassInstance<Properties extends PropertyMap = PropertyMap> =
+  ScriptComponent<Properties> | GuiComponent<Properties> | RenderComponent<Properties>;
+
+export interface ComponentClass<
+  Properties extends PropertyMap = PropertyMap,
+  Instance extends ComponentClassInstance = ComponentClassInstance
+> {
+  new(): Instance;
+  readonly properties?: Properties;
 }
 
 function descriptor<Value, Kind extends string>(): PropertyDescriptor<Value, Kind> {
@@ -77,6 +138,116 @@ export const property = Object.freeze({
   }
 });
 
-export function defineComponent<const Definition extends ComponentDefinition>(definition: Definition): Definition {
+export function defineComponent<const Definition extends ComponentDefinition>(
+  definition: Definition
+): Definition {
+  return definition;
+}
+
+const classInstanceSlot = "__deherm_component_class_instance_v1";
+
+interface InternalClassInstance {
+  init?: () => void;
+  update?: (dt: number) => void;
+  final?: () => void;
+  onMessage?: (messageId: DefoldHash, message: unknown, sender: DefoldUrl) => void;
+  onInput?: (actionId: DefoldHash, action: unknown) => boolean;
+  onReload?: () => void;
+  [name: string]: unknown;
+}
+
+interface InternalComponentSelf {
+  [classInstanceSlot]?: InternalClassInstance;
+  [name: string]: unknown;
+}
+
+function ensureClassInstance(
+  Type: new() => InternalClassInstance,
+  self: InternalComponentSelf,
+  propertyNames: readonly string[]
+): InternalClassInstance {
+  const retained = self[classInstanceSlot];
+  if (retained) return retained;
+
+  const instance = new Type();
+  for (let index = 0; index < propertyNames.length; ++index) {
+    const name = propertyNames[index];
+    instance[name] = self[name];
+  }
+  Object.defineProperty(self, classInstanceSlot, {
+    configurable: true,
+    value: instance,
+  });
+  return instance;
+}
+
+/**
+ * Adapt a class-authored component to the same definition ABI used by
+ * `defineComponent`. Generation reads the class declaration statically; this
+ * runtime adapter only creates one state instance per attached Defold instance
+ * and forwards lifecycle calls with that state as `this`.
+ */
+export function component<
+  const Properties extends PropertyMap,
+  Instance extends ComponentClassInstance
+>(Type: ComponentClass<Properties, Instance>): ComponentDefinition {
+  const InternalType = Type as unknown as new() => InternalClassInstance;
+  const prototype = InternalType.prototype;
+  const properties = Type.properties;
+  const propertyNames = properties ? Object.keys(properties) : [];
+  const definition: ComponentDefinition = properties ? { properties } : {};
+
+  const init = prototype.init;
+  definition.init = function classInit(self): void {
+    const instance = ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames);
+    if (typeof init === "function") {
+      init.call(instance);
+    }
+  };
+
+  const update = prototype.update;
+  if (typeof update === "function") {
+    definition.update = function classUpdate(self, dt): void {
+      update.call(ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames), dt);
+    };
+  }
+
+  const final = prototype.final;
+  if (typeof final === "function") {
+    definition.final = function classFinal(self): void {
+      final.call(ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames));
+    };
+  }
+
+  const onMessage = prototype.onMessage;
+  if (typeof onMessage === "function") {
+    definition.onMessage = function classOnMessage(self, messageId, message, sender): void {
+      onMessage.call(
+        ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames),
+        messageId,
+        message,
+        sender
+      );
+    };
+  }
+
+  const onInput = prototype.onInput;
+  if (typeof onInput === "function") {
+    definition.onInput = function classOnInput(self, actionId, action): boolean {
+      return onInput.call(
+        ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames),
+        actionId,
+        action
+      );
+    };
+  }
+
+  const onReload = prototype.onReload;
+  if (typeof onReload === "function") {
+    definition.onReload = function classOnReload(self): void {
+      onReload.call(ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames));
+    };
+  }
+
   return definition;
 }

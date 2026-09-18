@@ -1,5 +1,5 @@
 {
-  "name": "@ts-defold/deherm-internal-web-adapter",
+  "name": "@deherm/web-adapter",
   "version": "0.0.0",
   "private": true,
   "type": "module",

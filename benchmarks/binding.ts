@@ -1,7 +1,7 @@
 import {
   DefoldModules,
   defineDefoldApp
-} from "@defold-hermes/sdk";
+} from "@deherm/sdk";
 
 const iterations = 1_000_000;
 

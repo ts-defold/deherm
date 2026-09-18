@@ -18,6 +18,20 @@ export const scriptUniversalValuePolicy = {
 
 export const scriptUniversalValueBindings = [
   {
+    "id": "script:physics.destroy_joint",
+    "stableId": 350770,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "destroy_joint",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
     "id": "script:physics.raycast",
     "stableId": 2636616,
     "modulePath": [
@@ -27,7 +41,110 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:physics.wakeup",
+    "stableId": 10300768,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "wakeup",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.set_blend_func",
+    "stableId": 12859057,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_blend_func",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.update_world_transform",
+    "stableId": 16978861,
+    "modulePath": [
+      "go"
+    ],
+    "member": "update_world_transform",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_anchors",
+    "stableId": 19395531,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_anchors",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:b2d.joint.get_body_b",
+    "stableId": 26564256,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_body_b",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.delete_node",
+    "stableId": 39559745,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "delete_node",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_hinge_motor",
+    "stableId": 51420040,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_hinge_motor",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 3,
+    "maximumResultCount": 3,
+    "resultCount": 3
   },
   {
     "id": "script:b2d.joint.create_motor",
@@ -40,6 +157,68 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_impulse",
+    "stableId": 63674733,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_impulse",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_flags",
+    "stableId": 65880957,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_flags",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_cone_twist_limits",
+    "stableId": 74788897,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_cone_twist_limits",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 3,
+    "maximumResultCount": 3,
+    "resultCount": 3
+  },
+  {
+    "id": "script:b2d.joint.get_body_a",
+    "stableId": 76897113,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_body_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -53,7 +232,81 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_collision_filter_group",
+    "stableId": 84341599,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_collision_filter_group",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_inverse_mass",
+    "stableId": 92274755,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_inverse_mass",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.get_near_z",
+    "stableId": 94225445,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_near_z",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:factory.create",
+    "stableId": 96184340,
+    "modulePath": [
+      "factory"
+    ],
+    "member": "create",
+    "loweringFamily": "lua-table",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.enable_texture",
+    "stableId": 97040005,
+    "modulePath": [
+      "render"
+    ],
+    "member": "enable_texture",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:b2d.joint.create_pulley",
@@ -66,6 +319,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -78,6 +333,96 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.fixture.get_restitution",
+    "stableId": 109722038,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "get_restitution",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.enable_spring",
+    "stableId": 112322221,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "enable_spring",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:http.request",
+    "stableId": 125289847,
+    "modulePath": [
+      "http"
+    ],
+    "member": "request",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.set_spring_damping",
+    "stableId": 130334759,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_spring_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_angular_damping",
+    "stableId": 136055525,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_angular_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bit.bor",
+    "stableId": 143800718,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "bor",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 32,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -91,6 +436,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -104,6 +451,82 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.set_restitution_threshold",
+    "stableId": 156004587,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "set_restitution_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sys.set_connectivity_host",
+    "stableId": 161653622,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "set_connectivity_host",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.set_spring_stiffness",
+    "stableId": 161657368,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_spring_stiffness",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_linear_damping",
+    "stableId": 161836674,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_linear_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_angle",
+    "stableId": 165698188,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -116,6 +539,141 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.get_friction",
+    "stableId": 180453284,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "get_friction",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.disable_state",
+    "stableId": 182835960,
+    "modulePath": [
+      "render"
+    ],
+    "member": "disable_state",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_motor_speed",
+    "stableId": 190087790,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_motor_speed",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_force",
+    "stableId": 196611809,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.destroy_fixture",
+    "stableId": 203543744,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "destroy_fixture",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:profiler.dump_frame",
+    "stableId": 206098425,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "dump_frame",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_world_center",
+    "stableId": 209676193,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_world_center",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.world.cast_ray_async",
+    "stableId": 214949730,
+    "modulePath": [
+      "bullet3d",
+      "world"
+    ],
+    "member": "cast_ray_async",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.fixture.test_point",
+    "stableId": 216040350,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "test_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -128,7 +686,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_id",
+    "stableId": 226439103,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_id",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_linear_factor",
+    "stableId": 227921183,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_linear_factor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.get_config_boolean",
+    "stableId": 236701305,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_config_boolean",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:socket.select",
@@ -140,7 +743,343 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 2,
+    "maximumResultCount": 3,
     "resultCount": 3
+  },
+  {
+    "id": "script:buffer.copy_buffer",
+    "stableId": 248365108,
+    "modulePath": [
+      "buffer"
+    ],
+    "member": "copy_buffer",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 5,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_ccd_swept_sphere_radius",
+    "stableId": 249155039,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_ccd_swept_sphere_radius",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:model.reset_constant",
+    "stableId": 250460089,
+    "modulePath": [
+      "model"
+    ],
+    "member": "reset_constant",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_hertz",
+    "stableId": 251838610,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_screen_position",
+    "stableId": 262446896,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_screen_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_correction_factor",
+    "stableId": 269684289,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_correction_factor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_mass",
+    "stableId": 275202805,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_mass",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_angular_offset",
+    "stableId": 279418569,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_angular_offset",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.set_gravity",
+    "stableId": 284154525,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "set_gravity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.get_height",
+    "stableId": 286597108,
+    "modulePath": [
+      "render"
+    ],
+    "member": "get_height",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_min_length",
+    "stableId": 288336972,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_min_length",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.set_orthographic_zoom",
+    "stableId": 294035082,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "set_orthographic_zoom",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:resource.load",
+    "stableId": 306454494,
+    "modulePath": [
+      "resource"
+    ],
+    "member": "load",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.reboot",
+    "stableId": 309934808,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "reboot",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:zlib.deflate",
+    "stableId": 314843756,
+    "modulePath": [
+      "zlib"
+    ],
+    "member": "deflate",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.enable_spring",
+    "stableId": 325437063,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "enable_spring",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_angular_offset",
+    "stableId": 329503869,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_angular_offset",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.get_orthographic_auto_zoom",
+    "stableId": 333496520,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_orthographic_auto_zoom",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.has_contact_response",
+    "stableId": 334944506,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "has_contact_response",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_hinge_motor_target",
+    "stableId": 343784836,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_hinge_motor_target",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_enabled",
+    "stableId": 344287147,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_clipping_inverted",
+    "stableId": 344438576,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_clipping_inverted",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_type",
+    "stableId": 350183953,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_type",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:timer.get_info",
@@ -152,6 +1091,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_type",
+    "stableId": 353606235,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_type",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -165,6 +1121,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -178,6 +1136,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:resource.release",
+    "stableId": 366027815,
+    "modulePath": [
+      "resource"
+    ],
+    "member": "release",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_user_data",
+    "stableId": 366616171,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_user_data",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -191,6 +1180,155 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.cast_shape",
+    "stableId": 378378773,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "cast_shape",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:go.get_rotation",
+    "stableId": 384109339,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_rotation",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.exit",
+    "stableId": 389692837,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "exit",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.set_linear_velocity",
+    "stableId": 391829082,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_linear_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.cast_ray_closest",
+    "stableId": 404878944,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "cast_ray_closest",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:socket.newtry",
+    "stableId": 407150266,
+    "modulePath": [
+      "socket"
+    ],
+    "member": "newtry",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_slider_limits",
+    "stableId": 418897303,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_slider_limits",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 5,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_friction",
+    "stableId": 425242410,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_friction",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_anchor_a",
+    "stableId": 428788652,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_anchor_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_length_b",
+    "stableId": 435759016,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_length_b",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -203,6 +1341,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -216,7 +1356,68 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_velocity_in_local_point",
+    "stableId": 453695800,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_velocity_in_local_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_6dof_axis",
+    "stableId": 454405456,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_6dof_axis",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.get_world_scale",
+    "stableId": 457161058,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_world_scale",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_shape",
+    "stableId": 463523689,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_shape",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:sys.serialize",
@@ -228,7 +1429,97 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.destroy",
+    "stableId": 469246619,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "destroy",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:html5.run",
+    "stableId": 475687915,
+    "modulePath": [
+      "html5"
+    ],
+    "member": "run",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_anchor_b",
+    "stableId": 479121509,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_anchor_b",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_length_a",
+    "stableId": 486091873,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_length_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_angular_damping_ratio",
+    "stableId": 496555604,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_angular_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.set_group_gain",
+    "stableId": 497116905,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "set_group_gain",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:bullet3d.world.overlap_point",
@@ -241,6 +1532,66 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.enable_motor",
+    "stableId": 501836777,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "enable_motor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:profiler.scope_begin",
+    "stableId": 507784421,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "scope_begin",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.cast_ray",
+    "stableId": 508811620,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "cast_ray",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:gui.get_node",
+    "stableId": 509983822,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_node",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -254,6 +1605,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_id",
+    "stableId": 510669267,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_id",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.is_continuous_enabled",
+    "stableId": 512807196,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "is_continuous_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_total_force",
+    "stableId": 516724008,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_total_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -267,6 +1664,125 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:tilemap.set_tile",
+    "stableId": 530608877,
+    "modulePath": [
+      "tilemap"
+    ],
+    "member": "set_tile",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 5,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.is_valid",
+    "stableId": 537048135,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_max_force",
+    "stableId": 543146849,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_max_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:types.is_hash",
+    "stableId": 543852986,
+    "modulePath": [
+      "types"
+    ],
+    "member": "is_hash",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_ccd_swept_sphere_radius",
+    "stableId": 551560955,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_ccd_swept_sphere_radius",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.rebuild_static_tree",
+    "stableId": 553052175,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "rebuild_static_tree",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bit.lshift",
+    "stableId": 553650099,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "lshift",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_collide_connected",
+    "stableId": 555544111,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_collide_connected",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -280,6 +1796,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -292,6 +1810,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
   },
   {
@@ -305,6 +1825,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_position",
+    "stableId": 569013771,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bit.tobit",
+    "stableId": 578552117,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "tobit",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -317,6 +1868,150 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.set_parent",
+    "stableId": 593473189,
+    "modulePath": [
+      "go"
+    ],
+    "member": "set_parent",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_inner_radius",
+    "stableId": 599811265,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_inner_radius",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.quat_rotation_y",
+    "stableId": 603084884,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_rotation_y",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.set_render_enable",
+    "stableId": 606958618,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "set_render_enable",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.set_contact_tuning",
+    "stableId": 607955565,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "set_contact_tuning",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.set_position",
+    "stableId": 608141138,
+    "modulePath": [
+      "go"
+    ],
+    "member": "set_position",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.shape.enable_contact_events",
+    "stableId": 610292833,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "enable_contact_events",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sys.get_connectivity",
+    "stableId": 610646079,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_connectivity",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.quat_rotation_x",
+    "stableId": 619862503,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_rotation_x",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:collectionproxy.load",
+    "stableId": 620577334,
+    "modulePath": [
+      "collectionproxy"
+    ],
+    "member": "load",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -329,6 +2024,95 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_hinge_limits",
+    "stableId": 628130855,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_hinge_limits",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:bullet3d.constraint.set_hinge_motor",
+    "stableId": 628648916,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_hinge_motor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.overlap_aabb",
+    "stableId": 634121622,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "overlap_aabb",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:gui.set_particlefx",
+    "stableId": 634729758,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_particlefx",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:font.add_font",
+    "stableId": 638454056,
+    "modulePath": [
+      "font"
+    ],
+    "member": "add_font",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.pick_node",
+    "stableId": 642239255,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "pick_node",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -341,6 +2125,22 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.quat_rotation_z",
+    "stableId": 653417741,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_rotation_z",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -354,7 +2154,66 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:sound.set_pan",
+    "stableId": 665323993,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "set_pan",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sys.load_buffer",
+    "stableId": 667618348,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "load_buffer",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.fixture.is_sensor",
+    "stableId": 673579190,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "is_sensor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_color",
+    "stableId": 681356529,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_color",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:gui.get",
@@ -366,6 +2225,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -378,6 +2239,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.is_enabled",
+    "stableId": 689995381,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "is_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.world.is_valid",
+    "stableId": 696282104,
+    "modulePath": [
+      "bullet3d",
+      "world"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_linear_offset",
+    "stableId": 700729222,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_linear_offset",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -391,6 +2298,197 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_layer",
+    "stableId": 721158367,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_layer",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_blend_equation_separate",
+    "stableId": 721632055,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_blend_equation_separate",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.apply_angular_impulse",
+    "stableId": 726881113,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "apply_angular_impulse",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.set_angular_only",
+    "stableId": 733217526,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_angular_only",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.constant_buffer",
+    "stableId": 747345077,
+    "modulePath": [
+      "render"
+    ],
+    "member": "constant_buffer",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:hash_to_hex",
+    "stableId": 754452606,
+    "modulePath": [
+      "builtins"
+    ],
+    "member": "hash_to_hex",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.apply_torque",
+    "stableId": 761672151,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "apply_torque",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.new_text_node",
+    "stableId": 763092804,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "new_text_node",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.shape.get_local_transform",
+    "stableId": 764766037,
+    "modulePath": [
+      "bullet3d",
+      "shape"
+    ],
+    "member": "get_local_transform",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:b2d.joint.get_joint_translation",
+    "stableId": 767596551,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_joint_translation",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.dump",
+    "stableId": 775015646,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "dump",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.enable_sleeping",
+    "stableId": 776923317,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "enable_sleeping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.get_orthographic_mode",
+    "stableId": 780726310,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_orthographic_mode",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -403,6 +2501,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -415,7 +2515,139 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:collectionproxy.set_collection",
+    "stableId": 803274747,
+    "modulePath": [
+      "collectionproxy"
+    ],
+    "member": "set_collection",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:msg.url",
+    "stableId": 806414134,
+    "modulePath": [
+      "msg"
+    ],
+    "member": "url",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.is_sleeping_enabled",
+    "stableId": 814806862,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "is_sleeping_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.get_auto_aspect_ratio",
+    "stableId": 815384074,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_auto_aspect_ratio",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.get_window_height",
+    "stableId": 821977639,
+    "modulePath": [
+      "render"
+    ],
+    "member": "get_window_height",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:factory.unload",
+    "stableId": 826508291,
+    "modulePath": [
+      "factory"
+    ],
+    "member": "unload",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_local_center",
+    "stableId": 829974432,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_local_center",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_joint_angle",
+    "stableId": 830127879,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_joint_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.are_hit_events_enabled",
+    "stableId": 834096625,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "are_hit_events_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:b2d.body.get_transform",
@@ -428,7 +2660,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:profiler.enable_ui",
+    "stableId": 844414261,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "enable_ui",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.set_polygon_offset",
+    "stableId": 851073219,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_polygon_offset",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:sound.stop",
@@ -440,6 +2702,181 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_outline",
+    "stableId": 852399392,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_outline",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.is_sleeping_enabled",
+    "stableId": 853436726,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "is_sleeping_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.enable_cone_twist_motor",
+    "stableId": 859718991,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "enable_cone_twist_motor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_rotation",
+    "stableId": 863879680,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_rotation",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.set_restitution",
+    "stableId": 867459882,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "set_restitution",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.set_joint_tuning",
+    "stableId": 884160809,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "set_joint_tuning",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.cancel_flipbook",
+    "stableId": 884883204,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "cancel_flipbook",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:buffer.get_bytes",
+    "stableId": 886402628,
+    "modulePath": [
+      "buffer"
+    ],
+    "member": "get_bytes",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.is_valid",
+    "stableId": 889829034,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_translation",
+    "stableId": 889923285,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_translation",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.play",
+    "stableId": 900417529,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "play",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:socket.sleep",
+    "stableId": 902564824,
+    "modulePath": [
+      "socket"
+    ],
+    "member": "sleep",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -453,6 +2890,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -466,7 +2905,96 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 4,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_length",
+    "stableId": 944619485,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_length",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.shape.enable_hit_events",
+    "stableId": 945131398,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "enable_hit_events",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.shape.set_local_transform",
+    "stableId": 972753009,
+    "modulePath": [
+      "bullet3d",
+      "shape"
+    ],
+    "member": "set_local_transform",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.get_version",
+    "stableId": 984377853,
+    "modulePath": [
+      "b2d"
+    ],
+    "member": "get_version",
+    "loweringFamily": "lua-table",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.get_view",
+    "stableId": 986113063,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_view",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.get_rigid_body",
+    "stableId": 986235210,
+    "modulePath": [
+      "bullet3d"
+    ],
+    "member": "get_rigid_body",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:camera.get_cameras",
@@ -478,6 +3006,97 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_sleeping_thresholds",
+    "stableId": 1010176288,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_sleeping_thresholds",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.is_past_swing_limit",
+    "stableId": 1018022142,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "is_past_swing_limit",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_motor_force",
+    "stableId": 1020113598,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_motor_force",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.is_phone_call_active",
+    "stableId": 1027591192,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "is_phone_call_active",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_angular_factor",
+    "stableId": 1037639542,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_angular_factor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.is_warm_starting_enabled",
+    "stableId": 1037676287,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "is_warm_starting_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -490,7 +3109,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_awake",
+    "stableId": 1043138825,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_awake",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:window.set_mouse_lock",
+    "stableId": 1050223476,
+    "modulePath": [
+      "window"
+    ],
+    "member": "set_mouse_lock",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:socket.gettime",
+    "stableId": 1053915798,
+    "modulePath": [
+      "socket"
+    ],
+    "member": "gettime",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:socket.connect",
@@ -502,7 +3166,51 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 5,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:go.get_world_scale_uniform",
+    "stableId": 1055817377,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_world_scale_uniform",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_perspective",
+    "stableId": 1058276904,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_perspective",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.hide_keyboard",
+    "stableId": 1066639565,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "hide_keyboard",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:material.get_vertex_attributes",
@@ -514,7 +3222,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_shadow",
+    "stableId": 1077816394,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_shadow",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_compute",
+    "stableId": 1089182856,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_compute",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:b2d.body.get_shapes",
@@ -527,7 +3265,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:render.set_render_target_size",
+    "stableId": 1091762951,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_render_target_size",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:bullet3d.constraint.create_cone_twist",
@@ -540,6 +3294,139 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.set_event_listener",
+    "stableId": 1107212821,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "set_event_listener",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:msg.post",
+    "stableId": 1111726479,
+    "modulePath": [
+      "msg"
+    ],
+    "member": "post",
+    "loweringFamily": "lua-table",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_ccd_motion_threshold",
+    "stableId": 1113126993,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_ccd_motion_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_transform",
+    "stableId": 1115022875,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_transform",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.chain.get_world",
+    "stableId": 1117101178,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.get_joint_reaction_force",
+    "stableId": 1120188142,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "get_joint_reaction_force",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.overlap_shape",
+    "stableId": 1130607345,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "overlap_shape",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:window.get_dim_mode",
+    "stableId": 1130709659,
+    "modulePath": [
+      "window"
+    ],
+    "member": "get_dim_mode",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.get_world",
+    "stableId": 1138630650,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -553,7 +3440,67 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_hinge_limits",
+    "stableId": 1148448451,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_hinge_limits",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_max_torque",
+    "stableId": 1148546556,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_max_torque",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bit.bswap",
+    "stableId": 1151793552,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "bswap",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:html5.set_interaction_listener",
+    "stableId": 1164539114,
+    "modulePath": [
+      "html5"
+    ],
+    "member": "set_interaction_listener",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:sys.get_ifaddrs",
@@ -565,6 +3512,80 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.cancel_animations",
+    "stableId": 1183026732,
+    "modulePath": [
+      "go"
+    ],
+    "member": "cancel_animations",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:crash.set_user_field",
+    "stableId": 1193509462,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "set_user_field",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.shape.enable_sensor_events",
+    "stableId": 1203246873,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "enable_sensor_events",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_length_range",
+    "stableId": 1206835539,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_length_range",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_perimeter_vertices",
+    "stableId": 1209433937,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_perimeter_vertices",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -577,6 +3598,81 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.is_sleeping_allowed",
+    "stableId": 1222264979,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "is_sleeping_allowed",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.set_hit_event_threshold",
+    "stableId": 1227412505,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "set_hit_event_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.matrix4",
+    "stableId": 1238853489,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.get_gravity",
+    "stableId": 1242286766,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "get_gravity",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.get_maximum_linear_speed",
+    "stableId": 1242298027,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "get_maximum_linear_speed",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -589,7 +3685,96 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_linear_velocity",
+    "stableId": 1244171291,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_linear_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:model.get_go",
+    "stableId": 1244796042,
+    "modulePath": [
+      "model"
+    ],
+    "member": "get_go",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bit.arshift",
+    "stableId": 1244951420,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "arshift",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_name",
+    "stableId": 1246427194,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_name",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_awake",
+    "stableId": 1252612060,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_awake",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:resource.set",
+    "stableId": 1254740582,
+    "modulePath": [
+      "resource"
+    ],
+    "member": "set",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:sys.load",
@@ -601,6 +3786,22 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:crash.get_signum",
+    "stableId": 1269208753,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "get_signum",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -614,6 +3815,153 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.set_gravity",
+    "stableId": 1277170138,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "set_gravity",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:model.play_anim",
+    "stableId": 1281580293,
+    "modulePath": [
+      "model"
+    ],
+    "member": "play_anim",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:window.set_listener",
+    "stableId": 1282520203,
+    "modulePath": [
+      "window"
+    ],
+    "member": "set_listener",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sys.get_config_int",
+    "stableId": 1282948964,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_config_int",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_spring_equilibrium_point",
+    "stableId": 1284306316,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_spring_equilibrium_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_hertz",
+    "stableId": 1284819038,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.set_6dof_motor",
+    "stableId": 1289175282,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_6dof_motor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 5,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_internal_type",
+    "stableId": 1290785334,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_internal_type",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.ortho_inv",
+    "stableId": 1292408212,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "ortho_inv",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_world_center_of_mass",
+    "stableId": 1293500276,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_world_center_of_mass",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -626,7 +3974,24 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_max_motor_force",
+    "stableId": 1298519223,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_max_motor_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:socket.dns.tohostname",
@@ -639,7 +4004,125 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:go.animate",
+    "stableId": 1302980535,
+    "modulePath": [
+      "go"
+    ],
+    "member": "animate",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 6,
+    "maximumArgumentCount": 8,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.fixture.get_type",
+    "stableId": 1310385622,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "get_type",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.exists",
+    "stableId": 1311027776,
+    "modulePath": [
+      "go"
+    ],
+    "member": "exists",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.euler_to_quat",
+    "stableId": 1329930197,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "euler_to_quat",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_size",
+    "stableId": 1335131087,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_size",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_sleep_threshold",
+    "stableId": 1335620596,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_sleep_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.wake_bodies",
+    "stableId": 1338862049,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "wake_bodies",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.set_type",
+    "stableId": 1345069645,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_type",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:compute.get_samplers",
@@ -651,6 +4134,125 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.get_body",
+    "stableId": 1348712235,
+    "modulePath": [
+      "b2d"
+    ],
+    "member": "get_body",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_slider_motor",
+    "stableId": 1362876804,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_slider_motor",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 3,
+    "maximumResultCount": 3,
+    "resultCount": 3
+  },
+  {
+    "id": "script:b2d.fixture.set_density",
+    "stableId": 1362948782,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "set_density",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:socket.dns.gethostname",
+    "stableId": 1367399751,
+    "modulePath": [
+      "socket",
+      "dns"
+    ],
+    "member": "gethostname",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_activation_state",
+    "stableId": 1374213814,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_activation_state",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_linear_factor",
+    "stableId": 1380030491,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_linear_factor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.set_color_mask",
+    "stableId": 1380158343,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_color_mask",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_outer_bounds",
+    "stableId": 1380414043,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_outer_bounds",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -663,6 +4265,152 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_world",
+    "stableId": 1391478857,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_frequency",
+    "stableId": 1394715861,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_frequency",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.render_target",
+    "stableId": 1410796854,
+    "modulePath": [
+      "render"
+    ],
+    "member": "render_target",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_inner_radius",
+    "stableId": 1417724085,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_inner_radius",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.exists",
+    "stableId": 1421868765,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "exists",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_leading",
+    "stableId": 1425442548,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_leading",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_type",
+    "stableId": 1431438690,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_type",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:physics.get_joint_reaction_torque",
+    "stableId": 1431636929,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "get_joint_reaction_torque",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_damping",
+    "stableId": 1432460324,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_damping",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:b2d.body.get_force",
+    "stableId": 1437207392,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -675,6 +4423,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -687,6 +4437,22 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:profiler.get_memory_usage",
+    "stableId": 1450101103,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "get_memory_usage",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -699,6 +4465,427 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.quat_from_to",
+    "stableId": 1458980654,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_from_to",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.enable_limit",
+    "stableId": 1468180163,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "enable_limit",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_position",
+    "stableId": 1474440329,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_ratio",
+    "stableId": 1474552496,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.get_id",
+    "stableId": 1477563324,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_id",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_text",
+    "stableId": 1480837389,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_text",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_fill_angle",
+    "stableId": 1481858659,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_fill_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_shadow",
+    "stableId": 1482532654,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_shadow",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.set_stencil_op",
+    "stableId": 1483760217,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_stencil_op",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.shape.enable_pre_solve_events",
+    "stableId": 1486378210,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "enable_pre_solve_events",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bit.rshift",
+    "stableId": 1486569517,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "rshift",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_gravity_scale",
+    "stableId": 1493593008,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_gravity_scale",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.get_world_transform",
+    "stableId": 1495634860,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_world_transform",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.pause",
+    "stableId": 1502096075,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "pause",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.apply_linear_impulse_to_center",
+    "stableId": 1504032840,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "apply_linear_impulse_to_center",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_position",
+    "stableId": 1505246598,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_local_vector",
+    "stableId": 1514018830,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_local_vector",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.get_orthographic_zoom",
+    "stableId": 1514123934,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_orthographic_zoom",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.clone",
+    "stableId": 1520695164,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "clone",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_mouse_target",
+    "stableId": 1530375664,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_mouse_target",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.set_maximum_linear_speed",
+    "stableId": 1538520927,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "set_maximum_linear_speed",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_texture",
+    "stableId": 1539901009,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_texture",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:json.decode",
+    "stableId": 1547570734,
+    "modulePath": [
+      "json"
+    ],
+    "member": "decode",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:label.get_text",
+    "stableId": 1547809370,
+    "modulePath": [
+      "label"
+    ],
+    "member": "get_text",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_linear_sleeping_threshold",
+    "stableId": 1554278229,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_linear_sleeping_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_deactivation_time",
+    "stableId": 1557579929,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_deactivation_time",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.animate",
+    "stableId": 1559320978,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "animate",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 5,
+    "maximumArgumentCount": 8,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_joint2",
+    "stableId": 1561866043,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_joint2",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_static_or_kinematic",
+    "stableId": 1573718186,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_static_or_kinematic",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -711,7 +4898,241 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:gui.get_slice9",
+    "stableId": 1576625571,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_slice9",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.set_vsync_swap_interval",
+    "stableId": 1577053319,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "set_vsync_swap_interval",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_joint1",
+    "stableId": 1578643662,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_joint1",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.is_valid",
+    "stableId": 1599150497,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_text",
+    "stableId": 1599701945,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_text",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.get_config_number",
+    "stableId": 1601401386,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_config_number",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:collectionfactory.unload",
+    "stableId": 1613326455,
+    "modulePath": [
+      "collectionfactory"
+    ],
+    "member": "unload",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_friction",
+    "stableId": 1617568870,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_friction",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.get_world",
+    "stableId": 1630000402,
+    "modulePath": [
+      "bullet3d"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.is_angular_only",
+    "stableId": 1630645178,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "is_angular_only",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_slider_motor",
+    "stableId": 1640036184,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_slider_motor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 5,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_linear_damping_ratio",
+    "stableId": 1640780473,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_linear_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.is_motor_enabled",
+    "stableId": 1647569116,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "is_motor_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_clipping_mode",
+    "stableId": 1648551722,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_clipping_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.get_fov",
+    "stableId": 1655100321,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_fov",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_max_motor_torque",
+    "stableId": 1658584934,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_max_motor_torque",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:b2d.body.create_shape",
@@ -724,6 +5145,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -737,7 +5160,38 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_scale",
+    "stableId": 1671879400,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_scale",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_angular_velocity",
+    "stableId": 1682504750,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_angular_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:buffer.set_metadata",
@@ -749,6 +5203,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 4,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -761,7 +5217,96 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_linear_velocity_from_local_point",
+    "stableId": 1697160681,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_linear_velocity_from_local_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_stencil_func",
+    "stableId": 1699887816,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_stencil_func",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_spring_damping_ratio",
+    "stableId": 1701854609,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_spring_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sprite.set_hflip",
+    "stableId": 1703142815,
+    "modulePath": [
+      "sprite"
+    ],
+    "member": "set_hflip",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_outer_bounds",
+    "stableId": 1712128015,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_outer_bounds",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_torque",
+    "stableId": 1714775424,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_torque",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:sys.get_sys_info",
@@ -773,6 +5318,170 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_motor_torque",
+    "stableId": 1729897617,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_motor_torque",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_axis_angle",
+    "stableId": 1732915491,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_axis_angle",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_rigid_body",
+    "stableId": 1736938494,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_rigid_body",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_tracking",
+    "stableId": 1740794531,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_tracking",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.enable_hit_events",
+    "stableId": 1756693907,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "enable_hit_events",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_twist_angle",
+    "stableId": 1756909110,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_twist_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_sleep_threshold",
+    "stableId": 1761419560,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_sleep_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_texture",
+    "stableId": 1764006405,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_texture",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_valid",
+    "stableId": 1778479724,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_max_torque",
+    "stableId": 1781959424,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_max_torque",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.is_bullet",
+    "stableId": 1788367281,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "is_bullet",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -785,6 +5494,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -798,6 +5509,67 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:factory.load",
+    "stableId": 1808015212,
+    "modulePath": [
+      "factory"
+    ],
+    "member": "load",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.shape.is_valid",
+    "stableId": 1810895539,
+    "modulePath": [
+      "bullet3d",
+      "shape"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_angular_hertz",
+    "stableId": 1825309259,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_angular_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_angular_factor",
+    "stableId": 1829494690,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_angular_factor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -810,6 +5582,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_reference_angle",
+    "stableId": 1831975898,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_reference_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_depth_func",
+    "stableId": 1832879575,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_depth_func",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_contact_processing_threshold",
+    "stableId": 1840003570,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_contact_processing_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -823,6 +5641,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_central_force",
+    "stableId": 1847318583,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_central_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.mul_per_elem",
+    "stableId": 1848085754,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "mul_per_elem",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -836,6 +5685,38 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_current_length",
+    "stableId": 1858724003,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_current_length",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_linear_velocity",
+    "stableId": 1859883727,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_linear_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -848,6 +5729,183 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.play_flipbook",
+    "stableId": 1867420328,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "play_flipbook",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:physics.get_maskbit",
+    "stableId": 1870095059,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "get_maskbit",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_blend_mode",
+    "stableId": 1874419309,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_blend_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_linear_offset",
+    "stableId": 1876944410,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_linear_offset",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_angular_velocity",
+    "stableId": 1877680226,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_angular_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_target_transform",
+    "stableId": 1878493291,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_target_transform",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:window.set_size",
+    "stableId": 1882390770,
+    "modulePath": [
+      "window"
+    ],
+    "member": "set_size",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_force_at_relative_position",
+    "stableId": 1886699882,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_force_at_relative_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.destroy_shape",
+    "stableId": 1886957296,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "destroy_shape",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_next",
+    "stableId": 1887140972,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_next",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:label.set_text",
+    "stableId": 1888249062,
+    "modulePath": [
+      "label"
+    ],
+    "member": "set_text",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.is_fixed_rotation",
+    "stableId": 1888837992,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "is_fixed_rotation",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -860,6 +5918,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.get_sensor_capacity",
+    "stableId": 1923506897,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "get_sensor_capacity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -873,7 +5948,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_fill_angle",
+    "stableId": 1932260719,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_fill_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_safe_area_mode",
+    "stableId": 1932609869,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_safe_area_mode",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:graphics.get_engine_adapters",
@@ -885,6 +5990,51 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.delete_render_target",
+    "stableId": 1966474874,
+    "modulePath": [
+      "render"
+    ],
+    "member": "delete_render_target",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_alpha",
+    "stableId": 1980130538,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_alpha",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.get_restitution",
+    "stableId": 1981767718,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "get_restitution",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -897,7 +6047,81 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_reference_angle",
+    "stableId": 1986143646,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_reference_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_height",
+    "stableId": 1986171713,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_height",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_euler",
+    "stableId": 1987751891,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_euler",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_world",
+    "stableId": 1990790943,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_view",
+    "stableId": 1992852954,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_view",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:graphics.get_adapter_info",
@@ -909,7 +6133,154 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.get_restitution_threshold",
+    "stableId": 2004760327,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "get_restitution_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_size",
+    "stableId": 2019469243,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_size",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bit.band",
+    "stableId": 2020799616,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "band",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 32,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.get_gravity",
+    "stableId": 2025739993,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "get_gravity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_slider_position",
+    "stableId": 2033501892,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_slider_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.is_music_playing",
+    "stableId": 2034901354,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "is_music_playing",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_6dof_motor",
+    "stableId": 2038251318,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_6dof_motor",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 4,
+    "maximumResultCount": 4,
+    "resultCount": 4
+  },
+  {
+    "id": "script:gui.set_yanchor",
+    "stableId": 2042797604,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_yanchor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_width",
+    "stableId": 2048321486,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_width",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.fixture.refilter",
+    "stableId": 2058062780,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "refilter",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:sys.open_url",
@@ -921,7 +6292,308 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:camera.set_far_z",
+    "stableId": 2081791798,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "set_far_z",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.set_rotation",
+    "stableId": 2093413559,
+    "modulePath": [
+      "go"
+    ],
+    "member": "set_rotation",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.set_projection",
+    "stableId": 2094481018,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_projection",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.set_angular_damping",
+    "stableId": 2094621188,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_angular_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_size_mode",
+    "stableId": 2104597123,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_size_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.set_listener",
+    "stableId": 2106330303,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_listener",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.reset_nodes",
+    "stableId": 2107179008,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "reset_nodes",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.matrix4_scale",
+    "stableId": 2116175008,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_scale",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sprite.play_flipbook",
+    "stableId": 2116188218,
+    "modulePath": [
+      "sprite"
+    ],
+    "member": "play_flipbook",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_adjust_mode",
+    "stableId": 2124339589,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_adjust_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:crash.load_previous",
+    "stableId": 2128448069,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "load_previous",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_limit",
+    "stableId": 2136912702,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_limit",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:crash.write_dump",
+    "stableId": 2139022713,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "write_dump",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_static",
+    "stableId": 2139660584,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_static",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_look_at",
+    "stableId": 2149531511,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_look_at",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:window.get_display_scale",
+    "stableId": 2150954578,
+    "modulePath": [
+      "window"
+    ],
+    "member": "get_display_scale",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_clipping_mode",
+    "stableId": 2151763318,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_clipping_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.get_window_width",
+    "stableId": 2157256624,
+    "modulePath": [
+      "render"
+    ],
+    "member": "get_window_width",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:tilemap.get_bounds",
+    "stableId": 2158702312,
+    "modulePath": [
+      "tilemap"
+    ],
+    "member": "get_bounds",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 4,
+    "maximumResultCount": 4,
+    "resultCount": 4
+  },
+  {
+    "id": "script:b2d.body.get_inertia",
+    "stableId": 2158714333,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_inertia",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_deactivation_time",
+    "stableId": 2161861693,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_deactivation_time",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:b2d.shape.get_mass_data",
@@ -934,7 +6606,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:render.set_viewport",
+    "stableId": 2171506453,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_viewport",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.set_scale",
+    "stableId": 2172419017,
+    "modulePath": [
+      "go"
+    ],
+    "member": "set_scale",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_damping_ratio",
+    "stableId": 2177123021,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:material.get_constants",
@@ -946,6 +6663,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -958,7 +6677,81 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_particlefx",
+    "stableId": 2186140978,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_particlefx",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_collision_flags",
+    "stableId": 2203492448,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_collision_flags",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:profiler.set_ui_mode",
+    "stableId": 2218436408,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "set_ui_mode",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:socket.protect",
+    "stableId": 2218837340,
+    "modulePath": [
+      "socket"
+    ],
+    "member": "protect",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_mouse_target",
+    "stableId": 2226678396,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_mouse_target",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:b2d.chain.get_geometry",
@@ -971,6 +6764,82 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_limit_state",
+    "stableId": 2232191910,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_limit_state",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_linear_hertz",
+    "stableId": 2235591910,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_linear_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.set_user_data",
+    "stableId": 2241017567,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_user_data",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:buffer.copy_stream",
+    "stableId": 2241911666,
+    "modulePath": [
+      "buffer"
+    ],
+    "member": "copy_stream",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 5,
+    "maximumArgumentCount": 5,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_upper_limit",
+    "stableId": 2252539607,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_upper_limit",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -984,7 +6853,96 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:go.world_to_local_transform",
+    "stableId": 2265777619,
+    "modulePath": [
+      "go"
+    ],
+    "member": "world_to_local_transform",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.enable_continuous",
+    "stableId": 2271330915,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "enable_continuous",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_flipbook_playback_rate",
+    "stableId": 2274625155,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_flipbook_playback_rate",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.fixture.get_density",
+    "stableId": 2277077666,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "get_density",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:font.set_style",
+    "stableId": 2283853637,
+    "modulePath": [
+      "font"
+    ],
+    "member": "set_style",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_lower_limit",
+    "stableId": 2292242662,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_lower_limit",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:bullet3d.world.cast_shape_closest",
@@ -997,6 +6955,38 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.is_valid",
+    "stableId": 2301892650,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_linear_velocity_from_world_point",
+    "stableId": 2305883589,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_linear_velocity_from_world_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1009,7 +6999,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:b2d.shape.are_sensor_events_enabled",
+    "stableId": 2311969276,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "are_sensor_events_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sprite.set_vflip",
+    "stableId": 2316635445,
+    "modulePath": [
+      "sprite"
+    ],
+    "member": "set_vflip",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:crash.get_sys_field",
+    "stableId": 2320525628,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "get_sys_field",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:material.get_textures",
@@ -1021,6 +7056,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.get_projection",
+    "stableId": 2326768707,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_projection",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_world_transform",
+    "stableId": 2327634387,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_world_transform",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:b2d.chain.get_material",
+    "stableId": 2336375595,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "get_material",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1033,6 +7114,80 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_local_point",
+    "stableId": 2341357133,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_local_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:profiler.recorded_frame_count",
+    "stableId": 2347140851,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "recorded_frame_count",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_name",
+    "stableId": 2352869094,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_name",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:font.remove_font",
+    "stableId": 2369627843,
+    "modulePath": [
+      "font"
+    ],
+    "member": "remove_font",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.length",
+    "stableId": 2370510694,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "length",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1046,6 +7201,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 4,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.move_below",
+    "stableId": 2381037776,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "move_below",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.chain.set_material",
+    "stableId": 2384789823,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "set_material",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1058,6 +7244,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1070,7 +7258,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:crash.set_file_path",
+    "stableId": 2406941902,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "set_file_path",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:model.get_mesh_enabled",
+    "stableId": 2409536311,
+    "modulePath": [
+      "model"
+    ],
+    "member": "get_mesh_enabled",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:resource.get_text_metrics",
@@ -1082,7 +7300,97 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_mass",
+    "stableId": 2411304838,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_mass",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_body_a",
+    "stableId": 2420295687,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_body_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.is_locked",
+    "stableId": 2426035187,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "is_locked",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.disable_material",
+    "stableId": 2431147342,
+    "modulePath": [
+      "render"
+    ],
+    "member": "disable_material",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_body_b",
+    "stableId": 2437073306,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_body_b",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_depth_mask",
+    "stableId": 2443358201,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_depth_mask",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:bullet3d.shape.get_shape",
@@ -1095,7 +7403,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:sys.load_buffer_async",
+    "stableId": 2461929107,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "load_buffer_async",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:resource.create_texture_async",
+    "stableId": 2463011221,
+    "modulePath": [
+      "resource"
+    ],
+    "member": "create_texture_async",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
   },
   {
     "id": "script:sound.get_groups",
@@ -1107,6 +7445,22 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_index",
+    "stableId": 2475985606,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_index",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1119,6 +7473,294 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_use_linear_reference_frame_a",
+    "stableId": 2489081210,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_use_linear_reference_frame_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:window.set_dim_mode",
+    "stableId": 2490982863,
+    "modulePath": [
+      "window"
+    ],
+    "member": "set_dim_mode",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bit.tohex",
+    "stableId": 2491340691,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "tohex",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:model.set_mesh_enabled",
+    "stableId": 2492040859,
+    "modulePath": [
+      "model"
+    ],
+    "member": "set_mesh_enabled",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bit.bxor",
+    "stableId": 2492420236,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "bxor",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 32,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.world_to_local_position",
+    "stableId": 2492984466,
+    "modulePath": [
+      "go"
+    ],
+    "member": "world_to_local_position",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_mass",
+    "stableId": 2497237442,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_mass",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.is_limited",
+    "stableId": 2498795079,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "is_limited",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_compose",
+    "stableId": 2501238546,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_compose",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_pivot",
+    "stableId": 2503216970,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_pivot",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_rotation_y",
+    "stableId": 2509648852,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_rotation_y",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.shape.get_index",
+    "stableId": 2512948821,
+    "modulePath": [
+      "bullet3d",
+      "shape"
+    ],
+    "member": "get_index",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_contact_processing_threshold",
+    "stableId": 2518924678,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_contact_processing_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.get_group_name",
+    "stableId": 2520029065,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "get_group_name",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_font",
+    "stableId": 2524172963,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_font",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.disable_texture",
+    "stableId": 2525269590,
+    "modulePath": [
+      "render"
+    ],
+    "member": "disable_texture",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.matrix4_rotation_x",
+    "stableId": 2526426471,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_rotation_x",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.clamp",
+    "stableId": 2532589649,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "clamp",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.get_world_position",
+    "stableId": 2533378019,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_world_position",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.has_collision_flag",
+    "stableId": 2534203119,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "has_collision_flag",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1132,7 +7774,24 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_sleeping_allowed",
+    "stableId": 2544504459,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_sleeping_allowed",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:render.draw_debug3d",
@@ -1144,6 +7803,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1157,6 +7818,80 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_linear_velocity_from_world_point",
+    "stableId": 2555262514,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_linear_velocity_from_world_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_rotation_z",
+    "stableId": 2559981709,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_rotation_z",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_blend_mode",
+    "stableId": 2569911913,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_blend_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_restitution",
+    "stableId": 2573689764,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_restitution",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.screen_to_local",
+    "stableId": 2583888125,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "screen_to_local",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1170,7 +7905,225 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.world.get_gravity",
+    "stableId": 2585594286,
+    "modulePath": [
+      "bullet3d",
+      "world"
+    ],
+    "member": "get_gravity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_linear_velocity",
+    "stableId": 2588459910,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_linear_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_max_motor_force",
+    "stableId": 2596629563,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_max_motor_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:types.is_matrix4",
+    "stableId": 2597142853,
+    "modulePath": [
+      "types"
+    ],
+    "member": "is_matrix4",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_motor_speed",
+    "stableId": 2599386826,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_motor_speed",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:socket.skip",
+    "stableId": 2601339186,
+    "modulePath": [
+      "socket"
+    ],
+    "member": "skip",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 32,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.new_particlefx_node",
+    "stableId": 2603122601,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "new_particlefx_node",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.show_keyboard",
+    "stableId": 2609195142,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "show_keyboard",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:liveupdate.is_built_with_excluded_files",
+    "stableId": 2617193436,
+    "modulePath": [
+      "liveupdate"
+    ],
+    "member": "is_built_with_excluded_files",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.world.set_gravity",
+    "stableId": 2620477658,
+    "modulePath": [
+      "bullet3d",
+      "world"
+    ],
+    "member": "set_gravity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.set_near_z",
+    "stableId": 2620899633,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "set_near_z",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_reaction_torque",
+    "stableId": 2623669505,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_reaction_torque",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.new_pie_node",
+    "stableId": 2624398591,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "new_pie_node",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.get_rms",
+    "stableId": 2635085856,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "get_rms",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:vmath.quat_to_euler",
+    "stableId": 2641296689,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_to_euler",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 3,
+    "maximumResultCount": 3,
+    "resultCount": 3
   },
   {
     "id": "script:socket.tcp6",
@@ -1182,6 +8135,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
   },
   {
@@ -1194,6 +8149,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1207,7 +8164,81 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_collide_connected",
+    "stableId": 2656088301,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_collide_connected",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.set_angular_velocity",
+    "stableId": 2666237193,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_angular_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:window.set_position",
+    "stableId": 2677153760,
+    "modulePath": [
+      "window"
+    ],
+    "member": "set_position",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.project",
+    "stableId": 2686972787,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "project",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.delete_texture",
+    "stableId": 2687333512,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "delete_texture",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:b2d.body.get_fixtures",
@@ -1220,6 +8251,51 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_collide_connected",
+    "stableId": 2700128697,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_collide_connected",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_clipping_inverted",
+    "stableId": 2704515948,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_clipping_inverted",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.dot",
+    "stableId": 2708084985,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "dot",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1232,7 +8308,67 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.clear_forces",
+    "stableId": 2715712589,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "clear_forces",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.fixture.set_friction",
+    "stableId": 2716170248,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "set_friction",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.set_stencil_mask",
+    "stableId": 2717264638,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_stencil_mask",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sound.get_peak",
+    "stableId": 2722214421,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "get_peak",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
   },
   {
     "id": "script:b2d.world.get_profile",
@@ -1245,6 +8381,151 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.set_fov",
+    "stableId": 2734551893,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "set_fov",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_xanchor",
+    "stableId": 2738230127,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_xanchor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_cone_twist_motor_target",
+    "stableId": 2740088618,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_cone_twist_motor_target",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.get_hit_event_threshold",
+    "stableId": 2744346245,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "get_hit_event_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.get_config_string",
+    "stableId": 2745305294,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_config_string",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_alpha",
+    "stableId": 2749898006,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_alpha",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.quat",
+    "stableId": 2756728049,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_linear_damping",
+    "stableId": 2758787485,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_linear_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_clipping_visible",
+    "stableId": 2765276089,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_clipping_visible",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.get_scale",
+    "stableId": 2771038861,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_scale",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1257,7 +8538,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 6,
     "maximumArgumentCount": 7,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:sys.set_error_handler",
+    "stableId": 2791701985,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "set_error_handler",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.matrix4_orthographic",
+    "stableId": 2797369728,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_orthographic",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 6,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_angular_sleeping_threshold",
+    "stableId": 2798035104,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_angular_sleeping_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:bullet3d.world.cast_shape",
@@ -1270,6 +8596,224 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 5,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:particlefx.play",
+    "stableId": 2809933664,
+    "modulePath": [
+      "particlefx"
+    ],
+    "member": "play",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:tilemap.get_tile",
+    "stableId": 2810309289,
+    "modulePath": [
+      "tilemap"
+    ],
+    "member": "get_tile",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.from_shape",
+    "stableId": 2813724309,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "from_shape",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_ground_anchor_b",
+    "stableId": 2814295467,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_ground_anchor_b",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.get_world_rotation",
+    "stableId": 2823544550,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_world_rotation",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_linear_damping_ratio",
+    "stableId": 2826649109,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_linear_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_ground_anchor_a",
+    "stableId": 2831073086,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_ground_anchor_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.new_texture",
+    "stableId": 2832050683,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "new_texture",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 6,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 1,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:gui.set_screen_position",
+    "stableId": 2837486932,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_screen_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:hash",
+    "stableId": 2845099200,
+    "modulePath": [
+      "builtins"
+    ],
+    "member": "hash",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.set_engine_throttle",
+    "stableId": 2847174763,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "set_engine_throttle",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:font.prewarm_text",
+    "stableId": 2848412671,
+    "modulePath": [
+      "font"
+    ],
+    "member": "prewarm_text",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.is_active",
+    "stableId": 2866304309,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "is_active",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_tracking",
+    "stableId": 2870007327,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_tracking",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.fixture.get_friction",
+    "stableId": 2870775508,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "get_friction",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1283,6 +8827,50 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.set_orthographic_mode",
+    "stableId": 2873442090,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "set_orthographic_mode",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:physics.set_hflip",
+    "stableId": 2879664679,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "set_hflip",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_color",
+    "stableId": 2904403717,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_color",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1295,7 +8883,68 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_angular_damping",
+    "stableId": 2907872337,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_angular_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.delete",
+    "stableId": 2920192283,
+    "modulePath": [
+      "go"
+    ],
+    "member": "delete",
+    "loweringFamily": "lua-table",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_ratio",
+    "stableId": 2922516844,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_frame_a",
+    "stableId": 2928762044,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_frame_a",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
   },
   {
     "id": "script:resource.get_texture_info",
@@ -1307,6 +8956,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_frequency",
+    "stableId": 2930290441,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_frequency",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_inherit_alpha",
+    "stableId": 2930785382,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_inherit_alpha",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.is_awake",
+    "stableId": 2936687572,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "is_awake",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1319,6 +9014,22 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.set_aspect_ratio",
+    "stableId": 2940707570,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "set_aspect_ratio",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1332,7 +9043,39 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.get_body",
+    "stableId": 2944082506,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "get_body",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.fixture.set_sensor",
+    "stableId": 2944376556,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "set_sensor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:bullet3d.constraint.create_generic_6dof_spring",
@@ -1345,6 +9088,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1358,6 +9103,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1370,6 +9117,197 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.set_frame_a",
+    "stableId": 2961401384,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_frame_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.apply_force",
+    "stableId": 2962062296,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "apply_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.quat_basis",
+    "stableId": 2962238768,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_basis",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_reaction_force",
+    "stableId": 2962591790,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_reaction_force",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_mass_properties",
+    "stableId": 2968941778,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_mass_properties",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sys.get_host_path",
+    "stableId": 2971433320,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_host_path",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:pprint",
+    "stableId": 2977240615,
+    "modulePath": [
+      "builtins"
+    ],
+    "member": "pprint",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 32,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_frame_b",
+    "stableId": 2979094901,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_frame_b",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:vmath.length_sqr",
+    "stableId": 2981849211,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "length_sqr",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:json.encode",
+    "stableId": 2983061638,
+    "modulePath": [
+      "json"
+    ],
+    "member": "encode",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_xanchor",
+    "stableId": 2994148867,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_xanchor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.is_spring_enabled",
+    "stableId": 2998717522,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "is_spring_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_frame_b",
+    "stableId": 3011734241,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_frame_b",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1383,6 +9321,22 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.get_width",
+    "stableId": 3019471645,
+    "modulePath": [
+      "render"
+    ],
+    "member": "get_width",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1395,6 +9349,152 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.cross",
+    "stableId": 3022880242,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "cross",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.activate",
+    "stableId": 3024397388,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "activate",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_layout",
+    "stableId": 3027276460,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_layout",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.set_group",
+    "stableId": 3028485791,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "set_group",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.slerp",
+    "stableId": 3033910890,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "slerp",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_adjust_mode",
+    "stableId": 3034962065,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_adjust_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_pivots",
+    "stableId": 3035905514,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_pivots",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.apply_force_to_center",
+    "stableId": 3039406416,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "apply_force_to_center",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:profiler.enable",
+    "stableId": 3042163066,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "enable",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_world_point",
+    "stableId": 3042755438,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_world_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1407,6 +9507,51 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:particlefx.set_constant",
+    "stableId": 3047358751,
+    "modulePath": [
+      "particlefx"
+    ],
+    "member": "set_constant",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.world.get_collision_object_count",
+    "stableId": 3056503702,
+    "modulePath": [
+      "bullet3d",
+      "world"
+    ],
+    "member": "get_collision_object_count",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.set_update_frequency",
+    "stableId": 3058596528,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "set_update_frequency",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1419,6 +9564,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1432,7 +9579,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_quat",
+    "stableId": 3063853257,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_quat",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:profiler.set_ui_vsync_wait_visible",
+    "stableId": 3083074845,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "set_ui_vsync_wait_visible",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_pivots",
+    "stableId": 3105177886,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_pivots",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
   },
   {
     "id": "script:b2d.joint.create_weld",
@@ -1445,6 +9637,22 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:buffer.get_stream",
+    "stableId": 3111756709,
+    "modulePath": [
+      "buffer"
+    ],
+    "member": "get_stream",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1457,6 +9665,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1469,6 +9679,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1482,7 +9694,239 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:gui.get_parent",
+    "stableId": 3125128426,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_parent",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_torque_impulse",
+    "stableId": 3128444252,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_torque_impulse",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.enable_sleep",
+    "stableId": 3138438891,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "enable_sleep",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.get_parent",
+    "stableId": 3138865481,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_parent",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_flipbook_cursor",
+    "stableId": 3158379927,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_flipbook_cursor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.get_scale_uniform",
+    "stableId": 3159049394,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_scale_uniform",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.set_maskbit",
+    "stableId": 3160984935,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "set_maskbit",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.has_flag",
+    "stableId": 3174044920,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "has_flag",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_joint_speed",
+    "stableId": 3189910327,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_joint_speed",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.enable_state",
+    "stableId": 3190141495,
+    "modulePath": [
+      "render"
+    ],
+    "member": "enable_state",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.enable_speculative",
+    "stableId": 3194126675,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "enable_speculative",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:profiler.scope_end",
+    "stableId": 3195307493,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "scope_end",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:tilemap.set_visible",
+    "stableId": 3195961805,
+    "modulePath": [
+      "tilemap"
+    ],
+    "member": "set_visible",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_angular_hertz",
+    "stableId": 3205101343,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_angular_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.world_to_screen",
+    "stableId": 3205603148,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "world_to_screen",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_blend_func_separate",
+    "stableId": 3206577455,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_blend_func_separate",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:bullet3d.constraint.create_hinge",
@@ -1495,7 +9939,38 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.are_contact_events_enabled",
+    "stableId": 3217929986,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "are_contact_events_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_perimeter_vertices",
+    "stableId": 3222725677,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_perimeter_vertices",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:bullet3d.world.cast_ray_closest",
@@ -1508,6 +9983,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1521,6 +9998,52 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.reset_material",
+    "stableId": 3266845946,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "reset_material",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.reset_mass_data",
+    "stableId": 3269475957,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "reset_mass_data",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_world",
+    "stableId": 3271172727,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1534,6 +10057,197 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:crash.get_extra_data",
+    "stableId": 3280962645,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "get_extra_data",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.get_material",
+    "stableId": 3295889835,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "get_material",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.get_group_gain",
+    "stableId": 3299788677,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "get_group_gain",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_angles",
+    "stableId": 3303829155,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_angles",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_center_of_mass_position",
+    "stableId": 3306885988,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_center_of_mass_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_flipbook",
+    "stableId": 3311502564,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_flipbook",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.quat_matrix4",
+    "stableId": 3312627817,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_matrix4",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_gravity_scale",
+    "stableId": 3316588812,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_gravity_scale",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_collision_filter_mask",
+    "stableId": 3319614396,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_collision_filter_mask",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:types.is_quat",
+    "stableId": 3338215221,
+    "modulePath": [
+      "types"
+    ],
+    "member": "is_quat",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_rotation",
+    "stableId": 3342099614,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_rotation",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.shape.set_material",
+    "stableId": 3344304063,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "set_material",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:crash.get_user_field",
+    "stableId": 3344562290,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "get_user_field",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1546,7 +10260,81 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:profiler.set_ui_view_mode",
+    "stableId": 3352616584,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "set_ui_view_mode",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:resource.set_sound",
+    "stableId": 3353499114,
+    "modulePath": [
+      "resource"
+    ],
+    "member": "set_sound",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.is_active",
+    "stableId": 3359264919,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "is_active",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:types.is_vector",
+    "stableId": 3360255165,
+    "modulePath": [
+      "types"
+    ],
+    "member": "is_vector",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_world_vector",
+    "stableId": 3363163511,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_world_vector",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:buffer.get_metadata",
@@ -1558,6 +10346,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
   },
   {
@@ -1570,6 +10360,154 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_material",
+    "stableId": 3389488615,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_material",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_slider_limits",
+    "stableId": 3392355731,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_slider_limits",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 4,
+    "maximumResultCount": 4,
+    "resultCount": 4
+  },
+  {
+    "id": "script:gui.get_clipping_visible",
+    "stableId": 3393387365,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_clipping_visible",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_world_transform",
+    "stableId": 3397216655,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_world_transform",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_length",
+    "stableId": 3398271393,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_length",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_flipbook_playback_rate",
+    "stableId": 3400892719,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_flipbook_playback_rate",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_kinematic",
+    "stableId": 3402468551,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_kinematic",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.move_above",
+    "stableId": 3407589104,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "move_above",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_linear_impulse",
+    "stableId": 3408853959,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_linear_impulse",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.enable_contact_events",
+    "stableId": 3417435032,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "enable_contact_events",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1582,7 +10520,196 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:gui.set_font",
+    "stableId": 3446342703,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_font",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_linear_velocity_from_local_point",
+    "stableId": 3451721402,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_linear_velocity_from_local_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.is_valid",
+    "stableId": 3451743606,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_line_break",
+    "stableId": 3451930080,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_line_break",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.destroy",
+    "stableId": 3471585260,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "destroy",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.shape.get_type",
+    "stableId": 3481559031,
+    "modulePath": [
+      "bullet3d",
+      "shape"
+    ],
+    "member": "get_type",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:liveupdate.remove_mount",
+    "stableId": 3486747409,
+    "modulePath": [
+      "liveupdate"
+    ],
+    "member": "remove_mount",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_position",
+    "stableId": 3489078413,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.vector3",
+    "stableId": 3491633886,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "vector3",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:go.set_scale_xy",
+    "stableId": 3492879989,
+    "modulePath": [
+      "go"
+    ],
+    "member": "set_scale_xy",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_axes",
+    "stableId": 3495086682,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_axes",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
+  },
+  {
+    "id": "script:vmath.inv",
+    "stableId": 3499206161,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "inv",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:zlib.inflate",
+    "stableId": 3500234696,
+    "modulePath": [
+      "zlib"
+    ],
+    "member": "inflate",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:material.set_vertex_attributes",
@@ -1594,7 +10721,65 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:factory.get_status",
+    "stableId": 3501057803,
+    "modulePath": [
+      "factory"
+    ],
+    "member": "get_status",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:factory.set_prototype",
+    "stableId": 3506659009,
+    "modulePath": [
+      "factory"
+    ],
+    "member": "set_prototype",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_outline",
+    "stableId": 3513030284,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_outline",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sys.get_save_file",
+    "stableId": 3514141112,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_save_file",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:collectionfactory.create",
@@ -1606,7 +10791,24 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 5,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_awake",
+    "stableId": 3516473115,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_awake",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:resource.get_render_target_info",
@@ -1618,6 +10820,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_rotation",
+    "stableId": 3522006770,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_rotation",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1631,6 +10850,97 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_max_motor_torque",
+    "stableId": 3534238178,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_max_motor_torque",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.vector4",
+    "stableId": 3541966743,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "vector4",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_active",
+    "stableId": 3548885551,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_active",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.get_type_name",
+    "stableId": 3552548231,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_type_name",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_local_axis_a",
+    "stableId": 3553552188,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_local_axis_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.get_segment_count",
+    "stableId": 3555473695,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "get_segment_count",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1643,6 +10953,36 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:types.is_vector4",
+    "stableId": 3566590891,
+    "modulePath": [
+      "types"
+    ],
+    "member": "is_vector4",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:particlefx.reset_constant",
+    "stableId": 3569310218,
+    "modulePath": [
+      "particlefx"
+    ],
+    "member": "reset_constant",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1656,6 +10996,51 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_hinge_angle",
+    "stableId": 3580906706,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_hinge_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.normalize",
+    "stableId": 3582341977,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "normalize",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bit.ror",
+    "stableId": 3586131806,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "ror",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1668,6 +11053,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_angular_damping",
+    "stableId": 3599094944,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_angular_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.get_world",
+    "stableId": 3600623753,
+    "modulePath": [
+      "b2d"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1680,6 +11096,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_position",
+    "stableId": 3615172423,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1692,6 +11125,137 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.force_activation_state",
+    "stableId": 3632824611,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "force_activation_state",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_visible",
+    "stableId": 3634888820,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_visible",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:tilemap.reset_constant",
+    "stableId": 3635172296,
+    "modulePath": [
+      "tilemap"
+    ],
+    "member": "reset_constant",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.world.cast_shape_async",
+    "stableId": 3637746507,
+    "modulePath": [
+      "bullet3d",
+      "world"
+    ],
+    "member": "cast_shape_async",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:types.is_vector3",
+    "stableId": 3650478986,
+    "modulePath": [
+      "types"
+    ],
+    "member": "is_vector3",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:model.cancel",
+    "stableId": 3654418919,
+    "modulePath": [
+      "model"
+    ],
+    "member": "cancel",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.set_limit",
+    "stableId": 3660754354,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_limit",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:window.set_title",
+    "stableId": 3682979203,
+    "modulePath": [
+      "window"
+    ],
+    "member": "set_title",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.rotate",
+    "stableId": 3691011585,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "rotate",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1704,6 +11268,195 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:camera.get_enabled",
+    "stableId": 3707335843,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_enabled",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.get_render_target_width",
+    "stableId": 3723698286,
+    "modulePath": [
+      "render"
+    ],
+    "member": "get_render_target_width",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.is_valid",
+    "stableId": 3723945041,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:collectionfactory.set_prototype",
+    "stableId": 3724333493,
+    "modulePath": [
+      "collectionfactory"
+    ],
+    "member": "set_prototype",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_render_order",
+    "stableId": 3733202233,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_render_order",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_max_length",
+    "stableId": 3734354910,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_max_length",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.shape.are_pre_solve_events_enabled",
+    "stableId": 3741389297,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "are_pre_solve_events_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_6dof_angle",
+    "stableId": 3744239228,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_6dof_angle",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bit.rol",
+    "stableId": 3753907996,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "rol",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_damping_ratio",
+    "stableId": 3755540409,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_visible",
+    "stableId": 3757373152,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_visible",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_rotation",
+    "stableId": 3759172468,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_rotation",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:render.enable_material",
+    "stableId": 3764411239,
+    "modulePath": [
+      "render"
+    ],
+    "member": "enable_material",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1717,6 +11470,124 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_slice9",
+    "stableId": 3771988895,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_slice9",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bit.bnot",
+    "stableId": 3772371256,
+    "modulePath": [
+      "bit"
+    ],
+    "member": "bnot",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_linear_damping",
+    "stableId": 3773886542,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_linear_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.apply_central_impulse",
+    "stableId": 3774839951,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "apply_central_impulse",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.create_fixture",
+    "stableId": 3776606414,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "create_fixture",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_max_force",
+    "stableId": 3779646909,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_max_force",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_flipbook_cursor",
+    "stableId": 3781097035,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_flipbook_cursor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.set_cull_face",
+    "stableId": 3782563365,
+    "modulePath": [
+      "render"
+    ],
+    "member": "set_cull_face",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1730,6 +11601,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.is_valid",
+    "stableId": 3797032313,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "is_valid",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1742,7 +11630,39 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_local_anchor_a",
+    "stableId": 3797283836,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_local_anchor_a",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_bullet",
+    "stableId": 3802578041,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_bullet",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   },
   {
     "id": "script:resource.get_atlas",
@@ -1754,6 +11674,184 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.set_auto_aspect_ratio",
+    "stableId": 3812610558,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "set_auto_aspect_ratio",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_world",
+    "stableId": 3815014814,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_world",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.chain.set_friction",
+    "stableId": 3819138744,
+    "modulePath": [
+      "b2d",
+      "chain"
+    ],
+    "member": "set_friction",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_spring_damping_ratio",
+    "stableId": 3823101053,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_spring_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.reset_keyboard",
+    "stableId": 3823880698,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "reset_keyboard",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.body.get_angular_velocity",
+    "stableId": 3833370693,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_angular_velocity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_leading",
+    "stableId": 3835778536,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_leading",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.shape.get_closest_point",
+    "stableId": 3839784544,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "get_closest_point",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_flags",
+    "stableId": 3840802073,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_flags",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_local_anchor_b",
+    "stableId": 3847616693,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_local_anchor_b",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.fixture.set_restitution",
+    "stableId": 3849104602,
+    "modulePath": [
+      "b2d",
+      "fixture"
+    ],
+    "member": "set_restitution",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_size_mode",
+    "stableId": 3855360143,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_size_mode",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1766,6 +11864,36 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 4,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:crash.release",
+    "stableId": 3860576604,
+    "modulePath": [
+      "crash"
+    ],
+    "member": "release",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:liveupdate.add_mount",
+    "stableId": 3865730920,
+    "modulePath": [
+      "liveupdate"
+    ],
+    "member": "add_mount",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1779,6 +11907,66 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_damping",
+    "stableId": 3888079176,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.set_gravity",
+    "stableId": 3901430372,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "set_gravity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:go.get_position",
+    "stableId": 3918772974,
+    "modulePath": [
+      "go"
+    ],
+    "member": "get_position",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_euler",
+    "stableId": 3920485847,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_euler",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1792,7 +11980,137 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_scale",
+    "stableId": 3923373356,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_scale",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.play_particlefx",
+    "stableId": 3924164150,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "play_particlefx",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:physics.update_mass",
+    "stableId": 3925799645,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "update_mass",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:image.get_astc_header",
+    "stableId": 3935561203,
+    "modulePath": [
+      "image"
+    ],
+    "member": "get_astc_header",
+    "loweringFamily": "lua-table",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_shape_count",
+    "stableId": 3936603817,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_shape_count",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:profiler.log_text",
+    "stableId": 3938384805,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "log_text",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.world.enable_warm_starting",
+    "stableId": 3941511170,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "enable_warm_starting",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:profiler.get_cpu_usage",
+    "stableId": 3944657330,
+    "modulePath": [
+      "profiler"
+    ],
+    "member": "get_cpu_usage",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:window.get_size",
+    "stableId": 3950716894,
+    "modulePath": [
+      "window"
+    ],
+    "member": "get_size",
+    "loweringFamily": "multi-result",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
+    "resultCount": 2
   },
   {
     "id": "script:gui.get_layouts",
@@ -1804,6 +12122,153 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.get_group",
+    "stableId": 3971564819,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "get_group",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_layer",
+    "stableId": 3974957251,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_layer",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_parent",
+    "stableId": 3975981566,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_parent",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_spring_hertz",
+    "stableId": 3983520750,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_spring_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.shape.get_collision_object",
+    "stableId": 3986175953,
+    "modulePath": [
+      "bullet3d",
+      "shape"
+    ],
+    "member": "get_collision_object",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_correction_factor",
+    "stableId": 3987266405,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_correction_factor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_activation_state",
+    "stableId": 3989547642,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_activation_state",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.world.get_awake_body_count",
+    "stableId": 3991436541,
+    "modulePath": [
+      "b2d",
+      "world"
+    ],
+    "member": "get_awake_body_count",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_pivot",
+    "stableId": 3991574614,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_pivot",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sys.get_application_path",
+    "stableId": 3996665900,
+    "modulePath": [
+      "sys"
+    ],
+    "member": "get_application_path",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1816,6 +12281,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1829,6 +12296,38 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 5,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.set_ccd_motion_threshold",
+    "stableId": 4013471357,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "set_ccd_motion_threshold",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.shape.get_contact_capacity",
+    "stableId": 4016957215,
+    "modulePath": [
+      "b2d",
+      "shape"
+    ],
+    "member": "get_contact_capacity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1842,7 +12341,81 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:vmath.lerp",
+    "stableId": 4026227879,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "lerp",
+    "loweringFamily": "overload-dispatch",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_linear_damping",
+    "stableId": 4027002921,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_linear_damping",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_total_torque",
+    "stableId": 4032025831,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_total_torque",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:window.get_mouse_lock",
+    "stableId": 4036039488,
+    "modulePath": [
+      "window"
+    ],
+    "member": "get_mouse_lock",
+    "loweringFamily": "scalar",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:render.get_render_target_height",
+    "stableId": 4039286113,
+    "modulePath": [
+      "render"
+    ],
+    "member": "get_render_target_height",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:material.set_samplers",
@@ -1854,7 +12427,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_font_resource",
+    "stableId": 4047461608,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_font_resource",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:collectionproxy.get_resources",
@@ -1866,6 +12455,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1879,7 +12470,38 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "multi-result",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 2,
+    "maximumResultCount": 2,
     "resultCount": 2
+  },
+  {
+    "id": "script:b2d.body.get_local_center_of_mass",
+    "stableId": 4053048873,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_local_center_of_mass",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.get_far_z",
+    "stableId": 4055682442,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_far_z",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:render.set_camera",
@@ -1891,7 +12513,53 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 0,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.get_linear_hertz",
+    "stableId": 4056593298,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_linear_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_max_length",
+    "stableId": 4084330850,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_max_length",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:resource.get_buffer",
+    "stableId": 4087860613,
+    "modulePath": [
+      "resource"
+    ],
+    "member": "get_buffer",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:gui.get_layout_objects",
@@ -1903,6 +12571,181 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_active",
+    "stableId": 4093906604,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_active",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.collision_object.get_restitution",
+    "stableId": 4095848016,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "get_restitution",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_line_break",
+    "stableId": 4102050116,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_line_break",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_gravity",
+    "stableId": 4107412328,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_gravity",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:physics.set_vflip",
+    "stableId": 4109527981,
+    "modulePath": [
+      "physics"
+    ],
+    "member": "set_vflip",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_material",
+    "stableId": 4118133459,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_material",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.quat_axis_angle",
+    "stableId": 4121318819,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "quat_axis_angle",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.screen_xy_to_world",
+    "stableId": 4124133706,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "screen_xy_to_world",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.set_cone_twist_limits",
+    "stableId": 4131644821,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_cone_twist_limits",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 4,
+    "maximumArgumentCount": 7,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.rigid_body.get_local_inertia",
+    "stableId": 4138655148,
+    "modulePath": [
+      "bullet3d",
+      "rigid_body"
+    ],
+    "member": "get_local_inertia",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:collectionfactory.load",
+    "stableId": 4139911040,
+    "modulePath": [
+      "collectionfactory"
+    ],
+    "member": "load",
+    "loweringFamily": "callback-lifecycle",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.set_texture_data",
+    "stableId": 4140093370,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_texture_data",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 6,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1915,6 +12758,8 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
   },
   {
@@ -1927,7 +12772,156 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
     "resultCount": 0
+  },
+  {
+    "id": "script:camera.get_aspect_ratio",
+    "stableId": 4150761990,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "get_aspect_ratio",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_limits",
+    "stableId": 4151782493,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_limits",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.destroy",
+    "stableId": 4156305370,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "destroy",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:sprite.reset_constant",
+    "stableId": 4156456045,
+    "modulePath": [
+      "sprite"
+    ],
+    "member": "reset_constant",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.constraint.set_hinge_axis",
+    "stableId": 4157397330,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "set_hinge_axis",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.get_version",
+    "stableId": 4161320994,
+    "modulePath": [
+      "bullet3d"
+    ],
+    "member": "get_version",
+    "loweringFamily": "lua-table",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 0,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.apply_linear_impulse",
+    "stableId": 4170155344,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "apply_linear_impulse",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 3,
+    "maximumArgumentCount": 3,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:b2d.joint.set_spring_hertz",
+    "stableId": 4171464106,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_spring_hertz",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:bullet3d.collision_object.is_ghost_object",
+    "stableId": 4172283649,
+    "modulePath": [
+      "bullet3d",
+      "collision_object"
+    ],
+    "member": "is_ghost_object",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.constraint.get_6dof_position",
+    "stableId": 4183269174,
+    "modulePath": [
+      "bullet3d",
+      "constraint"
+    ],
+    "member": "get_6dof_position",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
   },
   {
     "id": "script:label.get_layout_objects",
@@ -1939,6 +12933,222 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.set_fixed_rotation",
+    "stableId": 4208282272,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "set_fixed_rotation",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:types.is_url",
+    "stableId": 4210288007,
+    "modulePath": [
+      "types"
+    ],
+    "member": "is_url",
+    "loweringFamily": "dynamic-values",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:camera.screen_to_world",
+    "stableId": 4212113566,
+    "modulePath": [
+      "camera"
+    ],
+    "member": "screen_to_world",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:sound.set_gain",
+    "stableId": 4220725117,
+    "modulePath": [
+      "sound"
+    ],
+    "member": "set_gain",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:gui.get_yanchor",
+    "stableId": 4222232448,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_yanchor",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.cancel_animations",
+    "stableId": 4228476809,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "cancel_animations",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
+  },
+  {
+    "id": "script:vmath.conj",
+    "stableId": 4233115420,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "conj",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.set_layout",
+    "stableId": 4235294552,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "set_layout",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.is_limit_enabled",
+    "stableId": 4236847242,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "is_limit_enabled",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:collectionfactory.get_status",
+    "stableId": 4238240607,
+    "modulePath": [
+      "collectionfactory"
+    ],
+    "member": "get_status",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 0,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:bullet3d.get_collision_object",
+    "stableId": 4240041128,
+    "modulePath": [
+      "bullet3d"
+    ],
+    "member": "get_collision_object",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 0,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.is_active",
+    "stableId": 4243840735,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "is_active",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:vmath.matrix4_frustum",
+    "stableId": 4245225016,
+    "modulePath": [
+      "vmath"
+    ],
+    "member": "matrix4_frustum",
+    "loweringFamily": "defold-value",
+    "minimumArgumentCount": 6,
+    "maximumArgumentCount": 6,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.new_box_node",
+    "stableId": 4256374046,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "new_box_node",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_rotational_inertia",
+    "stableId": 4257505987,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_rotational_inertia",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1952,6 +13162,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 3,
     "maximumArgumentCount": 4,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.body.get_type",
+    "stableId": 4261927433,
+    "modulePath": [
+      "b2d",
+      "body"
+    ],
+    "member": "get_type",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1965,6 +13192,37 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 2,
     "maximumArgumentCount": 3,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.get_min_length",
+    "stableId": 4268770728,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "get_min_length",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
+    "resultCount": 1
+  },
+  {
+    "id": "script:gui.get_inherit_alpha",
+    "stableId": 4271738474,
+    "modulePath": [
+      "gui"
+    ],
+    "member": "get_inherit_alpha",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 1,
+    "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
   },
   {
@@ -1977,6 +13235,23 @@ export const scriptUniversalValueBindings = [
     "loweringFamily": "lua-table",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
+    "minimumResultCount": 1,
+    "maximumResultCount": 1,
     "resultCount": 1
+  },
+  {
+    "id": "script:b2d.joint.set_angular_damping_ratio",
+    "stableId": 4293186976,
+    "modulePath": [
+      "b2d",
+      "joint"
+    ],
+    "member": "set_angular_damping_ratio",
+    "loweringFamily": "borrowed-handle",
+    "minimumArgumentCount": 2,
+    "maximumArgumentCount": 2,
+    "minimumResultCount": 0,
+    "maximumResultCount": 0,
+    "resultCount": 0
   }
 ] as const;

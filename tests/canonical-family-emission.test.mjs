@@ -165,20 +165,21 @@ int main() {
 });
 
 for (const target of ["staticHermesCAbi", "browserWasmHost"]) {
-  test(`${target} emits a compile-valid fail-closed registry and exact authority requirements`, async (t) => {
+  test(`${target} emits its exact compile-valid authorized registry and target gate`, async (t) => {
     const cxx = compiler();
     if (!cxx) return t.skip("No C++ compiler is available");
     const authority = await authorities();
     const selected = emission(authority, target, { schemaVersion: 1, dynamicAccess: true, symbols: [] });
     const generated = generateCanonicalFamilyArtifacts(authority.plan, selected);
-    assert.equal(generated.manifest.routeCount, 0);
-    assert.equal(generated.manifest.groupCount, 0);
-    assert.equal(generated.requirements.status, "blocked-by-canonical-plan");
+    assert.equal(generated.manifest.routeCount, selected.units.length);
+    assert.ok(generated.manifest.routeCount > 0);
+    assert.ok(generated.manifest.groupCount > 0);
+    assert.equal(generated.requirements.status, "authority-satisfied-for-selected-script-units");
     assert.match(generated.requirements.requirementsSha256, /^[a-f0-9]{64}$/);
     const { requirementsSha256, ...requirementsBody } = generated.requirements;
     assert.equal(requirementsSha256, sha256(JSON.stringify(requirementsBody)));
     assert.ok(Object.keys(generated.requirements.selectionCounts).length > 0);
-    assert.equal([...generated.artifacts.keys()].some((path) => path.includes("/family-")), false);
+    assert.equal([...generated.artifacts.keys()].some((path) => path.includes("/family-")), true);
     const expectedSelections = {};
     for (const unit of authority.plan.units) {
       const disposition = unit.backends[target].selection;
@@ -189,13 +190,16 @@ for (const target of ["staticHermesCAbi", "browserWasmHost"]) {
     const temporary = await mkdtemp(join(tmpdir(), `deherm-${target}-`));
     try {
       await writeArtifacts(temporary, generated.artifacts);
-      await compileAndRun(cxx, temporary, target, ["src/registry.cpp"], `
+      const selectedStableId = authority.plan.units[selected.units[0].sourceUnit].identity.stableId;
+      await compileAndRun(cxx, temporary, target, ["src/registry.cpp", ...generated.manifest.groups.map((group) => group.source)], `
 #include "deherm_canonical_release.h"
+#include <stdint.h>
+extern "C" int defoldHermesScriptCall(uint32_t, uint32_t, const uint8_t*, const uint8_t*, const double*, const uint64_t*, const uint32_t*, const uint32_t*, const char*, uint32_t, uint8_t*, uint8_t*, double*, uint64_t*, char*, uint32_t, uint32_t*) { return 31; }
 int main() {
-  if (dehermCanonicalReleaseRouteCount() != 0u) return 1;
-  if (dehermCanonicalReleaseRoutes() != nullptr) return 2;
-  if (dehermCanonicalReleaseRouteEnabled(1u)) return 3;
-  return dehermCanonicalReleaseDispatch(1u, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr) == DEHERM_CANONICAL_RELEASE_NOT_REACHABLE ? 0 : 4;
+  if (dehermCanonicalReleaseRouteCount() != ${selected.units.length}u) return 1;
+  if (dehermCanonicalReleaseRoutes() == nullptr) return 2;
+  if (!dehermCanonicalReleaseRouteEnabled(${selectedStableId}u)) return 3;
+  return dehermCanonicalReleaseDispatch(${selectedStableId}u, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr) == 31 ? 0 : 4;
 }
 `);
       if (target === "browserWasmHost") {
@@ -203,13 +207,13 @@ int main() {
         const syntax = spawnSync(process.execPath, ["--check", browserAdapter], { encoding: "utf8" });
         assert.equal(syntax.status, 0, syntax.stderr);
         const source = await readFile(browserAdapter, "utf8");
-        assert.match(source, /return false/);
-        assert.doesNotMatch(source, /_dehermCanonicalReleaseRouteEnabled/);
+        assert.match(source, /_dehermCanonicalReleaseRouteEnabled/);
+        assert.match(source, new RegExp(String(selectedStableId)));
       } else {
         const source = await readFile(join(temporary, "canonical", target, "static-hermes.js"), "utf8");
-        assert.match(source, /Object\.freeze\(\[\]\)/);
-        assert.match(source, /return false/);
-        assert.doesNotMatch(source, /extern_c/);
+        assert.match(source, /Object\.freeze\(\[/);
+        assert.match(source, /extern_c/);
+        assert.match(source, new RegExp(`0x${selectedStableId.toString(16).padStart(8, "0")}`));
       }
     } finally {
       await rm(temporary, { recursive: true, force: true });

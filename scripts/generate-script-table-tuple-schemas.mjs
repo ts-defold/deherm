@@ -227,7 +227,7 @@ function validateOverrides(document, functions, inScope) {
   const result = new Map();
   for (const override of document.overrides) {
     assert(!result.has(override.id), `Duplicate table/tuple override: ${override.id}`);
-    assert(inScope.has(override.id), `Override is outside the pending table/tuple scope: ${override.id}`);
+    assert(inScope.has(override.id), `Override is outside the structural table/tuple scope: ${override.id}`);
     const fn = functions.get(override.id);
     assert(fn, `Override route is absent from the pinned IR: ${override.id}`);
     assert(bucketDefinitions[override.bucket]?.origin === "reviewed-override",
@@ -266,7 +266,10 @@ export function generateScriptTableTupleSchemas(texts) {
   for (const accounted of accounting.rows) {
     const pattern = patternById.get(accounted.id);
     if (!pattern || !familyOrder.includes(pattern.loweringFamily)) continue;
-    if (accounted.category === "pending" || accounted.evidence?.generator === "fixed-tuple-lua-dispatch") {
+    // Schema classification describes the source ABI shape independently of
+    // whichever executable lane currently owns the route. Native value
+    // dispatch already supplies its own tighter GUI table representation.
+    if (accounted.evidence?.generator !== "native-value-dispatch") {
       inScope.set(pattern.id, pattern.loweringFamily);
     }
   }

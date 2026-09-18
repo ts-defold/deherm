@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { stableBindingId } from "./binding-identity.mjs";
+import { publicScriptRootName } from "../../packages/compiler/src/script-public-api-policy.mjs";
 
 const GO_PROPERTY_ID = "script:go.property";
 
@@ -79,7 +80,7 @@ function validateComponentSurface(inventory, manifest) {
 }
 
 function sourceToken(requirement) {
-  if (requirement.id === "script:hash") return "builtins.hash(";
+  if (requirement.id === "script:hash") return `${publicScriptRootName("builtins")}.hash(`;
   if (requirement.id === GO_PROPERTY_ID) return "property.vector3(";
   return `${requirement.typescriptName}(`;
 }

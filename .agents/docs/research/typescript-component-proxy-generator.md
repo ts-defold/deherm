@@ -27,9 +27,10 @@ sources:
 # Result
 
 The first `.script.ts` proxy generator is mechanical and source-authoritative.
-It parses the TypeScript AST supplied by TypeScript 7, accepts one explicit
-`export default defineComponent({...})`, and emits all three artifacts from the
-same normalized schema:
+It parses the TypeScript AST supplied by TypeScript 7, accepts either an
+explicit `export default defineComponent({...})` or
+`export default component(NamedClass)`, and emits all artifacts from the same
+normalized schema:
 
 1. the sibling editor-facing `.script` resource with `go.property` declarations
    and lifecycle forwarding;
@@ -41,6 +42,21 @@ same normalized schema:
 No component-specific file is authored by an agent or copied from a template by
 hand. The committed player fixture and exact goldens exercise the generator,
 but they are test inputs and outputs, not a second source of truth.
+
+The named same-file class must directly extend its context base
+(`ScriptComponent`, `GuiComponent`, or `RenderComponent`). Static literal
+`properties` and prototype lifecycle methods normalize into the same schema as
+the object form. The manifest and specialization record `authoringStyle` and
+the class name while the Lua proxy and native dispatch ABI stay identical.
+
+The shipped SDK adapter creates one class instance per runtime attachment,
+copies editor property values before `init`, and invokes lifecycle methods with
+that instance as `this`. Its private attachment field is non-enumerable. A new
+definition in the same Hermes runtime captures new prototype methods while
+retaining that instance and its fields. The executable adapter test verifies
+constructor count, property copying, exact input return, non-enumerability, and
+state continuity; this is JavaScript adapter evidence, not packaged-engine hot
+reload evidence.
 
 ```mermaid
 flowchart LR
@@ -55,7 +71,7 @@ flowchart LR
 
 # Authoring subset
 
-The first accepted shape is intentionally narrow:
+The object shape remains intentionally narrow:
 
 ```ts
 export default defineComponent({
@@ -82,6 +98,11 @@ matches Defold's declaration-time `msg.url()` restriction. Expressions,
 spreads, computed names, unknown members, unknown codecs, non-empty URL
 defaults, and unsafe Lua field names fail generation. This is deliberate: the
 generator never guesses a value by evaluating application code.
+
+Class declarations additionally fail closed on class expressions, indirect or
+context-incompatible base classes, required constructor arguments, static
+lifecycle methods, and per-instance lifecycle arrow fields. Prototype methods
+avoid one closure allocation per attached component.
 
 The component ID is a namespaced full SHA-256 digest of the normalized,
 project-relative `.script.ts` path. It stays stable when implementation or

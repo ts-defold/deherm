@@ -5,7 +5,7 @@
   "proxyRuntimeCapability": {
     "state": "native-dynamic-hermes-harness-executable",
     "runtimeConformant": false,
-    "luaModule": "defold_hermes",
+    "luaModule": "_deherm_",
     "requiredMethods": [
       "attachComponent",
       "dispatchLifecycle",
@@ -111,8 +111,9 @@
       "teardownPolicy": "final-callback-detach",
       "proxyKind": "script",
       "contextKind": "game-object",
+      "authoringStyle": "object",
       "sourceSha256": "c5bfaf7b53440054264c93d212626548a67c9ec2c5054f46be5a9be0087eb00d",
-      "schemaFingerprint": "86ee3419221d007f14096a22ac7dbfd337c4dd7af7ec6f2e70c97fdfef48946c",
+      "schemaFingerprint": "d051907021d6cd5a982ebc0dc68440cfa1dc9082cc690a102112822c384d393e",
       "reloadPolicy": "preserve-instance-state",
       "lifecycleMask": 63,
       "lifecycles": {
@@ -225,8 +226,9 @@
       "lifecycleEvidence": "upstream/defold/engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES",
       "proxyKind": "render_script",
       "contextKind": "render-instance+graphics",
+      "authoringStyle": "object",
       "sourceSha256": "d0341f4f60079963b3c46874e9de951c8788c9fb7d8c95486b20d54251e711c3",
-      "schemaFingerprint": "275beaa7a289e36d9e1dfdf688522e980aaf6da482ff927957d9cf280f842446",
+      "schemaFingerprint": "8fb3ace48da667a2119093091a9c1f950d6eeb49f44435418c216b8215bac256",
       "reloadPolicy": "preserve-instance-state",
       "lifecycleMask": 43,
       "lifecycles": {

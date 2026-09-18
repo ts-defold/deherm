@@ -3,6 +3,17 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
 
+const extensionBootstrapSource = await readFile(
+  new URL("../defold/defold_hermes/lib/web/library_defold_hermes.js", import.meta.url),
+  "utf8"
+);
+
+test("browser bootstrap installs the generated universal script provider", () => {
+  assert.match(extensionBootstrapSource, /'\$DEFOLD_HERMES_SCRIPT_UNIVERSAL'/);
+  assert.match(extensionBootstrapSource, /__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_UNIVERSAL\.install\(\)/);
+  assert.doesNotMatch(extensionBootstrapSource, /__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_BRIDGE\.install\(\)/);
+});
+
 async function loadLibrary() {
   const source = await readFile(
     new URL("../defold/defold_hermes/lib/web/library_defold_hermes.js", import.meta.url),
@@ -74,12 +85,15 @@ test("generated web bindings normalize C ABI booleans to JavaScript booleans", a
   context._defold_hermes_lua_timer_cancel = () => 1;
   context._defold_hermes_lua_timer_trigger = () => 0;
   context.DEFOLD_HERMES_DMSDK_SCALAR = { install: () => ({ call() {} }) };
+  const universal = { catalogSha256: "0".repeat(64), abi: {}, recipes: [], call() {} };
+  context.DEFOLD_HERMES_DMSDK_UNIVERSAL = universal;
   vm.runInContext(source, context, { filename: "generated_modules.js" });
 
   const modules = context.LibraryDefoldHermesGeneratedModules.$DEFOLD_HERMES_GENERATED_MODULES.install();
   assert.equal(modules.Timer.cancel(7), true);
   assert.equal(modules.Timer.trigger(7), false);
   assert.equal(typeof modules.Timer.cancel(7), "boolean");
+  assert.equal(modules.DmSdkUniversalRaw, universal);
 });
 
 test("generated browser dmSDK scalar adapter exposes only the 16 semantically valid bindings", async () => {

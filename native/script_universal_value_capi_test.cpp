@@ -1,12 +1,12 @@
 #include <defold_hermes/generated_script_universal_value_bindings.hpp>
 #include <defold_hermes/generated_script_universal_value_capi.h>
+#include <defold_hermes/generated_script_universal_static_frame.h>
 #include <defold_hermes/script_bridge_capi.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
 #include <defold_hermes/script_url_arena.hpp>
 
 #include <array>
 #include <atomic>
-#include <cassert>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
@@ -16,6 +16,13 @@ using namespace defold_hermes;
 
 namespace {
 std::atomic<uint64_t> gAllocations{0};
+
+[[noreturn]] void requireFailed(const char* expression, int line) {
+  std::cerr << "requirement failed at line " << line << ": " << expression << '\n';
+  std::abort();
+}
+
+#define REQUIRE(expression) ((expression) ? static_cast<void>(0) : requireFailed(#expression, __LINE__))
 
 struct Backend {
   uint32_t reentrantStableId = 0;
@@ -155,7 +162,7 @@ int main() {
   installScriptBridgeApi({&backend, Dispatch, LastError, Release});
   const auto* oneResult = operation(1, 1);
   const auto* zeroArgument = operation(0, 1);
-  assert(oneResult && zeroArgument);
+  REQUIRE(oneResult && zeroArgument);
   backend.reentrantStableId = zeroArgument->stableId;
 
   std::array<DehermScriptUniversalValue, 7> input{};
@@ -177,33 +184,84 @@ int main() {
   input[4].number = 1;
   const uint32_t argumentRoot = 0;
   Output output;
-  assert(Call(oneResult->stableId, input.data(), input.size(), inputEntries.data(), inputEntries.size(),
+  REQUIRE(Call(oneResult->stableId, input.data(), input.size(), inputEntries.data(), inputEntries.size(),
       inputStrings, sizeof(inputStrings) - 1, nullptr, 0, nullptr, 0, &argumentRoot, 1, output) ==
       DEHERM_SCRIPT_UNIVERSAL_OK);
-  assert(output.resultCount == 1 && output.valueCount >= 7 && output.entryCount >= 5 && output.urlCount == 1);
+  REQUIRE(output.resultCount == 1 && output.valueCount >= 7 && output.entryCount >= 5 && output.urlCount == 1);
   const auto& root = output.values[output.roots[0]];
-  assert(root.tag == static_cast<uint8_t>(ScriptValueTag::kTable));
+  REQUIRE(root.tag == static_cast<uint8_t>(ScriptValueTag::kTable));
 
   Output nestedOutput;
-  assert(Call(zeroArgument->stableId, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+  REQUIRE(Call(zeroArgument->stableId, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, 0, nestedOutput) == DEHERM_SCRIPT_UNIVERSAL_OK);
-  assert(backend.calls >= 3);
+  REQUIRE(backend.calls >= 3);
+
+  // The Static Hermes materializer owns a bounded frame from a thread-local
+  // reentrant pool; typed code never performs pointer arithmetic itself.
+  auto* staticFrame = deherm_script_static_frame_acquire();
+  auto* nestedStaticFrame = deherm_script_static_frame_acquire();
+  REQUIRE(staticFrame && nestedStaticFrame && staticFrame != nestedStaticFrame);
+  deherm_script_static_frame_release(nestedStaticFrame);
+  REQUIRE(deherm_script_static_frame_pool_bytes() ==
+      deherm_script_static_frame_bytes() * DEHERM_SCRIPT_STATIC_FRAME_REENTRANCY);
+  REQUIRE(deherm_script_static_frame_pool_bytes() <= 512u * 1024u);
+  const uint32_t staticRecord = deherm_script_static_push_table(staticFrame, 2, 1);
+  const uint32_t staticKey = deherm_script_static_push_string(staticFrame, 4);
+  REQUIRE(staticRecord != UINT32_MAX && staticKey != UINT32_MAX);
+  REQUIRE(deherm_script_static_write_string_byte(staticFrame, staticKey, 0, 'n'));
+  REQUIRE(deherm_script_static_write_string_byte(staticFrame, staticKey, 1, 'a'));
+  REQUIRE(deherm_script_static_write_string_byte(staticFrame, staticKey, 2, 'm'));
+  REQUIRE(deherm_script_static_write_string_byte(staticFrame, staticKey, 3, 'e'));
+  const uint32_t staticValue = deherm_script_static_push_number(staticFrame, 42.0);
+  REQUIRE(deherm_script_static_set_entry(staticFrame, staticRecord, 0, staticKey, staticValue));
+  REQUIRE(deherm_script_static_set_argument(staticFrame, 0, staticRecord));
+  REQUIRE(deherm_script_static_dispatch(staticFrame, oneResult->stableId, 1) == DEHERM_SCRIPT_UNIVERSAL_OK);
+  REQUIRE(deherm_script_static_result_count(staticFrame) == 1);
+  const uint32_t staticRoot = deherm_script_static_result_root(staticFrame, 0);
+  REQUIRE(deherm_script_static_value_tag(staticFrame, staticRoot) == static_cast<uint8_t>(ScriptValueTag::kTable));
+  REQUIRE(deherm_script_static_value_auxiliary(staticFrame, staticRoot) == static_cast<uint8_t>(ScriptTableKind::kRecord));
+  REQUIRE(deherm_script_static_value_length(staticFrame, staticRoot) == 3);
+  const uint32_t echoedRecord = deherm_script_static_entry_value(staticFrame, staticRoot, 0);
+  REQUIRE(deherm_script_static_value_tag(staticFrame, echoedRecord) == static_cast<uint8_t>(ScriptValueTag::kTable));
+  const uint32_t echoedNumber = deherm_script_static_entry_value(staticFrame, echoedRecord, 0);
+  REQUIRE(deherm_script_static_value_number(staticFrame, echoedNumber) == 42.0);
+  const uint32_t returnedHandle = deherm_script_static_entry_value(staticFrame, staticRoot, 2);
+  REQUIRE(deherm_script_static_value_handle_kind(staticFrame, returnedHandle) == static_cast<uint8_t>(ScriptHandleKind::kLuaSemanticHandle));
+  REQUIRE(deherm_script_static_value_runtime(staticFrame, returnedHandle) == 19);
+  REQUIRE(deherm_script_static_value_payload_low(staticFrame, returnedHandle) == 3);
+  REQUIRE(deherm_script_static_value_payload_high(staticFrame, returnedHandle) == 4);
+  deherm_script_static_frame_reset(staticFrame);
+  const uint32_t cyclicTable = deherm_script_static_push_table(staticFrame, 3, 1);
+  const uint32_t cyclicKey = deherm_script_static_push_number(staticFrame, 1.0);
+  REQUIRE(deherm_script_static_set_entry(staticFrame, cyclicTable, 0, cyclicKey, cyclicTable));
+  REQUIRE(deherm_script_static_set_argument(staticFrame, 0, cyclicTable));
+  REQUIRE(deherm_script_static_dispatch(staticFrame, oneResult->stableId, 1) == DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE);
+  REQUIRE(std::strstr(deherm_script_static_error(staticFrame), "cycle"));
+  deherm_script_static_frame_reset(staticFrame);
+  REQUIRE(deherm_script_static_push_string(staticFrame, DEHERM_SCRIPT_STATIC_FRAME_STRING_BYTES + 1) == UINT32_MAX);
+  REQUIRE(deherm_script_static_push_number(staticFrame, 7.0) == 0);
+  deherm_script_static_frame_reset(staticFrame);
+  REQUIRE(deherm_script_static_push_table(staticFrame, 2, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES + 1) == UINT32_MAX);
+  REQUIRE(deherm_script_static_push_number(staticFrame, 8.0) == 0);
+  deherm_script_static_frame_reset(staticFrame);
+  REQUIRE(deherm_script_static_dispatch(staticFrame, 0, 0) == DEHERM_SCRIPT_UNIVERSAL_ROUTE_MISSING);
+  deherm_script_static_frame_release(staticFrame);
 
   input[0].length = 1;
   inputEntries[0] = {1, 0};
   Output cycleOutput;
-  assert(Call(oneResult->stableId, input.data(), input.size(), inputEntries.data(), 1,
+  REQUIRE(Call(oneResult->stableId, input.data(), input.size(), inputEntries.data(), 1,
       inputStrings, sizeof(inputStrings) - 1, nullptr, 0, nullptr, 0, &argumentRoot, 1, cycleOutput) ==
       DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE);
-  assert(std::strstr(cycleOutput.error, "cycle"));
+  REQUIRE(std::strstr(cycleOutput.error, "cycle"));
   input[0].length = 2;
   inputEntries[0] = {1, 2};
 
   Output exhausted;
-  assert(Call(oneResult->stableId, input.data(), input.size(), inputEntries.data(), inputEntries.size(),
+  REQUIRE(Call(oneResult->stableId, input.data(), input.size(), inputEntries.data(), inputEntries.size(),
       inputStrings, sizeof(inputStrings) - 1, nullptr, 0, nullptr, 0, &argumentRoot, 1, exhausted, 1) ==
       DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED);
-  assert(exhausted.resultCount == 0);
+  REQUIRE(exhausted.resultCount == 0);
 
   DehermScriptUniversalValue retained{};
   retained.tag = static_cast<uint8_t>(ScriptValueTag::kHandle);
@@ -215,23 +273,25 @@ int main() {
   deherm_script_universal_release(&retained);
   deherm_script_universal_release(&retained);
   drainReleasedScriptHandles();
-  assert(backend.releases == releasesBeforeIdempotence + 1);
+  REQUIRE(backend.releases == releasesBeforeIdempotence + 1);
 
   Output warm;
-  assert(Call(zeroArgument->stableId, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+  REQUIRE(Call(zeroArgument->stableId, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
       nullptr, 0, warm) == DEHERM_SCRIPT_UNIVERSAL_OK);
   for (uint32_t index = 0; index < warm.valueCount; ++index) deherm_script_universal_release(&warm.values[index]);
   drainReleasedScriptHandles();
   const uint64_t baseline = gAllocations.load(std::memory_order_relaxed);
   for (uint32_t iteration = 0; iteration < 256; ++iteration) {
     Output current;
-    assert(Call(zeroArgument->stableId, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+    REQUIRE(Call(zeroArgument->stableId, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
         nullptr, 0, current) == DEHERM_SCRIPT_UNIVERSAL_OK);
     for (uint32_t index = 0; index < current.valueCount; ++index) deherm_script_universal_release(&current.values[index]);
     drainReleasedScriptHandles();
   }
-  assert(gAllocations.load(std::memory_order_relaxed) == baseline);
+  REQUIRE(gAllocations.load(std::memory_order_relaxed) == baseline);
 
   uninstallScriptBridgeApi();
-  std::cout << "script-universal-capi:recursive-reentrant-cycle-exhaustion-idempotence:ok allocations:0\n";
+  std::cout << "script-universal-capi:recursive-reentrant-cycle-exhaustion-idempotence:ok allocations:0"
+            << " static-frame-bytes:" << deherm_script_static_frame_bytes()
+            << " static-frame-pool-bytes:" << deherm_script_static_frame_pool_bytes() << '\n';
 }

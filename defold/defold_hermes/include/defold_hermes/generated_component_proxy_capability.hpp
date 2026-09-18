@@ -6,6 +6,7 @@
 
 namespace defold_hermes::component_proxy {
 
+inline constexpr char kLuaModuleName[] = "_deherm_";
 inline constexpr std::string_view kCapabilityState = "native-provider-capability-present";
 inline constexpr std::string_view kHarnessEvidenceState = "native-lua-and-dynamic-hermes-harness-proven";
 inline constexpr bool kPackagedDefoldEngineVerified = false;

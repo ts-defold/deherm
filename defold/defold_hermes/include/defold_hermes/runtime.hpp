@@ -24,8 +24,30 @@ class Host {
 
 class Runtime {
  public:
+  struct Telemetry {
+    uint64_t heapAllocatedBytes = 0;
+    uint64_t heapSizeBytes = 0;
+    /// Hermes cumulative peak used-before-collection; zero until the first GC.
+    uint64_t peakAllocatedBytes = 0;
+    uint32_t callbackRoots = 0;
+    uint32_t componentInstances = 0;
+    bool heapAvailable = false;
+  };
   enum class ComponentContext : uint8_t { kGameObject, kGuiScene, kRender };
-  enum class ComponentValueKind : uint8_t { kNil, kBoolean, kNumber, kString, kHash, kUrl, kVector3, kVector4, kQuaternion };
+  enum class ComponentValueKind : uint8_t {
+    kNil,
+    kBoolean,
+    kNumber,
+    kString,
+    kHash,
+    kUrl,
+    kVector3,
+    kVector4,
+    kQuaternion,
+    kObject,
+    kArray
+  };
+  struct ComponentField;
   struct ComponentValue {
     ComponentValueKind kind = ComponentValueKind::kNil;
     bool boolean = false;
@@ -34,12 +56,15 @@ class Runtime {
     float lanes32[4]{};
     const char* string = nullptr;
     uint32_t stringLength = 0;
+    const ComponentField* fields = nullptr;
+    const ComponentValue* elements = nullptr;
+    uint16_t childCount = 0;
   };
   struct ComponentField { const char* name = nullptr; ComponentValue value{}; };
   struct ComponentArgument {
     ComponentValue value{};
     const ComponentField* fields = nullptr;
-    uint8_t fieldCount = 0;
+    uint16_t fieldCount = 0;
   };
   struct ComponentHandle {
     uint32_t slot = UINT32_MAX;
@@ -76,6 +101,10 @@ class Runtime {
   void detachComponent(ComponentHandle handle);
   uint32_t liveComponents() const;
   uint32_t identity() const noexcept;
+  /** Exact compiler fingerprint embedded in the evaluated development bundle. */
+  std::string bundleFingerprint() const;
+  /** Low-rate instrumentation snapshot; callers must keep it off hot paths. */
+  Telemetry telemetry() const;
 
  private:
   class Impl;

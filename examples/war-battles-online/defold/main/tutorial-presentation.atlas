@@ -1,0 +1,19 @@
+animations {
+  id: "battlefield-background"
+  images {
+    image: "/assets/ui/title-screen/background.png"
+  }
+}
+animations {
+  id: "hud-panel"
+  images {
+    image: "/assets/ui/hud-panel.png"
+  }
+}
+animations {
+  id: "victory"
+  images {
+    image: "/assets/ui/victory.png"
+  }
+}
+extrude_borders: 2

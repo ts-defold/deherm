@@ -4,6 +4,8 @@ okf_version: "0.2"
 
 # Defold Hermes knowledge base
 
+> [Active implementation handoff](handoff.md) - Exact resume prompt, verified evidence, active lanes, and next integration order.
+
 ## Start here
 
 * [Implementation plan](plan.md) - Phased proof-of-concept plan, acceptance criteria, and delivery boundaries.
@@ -18,6 +20,7 @@ okf_version: "0.2"
 * [Full SDK compatibility](decisions/full-sdk-compatibility.md) - The two API surfaces, semantic overlay, ttsc role, and native extension contract.
 * [API source resolution](decisions/api-source-resolution.md) - Exact engine-SHA selection, canonical Defold artifacts, extension merging, and cache integrity.
 * [Semantic translation tokens](decisions/semantic-translation-tokens.md) - Provenance-preserving names, types, ABI projections, reproduced claims, and conformance states.
+* [Public script API names](decisions/public-script-api-names.md) - Deterministic `builtins`-source to `defold`-TypeScript projection with collision checks and unchanged ABI identity.
 * [Lua compatibility backend](decisions/lua-compatibility-backend.md) - Cached stack thunks, scratch arenas, generational pools, and instance discipline for Lua-only APIs.
 * [Memory and hot-path policy](decisions/memory-and-hot-path-policy.md) - Bounded lifetime tiers, allocation-free dispatch, arenas, pools, cache-local tables, and verification gates.
 * [Telemetry wire format](decisions/telemetry-wire-format.md) - Fixed allocation-free producer records batched into generated protobuf/DDF for native, browser, capture, JSON, and TUI consumers.
@@ -41,6 +44,9 @@ okf_version: "0.2"
 * [dmSDK coverage](research/sdk-coverage.md) - Generated, declaration-level coverage of every public dmSDK header.
 * [dmSDK ABI generator wave](research/dmsdk-abi-generator-wave.md) - Exact ABI-shape census, scalar and enum-value adapters, and isolated clean-room regeneration.
 * [dmSDK scalar out-parameter wave](research/dmsdk-scratch-scalar-out-wave.md) - Complete 79-row structural partition, seven provider-gated scalar outputs, and exact evidence boundaries.
+* [dmSDK universal fallback](research/dmsdk-universal-fallback.md) - All-declaration cross-target recipes, fixed caller-owned ABI frames, and usage-driven native thunk materialization.
+* [Native extension header generator](research/native-extension-header-generator.md) - Clang-driven C header ingestion, deterministic extension IR/TypeScript/C glue, explicit layout blockers, and the typed browser dmSDK arena.
+* [Compile-time Defold hash literals](research/compile-time-hash-literals.md) - Checker-bound `hashLiteral("#name")` lowering, native Defold vectors, and target-separated bigint evidence.
 * [Unified binding projection](research/unified-binding-projection.md) - Complete 926-route and 1,361-declaration value/effect IR, source-derived profiles, and honest evidence boundaries.
 * [Canonical lowering plan](research/canonical-lowering-plan.md) - All 2,287 API units across five backends, interned marshalling programs, semantic policies, and final-build reachability.
 * [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.

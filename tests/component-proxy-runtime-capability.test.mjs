@@ -62,9 +62,10 @@ test("the generated native gate header compiles and exposes every method once", 
 
 test("the report enumerates remaining runtime capabilities without erasing harness evidence", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
-  assert.deepEqual(report.blockers.map(({ id }) => id), ["recursive-message-input-codecs"]);
+  assert.deepEqual(report.blockers, []);
   assert.equal(report.implementedCapabilities.compilerRegistry, "deterministic-full-inventory-generated-and-bundled");
   assert.match(report.implementedCapabilities.scriptAdapterContextSelection, /fixed-depth-16/);
+  assert.match(report.implementedCapabilities.eventCodec, /256-fields-256-elements-depth-8/);
   assert.match(report.contexts["gui-scene"], /harness-proven-packaged-engine-unverified/);
   assert.match(report.contexts["render-instance+graphics"], /harness-proven-packaged-engine-unverified/);
 });

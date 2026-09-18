@@ -18,6 +18,9 @@
 
 namespace defold_hermes::lua_bridge::scalar {
 
+struct LuaClosureLifetime;
+struct LuaClosureRoot;
+
 /** First universal-script-ABI backend: the generated scalar Lua fast lane. */
 class ScriptAdapter {
  public:
@@ -55,6 +58,20 @@ class ScriptAdapter {
       ScriptHandleKind kind,
       uint32_t runtime,
       uint64_t payload) noexcept;
+  static int LuaCallbackThunk(lua_State* state);
+  static int LuaCallbackGc(lua_State* state);
+  static bool ConsumeCallbackResults(
+      void* context,
+      const ScriptCallFrame* results) noexcept;
+  static bool InvokeLuaClosure(
+      void* context,
+      const ScriptCallFrame* arguments,
+      void* consumeContext,
+      ScriptCallbackConsume consume,
+      char* error,
+      size_t errorCapacity) noexcept;
+  static void RetainLuaClosure(void* context) noexcept;
+  static void ReleaseLuaClosure(void* context) noexcept;
   static value_binding::DispatchStatus StructuredInvokeThunk(
       void* context,
       const value_binding::StructuredLuaOperation& operation,
@@ -115,7 +132,11 @@ class ScriptAdapter {
       ScriptCallFrame* frame,
       uint32_t depth,
       const void* const* ancestors,
-      uint32_t ancestorCount) noexcept;
+      uint32_t ancestorCount,
+      ScriptValue* borrowedHandles = nullptr,
+      uint32_t borrowedHandleCapacity = 0,
+      uint32_t* borrowedHandleCount = nullptr) noexcept;
+  bool captureLuaClosure(int stackIndex, ScriptValue* output) noexcept;
   url_binding::DispatchStatus invokeUrl(
       const url_binding::Operation& operation,
       ScriptCallFrame* frame,
@@ -207,6 +228,7 @@ class ScriptAdapter {
   universal_value::LuaApi universalValueLuaApi_{};
   std::unique_ptr<::defold_hermes::lua_bridge::LuaValueRegistry> semanticHandleRegistry_;
   std::unique_ptr<::defold_hermes::script_handle_lowering::CapturedLuaRouter> handleRouter_;
+  std::shared_ptr<LuaClosureLifetime> luaClosureLifetime_;
   const ::defold_hermes::script_handle_lowering::RuntimeProfile* runtimeProfile_ = nullptr;
   ::defold_hermes::lua_bridge::LuaRegistryApi semanticRegistryApi_{};
   char adapterError_[384]{};

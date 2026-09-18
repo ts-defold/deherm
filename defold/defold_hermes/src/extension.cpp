@@ -40,6 +40,7 @@ uint64_t gRejectedBundleGeneration = 0;
 uint64_t gPendingRejectedBundleGeneration = 0;
 bool gApplicationInitialized = false;
 bool gLoggedFirstExtensionUpdate = false;
+double gTelemetryElapsedSeconds = 0.0;
 dmResource::HFactory gResourceFactory = nullptr;
 void* gBundleResource = nullptr;
 std::string gBundlePath;
@@ -261,11 +262,15 @@ bool ActivateBundle(bool initial) {
   std::unique_ptr<defold_hermes::Runtime> candidate;
   bool candidateRejected = false;
   std::string candidateDiagnostic;
+  std::string candidateFingerprint;
+  uint32_t candidateRuntimeId = 0;
   try {
     candidate = std::make_unique<defold_hermes::Runtime>(gHost);
+    candidateRuntimeId = candidate->identity();
     candidate->load(
         std::string(bundle.data, bundle.size),
         std::string("deherm://") + gBundlePath);
+    candidateFingerprint = candidate->bundleFingerprint();
     if (gApplicationInitialized) {
       defold_hermes::game_object::ActiveContext context;
       if (!BuildBootstrapContext(&context)) {
@@ -292,6 +297,12 @@ bool ActivateBundle(bool initial) {
         "TypeScript bundle generation %llu was rejected: %s",
         static_cast<unsigned long long>(bundle.generation),
         candidateDiagnostic.c_str());
+    dmLogInfo(
+        "DEHERM_EVENT bundle-rejected fingerprint=%s resource_generation=%llu runtime_id=%u initial=%s",
+        candidateFingerprint.empty() ? "unavailable" : candidateFingerprint.c_str(),
+        static_cast<unsigned long long>(bundle.generation),
+        candidateRuntimeId,
+        initial ? "true" : "false");
     return false;
   }
 
@@ -318,6 +329,19 @@ bool ActivateBundle(bool initial) {
       initial ? "Loaded" : "Activated",
       static_cast<unsigned long long>(bundle.generation),
       gBundlePath.c_str());
+#if !defined(DM_PLATFORM_HTML5)
+  const std::string activeFingerprint = gRuntime
+      ? gRuntime->bundleFingerprint()
+      : std::string();
+  dmLogInfo(
+      "DEHERM_EVENT bundle-activated fingerprint=%s resource_generation=%llu runtime_id=%u initial=%s",
+      !activeFingerprint.empty()
+          ? activeFingerprint.c_str()
+          : "unavailable",
+      static_cast<unsigned long long>(bundle.generation),
+      gRuntime ? gRuntime->identity() : 0,
+      initial ? "true" : "false");
+#endif
   return true;
 }
 
@@ -577,6 +601,32 @@ int UpdateLuaInstance(lua_State* state) {
     return luaL_error(state, "TypeScript update failed: %s", error.what());
   }
 #endif
+#if !defined(DM_PLATFORM_HTML5)
+  gTelemetryElapsedSeconds += dt;
+  if (gRuntime && gTelemetryElapsedSeconds >= 1.0) {
+    gTelemetryElapsedSeconds = 0.0;
+    const auto runtime = gRuntime->telemetry();
+    const auto handles = gLuaBridge
+        ? gLuaBridge->handles().stats()
+        : defold_hermes::lua_bridge::HandlePoolStats{};
+    const auto scratch = gLuaBridge
+        ? gLuaBridge->scratch().stats()
+        : defold_hermes::lua_bridge::ScratchArenaStats{};
+    dmLogInfo(
+        "DEHERM_EVENT telemetry runtime_id=%u frame_dt_us=%llu heap_available=%s heap_bytes=%llu heap_size_bytes=%llu heap_peak_bytes=%llu callback_roots=%u component_instances=%u lua_handles=%u lua_handle_capacity=%u arena_high_water_bytes=%llu",
+        gRuntime->identity(),
+        static_cast<unsigned long long>(dt * 1000000.0),
+        runtime.heapAvailable ? "true" : "false",
+        static_cast<unsigned long long>(runtime.heapAllocatedBytes),
+        static_cast<unsigned long long>(runtime.heapSizeBytes),
+        static_cast<unsigned long long>(runtime.peakAllocatedBytes),
+        runtime.callbackRoots,
+        runtime.componentInstances,
+        handles.live + handles.queued,
+        handles.capacity,
+        static_cast<unsigned long long>(scratch.highWater));
+  }
+#endif
   if (gPendingRejectedBundleGeneration != 0) {
     dmLogInfo(
         "TypeScript bundle generation %llu remained active after rejecting generation %llu",
@@ -594,7 +644,7 @@ void RegisterLuaBootstrap(lua_State* state) {
     {"update", UpdateLuaInstance},
     {nullptr, nullptr}
   };
-  luaL_register(state, "defold_hermes", functions);
+  luaL_register(state, defold_hermes::component_proxy::kLuaModuleName, functions);
   lua_pop(state, 1);
 }
 
@@ -604,7 +654,10 @@ defold_hermes::lua_bridge::scalar::ScriptAdapter* CurrentComponentScriptAdapter(
 }
 
 bool EnsureComponentRuntime(void*, lua_State* state) noexcept {
-  return EnsureBundleLoaded() && EnsureScriptBridgeReady(state);
+  // Loading a Hermes bundle evaluates its module body immediately. Generated
+  // component modules may construct hashes/URLs at module scope, so the Lua
+  // dispatch table must already be installed before evaluation starts.
+  return EnsureScriptBridgeReady(state) && EnsureBundleLoaded();
 }
 #endif
 
@@ -693,6 +746,7 @@ dmExtension::Result FinalizeExtension(dmExtension::Params*) {
   FinalizeAttachedApplication("extension finalize");
   DetachCapturedLuaInstances();
   gLoggedFirstExtensionUpdate = false;
+  gTelemetryElapsedSeconds = 0.0;
   InvalidateBootstrapAttachment();
   defold_hermes::game_object::uninstallTerminalApi();
   defold_hermes::uninstallLuaTimerCapi();

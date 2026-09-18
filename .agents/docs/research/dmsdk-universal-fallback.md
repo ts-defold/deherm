@@ -1,0 +1,87 @@
+---
+title: dmSDK universal fallback and usage materializer
+description: Deterministic all-declaration recipes and a fail-closed caller-owned C ABI materialization path for dmSDK.
+type: research
+status: active
+---
+
+# dmSDK universal fallback
+
+The dmSDK compiler now emits a mechanically consumable recipe for every one of
+the 1,361 runtime declarations in the pinned Clang-derived projection IR. This
+is the completeness fallback beneath the specialized scalar, span, handle, and
+string families; specialized adapters remain preferred whenever they exist.
+
+Each recipe contains the exact source declaration identity, header/include,
+native signature shapes, receiver and template invocation form, caller-owned
+frame layout, required semantic tokens, and target projections for C ABI,
+Dynamic Hermes, Static Hermes, browser/Wasm direct memory, and TypeScript.
+There is no “unsupported and omitted” catalog state. That is not the same as
+claiming every recipe is safe to instantiate without policy. Shapes that
+cannot be eagerly instantiated become usage-materialized recipes. Specialized
+adapter bypasses, record layout assumptions, callback trampolines, typed
+variadic facades, and out/scratch storage require structured acknowledgements
+with a reason and evidence. Callback parameters additionally require an
+explicit named trampoline. The materializer refuses these cases otherwise.
+
+The common ABI uses a fixed 24-byte value cell and a caller-owned argument
+frame. The dispatcher performs exact ID, arity, and storage validation without
+heap allocation and invokes an installed generated provider. Each generated
+catalog has a SHA-256 identity embedded in C, TypeScript, recipes, CLI input,
+and materialization reports; mismatched catalogs fail before code emission.
+HTML5 metadata calls
+the same memory ABI directly and explicitly does not use Embind.
+
+Native Dynamic Hermes installs a generated `DmSdkUniversal.call(id, values)`
+JSI module into `__defoldModulesV1`. It validates the catalog identity, exact
+IDs and arity, finite numbers, signed/unsigned bigint ranges, pointer width,
+and the discriminated address/memory/native-value objects before dispatch.
+Results are decoded from the ABI tag without lossy integer conversion. The
+browser registration deliberately exposes `DmSdkUniversalRaw`, not the typed
+`DmSdkUniversal` bridge: it is a direct-memory ABI requiring a browser-side
+arena adapter that has not yet been implemented. Its Emscripten dependency
+list retains both dispatch and catalog symbols. Static Hermes continues to use
+the generated direct-memory extern-C surface rather than JSI.
+
+`@deherm/compiler/dmsdk-universal-materializer` accepts the reachable
+declaration IDs plus any required type substitutions and emits the C++ thunks
+for that user project. The generated recipe catalog is therefore complete,
+while the final native or Wasm binary only links materialized reachable thunks.
+Generated thunks validate scalar tags and narrow integer ranges, boolean
+domains, non-null pointer/reference/receiver addresses, target pointer width,
+and native alignment. Enum arguments fail closed until the usage supplies an
+explicit finite domain. Scalar-backed handles use their scalar cell tag;
+address-backed handles use the address tag.
+
+## Current evidence
+
+- 1,361 unique declaration IDs produce 1,361 recipes and stable numeric IDs.
+- All 1,361 have C ABI, Dynamic Hermes metadata, Static Hermes, browser direct
+  memory, and TypeScript projections; the omission count is zero.
+- 148 declarations prefer an existing specialized generated family; the other
+  1,213 retain the universal usage-materialized path.
+- Clean-room regeneration reproduces all universal artifacts byte-for-byte.
+- The generated common dispatcher is compiled into the local native runtime.
+- A mixed usage selection generates, compiles, links, and executes pinned
+  `dmEndian` direct calls, a monomorphized `dmMath::Clamp<int32_t>`, plus
+  `dmArray<uint32_t>` construction, member access, and destruction through the
+  common C ABI dispatcher.
+- The native harness exercises unsigned narrowing rejection, receiver-backed
+  construction/member/destruction, and uses `std::destroy_at` for deterministic
+  destructor generation. Negative generator tests cover catalog drift,
+  specialized-bypass policy, and illegal arity overrides.
+- An executable Hermes test calls generated `dmEndian::ToNetwork(uint32_t)`
+  and `ToHost(uint32_t)` materialized thunks through the installed JSI module
+  and common C dispatcher, and verifies the bigint round trip. This proves the
+  two selected usage-materialized routes, not all catalog recipes.
+
+This does not claim that all 1,361 native engine implementations have been
+linked or behavior-tested. Most are recipes awaiting a real project's reachable
+usage and semantic policy. It does prove that the compiler has a deterministic
+code-generation path instead of silently dropping those declarations.
+
+Remaining blockers are explicit: callback trampolines still need a project
+callback registry; record and out-storage recipes need per-shape layout/storage
+providers; enum domains should eventually be harvested directly from the SDK
+IR instead of supplied by reachable usage; and the full catalog has not yet
+been linked and behavior-tested against every engine feature/target matrix.

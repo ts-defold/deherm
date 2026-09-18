@@ -1,5 +1,5 @@
 {
-  "name": "@ts-defold/deherm-internal-abi",
+  "name": "@deherm/abi",
   "version": "0.0.0",
   "private": true,
   "type": "module",

@@ -1,48 +1,74 @@
-# Capability-gated Defold project skeleton
+# War Battles Online Ultimate — Defold project
 
-This directory is a structurally valid Defold project with an authored
-`src/controller.script.ts` component and its generated `.script` proxy. The
-TypeScript component consumes the deterministic `BattleWorld`, fixed-tick input
-schema, and transport-selection state machine.
+This is the visible Defold frontend for the deterministic 32-player simulation.
+The authored entry point is `main/battle.gui.ts`; the public `deherm generate`
+command owns `main/battle.gui_script`. Do not edit that proxy.
 
-It intentionally fails closed. The checked capability snapshot consumes two
-independent gates:
+The scene uses fixed, editor-authored pools rather than runtime node creation:
 
-- this example's generated manifest:
-  `proxyRuntimeCapability.state = native-provider-executable` and
-  `runtimeConformant = true`;
-- `.agents/docs/data/war-battles-runtime-gate.json`:
-  generated routes are `ready`, but `gameplayExecutionObserved = false`.
+- 32 tank bodies and 32 independently aimed turrets;
+- 160 projectile nodes, with deterministic culling when the authoritative pool
+  contains more visible projectiles;
+- a player-following camera projection over the bounded arena;
+- a HUD with health, score, credits, team counts, round, tick, and projectile
+  count; and
+- a deterministic restart loop after local defeat, plus manual restart.
 
-The executable proxy-provider contract is necessary but does not supersede the
-negative packaged-engine gameplay evidence. The project therefore is not
-described as playable or packageable yet. Regenerate the proxy rather than
-editing it:
+Controls:
 
-```sh
-node scripts/generate-component-proxies.mjs \
-  --project examples/war-battles-online/defold
-node examples/war-battles-online/integration/generate-capability-snapshot.mjs
-```
+| Keys | Action |
+| --- | --- |
+| W/A/S/D | Move and aim |
+| Space | Fire |
+| Z/X/C | Buy damage/mobility/armor upgrades |
+| R | Restart the match |
 
-Local compiler/TUI diagnostic commands from the repository root are:
+From the repository root, dogfood the public CLI entry point with:
 
 ```sh
 node examples/war-battles-online/integration/sync-defold-sources.mjs
 node bin/deherm.mjs generate --project examples/war-battles-online/defold
 node bin/deherm.mjs typecheck --project examples/war-battles-online/defold
+node bin/deherm.mjs verify-generated --project examples/war-battles-online/defold
 node bin/deherm.mjs dev \
   --project examples/war-battles-online/defold \
-  --entry examples/war-battles-online/defold/src/controller.script.ts \
-  --watch examples/war-battles-online/defold/src \
+  --entry examples/war-battles-online/defold/main/battle.gui.ts \
+  --watch examples/war-battles-online/defold \
   --once --headless --no-ttsc
 ```
 
-The second command proves only the local compile/control plane unless a real
-Defold target is also supplied and acknowledges the generated resource.
+The project exposes the repository extension through its example-local
+`defold_hermes` dependency link. Consequently a full native build requires the
+pinned local Extender:
 
-Observed on 2026-09-18: `generate` succeeds and the following Deherm
-`typecheck` reports all four generated TypeScript contexts—shared, game-object,
-GUI, and render—as passing. This is compiler evidence only. The `dev` command is
-listed for the later engine-attached phase and is not claimed as an executed
-gameplay run.
+```sh
+/opt/homebrew/opt/openjdk@25/bin/java -jar build/tooling/bob.jar \
+  --root examples/war-battles-online/defold \
+  --output build/default \
+  --platform arm64-macos --architectures arm64-macos \
+  --variant debug --archive \
+  --build-server http://localhost:9010 \
+  resolve build
+```
+
+Bob's debug upload inspection proves that this layout contributes the extension
+manifest, sources, headers, and arm64 Hermes archive. The earlier resource-only
+build proves that the collection, game object, GUI, font, input, and generated
+Lua proxy compile, but used a vanilla engine because the dependency was absent.
+The current custom engine has now executed the generated GUI proxy, loaded the
+bundle in Dynamic Hermes, completed the TypeScript `init`, first render, and
+first update/render, and remained free of rejected diagnostics for a bounded
+1.5-second window. Re-run
+and record that artifact-bound proof from the example package with:
+
+```sh
+pnpm runtime:packaged
+pnpm runtime:packaged:record
+pnpm runtime:packaged:check
+```
+
+The narrower generated component capability report still records
+`runtimeConformant: false`; this example observation does not promote every
+component context, lifecycle, runtime target, or API. See
+[PLAYABLE-BLOCKERS.md](./PLAYABLE-BLOCKERS.md) for the exact proven boundary and
+remaining blockers.

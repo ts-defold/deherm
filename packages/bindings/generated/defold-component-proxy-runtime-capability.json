@@ -5,6 +5,7 @@
   "capabilityState": "native-provider-capability-present",
   "harnessEvidenceState": "native-lua-and-dynamic-hermes-harness-proven",
   "runtimeConformant": false,
+  "luaModule": "_deherm_",
   "requiredLuaMethods": [
     "attachComponent",
     "dispatchLifecycle",
@@ -35,21 +36,12 @@
     "gui-scene": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
     "render-instance+graphics": "native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified"
   },
-  "blockers": [
-    {
-      "id": "recursive-message-input-codecs",
-      "blocks": [
-        "dispatchMessage",
-        "dispatchInput"
-      ],
-      "observed": "The executable backend supports leaf values and a bounded top-level string-key table, and rejects nested tables.",
-      "minimumCapability": "Bounded recursive record codec with explicit depth, entry, string-byte, cycle, ownership, and unsupported-value policies."
-    }
-  ],
+  "blockers": [],
   "implementedCapabilities": {
     "compilerRegistry": "deterministic-full-inventory-generated-and-bundled",
     "componentOnlyBootstrap": "native-runtime-and-lazy-extension-attach-path-implemented",
-    "scriptAdapterContextSelection": "fixed-depth-16-reentrant-stack-no-hot-path-registry-allocation"
+    "scriptAdapterContextSelection": "fixed-depth-16-reentrant-stack-no-hot-path-registry-allocation",
+    "eventCodec": "caller-stack-owned-256-fields-256-elements-depth-8-recursive-object-array-codec"
   },
   "methodDisposition": {
     "attachComponent": {
@@ -88,7 +80,7 @@
     "generation": "component generator emits context/property metadata plus a complete import registry; bundling emits exact component usage and a keyed sentinel",
     "nativeCompile": "component provider and Hermes backend compile in a dedicated native target",
     "nativeLuaHarness": "all six Lua ABI methods, all three contexts, failure recovery, warmed dispatch, and warmed attach/detach churn with zero Lua allocator calls are tested against pinned Lua 5.1",
-    "dynamicHermesHarness": "Lua-to-Hermes property/lifecycle/message/input/reload/final/detach and runtime-generation rebind execution is tested for all three contexts",
+    "dynamicHermesHarness": "Lua-to-Hermes property/lifecycle/message/input/reload/final/detach, wide nested event payloads, and runtime-generation rebind execution are tested for all three contexts",
     "packagedDefoldEngine": "unverified",
     "staticHermesRuntime": "unverified",
     "browserRuntime": "unverified"
@@ -96,47 +88,47 @@
   "provenance": {
     "proxyGenerator": {
       "path": "packages/compiler/src/component-proxy-generator.mjs",
-      "sha256": "65d5161ddcb94c6b501ce4dc1fe6d839b6a00c34fd0def6c1e9516c3e991990d"
+      "sha256": "e0d2c4d55ecefdccef5bd9f93ee6c572b9d838a5fbbc988290e85b59d5aeca14"
     },
     "componentBundler": {
       "path": "scripts/build-component-registry.mjs",
-      "sha256": "c6ee585fc977fb7aed5df09a8a0e00b31761d17c8dedc9c2b33619b62f3b161a"
+      "sha256": "8fda97f10690485ba26c6ef011fc709a28b1e4c8b291c03617b6003eee605f65"
     },
     "runtimeHeader": {
       "path": "defold/defold_hermes/include/defold_hermes/runtime.hpp",
-      "sha256": "cb29ce98feb8c245b03e03086f2dcd04d6257b623197c01a5e6733666d6bb298"
+      "sha256": "a5e8e0f7ff24de169e5e1cba2ba782671f7a2ba1706e3ee29af65b0c89dc7f74"
     },
     "runtimeSource": {
       "path": "defold/defold_hermes/src/runtime.cpp",
-      "sha256": "a233a2dd45fd31f3eb7dd9cb5c9d9aa0bbcb627a0c10df837b2344cad6bc036d"
+      "sha256": "6113b3727dcfdcf232b04d64039fced1828dbc2fbc0b5699d91097b24de7db9c"
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
-      "sha256": "4ceace847536b1f647ac6d2f8ed2227c3e08b039256ff32a6e6a8eb6b1e02bf6"
+      "sha256": "f0fac791d62b01fd8bb4ca42476477070096f1fb449a60f5badd7aca4bcb4911"
     },
     "luaProvider": {
       "path": "defold/defold_hermes/include/defold_hermes/component_proxy_lua_gate.hpp",
-      "sha256": "5dc5a5f77690925439f0cc88529cbe18046483c6e3885f5f43681cb3115cdfd6"
+      "sha256": "3f0a4558ba093532561f416d4ba92b8c87dd33894fa88817deb212f5d159e5c7"
     },
     "hermesBackend": {
       "path": "defold/defold_hermes/src/component_hermes_backend.cpp",
-      "sha256": "f3a1994aca507c430027303a8ca8ec7a3a41d04c82ee72944f7bd574a6623cfd"
+      "sha256": "fe226635684e01beaf9a3527f395fd67c657260691dd5cec073292622728d600"
     },
     "adapterSource": {
       "path": "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",
-      "sha256": "04d60ee6c175b34ef06ce103ec481ad4a705fe2ecdca94035ab0ede3f9e4b4a4"
+      "sha256": "a56a83e056b4f480e6a63e0d0e9caa5e4548d62bd1a464c3c061b19db3696c1e"
     },
     "componentSdk": {
       "path": "packages/sdk/src/component.ts",
-      "sha256": "ea295d09d449f38b4ce85553b441142e3dfe0ee0551dfd7b17f4d4958f25ba0f"
+      "sha256": "18e333f993c3de6ff36033e17d8b82eecc3ffc7825d137d43d0fd2e25a323929"
     },
     "nativeLuaHarness": {
       "path": "tests/native/component_proxy_lua_gate/component_proxy_lua_gate_test.cpp",
-      "sha256": "78b0900ee023dab741dfe33aaa288fd62c1ea5041d941abf5e893373464970fd"
+      "sha256": "01ffcc182654820507cca38505ef18182e1adf93adb76674707e3022dc1e5d1a"
     },
     "dynamicHermesHarness": {
       "path": "native/component_runtime_hermes_e2e.cpp",
-      "sha256": "972ae9fb7a88df223edd832d021d0f0feb118588c1cc8cff52398e2f5eb7c56e"
+      "sha256": "538f8a8923f21ce76f72ea3b0e80ab09ec2d138200a458814245cd145c3eff5a"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@ts-defold/deherm-internal-compiler",
+  "name": "@deherm/compiler",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,7 +7,12 @@
   "exports": {
     ".": "./src/index.mjs",
     "./binding-identity": "./src/binding-identity.mjs",
+    "./bundle-fingerprint": "./src/bundle-fingerprint.mjs",
     "./component-proxy-generator": "./src/component-proxy-generator.mjs",
-    "./binding-lowering-plan": "./src/generate-binding-lowering-plan.mjs"
+    "./binding-lowering-plan": "./src/generate-binding-lowering-plan.mjs",
+    "./dmsdk-universal-materializer": "./src/dmsdk-universal-materializer.mjs",
+    "./native-extension-generator": "./src/native-extension-generator.mjs",
+    "./defold-hash": "./src/defold-hash.mjs",
+    "./ttsc": "./ttsc.mjs"
   }
 }

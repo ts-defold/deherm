@@ -8,6 +8,7 @@
 #include <memory>
 #include <atomic>
 #include <array>
+#include <cctype>
 #include <exception>
 #include <optional>
 #include <stdexcept>
@@ -16,6 +17,7 @@
 #include <hermes/hermes.h>
 #include <jsi/jsi.h>
 #include <jsi/hermes-interfaces.h>
+#include <jsi/instrumentation.h>
 
 namespace jsi = facebook::jsi;
 
@@ -44,6 +46,13 @@ class Runtime::Impl {
     callbacks_ = std::make_unique<CallbackRegistry>(
         *runtime_, 4096, identity_);
     installHost();
+  }
+
+  ~Impl() {
+    // Lua closures can retain ScriptCallback descriptors beyond application
+    // finalization. Clear their JSI functions while runtime_ is unquestionably
+    // alive; a later Lua __gc may then release an inert native root safely.
+    shutdownScriptJsiBridge(scriptBridgeLifetime_);
   }
 
   void load(const std::string& source, const std::string& sourceUrl) {
@@ -197,6 +206,36 @@ class Runtime::Impl {
   uint32_t liveComponents() const { return liveComponents_; }
   uint32_t identity() const noexcept { return identity_; }
 
+  std::string bundleFingerprint() const {
+    auto value = runtime_->global().getProperty(
+        *runtime_, "__DEFOLD_HERMES_BUILD_FINGERPRINT__");
+    if (!value.isString()) return {};
+    std::string fingerprint = value.getString(*runtime_).utf8(*runtime_);
+    if (fingerprint.size() != 64) return {};
+    for (const unsigned char character : fingerprint) {
+      if (!std::isxdigit(character)) return {};
+    }
+    return fingerprint;
+  }
+
+  Telemetry telemetry() const {
+    Telemetry result;
+    result.callbackRoots = liveCallbacks();
+    result.componentInstances = liveComponents();
+    const auto heap = runtime_->instrumentation().getHeapInfo(false);
+    const auto read = [&heap](const char* key) -> uint64_t {
+      const auto found = heap.find(key);
+      return found == heap.end() || found->second < 0
+          ? 0
+          : static_cast<uint64_t>(found->second);
+    };
+    result.heapAllocatedBytes = read("hermes_allocatedBytes");
+    result.heapSizeBytes = read("hermes_heapSize");
+    result.peakAllocatedBytes = read("hermes_peakAllocatedBytes");
+    result.heapAvailable = heap.find("hermes_allocatedBytes") != heap.end();
+    return result;
+  }
+
  private:
   struct ComponentSlot {
     std::optional<jsi::Object> definition;
@@ -242,18 +281,30 @@ class Runtime::Impl {
         for (size_t index = 0; index < count; ++index) object.setProperty(*runtime_, names[index], value.lanes32[index]);
         return object;
       }
+      case ComponentValueKind::kObject: {
+        jsi::Object object(*runtime_);
+        for (uint16_t index = 0; index < value.childCount; ++index) {
+          if (!value.fields || !value.fields[index].name)
+            throw std::invalid_argument("Component object field storage is invalid");
+          object.setProperty(*runtime_, value.fields[index].name,
+              decodeComponentValue(value.fields[index].value));
+        }
+        return object;
+      }
+      case ComponentValueKind::kArray: {
+        if (value.childCount && !value.elements)
+          throw std::invalid_argument("Component array element storage is invalid");
+        jsi::Array array(*runtime_, value.childCount);
+        for (uint16_t index = 0; index < value.childCount; ++index)
+          array.setValueAtIndex(*runtime_, index, decodeComponentValue(value.elements[index]));
+        return array;
+      }
     }
     return jsi::Value::undefined();
   }
 
   jsi::Value decodeComponentArgument(const ComponentArgument& argument) {
-    if (!argument.fields) return decodeComponentValue(argument.value);
-    jsi::Object object(*runtime_);
-    for (uint8_t index = 0; index < argument.fieldCount; ++index) {
-      if (!argument.fields[index].name) throw std::invalid_argument("Component table field has no name");
-      object.setProperty(*runtime_, argument.fields[index].name, decodeComponentValue(argument.fields[index].value));
-    }
-    return object;
+    return decodeComponentValue(argument.value);
   }
 
   void finalizeComponents() {
@@ -323,7 +374,7 @@ class Runtime::Impl {
     installGeneratedModules(*runtime_, modules, *callbacks_);
     runtime_->global().setProperty(
         *runtime_, "__defoldModulesV1", std::move(modules));
-    installScriptJsiBridge(*runtime_);
+    scriptBridgeLifetime_ = installScriptJsiBridge(*runtime_);
   }
 
   void callOptional(
@@ -346,6 +397,7 @@ class Runtime::Impl {
   std::unique_ptr<jsi::Runtime> runtime_;
   uint32_t identity_ = 0;
   std::unique_ptr<CallbackRegistry> callbacks_;
+  std::shared_ptr<ScriptJsiBridgeLifetime> scriptBridgeLifetime_;
   std::unique_ptr<jsi::Object> app_;
   bool loaded_ = false;
   std::array<ComponentSlot, 256> componentSlots_{};
@@ -385,6 +437,8 @@ bool Runtime::releaseCallback(lua_bridge::Handle callback) {
 }
 const char* Runtime::callbackError() const { return impl_->callbackError(); }
 uint32_t Runtime::liveCallbacks() const { return impl_->liveCallbacks(); }
+std::string Runtime::bundleFingerprint() const { return impl_->bundleFingerprint(); }
+Runtime::Telemetry Runtime::telemetry() const { return impl_->telemetry(); }
 Runtime::ComponentHandle Runtime::attachComponent(const char* id, const char* schema, ComponentContext context) { return impl_->attachComponent(id, schema, context); }
 void Runtime::setComponentProperty(ComponentHandle handle, const char* name, const ComponentValue& value) { impl_->setComponentProperty(handle, name, value); }
 bool Runtime::dispatchComponent(ComponentHandle handle, const char* lifecycle, const ComponentArgument* arguments, uint8_t count) { return impl_->dispatchComponent(handle, lifecycle, arguments, count); }

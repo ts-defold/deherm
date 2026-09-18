@@ -1,0 +1,24 @@
+FROM ubuntu:24.04
+
+ARG TARGET_ARCH=x86_64
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    ca-certificates clang cmake git lld ninja-build python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY upstream/hermes /src/hermes
+COPY toolchains/hermes/package-posix.sh /usr/local/bin/package-posix
+WORKDIR /work
+RUN cmake -S /src/hermes -B /work/build -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_C_COMPILER=clang \
+      -DCMAKE_CXX_COMPILER=clang++ \
+      -DHERMES_ENABLE_TEST_SUITE=OFF \
+      -DHERMES_ENABLE_TOOLS=OFF \
+      -DHERMES_ENABLE_DEBUGGER=OFF \
+      -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_BUILD_SHARED_JSI=OFF && \
+    cmake --build /work/build --target hermesvm_a jsi --parallel && \
+    package-posix /work/build /out/libhermes.a
+
+FROM scratch
+COPY --from=0 /out/libhermes.a /libhermes.a

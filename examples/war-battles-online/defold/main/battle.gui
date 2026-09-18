@@ -1,0 +1,2199 @@
+script: "/main/battle.gui_script"
+fonts {
+  name: "system_font"
+  font: "/main/tutorial-text.font"
+}
+textures {
+  name: "combat"
+  texture: "/main/tutorial-combat-sprites.tilesource"
+}
+textures {
+  name: "presentation"
+  texture: "/main/tutorial-presentation.atlas"
+}
+nodes {
+  position { x: 640.0 y: 360.0 }
+  size { x: 1280.0 y: 720.0 }
+  color { x: 0.58 y: 0.68 z: 0.82 w: 1.0 }
+  type: TYPE_BOX
+  texture: "presentation/battlefield-background"
+  id: "backdrop"
+  adjust_mode: ADJUST_MODE_STRETCH
+}
+nodes {
+  position { x: 640.0 y: 360.0 z: 0.1 }
+  size { x: 1146.88 y: 1146.88 }
+  color { x: 0.035 y: 0.07 z: 0.09 w: 0.72 }
+  type: TYPE_BOX
+  id: "arena"
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 30.0 y: 22.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_01"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 26.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_01"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_02"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_02"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_03"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_03"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_04"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_04"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_05"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_05"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_06"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_06"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_07"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_07"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_08"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_08"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_09"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_09"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_10"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_10"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_11"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_11"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_12"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_12"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_13"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_13"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_14"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_14"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_15"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_15"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_16"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_16"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_17"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_17"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_18"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_18"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_19"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_19"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_20"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_20"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_21"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_21"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_22"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_22"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_23"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_23"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_24"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_24"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_25"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_25"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_26"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_26"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_27"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_27"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_28"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_28"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_29"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_29"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_30"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_30"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_31"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_31"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.4 }
+  size { x: 24.0 y: 18.0 }
+  color { x: 0.1 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_body_32"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.5 }
+  size { x: 21.0 y: 5.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "tank_turret_32"
+  pivot: PIVOT_W
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_001"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_002"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_003"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_004"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_005"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_006"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_007"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_008"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_009"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_010"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_011"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_012"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_013"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_014"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_015"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_016"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_017"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_018"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_019"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_020"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_021"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_022"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_023"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_024"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_025"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_026"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_027"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_028"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_029"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_030"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_031"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_032"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_033"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_034"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_035"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_036"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_037"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_038"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_039"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_040"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_041"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_042"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_043"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_044"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_045"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_046"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_047"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_048"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_049"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_050"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_051"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_052"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_053"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_054"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_055"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_056"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_057"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_058"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_059"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_060"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_061"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_062"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_063"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_064"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_065"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_066"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_067"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_068"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_069"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_070"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_071"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_072"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_073"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_074"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_075"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_076"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_077"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_078"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_079"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_080"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_081"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_082"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_083"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_084"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_085"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_086"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_087"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_088"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_089"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_090"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_091"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_092"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_093"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_094"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_095"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_096"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_097"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_098"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_099"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_100"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_101"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_102"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_103"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_104"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_105"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_106"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_107"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_108"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_109"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_110"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_111"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_112"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_113"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_114"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_115"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_116"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_117"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_118"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_119"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_120"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_121"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_122"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_123"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_124"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_125"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_126"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_127"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_128"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_129"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_130"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_131"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_132"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_133"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_134"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_135"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_136"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_137"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_138"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_139"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_140"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_141"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_142"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_143"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_144"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_145"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_146"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_147"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_148"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_149"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_150"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_151"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_152"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_153"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_154"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_155"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_156"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_157"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_158"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_159"
+  enabled: 0
+}
+nodes {
+  position { x: -100.0 y: -100.0 z: 0.6 }
+  size { x: 6.0 y: 6.0 }
+  color { x: 1.0 y: 0.86 z: 0.2 w: 1.0 }
+  type: TYPE_BOX
+  id: "projectile_160"
+  enabled: 0
+}
++nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_01"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_02"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_03"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_04"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_05"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_06"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_07"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_08"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_09"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_10"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_11"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_12"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_13"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_14"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_15"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_16"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_17"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_18"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_19"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_20"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_21"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_22"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_23"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_24"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_25"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_26"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_27"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_28"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_29"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_30"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_31"
+  enabled: 0
+}
+nodes {
+  position { x: -160.0 y: -100.0 z: 0.72 }
+  size { x: 122.0 y: 71.0 }
+  color { x: 1.0 y: 0.82 z: 0.64 w: 1.0 }
+  type: TYPE_BOX
+  texture: "combat/explosion"
+  id: "explosion_32"
+  enabled: 0
+}
+
+nodes {
+  position { x: 294.0 y: 653.0 z: 0.74 }
+  size { x: 540.0 y: 98.0 }
+  color { x: 0.72 y: 0.86 z: 1.0 w: 0.92 }
+  type: TYPE_BOX
+  texture: "presentation/hud-panel"
+  id: "hud_panel"
+}
+nodes {
+  position { x: 24.0 y: 696.0 z: 0.8 }
+  size { x: 500.0 y: 54.0 }
+  color { x: 0.93 y: 0.96 z: 1.0 w: 1.0 }
+  type: TYPE_TEXT
+  text: "ROUND 1"
+  font: "system_font"
+  id: "hud"
+  pivot: PIVOT_NW
+}
+nodes {
+  position { x: 24.0 y: 626.0 z: 0.8 }
+  size { x: 240.0 y: 16.0 }
+  color { x: 0.13 y: 0.16 z: 0.22 w: 0.9 }
+  type: TYPE_BOX
+  id: "health_back"
+  pivot: PIVOT_W
+}
+nodes {
+  position { x: 24.0 y: 626.0 z: 0.9 }
+  size { x: 240.0 y: 16.0 }
+  color { x: 0.2 y: 0.92 z: 0.46 w: 1.0 }
+  type: TYPE_BOX
+  id: "health_fill"
+  pivot: PIVOT_W
+}
+nodes {
+  position { x: 1256.0 y: 696.0 z: 0.8 }
+  size { x: 500.0 y: 80.0 }
+  color { x: 0.76 y: 0.82 z: 0.92 w: 1.0 }
+  type: TYPE_TEXT
+  text: "WASD MOVE / AIM   SPACE FIRE\nZ DAMAGE   X MOBILITY   C ARMOR   R RESTART"
+  font: "system_font"
+  id: "controls"
+  pivot: PIVOT_NE
+}
+nodes {
+  position { x: 640.0 y: 18.0 z: 0.8 }
+  size { x: 900.0 y: 24.0 }
+  color { x: 1.0 y: 0.72 z: 0.18 w: 1.0 }
+  type: TYPE_TEXT
+  text: "DEHERM ENGINE ATTACHMENT UNVERIFIED"
+  font: "system_font"
+  id: "capability"
+  pivot: PIVOT_S
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT
+max_nodes: 512

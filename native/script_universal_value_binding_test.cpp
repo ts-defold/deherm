@@ -6,11 +6,13 @@
 using namespace defold_hermes;
 
 namespace {
+bool useMinimumResults = false;
 universal_value::DispatchStatus invoke(
     void*, const universal_value::Operation& operation,
     ScriptCallFrame* frame, char*, size_t) noexcept {
-  frame->resultCount = operation.resultCount;
-  for (uint8_t index = 0; index < operation.resultCount; ++index) {
+  frame->resultCount = useMinimumResults
+      ? operation.minimumResultCount : operation.maximumResultCount;
+  for (uint8_t index = 0; index < frame->resultCount; ++index) {
     frame->results[index] = {};
     frame->results[index].tag = ScriptValueTag::kNull;
   }
@@ -41,6 +43,23 @@ int main() {
       universal_value::DispatchStatus::kSuccess);
   assert(frame.resultCount == rows[0].resultCount);
 
+  const universal_value::Operation* variable = nullptr;
+  for (size_t index = 0; index < universal_value::kOperationCount; ++index) {
+    if (rows[index].minimumResultCount < rows[index].maximumResultCount) {
+      variable = &rows[index];
+      break;
+    }
+  }
+  assert(variable);
+  useMinimumResults = true;
+  frame.stableId = variable->stableId;
+  frame.argumentCount = variable->minimumArgumentCount;
+  assert(universal_value::dispatch(&frame, error, sizeof(error), &api) ==
+      universal_value::DispatchStatus::kSuccess);
+  assert(frame.resultCount == variable->minimumResultCount);
+  useMinimumResults = false;
+
+  frame.stableId = rows[0].stableId;
   frame.argumentCount = static_cast<uint32_t>(rows[0].maximumArgumentCount) + 1;
   assert(universal_value::dispatch(&frame, error, sizeof(error), &api) ==
       universal_value::DispatchStatus::kError);

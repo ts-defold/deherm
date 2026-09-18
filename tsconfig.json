@@ -9,8 +9,23 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "paths": {
-      "@defold-hermes/sdk": ["./packages/sdk/src/index.ts"],
-      "@defold-hermes/sdk/*": ["./packages/sdk/src/generated/modules/*"]
+      "@deherm/abi": ["./packages/abi/src/generated/layouts.ts"],
+      "@deherm/bindings": ["./packages/bindings/modules.json"],
+      "@deherm/bindings/*": ["./packages/bindings/*"],
+      "@deherm/cli": ["./packages/cli/src/cli.mjs"],
+      "@deherm/cli/*": ["./packages/cli/src/*"],
+      "@deherm/compiler": ["./packages/compiler/src/index.mjs"],
+      "@deherm/compiler/*": ["./packages/compiler/src/*"],
+      "@deherm/polyfills": ["./packages/polyfills/compatibility.json"],
+      "@deherm/sdk": ["./packages/sdk/src/index.ts"],
+      "@deherm/sdk/component": ["./packages/sdk/src/component.ts"],
+      "@deherm/sdk/generated/*": ["./packages/sdk/src/generated/*"],
+      "@deherm/sdk/*": ["./packages/sdk/src/generated/modules/*"],
+      "@deherm/static-hermes": ["./packages/static-hermes/src/index.ts"],
+      "@deherm/static-hermes/*": ["./packages/static-hermes/src/*"],
+      "@deherm/telemetry": ["./packages/telemetry/schema/deherm_telemetry.proto"],
+      "@deherm/web-adapter": ["./packages/web-adapter/src/host.ts"],
+      "@deherm/web-adapter/*": ["./packages/web-adapter/src/*"]
     }
   },
   "include": [

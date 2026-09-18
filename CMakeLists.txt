@@ -58,6 +58,8 @@ add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp
+  defold/defold_hermes/src/generated_dmsdk_universal.cpp
+  defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp
   defold/defold_hermes/src/generated_jsi.cpp
   defold/defold_hermes/src/lua_bridge_core.cpp
   defold/defold_hermes/src/runtime.cpp
@@ -101,13 +103,21 @@ add_executable(defold-hermes-runner native/runner.cpp)
 target_compile_features(defold-hermes-runner PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-runner PRIVATE defold-hermes-runtime)
 
+add_executable(defold-hermes-dmsdk-universal-jsi-e2e
+  native/dmsdk_universal_jsi_e2e.cpp
+  tests/fixtures/generated_dmsdk_universal_test_provider.cpp
+)
+target_compile_features(defold-hermes-dmsdk-universal-jsi-e2e PRIVATE cxx_std_17)
+target_link_libraries(defold-hermes-dmsdk-universal-jsi-e2e PRIVATE defold-hermes-runtime)
+
 find_program(DEFOLD_HERMES_NODE_EXECUTABLE node REQUIRED)
 set(DEFOLD_HERMES_STATIC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/static-hermes")
 set(DEFOLD_HERMES_STATIC_FFI_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-ffi.c")
 set(DEFOLD_HERMES_STATIC_APP_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-app.c")
 set(DEFOLD_HERMES_STATIC_VMATH_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-vmath.c")
+set(DEFOLD_HERMES_STATIC_UNIVERSAL_C "${DEFOLD_HERMES_STATIC_OUTPUT_DIR}/static-universal.c")
 add_custom_command(
-  OUTPUT "${DEFOLD_HERMES_STATIC_FFI_C}" "${DEFOLD_HERMES_STATIC_APP_C}" "${DEFOLD_HERMES_STATIC_VMATH_C}"
+  OUTPUT "${DEFOLD_HERMES_STATIC_FFI_C}" "${DEFOLD_HERMES_STATIC_APP_C}" "${DEFOLD_HERMES_STATIC_VMATH_C}" "${DEFOLD_HERMES_STATIC_UNIVERSAL_C}"
   COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-hermes.mjs"
     --shermes "$<TARGET_FILE:shermes>"
@@ -117,6 +127,8 @@ add_custom_command(
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-hermes.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/ffi.js"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/script-vmath.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/script-universal-value.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-script-universal-value-bindings.json"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/typed-app.ts"
     "${CMAKE_CURRENT_SOURCE_DIR}/dist/sample.js"
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -126,14 +138,19 @@ set_source_files_properties(
   "${DEFOLD_HERMES_STATIC_FFI_C}"
   "${DEFOLD_HERMES_STATIC_APP_C}"
   "${DEFOLD_HERMES_STATIC_VMATH_C}"
+  "${DEFOLD_HERMES_STATIC_UNIVERSAL_C}"
   PROPERTIES GENERATED TRUE
 )
 add_executable(defold-hermes-static-runner
   native/static_runner.cpp
   defold/defold_hermes/src/generated_static_hermes_vmath.cpp
+  defold/defold_hermes/src/generated_script_universal_value_bindings.cpp
+  defold/defold_hermes/src/generated_script_universal_value_capi.cpp
+  defold/defold_hermes/src/generated_script_universal_static_frame.cpp
   "${DEFOLD_HERMES_STATIC_FFI_C}"
   "${DEFOLD_HERMES_STATIC_APP_C}"
   "${DEFOLD_HERMES_STATIC_VMATH_C}"
+  "${DEFOLD_HERMES_STATIC_UNIVERSAL_C}"
 )
 target_compile_features(defold-hermes-static-runner PRIVATE cxx_std_17)
 target_include_directories(defold-hermes-static-runner PRIVATE
@@ -185,12 +202,14 @@ add_library(defold-hermes-lua-bridge STATIC
   defold/defold_hermes/src/lua_bridge.cpp
   defold/defold_hermes/src/generated_lua_bridge.cpp
   defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp
+  defold/defold_hermes/src/generated_script_callback_lifecycle.cpp
   defold/defold_hermes/src/generated_script_fixed_tuples.cpp
   defold/defold_hermes/src/generated_script_handle_lowering.cpp
   defold/defold_hermes/src/generated_script_overload_dispatch.cpp
   defold/defold_hermes/src/generated_script_table_record_bindings.cpp
   defold/defold_hermes/src/generated_script_universal_value_bindings.cpp
   defold/defold_hermes/src/generated_script_universal_value_capi.cpp
+  defold/defold_hermes/src/generated_script_universal_static_frame.cpp
   defold/defold_hermes/src/generated_script_value_bindings.cpp
   defold/defold_hermes/src/generated_script_value_tail_bindings.cpp
   defold/defold_hermes/src/generated_script_url_bindings.cpp
@@ -377,6 +396,7 @@ add_executable(defold-hermes-script-universal-value-capi-test
   native/script_universal_value_capi_test.cpp
   defold/defold_hermes/src/generated_script_universal_value_bindings.cpp
   defold/defold_hermes/src/generated_script_universal_value_capi.cpp
+  defold/defold_hermes/src/generated_script_universal_static_frame.cpp
   defold/defold_hermes/src/script_bridge_capi.cpp
 )
 target_compile_features(defold-hermes-script-universal-value-capi-test PRIVATE cxx_std_17)

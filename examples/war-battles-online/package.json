@@ -1,0 +1,35 @@
+{
+  "name": "@deherm/example-war-battles-online",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "source": "./core/index.ts",
+  "exports": {
+    ".": "./core/index.ts"
+  },
+  "scripts": {
+    "sync": "node integration/sync-defold-sources.mjs",
+    "sync:check": "node integration/sync-defold-sources.mjs --check",
+    "generate": "deherm generate --project defold && pnpm sync && node integration/generate-capability-snapshot.mjs",
+    "verify:generated": "deherm verify-generated --project defold && pnpm sync:check && node integration/generate-capability-snapshot.mjs --check",
+    "typecheck": "tsc -p tsconfig.json --noEmit && deherm typecheck --project defold",
+    "test": "node --test test/core.test.mjs test/integration.test.mjs test/packaged-runtime-evidence.test.mjs",
+    "check": "pnpm verify:generated && pnpm typecheck && pnpm test",
+    "play:headless": "node headless/run-match.mjs --players 32 --ticks 3600 --seed 12648430",
+    "soak": "node headless/run-match.mjs --players 32 --ticks 36000 --seed 12648430",
+    "bundle:size": "node headless/measure-bundles.mjs",
+    "bundle:size:update": "node headless/measure-bundles.mjs --write",
+    "play": "node integration/play-packaged.mjs",
+    "runtime:packaged": "node integration/check-packaged-runtime.mjs",
+    "runtime:packaged:record": "node integration/check-packaged-runtime.mjs --record-evidence",
+    "runtime:packaged:check": "node integration/check-packaged-runtime.mjs --check-evidence",
+    "dev": "deherm dev --project defold --entry defold/main/battle.gui.ts --watch defold"
+  },
+  "dependencies": {
+    "@ts-defold/deherm": "workspace:*"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "typescript": "7.0.2"
+  }
+}

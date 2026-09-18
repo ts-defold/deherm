@@ -1,5 +1,5 @@
 {
-  "name": "@ts-defold/deherm-internal-bindings",
+  "name": "@deherm/bindings",
   "version": "0.0.0",
   "private": true,
   "type": "module",

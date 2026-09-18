@@ -73,7 +73,7 @@ deterministic callback release.
 Defold exposes the extension Lua state, but modules such as `timer`, `go`, and
 `sprite` also read the current script instance. The extension therefore ships a
 generated gameplay-free companion script. Its `init(self)` calls
-`defold_hermes.attach(self)`, which roots the instance and starts the TypeScript
+`_deherm_.attach(self)`, which roots the instance and starts the TypeScript
 application. Each compatibility call saves the previous current instance,
 installs the captured instance, invokes the cached function, restores the old
 instance, and resets the stack.

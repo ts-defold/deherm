@@ -7,6 +7,11 @@ import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
 import { generateScriptBindingDescriptors } from "./generate-script-binding-descriptors.mjs";
 import { generateScriptUrlAddressClassification } from "./generate-script-url-address-classification.mjs";
+import { componentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
+import {
+  selectUniversalRoutes,
+  universalTargetSupport
+} from "./lib/script-universal-selection.mjs";
 
 const root = new URL("../", import.meta.url);
 const inputUrls = {
@@ -19,7 +24,8 @@ const inputUrls = {
   tuple: new URL("packages/bindings/generated/defold-script-fixed-tuples.json", root),
   url: new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
   valueTail: new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root),
-  overload: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root)
+  overload: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root),
+  universalPolicy: new URL("packages/bindings/overrides/script-universal-value-bindings.json", root)
 };
 const valueDefinitionUrls = [
   new URL("packages/bindings/overrides/script-defold-value-bindings.json", root),
@@ -31,6 +37,10 @@ const valueDefinitionUrls = [
 ];
 const urlOverrideUrl = new URL("packages/bindings/overrides/script-url-address-classification.json", root);
 const outputUrl = new URL("packages/bindings/generated/defold-script-api-accounting.json", root);
+const componentPropertyCompilerIds = new Set([
+  "script:go.property",
+  ...Object.values(componentProxyConstants.resourceKinds).map((kind) => `script:resource.${kind}`)
+]);
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -254,6 +264,7 @@ export function generateScriptApiAccounting(inputs) {
   const url = parse(inputs.urlText, "URL binding report");
   const valueTail = parse(inputs.valueTailText, "value-tail binding report");
   const overload = parse(inputs.overloadText, "overload-dispatch report");
+  const universalPolicy = parse(inputs.universalPolicyText, "universal-value fallback policy");
 
   const revisions = [inventory, patterns, descriptors, scalar, value, url, valueTail, overload].map((artifact) => artifact.defoldRevision);
   assert(revisions.every((revision) => revision === ir.defoldRevision), "script generator Defold revisions differ");
@@ -419,6 +430,41 @@ export function generateScriptApiAccounting(inputs) {
     }
   }
 
+  const universal = selectUniversalRoutes(ir.functions.flatMap((fn) => {
+    const pattern = patternById.get(fn.id);
+    if (!pattern) return [];
+    return [{
+      id: fn.id,
+      modulePath: fn.modulePath,
+      member: fn.member,
+      loweringFamily: pattern.loweringFamily,
+      contextToken: componentPropertyCompilerIds.has(fn.id) ? "component-property-compiler" : "runtime-context-selected-later",
+      parameters: fn.parameters,
+      resultCount: fn.returns.length,
+      variadic: pattern.traits.includes("variable-arguments") || pattern.traits.includes("variable-results")
+    }];
+  }), universalPolicy);
+  for (const row of universal.selected) {
+    const pattern = patternById.get(row.id);
+    assert(pattern, `${row.id}: universal fallback route is not a runtime descriptor`);
+    assert(pattern.loweringFamily === row.loweringFamily,
+      `${row.id}: universal fallback lowering family differs from classification`);
+    const expectedStableId = stableBindingId(row.id);
+    assert(row.stableId === expectedStableId, `${row.id}: universal fallback has a stale stable ID`);
+    if (executableById.has(row.id)) continue;
+    const owner = stableIdOwners.get(row.stableId);
+    assert(!owner, `stable ID collision between '${owner}' and '${row.id}'`);
+    stableIdOwners.set(row.stableId, row.id);
+    executableById.set(row.id, {
+      generator: "universal-value-fallback",
+      stableId: row.stableId,
+      minimumArgumentCount: row.minimumArgumentCount,
+      maximumArgumentCount: row.maximumArgumentCount,
+      resultCount: row.resultCount,
+      targetSupport: universalTargetSupport
+    });
+  }
+
   const descriptorStableIds = new Map(descriptorIds.map((id, index) => [id, descriptors.hot.stableId[index]]));
   for (const [id, executable] of executableById) {
     assert(descriptorStableIds.get(id) === executable.stableId,
@@ -428,6 +474,7 @@ export function generateScriptApiAccounting(inputs) {
   const rows = [];
   const categoryCounts = {
     "executable-stable-id": 0,
+    "component-property-compiler": 0,
     "separate-module": 0,
     pending: 0
   };
@@ -447,6 +494,21 @@ export function generateScriptApiAccounting(inputs) {
         `${fn.id}: stable-ID route has unexpected IR runtime status '${fn.runtimeStatus}'`);
       rows.push({ ...base, category: "executable-stable-id", evidence: executable });
       categoryCounts["executable-stable-id"] += 1;
+      continue;
+    }
+    if (componentPropertyCompilerIds.has(fn.id)) {
+      assert(fn.runtimeStatus === "requires-universal-lua-bridge" && patternById.has(fn.id),
+        `${fn.id}: component-property intrinsic is no longer present in the generated script surface`);
+      rows.push({
+        ...base,
+        category: "component-property-compiler",
+        evidence: {
+          generator: componentProxyConstants.generator,
+          lowering: "static-typescript-property-to-generated-lua-declaration",
+          runtimeCall: false
+        }
+      });
+      categoryCounts["component-property-compiler"] += 1;
       continue;
     }
     if (fn.runtimeStatus === "implemented-generated-lua-bridge") {
@@ -484,7 +546,9 @@ export function generateScriptApiAccounting(inputs) {
     fixedTupleBindingsSha256: sha256(inputs.tupleText),
     urlBindingsSha256: sha256(inputs.urlText),
     valueTailBindingsSha256: sha256(inputs.valueTailText),
-    overloadDispatchSha256: sha256(inputs.overloadText)
+    overloadDispatchSha256: sha256(inputs.overloadText),
+    universalValuePolicySha256: sha256(inputs.universalPolicyText),
+    universalValueSelectionSha256: sha256(JSON.stringify(universal.selected))
   };
   const aggregateInputSha256 = sha256([
     ...Object.entries(sourceHashes).map(([name, hash]) => `${name}\0${hash}`),
@@ -500,7 +564,7 @@ export function generateScriptApiAccounting(inputs) {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
     scope: "Every function in the pinned Defold script API IR, exactly once",
-    coverageClaim: "Accounting only. Executable means a generated stable-ID route exists; it does not claim per-target or per-function engine conformance.",
+    coverageClaim: "Accounting only. Executable means a generated stable-ID route exists; component-property-compiler means the TypeScript AST is deterministically lowered to a Defold Lua declaration and no runtime call exists; neither category claims per-target or per-function engine conformance.",
     inputEvidence: {
       ...sourceHashes,
       valueDefinitions: valueEvidence.definitionEvidence,
@@ -550,6 +614,7 @@ async function loadInputs() {
     urlText: texts.url,
     valueTailText: texts.valueTail,
     overloadText: texts.overload,
+    universalPolicyText: texts.universalPolicy,
     urlOverrideText,
     urlSourceTexts,
     valueDefinitions
@@ -570,6 +635,7 @@ async function main(argv = process.argv.slice(2)) {
   }
   console.log(`${check ? "Verified" : "Generated"} exact script API accounting: ` +
     `${report.categoryCounts["executable-stable-id"]} stable-ID, ` +
+    `${report.categoryCounts["component-property-compiler"]} component-property compiler intrinsic, ` +
     `${report.categoryCounts["separate-module"]} separate-module, ${report.categoryCounts.pending} pending, ` +
     `${report.functionCount} total.`);
 }

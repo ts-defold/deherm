@@ -1,4 +1,5 @@
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
+#include <defold_hermes/generated_script_callback_lifecycle.hpp>
 #include <defold_hermes/generated_script_value_bindings.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
 #include <defold_hermes/script_url_arena.hpp>
@@ -11,6 +12,9 @@
 #include <cstdio>
 #include <cstring>
 #include <limits>
+#include <array>
+#include <atomic>
+#include <new>
 
 namespace dmScript {
 void PushHash(lua_State* state, dmhash_t hash);
@@ -28,10 +32,92 @@ dmMessage::URL* ToURL(lua_State* state, int index);
 }  // namespace dmScript
 
 namespace defold_hermes::lua_bridge::scalar {
+
+struct LuaClosureRoot {
+  std::atomic<uint32_t> references{1};
+  ScriptAdapter* adapter = nullptr;
+  lua_State* state = nullptr;
+  int reference = LUA_NOREF;
+  std::shared_ptr<LuaClosureLifetime> lifetime;
+  ScriptCallback callback{};
+};
+
+struct LuaClosureLifetime {
+  static constexpr size_t kMaximumRoots = 256;
+
+  explicit LuaClosureLifetime(lua_State* input) noexcept : state(input) {}
+
+  bool attach(LuaClosureRoot* root) noexcept {
+    if (!active || !root) return false;
+    for (auto*& slot : roots) {
+      if (slot) continue;
+      slot = root;
+      return true;
+    }
+    return false;
+  }
+
+  void detach(LuaClosureRoot* root) noexcept {
+    for (auto*& slot : roots) {
+      if (slot != root) continue;
+      slot = nullptr;
+      return;
+    }
+  }
+
+  void shutdown() noexcept {
+    if (!active) return;
+    active = false;
+    for (auto*& slot : roots) {
+      LuaClosureRoot* root = slot;
+      slot = nullptr;
+      if (!root) continue;
+      if (root->state && root->reference != LUA_NOREF && root->reference != LUA_REFNIL) {
+        luaL_unref(root->state, LUA_REGISTRYINDEX, root->reference);
+      }
+      root->reference = LUA_NOREF;
+      root->state = nullptr;
+      root->adapter = nullptr;
+    }
+    state = nullptr;
+  }
+
+  ~LuaClosureLifetime() { shutdown(); }
+
+  std::array<LuaClosureRoot*, kMaximumRoots> roots{};
+  lua_State* state = nullptr;
+  bool active = true;
+};
+
 namespace {
 constexpr int64_t kMaxExactInteger = 9007199254740991LL;
 constexpr uint32_t kNodeHandleType = 1;
 constexpr uint32_t kLuaUserdataHandleType = 2;
+constexpr const char* kCallbackMetatable = "_deherm_.retained_callback";
+constexpr const char* kLuaErrorTablePrefix = "__deherm_lua_error_table_v1__:";
+
+struct CallbackLuaRoot {
+  ScriptCallback* callback = nullptr;
+};
+
+struct CallbackConsumeContext {
+  ScriptAdapter* adapter = nullptr;
+  lua_State* state = nullptr;
+  int baseTop = 0;
+  int resultCount = 0;
+};
+
+bool containsCallback(const ScriptValue& value, uint32_t depth = 0) noexcept {
+  if (value.tag == ScriptValueTag::kCallback) return true;
+  if (value.tag != ScriptValueTag::kTable || !value.data ||
+      depth >= universal_value::kMaximumDepth) return false;
+  const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
+  for (uint32_t index = 0; index < value.length; ++index) {
+    if (containsCallback(entries[index].key, depth + 1) ||
+        containsCallback(entries[index].value, depth + 1)) return true;
+  }
+  return false;
+}
 
 uint64_t packHandle(Handle handle) noexcept {
   return static_cast<uint64_t>(handle.slot) |
@@ -95,6 +181,7 @@ bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi,
   state_ = state;
   instanceApi_ = instanceApi;
   semanticRegistryApi_ = semanticRegistryApi;
+  luaClosureLifetime_ = std::make_shared<LuaClosureLifetime>(state_);
   if (++runtimeGeneration_ == 0) ++runtimeGeneration_;
   semanticHandleRegistry_ = std::make_unique<::defold_hermes::lua_bridge::LuaValueRegistry>(
       state_, runtimeGeneration_, kLuaHandleCapacity, kLuaHandleCapacity, semanticRegistryApi_);
@@ -112,6 +199,10 @@ bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi,
 
 void ScriptAdapter::shutdown() noexcept {
   if (state_) {
+    // Returned Lua closures may outlive the adapter's Lua registry. Unroot and
+    // inert them while the state is unquestionably valid; later JSI finalizers
+    // only release the native descriptor.
+    if (luaClosureLifetime_) luaClosureLifetime_->shutdown();
     handleRouter_.reset();
     semanticHandleRegistry_.reset();
     drainReleasedHandles();
@@ -153,6 +244,7 @@ void ScriptAdapter::shutdown() noexcept {
   instanceRef_ = LUA_NOREF;
   handleRouter_.reset();
   semanticHandleRegistry_.reset();
+  luaClosureLifetime_.reset();
   hasActiveContext_ = false;
   componentContextDepth_ = 0;
   state_ = nullptr;
@@ -187,6 +279,36 @@ bool ScriptAdapter::captureLuaUserdata(int stackIndex, ScriptValue* output) noex
   output->handleKind = ScriptHandleKind::kLuaUserdata;
   output->length = handle.runtime;
   output->payload = packHandle(handle);
+  return true;
+}
+
+bool ScriptAdapter::captureLuaClosure(int stackIndex, ScriptValue* output) noexcept {
+  if (!state_ || !output || !lua_isfunction(state_, stackIndex) ||
+      !luaClosureLifetime_ || !luaClosureLifetime_->active) {
+    return fail("Lua closure capture requires an active generated closure lifetime");
+  }
+  lua_pushvalue(state_, stackIndex);
+  const int reference = luaL_ref(state_, LUA_REGISTRYINDEX);
+  auto* root = new (std::nothrow) LuaClosureRoot{};
+  if (!root) {
+    luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+    return fail("Lua closure root allocation failed");
+  }
+  root->adapter = this;
+  root->state = state_;
+  root->reference = reference;
+  root->lifetime = luaClosureLifetime_;
+  root->callback = {
+    root, InvokeLuaClosure, RetainLuaClosure, ReleaseLuaClosure
+  };
+  if (!luaClosureLifetime_->attach(root)) {
+    luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+    delete root;
+    return fail("Lua closure root arena is exhausted");
+  }
+  *output = {};
+  output->tag = ScriptValueTag::kCallback;
+  output->data = &root->callback;
   return true;
 }
 
@@ -324,13 +446,12 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
     return handleRouter_->dispatch(frame, adapterError_, sizeof(adapterError_));
   }
 
-  const auto universalStatus = universal_value::dispatch(
-      frame, adapterError_, sizeof(adapterError_), &universalValueLuaApi_);
-  if (universalStatus == universal_value::DispatchStatus::kSuccess) return true;
-  if (universalStatus == universal_value::DispatchStatus::kError) return false;
-
   size_t denseIndex = 0;
   if (!findDenseIndex(frame->stableId, &denseIndex)) {
+    const auto universalStatus = universal_value::dispatch(
+        frame, adapterError_, sizeof(adapterError_), &universalValueLuaApi_);
+    if (universalStatus == universal_value::DispatchStatus::kSuccess) return true;
+    if (universalStatus == universal_value::DispatchStatus::kError) return false;
     return fail("Defold script binding is not in the executable scalar family");
   }
   const auto& table = generated::tables();
@@ -449,6 +570,241 @@ void ScriptAdapter::ReleaseHandleThunk(
     uint32_t runtime,
     uint64_t payload) noexcept {
   static_cast<ScriptAdapter*>(context)->releaseHandle(kind, runtime, payload);
+}
+
+int ScriptAdapter::LuaCallbackGc(lua_State* state) {
+  auto* root = static_cast<CallbackLuaRoot*>(lua_touserdata(state, 1));
+  if (root && root->callback) {
+    ScriptCallback* callback = root->callback;
+    root->callback = nullptr;
+    callback->release(callback->context);
+  }
+  return 0;
+}
+
+bool ScriptAdapter::ConsumeCallbackResults(
+    void* opaque,
+    const ScriptCallFrame* results) noexcept {
+  auto* context = static_cast<CallbackConsumeContext*>(opaque);
+  if (!context || !context->adapter || !context->state || !results ||
+      results->resultCount > results->resultCapacity ||
+      (results->resultCount && !results->results)) return false;
+  lua_settop(context->state, context->baseTop);
+  for (uint32_t index = 0; index < results->resultCount; ++index) {
+    if (!context->adapter->pushStructuredValue(results->results[index],
+            const_cast<ScriptCallFrame*>(results))) {
+      lua_settop(context->state, context->baseTop);
+      return false;
+    }
+  }
+  context->resultCount = static_cast<int>(results->resultCount);
+  return true;
+}
+
+int ScriptAdapter::LuaCallbackThunk(lua_State* state) {
+  auto* adapter = static_cast<ScriptAdapter*>(lua_touserdata(state, lua_upvalueindex(1)));
+  auto* root = static_cast<CallbackLuaRoot*>(lua_touserdata(state, lua_upvalueindex(2)));
+  if (!adapter || !root || !root->callback || !root->callback->invoke) {
+    return luaL_error(state, "deherm callback is unavailable");
+  }
+  const int argumentCount = lua_gettop(state);
+  if (argumentCount < 0 || static_cast<size_t>(argumentCount) > universal_value::kMaximumArgumentCount) {
+    return luaL_error(state, "deherm callback argument count exceeds the generated bound");
+  }
+  constexpr int kCallbackStackReserve =
+      static_cast<int>(universal_value::kMaximumArgumentCount +
+          universal_value::kMaximumDepth * 2 + 16);
+  if (!lua_checkstack(state, kCallbackStackReserve)) {
+    return luaL_error(state, "deherm callback cannot reserve its bounded Lua stack frame");
+  }
+  std::array<ScriptValue, universal_value::kMaximumArgumentCount> arguments{};
+  std::array<ScriptValue, universal_value::kMaximumResultCount> results{};
+  std::array<ScriptTableEntry, universal_value::kMaximumEntries> tableScratch{};
+  std::array<ScriptValue,
+      universal_value::kMaximumArgumentCount + universal_value::kMaximumEntries * 2>
+      borrowedHandles{};
+  uint32_t borrowedHandleCount = 0;
+  std::array<char, universal_value::kMaximumStringBytes> stringScratch{};
+  ScriptMatrix4Arena matrix4Arena{};
+  ScriptUrlArena<> urlArena{};
+  urlArena.resetRuntime(adapter->runtimeGeneration_);
+  ScriptCallFrame frame{};
+  frame.arguments = arguments.data();
+  frame.argumentCount = static_cast<uint32_t>(argumentCount);
+  frame.results = results.data();
+  frame.resultCapacity = static_cast<uint32_t>(results.size());
+  frame.tableScratch = tableScratch.data();
+  frame.tableScratchCapacity = static_cast<uint32_t>(tableScratch.size());
+  frame.stringScratch = stringScratch.data();
+  frame.stringScratchCapacity = static_cast<uint32_t>(stringScratch.size());
+  frame.matrix4Arena = &matrix4Arena;
+  frame.urlArena = &urlArena;
+  const void* ancestors[universal_value::kMaximumDepth]{};
+  auto releaseBorrowedHandles = [&]() noexcept {
+    for (uint32_t index = 0; index < borrowedHandleCount; ++index) {
+      const ScriptValue& value = borrowedHandles[index];
+      adapter->releaseHandle(value.handleKind, value.length, value.payload);
+    }
+    borrowedHandleCount = 0;
+    adapter->drainReleasedHandles();
+  };
+  for (int index = 0; index < argumentCount; ++index) {
+    if (!adapter->readUniversalValue(index + 1, &arguments[static_cast<size_t>(index)],
+            &frame, 0, ancestors, 0, borrowedHandles.data(),
+            static_cast<uint32_t>(borrowedHandles.size()), &borrowedHandleCount)) {
+      releaseBorrowedHandles();
+      return luaL_error(state, "%s", adapter->lastError());
+    }
+  }
+  CallbackConsumeContext consume{adapter, state, argumentCount, 0};
+  char error[384]{};
+  const bool invoked = root->callback->invoke(root->callback->context, &frame, &consume,
+      ConsumeCallbackResults, error, sizeof(error));
+  releaseBorrowedHandles();
+  if (!invoked) {
+    lua_settop(state, argumentCount);
+    if (std::strncmp(error, kLuaErrorTablePrefix,
+            std::strlen(kLuaErrorTablePrefix)) == 0) {
+      lua_createtable(state, 1, 0);
+      const char* payload = error + std::strlen(kLuaErrorTablePrefix);
+      const char* newline = std::strchr(payload, '\n');
+      lua_pushlstring(state, payload,
+          newline ? static_cast<size_t>(newline - payload) : std::strlen(payload));
+      lua_rawseti(state, -2, 1);
+      return lua_error(state);
+    }
+    return luaL_error(state, "%s", error[0] ? error : "JavaScript callback failed");
+  }
+  return consume.resultCount;
+}
+
+void ScriptAdapter::RetainLuaClosure(void* opaque) noexcept {
+  if (auto* root = static_cast<LuaClosureRoot*>(opaque)) {
+    root->references.fetch_add(1, std::memory_order_relaxed);
+  }
+}
+
+void ScriptAdapter::ReleaseLuaClosure(void* opaque) noexcept {
+  auto* root = static_cast<LuaClosureRoot*>(opaque);
+  if (!root || root->references.fetch_sub(1, std::memory_order_acq_rel) != 1) return;
+  const auto lifetime = root->lifetime;
+  if (lifetime) lifetime->detach(root);
+  if (root->state && root->reference != LUA_NOREF && root->reference != LUA_REFNIL) {
+    luaL_unref(root->state, LUA_REGISTRYINDEX, root->reference);
+  }
+  root->reference = LUA_NOREF;
+  root->state = nullptr;
+  root->adapter = nullptr;
+  delete root;
+}
+
+bool ScriptAdapter::InvokeLuaClosure(
+    void* opaque,
+    const ScriptCallFrame* arguments,
+    void* consumeContext,
+    ScriptCallbackConsume consume,
+    char* error,
+    size_t errorCapacity) noexcept {
+  auto* root = static_cast<LuaClosureRoot*>(opaque);
+  auto reject = [&](const char* message) noexcept {
+    writeError(error, errorCapacity, message);
+    return false;
+  };
+  if (!root || !root->adapter || !root->state || root->reference == LUA_NOREF ||
+      root->reference == LUA_REFNIL || !root->lifetime || !root->lifetime->active) {
+    return reject("Lua closure belongs to a destroyed Defold script runtime");
+  }
+  if (!arguments || !consume ||
+      arguments->argumentCount > universal_value::kMaximumArgumentCount ||
+      (arguments->argumentCount && !arguments->arguments)) {
+    return reject("Lua closure received an invalid bounded argument frame");
+  }
+  auto* adapter = root->adapter;
+  lua_State* state = root->state;
+  constexpr int kStackReserve = static_cast<int>(
+      universal_value::kMaximumArgumentCount +
+      universal_value::kMaximumResultCount +
+      universal_value::kMaximumDepth * 2 + 16);
+  if (!lua_checkstack(state, kStackReserve)) {
+    return reject("Lua closure cannot reserve its bounded stack frame");
+  }
+
+  std::array<ScriptValue, universal_value::kMaximumResultCount> results{};
+  std::array<ScriptTableEntry, universal_value::kMaximumEntries> tableScratch{};
+  std::array<char, universal_value::kMaximumStringBytes> stringScratch{};
+  ScriptMatrix4Arena matrix4Arena{};
+  ScriptUrlArena<> urlArena{};
+  urlArena.resetRuntime(adapter->runtimeGeneration_);
+  ScriptCallFrame output{};
+  output.results = results.data();
+  output.resultCapacity = static_cast<uint32_t>(results.size());
+  output.tableScratch = tableScratch.data();
+  output.tableScratchCapacity = static_cast<uint32_t>(tableScratch.size());
+  output.stringScratch = stringScratch.data();
+  output.stringScratchCapacity = static_cast<uint32_t>(stringScratch.size());
+  output.matrix4Arena = &matrix4Arena;
+  output.urlArena = &urlArena;
+
+  const int baseTop = lua_gettop(state);
+  const bool scoped = adapter->hasSelectedContext() && adapter->instanceApi_.get &&
+      adapter->instanceApi_.set && adapter->instanceRef_ != LUA_NOREF &&
+      adapter->instanceRef_ != LUA_REFNIL;
+  if (scoped) {
+    adapter->instanceApi_.get(state);
+    lua_rawgeti(state, LUA_REGISTRYINDEX, adapter->instanceRef_);
+    adapter->instanceApi_.set(state);
+  }
+  const int callBase = lua_gettop(state);
+  lua_rawgeti(state, LUA_REGISTRYINDEX, root->reference);
+  bool ok = lua_isfunction(state, -1);
+  if (!ok) adapter->fail("Lua closure registry reference is stale");
+  for (uint32_t index = 0; ok && index < arguments->argumentCount; ++index) {
+    if (!adapter->pushStructuredValue(arguments->arguments[index],
+            const_cast<ScriptCallFrame*>(arguments))) ok = false;
+  }
+  if (ok && lua_pcall(state, static_cast<int>(arguments->argumentCount), LUA_MULTRET, 0) != 0) {
+    const char* message = lua_tostring(state, -1);
+    bool tableError = false;
+    if (!message && lua_istable(state, -1)) {
+      lua_rawgeti(state, -1, 1);
+      message = lua_tostring(state, -1);
+      tableError = message != nullptr;
+    }
+    if (tableError) {
+      char tagged[sizeof(adapter->adapterError_)]{};
+      std::snprintf(tagged, sizeof(tagged), "%s%s", kLuaErrorTablePrefix, message);
+      adapter->fail(tagged);
+    } else {
+      adapter->fail(message ? message : "Lua closure failed with a non-string error");
+    }
+    ok = false;
+  }
+  const int actualResultCount = ok ? lua_gettop(state) - callBase : 0;
+  if (ok && (actualResultCount < 0 ||
+      static_cast<size_t>(actualResultCount) > results.size())) {
+    adapter->fail("Lua closure result count exceeds the generated bound");
+    ok = false;
+  }
+  const void* ancestors[universal_value::kMaximumDepth]{};
+  for (int index = 0; ok && index < actualResultCount; ++index) {
+    if (!adapter->readUniversalValue(callBase + 1 + index,
+            &results[static_cast<size_t>(index)], &output, 0, ancestors, 0)) ok = false;
+  }
+  if (ok) {
+    output.resultCount = static_cast<uint32_t>(actualResultCount);
+    ok = consume(consumeContext, &output);
+    if (!ok && !adapter->lastError()[0]) {
+      adapter->fail("JavaScript rejected Lua closure results");
+    }
+  }
+  if (scoped) {
+    lua_settop(state, baseTop + 1);
+    adapter->instanceApi_.set(state);
+  }
+  lua_settop(state, baseTop);
+  if (!ok) return reject(adapter->lastError());
+  adapter->adapterError_[0] = '\0';
+  return true;
 }
 
 value_binding::DispatchStatus ScriptAdapter::StructuredInvokeThunk(
@@ -587,9 +943,18 @@ bool ScriptAdapter::pushStructuredValue(
         return fail("Structured Lua table exceeds the generated entry bound");
       }
       const bool sequence = value.reserved == static_cast<uint8_t>(ScriptTableKind::kSequence);
+      const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
+      for (uint32_t index = 0; index < value.length; ++index) {
+        const ScriptValue& key = entries[index].key;
+        if (key.tag == ScriptValueTag::kNull || key.tag == ScriptValueTag::kUndefined) {
+          return fail("Structured Lua table key cannot be null or undefined");
+        }
+        if (key.tag == ScriptValueTag::kNumber && !std::isfinite(key.number)) {
+          return fail("Structured Lua numeric table key must be finite");
+        }
+      }
       lua_createtable(state_, sequence ? static_cast<int>(value.length) : 0,
           sequence ? 0 : static_cast<int>(value.length));
-      const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
       for (uint32_t index = 0; index < value.length; ++index) {
         if (!pushStructuredValue(entries[index].key, frame, depth + 1) ||
             !pushStructuredValue(entries[index].value, frame, depth + 1)) return false;
@@ -598,7 +963,26 @@ bool ScriptAdapter::pushStructuredValue(
       return true;
     }
     case ScriptValueTag::kCallback:
-      return fail("Structured Lua callbacks are unsupported");
+      if (!value.data) return fail("Structured Lua callback descriptor is null");
+      {
+        auto* callback = const_cast<ScriptCallback*>(static_cast<const ScriptCallback*>(value.data));
+        if (!callback->invoke || !callback->retain || !callback->release) {
+          return fail("Structured Lua callback descriptor is incomplete");
+        }
+        auto* root = static_cast<CallbackLuaRoot*>(lua_newuserdata(state_, sizeof(CallbackLuaRoot)));
+        root->callback = callback;
+        callback->retain(callback->context);
+        if (luaL_newmetatable(state_, kCallbackMetatable)) {
+          lua_pushcfunction(state_, LuaCallbackGc);
+          lua_setfield(state_, -2, "__gc");
+        }
+        lua_setmetatable(state_, -2);
+        lua_pushlightuserdata(state_, this);
+        lua_pushvalue(state_, -2);
+        lua_pushcclosure(state_, LuaCallbackThunk, 2);
+        lua_remove(state_, -2);
+        return true;
+      }
   }
   return fail("Structured Lua value tag is unsupported");
 }
@@ -738,11 +1122,14 @@ value_binding::DispatchStatus ScriptAdapter::invokeStructured(
     writeError(error, errorCapacity, "Structured Lua call has no captured Defold instance");
     return value_binding::DispatchStatus::kError;
   }
+  const bool currentContext = operation.context == value_binding::StructuredLuaContext::kCurrentScriptInstance;
   const ActiveContext requiredContext = operation.context == value_binding::StructuredLuaContext::kGuiScriptInstance
       ? ActiveContext::kGui : ActiveContext::kGameObject;
-  if (!hasSelectedContext() || selectedContext() != requiredContext) {
+  if (!hasSelectedContext() || (!currentContext && selectedContext() != requiredContext)) {
     writeError(error, errorCapacity,
-        operation.context == value_binding::StructuredLuaContext::kGuiScriptInstance
+        currentContext
+          ? "Structured Lua call requires an active script instance"
+          : operation.context == value_binding::StructuredLuaContext::kGuiScriptInstance
           ? "Structured Lua call requires an active GUI script instance"
           : "Structured Lua call requires an active game-object script instance");
     return value_binding::DispatchStatus::kError;
@@ -893,6 +1280,14 @@ url_binding::DispatchStatus ScriptAdapter::invokeUrl(
   using Status = url_binding::DispatchStatus;
   if (!state_ || !frame || !bindUrl(operation)) {
     writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  constexpr int kUniversalStackReserve =
+      static_cast<int>(universal_value::kMaximumArgumentCount +
+          universal_value::kMaximumDepth * 2 + 16);
+  if (!lua_checkstack(state_, kUniversalStackReserve)) {
+    writeError(error, errorCapacity,
+        "Universal-value Lua backend cannot reserve its bounded stack frame");
     return Status::kError;
   }
   if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
@@ -1460,7 +1855,10 @@ bool ScriptAdapter::readUniversalValue(
     ScriptCallFrame* frame,
     uint32_t depth,
     const void* const* ancestors,
-    uint32_t ancestorCount) noexcept {
+    uint32_t ancestorCount,
+    ScriptValue* borrowedHandles,
+    uint32_t borrowedHandleCapacity,
+    uint32_t* borrowedHandleCount) noexcept {
   if (!state_ || !output || !frame) return fail("Universal-value result reader is not initialized");
   const int absoluteIndex = stackIndex < 0 ? lua_gettop(state_) + stackIndex + 1 : stackIndex;
   *output = {};
@@ -1491,6 +1889,8 @@ bool ScriptAdapter::readUniversalValue(
       frame->stringScratchUsed += static_cast<uint32_t>(length);
       return true;
     }
+    case LUA_TFUNCTION:
+      return captureLuaClosure(absoluteIndex, output);
     case LUA_TUSERDATA: {
       if (auto* value = dmScript::ToVector3(state_, absoluteIndex)) {
         output->tag = ScriptValueTag::kDefoldValue;
@@ -1543,7 +1943,17 @@ bool ScriptAdapter::readUniversalValue(
         }
         return true;
       }
-      return captureLuaUserdata(absoluteIndex, output);
+      if (!captureLuaUserdata(absoluteIndex, output)) return false;
+      if (borrowedHandleCount) {
+        if (!borrowedHandles || *borrowedHandleCount >= borrowedHandleCapacity) {
+          releaseHandle(output->handleKind, output->length, output->payload);
+          drainReleasedHandles();
+          *output = {};
+          return fail("Universal-value callback borrowed-handle ledger is exhausted");
+        }
+        borrowedHandles[(*borrowedHandleCount)++] = *output;
+      }
+      return true;
     }
     case LUA_TTABLE: {
       if (depth >= universal_value::kMaximumDepth) {
@@ -1596,9 +2006,11 @@ bool ScriptAdapter::readUniversalValue(
       lua_pushnil(state_);
       while (lua_next(state_, absoluteIndex) != 0) {
         if (!readUniversalValue(-2, &entries[entry].key, frame, depth + 1,
-                nextAncestors.data(), ancestorCount + 1) ||
+                nextAncestors.data(), ancestorCount + 1, borrowedHandles,
+                borrowedHandleCapacity, borrowedHandleCount) ||
             !readUniversalValue(-1, &entries[entry].value, frame, depth + 1,
-                nextAncestors.data(), ancestorCount + 1)) {
+                nextAncestors.data(), ancestorCount + 1, borrowedHandles,
+                borrowedHandleCapacity, borrowedHandleCount)) {
           lua_pop(state_, 2);
           return false;
         }
@@ -1624,7 +2036,24 @@ universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
     char* error,
     size_t errorCapacity) noexcept {
   using Status = universal_value::DispatchStatus;
-  if (!state_ || !frame || !bindUniversalValue(operation)) {
+  if (!state_ || !frame) {
+    writeError(error, errorCapacity, "Universal-value Lua backend is not initialized");
+    return Status::kError;
+  }
+  bool hasCallback = false;
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    hasCallback = hasCallback || containsCallback(frame->arguments[index]);
+  }
+  if (hasCallback) {
+    const auto* lifecycle = callback_lifecycle::find(operation.stableId);
+    if (!lifecycle || (!lifecycle->registryEligible &&
+        lifecycle->lifetime != callback_lifecycle::Lifetime::kHigherOrderClosure)) {
+      writeError(error, errorCapacity,
+          "Universal-value callback route is absent from the generated executable lifecycle ledger");
+      return Status::kError;
+    }
+  }
+  if (!bindUniversalValue(operation)) {
     writeError(error, errorCapacity, lastError());
     return Status::kError;
   }
@@ -1655,12 +2084,13 @@ universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
     ok = fail(message ? message : "Universal-value Lua call failed without an error string");
   }
   const int actualResultCount = ok ? lua_gettop(state_) - callBase : 0;
-  if (ok && actualResultCount != operation.resultCount) {
-    ok = fail("Universal-value Lua result count does not match exact descriptor");
+  if (ok && (actualResultCount < operation.minimumResultCount ||
+             actualResultCount > operation.maximumResultCount)) {
+    ok = fail("Universal-value Lua result count is outside the generated range");
   }
   const void* ancestors[universal_value::kMaximumDepth]{};
   if (ok) {
-    for (uint8_t index = 0; index < operation.resultCount; ++index) {
+    for (int index = 0; index < actualResultCount; ++index) {
       if (!readUniversalValue(callBase + 1 + index, &frame->results[index], frame,
               0, ancestors, 0)) {
         ok = false;
@@ -1668,7 +2098,7 @@ universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
       }
     }
   }
-  if (ok) frame->resultCount = operation.resultCount;
+  if (ok) frame->resultCount = static_cast<uint32_t>(actualResultCount);
   if (scoped) {
     lua_settop(state_, baseTop + 1);
     instanceApi_.set(state_);

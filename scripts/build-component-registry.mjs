@@ -1,5 +1,11 @@
 import { createHash } from "node:crypto";
 import { build } from "esbuild";
+
+import {
+  applyBundleFingerprint,
+  bundleFingerprintBanner,
+  createBundleFingerprintPlaceholder
+} from "../packages/compiler/src/bundle-fingerprint.mjs";
 import { lstat, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -112,6 +118,9 @@ export async function buildComponentRegistry(argv = []) {
   if (current) return { cacheHit: true, key, manifest, sentinel: current, generated };
   if (options.check) throw new Error("Component registry bundle is missing or stale; run without --check to regenerate it");
 
+  // This bundle is evaluated by defold_hermes::Runtime::load, so it must carry
+  // the same self-describing content fingerprint as every other deherm bundle.
+  const fingerprintPlaceholder = createBundleFingerprintPlaceholder();
   const buildResult = await build({
     absWorkingDir: options.projectRoot,
     entryPoints: [registryPath],
@@ -123,6 +132,7 @@ export async function buildComponentRegistry(argv = []) {
     platform: "neutral",
     target: "es2020",
     legalComments: "none",
+    banner: { js: bundleFingerprintBanner(fingerprintPlaceholder) },
     sourcemap: "external",
     metafile: true,
     alias: {
@@ -132,18 +142,21 @@ export async function buildComponentRegistry(argv = []) {
   const js = buildResult.outputFiles.find(({ path: file }) => file.endsWith(".js"));
   const map = buildResult.outputFiles.find(({ path: file }) => file.endsWith(".js.map"));
   if (!js || !map) throw new Error("Component registry bundler did not emit JavaScript and source map outputs");
+  const { fingerprint, source: fingerprintedJs } =
+      applyBundleFingerprint(js.text, fingerprintPlaceholder);
   const usage = `${JSON.stringify({
     schemaVersion: 1,
     generator: "scripts/build-component-registry.mjs",
     cacheKey: key,
     registry: "__defoldComponentsV1",
     componentOnlyBootstrap: true,
+    bundleFingerprint: fingerprint,
     components: manifest.components.map(({ componentId, source, contextKind, schemaFingerprint }) => ({
       componentId, source, contextKind, schemaFingerprint
     }))
   }, null, 2)}\n`;
   const contents = new Map([
-    ["components.js", js.contents],
+    ["components.js", Buffer.from(fingerprintedJs)],
     ["components.js.map", map.contents],
     ["components.usage.json", Buffer.from(usage)]
   ]);

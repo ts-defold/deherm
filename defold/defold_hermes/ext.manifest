@@ -5,3 +5,16 @@ platforms:
         context:
             frameworks: ["CoreFoundation"]
             flags: ["-std=c++17", "-fexceptions"]
+    x86_64-osx:
+        context:
+            frameworks: ["CoreFoundation"]
+            flags: ["-std=c++17", "-fexceptions"]
+    x86_64-linux:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]
+    arm64-linux:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]
+    x86_64-win32:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]

@@ -108,7 +108,7 @@ constexpr StructuredLuaOperation kStructuredLuaOperations[] = {
   {6, 0x25d5351eu, "script:gui.set_particlefx", "gui", "set_particlefx", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
   {7, 0x289cacf1u, "script:gui.set_color", "gui", "set_color", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
   {8, 0x32ce9520u, "script:gui.set_outline", "gui", "set_outline", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
-  {9, 0x4243998fu, "script:msg.post", "msg", "post", StructuredLuaResultCodec::kNone, StructuredLuaContext::kScriptInstance},
+  {9, 0x4243998fu, "script:msg.post", "msg", "post", StructuredLuaResultCodec::kNone, StructuredLuaContext::kCurrentScriptInstance},
   {10, 0x4f947bcfu, "script:gui.set_size", "gui", "set_size", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
   {11, 0x54f686f4u, "script:gui.set_leading", "gui", "set_leading", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},
   {12, 0x57e22c89u, "script:gui.set_position", "gui", "set_position", StructuredLuaResultCodec::kNone, StructuredLuaContext::kGuiScriptInstance},

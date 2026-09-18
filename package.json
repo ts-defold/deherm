@@ -6,7 +6,8 @@
   "type": "module",
   "packageManager": "pnpm@11.22.0",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "examples/*"
   ],
   "source": "./packages/sdk/src/index.ts",
   "types": "./packages/sdk/src/index.ts",
@@ -20,11 +21,29 @@
       "types": "./packages/sdk/src/component.ts",
       "import": "./packages/sdk/src/component.ts",
       "default": "./packages/sdk/src/component.ts"
+    },
+    "./modules/*": {
+      "types": "./packages/sdk/src/generated/modules/*.ts",
+      "import": "./packages/sdk/src/generated/modules/*.ts",
+      "default": "./packages/sdk/src/generated/modules/*.ts"
+    },
+    "./compiler/dmsdk-universal-materializer": {
+      "import": "./packages/compiler/src/dmsdk-universal-materializer.mjs",
+      "default": "./packages/compiler/src/dmsdk-universal-materializer.mjs"
+    },
+    "./compiler/native-extension-generator": {
+      "import": "./packages/compiler/src/native-extension-generator.mjs",
+      "default": "./packages/compiler/src/native-extension-generator.mjs"
+    },
+    "./ttsc": {
+      "import": "./packages/compiler/ttsc.mjs",
+      "default": "./packages/compiler/ttsc.mjs"
     }
   },
   "files": [
     "bin/",
     "packages/",
+    "defold/defold_hermes/",
     "!packages/**/*.type-test.ts",
     "README.md"
   ],
@@ -48,10 +67,15 @@
     "deherm": "bin/deherm.mjs"
   },
   "scripts": {
+    "prepack": "node scripts/check-package-native-artifacts.mjs",
     "bootstrap": "pnpm bootstrap:upstreams && pnpm bootstrap:bob",
     "bootstrap:upstreams": "./scripts/bootstrap-upstreams.sh",
     "bootstrap:bob": "./scripts/bootstrap-bob.sh",
     "bootstrap:emsdk": "./scripts/bootstrap-emsdk.sh",
+    "artifacts:fingerprint": "node scripts/manage-native-artifacts.mjs fingerprint",
+    "artifacts:verify": "node scripts/manage-native-artifacts.mjs verify",
+    "artifacts:verify:complete": "node scripts/manage-native-artifacts.mjs verify --complete",
+    "artifacts:pull": "node scripts/manage-native-artifacts.mjs pull",
     "extender:prepare": "./scripts/extender-local.sh prepare",
     "extender:start": "./scripts/extender-local.sh start",
     "extender:foreground": "./scripts/extender-local.sh foreground",
@@ -100,6 +124,7 @@
     "generate:dmsdk-arena-span-blockers": "node scripts/generate-dmsdk-arena-span-blockers.mjs",
     "generate:dmsdk-projection-ir": "node scripts/generate-dmsdk-projection-ir.mjs",
     "generate:dmsdk-cstring-value-bindings": "node scripts/generate-dmsdk-cstring-value-bindings.mjs",
+    "generate:dmsdk-universal-bindings": "node scripts/generate-dmsdk-universal-bindings.mjs",
     "generate:component-proxy-runtime-capability": "node scripts/generate-component-proxy-runtime-capability.mjs",
     "generate:binding-lowering-plan": "node scripts/ensure-binding-lowering-plan.mjs",
     "plan:binding-emission": "node scripts/generate-binding-emission-plan.mjs",
@@ -145,6 +170,7 @@
     "check:dmsdk-arena-span-blockers": "node scripts/generate-dmsdk-arena-span-blockers.mjs --check",
     "check:dmsdk-projection-ir": "node scripts/generate-dmsdk-projection-ir.mjs --check",
     "check:dmsdk-cstring-value-bindings": "node scripts/generate-dmsdk-cstring-value-bindings.mjs --check",
+    "check:dmsdk-universal-bindings": "node scripts/generate-dmsdk-universal-bindings.mjs --check",
     "check:component-proxy-runtime-capability": "node scripts/generate-component-proxy-runtime-capability.mjs --check",
     "check:binding-lowering-plan": "node scripts/ensure-binding-lowering-plan.mjs --deep-check",
     "verify:binding-lowering-plan": "node scripts/ensure-binding-lowering-plan.mjs --deep-check",
@@ -186,8 +212,9 @@
     "test:binding-patterns": "node --test tests/script-binding-patterns.test.mjs tests/dmsdk-binding-patterns.test.mjs",
     "test:binding-runtime-codegen": "node --test tests/script-binding-descriptors.test.mjs tests/scalar-lua-dispatch.test.mjs tests/script-value-bindings.test.mjs tests/script-defold-value-tail.test.mjs tests/script-fixed-tuples.test.mjs tests/script-dynamic-values.test.mjs tests/script-callback-lifecycle.test.mjs tests/script-overload-dispatch.test.mjs tests/script-table-record-bindings.test.mjs tests/script-universal-value-bindings.test.mjs tests/script-copied-value-record-blockers.test.mjs tests/script-opaque-record-blockers.test.mjs tests/static-hermes-vmath.test.mjs tests/script-api-accounting.test.mjs tests/borrowed-handle-classification.test.mjs tests/script-table-tuple-schemas.test.mjs tests/script-url-address-classification.test.mjs tests/script-real-engine-matrix.test.mjs tests/script-route-availability-profiles.test.mjs tests/script-projection-ir.test.mjs tests/script-handle-lowering.test.mjs tests/script-generator-pipeline.test.mjs tests/script-clean-room-regeneration.test.mjs tests/native-runtime-probe-report.test.mjs tests/war-battles-real-engine-probes.test.mjs tests/dmsdk-scalar-thunks.test.mjs tests/dmsdk-abi-shapes.test.mjs tests/dmsdk-enum-value-bindings.test.mjs tests/dmsdk-named-scalar-bindings.test.mjs tests/dmsdk-fixed-digest-bindings.test.mjs tests/dmsdk-base64-span-bindings.test.mjs tests/dmsdk-astc-probe-bindings.test.mjs tests/dmsdk-xtea-span-bindings.test.mjs tests/dmsdk-hash-span-bindings.test.mjs tests/dmsdk-arena-span-blockers.test.mjs tests/dmsdk-projection-ir.test.mjs tests/dmsdk-cstring-value-bindings.test.mjs tests/dmsdk-generator-pipeline.test.mjs tests/dmsdk-clean-room-regeneration.test.mjs tests/binding-lowering-plan.test.mjs tests/binding-emission-plan.test.mjs tests/binding-lowering-cache.test.mjs",
     "test:static-hermes-vmath": "node --test tests/static-hermes-vmath.test.mjs",
+    "test:hash-literal": "node --test tests/hash-literal.test.mjs",
     "test:script-clean-room": "node --test tests/script-clean-room-regeneration.test.mjs",
-    "test:dmsdk-runtime-codegen": "node --test tests/dmsdk-binding-patterns.test.mjs tests/dmsdk-scalar-thunks.test.mjs tests/dmsdk-abi-shapes.test.mjs tests/dmsdk-enum-value-bindings.test.mjs tests/dmsdk-named-scalar-bindings.test.mjs tests/dmsdk-fixed-digest-bindings.test.mjs tests/dmsdk-base64-span-bindings.test.mjs tests/dmsdk-astc-probe-bindings.test.mjs tests/dmsdk-xtea-span-bindings.test.mjs tests/dmsdk-hash-span-bindings.test.mjs tests/dmsdk-arena-span-blockers.test.mjs tests/dmsdk-projection-ir.test.mjs tests/dmsdk-cstring-value-bindings.test.mjs tests/dmsdk-generator-pipeline.test.mjs",
+    "test:dmsdk-runtime-codegen": "node --test tests/dmsdk-binding-patterns.test.mjs tests/dmsdk-scalar-thunks.test.mjs tests/dmsdk-abi-shapes.test.mjs tests/dmsdk-enum-value-bindings.test.mjs tests/dmsdk-named-scalar-bindings.test.mjs tests/dmsdk-fixed-digest-bindings.test.mjs tests/dmsdk-base64-span-bindings.test.mjs tests/dmsdk-astc-probe-bindings.test.mjs tests/dmsdk-xtea-span-bindings.test.mjs tests/dmsdk-hash-span-bindings.test.mjs tests/dmsdk-arena-span-blockers.test.mjs tests/dmsdk-projection-ir.test.mjs tests/dmsdk-cstring-value-bindings.test.mjs tests/dmsdk-universal-bindings.test.mjs tests/dmsdk-generator-pipeline.test.mjs",
     "test:dmsdk-clean-room": "node --test tests/dmsdk-clean-room-regeneration.test.mjs",
     "test:contract": "pnpm build:js && node --test tests/contract.test.mjs",
     "test:web-host": "pnpm build:js && node --test tests/web-host.test.mjs",
@@ -195,14 +222,14 @@
     "test:polyfills": "node --test tests/polyfill-manifest.test.mjs",
     "test:conformance": "node --test tests/conformance-harness.test.mjs",
     "test:lua-value-registry": "node --test tests/lua-value-registry.test.mjs",
-    "test:component-proxies": "node --test tests/component-proxy-generator.test.mjs tests/component-registry-build.test.mjs",
+    "test:component-proxies": "node --test tests/component-class-adapter.test.mjs tests/component-proxy-generator.test.mjs tests/component-registry-build.test.mjs",
     "test:component-proxy-runtime-capability": "node --test tests/component-proxy-runtime-capability.test.mjs && cmake -S tests/native/component_proxy_lua_gate -B build/component-proxy-lua-gate -G Ninja -DCMAKE_BUILD_TYPE=Release && cmake --build build/component-proxy-lua-gate --parallel && build/component-proxy-lua-gate/component-proxy-lua-gate-test && node scripts/build-component-runtime-e2e.mjs && pnpm configure:native && cmake --build build/native --target defold-hermes-component-runtime-e2e --parallel && node scripts/run-component-runtime-e2e.mjs",
     "test:html5:runtime": "node scripts/check-html5-runtime.mjs",
     "test:native-defold:runtime": "node scripts/check-native-defold-runtime.mjs",
     "test:native-defold:hot-reload": "node --test tests/native-hot-reload-fixture.test.mjs && node scripts/check-native-defold-hot-reload.mjs",
     "test:extension-retention": "node --test tests/dmsdk-scalar-extension-retention.test.mjs",
     "test:cli": "node --test tests/cli.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs",
-    "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs",
+    "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs tests/hash-literal.test.mjs tests/installed-dev-loop.test.mjs",
     "test:canonical-family-emission": "node --test tests/canonical-family-emission.test.mjs",
     "test:usage": "pnpm build:release-plan && node --test tests/usage.test.mjs tests/release-build.test.mjs tests/canonical-family-emission.test.mjs",
     "test:native": "pnpm build && node --test tests/native.test.mjs",
@@ -218,7 +245,7 @@
     "test:device-dev": "pnpm build:native && pnpm build:device-dev && node --test tests/bytecode.test.mjs",
     "test:lua-bridge": "pnpm bench:lua-bridge",
     "test:lua-hermes": "pnpm generate:bindings && pnpm generate:lua-bridge && pnpm configure:native && cmake --build build/native --target defold-hermes-lua-hermes-e2e --parallel && build/native/defold-hermes-lua-hermes-e2e",
-    "test": "pnpm check && pnpm test:codegen && pnpm test:lua-codegen && pnpm test:coverage && pnpm test:binding-patterns && pnpm test:binding-runtime-codegen && pnpm test:contract && pnpm test:web-host && pnpm test:web-library && pnpm test:polyfills && pnpm test:conformance && pnpm test:lua-value-registry && pnpm test:component-proxies && pnpm test:component-proxy-runtime-capability && pnpm test:cli && pnpm test:dev && pnpm test:usage",
+    "test": "pnpm check && pnpm test:codegen && pnpm test:lua-codegen && pnpm test:coverage && pnpm test:binding-patterns && pnpm test:binding-runtime-codegen && pnpm test:contract && pnpm test:web-host && pnpm test:web-library && pnpm test:polyfills && pnpm test:hash-literal && pnpm test:conformance && pnpm test:lua-value-registry && pnpm test:component-proxies && pnpm test:component-proxy-runtime-capability && pnpm test:cli && pnpm test:dev && pnpm test:usage",
     "verify": "pnpm test && pnpm test:binding-arena && pnpm test:scalar-lua-runtime && pnpm test:script-value-runtime && pnpm test:script-generated-families-runtime && pnpm test:script-handle-runtime && pnpm test:script-api-hermes && pnpm test:native && pnpm test:device-dev && pnpm test:lua-bridge && pnpm test:lua-hermes && pnpm test:static-hermes && pnpm check:static-hermes && pnpm check:extension-syntax && pnpm test:extension-retention && pnpm package:defold",
     "verify:engine:native": "pnpm bob:local:bundle && DEHERM_REQUIRE_ENGINE_ARTIFACTS=1 pnpm test:extension-retention && pnpm test:native-defold:runtime"
   },

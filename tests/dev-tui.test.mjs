@@ -28,10 +28,14 @@ function snapshot(overrides = {}) {
       appliedGeneration: 3,
       signalledGeneration: 4,
       telemetry: {
-        frameMs: 8.2,
+        frameDtMs: 8.2,
         frameSamples: [8.1, 7.9, 8.4, 8.2],
+        hermesHeapAvailable: true,
         hermesHeapBytes: 2_000_000,
-        hermesRoots: 41,
+        hermesHeapSizeBytes: 4_000_000,
+        hermesPeakBytes: 2_500_000,
+        callbackRoots: 41,
+        componentInstances: 1,
         arenaHighWaterBytes: 8_192,
         luaRegistryUsed: 8,
         luaRegistryCapacity: 256,
@@ -49,6 +53,7 @@ function state(viewport, snapshotValue = snapshot(), overrides = {}) {
     reducedMotion: false,
     viewport,
     logScroll: 0,
+    logAutoScroll: true,
     setLogScroll() {},
     snapshot: snapshotValue,
     ...overrides
@@ -106,6 +111,24 @@ test("dashboard never infers activation from a ready phase or successful build",
   assert.doesNotMatch(text, /built 4 · applied 1\/1/);
 });
 
+test("dashboard shows the exact runtime acknowledgement identity", () => {
+  const fingerprint = "ab".repeat(32);
+  const result = render({ cols: 150, rows: 48 }, snapshot({
+    phase: "ready",
+    targets: [{
+      id: "local",
+      name: "War Battles",
+      url: "http://127.0.0.1:8001",
+      status: "connected",
+      appliedGeneration: 4,
+      telemetry: { bundleFingerprint: fingerprint, runtimeId: 17, resourceGeneration: 6 }
+    }]
+  }));
+  const text = result.toText();
+  assert.match(text, /built 4 · applied 1\/1/);
+  assert.match(text, /runtime 17  resource 6  abababababab/);
+});
+
 test("log row ids remain stable when the bounded log window shifts", () => {
   const viewport = { cols: 150, rows: 48 };
   const shared = { at: 2, level: "info", source: "engine", message: "shared" };
@@ -141,7 +164,7 @@ test("wordmark exposes every selected xterm-256 basalt, prism, and heart color",
   for (const color of selected) assert.ok(observed.has(color), `expected xterm color #${color.toString(16).padStart(6, "0")}`);
 });
 
-function lifecycleHarness() {
+function lifecycleHarness(keys = ["q"]) {
   let status = "created";
   let stateValue;
   let bindings;
@@ -160,7 +183,9 @@ function lifecycleHarness() {
         setTimeout(() => {
           status = "running";
           resolveReady();
-          setTimeout(() => app.press("q"), 15);
+          setTimeout(() => {
+            for (const key of keys) app.press(key);
+          }, 15);
         }, 5);
         return runPromise;
       },
@@ -207,5 +232,33 @@ test("TUI refresh starts after ready, stops before teardown, and defers q lifecy
   assert.equal(harness.evidence.stopDuringKeyDispatch, false);
   assert.ok(harness.evidence.updates > 0);
   assert.equal(harness.state().tick, 0, "reduced-motion polling must not advance the animation frame");
+  assert.equal(harness.evidence.disposed, true);
+});
+
+test("TUI p key requests an engine play/stop toggle without leaving the dashboard", async () => {
+  const harness = lifecycleHarness(["p", "q"]);
+  const intents = [];
+  await runDevTui({
+    createApp: harness.createApp,
+    snapshot,
+    onIntent: (intent) => intents.push(intent.type),
+    viewport: () => ({ cols: 120, rows: 30 }),
+    refreshMs: 1,
+    reducedMotion: true
+  });
+  assert.deepEqual(intents, ["play"]);
+  assert.equal(harness.evidence.disposed, true);
+});
+
+test("TUI log navigation suspends and resumes tail following", async () => {
+  const harness = lifecycleHarness(["pageup", "end", "q"]);
+  await runDevTui({
+    createApp: harness.createApp,
+    snapshot,
+    viewport: () => ({ cols: 120, rows: 30 }),
+    refreshMs: 1,
+    reducedMotion: true
+  });
+  assert.equal(harness.state().logAutoScroll, true);
   assert.equal(harness.evidence.disposed, true);
 });

@@ -16,7 +16,14 @@ export default defineComponent({
   onMessage(_self: unknown, messageId: string, message: { damage: number }, sender: string): void {
     host.log("info", `game:message:${messageId}:${message.damage}:${sender}`);
   },
-  onInput(_self: unknown, actionId: string, action: { pressed: boolean }): boolean {
+  onInput(_self: unknown, actionId: string, action: {
+    pressed: boolean;
+    nested?: { label: string };
+    samples?: readonly number[];
+  }): boolean {
+    if (action.nested) {
+      host.log("info", `game:complex:${action.nested?.label}:${action.samples?.[1]}`);
+    }
     host.log("info", `game:input:${actionId}:${action.pressed}`);
     return action.pressed;
   },

@@ -14,6 +14,98 @@
 namespace {
 using namespace defold_hermes;
 
+#if defined(DM_PLATFORM_HTML5)
+extern "C" int defoldHermesWebInvokeUniversalCallback(
+    uint32_t runtime, uint32_t slot, uint32_t generation, uint32_t type,
+    const DehermScriptUniversalValue* inputValues, uint32_t inputValueCount,
+    const DehermScriptUniversalEntry* inputEntries, uint32_t inputEntryCount,
+    const char* inputStrings, uint32_t inputStringBytes,
+    const float* inputFloats, uint32_t inputFloatCount,
+    const DehermScriptUniversalUrl* inputUrls, uint32_t inputUrlCount,
+    const uint32_t* argumentRoots, uint32_t argumentCount,
+    DehermScriptUniversalValue* outputValues, uint32_t outputValueCapacity,
+    uint32_t* outputValueCount,
+    DehermScriptUniversalEntry* outputEntries, uint32_t outputEntryCapacity,
+    uint32_t* outputEntryCount,
+    char* outputStrings, uint32_t outputStringCapacity,
+    uint32_t* outputStringBytes,
+    float* outputFloats, uint32_t outputFloatCapacity,
+    uint32_t* outputFloatCount,
+    DehermScriptUniversalUrl* outputUrls, uint32_t outputUrlCapacity,
+    uint32_t* outputUrlCount,
+    uint32_t* resultRoots, uint32_t resultCapacity, uint32_t* resultCount,
+    char* error, uint32_t errorCapacity);
+extern "C" void defoldHermesWebReleaseCallback(
+    uint32_t runtime, uint32_t slot, uint32_t generation, uint32_t type);
+
+struct BrowserCallbackSlot;
+bool invokeBrowserCallback(
+    void*, const ScriptCallFrame*, void*, ScriptCallbackConsume,
+    char*, size_t) noexcept;
+void retainBrowserCallback(void*) noexcept;
+void releaseBrowserCallback(void*) noexcept;
+
+struct BrowserCallbackSlot {
+  ScriptCallback callback{};
+  uint32_t runtime = 0;
+  uint32_t slot = 0;
+  uint32_t generation = 0;
+  uint32_t type = 0;
+  uint32_t references = 0;
+  bool active = false;
+};
+
+std::array<BrowserCallbackSlot, DEHERM_SCRIPT_UNIVERSAL_BROWSER_CALLBACK_CAPACITY>
+    gBrowserCallbacks{};
+
+BrowserCallbackSlot* acquireBrowserCallback(
+    uint32_t runtime, uint32_t slot, uint32_t generation, uint32_t type) noexcept {
+  if (!runtime || !generation || !type) return nullptr;
+  for (auto& entry : gBrowserCallbacks) {
+    if (entry.active) continue;
+    entry.callback = {&entry, invokeBrowserCallback, retainBrowserCallback, releaseBrowserCallback};
+    entry.runtime = runtime;
+    entry.slot = slot;
+    entry.generation = generation;
+    entry.type = type;
+    entry.references = 1;
+    entry.active = true;
+    return &entry;
+  }
+  return nullptr;
+}
+
+void retainBrowserCallback(void* opaque) noexcept {
+  auto* entry = static_cast<BrowserCallbackSlot*>(opaque);
+  if (entry && entry->active && entry->references != UINT32_MAX) ++entry->references;
+}
+
+void releaseBrowserCallback(void* opaque) noexcept {
+  auto* entry = static_cast<BrowserCallbackSlot*>(opaque);
+  if (!entry || !entry->active || !entry->references) return;
+  if (--entry->references) return;
+  defoldHermesWebReleaseCallback(entry->runtime, entry->slot, entry->generation, entry->type);
+  entry->callback = {};
+  entry->runtime = entry->slot = entry->generation = entry->type = 0;
+  entry->active = false;
+}
+
+struct BrowserCallbackLeases {
+  std::array<BrowserCallbackSlot*, DEHERM_SCRIPT_UNIVERSAL_MAX_VALUES> entries{};
+  uint32_t count = 0;
+
+  ~BrowserCallbackLeases() noexcept {
+    while (count) releaseBrowserCallback(entries[--count]);
+  }
+
+  bool add(BrowserCallbackSlot* entry) noexcept {
+    if (!entry || count >= entries.size()) return false;
+    entries[count++] = entry;
+    return true;
+  }
+};
+#endif
+
 DehermScriptUniversalStatus fail(
     DehermScriptUniversalStatus status, char* error, uint32_t capacity,
     const char* message) noexcept {
@@ -33,6 +125,12 @@ bool releasable(const ScriptValue& value) noexcept {
 }
 
 void releaseGraph(const ScriptValue& value, uint32_t depth) noexcept {
+  if (value.tag == ScriptValueTag::kCallback && value.data) {
+    auto* callback = const_cast<ScriptCallback*>(
+        static_cast<const ScriptCallback*>(value.data));
+    if (callback->release) callback->release(callback->context);
+    return;
+  }
   if (releasable(value)) {
     releaseScriptHandle(value.handleKind, value.length, value.payload);
     return;
@@ -61,6 +159,9 @@ struct DecodeContext {
   uint32_t scratchUsed = 0;
   ScriptMatrix4Arena* matrices = nullptr;
   ScriptUrlArena<32>* urlArena = nullptr;
+#if defined(DM_PLATFORM_HTML5)
+  BrowserCallbackLeases* callbackLeases = nullptr;
+#endif
   char* error = nullptr;
   uint32_t errorCapacity = 0;
   DehermScriptUniversalStatus status = DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE;
@@ -185,7 +286,24 @@ struct DecodeContext {
         return true;
       }
       case ScriptValueTag::kCallback:
-        return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal value family does not accept callbacks");
+#if defined(DM_PLATFORM_HTML5)
+        if (!callbackLeases) return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal browser callback lease set is unavailable");
+        {
+          const uint32_t slot = static_cast<uint32_t>(wire.payload);
+          const uint32_t generation = static_cast<uint32_t>(wire.payload >> 32u);
+          BrowserCallbackSlot* callback = acquireBrowserCallback(
+              wire.runtime, slot, generation, wire.auxiliary);
+          if (!callback) return reject(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, "Universal browser callback pool is exhausted or the token is invalid");
+          if (!callbackLeases->add(callback)) {
+            releaseBrowserCallback(callback);
+            return reject(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, "Universal browser callback lease set is exhausted");
+          }
+          output->data = &callback->callback;
+          return true;
+        }
+#else
+        return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal value family accepts callbacks only in the browser host");
+#endif
     }
     return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal wire value is unsupported");
   }
@@ -304,6 +422,142 @@ struct EncodeContext {
     return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal backend returned an unknown tag");
   }
 };
+
+#if defined(DM_PLATFORM_HTML5)
+struct BrowserCallbackScratch {
+  std::array<DehermScriptUniversalValue, DEHERM_SCRIPT_UNIVERSAL_MAX_VALUES> inputValues{};
+  std::array<DehermScriptUniversalEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> inputEntries{};
+  std::array<char, DEHERM_SCRIPT_UNIVERSAL_MAX_STRING_BYTES + 1> inputStrings{};
+  std::array<float, DEHERM_SCRIPT_UNIVERSAL_MAX_MATRIX4_VALUES * 16> inputFloats{};
+  std::array<DehermScriptUniversalUrl, DEHERM_SCRIPT_UNIVERSAL_MAX_URL_VALUES> inputUrls{};
+  std::array<uint32_t, DEHERM_SCRIPT_UNIVERSAL_MAX_ARGUMENTS> argumentRoots{};
+  std::array<DehermScriptUniversalValue, DEHERM_SCRIPT_UNIVERSAL_MAX_VALUES> outputValues{};
+  std::array<DehermScriptUniversalEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> outputEntries{};
+  std::array<char, DEHERM_SCRIPT_UNIVERSAL_MAX_STRING_BYTES + 1> outputStrings{};
+  std::array<float, DEHERM_SCRIPT_UNIVERSAL_MAX_MATRIX4_VALUES * 16> outputFloats{};
+  std::array<DehermScriptUniversalUrl, DEHERM_SCRIPT_UNIVERSAL_MAX_URL_VALUES> outputUrls{};
+  std::array<uint32_t, DEHERM_SCRIPT_UNIVERSAL_MAX_RESULTS> resultRoots{};
+  std::array<ScriptValue, DEHERM_SCRIPT_UNIVERSAL_MAX_RESULTS> results{};
+  std::array<ScriptTableEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> tableScratch{};
+};
+
+std::array<BrowserCallbackScratch, DEHERM_SCRIPT_UNIVERSAL_BROWSER_CALLBACK_REENTRANCY>
+    gBrowserCallbackScratch{};
+uint32_t gBrowserCallbackDepth = 0;
+
+struct BrowserCallbackDepthGuard {
+  BrowserCallbackDepthGuard() noexcept { ++gBrowserCallbackDepth; }
+  ~BrowserCallbackDepthGuard() { --gBrowserCallbackDepth; }
+};
+
+struct BrowserCallbackArenaGuard {
+  explicit BrowserCallbackArenaGuard(const ScriptCallFrame& frame) noexcept
+      : matrices(frame.matrix4Arena), matrixMark(matrices ? matrices->used : 0),
+        urls(frame.urlArena), urlMark(urls ? urls->mark() : ScriptUrlArena<32>::Mark{}) {}
+  ~BrowserCallbackArenaGuard() {
+    if (matrices) matrices->rewind(matrixMark);
+    if (urls) urls->rewind(urlMark);
+  }
+  ScriptMatrix4Arena* matrices = nullptr;
+  uint32_t matrixMark = 0;
+  ScriptUrlArena<32>* urls = nullptr;
+  ScriptUrlArena<32>::Mark urlMark{};
+};
+
+bool invokeBrowserCallback(
+    void* opaque,
+    const ScriptCallFrame* arguments,
+    void* consumeContext,
+    ScriptCallbackConsume consume,
+    char* error,
+    size_t errorCapacity) noexcept {
+  auto* entry = static_cast<BrowserCallbackSlot*>(opaque);
+  if (!entry || !entry->active || !entry->references || !arguments || !consume) {
+    fail(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, error, static_cast<uint32_t>(errorCapacity),
+        "Universal browser callback is stale or malformed");
+    return false;
+  }
+  if (arguments->argumentCount > DEHERM_SCRIPT_UNIVERSAL_MAX_ARGUMENTS ||
+      (arguments->argumentCount && !arguments->arguments) ||
+      gBrowserCallbackDepth >= DEHERM_SCRIPT_UNIVERSAL_BROWSER_CALLBACK_REENTRANCY) {
+    fail(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, error, static_cast<uint32_t>(errorCapacity),
+        "Universal browser callback reentrancy or argument bound is exhausted");
+    return false;
+  }
+  BrowserCallbackDepthGuard depthGuard;
+  BrowserCallbackArenaGuard arenaGuard(*arguments);
+  BrowserCallbackScratch& scratch = gBrowserCallbackScratch[gBrowserCallbackDepth - 1];
+  EncodeContext encoder{
+      scratch.inputValues.data(), static_cast<uint32_t>(scratch.inputValues.size()), 0,
+      scratch.inputEntries.data(), static_cast<uint32_t>(scratch.inputEntries.size()), 0,
+      scratch.inputStrings.data(), static_cast<uint32_t>(scratch.inputStrings.size() - 1), 0,
+      scratch.inputFloats.data(), static_cast<uint32_t>(scratch.inputFloats.size()), 0,
+      scratch.inputUrls.data(), static_cast<uint32_t>(scratch.inputUrls.size()), 0,
+      arguments->matrix4Arena, arguments->urlArena,
+      error, static_cast<uint32_t>(errorCapacity)};
+  const void* noPointers[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
+  for (uint32_t index = 0; index < arguments->argumentCount; ++index) {
+    if (!encoder.encode(arguments->arguments[index], &scratch.argumentRoots[index], 0,
+            noPointers, 0)) return false;
+  }
+  uint32_t outputValueCount = 0;
+  uint32_t outputEntryCount = 0;
+  uint32_t outputStringBytes = 0;
+  uint32_t outputFloatCount = 0;
+  uint32_t outputUrlCount = 0;
+  uint32_t resultCount = 0;
+  if (!defoldHermesWebInvokeUniversalCallback(
+          entry->runtime, entry->slot, entry->generation, entry->type,
+          scratch.inputValues.data(), encoder.valueUsed,
+          scratch.inputEntries.data(), encoder.entryUsed,
+          scratch.inputStrings.data(), encoder.stringUsed,
+          scratch.inputFloats.data(), encoder.floatUsed,
+          scratch.inputUrls.data(), encoder.urlUsed,
+          scratch.argumentRoots.data(), arguments->argumentCount,
+          scratch.outputValues.data(), static_cast<uint32_t>(scratch.outputValues.size()), &outputValueCount,
+          scratch.outputEntries.data(), static_cast<uint32_t>(scratch.outputEntries.size()), &outputEntryCount,
+          scratch.outputStrings.data(), static_cast<uint32_t>(scratch.outputStrings.size() - 1), &outputStringBytes,
+          scratch.outputFloats.data(), static_cast<uint32_t>(scratch.outputFloats.size()), &outputFloatCount,
+          scratch.outputUrls.data(), static_cast<uint32_t>(scratch.outputUrls.size()), &outputUrlCount,
+          scratch.resultRoots.data(), static_cast<uint32_t>(scratch.resultRoots.size()), &resultCount,
+          error, static_cast<uint32_t>(errorCapacity))) return false;
+  if (outputValueCount > scratch.outputValues.size() ||
+      outputEntryCount > scratch.outputEntries.size() ||
+      outputStringBytes > scratch.outputStrings.size() - 1 ||
+      outputFloatCount > scratch.outputFloats.size() ||
+      outputUrlCount > scratch.outputUrls.size() ||
+      resultCount > scratch.results.size()) {
+    fail(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, error, static_cast<uint32_t>(errorCapacity),
+        "Universal browser callback returned counts outside generated bounds");
+    return false;
+  }
+  DecodeContext decoder{
+      scratch.outputValues.data(), outputValueCount,
+      scratch.outputEntries.data(), outputEntryCount,
+      scratch.outputStrings.data(), outputStringBytes,
+      scratch.outputFloats.data(), outputFloatCount,
+      scratch.outputUrls.data(), outputUrlCount,
+      scratch.tableScratch.data(), 0, arguments->matrix4Arena, arguments->urlArena,
+      nullptr, error, static_cast<uint32_t>(errorCapacity)};
+  const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
+  for (uint32_t index = 0; index < resultCount; ++index) {
+    if (!decoder.decode(scratch.resultRoots[index], &scratch.results[index], 0,
+            noAncestors, 0)) return false;
+  }
+  ScriptCallFrame results{};
+  results.results = scratch.results.data();
+  results.resultCapacity = static_cast<uint32_t>(scratch.results.size());
+  results.resultCount = resultCount;
+  results.tableScratch = scratch.tableScratch.data();
+  results.tableScratchCapacity = static_cast<uint32_t>(scratch.tableScratch.size());
+  results.stringScratch = scratch.outputStrings.data();
+  results.stringScratchCapacity = static_cast<uint32_t>(scratch.outputStrings.size() - 1);
+  results.stringScratchUsed = outputStringBytes;
+  results.matrix4Arena = arguments->matrix4Arena;
+  results.urlArena = arguments->urlArena;
+  return consume(consumeContext, &results);
+}
+#endif
 }  // namespace
 
 extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
@@ -351,7 +605,7 @@ extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
       output_string_capacity > DEHERM_SCRIPT_UNIVERSAL_MAX_STRING_BYTES || (output_string_capacity && !output_strings) ||
       output_float_capacity > DEHERM_SCRIPT_UNIVERSAL_MAX_MATRIX4_VALUES * 16u || (output_float_capacity && !output_floats) ||
       output_url_capacity > DEHERM_SCRIPT_UNIVERSAL_MAX_URL_VALUES || (output_url_capacity && !output_urls) ||
-      result_capacity < operation->resultCount || (result_capacity && !result_roots)) {
+      result_capacity < operation->maximumResultCount || (result_capacity && !result_roots)) {
     return fail(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, error, error_capacity, "Universal output frame violates generated bounds or capacity");
   }
 
@@ -361,9 +615,16 @@ extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
   std::array<ScriptTableEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> outputTableScratch{};
   ScriptMatrix4Arena matrixArena{};
   ScriptUrlArena<32> urlArena{1};
+#if defined(DM_PLATFORM_HTML5)
+  BrowserCallbackLeases callbackLeases{};
+#endif
   DecodeContext decoder{input_values, input_value_count, input_entries, input_entry_count,
       input_strings, input_string_bytes, input_floats, input_float_count, input_urls, input_url_count,
-      inputTableScratch.data(), 0, &matrixArena, &urlArena, error, error_capacity};
+      inputTableScratch.data(), 0, &matrixArena, &urlArena,
+#if defined(DM_PLATFORM_HTML5)
+      &callbackLeases,
+#endif
+      error, error_capacity};
   const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
   for (uint32_t index = 0; index < argument_count; ++index) {
     if (!decoder.decode(argument_roots[index], &arguments[index], 0, noAncestors, 0)) return decoder.status;
@@ -384,7 +645,8 @@ extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
   if (!dispatchScriptCall(&frame)) {
     return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, error, error_capacity, scriptBridgeLastError());
   }
-  if (frame.resultCount != operation->resultCount) {
+  if (frame.resultCount < operation->minimumResultCount ||
+      frame.resultCount > operation->maximumResultCount) {
     for (uint32_t index = 0; index < frame.resultCount && index < results.size(); ++index) releaseGraph(results[index], 0);
     return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, error, error_capacity, "Universal backend returned the wrong result count");
   }

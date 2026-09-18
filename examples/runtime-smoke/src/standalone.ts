@@ -1,5 +1,5 @@
-import { defineDefoldApp } from "@defold-hermes/sdk";
-import { add } from "@defold-hermes/sdk/ExampleMath";
+import { defineDefoldApp } from "@ts-defold/deherm";
+import { add } from "@ts-defold/deherm/modules/ExampleMath";
 
 defineDefoldApp((defold) => {
   let updates = 0;

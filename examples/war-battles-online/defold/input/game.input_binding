@@ -18,3 +18,19 @@ key_trigger {
   input: KEY_SPACE
   action: "fire"
 }
+key_trigger {
+  input: KEY_R
+  action: "restart"
+}
+key_trigger {
+  input: KEY_Z
+  action: "upgrade_damage"
+}
+key_trigger {
+  input: KEY_X
+  action: "upgrade_mobility"
+}
+key_trigger {
+  input: KEY_C
+  action: "upgrade_armor"
+}

@@ -16,10 +16,10 @@ var LibraryDefoldHermes = {
       if (this.generations[slot] === undefined) this.generations[slot] = 1;
       this.functions[slot] = callback;
       return {
-        runtime: this.runtime,
-        slot: slot,
-        generation: this.generations[slot],
-        type: this.type
+        runtime: this.runtime >>> 0,
+        slot: slot >>> 0,
+        generation: this.generations[slot] >>> 0,
+        type: this.type >>> 0
       };
     },
 
@@ -28,6 +28,11 @@ var LibraryDefoldHermes = {
     },
 
     resolveParts: function(runtime, slot, generation, type) {
+      runtime = runtime >>> 0;
+      slot = slot >>> 0;
+      generation = generation >>> 0;
+      type = type >>> 0;
+      if (slot >= this.capacity) return null;
       if (runtime !== this.runtime || type !== this.type) return null;
       if (this.generations[slot] !== generation) return null;
       return this.functions[slot] || null;
@@ -38,6 +43,10 @@ var LibraryDefoldHermes = {
     },
 
     releaseParts: function(runtime, slot, generation, type) {
+      runtime = runtime >>> 0;
+      slot = slot >>> 0;
+      generation = generation >>> 0;
+      type = type >>> 0;
       if (!this.resolveParts(runtime, slot, generation, type)) return false;
       this.functions[slot] = null;
       this.generations[slot] = (this.generations[slot] + 1) >>> 0 || 1;
@@ -56,7 +65,7 @@ var LibraryDefoldHermes = {
   $DEFOLD_HERMES_BRIDGE__deps: [
     '$DEFOLD_HERMES_GENERATED_MODULES',
     '$DEFOLD_HERMES_WEB_CALLBACKS',
-    '$DEFOLD_HERMES_SCRIPT_BRIDGE',
+    '$DEFOLD_HERMES_SCRIPT_UNIVERSAL',
     '$UTF8ToString'
   ],
   $DEFOLD_HERMES_BRIDGE: {
@@ -88,7 +97,7 @@ var LibraryDefoldHermes = {
         }
       };
       globalThis.__defoldModulesV1 = DEFOLD_HERMES_GENERATED_MODULES.install();
-      globalThis.__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_BRIDGE.install();
+      globalThis.__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_UNIVERSAL.install();
 
       try {
         (0, eval)(source + '\n//# sourceURL=defold-hermes://app.js');

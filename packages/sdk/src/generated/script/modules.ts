@@ -336,12 +336,6 @@ export const buffer: Types.BufferApi = {
   setMetadata: ((...args: readonly unknown[]) => callScriptApi(0x64ebca74, args)) as Types.BufferApi["setMetadata"],
 };
 
-export const builtins: Types.BuiltinsApi = {
-  hash: ((...args: readonly unknown[]) => callScriptApi(0xa994c4c0, args)) as Types.BuiltinsApi["hash"],
-  hashToHex: ((...args: readonly unknown[]) => callScriptApi(0x2cf8087e, args)) as Types.BuiltinsApi["hashToHex"],
-  pprint: ((...args: readonly unknown[]) => callScriptApi(0xb1751627, args)) as Types.BuiltinsApi["pprint"],
-};
-
 export const bullet3d: Types.Bullet3dApi = {
   getCollisionObject: ((...args: readonly unknown[]) => callScriptApi(0xfcb9e4a8, args)) as Types.Bullet3dApi["getCollisionObject"],
   getRigidBody: ((...args: readonly unknown[]) => callScriptApi(0x3ac8c14a, args)) as Types.Bullet3dApi["getRigidBody"],
@@ -644,6 +638,12 @@ export const crash: Types.CrashApi = {
   setFilePath: ((...args: readonly unknown[]) => callScriptApi(0x8f7704ce, args)) as Types.CrashApi["setFilePath"],
   setUserField: ((...args: readonly unknown[]) => callScriptApi(0x47238256, args)) as Types.CrashApi["setUserField"],
   writeDump: ((...args: readonly unknown[]) => callScriptApi(0x7f7ee579, args)) as Types.CrashApi["writeDump"],
+};
+
+export const defold: Types.DefoldApi = {
+  hash: ((...args: readonly unknown[]) => callScriptApi(0xa994c4c0, args)) as Types.DefoldApi["hash"],
+  hashToHex: ((...args: readonly unknown[]) => callScriptApi(0x2cf8087e, args)) as Types.DefoldApi["hashToHex"],
+  pprint: ((...args: readonly unknown[]) => callScriptApi(0xb1751627, args)) as Types.DefoldApi["pprint"],
 };
 
 export const factory: Types.FactoryApi = {

@@ -70,7 +70,7 @@ test("explicit use fails closed for blocked, unavailable, duplicate, and unknown
     plan,
     scriptProjection,
     profiles,
-    usage(["script:b2d.body.apply_force"])
+    usage(["dmsdk:ArraySizeHelper@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:57:12"])
   ), /cannot emit.*blocked-semantic/);
   assert.throws(() => generateBindingEmissionPlan(
     plan,

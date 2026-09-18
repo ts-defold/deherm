@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "scope": "The reviewed, finite fixed-record subset of the accounting-pending lua-table routes",
+  "scope": "The reviewed, finite fixed-record subset of the structural lua-table routes not owned by native value dispatch",
   "coverageClaim": "All listed candidates have generated fail-closed descriptors and a native-dynamic captured-Lua adapter using caller-owned bounded record storage. Static Hermes, packaged-engine, and browser execution are not claimed.",
   "routeCount": 148,
   "mechanicallySafeFixedRecordCount": 6,
@@ -38,9 +38,9 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "accountingSha256": "b08a9a864c39618107a8d249daee0fdb24eb79c11625e30e1875482361c5ed2d",
-    "tableTupleSchemaSha256": "9c404f87640e1b5e490c875b3ff003bfa865ccc527577f73ed24698e306b409d",
-    "reviewedPolicySha256": "09f583ae396de5d6eba52f6ae773fef07b564607a93999c1a8554e407a03dc7d",
+    "accountingSha256": "a516a54866d6bfac6a0b637685accfd25aced0a99eb36377de509001f576f7f9",
+    "tableTupleSchemaSha256": "8f1456719fefce26c5d15737b9389192cd9b2e497e90b31d03d2718432b2c1a2",
+    "reviewedPolicySha256": "7b00663e46ec4018bbcb74226e32bd8eeb06e11c9ccb97cd6dc7596178916968",
     "defoldSources": [
       {
         "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",

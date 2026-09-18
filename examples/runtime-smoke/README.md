@@ -1,14 +1,15 @@
 # Runtime smoke example
 
-This is the smallest TypeScript program used to prove the shared déherm build
-against dynamic Hermes and the browser-host path. It is an example/build
-fixture, not a separately published npm package, so it is intentionally not a
-pnpm workspace project.
+This is the smallest TypeScript consumer used to prove the shared déherm build
+against dynamic Hermes and the browser-host path. It is a private pnpm
+workspace package and consumes the public `@ts-defold/deherm` package through
+`workspace:*`; it is never published with the package.
 
-From the repository root:
+From this directory:
 
 ```sh
-pnpm build:js
+pnpm typecheck
+pnpm build
 pnpm run:native
 pnpm run:web
 ```

@@ -137,7 +137,7 @@ function renderSessionPlate(snapshot) {
     ui.text("DYNAMIC HERMES", { style: { fg: prism[4], bold: true } }),
     ui.text(`BUNDLE ${snapshot.lastSuccessfulGeneration ?? 0}`, { style: { fg: basaltRamp[4] } }),
     ui.text(applied, { style: { fg: activation.progress === 1 ? good : prism[4], bold: true } }),
-    ui.text(snapshot.phase ?? "idle", { style: { fg: dim } })
+    ui.text(`${snapshot.phase ?? "idle"} · engine ${snapshot.engine?.status ?? "stopped"}`, { style: { fg: dim } })
   ]);
 }
 
@@ -195,7 +195,10 @@ function renderTargets(snapshot, compact = false) {
         ui.text(target.name ?? target.id, { style: { bold: true }, textOverflow: "ellipsis" }),
         ui.text(target.status, { style: { fg: statusColor(target.status) }, textOverflow: "ellipsis" })
       ]),
-      ui.text(`applied ${target.appliedGeneration ?? "—"}  signalled ${target.signalledGeneration ?? "—"}${compact ? "" : `  ${target.url ?? ""}`}`, { style: { fg: dim }, textOverflow: "middle" })
+      ui.text(`applied ${target.appliedGeneration ?? "—"}  signalled ${target.signalledGeneration ?? "—"}${compact ? "" : `  ${target.url ?? ""}`}`, { style: { fg: dim }, textOverflow: "middle" }),
+      ...(!compact && target.telemetry?.bundleFingerprint ? [
+        ui.text(`runtime ${target.telemetry.runtimeId ?? "—"}  resource ${target.telemetry.resourceGeneration ?? "—"}  ${target.telemetry.bundleFingerprint.slice(0, 12)}`, { style: { fg: good }, textOverflow: "middle" })
+      ] : [])
     ])) : [ui.text("no target connected · activation unverified", { style: { fg: dim }, textOverflow: "ellipsis" })]),
     ...(compact && targets.length > visible.length ? [ui.text(`+ ${targets.length - visible.length} more targets`, { style: { fg: dim } })] : [])
   ]);
@@ -203,16 +206,17 @@ function renderTargets(snapshot, compact = false) {
 
 function renderRuntime(snapshot) {
   const telemetry = snapshot.targets?.[0]?.telemetry ?? {};
-  const frame = telemetry.frameMs ?? 0;
-  const heap = telemetry.hermesHeapBytes ?? 0;
-  const roots = telemetry.hermesRoots ?? 0;
-  const arena = telemetry.arenaHighWaterBytes ?? 0;
+  const frame = telemetry.frameDtMs;
+  const heap = telemetry.hermesHeapBytes;
+  const arena = telemetry.arenaHighWaterBytes;
+  const hasSample = Number.isFinite(frame);
   return ui.panel({ title: "RUNTIME HEALTH", variant: "heavy", p: 1, gap: 0 }, [
-    ui.row({ justify: "between" }, [ui.text("frame"), ui.text(`${frame.toFixed(2)} ms`, { style: { fg: frame > 16.7 ? bad : good } })]),
-    ui.sparkline(telemetry.frameSamples ?? [0], { height: 2, min: 0, max: Math.max(20, ...(telemetry.frameSamples ?? [0])), style: { fg: prism[4] } }),
-    ui.text(`Hermes heap ${formatBytes(heap)}  roots ${roots}`),
-    ui.text(`arena high-water ${formatBytes(arena)}`),
-    ui.text(`Lua registry ${telemetry.luaRegistryUsed ?? 0}/${telemetry.luaRegistryCapacity ?? 0}  dropped ${telemetry.droppedEvents ?? 0}`, { style: { fg: dim } })
+    ui.row({ justify: "between" }, [ui.text("engine dt"), ui.text(hasSample ? `${frame.toFixed(2)} ms` : "unavailable", { style: { fg: hasSample && frame > 16.7 ? bad : hasSample ? good : dim } })]),
+    ui.sparkline(telemetry.frameSamples?.length ? telemetry.frameSamples : [0], { height: 2, min: 0, max: Math.max(20, ...(telemetry.frameSamples ?? [0])), style: { fg: prism[4] } }),
+    ui.text(telemetry.hermesHeapAvailable ? `Hermes heap ${formatBytes(heap)} / ${formatBytes(telemetry.hermesHeapSizeBytes)}  peak ${formatBytes(telemetry.hermesPeakBytes)}` : "Hermes heap unavailable", { style: { fg: telemetry.hermesHeapAvailable ? basalt : dim } }),
+    ui.text(`callback roots ${telemetry.callbackRoots ?? "—"}  component instances ${telemetry.componentInstances ?? "—"}`),
+    ui.text(`arena high-water ${arena === undefined ? "unavailable" : formatBytes(arena)}`),
+    ui.text(`Lua handles ${telemetry.luaRegistryUsed ?? "—"}/${telemetry.luaRegistryCapacity ?? "—"}`, { style: { fg: dim } })
   ]);
 }
 
@@ -243,7 +247,7 @@ function renderLogs(state, height) {
     };
   });
   return ui.box({ title: "LIVE LOGS", border: "heavy", p: 0, style: { fg: basalt }, width: "full" }, [
-    ui.logsConsole({ id: "deherm-logs", entries, scrollTop: state.logScroll, autoScroll: true, showSource: true, showTimestamps: true, onScroll: state.setLogScroll, height })
+    ui.logsConsole({ id: "deherm-logs", entries, scrollTop: state.logScroll, autoScroll: state.logAutoScroll, showSource: true, showTimestamps: true, onScroll: state.setLogScroll, height })
   ]);
 }
 
@@ -261,7 +265,7 @@ export function renderDevDashboard(state) {
   const main = mode === "wide"
     ? ui.grid({ columns: "1fr 1fr", rows: "1fr 1fr", gap: 1, width: "full", height: 22 }, renderPipeline(snapshot), renderBundle(snapshot), renderTargets(snapshot), renderRuntime(snapshot))
     : ui.grid({ columns: "1fr 1fr", rows: "1fr", gap: 1, width: "full", height: compact ? 12 : 14 }, renderPipeline(snapshot, compact), renderTargets(snapshot, compact));
-  const footer = compact ? "r reload  b build  t targets  : commands" : "r reload  b rebuild  t targets  i instances  g generations  : commands  ? help";
+  const footer = compact ? "p play/stop  r reload  ↑/↓ logs  f follow" : "p play/stop  r reload  b rebuild  ↑/↓ logs  ^U/^D page  f follow  : commands  ? help";
   return ui.page({
     p: 0,
     gap: 0,
@@ -274,7 +278,7 @@ export function renderDevDashboard(state) {
     body: ui.column({ px: 1, gap: 1, height: "full", overflow: "hidden" }, [main, renderLogs(state, mode === "wide" ? 10 : 5)]),
     footer: ui.statusBar({
       left: [ui.text(footer, { textOverflow: "ellipsis" })],
-      right: [ui.text("q detach", { style: { fg: prism[0], bold: true } })],
+      right: [ui.text("q quit", { style: { fg: prism[0], bold: true } })],
       style: { fg: basalt }
     })
   });
@@ -329,7 +333,7 @@ export function renderLauncher(state, actions) {
           onPress: () => actions.finish({ type: "create", directory: state.createPath.trim() })
         })
       ]),
-      ui.callout("deherm dev --project <path> starts directly · deherm create <dir> scaffolds without the TUI", { variant: "info", title: "CLI" })
+      ui.callout("Start dev opens the operator console; press p there to launch/stop the built game. deherm dev --project <path> starts directly.", { variant: "info", title: "PLAY" })
     ]),
     footer: ui.statusBar({
       left: [ui.text("tab navigate  enter activate")],
@@ -399,13 +403,17 @@ export async function runLauncherTui(options = {}) {
 
 export async function runDevTui(options) {
   let logScroll = 0;
+  let logAutoScroll = true;
   let interval;
   let stopping = false;
   const reducedMotion = options.reducedMotion ?? process.env.DEHERM_REDUCED_MOTION === "1";
-  const setLogScroll = (value) => { logScroll = value; };
+  const setLogScroll = (value) => {
+    logScroll = Math.max(0, Math.trunc(value));
+    logAutoScroll = false;
+  };
   const viewport = () => options.viewport?.() ?? { cols: process.stdout.columns ?? 120, rows: process.stdout.rows ?? 30 };
   const app = (options.createApp ?? createNodeApp)({
-    initialState: { snapshot: options.snapshot(), tick: 0, reducedMotion, viewport: viewport(), logScroll, setLogScroll },
+    initialState: { snapshot: options.snapshot(), tick: 0, reducedMotion, viewport: viewport(), logScroll, logAutoScroll, setLogScroll },
     config: { fpsCap: options.fpsCap ?? 20, executionMode: "worker" }
   });
   app.view(renderDevDashboard);
@@ -423,13 +431,33 @@ export async function runDevTui(options) {
       });
     }, 0);
   };
+  const scrollLogs = (delta) => () => {
+    logAutoScroll = false;
+    logScroll = Math.max(0, logScroll + delta);
+  };
+  const followLogs = () => {
+    logAutoScroll = true;
+  };
   app.keys({
-    q: { description: "Detach and quit", handler: requestStop },
+    q: { description: "Quit dev session and stop the engine", handler: requestStop },
+    p: { description: "Launch or stop the built Defold game", handler: intent("play") },
     r: { description: "Signal hot reload", handler: intent("reload") },
     b: { description: "Full rebuild", handler: intent("rebuild") },
     t: { description: "Open targets", handler: intent("targets") },
     i: { description: "Open instances", handler: intent("instances") },
     g: { description: "Open generations", handler: intent("generations") },
+    up: { description: "Scroll logs up one line", handler: scrollLogs(-1) },
+    down: { description: "Scroll logs down one line", handler: scrollLogs(1) },
+    "ctrl+u": { description: "Scroll logs up one page", handler: scrollLogs(-10) },
+    "ctrl+d": { description: "Scroll logs down one page", handler: scrollLogs(10) },
+    f: { description: "Follow the newest log entries", handler: followLogs },
+    pageup: { description: "Scroll logs up", handler: scrollLogs(-10) },
+    pagedown: { description: "Scroll logs down", handler: scrollLogs(10) },
+    home: { description: "Scroll logs to the beginning", handler: () => {
+      logAutoScroll = false;
+      logScroll = 0;
+    } },
+    end: { description: "Follow the newest log entries", handler: followLogs },
     ":": { description: "Command palette", handler: intent("commands") },
     "?": { description: "Help", handler: intent("help") }
   });
@@ -447,6 +475,7 @@ export async function runDevTui(options) {
             tick: reducedMotion ? previous.tick : previous.tick + 1,
             viewport: viewport(),
             logScroll,
+            logAutoScroll,
             setLogScroll
           }));
         } catch (error) {

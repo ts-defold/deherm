@@ -3,3 +3,4 @@ export * from "./types";
 export * from "./runtime";
 export * from "./scalar";
 export * from "./enum-value";
+export * from "./universal";

@@ -20,9 +20,15 @@ This repository is an architecture spike. Start with the
 
 Repository boundaries are intentional: `packages/*` contains internal product
 modules that compose the single published `@ts-defold/deherm` package, while
-`examples/*` contains runnable consumers and integration fixtures. Examples
-only join the pnpm workspace when they have an actual `package.json` and need
-workspace dependency or script orchestration.
+`examples/*` contains private runnable consumers and integration fixtures.
+Every first-level example is a pnpm workspace package with its own dependencies
+and commands; examples are never included in the public npm artifact.
+
+Private workspace modules use the non-published `@deherm/*` scope and resolve
+directly to their canonical raw sources through the root TypeScript path map.
+The npm-facing scope remains `@ts-defold/deherm`; the two namespaces are
+deliberately independent. `@deherm/project` is reserved for each generated,
+context-filtered Defold project SDK rather than a repository package.
 
 The working developer experience is:
 
@@ -51,6 +57,7 @@ pnpm cli -- doctor --project defold
 pnpm cli -- extensions --project defold
 pnpm cli -- generate --project defold
 pnpm cli -- verify-generated --project defold
+pnpm cli -- materialize-dmsdk --usage defold/deherm.dmsdk.json --output defold/generated/dmsdk-provider.cpp
 ```
 
 ## Project CLI
@@ -135,13 +142,22 @@ The status of every declaration is machine-readable under
 `packages/bindings/generated/` and drift-gated by `pnpm check`.
 
 The current generated execution floor is also machine-readable: all 926 script
-functions and 2,140 dmSDK declarations compile as TypeScript types; 93 script
-calls (90 generic scalar dispatchers plus 3 specialized timer calls) and 26
-scalar dmSDK thunks have runtime adapters. Per-function target behavior remains
-a separate conformance gate. The pinned arm64 macOS Defold engine currently
-proves 14 generated calls across 12 unique script bindings and a transactional
-dynamic-Hermes reject/retain/recover reload; it does not prove the remaining API
-by association.
+functions and 2,140 dmSDK declarations compile as TypeScript types. One bounded
+universal value-graph ABI covers all 915 stable-ID script routes and composes
+with the specialized scalar, value, tuple, URL, handle, overload, and callback
+families. The canonical plan currently emits 911 profile-available routes for
+Dynamic Hermes, the Lua compatibility bridge, and the browser host; Static
+Hermes emits the 138 routes whose complete recursive value shapes are proven.
+The two `luasocket` routes that manufacture captured Lua closures fail closed.
+
+Every one of the 1,361 runtime dmSDK declarations has a deterministic universal
+recipe and stable ID. `deherm materialize-dmsdk` turns a project's reachable
+recipe selection into tree-shakeable C++ thunks; specialized generated adapters
+remain preferred. This is a complete generation path, not a claim that all
+native engine implementations have already been linked and behavior-tested.
+The pinned arm64 macOS Defold engine currently proves selected generated calls,
+a packaged TypeScript GUI component, and a transactional Dynamic-Hermes
+reject/retain/recover reload; unobserved plan rows remain unproven.
 
 Exact upstream revisions live in `upstream.lock`; `pnpm bootstrap`
 materializes ignored working copies and downloads the checksum-pinned Bob JAR.

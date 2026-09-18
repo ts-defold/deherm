@@ -1,0 +1,9 @@
+{
+  "name": "@deherm/toolchains",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./native-artifacts.json": "./native-artifacts.json"
+  }
+}

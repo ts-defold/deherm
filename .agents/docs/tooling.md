@@ -36,9 +36,11 @@ ordinary edit loop.
 | Intent | Command | Result |
 | --- | --- | --- |
 | Launch the project/scaffold TUI | `pnpm cli` | Discovers projects; starts dev, doctor, or scaffolding |
+| Run the War Battles edit loop | `pnpm --filter @deherm/example-war-battles-online dev` | Rezi console; press `p` to launch/stop the built engine |
 | Validate generated sources, inventories, types, and OKF | `pnpm check` | No native rebuild |
 | Inspect a Defold project | `pnpm cli -- doctor --project <path>` | Finds local and resolved extensions |
 | List extension binding inputs | `pnpm cli -- extensions --project <path>` | Reports script API, headers, and schema gaps |
+| Generate a native C extension API | `pnpm cli -- generate-extension-api --header <header> --module <prefix> --output <dir>` | Writes Clang-derived IR, TypeScript, and universal-cell C++ glue; exits 2 when explicit layout blockers remain |
 | Generate a project SDK | `pnpm cli -- generate --project <path>` | Writes types, executable TS modules, tsconfig, and VS Code setup |
 | Bundle TypeScript | `pnpm build:js` | `dist/sample.js` plus its symbol-usage manifest |
 | Build the standalone embedded-Hermes runner | `pnpm build:native` | Native test runner, not a Defold game |
@@ -131,6 +133,7 @@ pnpm exec deherm create my-game --name "My Game"
 pnpm exec deherm doctor
 pnpm exec deherm extensions
 pnpm exec deherm generate
+pnpm exec deherm materialize-dmsdk --usage deherm.dmsdk.json --output generated/dmsdk-provider.cpp
 pnpm exec deherm typecheck
 pnpm exec deherm verify-generated
 ```
@@ -146,7 +149,7 @@ any `game.project` exists.
 .deherm/extensions.json       sanitized deterministic inventory
 .deherm/bindings.ir.json      normalized symbol/type/lowering IR
 .deherm/extensions.d.ts       extension interfaces
-.deherm/ir/**                 pinned complete API inputs and lowering plan
+.deherm/ir/**                 pinned complete API inputs, universal catalogs, and lowering plan
 .deherm/ir/binding-lowering-plan.sentinel.json  plan/generator authority
 .deherm/sdk/**                executable TypeScript compatibility SDK
 .deherm/sdk/contexts/**       context-filtered SDK entrypoints
@@ -158,6 +161,7 @@ tsconfig.deherm.shared.json   ordinary context-free `*.ts`
 tsconfig.deherm.game-object.json  game-object `*.script.ts`
 tsconfig.deherm.gui.json      GUI `*.gui.ts`
 tsconfig.deherm.render.json   render `*.render.ts`
+tsconfig.deherm.bundle.json   unfiltered runtime SDK used only to compose mixed-context bundles
 tsconfig.deherm.json          solution referencing all four contexts
 tsconfig.json                        created only when the project has none
 .vscode/extensions.json              created only when absent
@@ -175,18 +179,59 @@ semantic resolution. The generated ttsc plugin entry remains disabled until
 the déherm transform package is implemented.
 
 Generation is a keyed ensure: unchanged project inventory, Defold/profile
-authority, generator implementation, and output location return without
-rewriting generated files. It does not hash every output on this fast path.
+authority, package SDK source tree, generator implementation, and output
+location return without rewriting generated files. It does not hash every
+output on this fast path.
 Use `npx deherm generate --force` to replace disposable generated output, and
 `npx deherm verify-generated --project <project>` for the exact integrity audit.
 `typecheck` runs that audit first, so stale schema-v2 plan, generator sentinel,
-manifest/lock, context entrypoint, or generated config state fails before `tsc`.
+manifest/lock, generated SDK tree, context entrypoint, or generated config state
+fails before `tsc`. The installed native-extension runtime has its own complete
+tree digest and is copied through a staged replacement, so a source change
+cannot be mislabeled as “Current” merely because `ext.manifest` stayed the same.
+
+The generated manifest reports three different facts separately: complete
+TypeScript declaration coverage, universal recipe coverage, and the per-target
+canonical lowering matrix. Script recipes cover all 915 stable-ID calls, while
+the remaining eight functions are compiler intrinsics and three timer routes
+use their dedicated module. dmSDK carries 1,361 universal recipes, but a recipe
+is not reported as a project-linked implementation until reachability and any
+required native type/layout/lifetime inputs have been materialized. The copied
+`script-universal-value-bindings.json` and `dmsdk-universal-bindings.json`
+catalogs are the project-local authorities for that next build step.
+
+`materialize-dmsdk` is that deterministic next step for native extension code.
+It accepts a versioned JSON document with a `usages` array, resolves every
+`declarationId` against the shipped universal recipe catalog, and emits a
+single usage-pruned C++ provider plus a hash-bound JSON report. Concrete
+functions need only their declaration identity; templates, records, receivers,
+and ambiguous native types supply the explicit materializer fields recorded by
+their recipe. `--check` verifies both outputs byte-for-byte without writing.
+The generated report names the provider install function that the consuming
+Defold extension calls during initialization. This keeps native reachability
+and all non-inferable ABI choices in checked configuration instead of edits to
+generated code.
 
 The four generated projects use project-wide suffix discovery (`**/*.ts`) with
 dependency, build, and distribution caches excluded. This covers components
 outside `src/`. The boundary check rejects package-root SDK imports, generated
 SDK deep imports, normalized path aliases, cross-context files, and the same
 bypasses hidden behind a shared re-export.
+
+`deherm dev` typechecks authored files through those strict context projects,
+but bundles the generated all-component registry through
+`tsconfig.deherm.bundle.json`. That runtime-only project maps
+`@deherm/project` to the unfiltered SDK so one bundle can contain game-object,
+GUI, and render components without weakening editor/typecheck boundaries. In
+the interactive console, `p` launches or stops the current platform's compiled
+engine under `build/<platform>/dmengine`; its stdout and stderr are captured in
+the Live Logs panel rather than written over the terminal UI. A missing Bob
+build fails inside that panel with the expected artifact path. `--no-launch`
+suppresses only the automatic startup launch: the local reload target remains
+configured, `p` still performs a build and launch, and later project/extension
+changes restart an engine that the operator launched manually. The watcher
+excludes `.internal`, `.deherm`, build outputs, and generated proxies so editor
+cache churn and self-authored outputs do not form rebuild loops.
 
 The next commands will orchestrate the internal build graph:
 
@@ -230,3 +275,14 @@ Low-level, complete
 dmSDK access is available from a separate raw namespace so pointer ownership,
 thread restrictions, and lifetime contracts remain visible rather than being
 made deceptively ergonomic.
+
+## Package identities
+
+The repository is a pnpm monorepo with private packages named `@deherm/*`.
+Those identities are development-only module boundaries and map directly to
+raw source in the root `tsconfig.json`; they are not npm publication names.
+The unified public artifact is `@ts-defold/deherm` and contains those package
+directories. `@deherm/project` is intentionally not a workspace package: the
+CLI generates that alias inside a consumer project and points it at the
+context-specific SDK for `.script.ts`, `.gui.ts`, `.render.ts`, or shared
+TypeScript.

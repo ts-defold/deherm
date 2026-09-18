@@ -1,0 +1,116 @@
+{
+  "schemaVersion": 2,
+  "scope": "war-battles-packaged-gui-typescript-dynamic-hermes",
+  "target": "arm64-macos",
+  "runtime": "dynamic-hermes",
+  "status": "observed-clean",
+  "claim": "The packaged War Battles GUI proxy attached its generated TypeScript component, loaded the bundle in Dynamic Hermes, completed its TypeScript GUI initialization, first render, and first update render through real Defold APIs, and remained free of rejected diagnostics for the bounded settling window.",
+  "exclusions": [
+    "Static Hermes execution",
+    "HTML5 browser-host execution",
+    "all Defold component contexts or lifecycle combinations",
+    "the complete generated script or dmSDK surface",
+    "multiplayer transport execution"
+  ],
+  "artifactKey": "ab1cf2fcb6ed7fea045cebb21695f69957e1bf2f03cf9ac3e91fe867510a431e",
+  "sourceKey": "9b2a676be31e9baec3004c42c1477ccf077ef7846a3fa436276a688fb9b434dd",
+  "evidenceKey": "1864b0746a8bd35af29ed67f8313a5624ebcb69feda1c6c077ac2e31d7f73311",
+  "artifacts": [
+    {
+      "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
+      "bytes": 16138776,
+      "sha256": "b298058d84dac104c49741d2ed62b10d95fd39731429231639a9556e33b54bb1"
+    },
+    {
+      "path": "examples/war-battles-online/defold/build/default/game.arcd",
+      "bytes": 164584,
+      "sha256": "ebcfeb2466be6d473d7f8f6dd9448124dac2007913f4d9fb6d9868c90c508fd7"
+    },
+    {
+      "path": "examples/war-battles-online/defold/build/default/game.arci",
+      "bytes": 1728,
+      "sha256": "2eed897f73a7e2209abf860e3a8de2f2093af27d15eea8822b84c259cef9f8a0"
+    },
+    {
+      "path": "examples/war-battles-online/defold/build/default/game.dmanifest",
+      "bytes": 1713,
+      "sha256": "74a9aff4490abd0a21b9b1b71327fea6549f85ab30771c9e3ca4dc3e1b4a50f3"
+    },
+    {
+      "path": "examples/war-battles-online/defold/build/default/game.projectc",
+      "bytes": 4944,
+      "sha256": "8d0956b797467292b1597124aaa41fce334da87d971afa6cf7fdc16554a535b3"
+    },
+    {
+      "path": "examples/war-battles-online/defold/build/default/deherm/app.dehermc",
+      "bytes": 78861,
+      "sha256": "6b8972238c8054c7e3fa973a3d28985c8a1e7f01c1d0328cccbfa725b238971c"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "path": "defold/defold_hermes",
+      "kind": "tree",
+      "fileCount": 162,
+      "bytes": 12611633,
+      "sha256": "1c785cdc7f3bf37caf759cd1c1e9c3afcc88769965817ae56ae86d8d9d6e7882"
+    },
+    {
+      "path": "examples/war-battles-online/defold",
+      "kind": "tree",
+      "fileCount": 26,
+      "bytes": 107503,
+      "sha256": "44cf1cc7ac6e771b69fb819e3c8aa441cb82bfbb8308dda0dca720c8e4223a58"
+    },
+    {
+      "path": "upstream.lock",
+      "bytes": 1124,
+      "sha256": "bdd075f2712a1aa3b4e486a4c426557e030d5b5cbe24bb767ebdcc0bd44dc951"
+    },
+    {
+      "path": "examples/war-battles-online/defold/deherm.lock",
+      "bytes": 3209,
+      "sha256": "febfdcb2c8dcf49ca2373b17cdb45bf9cfcc891e6729a24444eeac5f6a928a99"
+    },
+    {
+      "path": "examples/war-battles-online/defold/.deherm/ir/binding-lowering-plan.sentinel.json",
+      "bytes": 6694,
+      "sha256": "c8f5a53cd4e4c39f453948937763d29d3578d6dfcebd3af75ec9872721da6241"
+    },
+    {
+      "path": "examples/war-battles-online/defold/.deherm/generated/components/manifest.json",
+      "bytes": 4031,
+      "sha256": "75c919371d44bebfd84dd49ebbfebe3172d5c8707dfee6acabb8cc336bf66aea"
+    }
+  ],
+  "observation": {
+    "requiredMarkers": [
+      "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
+      "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
+      "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
+      "INFO:DEFOLD_HERMES: war-battles-runtime:gui-init-rendered:32:160",
+      "INFO:DEFOLD_HERMES: war-battles-runtime:first-update-rendered:32:160",
+      "INFO:DEFOLD_HERMES: Extension update entered (application initialized: false)"
+    ],
+    "settleMs": 1500,
+    "rejectedDiagnosticIds": [
+      "error-severity",
+      "fatal-severity",
+      "script-error",
+      "lua-traceback",
+      "javascript-failure",
+      "bundle-rejected",
+      "missing-lua-provider",
+      "component-runtime-unavailable"
+    ],
+    "termination": {
+      "method": "sigterm",
+      "exitCode": null,
+      "signal": "SIGTERM"
+    },
+    "transcript": {
+      "canonicalLineCount": 20,
+      "canonicalSha256": "f0096e7a594b64708a78da15249826b5197edc166c84600889a146f1b470fa31"
+    }
+  }
+}

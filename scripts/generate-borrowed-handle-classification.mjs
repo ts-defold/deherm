@@ -140,7 +140,7 @@ function validateExceptionalRoutes(override, borrowedById) {
     assert(Array.isArray(reviewed), `missing reviewed exceptions for '${operationClass}'`);
     const reviewedById = uniqueMap(reviewed, `${operationClass} exceptions`);
     for (const [id, row] of reviewedById) {
-      assert(borrowedById.has(id), `${id}: reviewed exception is not a pending borrowed-handle route`);
+      assert(borrowedById.has(id), `${id}: reviewed exception is not a borrowed-handle route`);
       assert(row.stableId === stableBindingId(id), `${id}: reviewed stable ID is stale`);
       assert(!exceptional.has(id), `${id}: reviewed exceptional route appears in multiple operation classes`);
       exceptional.set(id, operationClass);
@@ -165,8 +165,19 @@ export function generateBorrowedHandleClassification(inputs) {
 
   const irById = uniqueMap(ir.functions, "script API IR");
   const patternById = uniqueMap(patterns.bindings, "script binding patterns");
-  const borrowedAccountingRows = accounting.rows.filter((row) =>
-    row.category === "pending" && row.reason?.loweringFamily === "borrowed-handle");
+  // Universal fallback accounting answers whether a route is callable; the
+  // structural pattern remains the source of truth for specialized lowering.
+  // This keeps all handle routes eligible for a faster generated shape even
+  // after the generic path has made them executable.
+  const borrowedPatternIds = new Set(patterns.bindings
+    .filter(({ loweringFamily }) => loweringFamily === "borrowed-handle")
+    .map(({ id }) => id));
+  // Native value dispatch owns GUI node reads/writes with a tighter generated
+  // shape. Keep the borrowed-handle classifier structural, but do not emit a
+  // second competing lowering recipe for routes already specialized there.
+  const borrowedAccountingRows = accounting.rows.filter(
+    ({ id, evidence }) => borrowedPatternIds.has(id) && evidence?.generator !== "native-value-dispatch",
+  );
   const borrowedById = uniqueMap(borrowedAccountingRows, "borrowed-handle accounting rows");
   assert(borrowedById.size === override.expectedCounts.total,
     `borrowed-handle route count drifted: expected ${override.expectedCounts.total}, got ${borrowedById.size}`);

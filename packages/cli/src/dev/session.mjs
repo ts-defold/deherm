@@ -1,3 +1,4 @@
+import { createWriteStream } from "node:fs";
 import { access, mkdir, readdir } from "node:fs/promises";
 import path from "node:path";
 
@@ -6,7 +7,9 @@ import {
   generateComponentProxies
 } from "../../../compiler/src/component-proxy-generator.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
+import { createDefoldBuilder } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
+import { createEngineController } from "./engine-process.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "./model.mjs";
 import { normalizeResourcePaths } from "./protocol.mjs";
 import { startResourceServer } from "./resource-server.mjs";
@@ -21,6 +24,24 @@ async function exists(file) {
   }
 }
 
+const componentSourceSuffixes = componentProxyConstants.sourceKinds.map(({ suffix }) => suffix);
+const componentProxySuffixes = componentSourceSuffixes.map((suffix) => suffix.slice(0, -3));
+const ignoredEntryDirectories = new Set([
+  ".deherm",
+  ".git",
+  "build",
+  "defold_hermes",
+  "node_modules"
+]);
+
+function isComponentSource(file) {
+  return componentSourceSuffixes.some((suffix) => file.endsWith(suffix));
+}
+
+function isComponentProxy(file) {
+  return componentProxySuffixes.some((suffix) => file.endsWith(suffix));
+}
+
 async function resolveEntry(projectRoot, requested) {
   if (requested) return path.resolve(requested);
   const candidates = [
@@ -28,21 +49,22 @@ async function resolveEntry(projectRoot, requested) {
     path.join(projectRoot, "src", "main.script.ts")
   ];
   for (const candidate of candidates) if (await exists(candidate)) return candidate;
-  const sourceRoot = path.join(projectRoot, "src");
   let componentEntries = [];
   try {
-    componentEntries = (await readdir(sourceRoot, { recursive: true, withFileTypes: true }))
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".script.ts"))
+    componentEntries = (await readdir(projectRoot, { recursive: true, withFileTypes: true }))
+      .filter((entry) => {
+        if (!entry.isFile() || !isComponentSource(entry.name)) return false;
+        const relativeParent = path.relative(projectRoot, entry.parentPath);
+        return !relativeParent.split(path.sep).some((part) => ignoredEntryDirectories.has(part));
+      })
       .map((entry) => path.join(entry.parentPath, entry.name))
       .sort();
   } catch {
     // The actionable error below covers missing or unreadable source trees.
   }
   if (componentEntries.length === 1) return componentEntries[0];
-  if (componentEntries.length > 1) {
-    throw new Error(`deherm dev found multiple .script.ts entries; choose one with --entry:\n${componentEntries.map((file) => `- ${file}`).join("\n")}`);
-  }
-  throw new Error("deherm dev needs --entry <file>; no src/main.ts or src/main.script.ts was found");
+  if (componentEntries.length > 1) return componentEntries[0];
+  throw new Error(`deherm dev needs --entry <file>; no conventional entry or authored ${componentSourceSuffixes.join(", ")} component was found`);
 }
 
 function containedPath(root, relative, label) {
@@ -66,18 +88,12 @@ function waitForSignal() {
   });
 }
 
-const componentSourceSuffixes = componentProxyConstants.sourceKinds.map(({ suffix }) => suffix);
-const componentProxySuffixes = componentSourceSuffixes.map((suffix) => suffix.slice(0, -3));
-
-function isComponentSource(file) {
-  return componentSourceSuffixes.some((suffix) => file.endsWith(suffix));
-}
-
-function isComponentProxy(file) {
-  return componentProxySuffixes.some((suffix) => file.endsWith(suffix));
-}
-
 async function entryTsconfig(projectRoot, entryPoint) {
+  // A development bundle composes every authored component through the
+  // generated registry. It therefore needs the unfiltered runtime SDK while
+  // the separate context projects remain the authoritative typecheck gates.
+  const bundle = path.join(projectRoot, "tsconfig.deherm.bundle.json");
+  if (await exists(bundle)) return bundle;
   const name = entryPoint.toLowerCase();
   const context = name.endsWith(".script.ts")
     ? "game-object"
@@ -99,10 +115,31 @@ export function createDevWatchOptions({ outputFile, sourceMirror, buildMirror })
   };
 }
 
+function needsDefoldBuild(files) {
+  return files.some((file) => isComponentSource(file) || !/\.[cm]?[jt]sx?$/.test(file));
+}
+
+function needsEngineRestart(files) {
+  return files.some((file) => file === "game.project" || file.startsWith("defold_hermes/") || file.endsWith("/ext.manifest") || file === "ext.manifest");
+}
+
 export async function runDevSession(options = {}) {
+  const services = options.services ?? {};
   const projectRoot = path.resolve(options.project ?? process.cwd());
   const entryPoint = await resolveEntry(projectRoot, options.entry);
   const outputFile = path.resolve(options.outputFile ?? path.join(projectRoot, ".deherm", "dev", "app.dehermc"));
+  const sessionLogFile = path.resolve(options.sessionLog ?? path.join(projectRoot, ".deherm", "dev", "session.log"));
+  await mkdir(path.dirname(sessionLogFile), { recursive: true });
+  const sessionLog = createWriteStream(sessionLogFile, { flags: "w" });
+  let sessionLogFailed = false;
+  let sessionLogClosed = false;
+  sessionLog.on("error", () => { sessionLogFailed = true; });
+  const closeSessionLog = async () => {
+    if (sessionLogClosed) return;
+    sessionLogClosed = true;
+    if (sessionLog.destroyed) return;
+    await new Promise((resolve) => sessionLog.end(resolve));
+  };
   const [resourcePath] = normalizeResourcePaths([options.resourcePath ?? "/deherm/app.dehermc"]);
   const resourceRelative = resourcePath.slice(1);
   const sourceMirror = options.sourceMirror
@@ -115,13 +152,22 @@ export async function runDevSession(options = {}) {
   const lineOutput = options.headless || (!options.json && (!process.stdin.isTTY || !process.stdout.isTTY));
   const emit = (event) => {
     applyDevEvent(model, event);
+    if (!sessionLogFailed && !sessionLog.destroyed) {
+      const timestamp = new Date(event.at ?? Date.now()).toISOString();
+      const line = event.type === "log"
+        ? `${timestamp} [${String(event.level ?? "info").toUpperCase()}] ${event.source ?? "deherm"} ${event.message}`
+        : `${timestamp} [EVENT] ${event.type} ${JSON.stringify(event)}`;
+      sessionLog.write(`${line}\n`);
+    }
     if (options.json) process.stdout.write(`${JSON.stringify({ schemaVersion: 1, event })}\n`);
     else if (lineOutput) {
       const detail = event.diagnostic ? `: ${event.diagnostic}` : "";
       process.stdout.write(`[deherm] ${event.type} generation=${event.generation ?? "-"}${detail}\n`);
     }
     for (const listener of listeners) listener(event);
+    services.onEvent?.(event);
   };
+  emit({ type: "log", source: "dev", message: `session log: ${path.relative(projectRoot, sessionLogFile).split(path.sep).join("/")}` });
   const targets = new Map((options.targets ?? []).map((url, index) => {
     const id = `target-${index + 1}`;
     const name = new URL(url).host;
@@ -137,8 +183,13 @@ export async function runDevSession(options = {}) {
     });
   }
   let generatedComponents = false;
-  const compiler = await createIncrementalCompiler({
+  const compiler = await (services.createIncrementalCompiler ?? createIncrementalCompiler)({
     entryPoint,
+    // The generated registry imports every authored component and installs the
+    // runtime component table. Import it before the requested app entry so a
+    // single development bundle supports component-only, app-only, and mixed
+    // projects without asking authors to maintain a bootstrap file.
+    preludeEntries: [path.join(projectRoot, ".deherm", "generated", "components", "registry.ts")],
     tsconfig: await entryTsconfig(projectRoot, entryPoint),
     outputFile,
     mirrors: [sourceMirror, buildMirror],
@@ -150,16 +201,79 @@ export async function runDevSession(options = {}) {
       generatedComponents = true;
     }
   });
-  const coordinator = new HotReloadCoordinator({ compiler, targets, emit });
+  const coordinator = services.createCoordinator
+    ? services.createCoordinator({ compiler, targets, emit })
+    : new HotReloadCoordinator({ compiler, targets, emit });
+  const servicePort = options.servicePort ?? 8001;
+  const localTargetUrl = `http://127.0.0.1:${servicePort}`;
+  const engine = (services.createEngineController ?? createEngineController)({
+    projectRoot,
+    emit,
+    targetId: "local-engine",
+    env: { DM_SERVICE_PORT: String(servicePort) }
+  });
   await coordinator.requestBuild([path.relative(projectRoot, entryPoint).split(path.sep).join("/") || path.basename(entryPoint)]);
 
   if (options.once) {
     await coordinator.close();
+    await closeSessionLog();
     return snapshotDevModel(model);
   }
 
+
+  if (![...targets.values()].some(({ url }) => url === localTargetUrl)) {
+    targets.set("local-engine", { url: localTargetUrl, name: `local:${servicePort}` });
+    emit({ type: "target-configured", id: "local-engine", name: `local:${servicePort}`, url: localTargetUrl });
+  }
+
+  let builder;
+  let builderPromise;
+  let developmentLoop = Promise.resolve();
+  const ensureBuilder = () => builderPromise ??= (services.createDefoldBuilder ?? createDefoldBuilder)({
+    projectRoot,
+    outputRoot: buildRoot,
+    buildServer: options.buildServer,
+    emit
+  }).then((value) => (builder = value));
+  const enqueue = (operation) => {
+    const current = developmentLoop.then(operation);
+    developmentLoop = current.catch(() => {});
+    return current;
+  };
+  const buildDefoldAndMaybeLaunch = (
+      reason,
+      restart = false,
+      launch = options.autoLaunch !== false) => enqueue(async () => {
+    const activeBuilder = await ensureBuilder();
+    const result = await activeBuilder.build(reason);
+    if (restart && engine.running()) await engine.stop();
+    if (launch && !engine.running()) await engine.launch();
+    else if (engine.running() && result.resources.length) await coordinator.reloadResources(result.resources);
+    return result;
+  });
+  const launchBuiltGame = () => enqueue(async () => {
+    if (model.defoldBuild.status !== "ready") {
+      const activeBuilder = await ensureBuilder();
+      await activeBuilder.build("manual launch");
+    }
+    if (!engine.running()) await engine.launch();
+  });
+  const processChanges = (files) => enqueue(async () => {
+    await coordinator.requestBuild(files);
+    if (!needsDefoldBuild(files)) return;
+    const activeBuilder = await ensureBuilder();
+    const result = await activeBuilder.build(`changed ${files.length} file(s)`);
+    if (needsEngineRestart(files)) {
+      const wasRunning = engine.running();
+      if (wasRunning) await engine.stop();
+      if (wasRunning || options.autoLaunch !== false) await engine.launch();
+    } else if (engine.running() && result.resources.length) {
+      await coordinator.reloadResources(result.resources);
+    }
+  });
+
   await mkdir(buildRoot, { recursive: true });
-  const resourceServer = options.serve === false ? undefined : await startResourceServer({
+  const resourceServer = options.serve === false ? undefined : await (services.startResourceServer ?? startResourceServer)({
     root: buildRoot,
     host: options.serveHost,
     port: options.servePort,
@@ -168,30 +282,65 @@ export async function runDevSession(options = {}) {
   if (resourceServer) {
     emit({ type: "log", source: "resource-server", message: `serving ${buildRoot} at ${resourceServer.baseUrl}` });
   }
-  const watcher = await watchProject({
+  const watcher = await (services.watchProject ?? watchProject)({
     root: path.resolve(options.watchRoot ?? projectRoot),
     debounceMs: options.debounceMs,
     ...createDevWatchOptions({ outputFile, sourceMirror, buildMirror }),
-    onBatch: (files) => coordinator.requestBuild(files),
+    onBatch: (files) => processChanges(files),
     onError: (error) => emit({ type: "log", level: "error", source: "watcher", message: error.message })
   });
+  const startup = buildDefoldAndMaybeLaunch("initial dev startup", false).catch((error) => emit({
+    type: "log",
+    level: "error",
+    source: "dev",
+    message: `automatic Defold build/launch failed: ${error instanceof Error ? error.message : String(error)}`
+  }));
   const close = async () => {
     watcher.close();
+    await startup;
+    await developmentLoop;
+    await engine.stop();
     await coordinator.close();
+    await builder?.close();
     await resourceServer?.close();
+    await closeSessionLog();
   };
-  if (!options.headless && !options.json && process.stdin.isTTY && process.stdout.isTTY) {
-    const { runDevTui } = await import("./tui.mjs");
+  if (services.runDevTui || (!options.headless && !options.json && process.stdin.isTTY && process.stdout.isTTY)) {
+    const runDevTui = services.runDevTui ?? (await import("./tui.mjs")).runDevTui;
     try {
       await runDevTui({
         snapshot: () => snapshotDevModel(model),
         onIntent(intent) {
-          if (intent.type === "reload" || intent.type === "rebuild") {
+          if (intent.type === "reload") {
             void coordinator.requestBuild([]).catch((error) => emit({
               type: "log",
               level: "error",
               source: "coordinator",
               message: error.message
+            }));
+          }
+          else if (intent.type === "rebuild") {
+            void enqueue(async () => {
+              await coordinator.requestBuild([]);
+              const activeBuilder = await ensureBuilder();
+              await activeBuilder.build("manual full rebuild");
+              const wasRunning = engine.running();
+              if (wasRunning) await engine.stop();
+              if (wasRunning || options.autoLaunch !== false) await engine.launch();
+            }).catch((error) => emit({
+              type: "log",
+              level: "error",
+              source: "coordinator",
+              message: error instanceof Error ? error.message : String(error)
+            }));
+          }
+          else if (intent.type === "play") {
+            const action = engine.running()
+              ? engine.stop()
+              : launchBuiltGame();
+            void action.catch((error) => emit({
+              type: "engine-failed",
+              diagnostic: error instanceof Error ? error.message : String(error)
             }));
           }
           else emit({ type: "log", source: "tui", message: `${intent.type} panel is staged but not implemented` });
@@ -201,7 +350,7 @@ export async function runDevSession(options = {}) {
       await close();
     }
   } else {
-    await waitForSignal();
+    await (services.waitForSignal ?? waitForSignal)();
     await close();
   }
   return snapshotDevModel(model);

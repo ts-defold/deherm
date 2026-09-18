@@ -22,6 +22,13 @@ context to the TypeScript component instance.
 Application authors attach the generated resource exactly as they attach any
 other Defold script. They write no proxy Lua and no gameplay Lua.
 
+Generated proxies call a private `_deherm_` Lua global installed by the native
+extension. The implementation-shaped `defold_hermes` global is forbidden, and
+the short public-looking `deherm` name stays unclaimed so a future deliberate
+Lua compatibility API can use it without exposing proxy/bootstrap internals.
+The extension directory, C/C++ namespace, include paths, log domain, and C ABI
+symbols remain `defold_hermes`; this decision concerns only Lua's global table.
+
 A later backend may register a native `.deherm` component/resource type through
 dmSDK. Both backends consume the same component manifest and present the same
 TypeScript contract, so game code does not change when the native component is
@@ -30,7 +37,7 @@ ready.
 # Authoring contract
 
 An application module exports a component definition rather than process-wide
-singleton hooks. A representative shape is:
+singleton hooks. The object form remains the smallest data-oriented shape:
 
 ```ts
 export default defineComponent({
@@ -47,8 +54,43 @@ export default defineComponent({
 });
 ```
 
-The exact public syntax remains generator-owned and may become class- or
-function-based. The semantic requirements do not change:
+The same generated manifest, proxy, registry, and runtime ABI also accept an
+idiomatic class adapter:
+
+```ts
+class Player extends ScriptComponent {
+  static readonly properties = {
+    speed: property.number(120),
+    team: property.hash("blue"),
+  } as const;
+
+  declare speed: number;
+  declare team: DefoldHash;
+  private elapsed = 0;
+
+  init(): void {
+    this.elapsed = this.speed;
+  }
+
+  update(dt: number): void {
+    this.elapsed += dt;
+  }
+}
+
+export default component(Player);
+```
+
+`*.script.ts`, `*.gui.ts`, and `*.render.ts` classes directly extend
+`ScriptComponent`, `GuiComponent`, and `RenderComponent`, respectively. The
+generator reads the named class declaration without executing it, accepts only
+zero-argument construction, static literal property maps, and prototype
+lifecycle methods, and rejects a context/base mismatch. Per-instance field
+initializers run once. Authored Defold properties are then copied onto that
+instance before `init`, so lifecycle methods receive the instance as typed
+`this`; `this.props` is an allocation-free typed view when the base class is
+parameterized by a property map.
+
+Both authoring forms retain the same semantic requirements:
 
 * one state object per Defold component instance;
 * typed properties initialized from Defold's authored/spawned properties;
@@ -56,6 +98,14 @@ function-based. The semantic requirements do not change:
 * stable component and game-object URLs;
 * deterministic destruction and callback/root release;
 * hot reload that can migrate or recreate instances explicitly.
+
+The class adapter anchors its instance on the runtime-owned component state as
+a non-enumerable private field. Re-evaluated definitions capture the new
+prototype methods while retaining that object and its fields. A fresh Hermes
+runtime has no retained object: the native rebind path dispatches `init` before
+`onReload`, creating and initializing the new class instance before reload code
+runs. The manifest records `authoringStyle` and, for class components, the
+source class name; this metadata does not create a second ABI.
 
 # Generated artifacts
 

@@ -17,7 +17,7 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "tableRecordFrontierSha256": "9224dfd7d1500ec30ff438acbf0ae97b897c17e5122e77126d74fbae8ae12dfc",
+    "tableRecordFrontierSha256": "0330f601e736cd690567478381b513e6febc35d40e1194a71c59b07e59390504",
     "reviewedPolicySha256": "cc7988e1de66c6e8ca36caf06fbc46232790c89806dd918accf4260a4694319f",
     "defoldSources": [
       {

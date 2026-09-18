@@ -48,20 +48,23 @@ export class HotReloadCoordinator {
         continue;
       }
 
-      const targets = [...this.#targets];
-      for (const [id] of targets) {
-        this.#emit({ type: "reload-started", id, generation });
-      }
-      await Promise.all(targets.map(async ([id, target]) => {
-        try {
-          await this.#postReload(target.url, build.resourcePaths);
-          this.#emit({ type: "target-connected", id, name: target.name, url: target.url });
-          this.#emit({ type: "reload-signalled", id, generation });
-        } catch (error) {
-          this.#emit({ type: "reload-failed", id, generation, diagnostic: error instanceof Error ? error.message : String(error) });
-        }
-      }));
+      await this.reloadResources(build.resourcePaths, generation);
     }
+  }
+
+  async reloadResources(resources, generation = this.#generation) {
+    const targets = [...this.#targets];
+    if (generation <= 0 || resources.length === 0 || targets.length === 0) return;
+    for (const [id] of targets) this.#emit({ type: "reload-started", id, generation });
+    await Promise.all(targets.map(async ([id, target]) => {
+      try {
+        await this.#postReload(target.url, resources);
+        this.#emit({ type: "target-connected", id, name: target.name, url: target.url });
+        this.#emit({ type: "reload-signalled", id, generation });
+      } catch (error) {
+        this.#emit({ type: "reload-failed", id, generation, diagnostic: error instanceof Error ? error.message : String(error) });
+      }
+    }));
   }
 
   async close() {

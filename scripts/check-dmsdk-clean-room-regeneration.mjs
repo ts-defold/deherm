@@ -133,28 +133,28 @@ async function walk(root, relative = "") {
 export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositoryRootDefault) {
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
-    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings)\.json$/.test(file)) {
+    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings)\.json$/.test(file)) {
       result.add(`packages/bindings/generated/${file}`);
     }
   }
   for (const file of await walk(path.join(repositoryRoot, "defold/defold_hermes/include/defold_hermes"))) {
-    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|borrowed_handle|scratch_scalar_out|cstring_value)/.test(file)) {
+    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|borrowed_handle|scratch_scalar_out|cstring_value|universal)/.test(file)) {
       result.add(`defold/defold_hermes/include/defold_hermes/${file}`);
     }
   }
   for (const file of await walk(path.join(repositoryRoot, "defold/defold_hermes/src"))) {
-    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|borrowed_handle|scratch_scalar_out|cstring_value)/.test(file)) {
+    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|borrowed_handle|scratch_scalar_out|cstring_value|universal)/.test(file)) {
       result.add(`defold/defold_hermes/src/${file}`);
     }
   }
-  for (const browser of ["defold/defold_hermes/lib/web/generated_dmsdk_scalar.js", "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js", "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js", "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js"]) {
+  for (const browser of ["defold/defold_hermes/lib/web/generated_dmsdk_scalar.js", "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js", "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js", "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js", "defold/defold_hermes/lib/web/generated_dmsdk_universal.js"]) {
     try {
       if ((await lstat(path.join(repositoryRoot, browser))).isFile()) result.add(browser);
     } catch (error) {
       if (error.code !== "ENOENT") throw error;
     }
   }
-  for (const file of ["scalar.ts", "enum-value.ts", "named-scalar.ts", "borrowed-handle.ts", "scratch-scalar-out.ts", "cstring-value.ts"]) {
+  for (const file of ["scalar.ts", "enum-value.ts", "named-scalar.ts", "borrowed-handle.ts", "scratch-scalar-out.ts", "cstring-value.ts", "browser-arena.ts", "universal.ts"]) {
     const relative = `packages/sdk/src/generated/dmsdk/${file}`;
     try {
       if ((await lstat(path.join(repositoryRoot, relative))).isFile()) result.add(relative);
@@ -166,8 +166,12 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
     "packages/static-hermes/src/generated/dmsdk-borrowed-handle.ts",
     "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts",
     "packages/static-hermes/src/generated/dmsdk-cstring-value.ts",
+    "packages/static-hermes/src/generated/dmsdk-universal.ts",
+    "packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
     "native/generated_dmsdk_borrowed_handle_header_audit.cpp",
-    "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp"
+    "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp",
+    "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
+    "tests/fixtures/generated_dmsdk_universal_test_ids.h"
   ]) {
     try {
       if ((await lstat(path.join(repositoryRoot, relative))).isFile()) result.add(relative);
@@ -207,7 +211,7 @@ async function compareArtifacts(cleanRoot, repositoryRoot) {
 
 async function validateReports(root) {
   const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
-  const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, arenaSpan, projection, borrowedHandle, scratchScalarOut, cstringValue] = await Promise.all([
+  const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, arenaSpan, projection, borrowedHandle, scratchScalarOut, cstringValue, universal] = await Promise.all([
     load("packages/bindings/generated/defold-dmsdk-binding-patterns.json"),
     load("packages/bindings/generated/defold-dmsdk-scalar-thunks.json"),
     load("packages/bindings/generated/defold-dmsdk-abi-shapes.json"),
@@ -222,7 +226,8 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-projection-ir.json"),
     load("packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
-    load("packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json")
+    load("packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-universal-bindings.json")
   ]);
   assert(patterns.coverage.runtimePendingCount === 1361 && patterns.coverage.classifiedCount === 1361,
     "dmSDK classifier did not account for all 1,361 runtime-pending declarations");
@@ -293,6 +298,11 @@ async function validateReports(root) {
     cstringValue.coverage.stubAbiLinkedAndRuntimeTested === 0 &&
     cstringValue.coverage.pinnedEngineLinked === 0 && cstringValue.coverage.allTargetConformant === 0,
   "C-string/value report does not preserve its pinned 14 generated + 6 blocked truth boundary");
+  assert(universal.coverage.declarations === 1361 && universal.coverage.recipes === 1361 &&
+    universal.coverage.cAbiDispatchable === 1361 && universal.coverage.dynamicHermesMetadata === 1361 &&
+    universal.coverage.staticHermesDeclarations === 1361 && universal.coverage.browserDirectMemoryMetadata === 1361 &&
+    universal.coverage.typescriptStableIds === 1361 && universal.coverage.silentlyOmitted === 0,
+  "universal dmSDK fallback does not cover every declaration and target");
   const scalarIds = new Set(scalar.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const enumIds = new Set(enumValue.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const fixedDigestIds = new Set(fixedDigest.declarations.map(({ id }) => id));
@@ -377,6 +387,7 @@ async function validateReports(root) {
   const borrowedHandleOwned = generatedDmSdkArtifacts.filter((entry) => borrowedHandle.artifacts.includes(entry));
   const scratchScalarOutOwned = generatedDmSdkArtifacts.filter((entry) => scratchScalarOut.artifacts.includes(entry));
   const cstringValueOwned = generatedDmSdkArtifacts.filter((entry) => cstringValue.artifacts.includes(entry));
+  const universalOwned = generatedDmSdkArtifacts.filter((entry) => universal.artifacts.includes(entry));
   assert(scalarOwned.length === scalar.artifacts.length, "scalar report names an artifact absent from registry ownership");
   assert(enumOwned.length === enumValue.artifacts.length, "enum report names an artifact absent from registry ownership");
   assert(fixedDigestOwned.length === fixedDigest.artifacts.length,
@@ -395,6 +406,8 @@ async function validateReports(root) {
     "scratch scalar-out report names an artifact absent from registry ownership");
   assert(cstringValueOwned.length === cstringValue.artifacts.length,
     "C-string/value report names an artifact absent from registry ownership");
+  assert(universalOwned.length === universal.artifacts.length,
+    "universal report names an artifact absent from registry ownership");
   return {
     runtimePendingCount: patterns.coverage.runtimePendingCount,
     scalarGeneratedCount: scalar.coverage.generated,
@@ -409,6 +422,7 @@ async function validateReports(root) {
     scratchScalarOutGeneratedCount: scratchScalarOut.coverage.generated,
     scratchScalarOutBlockedCount: scratchScalarOut.coverage.blocked,
     cstringValueGeneratedCount: cstringValue.coverage.generated,
+    universalRecipeCount: universal.coverage.recipes,
     arenaSpanCensusCount: arenaSpan.coverage.arenaSpanCensus,
     arenaSpanPriorWaveCount: arenaSpan.coverage.coveredByPriorWaves,
     arenaSpanBlockedCount: arenaSpan.coverage.blocked,
@@ -469,7 +483,7 @@ async function main() {
   if (unknown.length) throw new Error(`Unknown argument: ${unknown[0]}`);
   const report = await runDmSdkCleanRoomRegeneration({ keep: process.argv.includes("--keep") });
   console.log(`Clean-room regeneration verified ${report.runtimePendingCount} dmSDK declarations across ${report.artifactCount} byte-identical artifacts.`);
-  console.log(`Generated adapters: ${report.scalarGeneratedCount} scalar + ${report.enumGeneratedCount} enum-value + ${report.fixedDigestGeneratedCount} fixed-digest + ${report.base64SpanGeneratedCount} base64-span + ${report.astcProbeGeneratedCount} ASTC-probe + ${report.xteaSpanGeneratedCount} XTEA-span + ${report.hashSpanGeneratedCount} hash-span + ${report.borrowedHandleGeneratedCount} borrowed-handle provider-boundary; ${report.remainingWithoutGeneratedAdapters} remain before later structural waves.`);
+  console.log(`Generated specialized adapters: ${report.scalarGeneratedCount} scalar + ${report.enumGeneratedCount} enum-value + ${report.fixedDigestGeneratedCount} fixed-digest + ${report.base64SpanGeneratedCount} base64-span + ${report.astcProbeGeneratedCount} ASTC-probe + ${report.xteaSpanGeneratedCount} XTEA-span + ${report.hashSpanGeneratedCount} hash-span + ${report.borrowedHandleGeneratedCount} borrowed-handle provider-boundary; all ${report.universalRecipeCount} declarations retain a universal recipe beneath specialized lanes.`);
   console.log(`Borrowed-handle structural partition: ${report.borrowedHandleGeneratedCount}/348 generated; ${report.borrowedHandleBlockedCount} blocked; packaged-engine provider remains unverified.`);
   console.log(`Scratch scalar-out structural partition: ${report.scratchScalarOutGeneratedCount}/79 generated; ${report.scratchScalarOutBlockedCount} blocked; packaged-engine provider remains unverified.`);
   console.log(`Named-scalar policy: ${report.namedScalarGeneratedCount}/${report.namedScalarReviewedCount} generated; ${report.namedScalarBlockedCount} blocked.`);

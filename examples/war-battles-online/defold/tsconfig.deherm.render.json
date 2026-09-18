@@ -21,6 +21,7 @@
     "node_modules/**",
     ".internal/**",
     "build/**",
-    "dist/**"
+    "dist/**",
+    ".deherm/generated/components/registry.ts"
   ]
 }

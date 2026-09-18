@@ -15,6 +15,7 @@
 #include <array>
 #include <atomic>
 #include <cmath>
+#include <cstdio>
 #include <cstdint>
 #include <limits>
 #include <memory>
@@ -25,6 +26,54 @@
 
 namespace defold_hermes {
 namespace jsi = facebook::jsi;
+
+class ScriptJsiBridgeLifetime final {
+ public:
+  static constexpr size_t kMaximumRoots = 4096;
+  using Invalidate = void (*)(void*) noexcept;
+
+  ~ScriptJsiBridgeLifetime() { shutdown(); }
+
+  bool attach(void* root, Invalidate invalidate) noexcept {
+    if (!active_ || !root || !invalidate) return false;
+    for (auto& slot : slots_) {
+      if (slot.root) continue;
+      slot = {root, invalidate};
+      return true;
+    }
+    return false;
+  }
+
+  void detach(void* root) noexcept {
+    if (!root) return;
+    for (auto& slot : slots_) {
+      if (slot.root != root) continue;
+      slot = {};
+      return;
+    }
+  }
+
+  void shutdown() noexcept {
+    if (!active_) return;
+    active_ = false;
+    for (auto& slot : slots_) {
+      const Slot owned = slot;
+      slot = {};
+      if (owned.root) owned.invalidate(owned.root);
+    }
+  }
+
+  bool active() const noexcept { return active_; }
+
+ private:
+  struct Slot {
+    void* root = nullptr;
+    Invalidate invalidate = nullptr;
+  };
+  std::array<Slot, kMaximumRoots> slots_{};
+  bool active_ = true;
+};
+
 namespace {
 
 constexpr size_t kMaximumArguments = universal_value::kMaximumArgumentCount;
@@ -36,6 +85,13 @@ constexpr size_t kStringScratchCapacity = 64 * 1024;
 constexpr size_t kMaximumReentrantDepth = 16;
 constexpr const char* kDefoldValueKindProperty = "__dehermValueKind";
 constexpr const char* kDefoldUrlProperty = "__dehermUrlV1";
+constexpr const char* kLuaErrorTablePrefix = "__deherm_lua_error_table_v1__:";
+thread_local uint32_t gJsiCallbackInvocationDepth = 0;
+
+struct JsiCallbackInvocationGuard {
+  JsiCallbackInvocationGuard() noexcept { ++gJsiCallbackInvocationDepth; }
+  ~JsiCallbackInvocationGuard() { --gJsiCallbackInvocationDepth; }
+};
 constexpr uint8_t kTableSequence = static_cast<uint8_t>(ScriptTableKind::kSequence);
 constexpr uint8_t kTableRecord = static_cast<uint8_t>(ScriptTableKind::kRecord);
 constexpr uint8_t kTableMap = static_cast<uint8_t>(ScriptTableKind::kMap);
@@ -59,10 +115,25 @@ struct ScratchSlot {
   ScriptUrlArena<> urlArena{};
   uint32_t inputStringCount = 0;
   uint32_t inputTableEntryCount = 0;
+  std::array<ScriptCallback*, kMaximumArguments> callbackRoots{};
+  uint32_t callbackRootCount = 0;
 
   void resetCallScratch() noexcept {
+    for (uint32_t index = 0; index < callbackRootCount; ++index) {
+      ScriptCallback* callback = callbackRoots[index];
+      if (callback && callback->release) callback->release(callback->context);
+      callbackRoots[index] = nullptr;
+    }
+    callbackRootCount = 0;
     inputStringCount = 0;
     inputTableEntryCount = 0;
+  }
+
+  void trackCallback(ScriptCallback* callback) {
+    if (callbackRootCount >= callbackRoots.size()) {
+      throw std::out_of_range("Defold script callback root arena is exhausted");
+    }
+    callbackRoots[callbackRootCount++] = callback;
   }
 
   std::string& acquireInputString() {
@@ -101,6 +172,7 @@ class ScratchFrame {
   }
   ~ScratchFrame() {
     if (slot_) {
+      slot_->resetCallScratch();
       slot_->matrix4Arena.rewind(0);
       slot_->urlArena.rewind(urlMark_);
       --scratch_.depth;
@@ -112,6 +184,14 @@ class ScratchFrame {
   ScratchSlot* slot_ = nullptr;
   ScriptUrlArena<>::Mark urlMark_{};
 };
+
+void encodeCallback(
+    jsi::Runtime& runtime,
+    jsi::Function function,
+    ScriptValue& output,
+    ScratchSlot& slot,
+    std::shared_ptr<Scratch> scratch,
+    std::shared_ptr<ScriptJsiBridgeLifetime> lifetime);
 
 uint32_t stableId(jsi::Runtime& runtime, const jsi::Value& value) {
   if (!value.isNumber()) throw jsi::JSError(runtime, "Defold script stable ID must be a number");
@@ -136,8 +216,10 @@ class ScriptHandleHostObject final : public jsi::HostObject,
       ScriptHandleKind kind,
       uint8_t semanticKind,
       uint32_t runtime,
-      uint64_t payload) noexcept
-      : kind_(kind), semanticKind_(semanticKind), runtime_(runtime), payload_(payload) {}
+      uint64_t payload,
+      bool owned) noexcept
+      : kind_(kind), semanticKind_(semanticKind), runtime_(runtime), payload_(payload),
+        owned_(owned) {}
 
   ~ScriptHandleHostObject() override { dispose(); }
 
@@ -148,6 +230,7 @@ class ScriptHandleHostObject final : public jsi::HostObject,
   bool disposed() const noexcept { return disposed_.load(std::memory_order_acquire); }
 
   void dispose() noexcept {
+    if (!owned_) return;
     bool expected = false;
     if (disposed_.compare_exchange_strong(expected, true, std::memory_order_acq_rel)) {
       releaseScriptHandle(kind_, runtime_, payload_);
@@ -193,6 +276,7 @@ class ScriptHandleHostObject final : public jsi::HostObject,
   uint8_t semanticKind_ = 0;
   uint32_t runtime_ = 0;
   uint64_t payload_ = 0;
+  bool owned_ = true;
   std::atomic<bool> disposed_{false};
 };
 
@@ -200,7 +284,9 @@ void encodeLeaf(
     jsi::Runtime& runtime,
     const jsi::Value& value,
     ScriptValue& output,
-    ScratchSlot& scratch) {
+    ScratchSlot& scratch,
+    const std::shared_ptr<Scratch>& bridgeScratch,
+    const std::shared_ptr<ScriptJsiBridgeLifetime>& lifetime) {
   output = {};
   if (value.isUndefined()) {
     output.tag = ScriptValueTag::kUndefined;
@@ -227,6 +313,11 @@ void encodeLeaf(
     output.data = string.data();
   } else if (value.isObject()) {
     auto object = value.asObject(runtime);
+    if (object.isFunction(runtime)) {
+      encodeCallback(
+          runtime, object.asFunction(runtime), output, scratch, bridgeScratch, lifetime);
+      return;
+    }
     if (object.isHostObject<ScriptHandleHostObject>(runtime)) {
       const auto handle = object.getHostObject<ScriptHandleHostObject>(runtime);
       if (handle->disposed()) throw jsi::JSError(runtime, "Defold handle is disposed");
@@ -283,10 +374,12 @@ void encode(
     ScratchSlot& scratch,
     ScriptMatrix4Arena& matrix4Arena,
     ScriptUrlArena<>& urlArena,
+    const std::shared_ptr<Scratch>& bridgeScratch,
+    const std::shared_ptr<ScriptJsiBridgeLifetime>& lifetime,
     size_t depth = 0,
     const ObjectAncestor* ancestor = nullptr) {
   if (!value.isObject()) {
-    encodeLeaf(runtime, value, output, scratch);
+    encodeLeaf(runtime, value, output, scratch, bridgeScratch, lifetime);
     return;
   }
   auto object = value.asObject(runtime);
@@ -328,9 +421,10 @@ void encode(
       return;
     }
   }
-  if (object.isHostObject<ScriptHandleHostObject>(runtime) ||
+  if (object.isFunction(runtime) ||
+      object.isHostObject<ScriptHandleHostObject>(runtime) ||
       object.getProperty(runtime, kDefoldValueKindProperty).isString()) {
-    encodeLeaf(runtime, value, output, scratch);
+    encodeLeaf(runtime, value, output, scratch, bridgeScratch, lifetime);
     return;
   }
 
@@ -376,8 +470,10 @@ void encode(
       throw jsi::JSError(runtime, "Defold script table changed while it was encoded");
     }
     auto& entry = tableEntries[entryCount];
-    encode(runtime, key, entry.key, scratch, matrix4Arena, urlArena, depth + 1, &current);
-    encode(runtime, item, entry.value, scratch, matrix4Arena, urlArena, depth + 1, &current);
+    encode(runtime, key, entry.key, scratch, matrix4Arena, urlArena, bridgeScratch,
+        lifetime, depth + 1, &current);
+    encode(runtime, item, entry.value, scratch, matrix4Arena, urlArena, bridgeScratch,
+        lifetime, depth + 1, &current);
     if (entry.key.tag == ScriptValueTag::kNull || entry.key.tag == ScriptValueTag::kUndefined) {
       throw jsi::JSError(runtime, "Defold script table keys cannot be null or undefined");
     }
@@ -429,7 +525,29 @@ jsi::Value decode(
     jsi::Runtime& runtime,
     const ScriptValue& value,
     const ScriptMatrix4Arena& matrix4Arena,
-    const ScriptUrlArena<>& urlArena) {
+    const ScriptUrlArena<>& urlArena,
+    const std::shared_ptr<Scratch>& bridgeScratch,
+    const std::shared_ptr<ScriptJsiBridgeLifetime>& lifetime,
+    bool ownHandles = true);
+
+struct LuaClosureConsumeContext {
+  jsi::Runtime* runtime = nullptr;
+  const std::shared_ptr<Scratch>* scratch = nullptr;
+  const std::shared_ptr<ScriptJsiBridgeLifetime>* lifetime = nullptr;
+  std::optional<jsi::Value> value;
+  std::string error;
+};
+
+bool ConsumeLuaClosureResults(void* opaque, const ScriptCallFrame* results) noexcept;
+
+jsi::Value decode(
+    jsi::Runtime& runtime,
+    const ScriptValue& value,
+    const ScriptMatrix4Arena& matrix4Arena,
+    const ScriptUrlArena<>& urlArena,
+    const std::shared_ptr<Scratch>& bridgeScratch,
+    const std::shared_ptr<ScriptJsiBridgeLifetime>& lifetime,
+    bool ownHandles) {
   switch (value.tag) {
     case ScriptValueTag::kUndefined: return jsi::Value::undefined();
     case ScriptValueTag::kNull: return jsi::Value(nullptr);
@@ -448,7 +566,7 @@ jsi::Value decode(
         return jsi::Object::createFromHostObject(
             runtime,
             std::make_shared<ScriptHandleHostObject>(
-                value.handleKind, value.reserved, value.length, value.payload));
+                value.handleKind, value.reserved, value.length, value.payload, ownHandles));
       }
       if (value.handleKind == ScriptHandleKind::kUrl) {
         ScriptResolvedUrl url{};
@@ -503,7 +621,8 @@ jsi::Value decode(
             throw jsi::JSError(runtime, "Defold script bridge returned an invalid sequence key");
           }
           array.setValueAtIndex(runtime, static_cast<size_t>(key.number - 1.0), decode(
-              runtime, entries[index].value, matrix4Arena, urlArena));
+              runtime, entries[index].value, matrix4Arena, urlArena,
+              bridgeScratch, lifetime, ownHandles));
         }
         return array;
       }
@@ -517,7 +636,8 @@ jsi::Value decode(
           const auto name = jsi::PropNameID::forUtf8(
               runtime, static_cast<const uint8_t*>(key.data), key.length);
           object.setProperty(runtime, name, decode(
-              runtime, entries[index].value, matrix4Arena, urlArena));
+              runtime, entries[index].value, matrix4Arena, urlArena,
+              bridgeScratch, lifetime, ownHandles));
         }
         return object;
       }
@@ -528,28 +648,269 @@ jsi::Value decode(
         set.callWithThis(
             runtime,
             map,
-            decode(runtime, entries[index].key, matrix4Arena, urlArena),
-            decode(runtime, entries[index].value, matrix4Arena, urlArena));
+            decode(runtime, entries[index].key, matrix4Arena, urlArena,
+                bridgeScratch, lifetime, ownHandles),
+            decode(runtime, entries[index].value, matrix4Arena, urlArena,
+                bridgeScratch, lifetime, ownHandles));
       }
       return map;
     }
-    case ScriptValueTag::kCallback:
-      throw jsi::JSError(runtime, "Defold script bridge returned a value tag not implemented by JSI yet");
+    case ScriptValueTag::kCallback: {
+      auto* callback = const_cast<ScriptCallback*>(
+          static_cast<const ScriptCallback*>(value.data));
+      if (!callback || !callback->invoke || !callback->retain || !callback->release) {
+        throw jsi::JSError(runtime, "Defold script bridge returned an incomplete callback descriptor");
+      }
+      std::shared_ptr<ScriptCallback> owner(callback, [](ScriptCallback* held) {
+        held->release(held->context);
+      });
+      return jsi::Function::createFromHostFunction(
+          runtime,
+          jsi::PropNameID::forAscii(runtime, "dehermLuaClosure"),
+          0,
+          [owner, bridgeScratch, lifetime](
+              jsi::Runtime& runtime,
+              const jsi::Value&,
+              const jsi::Value* arguments,
+              size_t argumentCount) -> jsi::Value {
+            if (argumentCount > kMaximumArguments) {
+              throw jsi::JSError(runtime, "Lua closure argument count exceeds the generated bound");
+            }
+            ScratchFrame scratchFrame(*bridgeScratch);
+            ScratchSlot* slot = scratchFrame.get();
+            if (!slot) {
+              throw jsi::JSError(runtime, "Lua closure reentrancy exceeds the fixed scratch stack");
+            }
+            for (size_t index = 0; index < argumentCount; ++index) {
+              encode(runtime, arguments[index], slot->arguments[index], *slot,
+                  slot->matrix4Arena, slot->urlArena, bridgeScratch, lifetime);
+            }
+            ScriptCallFrame frame{};
+            frame.arguments = slot->arguments.data();
+            frame.argumentCount = static_cast<uint32_t>(argumentCount);
+            frame.matrix4Arena = &slot->matrix4Arena;
+            frame.urlArena = &slot->urlArena;
+            LuaClosureConsumeContext consumed{&runtime, &bridgeScratch, &lifetime};
+            char error[384]{};
+            if (!owner->invoke(owner->context, &frame, &consumed,
+                    ConsumeLuaClosureResults, error, sizeof(error))) {
+              const char* message = error[0] ? error :
+                  consumed.error.empty() ? "Lua closure invocation failed" : consumed.error.c_str();
+              if (gJsiCallbackInvocationDepth == 0 &&
+                  std::strncmp(message, kLuaErrorTablePrefix,
+                      std::strlen(kLuaErrorTablePrefix)) == 0) {
+                message += std::strlen(kLuaErrorTablePrefix);
+              }
+              throw jsi::JSError(runtime, message);
+            }
+            if (!consumed.value) {
+              throw jsi::JSError(runtime, consumed.error.empty()
+                  ? "Lua closure did not consume its results" : consumed.error);
+            }
+            return std::move(*consumed.value);
+          });
+    }
   }
   throw jsi::JSError(runtime, "Defold script bridge returned an unknown value tag");
 }
 
+bool ConsumeLuaClosureResults(void* opaque, const ScriptCallFrame* results) noexcept {
+  auto* context = static_cast<LuaClosureConsumeContext*>(opaque);
+  if (!context || !context->runtime || !context->scratch || !context->lifetime ||
+      !results || results->resultCount > results->resultCapacity ||
+      (results->resultCount && !results->results) || !results->matrix4Arena ||
+      !results->urlArena) return false;
+  try {
+    if (results->resultCount == 0) {
+      context->value.emplace(jsi::Value::undefined());
+    } else if (results->resultCount == 1) {
+      context->value.emplace(decode(*context->runtime, results->results[0],
+          *results->matrix4Arena, *results->urlArena,
+          *context->scratch, *context->lifetime));
+    } else {
+      jsi::Array output(*context->runtime, results->resultCount);
+      for (uint32_t index = 0; index < results->resultCount; ++index) {
+        output.setValueAtIndex(*context->runtime, index, decode(
+            *context->runtime, results->results[index],
+            *results->matrix4Arena, *results->urlArena,
+            *context->scratch, *context->lifetime));
+      }
+      context->value.emplace(std::move(output));
+    }
+    return true;
+  } catch (const std::exception& exception) {
+    context->error = exception.what();
+  } catch (...) {
+    context->error = "Lua closure result decoding failed";
+  }
+  return false;
+}
+
+class JsiCallbackRoot final {
+ public:
+  JsiCallbackRoot(
+      jsi::Runtime& runtime,
+      jsi::Function function,
+      std::shared_ptr<Scratch> scratch,
+      std::shared_ptr<ScriptJsiBridgeLifetime> lifetime)
+      : runtime_(&runtime), function_(std::move(function)), scratch_(std::move(scratch)),
+        lifetime_(std::move(lifetime)) {
+    if (!lifetime_ || !lifetime_->attach(this, Invalidate)) {
+      throw std::out_of_range("Defold script callback lifetime arena is exhausted or shut down");
+    }
+    descriptor_ = {this, Invoke, Retain, Release};
+  }
+
+  ~JsiCallbackRoot() {
+    if (lifetime_) lifetime_->detach(this);
+  }
+
+  ScriptCallback* descriptor() noexcept { return &descriptor_; }
+
+ private:
+  static void Retain(void* opaque) noexcept {
+    static_cast<JsiCallbackRoot*>(opaque)->references_.fetch_add(1, std::memory_order_relaxed);
+  }
+
+  static void Release(void* opaque) noexcept {
+    auto* self = static_cast<JsiCallbackRoot*>(opaque);
+    if (self->references_.fetch_sub(1, std::memory_order_acq_rel) == 1) delete self;
+  }
+
+  static void Invalidate(void* opaque) noexcept {
+    auto* self = static_cast<JsiCallbackRoot*>(opaque);
+    // Publish invalidation before releasing the JSI function. Callback invoke
+    // is owner-thread-only, so teardown and invocation cannot race legally;
+    // this ordering still ensures reentrant release observes an inert root.
+    self->runtime_ = nullptr;
+    self->function_.reset();
+    self->scratch_.reset();
+  }
+
+  static bool Invoke(
+      void* opaque,
+      const ScriptCallFrame* arguments,
+      void* consumeContext,
+      ScriptCallbackConsume consume,
+      char* error,
+      size_t errorCapacity) noexcept {
+    auto* self = static_cast<JsiCallbackRoot*>(opaque);
+    auto fail = [&](const char* message) {
+      if (error && errorCapacity) std::snprintf(error, errorCapacity, "%s", message ? message : "JavaScript callback failed");
+      return false;
+    };
+    if (!self->runtime_ || !self->function_ || !self->scratch_) {
+      return fail("JavaScript callback belongs to a destroyed Hermes runtime");
+    }
+    if (!arguments || !consume ||
+        arguments->argumentCount > kMaximumArguments ||
+        (arguments->argumentCount && !arguments->arguments) ||
+        !arguments->matrix4Arena || !arguments->urlArena) {
+      return fail("JavaScript callback received an invalid bounded frame");
+    }
+    try {
+      ScratchFrame scratchFrame(*self->scratch_);
+      ScratchSlot* slot = scratchFrame.get();
+      if (!slot) return fail("Reentrant JavaScript callback depth exceeds the fixed scratch stack");
+      std::array<jsi::Value, kMaximumArguments> values{};
+      for (uint32_t index = 0; index < arguments->argumentCount; ++index) {
+        values[index] = decode(*self->runtime_, arguments->arguments[index],
+            *arguments->matrix4Arena, *arguments->urlArena,
+            self->scratch_, self->lifetime_, false);
+      }
+      JsiCallbackInvocationGuard invocationGuard;
+      jsi::Value result = self->function_->call(
+          *self->runtime_, static_cast<const jsi::Value*>(values.data()),
+          static_cast<size_t>(arguments->argumentCount));
+      ScriptCallFrame output{};
+      output.results = slot->results.data();
+      output.resultCapacity = static_cast<uint32_t>(slot->results.size());
+      output.tableScratch = slot->inputTableEntries.data();
+      output.tableScratchCapacity = static_cast<uint32_t>(slot->inputTableEntries.size());
+      output.stringScratch = slot->outputStrings.data();
+      output.stringScratchCapacity = static_cast<uint32_t>(slot->outputStrings.size());
+      output.matrix4Arena = &slot->matrix4Arena;
+      output.urlArena = &slot->urlArena;
+      bool encodedMultiple = false;
+      if (result.isObject()) {
+        auto object = result.asObject(*self->runtime_);
+        const auto marker = object.getProperty(
+            *self->runtime_, "__dehermCallbackResultsV1");
+        if (marker.isBool() && marker.getBool()) {
+          const auto valuesProperty = object.getProperty(*self->runtime_, "values");
+          if (!valuesProperty.isObject() ||
+              !valuesProperty.asObject(*self->runtime_).isArray(*self->runtime_)) {
+            return fail("JavaScript callback multi-result marker has no values array");
+          }
+          auto outputValues = valuesProperty.asObject(*self->runtime_).asArray(*self->runtime_);
+          const size_t count = outputValues.size(*self->runtime_);
+          if (count > slot->results.size()) {
+            return fail("JavaScript callback result count exceeds the generated bound");
+          }
+          for (size_t index = 0; index < count; ++index) {
+            encode(*self->runtime_, outputValues.getValueAtIndex(*self->runtime_, index),
+                slot->results[index], *slot, slot->matrix4Arena, slot->urlArena,
+                self->scratch_, self->lifetime_);
+          }
+          output.resultCount = static_cast<uint32_t>(count);
+          encodedMultiple = true;
+        }
+      }
+      if (!encodedMultiple && !result.isUndefined()) {
+        encode(*self->runtime_, result, slot->results[0], *slot,
+            slot->matrix4Arena, slot->urlArena, self->scratch_, self->lifetime_);
+        output.resultCount = 1;
+      }
+      if (!consume(consumeContext, &output)) return fail("Lua rejected JavaScript callback results");
+      return true;
+    } catch (const std::exception& exception) {
+      return fail(exception.what());
+    } catch (...) {
+      return fail("JavaScript callback threw a non-standard exception");
+    }
+  }
+
+  std::atomic<uint32_t> references_{1};
+  jsi::Runtime* runtime_ = nullptr;
+  std::optional<jsi::Function> function_;
+  std::shared_ptr<Scratch> scratch_;
+  std::shared_ptr<ScriptJsiBridgeLifetime> lifetime_;
+  ScriptCallback descriptor_{};
+};
+
+void encodeCallback(
+    jsi::Runtime& runtime,
+    jsi::Function function,
+    ScriptValue& output,
+    ScratchSlot& slot,
+    std::shared_ptr<Scratch> scratch,
+    std::shared_ptr<ScriptJsiBridgeLifetime> lifetime) {
+  auto* root = new JsiCallbackRoot(
+      runtime, std::move(function), std::move(scratch), std::move(lifetime));
+  ScriptCallback* descriptor = root->descriptor();
+  try {
+    slot.trackCallback(descriptor);
+  } catch (...) {
+    descriptor->release(descriptor->context);
+    throw;
+  }
+  output = {};
+  output.tag = ScriptValueTag::kCallback;
+  output.data = descriptor;
+}
+
 }  // namespace
 
-void installScriptJsiBridge(jsi::Runtime& runtime) {
+std::shared_ptr<ScriptJsiBridgeLifetime> installScriptJsiBridge(jsi::Runtime& runtime) {
   auto scratch = std::make_shared<Scratch>();
+  auto lifetime = std::make_shared<ScriptJsiBridgeLifetime>();
   jsi::Object bridge(runtime);
   bridge.setProperty(runtime, "target", jsi::String::createFromAscii(runtime, "native-hermes"));
   auto call = jsi::Function::createFromHostFunction(
       runtime,
       jsi::PropNameID::forAscii(runtime, "call"),
       2,
-      [scratch](jsi::Runtime& runtime,
+      [scratch, lifetime](jsi::Runtime& runtime,
                 const jsi::Value&,
                 const jsi::Value* args,
                 size_t count) -> jsi::Value {
@@ -577,7 +938,9 @@ void installScriptJsiBridge(jsi::Runtime& runtime) {
               slot->arguments[index],
               *slot,
               slot->matrix4Arena,
-              slot->urlArena);
+              slot->urlArena,
+              scratch,
+              lifetime);
         }
         ScriptCallFrame frame;
         frame.stableId = id;
@@ -592,18 +955,38 @@ void installScriptJsiBridge(jsi::Runtime& runtime) {
         frame.matrix4Arena = &slot->matrix4Arena;
         frame.urlArena = &slot->urlArena;
         if (!dispatchScriptCall(&frame)) throw jsi::JSError(runtime, scriptBridgeLastError());
+        const auto* universalOperation = universal_value::find(id);
+        if (universalOperation && universalOperation->maximumResultCount > 1) {
+          jsi::Array results(runtime, universalOperation->maximumResultCount);
+          for (size_t index = 0; index < universalOperation->maximumResultCount; ++index) {
+            results.setValueAtIndex(runtime, index,
+                index < frame.resultCount
+                    ? decode(runtime, frame.results[index], slot->matrix4Arena,
+                        slot->urlArena, scratch, lifetime)
+                    : jsi::Value::undefined());
+          }
+          return results;
+        }
         if (frame.resultCount == 0) return jsi::Value::undefined();
         if (frame.resultCount == 1) return decode(
-            runtime, frame.results[0], slot->matrix4Arena, slot->urlArena);
+            runtime, frame.results[0], slot->matrix4Arena, slot->urlArena,
+            scratch, lifetime);
         jsi::Array results(runtime, frame.resultCount);
         for (size_t index = 0; index < frame.resultCount; ++index) {
           results.setValueAtIndex(runtime, index, decode(
-              runtime, frame.results[index], slot->matrix4Arena, slot->urlArena));
+              runtime, frame.results[index], slot->matrix4Arena, slot->urlArena,
+              scratch, lifetime));
         }
         return results;
       });
   bridge.setProperty(runtime, "call", std::move(call));
   runtime.global().setProperty(runtime, "__defoldScriptBridgeV1", std::move(bridge));
+  return lifetime;
+}
+
+void shutdownScriptJsiBridge(
+    const std::shared_ptr<ScriptJsiBridgeLifetime>& lifetime) noexcept {
+  if (lifetime) lifetime->shutdown();
 }
 
 }  // namespace defold_hermes

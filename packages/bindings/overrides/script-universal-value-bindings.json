@@ -1,11 +1,16 @@
 {
   "schemaVersion": 1,
-  "scope": "One bounded, generated value-graph policy shared by every projection-only Lua-table and multi-result route.",
+  "scope": "One bounded, generated value-graph fallback shared by every pending non-callback script route.",
   "selection": {
-    "accountingCategory": "pending",
     "loweringFamilies": [
+      "borrowed-handle",
+      "callback-lifecycle",
+      "defold-value",
+      "dynamic-values",
       "lua-table",
-      "multi-result"
+      "multi-result",
+      "overload-dispatch",
+      "scalar"
     ],
     "excludedContexts": [
       "component-property-compiler"
@@ -13,7 +18,7 @@
     "excludedLoweringFamilies": [
       "separate-module"
     ],
-    "callbacks": "reject-from-this-family",
+    "callbacks": "retained-runtime-neutral-callback-descriptor",
     "variadics": "bounded-by-global-argument-capacity",
     "optimizedFamilies": "remain-on-their-specialized-lanes"
   },

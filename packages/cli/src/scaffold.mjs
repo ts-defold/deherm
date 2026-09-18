@@ -20,7 +20,7 @@ function templateFiles({ name, packageVersion }) {
   const packageName = projectSlug(title);
   const dependency = packageVersion === "0.0.0" ? "latest" : `^${packageVersion}`;
   return new Map([
-    ["game.project", `[project]\ntitle = ${title}\nversion = 0.1.0\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 0\n`],
+    ["game.project", `[project]\ntitle = ${title}\nversion = 0.1.0\ncustom_resources = /deherm\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 1\n\n[library]\ninclude_dirs = defold_hermes\n\n[defold_hermes]\napp = /deherm/app.dehermc\n`],
     ["main/main.collection", `name: "main"\ninstances {\n  id: "controller"\n  prototype: "/main/controller.go"\n}\n`],
     ["main/controller.go", `components {\n  id: "script"\n  component: "/src/main.script"\n}\n`],
     ["src/main.script.ts", `import { defineComponent } from "@deherm/project";\n\nexport default defineComponent({\n  init(): void {\n    console.log("${title.replaceAll("\\", "\\\\").replaceAll('"', '\\"')} is running with déherm");\n  },\n\n  update(_self, _dt: number): void {\n    // Game logic lives here. This file generates /src/main.script.\n  },\n});\n`],

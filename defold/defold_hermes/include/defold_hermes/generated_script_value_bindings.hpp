@@ -9,7 +9,7 @@ namespace defold_hermes::value_binding {
 
 enum class DispatchStatus { kMissing, kSuccess, kError };
 enum class StructuredLuaResultCodec : uint8_t { kNone, kHash, kHashOrUndefined, kNode };
-enum class StructuredLuaContext : uint8_t { kScriptInstance, kGuiScriptInstance };
+enum class StructuredLuaContext : uint8_t { kScriptInstance, kGuiScriptInstance, kCurrentScriptInstance };
 struct StructuredLuaOperation {
   uint16_t index;
   uint32_t stableId;

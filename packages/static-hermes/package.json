@@ -1,5 +1,5 @@
 {
-  "name": "@ts-defold/deherm-internal-static-hermes",
+  "name": "@deherm/static-hermes",
   "version": "0.0.0",
   "private": true,
   "type": "module",

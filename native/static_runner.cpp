@@ -1,5 +1,6 @@
 #include <defold_hermes/runtime.hpp>
 #include <defold_hermes/generated_static_hermes_vmath.h>
+#include <defold_hermes/script_bridge_capi.hpp>
 
 #include <atomic>
 #include <cmath>
@@ -12,6 +13,7 @@
 extern "C" SHUnit* sh_export_deherm_static_ffi();
 extern "C" SHUnit* sh_export_deherm_static_app();
 extern "C" SHUnit* sh_export_deherm_static_vmath();
+extern "C" SHUnit* sh_export_deherm_static_universal();
 
 namespace {
 std::atomic<bool> gTrackAllocations{false};
@@ -47,6 +49,17 @@ double gLifecycleUpdate = 0.0;
 double gLifecycleMessageLength = 0.0;
 double gLifecycleFinalUpdates = 0.0;
 double gVmathResults[8]{};
+uint32_t gUniversalResults = 0;
+uint32_t gUniversalRecordEntries = 0;
+
+bool StaticUniversalDispatch(void*, defold_hermes::ScriptCallFrame* frame) {
+  if (!frame || frame->argumentCount != 1 || frame->resultCapacity < 1) return false;
+  frame->results[0] = frame->arguments[0];
+  frame->resultCount = 1;
+  return true;
+}
+
+const char* StaticUniversalLastError(void*) { return "Static universal probe dispatch failed"; }
 
 class ConsoleHost final : public defold_hermes::Host {
  public:
@@ -84,16 +97,26 @@ extern "C" void defold_hermes_static_vmath_report(
   if (stage >= 1 && stage <= 8) gVmathResults[stage - 1] = value;
 }
 
+extern "C" void defold_hermes_static_universal_report(
+    uint32_t results,
+    uint32_t recordEntries) {
+  gUniversalResults = results;
+  gUniversalRecordEntries = recordEntries;
+}
+
 int main() {
   try {
     ConsoleHost host;
+    defold_hermes::installScriptBridgeApi(
+        {nullptr, StaticUniversalDispatch, StaticUniversalLastError, nullptr});
     defold_hermes::Runtime runtime(host);
     const defold_hermes::StaticUnitCreator units[] = {
       sh_export_deherm_static_ffi,
       sh_export_deherm_static_app,
       sh_export_deherm_static_vmath,
+      sh_export_deherm_static_universal,
     };
-    runtime.loadStatic(units, 3, "defold-hermes://static-app");
+    runtime.loadStatic(units, 4, "defold-hermes://static-app");
     if (std::fabs(gStaticFfiResult - 42.0) > 0.000001) {
       throw std::runtime_error("Strict Static Hermes C ABI probe did not return 42");
     }
@@ -122,6 +145,10 @@ int main() {
     std::cout << "static.vmath:3-bindings,7-shapes\n";
     std::cout << "static.vmath.project-zero-target:rejected\n";
     std::cout << "static.vmath.allocations:0\n";
+    if (gUniversalResults != 1 || gUniversalRecordEntries != 5) {
+      throw std::runtime_error("Sound-typed Static Hermes universal marshaller returned an unexpected value graph");
+    }
+    std::cout << "static.universal:scalar,string,array,record,handle,defold-value\n";
     runtime.init();
     runtime.update(1.0 / 60.0);
     runtime.onMessage("hello-from-static-hermes");
@@ -136,6 +163,7 @@ int main() {
     }
     std::cout << "static.lifecycle:typed-strict:init,update,message,final\n";
     std::cout << "defold-hermes-static:ok\n";
+    defold_hermes::uninstallScriptBridgeApi();
     return 0;
   } catch (const std::exception& error) {
     std::cerr << "defold-hermes-static:error:" << error.what() << '\n';
