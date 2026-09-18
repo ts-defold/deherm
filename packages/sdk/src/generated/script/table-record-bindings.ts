@@ -8,6 +8,7 @@ export const scriptTableRecordBindings = [
       "b2d"
     ],
     "member": "get_version",
+    "requiredContext": "global",
     "fields": [
       {
         "name": "version",
@@ -34,6 +35,7 @@ export const scriptTableRecordBindings = [
       "image"
     ],
     "member": "get_astc_header",
+    "requiredContext": "global",
     "fields": [
       {
         "name": "width",
@@ -68,6 +70,7 @@ export const scriptTableRecordBindings = [
       "bullet3d"
     ],
     "member": "get_version",
+    "requiredContext": "global",
     "fields": [
       {
         "name": "version",
@@ -88,5 +91,5 @@ export const scriptTableRecordBindings = [
     ]
   }
 ] as const;
-export const scriptTableRecordTargetSupport = { nativeDynamicHermes: "candidate-descriptor-and-fail-closed-runtime-only", nativeStaticHermes: "not-integrated", html5BrowserHost: "not-executable-no-provider" } as const;
+export const scriptTableRecordTargetSupport = { nativeDynamicHermes: "generated-executable-shared-script-adapter", nativeStaticHermes: "not-integrated", html5BrowserHost: "not-executable-no-provider" } as const;
 export function assertScriptTableRecordTargetSupport(_: number, target: string | undefined): void { if (target === "html5-browser-host") throw new Error("Fixed-record Lua-table bindings are not executable in the HTML5 browser host"); }

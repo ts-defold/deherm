@@ -80,6 +80,7 @@ ScriptAdapter::ScriptAdapter() noexcept : luaHandles_(kLuaHandleCapacity) {
   urlLuaApi_ = {this, UrlInvokeThunk};
   valueTailLuaApi_ = {this, ValueTailInvokeThunk};
   overloadLuaApi_ = {this, OverloadInvokeThunk};
+  tableRecordLuaApi_ = {this, TableRecordInvokeThunk};
 }
 
 bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi) noexcept {
@@ -94,6 +95,7 @@ bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi) noexce
   urlFunctionRefs_.fill(LUA_NOREF);
   valueTailFunctionRefs_.fill(LUA_NOREF);
   overloadFunctionRefs_.fill(LUA_NOREF);
+  tableRecordFunctionRefs_.fill(LUA_NOREF);
   return true;
 }
 
@@ -120,6 +122,10 @@ void ScriptAdapter::shutdown() noexcept {
       reference = LUA_NOREF;
     }
     for (int& reference : overloadFunctionRefs_) {
+      if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+      reference = LUA_NOREF;
+    }
+    for (int& reference : tableRecordFunctionRefs_) {
       if (reference != LUA_NOREF && reference != LUA_REFNIL) luaL_unref(state_, LUA_REGISTRYINDEX, reference);
       reference = LUA_NOREF;
     }
@@ -200,6 +206,7 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
   adapterError_[0] = '\0';
   frame->resultCount = 0;
   frame->stringScratchUsed = 0;
+  frame->tableScratchUsed = 0;
 
   drainReleasedHandles();
   const auto valueStatus = value_binding::dispatch(
@@ -226,6 +233,11 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
       frame, adapterError_, sizeof(adapterError_), &overloadLuaApi_);
   if (overloadStatus == overload_dispatch::DispatchStatus::kSuccess) return true;
   if (overloadStatus == overload_dispatch::DispatchStatus::kError) return false;
+
+  const auto tableRecordStatus = table_record::dispatch(
+      frame, adapterError_, sizeof(adapterError_), &tableRecordLuaApi_);
+  if (tableRecordStatus == table_record::DispatchStatus::kSuccess) return true;
+  if (tableRecordStatus == table_record::DispatchStatus::kError) return false;
 
   size_t denseIndex = 0;
   if (!findDenseIndex(frame->stableId, &denseIndex)) {
@@ -1068,6 +1080,206 @@ overload_dispatch::DispatchStatus ScriptAdapter::invokeOverload(
   instanceApi_.set(state_);
   lua_settop(state_, baseTop);
   if (!ok) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  adapterError_[0] = '\0';
+  return Status::kSuccess;
+}
+
+table_record::DispatchStatus ScriptAdapter::TableRecordInvokeThunk(
+    void* context,
+    const table_record::Operation& operation,
+    const table_record::Codec*,
+    const table_record::Field* fields,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  return static_cast<ScriptAdapter*>(context)->invokeTableRecord(
+      operation, fields, frame, error, errorCapacity);
+}
+
+bool ScriptAdapter::bindTableRecord(
+    const table_record::Operation& operation) noexcept {
+  if (!state_ || operation.index >= tableRecordFunctionRefs_.size()) {
+    return fail("Table-record operation index is invalid");
+  }
+  int& reference = tableRecordFunctionRefs_[operation.index];
+  if (reference != LUA_NOREF && reference != LUA_REFNIL) return true;
+  const int baseTop = lua_gettop(state_);
+  const char* segment = operation.modulePath;
+  const char* dot = std::strchr(segment, '.');
+  if (dot) {
+    const size_t length = static_cast<size_t>(dot - segment);
+    if (length >= 64) return fail("Table-record Lua module segment exceeds fixed stack scratch");
+    char first[64]{};
+    std::memcpy(first, segment, length);
+    lua_getglobal(state_, first);
+  } else {
+    lua_getglobal(state_, segment);
+  }
+  while (dot && lua_istable(state_, -1)) {
+    segment = dot + 1;
+    dot = std::strchr(segment, '.');
+    const size_t length = dot ? static_cast<size_t>(dot - segment) : std::strlen(segment);
+    lua_pushlstring(state_, segment, length);
+    lua_gettable(state_, -2);
+    lua_remove(state_, -2);
+  }
+  if (!lua_istable(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("Table-record Lua module is unavailable");
+  }
+  lua_getfield(state_, -1, operation.member);
+  if (!lua_isfunction(state_, -1)) {
+    lua_settop(state_, baseTop);
+    return fail("Table-record Lua function is unavailable");
+  }
+  reference = luaL_ref(state_, LUA_REGISTRYINDEX);
+  lua_settop(state_, baseTop);
+  return reference != LUA_NOREF && reference != LUA_REFNIL;
+}
+
+bool ScriptAdapter::readTableRecord(
+    const table_record::Operation& operation,
+    const table_record::Field* fields,
+    int stackIndex,
+    ScriptCallFrame* frame) noexcept {
+  if (!lua_istable(state_, stackIndex)) return fail("Table-record Lua result is not a table");
+  if (!frame->results || frame->resultCapacity < 1 || !frame->tableScratch ||
+      frame->tableScratchUsed > frame->tableScratchCapacity ||
+      operation.fieldCount > frame->tableScratchCapacity - frame->tableScratchUsed) {
+    return fail("Table-record caller-owned scratch is exhausted");
+  }
+  const int tableIndex = stackIndex < 0 ? lua_gettop(state_) + stackIndex + 1 : stackIndex;
+  std::array<bool, table_record::kMaximumFieldCount> seen{};
+  ScriptTableEntry* entries = frame->tableScratch + frame->tableScratchUsed;
+  uint8_t entryCount = 0;
+  lua_pushnil(state_);
+  while (lua_next(state_, tableIndex) != 0) {
+    if (lua_type(state_, -2) != LUA_TSTRING) return fail("Table-record Lua result has a non-string field");
+    size_t keyLength = 0;
+    const char* key = lua_tolstring(state_, -2, &keyLength);
+    uint8_t fieldIndex = operation.fieldCount;
+    for (uint8_t index = 0; index < operation.fieldCount; ++index) {
+      const char* expected = fields[operation.fieldOffset + index].name;
+      if (keyLength == std::strlen(expected) && std::memcmp(key, expected, keyLength) == 0) {
+        fieldIndex = index;
+        break;
+      }
+    }
+    if (fieldIndex == operation.fieldCount || seen[fieldIndex]) {
+      return fail("Table-record Lua result has an unknown or duplicate field");
+    }
+    seen[fieldIndex] = true;
+    ++entryCount;
+    const table_record::Field& field = fields[operation.fieldOffset + fieldIndex];
+    ScriptTableEntry& entry = entries[fieldIndex];
+    entry = {};
+    entry.key.tag = ScriptValueTag::kString;
+    entry.key.data = field.name;
+    entry.key.length = static_cast<uint32_t>(std::strlen(field.name));
+    if (field.codec == table_record::Codec::kBoolean) {
+      if (lua_type(state_, -1) != LUA_TBOOLEAN) return fail("Table-record boolean field has the wrong Lua type");
+      entry.value.tag = ScriptValueTag::kBoolean;
+      entry.value.number = lua_toboolean(state_, -1) ? 1.0 : 0.0;
+    } else if (field.codec == table_record::Codec::kString) {
+      if (lua_type(state_, -1) != LUA_TSTRING) return fail("Table-record string field has the wrong Lua type");
+      size_t length = 0;
+      const char* value = lua_tolstring(state_, -1, &length);
+      if (!frame->stringScratch || frame->stringScratchUsed > frame->stringScratchCapacity ||
+          length > frame->stringScratchCapacity - frame->stringScratchUsed) {
+        return fail("Table-record string scratch is exhausted");
+      }
+      char* destination = frame->stringScratch + frame->stringScratchUsed;
+      if (length) std::memcpy(destination, value, length);
+      entry.value.tag = ScriptValueTag::kString;
+      entry.value.data = destination;
+      entry.value.length = static_cast<uint32_t>(length);
+      frame->stringScratchUsed += static_cast<uint32_t>(length);
+    } else {
+      if (lua_type(state_, -1) != LUA_TNUMBER) return fail("Table-record numeric field has the wrong Lua type");
+      const double value = lua_tonumber(state_, -1);
+      if (!std::isfinite(value) ||
+          (field.codec == table_record::Codec::kInteger &&
+           (std::trunc(value) != value || value < -static_cast<double>(kMaxExactInteger) ||
+            value > static_cast<double>(kMaxExactInteger)))) {
+        return fail("Table-record numeric field is not an exact finite value");
+      }
+      entry.value.tag = ScriptValueTag::kNumber;
+      entry.value.number = value;
+    }
+    lua_pop(state_, 1);
+  }
+  if (entryCount != operation.fieldCount) return fail("Table-record Lua result is missing a required field");
+  ScriptValue& output = frame->results[0];
+  output = {};
+  output.tag = ScriptValueTag::kTable;
+  output.data = entries;
+  output.length = operation.fieldCount;
+  frame->tableScratchUsed += operation.fieldCount;
+  frame->resultCount = 1;
+  return true;
+}
+
+table_record::DispatchStatus ScriptAdapter::invokeTableRecord(
+    const table_record::Operation& operation,
+    const table_record::Field* fields,
+    ScriptCallFrame* frame,
+    char* error,
+    size_t errorCapacity) noexcept {
+  using Status = table_record::DispatchStatus;
+  if (!state_ || !frame || !bindTableRecord(operation)) {
+    writeError(error, errorCapacity, lastError());
+    return Status::kError;
+  }
+  const bool scoped = operation.context != table_record::Context::kGlobal;
+  if (scoped && (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
+      instanceRef_ == LUA_REFNIL || !hasActiveContext_)) {
+    writeError(error, errorCapacity, "Table-record call has no captured Defold instance");
+    return Status::kError;
+  }
+  if (operation.context == table_record::Context::kScriptInstance &&
+      activeContext_ != value_binding::StructuredLuaContext::kScriptInstance) {
+    writeError(error, errorCapacity, "Table-record call requires an active game-object script instance");
+    return Status::kError;
+  }
+  if (operation.context == table_record::Context::kGuiScriptInstance &&
+      activeContext_ != value_binding::StructuredLuaContext::kGuiScriptInstance) {
+    writeError(error, errorCapacity, "Table-record call requires an active GUI script instance");
+    return Status::kError;
+  }
+  const uint32_t tableMark = frame->tableScratchUsed;
+  const uint32_t stringMark = frame->stringScratchUsed;
+  const int baseTop = lua_gettop(state_);
+  if (scoped) {
+    instanceApi_.get(state_);
+    lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
+    instanceApi_.set(state_);
+  }
+  const int callBase = lua_gettop(state_);
+  lua_rawgeti(state_, LUA_REGISTRYINDEX, tableRecordFunctionRefs_[operation.index]);
+  bool ok = true;
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
+  }
+  if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), 1, 0) != 0) {
+    const char* message = lua_tostring(state_, -1);
+    ok = fail(message ? message : "Table-record Lua call failed without an error string");
+  }
+  if (ok && lua_gettop(state_) - callBase != 1) {
+    ok = fail("Table-record Lua result count does not match exact descriptor");
+  }
+  if (ok) ok = readTableRecord(operation, fields, -1, frame);
+  if (scoped) {
+    lua_settop(state_, baseTop + 1);
+    instanceApi_.set(state_);
+  }
+  lua_settop(state_, baseTop);
+  if (!ok) {
+    frame->tableScratchUsed = tableMark;
+    frame->stringScratchUsed = stringMark;
+    frame->resultCount = 0;
     writeError(error, errorCapacity, lastError());
     return Status::kError;
   }

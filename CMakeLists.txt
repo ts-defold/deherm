@@ -165,6 +165,7 @@ add_library(defold-hermes-lua-bridge STATIC
   defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp
   defold/defold_hermes/src/generated_script_fixed_tuples.cpp
   defold/defold_hermes/src/generated_script_overload_dispatch.cpp
+  defold/defold_hermes/src/generated_script_table_record_bindings.cpp
   defold/defold_hermes/src/generated_script_value_bindings.cpp
   defold/defold_hermes/src/generated_script_value_tail_bindings.cpp
   defold/defold_hermes/src/generated_script_url_bindings.cpp

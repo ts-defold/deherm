@@ -41,6 +41,7 @@ struct ScratchSlot {
   std::array<std::string, kMaximumArguments> inputStrings{};
   std::array<std::array<ScriptTableEntry, kMaximumTableEntries>, kMaximumArguments> tableEntries{};
   std::array<std::array<std::string, kMaximumTableEntries * 2>, kMaximumArguments> tableStrings{};
+  std::array<ScriptTableEntry, kMaximumResults * kMaximumTableEntries> outputTableEntries{};
   std::array<char, kStringScratchCapacity> outputStrings{};
   ScriptMatrix4Arena matrix4Arena{};
   ScriptUrlArena<> urlArena{};
@@ -349,8 +350,25 @@ jsi::Value decode(
       object.setProperty(runtime, kDefoldValueKindProperty, jsi::String::createFromAscii(runtime, kind));
       return object;
     }
+    case ScriptValueTag::kTable: {
+      if (value.length != 0 && !value.data) {
+        throw jsi::JSError(runtime, "Defold script bridge returned a table with null storage");
+      }
+      jsi::Object object(runtime);
+      const auto* entries = static_cast<const ScriptTableEntry*>(value.data);
+      for (uint32_t index = 0; index < value.length; ++index) {
+        const ScriptValue& key = entries[index].key;
+        if (key.tag != ScriptValueTag::kString || (key.length != 0 && !key.data)) {
+          throw jsi::JSError(runtime, "Defold script bridge returned a non-string record key");
+        }
+        const auto name = jsi::PropNameID::forUtf8(
+            runtime, static_cast<const uint8_t*>(key.data), key.length);
+        object.setProperty(runtime, name, decode(
+            runtime, entries[index].value, matrix4Arena, urlArena));
+      }
+      return object;
+    }
     case ScriptValueTag::kCallback:
-    case ScriptValueTag::kTable:
       throw jsi::JSError(runtime, "Defold script bridge returned a value tag not implemented by JSI yet");
   }
   throw jsi::JSError(runtime, "Defold script bridge returned an unknown value tag");
@@ -401,6 +419,8 @@ void installScriptJsiBridge(jsi::Runtime& runtime) {
         frame.resultCapacity = static_cast<uint32_t>(slot->results.size());
         frame.stringScratch = slot->outputStrings.data();
         frame.stringScratchCapacity = static_cast<uint32_t>(slot->outputStrings.size());
+        frame.tableScratch = slot->outputTableEntries.data();
+        frame.tableScratchCapacity = static_cast<uint32_t>(slot->outputTableEntries.size());
         frame.matrix4Arena = &slot->matrix4Arena;
         frame.urlArena = &slot->urlArena;
         if (!dispatchScriptCall(&frame)) throw jsi::JSError(runtime, scriptBridgeLastError());

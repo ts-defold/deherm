@@ -74,6 +74,10 @@ struct ScriptCallFrame {
   char* stringScratch = nullptr;
   uint32_t stringScratchCapacity = 0;
   uint32_t stringScratchUsed = 0;
+  /** Caller-owned, bounded storage for flat generated table results. */
+  ScriptTableEntry* tableScratch = nullptr;
+  uint32_t tableScratchCapacity = 0;
+  uint32_t tableScratchUsed = 0;
   /** Optional fixed-capacity sidecar for canonical column-major Matrix4 values. */
   ScriptMatrix4Arena* matrix4Arena = nullptr;
   /** Optional fixed-capacity sidecar for exact four-lane dmMessage::URL values. */

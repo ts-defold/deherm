@@ -8,10 +8,12 @@
 namespace defold_hermes::table_record {
 enum class DispatchStatus : uint8_t { kMissing, kSuccess, kError };
 enum class Codec : uint8_t { kBoolean, kInteger, kNumber, kString };
+enum class Context : uint8_t { kGlobal, kScriptInstance, kGuiScriptInstance };
 struct Field { const char* name; Codec codec; };
-struct Operation { uint16_t index; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; uint16_t argumentOffset; uint8_t argumentCount; uint16_t fieldOffset; uint8_t fieldCount; };
+struct Operation { uint16_t index; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; Context context; uint16_t argumentOffset; uint8_t argumentCount; uint16_t fieldOffset; uint8_t fieldCount; };
 struct LuaApi { void* context = nullptr; DispatchStatus (*invoke)(void*, const Operation&, const Codec*, const Field*, ScriptCallFrame*, char*, size_t) noexcept = nullptr; };
 inline constexpr size_t kCandidateCount = 3;
+inline constexpr size_t kMaximumFieldCount = 6;
 const Operation* find(uint32_t stableId) noexcept;
 const Codec* argumentCodecs() noexcept;
 const Field* fields() noexcept;

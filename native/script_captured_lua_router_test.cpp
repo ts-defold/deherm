@@ -1,4 +1,5 @@
 #include <defold_hermes/generated_script_overload_dispatch.hpp>
+#include <defold_hermes/generated_script_table_record_bindings.hpp>
 #include <defold_hermes/generated_script_value_tail_bindings.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
@@ -21,6 +22,7 @@ extern "C" {
 #include <new>
 
 namespace overload = defold_hermes::overload_dispatch;
+namespace records = defold_hermes::table_record;
 namespace scalar = defold_hermes::lua_bridge::scalar;
 namespace tail = defold_hermes::value_tail;
 using defold_hermes::ScriptCallFrame;
@@ -28,6 +30,7 @@ using defold_hermes::ScriptDefoldValueKind;
 using defold_hermes::ScriptHandleKind;
 using defold_hermes::ScriptMatrix4Arena;
 using defold_hermes::ScriptResolvedUrl;
+using defold_hermes::ScriptTableEntry;
 using defold_hermes::ScriptUrlArena;
 using defold_hermes::ScriptValue;
 using defold_hermes::ScriptValueTag;
@@ -41,6 +44,9 @@ scalar::ScriptAdapter* gAdapter = nullptr;
 bool gRunReentrantCall = false;
 uint64_t gTailCalls = 0;
 uint64_t gOverloadCalls = 0;
+uint64_t gRecordCalls = 0;
+enum class RecordMode { kValid, kMissingField, kExtraField, kWrongType };
+RecordMode gRecordMode = RecordMode::kValid;
 
 [[noreturn]] void fail(const char* message) {
   std::fprintf(stderr, "script-captured-lua-router:error:%s\n", message);
@@ -154,6 +160,33 @@ int MockTail(lua_State* state) {
   }
 }
 
+int MockRecord(lua_State* state) {
+  const uint32_t stableId = static_cast<uint32_t>(lua_tonumber(state, lua_upvalueindex(1)));
+  const records::Operation* operation = records::find(stableId);
+  if (!operation) return luaL_error(state, "unknown generated table-record route");
+  if (operation->stableId == UINT32_C(0xea93e5f3) &&
+      (lua_gettop(state) != 1 || lua_type(state, 1) != LUA_TSTRING)) {
+    return luaL_error(state, "ASTC table-record route expected one byte string");
+  }
+  ++gRecordCalls;
+  lua_newtable(state);
+  const uint8_t count = gRecordMode == RecordMode::kMissingField
+      ? static_cast<uint8_t>(operation->fieldCount - 1) : operation->fieldCount;
+  for (uint8_t offset = 0; offset < count; ++offset) {
+    const uint8_t index = static_cast<uint8_t>(operation->fieldCount - 1 - offset);
+    const auto& field = records::fields()[operation->fieldOffset + index];
+    if (gRecordMode == RecordMode::kWrongType && index == 0) lua_pushboolean(state, 1);
+    else if (field.codec == records::Codec::kString) lua_pushliteral(state, "3.1.4");
+    else lua_pushinteger(state, static_cast<lua_Integer>(index + 1));
+    lua_setfield(state, -2, field.name);
+  }
+  if (gRecordMode == RecordMode::kExtraField) {
+    lua_pushinteger(state, 1);
+    lua_setfield(state, -2, "unexpected");
+  }
+  return 1;
+}
+
 void installGeneratedRoutes(lua_State* state) {
   lua_newtable(state);
   for (size_t index = 0; index < overload::kBindingCount; ++index) {
@@ -182,6 +215,25 @@ void installGeneratedRoutes(lua_State* state) {
     }
     lua_insert(state, -2);
     lua_setfield(state, -2, route.member);
+    lua_pop(state, 1);
+  }
+
+  constexpr uint32_t recordIds[] = {
+    UINT32_C(0x3aac69fd), UINT32_C(0xea93e5f3), UINT32_C(0xf808b822)
+  };
+  for (uint32_t stableId : recordIds) {
+    const records::Operation* operation = records::find(stableId);
+    expect(operation != nullptr, "generated table-record operation is absent");
+    lua_getglobal(state, operation->modulePath);
+    if (!lua_istable(state, -1)) {
+      lua_pop(state, 1);
+      lua_newtable(state);
+      lua_pushvalue(state, -1);
+      lua_setglobal(state, operation->modulePath);
+    }
+    lua_pushnumber(state, static_cast<lua_Number>(stableId));
+    lua_pushcclosure(state, MockRecord, 1);
+    lua_setfield(state, -2, operation->member);
     lua_pop(state, 1);
   }
 }
@@ -237,6 +289,28 @@ bool dispatchTail(scalar::ScriptAdapter& adapter, const tail::Route& route, size
   frame.stringScratchCapacity=sizeof(scratch); frame.matrix4Arena=&matrices; frame.urlArena=&urls;
   return adapter.dispatch(&frame);
 }
+
+bool dispatchRecord(
+    scalar::ScriptAdapter& adapter,
+    const records::Operation& operation,
+    ScriptTableEntry* tableScratch,
+    uint32_t tableCapacity,
+    char* stringScratch,
+    uint32_t stringCapacity,
+    ScriptValue* result,
+    const ScriptValue* argument = nullptr) {
+  ScriptCallFrame frame{};
+  frame.stableId = operation.stableId;
+  frame.arguments = argument;
+  frame.argumentCount = argument ? 1 : 0;
+  frame.results = result;
+  frame.resultCapacity = 1;
+  frame.stringScratch = stringScratch;
+  frame.stringScratchCapacity = stringCapacity;
+  frame.tableScratch = tableScratch;
+  frame.tableScratchCapacity = tableCapacity;
+  return adapter.dispatch(&frame);
+}
 }
 
 int main() {
@@ -250,6 +324,76 @@ int main() {
   scalar::ScriptAdapter adapter;
   gAdapter = &adapter;
   expect(adapter.initialize(state, {GetInstance, SetInstance}), "adapter initialization failed");
+
+  constexpr uint32_t recordIds[] = {
+    UINT32_C(0x3aac69fd), UINT32_C(0xea93e5f3), UINT32_C(0xf808b822)
+  };
+  for (uint32_t stableId : recordIds) {
+    const records::Operation* operation = records::find(stableId);
+    expect(operation && operation->context == records::Context::kGlobal,
+        "table-record route does not have exact global context");
+    std::array<ScriptTableEntry, records::kMaximumFieldCount> table{};
+    std::array<char, 128> strings{};
+    ScriptValue result{};
+    static constexpr char astcBytes[] = "astc-bytes";
+    ScriptValue argument{};
+    const ScriptValue* arguments = nullptr;
+    if (operation->argumentCount) {
+      argument.tag = ScriptValueTag::kString;
+      argument.data = astcBytes;
+      argument.length = sizeof(astcBytes) - 1;
+      arguments = &argument;
+    }
+    expect(dispatchRecord(adapter, *operation, table.data(), table.size(),
+        strings.data(), strings.size(), &result, arguments), adapter.lastError());
+    expect(result.tag == ScriptValueTag::kTable && result.data == table.data() &&
+        result.length == operation->fieldCount,
+    "table-record result did not use caller-owned bounded storage");
+    for (uint8_t index = 0; index < operation->fieldCount; ++index) {
+      const auto& field = records::fields()[operation->fieldOffset + index];
+      expect(table[index].key.tag == ScriptValueTag::kString &&
+          table[index].key.length == std::strlen(field.name) &&
+          std::memcmp(table[index].key.data, field.name, table[index].key.length) == 0,
+      "table-record fields were not normalized to descriptor order");
+      expect(table[index].value.tag == (field.codec == records::Codec::kString
+          ? ScriptValueTag::kString : ScriptValueTag::kNumber),
+      "table-record field codec was not preserved");
+    }
+  }
+  expect(gRecordCalls == records::kCandidateCount,
+      "not every table-record candidate crossed the real Lua stack");
+
+  const records::Operation* astcRecord = records::find(UINT32_C(0xea93e5f3));
+  expect(astcRecord != nullptr, "ASTC table-record route is absent");
+  static constexpr char astcBytes[] = "astc-bytes";
+  ScriptValue astcArgument{};
+  astcArgument.tag = ScriptValueTag::kString;
+  astcArgument.data = astcBytes;
+  astcArgument.length = sizeof(astcBytes) - 1;
+  for (RecordMode mode : {RecordMode::kMissingField, RecordMode::kExtraField, RecordMode::kWrongType}) {
+    gRecordMode = mode;
+    std::array<ScriptTableEntry, records::kMaximumFieldCount> table{};
+    std::array<char, 128> strings{};
+    ScriptValue result{};
+    expect(!dispatchRecord(adapter, *astcRecord, table.data(), table.size(),
+        strings.data(), strings.size(), &result, &astcArgument),
+    "malformed Lua fixed record was accepted");
+    expect(result.tag == ScriptValueTag::kUndefined,
+        "malformed Lua fixed record exposed a partial result");
+  }
+  gRecordMode = RecordMode::kValid;
+  {
+    std::array<ScriptTableEntry, records::kMaximumFieldCount - 1> table{};
+    std::array<char, 128> strings{};
+    ScriptValue result{};
+    const uint64_t calls = gRecordCalls;
+    expect(!dispatchRecord(adapter, *astcRecord, table.data(), table.size(),
+        strings.data(), strings.size(), &result, &astcArgument),
+    "exhausted caller-owned table scratch was accepted");
+    expect(gRecordCalls == calls && std::strstr(adapter.lastError(), "scratch is exhausted"),
+        "table scratch exhaustion was not rejected before Lua dispatch");
+  }
+
   lua_pushlightuserdata(state, gExpectedInstance);
   expect(adapter.captureInstance(-1), "instance capture failed");
   lua_pop(state, 1);
@@ -337,6 +481,13 @@ int main() {
     expect(dispatchTail(adapter, *hot, tail::candidateRouteOffsets()[hot->candidateIndex],
         hotMatrices, hotUrls, &result), "allocation loop failed");
   }
+  for (size_t iteration = 0; iteration < 1024; ++iteration) {
+    std::array<ScriptTableEntry, records::kMaximumFieldCount> table{};
+    std::array<char, 128> strings{};
+    expect(dispatchRecord(adapter, *astcRecord, table.data(), table.size(),
+        strings.data(), strings.size(), &result, &astcArgument),
+    "table-record allocation loop failed");
+  }
   gTrackAllocations.store(false, std::memory_order_relaxed);
   expect(gAllocations.load(std::memory_order_relaxed) == baseline,
       "warmed captured-Lua router allocated through C++ new");
@@ -346,6 +497,7 @@ int main() {
   lua_close(state);
   std::printf("script-captured-lua-router:tail:%zu:ok\n", tailRouteCount);
   std::printf("script-captured-lua-router:overload:%zu:ok\n", overload::kBindingCount);
+  std::printf("script-captured-lua-router:table-record:%zu:ok\n", records::kCandidateCount);
   std::puts("script-captured-lua-router:reentrant-stale-exhaustion:ok");
   std::puts("script-captured-lua-router:allocations:0");
 }

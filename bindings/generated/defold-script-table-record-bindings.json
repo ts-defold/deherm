@@ -2,12 +2,17 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "The reviewed, finite fixed-record subset of the accounting-pending lua-table routes",
-  "coverageClaim": "Generated descriptors and a fail-closed runtime validate only the listed candidate ABI shapes. No captured-Lua adapter, compilation, linkage, packaged-engine execution, or browser execution is claimed.",
+  "coverageClaim": "All listed candidates have generated fail-closed descriptors and a native-dynamic captured-Lua adapter using caller-owned bounded record storage. Static Hermes, packaged-engine, and browser execution are not claimed.",
   "routeCount": 148,
   "mechanicallySafeFixedRecordCount": 6,
   "candidateCount": 3,
-  "executableCount": 0,
+  "executableCount": 3,
   "blockedCount": 145,
+  "targetSupport": {
+    "nativeDynamicHermes": "generated-executable-shared-script-adapter",
+    "nativeStaticHermes": "not-integrated",
+    "html5BrowserHost": "not-executable-no-provider"
+  },
   "blockerTaxonomy": {
     "unbounded-typed-sequence": "IR supplies element codecs but no maximum length or dense-array policy.",
     "unbounded-typed-map": "IR supplies key/value codecs but no maximum-entry, own-key, or collision policy.",
@@ -35,7 +40,7 @@
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "accountingSha256": "edc48fb2e3c6aeeeabebcae531e1b052f688a11af49111585d4aaab8928ab044",
     "tableTupleSchemaSha256": "96c7e5c04cf746768d375cb22c2c23162e56cb0ea7ce740999b5ab1749908a86",
-    "reviewedPolicySha256": "eee14801b1bb4a38d81b01ca481433ff86432e529b6fd2cf78ac29d0dd2db232",
+    "reviewedPolicySha256": "09f583ae396de5d6eba52f6ae773fef07b564607a93999c1a8554e407a03dc7d",
     "defoldSources": [
       {
         "path": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",
@@ -59,6 +64,8 @@
         "b2d"
       ],
       "member": "get_version",
+      "requiredContext": "global",
+      "context": "Global",
       "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
       "sourceSha256": "ec53ed1eda1094564cbeecbbd8cc0a696c3be1805917583138d4d2c00e35ae95",
       "sourceAnchors": [
@@ -96,6 +103,8 @@
         "image"
       ],
       "member": "get_astc_header",
+      "requiredContext": "global",
+      "context": "Global",
       "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/script_image.cpp",
       "sourceSha256": "0ef39bda9de2db39ec59f97ffb04d916b522b80bd1a51a3cfdc8d07f23f0d281",
       "sourceAnchors": [
@@ -142,6 +151,8 @@
         "bullet3d"
       ],
       "member": "get_version",
+      "requiredContext": "global",
+      "context": "Global",
       "source": "upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d.cpp",
       "sourceSha256": "50c51d3d802eaa495eb7c66ffc87b1e9deb31ec7126001c44652c8f5cefd8996",
       "sourceAnchors": [

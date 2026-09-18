@@ -34,6 +34,7 @@
   "routes": [
     {
       "id": "script:image.get_astc_header",
+      "requiredContext": "global",
       "source": "script-image",
       "recordType": "image.astc_header",
       "sourceAnchors": [
@@ -46,6 +47,7 @@
     },
     {
       "id": "script:b2d.get_version",
+      "requiredContext": "global",
       "source": "script-box2d-v3",
       "recordType": "b2d.version_info",
       "sourceAnchors": [
@@ -59,6 +61,7 @@
     },
     {
       "id": "script:bullet3d.get_version",
+      "requiredContext": "global",
       "source": "script-bullet3d",
       "recordType": "bullet3d.version_info",
       "sourceAnchors": [

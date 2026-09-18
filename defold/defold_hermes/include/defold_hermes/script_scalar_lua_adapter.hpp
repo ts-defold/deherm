@@ -4,6 +4,7 @@
 #include <defold_hermes/generated_script_value_bindings.hpp>
 #include <defold_hermes/generated_script_fixed_tuples.hpp>
 #include <defold_hermes/generated_script_overload_dispatch.hpp>
+#include <defold_hermes/generated_script_table_record_bindings.hpp>
 #include <defold_hermes/generated_script_url_bindings.hpp>
 #include <defold_hermes/generated_script_value_tail_bindings.hpp>
 #include <defold_hermes/lua_bridge_core.hpp>
@@ -72,6 +73,14 @@ class ScriptAdapter {
       ScriptCallFrame* frame,
       char* error,
       size_t errorCapacity) noexcept;
+  static table_record::DispatchStatus TableRecordInvokeThunk(
+      void* context,
+      const table_record::Operation& operation,
+      const table_record::Codec* argumentCodecs,
+      const table_record::Field* fields,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
   url_binding::DispatchStatus invokeUrl(
       const url_binding::Operation& operation,
       ScriptCallFrame* frame,
@@ -94,6 +103,18 @@ class ScriptAdapter {
       size_t errorCapacity) noexcept;
   bool bindOverload(const overload_dispatch::Operation& operation) noexcept;
   bool readOverloadResult(uint16_t codec, ScriptCallFrame* frame) noexcept;
+  table_record::DispatchStatus invokeTableRecord(
+      const table_record::Operation& operation,
+      const table_record::Field* fields,
+      ScriptCallFrame* frame,
+      char* error,
+      size_t errorCapacity) noexcept;
+  bool bindTableRecord(const table_record::Operation& operation) noexcept;
+  bool readTableRecord(
+      const table_record::Operation& operation,
+      const table_record::Field* fields,
+      int stackIndex,
+      ScriptCallFrame* frame) noexcept;
   fixed_tuple::DispatchStatus invokeFixedTuple(
       const fixed_tuple::Operation& operation,
       const uint16_t* resultCodecs,
@@ -134,12 +155,14 @@ class ScriptAdapter {
   std::array<int, url_binding::kBindingCount> urlFunctionRefs_{};
   std::array<int, value_tail::kCandidateCount> valueTailFunctionRefs_{};
   std::array<int, overload_dispatch::kBindingCount> overloadFunctionRefs_{};
+  std::array<int, table_record::kCandidateCount> tableRecordFunctionRefs_{};
   ::defold_hermes::lua_bridge::HandlePool luaHandles_;
   value_binding::StructuredLuaApi structuredLuaApi_{};
   fixed_tuple::LuaApi fixedTupleLuaApi_{};
   url_binding::LuaApi urlLuaApi_{};
   value_tail::LuaApi valueTailLuaApi_{};
   overload_dispatch::LuaApi overloadLuaApi_{};
+  table_record::LuaApi tableRecordLuaApi_{};
   char adapterError_[384]{};
 };
 
