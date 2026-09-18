@@ -16,10 +16,27 @@ The pinned Defold script API accounting contains 415 pending routes whose primar
 
 1. Implement the 367 `checked-handle-input-terminal` routes first. They consume an existing handle, run the original Defold Lua terminal validation, and neither capture a returned handle nor retire engine identity.
 2. Implement the 33 `checked-handle-return-capture` routes next. Each return must be checked against its reviewed concrete kind before the exact Lua userdata is rooted. Numeric graphics handles remain branded scalar values rather than Lua registry entries.
-3. Implement the 7 `checked-handle-invalidate` routes after return capture. A bridge slot is retired only after the underlying Defold operation succeeds. GUI deletion remains deferred, and physics/render validity remains owned by the engine.
-4. Implement the 8 `declaration-token` routes in the component/property compiler. `resource_data` is declaration metadata accepted by `go.property`; it is not a runtime handle.
+3. Implement the two `checked-child-engine-object-invalidate` routes without
+   retiring the parent body host handle. `b2d.body.destroy_fixture` and
+   `b2d.body.destroy_shape` destroy a child selected by integer index; the body
+   remains valid.
+4. Implement the five `checked-self-engine-object-invalidate` routes while
+   preserving their rooted host userdata. Defold mutates or invalidates the
+   underlying identity, and follow-up `is_valid(handle)` calls must observe
+   `false`; retiring the host slot would incorrectly prevent that API behavior.
+5. Implement the 8 `declaration-token` routes in the component/property compiler. `resource_data` is declaration metadata accepted by `go.property`; it is not a runtime handle.
 
 The exact module census is Box2D 206, Bullet3D 131, GUI 55, runtime buffer routes 8, render routes 7, and declaration-only routes 8.
+
+The 206 Box2D rows are a documentation union, not one linkable runtime surface.
+Pinned Defold build and Lua-registration sources show mutually exclusive
+availability profiles: the default no-app-manifest engine exposes legacy
+Box2D v2 plus Bullet 3D (253 total handle routes including eight global
+buffer/resource/sys routes), while `physics.2d=:v3` plus Bullet exposes 320.
+Legacy without Bullet exposes 122, v3 without Bullet 189, and a no-physics
+profile only the eight globals. The executable handle generator must derive
+its route set from the selected app-manifest profile and registration arrays;
+it must never bind or claim the 345-route Box2D/Bullet union.
 
 ## Representation boundary
 

@@ -20,11 +20,13 @@ Three routes are exact flat-record candidates:
 - `bullet3d.get_version` returns the matching fixed version record.
 
 The generated C++ layer has fixed descriptor/field arrays, caller-owned result
-storage, exact scalar validation, no heap ownership primitive, and an injected
-captured-Lua backend. It remains fail-closed because that backend is not yet
-installed for this family. The standalone native harness validates descriptor
-layout and negative behavior; no executable-accounting or packaged-engine
-claim is made for these three routes.
+and table scratch storage, exact scalar and field-set validation, bounded
+string copying, no heap ownership primitive, and an installed shared
+captured-Lua backend. A pinned Lua 5.1 harness crosses all three routes, rejects
+missing/extra/wrong-type fields and scratch exhaustion, and observes zero C++
+`operator new` calls across 1,024 warmed calls. JSI result decoding compiles,
+but dynamic-Hermes E2E, central executable accounting, and packaged-engine
+observation remain separate unfinished evidence gates.
 
 The other 145 routes have a complete generated blocker ledger:
 

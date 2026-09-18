@@ -18,7 +18,8 @@ const outputUrl = new URL("bindings/generated/defold-script-borrowed-handle-clas
 const OPERATION_CLASSES = [
   "checked-handle-input-terminal",
   "checked-handle-return-capture",
-  "checked-handle-invalidate",
+  "checked-child-engine-object-invalidate",
+  "checked-self-engine-object-invalidate",
   "declaration-token"
 ];
 
@@ -154,7 +155,7 @@ export function generateBorrowedHandleClassification(inputs) {
   const patterns = parse(inputs.patternsText, "script binding patterns");
   const override = parse(inputs.overrideText, "borrowed-handle override");
 
-  assert(override.schemaVersion === 1, "borrowed-handle override has an unsupported schema");
+  assert(override.schemaVersion === 2, "borrowed-handle override has an unsupported schema");
   assert(ir.defoldRevision === accounting.defoldRevision && ir.defoldRevision === patterns.defoldRevision &&
     ir.defoldRevision === override.defoldRevision, "borrowed-handle inputs use different Defold revisions");
   assert(accounting.inputEvidence?.scriptIrSha256 === sha256(inputs.irText),
@@ -186,7 +187,9 @@ export function generateBorrowedHandleClassification(inputs) {
   const exceptional = validateExceptionalRoutes(override, borrowedById);
   const declarationIds = new Set(override.exceptionalRoutes["declaration-token"].map(({ id }) => id));
   const producerIds = new Set(override.exceptionalRoutes["checked-handle-return-capture"].map(({ id }) => id));
-  const invalidatorIds = new Set(override.exceptionalRoutes["checked-handle-invalidate"].map(({ id }) => id));
+  const childInvalidatorIds = new Set(override.exceptionalRoutes["checked-child-engine-object-invalidate"].map(({ id }) => id));
+  const selfInvalidatorIds = new Set(override.exceptionalRoutes["checked-self-engine-object-invalidate"].map(({ id }) => id));
+  const invalidatorIds = new Set([...childInvalidatorIds, ...selfInvalidatorIds]);
 
   const mechanicallyReturnedHandles = new Set();
   const mechanicallyInvalidatingNames = new Set();
@@ -224,7 +227,8 @@ export function generateBorrowedHandleClassification(inputs) {
       assert(!isInvalidatorName(binding.rawName), `${id}: terminal route has invalidating semantics`);
     } else if (operationClass === "checked-handle-return-capture") {
       assert(returnHandleKinds.length > 0, `${id}: reviewed producer has no handle return`);
-    } else if (operationClass === "checked-handle-invalidate") {
+    } else if (operationClass === "checked-child-engine-object-invalidate" ||
+      operationClass === "checked-self-engine-object-invalidate") {
       assert(inputHandleKinds.length > 0, `${id}: reviewed invalidator has no handle input`);
       assert(returnHandleKinds.length === 0, `${id}: reviewed invalidator returns a handle`);
     } else {
@@ -242,6 +246,10 @@ export function generateBorrowedHandleClassification(inputs) {
       source: binding.source,
       line: binding.line,
       operationClass,
+      invalidatedIdentity: operationClass === "checked-child-engine-object-invalidate" ? "child-index" :
+        operationClass === "checked-self-engine-object-invalidate" ? "self-underlying" : null,
+      hostHandleEffect: operationClass === "checked-handle-return-capture" ? "capture-return" :
+        operationClass === "declaration-token" ? "not-runtime" : "preserve",
       requiredContext: resolveContext(binding, operationClass, override.contextRules),
       inputHandleKinds,
       returnHandleKinds
@@ -278,7 +286,7 @@ export function generateBorrowedHandleClassification(inputs) {
   ].join("\0"));
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     defoldRevision: ir.defoldRevision,
     scope: "Every pending borrowed-handle route in the pinned script API accounting artifact, exactly once",
     coverageClaim: override.coverageClaim,
@@ -327,7 +335,8 @@ async function main(argv = process.argv.slice(2)) {
   console.log(`${check ? "Verified" : "Generated"} borrowed-handle classification: ` +
     `${report.operationClassCounts["checked-handle-input-terminal"]} terminals, ` +
     `${report.operationClassCounts["checked-handle-return-capture"]} producers, ` +
-    `${report.operationClassCounts["checked-handle-invalidate"]} invalidators, ` +
+    `${report.operationClassCounts["checked-child-engine-object-invalidate"]} child invalidators, ` +
+    `${report.operationClassCounts["checked-self-engine-object-invalidate"]} self invalidators, ` +
     `${report.operationClassCounts["declaration-token"]} declarations, ${report.routeCount} total.`);
 }
 

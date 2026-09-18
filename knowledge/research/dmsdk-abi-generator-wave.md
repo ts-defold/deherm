@@ -22,13 +22,18 @@ selectors plus source-pinned semantic policies:
 - two bounded ASTC header probes returning a caller-owned three-`uint32_t`
   record; and
 - XTEA encrypt/decrypt specialized to `ALGORITHM_XTEA`, with non-null spans and
-  the pinned 16-byte key maximum checked before the native assertion.
+  the pinned 16-byte key maximum checked before the native assertion; and
+- `dmHashBuffer32`/`dmHashBuffer64` over borrowed explicit-length byte spans,
+  including embedded-NUL vectors and caller-owned scalar results.
 
 All ten compile and link against pinned Defold code or packaged SDK libraries
 and pass known-behavior and rejection tests. Warmed harnesses observe zero C++
 `operator new` calls through the generated glue. That is not a claim that every
 platform-native implementation is allocation-free: the Apple Base64 path uses
-Foundation, so Objective-C/native allocations remain unmeasured.
+Foundation, so Objective-C/native allocations remain unmeasured. Defold buffer
+hashing can also allocate when its process-global reverse-hash registry is
+explicitly enabled; pinned source proves that registry defaults off, and the
+generated glue itself owns no heap primitive.
 
 ## Corrected blocker claim
 
@@ -51,7 +56,7 @@ registry for this focused runtime-lowering pipeline. The clean-room checker
 copies only the registered generator sources, pinned inputs, and referenced
 Defold evidence into a new temporary directory, executes the steps in order,
 discovers generated dmSDK files independently, rejects unowned output, and
-compares all 55 artifacts byte-for-byte with the repository.
+compares all 60 artifacts byte-for-byte with the repository.
 `scripts/generate-dmsdk-runtime.mjs` is the thin public orchestrator; both its
 generate and `--check` modes consume this registry rather than restating the
 step chain.
@@ -81,11 +86,13 @@ The registered steps are:
    - outputs: two bounded ASTC probes with a fixed caller-owned result record
 9. `scripts/generate-dmsdk-xtea-span-bindings.mjs`
    - outputs: specialized XTEA encrypt/decrypt span wrappers and dispatcher
+10. `scripts/generate-dmsdk-hash-span-bindings.mjs`
+   - outputs: bounded `dmHashBuffer32`/`dmHashBuffer64` wrappers and dispatcher
 
 Focused gates are `npm run check:dmsdk-runtime`,
 `npm run check:dmsdk-clean-room`, `npm run test:dmsdk-runtime-codegen`, and
 `npm run test:dmsdk-clean-room`. The clean-room input fingerprint for this
-wave is `44d9b2f3c3d2036b644862798cb480e0c07bd5402d86c24f3f1080096ac24588`.
+wave is `084e8e8598a175851932f16ebaca12311a8be510ada183f0a6c7340addab21d1`.
 
 The enum-value runtime and JSI dispatcher are now installed by the generated
 module installer and exported by the generated SDK barrel. The standalone host

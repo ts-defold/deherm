@@ -42,8 +42,9 @@ test("partitions all 415 borrowed-handle routes exactly once", () => {
   assert.equal(generated.routeCount, 415);
   assert.deepEqual(generated.operationClassCounts, {
     "checked-handle-input-terminal": 367,
-    "checked-handle-invalidate": 7,
+    "checked-child-engine-object-invalidate": 2,
     "checked-handle-return-capture": 33,
+    "checked-self-engine-object-invalidate": 5,
     "declaration-token": 8
   });
   assert.deepEqual(generated.moduleCounts, {
@@ -81,6 +82,12 @@ test("assigns stable IDs, concrete representations, context, and validity metada
     "render-script-instance-and-graphics-context");
   assert.equal(generated.rows.find(({ id }) => id === "script:resource.atlas").requiredContext,
     "component-property-compiler");
+  const childDestroy = generated.rows.find(({ id }) => id === "script:b2d.body.destroy_shape");
+  assert.equal(childDestroy.invalidatedIdentity, "child-index");
+  assert.equal(childDestroy.hostHandleEffect, "preserve");
+  const selfDestroy = generated.rows.find(({ id }) => id === "script:b2d.joint.destroy");
+  assert.equal(selfDestroy.invalidatedIdentity, "self-underlying");
+  assert.equal(selfDestroy.hostHandleEffect, "preserve");
 });
 
 test("keeps declaration tokens out of runtime handle capture", () => {
@@ -102,7 +109,8 @@ test("keeps declaration tokens out of runtime handle capture", () => {
   assert.deepEqual(generated.implementationOrder.map(({ operationClass }) => operationClass), [
     "checked-handle-input-terminal",
     "checked-handle-return-capture",
-    "checked-handle-invalidate",
+    "checked-child-engine-object-invalidate",
+    "checked-self-engine-object-invalidate",
     "declaration-token"
   ]);
 });
@@ -131,7 +139,7 @@ test("fails closed on census, exception, stable-ID, kind, and source drift", () 
 
   const overlap = structuredClone(sourceInputs);
   overlap.overrideText = replaceJson(overlap.overrideText, (value) => {
-    value.exceptionalRoutes["checked-handle-invalidate"].push(
+    value.exceptionalRoutes["checked-self-engine-object-invalidate"].push(
       value.exceptionalRoutes["checked-handle-return-capture"][0]
     );
   });

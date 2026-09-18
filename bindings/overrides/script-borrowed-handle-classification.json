@@ -1,10 +1,11 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "expectedCounts": {
     "checked-handle-input-terminal": 367,
     "checked-handle-return-capture": 33,
-    "checked-handle-invalidate": 7,
+    "checked-child-engine-object-invalidate": 2,
+    "checked-self-engine-object-invalidate": 5,
     "declaration-token": 8,
     "total": 415
   },
@@ -23,11 +24,16 @@
     },
     {
       "order": 3,
-      "operationClass": "checked-handle-invalidate",
-      "reason": "Must retire bridge identity only after the engine operation succeeds and must preserve deferred engine invalidation semantics."
+      "operationClass": "checked-child-engine-object-invalidate",
+      "reason": "Destroys a body-owned child selected by integer index while preserving the validated parent body and its host handle."
     },
     {
       "order": 4,
+      "operationClass": "checked-self-engine-object-invalidate",
+      "reason": "Invalidates the wrapped engine identity after success but preserves the rooted host userdata so is_valid can observe false and native validators retain Defold semantics."
+    },
+    {
+      "order": 5,
       "operationClass": "declaration-token",
       "reason": "Belongs in the TypeScript component/property compiler and must not be represented as a runtime handle."
     }
@@ -389,9 +395,11 @@
       { "id": "script:resource.load", "stableId": 306454494 },
       { "id": "script:sys.load_buffer", "stableId": 667618348 }
     ],
-    "checked-handle-invalidate": [
+    "checked-child-engine-object-invalidate": [
       { "id": "script:b2d.body.destroy_fixture", "stableId": 203543744 },
-      { "id": "script:b2d.body.destroy_shape", "stableId": 1886957296 },
+      { "id": "script:b2d.body.destroy_shape", "stableId": 1886957296 }
+    ],
+    "checked-self-engine-object-invalidate": [
       { "id": "script:b2d.chain.destroy", "stableId": 469246619 },
       { "id": "script:b2d.joint.destroy", "stableId": 4156305370 },
       { "id": "script:bullet3d.constraint.destroy", "stableId": 3471585260 },
