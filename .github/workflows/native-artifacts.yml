@@ -99,12 +99,13 @@ jobs:
           # and rebuilding would produce the same bytes at best while churning
           # the digests users pinned at worst.
           #
-          # Completeness is decided on the assets, never on the tag. The first
-          # run of this workflow created both releases and then failed every
-          # build lane, leaving one release empty and the other holding two
-          # assets of fifteen - and an existence check would have treated both
-          # as finished forever, reporting success for a workflow that had
-          # built nothing.
+          # Completeness is decided on the assets, never on the tag. An early
+          # run created both releases up front and then failed every build lane,
+          # leaving one release empty and the other holding two assets of
+          # fifteen - and an existence check treated both as finished forever,
+          # reporting success for a workflow that had built nothing. Releases
+          # are now created by the first successful upload, so an empty one
+          # cannot exist, but the asset check still guards a partial run.
           complete() {
             local tag="$1" expected="$2"
             gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1 || return 1
@@ -157,46 +158,8 @@ jobs:
             require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, out.map(([k, v]) => `${k}=${v}`).join("\n") + "\n");
           '
 
-  # Create the two releases once, before any lane uploads to them. `gh release
-  # upload --clobber` needs the release to exist, and a per-lane create would
-  # race across the matrix.
-  releases:
-    needs: plan
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          create() {
-            local tag="$1" title="$2"
-            if gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-              echo "release $tag already exists"
-              return
-            fi
-            gh release create "$tag" \
-              --repo "${{ github.repository }}" \
-              --title "$title" \
-              --notes "Content-addressed build artifacts. The tag is the SHA-256 fingerprint of the inputs that determine these bytes, so many déherm versions share this release and a rebuild with unchanged inputs is a no-op. Vendor with \`node scripts/manage-native-artifacts.mjs pull\` or \`node scripts/manage-host-compilers.mjs pull\`." \
-              --prerelease
-          }
-          if [ "${{ needs.plan.outputs.target_exists }}" != "true" ]; then
-            create "${{ needs.plan.outputs.target_tag }}" "Hermes target archives ${{ needs.plan.outputs.target_tag }}"
-          fi
-          if [ "${{ needs.plan.outputs.host_exists }}" != "true" ]; then
-            create "${{ needs.plan.outputs.host_tag }}" "Host tools ${{ needs.plan.outputs.host_tag }}"
-          fi
-
-  # ── The transform compiler ──────────────────────────────────────────────────
-  #
-  # One job, five hosts. dehermc is pure Go: CGO_ENABLED=0 links it with no C
-  # toolchain on any host, so GOOS/GOARCH is the whole of cross-compilation and
-  # the five binaries are byte-reproducible from the same inputs. Contrast the
-  # host-compilers lane below, which needs a runner per architecture because
-  # hermesc and shermes are LLVM.
   go-compiler:
-    needs: [plan, releases]
+    needs: plan
     if: needs.plan.outputs.host_exists != 'true'
     runs-on: ubuntu-24.04
     strategy:
@@ -235,7 +198,7 @@ jobs:
   # ── Target libraries: one libhermes.a per Defold bundle target ──────────────
 
   linux:
-    needs: [plan, releases]
+    needs: plan
     if: needs.plan.outputs.target_exists != 'true'
     strategy:
       fail-fast: false
@@ -276,7 +239,7 @@ jobs:
   # the secret - `windows-native` runs instead and produces a weaker artifact
   # rather than no artifact. Exactly one of the two ever runs.
   windows:
-    needs: [plan, releases]
+    needs: plan
     if: needs.plan.outputs.target_exists != 'true' && needs.plan.outputs.registry_credential == 'true'
     runs-on: ubuntu-24.04
     steps:
@@ -306,7 +269,7 @@ jobs:
   # records why this artifact makes a weaker provenance claim than every other
   # lane's.
   windows-native:
-    needs: [plan, releases]
+    needs: plan
     if: needs.plan.outputs.target_exists != 'true' && needs.plan.outputs.registry_credential != 'true'
     runs-on: windows-2022
     defaults:
@@ -331,7 +294,7 @@ jobs:
             "build/artifacts/x86_64-win32/hermes.lib" "hermes-x86_64-win32-hermes.lib"
 
   android:
-    needs: [plan, releases]
+    needs: plan
     if: needs.plan.outputs.target_exists != 'true'
     strategy:
       fail-fast: false
@@ -373,7 +336,7 @@ jobs:
   # container path for them. One macOS runner builds all four Apple targets and
   # reuses a single host-compiler build across them.
   apple:
-    needs: [plan, releases]
+    needs: plan
     if: needs.plan.outputs.target_exists != 'true'
     runs-on: macos-15
     strategy:
@@ -410,7 +373,7 @@ jobs:
   # the binaries other builds import, so cross-compiling them would defeat the
   # point.
   host-compilers:
-    needs: [plan, releases]
+    needs: plan
     if: needs.plan.outputs.host_exists != 'true'
     strategy:
       fail-fast: false
@@ -467,7 +430,7 @@ jobs:
   # and the release is visible in the run summary rather than discovered by a
   # user.
   summary:
-    needs: [plan, go-compiler, linux, windows, android, apple, host-compilers]
+    needs: [plan, go-compiler, linux, windows, windows-native, android, apple, host-compilers]
     if: always()
     runs-on: ubuntu-24.04
     steps:

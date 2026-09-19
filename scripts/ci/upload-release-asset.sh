@@ -42,6 +42,33 @@ cp "$file" "$staged"
 attempts=5
 delay=5
 
+# Create the release on first use rather than ahead of the build lanes.
+#
+# A dedicated `releases` job used to create both releases before anything was
+# built, so every failed run stranded an empty release under a tag that then
+# looked published - and the plan job's completeness check kept it alive
+# forever. Creating it here means no successful upload, no release.
+#
+# The lanes race each other to this, which is fine: the create is attempted,
+# and a failure because it already exists is indistinguishable from success for
+# our purposes, so the result is only checked by asking again.
+ensure_release() {
+  if gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
+    return 0
+  fi
+  gh release create "$tag" \
+    --repo "$repo" \
+    --title "$tag" \
+    --notes "Content-addressed build artifacts. The tag is the SHA-256 fingerprint of the inputs that determine these bytes - the pinned upstream revisions AND the build recipe, because the recipe changes the output - so many deherm versions share one release and a rebuild with unchanged inputs is a no-op. Vendor with \`node scripts/manage-native-artifacts.mjs pull\` or \`node scripts/manage-host-compilers.mjs pull\`, which resolve assets by URL and need no gh." \
+    --prerelease >/dev/null 2>&1 || true
+  gh release view "$tag" --repo "$repo" >/dev/null 2>&1
+}
+
+if ! ensure_release; then
+  echo "Could not create or find release $tag" >&2
+  exit 1
+fi
+
 for attempt in $(seq 1 "$attempts"); do
   if gh release upload "$tag" "$staged" --repo "$repo" --clobber; then
     exit 0
