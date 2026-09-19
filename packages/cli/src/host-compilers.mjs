@@ -259,6 +259,7 @@ function familyForTool(tool) {
 export async function requireHostTool(tool, options = {}) {
   const key = hostCompilerKey();
   let result = await inspectHostCompilers(key);
+  let fetchFailure = null;
   // A miss is the NORMAL state of a fresh install: the tools are published as
   // release archives rather than shipped in the package, so nothing has put
   // them on disk yet. Fetch the one archive this host needs before deciding the
@@ -268,7 +269,14 @@ export async function requireHostTool(tool, options = {}) {
     const family = familyForTool(tool);
     if (family) {
       const { ensureHostFamily } = await import("./ensure-host-tool.mjs");
-      await ensureHostFamily(family, key, { onProgress: options.onProgress });
+      try {
+        await ensureHostFamily(family, key, { onProgress: options.onProgress });
+      } catch (error) {
+        // A network/release failure is context for the same unavailable-tool
+        // diagnosis, not a replacement for it. Leaking bare "fetch failed"
+        // hides which compiler was requested and how the user can recover.
+        fetchFailure = error;
+      }
       result = await inspectHostCompilers(key);
     }
   }
@@ -277,7 +285,8 @@ export async function requireHostTool(tool, options = {}) {
     throw new Error(`déherm declares no ${tool} for ${key}; declared tools are ${Object.keys(result.tools ?? {}).join(", ") || "none"}`);
   }
   if (!resolvedTool.ok) {
-    throw new Error(`déherm cannot run ${tool} on this host: ${resolvedTool.detail}`);
+    const fetchDetail = fetchFailure ? `; automatic release fetch failed: ${fetchFailure.message}` : "";
+    throw new Error(`déherm cannot run ${tool} on this host: ${resolvedTool.detail}${fetchDetail}`);
   }
   return resolvedTool;
 }

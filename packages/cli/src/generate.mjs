@@ -23,7 +23,7 @@ import {
   resolveDefoldSurface
 } from "./defold-surface.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
-import { defoldToolchain } from "./toolchains.mjs";
+import { defoldToolchain, hostDefoldPlatform } from "./toolchains.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const require = createRequire(import.meta.url);
@@ -967,7 +967,10 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     surfaceLayer: surface.layer,
     sdkSourceRoot,
     packageVersion: JSON.parse(packageSource).version,
-    platform: dmsdkIr.platform,
+    // The dmSDK declaration IR is deliberately platform-neutral and therefore
+    // carries parseEnvironment, not a fake host platform. This field names the
+    // host on which the generated project will run conformance/development.
+    platform: hostDefoldPlatform(),
     scriptIr,
     dmsdkIr,
     scriptDispatch,
