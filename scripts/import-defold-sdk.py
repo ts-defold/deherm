@@ -330,7 +330,7 @@ _OVERRIDES_CACHE: dict[str, Any] | None = None
 def overrides() -> dict[str, Any]:
     global _OVERRIDES_CACHE
     if _OVERRIDES_CACHE is None:
-        _OVERRIDES_CACHE = json.loads(OVERRIDES.read_text())
+        _OVERRIDES_CACHE = json.loads(OVERRIDES.read_text(encoding="utf-8"))
     return _OVERRIDES_CACHE
 
 
@@ -351,7 +351,7 @@ def declaration_parse() -> dict[str, Any]:
 
 
 def lock_value(key: str) -> str:
-    match = re.search(rf"^{key}=(.*)$", (ROOT / "upstream.lock").read_text(), re.MULTILINE)
+    match = re.search(rf"^{key}=(.*)$", (ROOT / "upstream.lock").read_text(encoding="utf-8"), re.MULTILINE)
     if not match or not match.group(1).strip():
         raise SystemExit(f"upstream.lock does not pin {key}")
     return match.group(1).strip()
@@ -461,7 +461,7 @@ def spelling_prelude() -> Path:
         ]
     path = ROOT / "build" / "dmsdk-parse" / "target-spellings.h"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines) + "\n")
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path
 
 
@@ -617,7 +617,7 @@ def parse_header(header: Path, includes: list[Path], target: str, flags: list[st
 
 
 def defold_revision() -> str:
-    lock = (ROOT / "upstream.lock").read_text()
+    lock = (ROOT / "upstream.lock").read_text(encoding="utf-8")
     match = re.search(r"^DEFOLD_REV=(\w+)$", lock, re.MULTILINE)
     return match.group(1) if match else "unknown"
 
@@ -852,7 +852,11 @@ def main() -> int:
     inventory_text, report_text = serialized_outputs()
     outputs = ((INVENTORY, inventory_text), (REPORT, report_text))
     if args.check:
-        stale = [str(path.relative_to(ROOT)) for path, text in outputs if not path.exists() or path.read_text() != text]
+        stale = [
+            str(path.relative_to(ROOT))
+            for path, text in outputs
+            if not path.exists() or path.read_text(encoding="utf-8") != text
+        ]
         if stale:
             print("stale generated SDK inventory: " + ", ".join(stale), file=sys.stderr)
             return 1
@@ -860,7 +864,7 @@ def main() -> int:
         return 0
     for path, text in outputs:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
+        path.write_text(text, encoding="utf-8")
     print(
         f"inventoried {json.loads(inventory_text)['declarationCount']} declarations "
         f"from {json.loads(inventory_text)['parsedHeaderCount']} headers"
