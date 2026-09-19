@@ -131,6 +131,11 @@ So:
 * A small index maps **Defold sha -> policy root**. Many shas point at one
   policy, and the index is the only thing that grows per revision - a pair of
   hashes.
+* The Defold-sha index entry is a replaceable pointer, not a content-addressed
+  object. If a newer generator proves more of an unchanged engine revision, its
+  newly derived root replaces that revision's pointer immediately. Old roots
+  and subtrees remain immutable by hash; they simply stop being reachable from
+  that revision.
 * Supporting every version therefore costs nothing like storing every version.
 
 ## Branching falls out of the Merkle structure

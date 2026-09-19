@@ -323,8 +323,9 @@ function buildShippedIndex({ site, entries }) {
     kind: "deherm.policy.index",
     comment:
       "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision " +
-      "Defold has already published, and its policyRoot is written once and never rewritten, " +
-      "because that revision's declaration inputs are fixed forever. Consumers FETCH the entry they need " +
+      "Defold has already published. Its policyRoot may be replaced when a newer generator derives a more " +
+      "complete projection from the same fixed engine inputs; the roots and subtrees it names remain immutable. " +
+      "Consumers FETCH the entry they need " +
       "from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes " +
       "nightlies daily, so an index that had to be re-released to stay current would be a pin, " +
       "not an index. The policy an entry names is content-addressed and therefore " +

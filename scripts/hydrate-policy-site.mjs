@@ -5,7 +5,7 @@
 // intentionally small; the website is the catalogue. Without this hydration a
 // no-op nightly would rebuild a one-entry site and erase every older revision.
 
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -14,16 +14,6 @@ import { readSiteConfig, readStore, shippedIndexPath, storeRoot } from "./genera
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REVISION = /^[0-9a-f]{40}$/u;
 const HASH = /^[0-9a-f]{64}$/u;
-
-async function walk(directory, prefix = "") {
-  const rows = [];
-  for (const entry of (await readdir(directory, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
-    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) rows.push(...await walk(path.join(directory, entry.name), relative));
-    else if (entry.isFile()) rows.push(relative);
-  }
-  return rows;
-}
 
 function assertEntry(entry, source) {
   if (!entry || entry.kind !== "deherm.policy.index-entry" || entry.schemaVersion !== 1 ||
@@ -52,6 +42,19 @@ async function copyImmutable(source, destination, relative) {
   return false;
 }
 
+async function importPublishedClosure({ entry, layoutSource, layoutDestination }) {
+  let copied = 0;
+  const rootRelative = `policy/${entry.policyRoot}.json`;
+  const root = JSON.parse(await readFile(path.join(layoutSource, rootRelative), "utf8"));
+  for (const hash of Object.values(root.subtrees ?? {})) {
+    if (!HASH.test(hash)) throw new Error(`${rootRelative}: malformed subtree hash`);
+    if (await copyImmutable(layoutSource, layoutDestination, `object/${hash}.json`)) copied += 1;
+  }
+  if (await copyImmutable(layoutSource, layoutDestination, rootRelative)) copied += 1;
+  if (await copyImmutable(layoutSource, layoutDestination, `index/${entry.defoldRevision}.json`)) copied += 1;
+  return copied;
+}
+
 export async function hydratePolicySite(options) {
   const site = options.site ?? await readSiteConfig();
   const publishedRoot = path.resolve(options.from);
@@ -65,42 +68,56 @@ export async function hydratePolicySite(options) {
     throw new Error(`${manifestFile}: layout ${published.base?.layoutVersion} does not match ${site.layoutVersion}`);
   }
 
-  const seen = new Set();
+  const publishedEntries = new Map();
   for (const summary of published.entries) {
     if (!REVISION.test(summary?.defoldRevision ?? "") || !HASH.test(summary?.policyRoot ?? "") ||
         !/^sha256:[0-9a-f]{64}$/u.test(summary?.generator ?? "")) {
       throw new Error(`${manifestFile}: malformed entry summary`);
     }
-    if (seen.has(summary.defoldRevision)) throw new Error(`${manifestFile}: duplicate ${summary.defoldRevision}`);
-    seen.add(summary.defoldRevision);
+    if (publishedEntries.has(summary.defoldRevision)) throw new Error(`${manifestFile}: duplicate ${summary.defoldRevision}`);
     const entryFile = path.join(layoutSource, "index", `${summary.defoldRevision}.json`);
     const entry = JSON.parse(await readFile(entryFile, "utf8"));
     assertEntry(entry, entryFile);
     if (entry.policyRoot !== summary.policyRoot || entry.generator !== summary.generator) {
       throw new Error(`${entryFile}: entry does not match the published manifest`);
     }
+    publishedEntries.set(entry.defoldRevision, entry);
   }
 
   const layoutDestination = path.join(options.store ?? storeRoot, site.layoutVersion);
-  let copied = 0;
-  for (const family of ["index", "policy", "object"]) {
-    const familyRoot = path.join(layoutSource, family);
-    for (const relative of await walk(familyRoot)) {
-      if (family === "index" && relative === "manifest.json") continue;
-      if (await copyImmutable(familyRoot, path.join(layoutDestination, family), relative)) copied += 1;
-    }
-  }
-
   const localIndexPath = options.index ?? shippedIndexPath;
   const local = JSON.parse(await readFile(localIndexPath, "utf8"));
-  const merged = new Map(published.entries.map((entry) => [entry.defoldRevision, entry]));
-  for (const entry of local.entries ?? []) {
-    const prior = merged.get(entry.defoldRevision);
-    if (prior && (prior.policyRoot !== entry.policyRoot || prior.generator !== entry.generator)) {
-      throw new Error(`${entry.defoldRevision}: published and packaged policy entries disagree`);
+  const localEntries = new Map((local.entries ?? []).map((entry) => [entry.defoldRevision, entry]));
+
+  // A revision index is a replaceable pointer produced by a particular
+  // generator, not a content-addressed object. When the parser improves, the
+  // same immutable Defold source revision can legitimately acquire a better
+  // policy root. The checkout is the authority for revisions it packages;
+  // hydration imports only published revisions it does not already own (or an
+  // identical closure when a custom/empty destination is being seeded).
+  let copied = 0;
+  for (const entry of publishedEntries.values()) {
+    const packaged = localEntries.get(entry.defoldRevision);
+    const agrees = packaged && packaged.policyRoot === entry.policyRoot && packaged.generator === entry.generator;
+    if (packaged && !agrees) {
+      const packagedEntryFile = path.join(layoutDestination, "index", `${entry.defoldRevision}.json`);
+      const packagedEntry = JSON.parse(await readFile(packagedEntryFile, "utf8").catch((error) => {
+        if (error.code === "ENOENT") {
+          throw new Error(`${entry.defoldRevision}: packaged index claims the revision but its store entry is missing`);
+        }
+        throw error;
+      }));
+      assertEntry(packagedEntry, packagedEntryFile);
+      if (packagedEntry.policyRoot !== packaged.policyRoot || packagedEntry.generator !== packaged.generator) {
+        throw new Error(`${packagedEntryFile}: entry does not match the packaged index`);
+      }
+      continue;
     }
-    merged.set(entry.defoldRevision, entry);
+    copied += await importPublishedClosure({ entry, layoutSource, layoutDestination });
   }
+
+  const merged = new Map(published.entries.map((entry) => [entry.defoldRevision, entry]));
+  for (const entry of local.entries ?? []) merged.set(entry.defoldRevision, entry);
   const document = {
     ...local,
     entries: [...merged.values()].sort((a, b) => a.defoldRevision.localeCompare(b.defoldRevision))
