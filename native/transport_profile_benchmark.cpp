@@ -71,6 +71,8 @@ constexpr size_t kWarmup = 20000;
 constexpr size_t kIterations = 100000;
 constexpr size_t kRepeats = 9;
 constexpr size_t kMaxSampledShapes = 6;
+// Typed-native shape sweep bound. Covers every arity the Lua-bridge table reports.
+constexpr uint32_t kTypedNativeMaxArguments = 4;
 #if DEHERM_PROFILE_ENABLED
 // Sized so every sampled route and transport fits in one ring without drops.
 constexpr size_t kRingSampleCalls = 200;
@@ -533,15 +535,31 @@ int main() {
 
   // (c) typed-native extern_c over a stub backend. The generated dispatcher for
   // this transport decodes the wire frame, calls the backend, and encodes back.
+  //
+  // One route per distinct "Narg-Mres" contract shape, in stable-id order, so
+  // the same route is selected before and after a dispatcher change and the
+  // figures stay comparable. Arguments are wire numbers: this layer validates
+  // arity, not parameter types, and the stub backend ignores the values.
   {
     int backend = 0;
     defold_hermes::installScriptBridgeApi(
         {&backend, TypedNativeDispatch, TypedNativeLastError, TypedNativeRelease});
     const auto* operations = defold_hermes::universal_value::operations();
-    size_t reported = 0;
-    for (size_t index = 0; index < defold_hermes::universal_value::kOperationCount && reported < 2; ++index) {
+    std::vector<std::string> seenTypedShapes;
+    for (size_t index = 0; index < defold_hermes::universal_value::kOperationCount; ++index) {
       const auto& operation = operations[index];
-      if (operation.minimumArgumentCount != 0 || operation.maximumArgumentCount != 0) continue;
+      const uint32_t argumentCount = operation.maximumArgumentCount;
+      if (argumentCount > kTypedNativeMaxArguments) continue;
+      const std::string shape =
+          std::to_string(argumentCount) + "arg-" + std::to_string(operation.resultCount) + "res";
+      if (std::find(seenTypedShapes.begin(), seenTypedShapes.end(), shape) != seenTypedShapes.end()) continue;
+      std::array<DehermScriptUniversalValue, kTypedNativeMaxArguments> inputValues{};
+      std::array<uint32_t, kTypedNativeMaxArguments> argumentRoots{};
+      for (uint32_t argument = 0; argument < argumentCount; ++argument) {
+        inputValues[argument].tag = 3;  // number
+        inputValues[argument].number = 3;
+        argumentRoots[argument] = argument;
+      }
       std::array<DehermScriptUniversalValue, 8> outputValues{};
       std::array<DehermScriptUniversalEntry, 8> outputEntries{};
       std::array<char, 256> outputStrings{};
@@ -552,7 +570,9 @@ int main() {
       char error[128]{};
       const auto call = [&] {
         return deherm_script_universal_dispatch(operation.stableId,
-            nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+            argumentCount ? inputValues.data() : nullptr, argumentCount,
+            nullptr, 0, nullptr, 0, nullptr, 0, nullptr, 0,
+            argumentCount ? argumentRoots.data() : nullptr, argumentCount,
             outputValues.data(), outputValues.size(), &valueCount,
             outputEntries.data(), outputEntries.size(), &entryCount,
             outputStrings.data(), outputStrings.size(), &stringBytes,
@@ -561,12 +581,11 @@ int main() {
             roots.data(), roots.size(), &resultCount, error, sizeof(error));
       };
       if (call() != DEHERM_SCRIPT_UNIVERSAL_OK) continue;
+      seenTypedShapes.push_back(shape);
       const Timing timing = measure([&] { (void)call(); });
-      const std::string shape = "0arg-" + std::to_string(operation.resultCount) + "res";
       report("typed-native", shape.c_str(), operation.canonicalId, timing);
-      ++reported;
     }
-    if (!reported) std::puts("transport-profile:typed-native:no-zero-argument-route-dispatched");
+    if (seenTypedShapes.empty()) std::puts("transport-profile:typed-native:no-route-dispatched");
   }
 
 #if DEHERM_PROFILE_ENABLED

@@ -28,6 +28,12 @@ const relativePaths = Object.freeze({
   browser: "defold/defold_hermes/lib/web/generated_script_universal_value.js"
 });
 
+function chunk(items, size) {
+  const output = [];
+  for (let index = 0; index < items.length; index += size) output.push(items.slice(index, index + size));
+  return output;
+}
+
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -267,6 +273,95 @@ function collectShapeKinds(value, output = new Set()) {
   return output;
 }
 
+/**
+ * Value-shape constructors whose children the pinned projection IR inlines.
+ * Anything outside this set - `dynamic`, a named or referenced schema, a
+ * callback, or a constructor a later Defold revision introduces - describes a
+ * value whose contents this generator cannot read, so a route carrying one
+ * keeps the full per-call frame. Unrecognized constructors therefore widen the
+ * frame instead of silently narrowing it.
+ */
+const inlinedShapeKinds = new Set([
+  "scalar", "enum", "defold-value", "handle", "union", "optional", "void",
+  "sequence", "map", "record", "variadic"
+]);
+
+/** Inlined constructors that materialize as a bounded table in the call frame. */
+const tableShapeKinds = new Set(["sequence", "map", "record", "variadic"]);
+
+/**
+ * Walk one half of a signature and report the constructors and exact Defold
+ * value names it can reach, including inside union variants.
+ */
+function collectFramePhase(value, output = { kinds: new Set(), defoldValueTypes: new Set() }) {
+  if (!value || typeof value !== "object") return output;
+  if (Array.isArray(value)) {
+    for (const item of value) collectFramePhase(item, output);
+    return output;
+  }
+  if (typeof value.kind === "string") {
+    output.kinds.add(value.kind);
+    if (value.kind === "defold-value" && typeof value.name === "string") {
+      output.defoldValueTypes.add(value.name);
+    }
+  }
+  for (const child of Object.values(value)) collectFramePhase(child, output);
+  return output;
+}
+
+/**
+ * Size one route's per-call frame scratch to what its contract can reach.
+ *
+ * The frame was allocation-free before this and stays allocation-free after:
+ * the cost removed is the value-initialization of scratch the route can never
+ * address. Every capacity here is at least what the generated dispatcher
+ * enforces for the same route, so a narrowed frame cannot reject a call the
+ * descriptor accepts. Table entry capacity keeps the policy bound because the
+ * IR states no per-route element count; the decision a route makes is whether
+ * it can carry a table at all.
+ */
+function frameContract(signature, bounds, row) {
+  const input = collectFramePhase(signature?.parameters ?? []);
+  const output = collectFramePhase(signature?.returns ?? []);
+  const opaque = (phase) => [...phase.kinds].some((kind) => !inlinedShapeKinds.has(kind));
+  const carriesTable = (phase) =>
+    opaque(phase) || [...phase.kinds].some((kind) => tableShapeKinds.has(kind));
+  const anyOpaque = opaque(input) || opaque(output);
+  const reaches = (name) =>
+    anyOpaque || input.defoldValueTypes.has(name) || output.defoldValueTypes.has(name);
+  return {
+    argumentCapacity: row.maximumArgumentCount,
+    resultCapacity: row.maximumResultCount,
+    inputEntryCapacity: carriesTable(input) ? bounds.maximumEntries : 0,
+    outputEntryCapacity: carriesTable(output) ? bounds.maximumEntries : 0,
+    matrix4Arena: reaches("matrix4"),
+    urlArena: reaches("url")
+  };
+}
+
+/** Stable key and census for the distinct frame shapes the routes need. */
+function frameProfileKey(contract) {
+  return [
+    contract.argumentCapacity, contract.resultCapacity,
+    contract.inputEntryCapacity, contract.outputEntryCapacity,
+    contract.matrix4Arena ? 1 : 0, contract.urlArena ? 1 : 0
+  ].join("/");
+}
+
+function frameProfiles(rows) {
+  const order = [];
+  const index = new Map();
+  for (const row of rows) {
+    const key = frameProfileKey(row.frameContract);
+    if (!index.has(key)) {
+      index.set(key, order.length);
+      order.push({ ...row.frameContract, routeCount: 0 });
+    }
+    ++order[index.get(key)].routeCount;
+  }
+  return { profiles: order, indexOf: (row) => index.get(frameProfileKey(row.frameContract)) };
+}
+
 function collectDefoldValueTypes(value, output = new Set()) {
   if (!value || typeof value !== "object") return output;
   if (Array.isArray(value)) {
@@ -324,6 +419,15 @@ struct Operation {
   uint8_t minimumResultCount;
   uint8_t maximumResultCount;
   uint8_t resultCount;
+  /**
+   * Per-call frame scratch this route's value shapes can reach, derived from
+   * the same projected signature the arity fields come from. A transport sizes
+   * its frame from these; a backend may not address scratch beyond them.
+   */
+  uint16_t inputTableEntryCapacity;
+  uint16_t outputTableEntryCapacity;
+  uint8_t matrix4Arena;
+  uint8_t urlArena;
 };
 
 struct LuaApi {
@@ -348,7 +452,7 @@ DispatchStatus dispatch(ScriptCallFrame*, char*, size_t, const LuaApi*) noexcept
 
 function renderSource(rows) {
   const operations = rows.map((row) =>
-    `  {0x${row.stableId.toString(16).padStart(8, "0")}u, ${quote(row.id)}, ${quote(row.modulePath.join("."))}, ${quote(row.member)}, ${row.minimumArgumentCount}, ${row.maximumArgumentCount}, ${row.minimumResultCount}, ${row.maximumResultCount}, ${row.maximumResultCount}},`
+    `  {0x${row.stableId.toString(16).padStart(8, "0")}u, ${quote(row.id)}, ${quote(row.modulePath.join("."))}, ${quote(row.member)}, ${row.minimumArgumentCount}, ${row.maximumArgumentCount}, ${row.minimumResultCount}, ${row.maximumResultCount}, ${row.maximumResultCount}, ${row.frameContract.inputEntryCapacity}, ${row.frameContract.outputEntryCapacity}, ${row.frameContract.matrix4Arena ? 1 : 0}, ${row.frameContract.urlArena ? 1 : 0}},`
   ).join("\n");
   return `// Generated by scripts/generate-script-universal-value-bindings.mjs. Do not edit.
 #include <defold_hermes/generated_script_universal_value_bindings.hpp>
@@ -533,7 +637,216 @@ _Static_assert(sizeof(DehermScriptUniversalUrl) == 32, "universal wire URL layou
 `;
 }
 
+const frameMachineryTemplate = `
+// ---------------------------------------------------------------------------
+// Per-call frame scratch, sized to each route's generated contract.
+//
+// The frame is stack-resident and allocation-free either way. What the sizing
+// removes is the per-call value-initialization of scratch a route's value
+// shapes can never address: a scalar route no longer zeroes two 256-entry table
+// arrays, a Matrix4 arena, and a 32-slot URL arena on every dispatch. Bounds,
+// generation counters, and every stale-handle check are unchanged; a route
+// whose contract can reach a table, a Matrix4, or a URL still gets the full
+// arena, and a route whose contract cannot gets a null arena that the decoder
+// and encoder already fail closed on.
+// ---------------------------------------------------------------------------
+struct FrameScratch {
+  ScriptValue* arguments;
+  uint32_t argumentCapacity;
+  ScriptValue* results;
+  uint32_t resultCapacity;
+  ScriptTableEntry* inputEntries;
+  uint32_t inputEntryCapacity;
+  ScriptTableEntry* outputEntries;
+  uint32_t outputEntryCapacity;
+  ScriptMatrix4Arena* matrices;
+  ScriptUrlArena<32>* urls;
+};
+
+template <bool Present> struct Matrix4Scratch {
+  ScriptMatrix4Arena arena{};
+  ScriptMatrix4Arena* pointer() noexcept { return &arena; }
+};
+template <> struct Matrix4Scratch<false> {
+  ScriptMatrix4Arena* pointer() noexcept { return nullptr; }
+};
+template <bool Present> struct UrlScratch {
+  ScriptUrlArena<32> arena{1};
+  ScriptUrlArena<32>* pointer() noexcept { return &arena; }
+};
+template <> struct UrlScratch<false> {
+  ScriptUrlArena<32>* pointer() noexcept { return nullptr; }
+};
+
+template <uint32_t Arguments, uint32_t Results, uint32_t InputEntries, uint32_t OutputEntries,
+    bool Matrix4, bool Url>
+struct ContractFrame {
+  std::array<ScriptValue, Arguments> arguments{};
+  std::array<ScriptValue, Results> results{};
+  std::array<ScriptTableEntry, InputEntries> inputEntries{};
+  std::array<ScriptTableEntry, OutputEntries> outputEntries{};
+  Matrix4Scratch<Matrix4> matrices{};
+  UrlScratch<Url> urls{};
+  FrameScratch view() noexcept {
+    return FrameScratch{
+        Arguments ? arguments.data() : nullptr, Arguments,
+        Results ? results.data() : nullptr, Results,
+        InputEntries ? inputEntries.data() : nullptr, InputEntries,
+        OutputEntries ? outputEntries.data() : nullptr, OutputEntries,
+        matrices.pointer(), urls.pointer()};
+  }
+};
+
+/** The caller-owned wire frame, bundled so one dispatcher body serves every profile. */
+struct WireFrame {
+  const DehermScriptUniversalValue* inputValues;
+  uint32_t inputValueCount;
+  const DehermScriptUniversalEntry* inputEntries;
+  uint32_t inputEntryCount;
+  const char* inputStrings;
+  uint32_t inputStringBytes;
+  const float* inputFloats;
+  uint32_t inputFloatCount;
+  const DehermScriptUniversalUrl* inputUrls;
+  uint32_t inputUrlCount;
+  const uint32_t* argumentRoots;
+  uint32_t argumentCount;
+  DehermScriptUniversalValue* outputValues;
+  uint32_t outputValueCapacity;
+  uint32_t* outputValueCount;
+  DehermScriptUniversalEntry* outputEntries;
+  uint32_t outputEntryCapacity;
+  uint32_t* outputEntryCount;
+  char* outputStrings;
+  uint32_t outputStringCapacity;
+  uint32_t* outputStringBytes;
+  float* outputFloats;
+  uint32_t outputFloatCapacity;
+  uint32_t* outputFloatCount;
+  DehermScriptUniversalUrl* outputUrls;
+  uint32_t outputUrlCapacity;
+  uint32_t* outputUrlCount;
+  uint32_t* resultRoots;
+  uint32_t* resultCount;
+  char* error;
+  uint32_t errorCapacity;
+};
+
+// One out-of-line body for every profile: the frame shape is the only thing the
+// profiles differ in, so instantiating this per profile would multiply code size
+// without changing behavior.
+DehermScriptUniversalStatus dispatchContractFrame(
+    const defold_hermes::universal_value::Operation& operation,
+    const WireFrame& wire,
+    const FrameScratch& scratch) noexcept {
+  if (wire.argumentCount > scratch.argumentCapacity) {
+    return fail(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, wire.error, wire.errorCapacity,
+        "Universal argument frame is narrower than the generated contract");
+  }
+#if defined(DM_PLATFORM_HTML5)
+  BrowserCallbackLeases callbackLeases{};
+#endif
+  DecodeContext decoder{wire.inputValues, wire.inputValueCount, wire.inputEntries, wire.inputEntryCount,
+      wire.inputStrings, wire.inputStringBytes, wire.inputFloats, wire.inputFloatCount,
+      wire.inputUrls, wire.inputUrlCount,
+      scratch.inputEntries, scratch.inputEntryCapacity, 0, scratch.matrices, scratch.urls,
+#if defined(DM_PLATFORM_HTML5)
+      &callbackLeases,
+#endif
+      wire.error, wire.errorCapacity};
+  const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
+  for (uint32_t index = 0; index < wire.argumentCount; ++index) {
+    if (!decoder.decode(wire.argumentRoots[index], &scratch.arguments[index], 0, noAncestors, 0)) {
+      return decoder.status;
+    }
+  }
+
+  ScriptCallFrame frame{};
+  frame.stableId = operation.stableId;
+  frame.arguments = scratch.arguments;
+  frame.argumentCount = wire.argumentCount;
+  frame.results = scratch.results;
+  frame.resultCapacity = scratch.resultCapacity;
+  frame.stringScratch = wire.outputStrings;
+  frame.stringScratchCapacity = wire.outputStringCapacity;
+  frame.tableScratch = scratch.outputEntries;
+  frame.tableScratchCapacity = scratch.outputEntryCapacity;
+  frame.matrix4Arena = scratch.matrices;
+  frame.urlArena = scratch.urls;
+  if (!dispatchScriptCall(&frame)) {
+    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, wire.error, wire.errorCapacity, scriptBridgeLastError());
+  }
+  if (frame.resultCount < operation.minimumResultCount ||
+      frame.resultCount > operation.maximumResultCount) {
+    for (uint32_t index = 0; index < frame.resultCount && index < scratch.resultCapacity; ++index) {
+      releaseGraph(scratch.results[index], 0);
+    }
+    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, wire.error, wire.errorCapacity,
+        "Universal backend returned the wrong result count");
+  }
+
+  EncodeContext encoder{wire.outputValues, wire.outputValueCapacity, 0,
+      wire.outputEntries, wire.outputEntryCapacity, 0,
+      wire.outputStrings, wire.outputStringCapacity, frame.stringScratchUsed,
+      wire.outputFloats, wire.outputFloatCapacity, 0,
+      wire.outputUrls, wire.outputUrlCapacity, 0, scratch.matrices, scratch.urls,
+      wire.error, wire.errorCapacity};
+  const void* noPointers[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
+  for (uint32_t index = 0; index < frame.resultCount; ++index) {
+    if (!encoder.encode(scratch.results[index], &wire.resultRoots[index], 0, noPointers, 0)) {
+      for (uint32_t release = 0; release < frame.resultCount; ++release) {
+        releaseGraph(scratch.results[release], 0);
+      }
+      return encoder.status;
+    }
+  }
+  *wire.outputValueCount = encoder.valueUsed;
+  *wire.outputEntryCount = encoder.entryUsed;
+  *wire.outputStringBytes = encoder.stringUsed;
+  *wire.outputFloatCount = encoder.floatUsed;
+  *wire.outputUrlCount = encoder.urlUsed;
+  *wire.resultCount = frame.resultCount;
+  return DEHERM_SCRIPT_UNIVERSAL_OK;
+}
+
+template <uint32_t Arguments, uint32_t Results, uint32_t InputEntries, uint32_t OutputEntries,
+    bool Matrix4, bool Url>
+DehermScriptUniversalStatus runContractFrame(
+    const defold_hermes::universal_value::Operation& operation, const WireFrame& wire) noexcept {
+  ContractFrame<Arguments, Results, InputEntries, OutputEntries, Matrix4, Url> frame;
+  return dispatchContractFrame(operation, wire, frame.view());
+}
+
+using ContractFrameEntry = DehermScriptUniversalStatus (*)(
+    const defold_hermes::universal_value::Operation&, const WireFrame&) noexcept;
+
+// Generated frame shapes. @PROFILE_COUNT@ distinct profiles cover @ROUTE_COUNT@ routes.
+constexpr ContractFrameEntry kContractFrames[] = {
+@PROFILE_ROWS@
+};
+
+// Route index (dense, the same index the operation table uses) to frame profile.
+constexpr uint8_t kRouteContractFrames[] = {
+@ROUTE_ROWS@
+};
+
+static_assert(sizeof(kContractFrames) / sizeof(kContractFrames[0]) == @PROFILE_COUNT@u,
+    "universal frame profile census drifted");
+static_assert(sizeof(kRouteContractFrames) / sizeof(kRouteContractFrames[0]) == @ROUTE_COUNT@u,
+    "universal frame profile assignment census drifted");
+`;
+
 function renderCSource(rows) {
+  const { profiles, indexOf } = frameProfiles(rows);
+  assert(profiles.length <= 256, "universal frame profile census exceeds the u8 assignment table");
+  const frameMachinery = frameMachineryTemplate
+    .replaceAll("@PROFILE_COUNT@", String(profiles.length))
+    .replaceAll("@ROUTE_COUNT@", String(rows.length))
+    .replace("@PROFILE_ROWS@", profiles.map((profile) =>
+      `  &runContractFrame<${profile.argumentCapacity}u, ${profile.resultCapacity}u, ${profile.inputEntryCapacity}u, ${profile.outputEntryCapacity}u, ${profile.matrix4Arena}, ${profile.urlArena}>,`).join("\n"))
+    .replace("@ROUTE_ROWS@", chunk(rows.map((row) => String(indexOf(row))), 24)
+      .map((line) => `  ${line.join(", ")},`).join("\n"));
+
   // Telemetry identity for the typed-native (extern_c) transport. Interned from
   // the same generated arity contract the dispatcher enforces, so cost is
   // attributable per route and per contract shape without a hand-written call
@@ -743,6 +1056,7 @@ struct DecodeContext {
   const DehermScriptUniversalUrl* urls = nullptr;
   uint32_t urlCount = 0;
   ScriptTableEntry* scratch = nullptr;
+  uint32_t scratchCapacity = 0;
   uint32_t scratchUsed = 0;
   ScriptMatrix4Arena* matrices = nullptr;
   ScriptUrlArena<32>* urlArena = nullptr;
@@ -839,7 +1153,7 @@ struct DecodeContext {
         for (uint32_t ancestor = 0; ancestor < ancestorCount; ++ancestor) {
           if (ancestors[ancestor] == index) return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal wire value graph contains a cycle");
         }
-        if (wire.length > DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES - scratchUsed) {
+        if (!scratch || scratchUsed > scratchCapacity || wire.length > scratchCapacity - scratchUsed) {
           return reject(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, "Universal input table scratch is exhausted");
         }
         const uint32_t start = scratchUsed;
@@ -1124,7 +1438,8 @@ bool invokeBrowserCallback(
       scratch.outputStrings.data(), outputStringBytes,
       scratch.outputFloats.data(), outputFloatCount,
       scratch.outputUrls.data(), outputUrlCount,
-      scratch.tableScratch.data(), 0, arguments->matrix4Arena, arguments->urlArena,
+      scratch.tableScratch.data(), static_cast<uint32_t>(scratch.tableScratch.size()), 0,
+      arguments->matrix4Arena, arguments->urlArena,
       nullptr, error, static_cast<uint32_t>(errorCapacity)};
   const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
   for (uint32_t index = 0; index < resultCount; ++index) {
@@ -1145,6 +1460,7 @@ bool invokeBrowserCallback(
   return consume(consumeContext, &results);
 }
 #endif
+${frameMachinery}
 }  // namespace
 
 ${profileResolvers}
@@ -1179,9 +1495,9 @@ extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
   if (error && error_capacity) error[0] = '\\0';
   const auto* operation = defold_hermes::universal_value::find(stable_id);
   if (!operation) return fail(DEHERM_SCRIPT_UNIVERSAL_ROUTE_MISSING, error, error_capacity, "Stable ID is not in the universal-value family");
+  const size_t operationIndex = static_cast<size_t>(operation - defold_hermes::universal_value::operations());
   DEHERM_PROFILE_TRANSPORT_SCOPE(DEHERM_PROFILE_TRANSPORT_TYPED_NATIVE, stable_id,
-      kProfileContractShapes[static_cast<size_t>(operation - defold_hermes::universal_value::operations())],
-      kProfileNames[static_cast<size_t>(operation - defold_hermes::universal_value::operations())]);
+      kProfileContractShapes[operationIndex], kProfileNames[operationIndex]);
   if (argument_count < operation->minimumArgumentCount || argument_count > operation->maximumArgumentCount ||
       argument_count > DEHERM_SCRIPT_UNIVERSAL_MAX_ARGUMENTS || (argument_count && !argument_roots) ||
       input_value_count > DEHERM_SCRIPT_UNIVERSAL_MAX_VALUES || (input_value_count && !input_values) ||
@@ -1201,65 +1517,19 @@ extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
     return fail(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, error, error_capacity, "Universal output frame violates generated bounds or capacity");
   }
 
-  std::array<ScriptValue, DEHERM_SCRIPT_UNIVERSAL_MAX_ARGUMENTS> arguments{};
-  std::array<ScriptValue, DEHERM_SCRIPT_UNIVERSAL_MAX_RESULTS> results{};
-  std::array<ScriptTableEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> inputTableScratch{};
-  std::array<ScriptTableEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> outputTableScratch{};
-  ScriptMatrix4Arena matrixArena{};
-  ScriptUrlArena<32> urlArena{1};
-#if defined(DM_PLATFORM_HTML5)
-  BrowserCallbackLeases callbackLeases{};
-#endif
-  DecodeContext decoder{input_values, input_value_count, input_entries, input_entry_count,
-      input_strings, input_string_bytes, input_floats, input_float_count, input_urls, input_url_count,
-      inputTableScratch.data(), 0, &matrixArena, &urlArena,
-#if defined(DM_PLATFORM_HTML5)
-      &callbackLeases,
-#endif
-      error, error_capacity};
-  const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
-  for (uint32_t index = 0; index < argument_count; ++index) {
-    if (!decoder.decode(argument_roots[index], &arguments[index], 0, noAncestors, 0)) return decoder.status;
-  }
-
-  ScriptCallFrame frame{};
-  frame.stableId = stable_id;
-  frame.arguments = arguments.data();
-  frame.argumentCount = argument_count;
-  frame.results = results.data();
-  frame.resultCapacity = results.size();
-  frame.stringScratch = output_strings;
-  frame.stringScratchCapacity = output_string_capacity;
-  frame.tableScratch = outputTableScratch.data();
-  frame.tableScratchCapacity = outputTableScratch.size();
-  frame.matrix4Arena = &matrixArena;
-  frame.urlArena = &urlArena;
-  if (!dispatchScriptCall(&frame)) {
-    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, error, error_capacity, scriptBridgeLastError());
-  }
-  if (frame.resultCount < operation->minimumResultCount ||
-      frame.resultCount > operation->maximumResultCount) {
-    for (uint32_t index = 0; index < frame.resultCount && index < results.size(); ++index) releaseGraph(results[index], 0);
-    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, error, error_capacity, "Universal backend returned the wrong result count");
-  }
-
-  EncodeContext encoder{output_values, output_value_capacity, 0, output_entries, output_entry_capacity, 0,
-      output_strings, output_string_capacity, frame.stringScratchUsed, output_floats, output_float_capacity, 0,
-      output_urls, output_url_capacity, 0, &matrixArena, &urlArena, error, error_capacity};
-  const void* noPointers[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
-  for (uint32_t index = 0; index < frame.resultCount; ++index) {
-    if (!encoder.encode(results[index], &result_roots[index], 0, noPointers, 0)) {
-      for (uint32_t release = 0; release < frame.resultCount; ++release) releaseGraph(results[release], 0);
-      return encoder.status;
-    }
-  }
-  *output_value_count = encoder.valueUsed;
-  *output_entry_count = encoder.entryUsed;
-  *output_string_bytes = encoder.stringUsed;
-  *output_float_count = encoder.floatUsed;
-  *output_url_count = encoder.urlUsed;
-  *result_count = frame.resultCount;
-  return DEHERM_SCRIPT_UNIVERSAL_OK;
+  // The route's generated frame profile owns the stack scratch. Everything the
+  // body needs is bundled so one dispatcher body serves every profile.
+  const WireFrame wire{
+      input_values, input_value_count, input_entries, input_entry_count,
+      input_strings, input_string_bytes, input_floats, input_float_count,
+      input_urls, input_url_count, argument_roots, argument_count,
+      output_values, output_value_capacity, output_value_count,
+      output_entries, output_entry_capacity, output_entry_count,
+      output_strings, output_string_capacity, output_string_bytes,
+      output_floats, output_float_capacity, output_float_count,
+      output_urls, output_url_capacity, output_url_count,
+      result_roots, result_count, error, error_capacity};
+  return kContractFrames[kRouteContractFrames[operationIndex]](*operation, wire);
 }
 
 extern "C" void deherm_script_universal_release(DehermScriptUniversalValue* value) {
@@ -1929,10 +2199,14 @@ export function generateUniversalValueBindings(inputs) {
       recursive: row.effects.recursive
     };
   }), policy);
+  const signatureById = new Map(projection.rows.map((row) => [row.id, row.signature]));
   const selected = selectedBase.map((row) => {
+    const signature = signatureById.get(row.id);
+    assert(signature, `${row.id}: universal selection lost its projected signature`);
     const callback = callbackById.get(row.id);
+    const sized = { ...row, frameContract: frameContract(signature, policy.bounds, row) };
     return callback ? {
-      ...row,
+      ...sized,
       browserCallback: {
         registryEligible: callback.registryEligible,
         lifetime: callback.lifetime,
@@ -1940,7 +2214,7 @@ export function generateUniversalValueBindings(inputs) {
         threadAffinity: callback.threadAffinity,
         machineBlock: callback.machineBlock ?? null
       }
-    } : row;
+    } : sized;
   });
   assert(selected.filter(({ shapeKinds }) => shapeKinds.includes("callback")).length === callbacks.routeCount,
     "universal callback census differs from the lifecycle ledger");
@@ -1949,6 +2223,12 @@ export function generateUniversalValueBindings(inputs) {
   assert(browserCallbackRoutes.length === callbacks.registryEligibleRouteCount &&
     blockedBrowserCallbackRoutes.length === callbacks.higherOrderClosureRouteCount,
   "universal browser callback partition differs from the lifecycle ledger");
+  const frameProfileCensus = frameProfiles(selected).profiles.map((profile) => ({
+    ...profile,
+    bytes: profile.argumentCapacity * 48 + profile.resultCapacity * 48 +
+      (profile.inputEntryCapacity + profile.outputEntryCapacity) * 96 +
+      (profile.matrix4Arena ? 1296 : 0) + (profile.urlArena ? 1296 : 0)
+  }));
   const header = renderHeader(selected, policy);
   const source = renderSource(selected);
   const cHeader = renderCHeader(selected, policy, layouts);
@@ -1997,6 +2277,15 @@ export function generateUniversalValueBindings(inputs) {
     tablePolicy: policy.tablePolicy,
     candidateCount: selected.length,
     excludedCount: excluded.length,
+    // Per-call frame scratch is sized to each route's contract rather than to
+    // the family maximum. Byte figures are the generated array footprints on a
+    // 64-bit target and exist so the cost of a dispatch is auditable from the
+    // report, not only from a profiler.
+    frameProfiles: {
+      rule: "input-and-output-value-shapes-walked-per-phase-unreadable-constructors-keep-the-full-frame",
+      distinct: frameProfileCensus.length,
+      profiles: frameProfileCensus
+    },
     targetSupport: universalTargetSupport,
     targetEvidence: {
       nativeDynamicHermes: {

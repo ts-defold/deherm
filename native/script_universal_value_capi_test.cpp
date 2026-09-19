@@ -107,10 +107,18 @@ void Release(void* opaque, ScriptHandleKind, uint32_t, uint64_t) noexcept {
   ++static_cast<Backend*>(opaque)->releases;
 }
 
-const universal_value::Operation* operation(uint8_t minimumArguments, uint8_t resultCount) {
+// The fake backend above returns a record carrying a URL and a retained handle,
+// and the input frame below carries a record argument. A route's per-call frame
+// is sized to its own generated contract, so this test must drive a route whose
+// descriptor declares the scratch it uses; asking for it by contract is also the
+// check that the descriptor and the frame agree.
+const universal_value::Operation* operation(
+    uint8_t minimumArguments, uint8_t resultCount, uint16_t inputTableEntries) {
   for (size_t index = 0; index < universal_value::kOperationCount; ++index) {
     const auto& candidate = universal_value::operations()[index];
-    if (candidate.minimumArgumentCount == minimumArguments && candidate.resultCount == resultCount) return &candidate;
+    if (candidate.minimumArgumentCount == minimumArguments && candidate.resultCount == resultCount &&
+        candidate.inputTableEntryCapacity >= inputTableEntries &&
+        candidate.outputTableEntryCapacity >= 3 && candidate.urlArena) return &candidate;
   }
   return nullptr;
 }
@@ -160,8 +168,8 @@ void operator delete(void* pointer, std::size_t) noexcept { std::free(pointer); 
 int main() {
   Backend backend;
   installScriptBridgeApi({&backend, Dispatch, LastError, Release});
-  const auto* oneResult = operation(1, 1);
-  const auto* zeroArgument = operation(0, 1);
+  const auto* oneResult = operation(1, 1, 2);
+  const auto* zeroArgument = operation(0, 1, 0);
   REQUIRE(oneResult && zeroArgument);
   backend.reentrantStableId = zeroArgument->stableId;
 

@@ -52,7 +52,7 @@
     "scriptOpaqueRecordBlockers": "2624be71dcc7c7ae15b2c9c5c05914e24dcbc0a8a06307ce29b565294f229847",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
     "scriptHandleLowering": "6978d1160295eedcc2dae6a0adb5909bb0cd9d7c57a871739c01e37b21d7f36b",
-    "scriptUniversalValue": "43e45305ee983316adf1fc6bf1089bda189896cbdeaeb9770490e5385fc3120f",
+    "scriptUniversalValue": "f1b454b15d8c1a970422e2707696bfba360e8ff7649d992054eb7856ca7e2e48",
     "defoldValueLayouts": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
     "dmsdkProjection": "052a5bb57b3c247abc5e0810321ed19b1cddb886b6ecc2d4348b96f44bf5e1bf",
     "dmsdkUniversal": "cff89257532f6661ef563bc0f0892a31dc582a12e871b362568428deaa5d759d",
@@ -74,9 +74,9 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "a37c802a10c1a7675c2d68fae552c9e2a34537900176ec50327c86b39f82f7ad",
+  "cacheKey": "f0c54d53d7461317a691350bfad521159ddc3b777b148759b8e1e877b48cc7d3",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
   "outputBytes": 15872758,
-  "outputSha256": "4e25823968f903d41d1450ea2666e1978897dbadcfa491ec02316f41ece8176c",
-  "planSha256": "e02547aecda20fa13c201820061881b775a01e4206c6d266735bf59b695c90a0"
+  "outputSha256": "be16906f4472132f4306bc3f1a7c997f9be5f7823f2702b2bffea8c2c9ec3c8a",
+  "planSha256": "12e47a842832b04354c4129c7d50ed420711a15151559a0a1e70a08cf7788ad2"
 }

@@ -22,7 +22,7 @@ okf_version: "0.2"
 * [Semantic translation tokens](decisions/semantic-translation-tokens.md) - Provenance-preserving names, types, ABI projections, reproduced claims, and conformance states.
 * [Public script API names](decisions/public-script-api-names.md) - Deterministic `builtins`-source to `defold`-TypeScript projection with collision checks and unchanged ABI identity.
 * [Lua compatibility backend](decisions/lua-compatibility-backend.md) - Cached stack thunks, scratch arenas, generational pools, and instance discipline for Lua-only APIs.
-* [Memory and hot-path policy](decisions/memory-and-hot-path-policy.md) - Bounded lifetime tiers, allocation-free dispatch, arenas, pools, cache-local tables, and verification gates.
+* [Memory and hot-path policy](decisions/memory-and-hot-path-policy.md) - Bounded lifetime tiers, allocation-free dispatch, contract-sized per-call frames, arenas, pools, cache-local tables, and verification gates.
 * [Telemetry wire format](decisions/telemetry-wire-format.md) - Fixed allocation-free producer records batched into generated protobuf/DDF for native, browser, capture, JSON, and TUI consumers.
 * [Static Hermes extension authoring](decisions/static-hermes-extension-authoring.md) - Proposed strict-TypeScript extension SDK with generated Defold lifecycle, ABI, metadata, and browser projection.
 * [Hybrid TypeScript toolchain](decisions/hybrid-toolchain.md) - Lua scripts plus Hermes modules, coordinated by TypeScript 7 and ttsc.
@@ -59,7 +59,7 @@ okf_version: "0.2"
 * [Canonical lowering plan](research/canonical-lowering-plan.md) - All 2,287 API units across five backends, interned marshalling programs, semantic policies, and final-build reachability.
 * [Full-stack completion matrix](research/full-stack-completion-matrix.md) - Evidence-separated API, compiler, bundler, runtime, editor, and packaged-engine completion gates.
 * [Generated script recording engine](research/generated-script-recording-engine.md) - Generated null/observer Defold that asserts, records, and replays every callable script route through the real binding stack over each drivable transport.
-* [Measured binding-transport overhead](research/transport-overhead-measurement.md) - The `DEHERM_PROFILE` compile switch, generated per-route transport spans, its compile-out proof, and the first measured cost of the Lua bridge.
+* [Measured binding-transport overhead](research/transport-overhead-measurement.md) - The `DEHERM_PROFILE` compile switch, generated per-route transport spans, its compile-out proof, the measured cost of the Lua bridge, and the contract-sized dispatch frame that removed 53,472 bytes of per-call zeroing from the typed-native transport.
 * [Headless engine conformance](research/headless-engine-conformance.md) - In-process headless Defold driven a tick at a time, generated per-contract fixtures, and the enumerated set of contracts a headless engine still cannot reach.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Exact positional Lua tuple ABI, public reachability limits, and unpromoted engine evidence.
 * [Script API coverage](research/script-api-coverage.md) - Generated inventory of the Lua-shaped API TypeScript game logic must replace.

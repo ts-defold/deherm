@@ -20,6 +20,15 @@ struct Operation {
   uint8_t minimumResultCount;
   uint8_t maximumResultCount;
   uint8_t resultCount;
+  /**
+   * Per-call frame scratch this route's value shapes can reach, derived from
+   * the same projected signature the arity fields come from. A transport sizes
+   * its frame from these; a backend may not address scratch beyond them.
+   */
+  uint16_t inputTableEntryCapacity;
+  uint16_t outputTableEntryCapacity;
+  uint8_t matrix4Arena;
+  uint8_t urlArena;
 };
 
 struct LuaApi {

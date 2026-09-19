@@ -2065,6 +2065,7 @@ struct DecodeContext {
   const DehermScriptUniversalUrl* urls = nullptr;
   uint32_t urlCount = 0;
   ScriptTableEntry* scratch = nullptr;
+  uint32_t scratchCapacity = 0;
   uint32_t scratchUsed = 0;
   ScriptMatrix4Arena* matrices = nullptr;
   ScriptUrlArena<32>* urlArena = nullptr;
@@ -2161,7 +2162,7 @@ struct DecodeContext {
         for (uint32_t ancestor = 0; ancestor < ancestorCount; ++ancestor) {
           if (ancestors[ancestor] == index) return reject(DEHERM_SCRIPT_UNIVERSAL_INVALID_VALUE, "Universal wire value graph contains a cycle");
         }
-        if (wire.length > DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES - scratchUsed) {
+        if (!scratch || scratchUsed > scratchCapacity || wire.length > scratchCapacity - scratchUsed) {
           return reject(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, "Universal input table scratch is exhausted");
         }
         const uint32_t start = scratchUsed;
@@ -2446,7 +2447,8 @@ bool invokeBrowserCallback(
       scratch.outputStrings.data(), outputStringBytes,
       scratch.outputFloats.data(), outputFloatCount,
       scratch.outputUrls.data(), outputUrlCount,
-      scratch.tableScratch.data(), 0, arguments->matrix4Arena, arguments->urlArena,
+      scratch.tableScratch.data(), static_cast<uint32_t>(scratch.tableScratch.size()), 0,
+      arguments->matrix4Arena, arguments->urlArena,
       nullptr, error, static_cast<uint32_t>(errorCapacity)};
   const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
   for (uint32_t index = 0; index < resultCount; ++index) {
@@ -2467,6 +2469,330 @@ bool invokeBrowserCallback(
   return consume(consumeContext, &results);
 }
 #endif
+
+// ---------------------------------------------------------------------------
+// Per-call frame scratch, sized to each route's generated contract.
+//
+// The frame is stack-resident and allocation-free either way. What the sizing
+// removes is the per-call value-initialization of scratch a route's value
+// shapes can never address: a scalar route no longer zeroes two 256-entry table
+// arrays, a Matrix4 arena, and a 32-slot URL arena on every dispatch. Bounds,
+// generation counters, and every stale-handle check are unchanged; a route
+// whose contract can reach a table, a Matrix4, or a URL still gets the full
+// arena, and a route whose contract cannot gets a null arena that the decoder
+// and encoder already fail closed on.
+// ---------------------------------------------------------------------------
+struct FrameScratch {
+  ScriptValue* arguments;
+  uint32_t argumentCapacity;
+  ScriptValue* results;
+  uint32_t resultCapacity;
+  ScriptTableEntry* inputEntries;
+  uint32_t inputEntryCapacity;
+  ScriptTableEntry* outputEntries;
+  uint32_t outputEntryCapacity;
+  ScriptMatrix4Arena* matrices;
+  ScriptUrlArena<32>* urls;
+};
+
+template <bool Present> struct Matrix4Scratch {
+  ScriptMatrix4Arena arena{};
+  ScriptMatrix4Arena* pointer() noexcept { return &arena; }
+};
+template <> struct Matrix4Scratch<false> {
+  ScriptMatrix4Arena* pointer() noexcept { return nullptr; }
+};
+template <bool Present> struct UrlScratch {
+  ScriptUrlArena<32> arena{1};
+  ScriptUrlArena<32>* pointer() noexcept { return &arena; }
+};
+template <> struct UrlScratch<false> {
+  ScriptUrlArena<32>* pointer() noexcept { return nullptr; }
+};
+
+template <uint32_t Arguments, uint32_t Results, uint32_t InputEntries, uint32_t OutputEntries,
+    bool Matrix4, bool Url>
+struct ContractFrame {
+  std::array<ScriptValue, Arguments> arguments{};
+  std::array<ScriptValue, Results> results{};
+  std::array<ScriptTableEntry, InputEntries> inputEntries{};
+  std::array<ScriptTableEntry, OutputEntries> outputEntries{};
+  Matrix4Scratch<Matrix4> matrices{};
+  UrlScratch<Url> urls{};
+  FrameScratch view() noexcept {
+    return FrameScratch{
+        Arguments ? arguments.data() : nullptr, Arguments,
+        Results ? results.data() : nullptr, Results,
+        InputEntries ? inputEntries.data() : nullptr, InputEntries,
+        OutputEntries ? outputEntries.data() : nullptr, OutputEntries,
+        matrices.pointer(), urls.pointer()};
+  }
+};
+
+/** The caller-owned wire frame, bundled so one dispatcher body serves every profile. */
+struct WireFrame {
+  const DehermScriptUniversalValue* inputValues;
+  uint32_t inputValueCount;
+  const DehermScriptUniversalEntry* inputEntries;
+  uint32_t inputEntryCount;
+  const char* inputStrings;
+  uint32_t inputStringBytes;
+  const float* inputFloats;
+  uint32_t inputFloatCount;
+  const DehermScriptUniversalUrl* inputUrls;
+  uint32_t inputUrlCount;
+  const uint32_t* argumentRoots;
+  uint32_t argumentCount;
+  DehermScriptUniversalValue* outputValues;
+  uint32_t outputValueCapacity;
+  uint32_t* outputValueCount;
+  DehermScriptUniversalEntry* outputEntries;
+  uint32_t outputEntryCapacity;
+  uint32_t* outputEntryCount;
+  char* outputStrings;
+  uint32_t outputStringCapacity;
+  uint32_t* outputStringBytes;
+  float* outputFloats;
+  uint32_t outputFloatCapacity;
+  uint32_t* outputFloatCount;
+  DehermScriptUniversalUrl* outputUrls;
+  uint32_t outputUrlCapacity;
+  uint32_t* outputUrlCount;
+  uint32_t* resultRoots;
+  uint32_t* resultCount;
+  char* error;
+  uint32_t errorCapacity;
+};
+
+// One out-of-line body for every profile: the frame shape is the only thing the
+// profiles differ in, so instantiating this per profile would multiply code size
+// without changing behavior.
+DehermScriptUniversalStatus dispatchContractFrame(
+    const defold_hermes::universal_value::Operation& operation,
+    const WireFrame& wire,
+    const FrameScratch& scratch) noexcept {
+  if (wire.argumentCount > scratch.argumentCapacity) {
+    return fail(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, wire.error, wire.errorCapacity,
+        "Universal argument frame is narrower than the generated contract");
+  }
+#if defined(DM_PLATFORM_HTML5)
+  BrowserCallbackLeases callbackLeases{};
+#endif
+  DecodeContext decoder{wire.inputValues, wire.inputValueCount, wire.inputEntries, wire.inputEntryCount,
+      wire.inputStrings, wire.inputStringBytes, wire.inputFloats, wire.inputFloatCount,
+      wire.inputUrls, wire.inputUrlCount,
+      scratch.inputEntries, scratch.inputEntryCapacity, 0, scratch.matrices, scratch.urls,
+#if defined(DM_PLATFORM_HTML5)
+      &callbackLeases,
+#endif
+      wire.error, wire.errorCapacity};
+  const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
+  for (uint32_t index = 0; index < wire.argumentCount; ++index) {
+    if (!decoder.decode(wire.argumentRoots[index], &scratch.arguments[index], 0, noAncestors, 0)) {
+      return decoder.status;
+    }
+  }
+
+  ScriptCallFrame frame{};
+  frame.stableId = operation.stableId;
+  frame.arguments = scratch.arguments;
+  frame.argumentCount = wire.argumentCount;
+  frame.results = scratch.results;
+  frame.resultCapacity = scratch.resultCapacity;
+  frame.stringScratch = wire.outputStrings;
+  frame.stringScratchCapacity = wire.outputStringCapacity;
+  frame.tableScratch = scratch.outputEntries;
+  frame.tableScratchCapacity = scratch.outputEntryCapacity;
+  frame.matrix4Arena = scratch.matrices;
+  frame.urlArena = scratch.urls;
+  if (!dispatchScriptCall(&frame)) {
+    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, wire.error, wire.errorCapacity, scriptBridgeLastError());
+  }
+  if (frame.resultCount < operation.minimumResultCount ||
+      frame.resultCount > operation.maximumResultCount) {
+    for (uint32_t index = 0; index < frame.resultCount && index < scratch.resultCapacity; ++index) {
+      releaseGraph(scratch.results[index], 0);
+    }
+    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, wire.error, wire.errorCapacity,
+        "Universal backend returned the wrong result count");
+  }
+
+  EncodeContext encoder{wire.outputValues, wire.outputValueCapacity, 0,
+      wire.outputEntries, wire.outputEntryCapacity, 0,
+      wire.outputStrings, wire.outputStringCapacity, frame.stringScratchUsed,
+      wire.outputFloats, wire.outputFloatCapacity, 0,
+      wire.outputUrls, wire.outputUrlCapacity, 0, scratch.matrices, scratch.urls,
+      wire.error, wire.errorCapacity};
+  const void* noPointers[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
+  for (uint32_t index = 0; index < frame.resultCount; ++index) {
+    if (!encoder.encode(scratch.results[index], &wire.resultRoots[index], 0, noPointers, 0)) {
+      for (uint32_t release = 0; release < frame.resultCount; ++release) {
+        releaseGraph(scratch.results[release], 0);
+      }
+      return encoder.status;
+    }
+  }
+  *wire.outputValueCount = encoder.valueUsed;
+  *wire.outputEntryCount = encoder.entryUsed;
+  *wire.outputStringBytes = encoder.stringUsed;
+  *wire.outputFloatCount = encoder.floatUsed;
+  *wire.outputUrlCount = encoder.urlUsed;
+  *wire.resultCount = frame.resultCount;
+  return DEHERM_SCRIPT_UNIVERSAL_OK;
+}
+
+template <uint32_t Arguments, uint32_t Results, uint32_t InputEntries, uint32_t OutputEntries,
+    bool Matrix4, bool Url>
+DehermScriptUniversalStatus runContractFrame(
+    const defold_hermes::universal_value::Operation& operation, const WireFrame& wire) noexcept {
+  ContractFrame<Arguments, Results, InputEntries, OutputEntries, Matrix4, Url> frame;
+  return dispatchContractFrame(operation, wire, frame.view());
+}
+
+using ContractFrameEntry = DehermScriptUniversalStatus (*)(
+    const defold_hermes::universal_value::Operation&, const WireFrame&) noexcept;
+
+// Generated frame shapes. 89 distinct profiles cover 915 routes.
+constexpr ContractFrameEntry kContractFrames[] = {
+  &runContractFrame<2u, 0u, 0u, 0u, false, true>,
+  &runContractFrame<4u, 1u, 256u, 256u, true, true>,
+  &runContractFrame<1u, 0u, 0u, 0u, false, true>,
+  &runContractFrame<2u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 2u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 1u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 3u, 0u, 0u, false, false>,
+  &runContractFrame<3u, 1u, 256u, 0u, true, true>,
+  &runContractFrame<3u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<4u, 1u, 256u, 0u, true, true>,
+  &runContractFrame<1u, 1u, 0u, 0u, false, true>,
+  &runContractFrame<5u, 1u, 256u, 0u, true, true>,
+  &runContractFrame<2u, 1u, 256u, 0u, true, true>,
+  &runContractFrame<2u, 1u, 0u, 0u, false, false>,
+  &runContractFrame<6u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<32u, 1u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 1u, 0u, 256u, true, true>,
+  &runContractFrame<2u, 1u, 256u, 256u, true, true>,
+  &runContractFrame<0u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<3u, 1u, 0u, 0u, false, false>,
+  &runContractFrame<4u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<3u, 3u, 256u, 256u, true, true>,
+  &runContractFrame<5u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<0u, 1u, 0u, 0u, false, false>,
+  &runContractFrame<6u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<5u, 2u, 256u, 256u, true, true>,
+  &runContractFrame<1u, 1u, 256u, 256u, true, true>,
+  &runContractFrame<3u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<1u, 1u, 256u, 0u, true, true>,
+  &runContractFrame<6u, 0u, 0u, 0u, false, true>,
+  &runContractFrame<0u, 2u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 0u, 256u, 0u, false, false>,
+  &runContractFrame<3u, 0u, 0u, 0u, false, true>,
+  &runContractFrame<4u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<4u, 2u, 256u, 256u, true, true>,
+  &runContractFrame<3u, 0u, 256u, 0u, false, false>,
+  &runContractFrame<2u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<2u, 2u, 0u, 0u, false, true>,
+  &runContractFrame<3u, 1u, 0u, 0u, false, true>,
+  &runContractFrame<1u, 1u, 0u, 0u, true, false>,
+  &runContractFrame<3u, 1u, 0u, 256u, true, true>,
+  &runContractFrame<0u, 1u, 0u, 256u, true, true>,
+  &runContractFrame<1u, 1u, 0u, 0u, true, true>,
+  &runContractFrame<0u, 1u, 0u, 256u, false, true>,
+  &runContractFrame<5u, 2u, 0u, 0u, false, false>,
+  &runContractFrame<4u, 1u, 0u, 0u, true, false>,
+  &runContractFrame<1u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<2u, 1u, 0u, 0u, false, true>,
+  &runContractFrame<2u, 1u, 0u, 256u, true, true>,
+  &runContractFrame<2u, 1u, 0u, 256u, false, false>,
+  &runContractFrame<5u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<1u, 2u, 0u, 256u, true, true>,
+  &runContractFrame<8u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<2u, 3u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 1u, 256u, 0u, false, false>,
+  &runContractFrame<4u, 0u, 256u, 0u, false, false>,
+  &runContractFrame<1u, 1u, 0u, 256u, false, false>,
+  &runContractFrame<2u, 1u, 0u, 0u, true, false>,
+  &runContractFrame<0u, 1u, 0u, 256u, false, false>,
+  &runContractFrame<1u, 0u, 0u, 0u, true, false>,
+  &runContractFrame<2u, 4u, 0u, 0u, false, false>,
+  &runContractFrame<3u, 1u, 0u, 0u, true, false>,
+  &runContractFrame<2u, 2u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 4u, 0u, 0u, false, true>,
+  &runContractFrame<1u, 2u, 0u, 256u, false, false>,
+  &runContractFrame<2u, 1u, 0u, 0u, true, true>,
+  &runContractFrame<2u, 1u, 0u, 256u, false, true>,
+  &runContractFrame<3u, 1u, 256u, 256u, true, true>,
+  &runContractFrame<4u, 2u, 256u, 0u, true, true>,
+  &runContractFrame<32u, 1u, 256u, 256u, true, true>,
+  &runContractFrame<4u, 1u, 0u, 0u, false, false>,
+  &runContractFrame<7u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<6u, 1u, 0u, 0u, true, false>,
+  &runContractFrame<5u, 1u, 256u, 256u, true, true>,
+  &runContractFrame<4u, 1u, 0u, 0u, false, true>,
+  &runContractFrame<6u, 2u, 0u, 0u, false, false>,
+  &runContractFrame<2u, 0u, 256u, 0u, false, true>,
+  &runContractFrame<4u, 1u, 0u, 256u, true, true>,
+  &runContractFrame<32u, 0u, 256u, 0u, true, true>,
+  &runContractFrame<4u, 0u, 0u, 0u, false, true>,
+  &runContractFrame<2u, 0u, 256u, 0u, false, false>,
+  &runContractFrame<2u, 2u, 256u, 256u, true, true>,
+  &runContractFrame<2u, 2u, 0u, 256u, false, false>,
+  &runContractFrame<1u, 4u, 0u, 0u, false, false>,
+  &runContractFrame<1u, 1u, 0u, 256u, false, true>,
+  &runContractFrame<4u, 1u, 0u, 256u, false, true>,
+  &runContractFrame<7u, 0u, 0u, 0u, false, false>,
+  &runContractFrame<6u, 1u, 0u, 0u, false, false>,
+};
+
+// Route index (dense, the same index the operation table uses) to frame profile.
+constexpr uint8_t kRouteContractFrames[] = {
+  0, 1, 2, 3, 2, 4, 5, 6, 7, 8, 9, 5, 7, 5, 10, 5, 5, 11, 12, 9, 8, 13, 14, 3,
+  15, 9, 5, 16, 1, 17, 3, 6, 9, 5, 5, 18, 5, 6, 5, 9, 3, 19, 5, 15, 20, 21, 5, 5,
+  14, 22, 23, 3, 0, 5, 5, 5, 5, 5, 3, 24, 3, 0, 5, 25, 5, 9, 3, 11, 5, 9, 3, 3,
+  5, 17, 5, 8, 8, 6, 5, 17, 26, 11, 6, 3, 1, 27, 23, 3, 5, 5, 28, 28, 14, 14, 11, 14,
+  29, 6, 5, 5, 5, 5, 3, 1, 3, 6, 26, 5, 17, 3, 5, 5, 8, 30, 5, 3, 29, 5, 6, 14,
+  5, 17, 31, 1, 3, 5, 32, 33, 3, 5, 6, 34, 0, 3, 24, 5, 28, 17, 4, 34, 35, 3, 3, 20,
+  8, 5, 17, 0, 5, 14, 3, 36, 13, 14, 5, 5, 8, 5, 3, 3, 3, 24, 5, 3, 14, 4, 5, 6,
+  3, 11, 37, 37, 38, 39, 5, 11, 24, 2, 5, 5, 5, 17, 6, 3, 37, 3, 5, 3, 5, 3, 9, 6,
+  14, 5, 40, 8, 6, 41, 21, 3, 3, 9, 42, 43, 11, 44, 9, 5, 14, 24, 5, 5, 37, 5, 6, 24,
+  45, 11, 46, 19, 17, 5, 6, 17, 9, 8, 47, 28, 5, 9, 5, 48, 35, 24, 5, 49, 23, 5, 5, 47,
+  42, 0, 3, 3, 9, 5, 49, 5, 3, 40, 24, 5, 17, 3, 48, 14, 5, 3, 3, 17, 5, 50, 6, 51,
+  47, 14, 9, 3, 25, 5, 40, 5, 17, 3, 52, 53, 14, 11, 20, 3, 5, 6, 3, 17, 11, 54, 34, 24,
+  3, 3, 34, 5, 42, 5, 5, 13, 5, 5, 3, 4, 48, 4, 5, 37, 18, 24, 55, 14, 3, 3, 5, 5,
+  3, 5, 3, 9, 3, 14, 5, 43, 0, 3, 5, 14, 11, 5, 5, 3, 3, 18, 11, 5, 5, 53, 5, 5,
+  31, 5, 6, 5, 5, 5, 14, 2, 5, 24, 5, 23, 5, 5, 3, 11, 5, 37, 17, 5, 3, 56, 57, 14,
+  9, 3, 0, 3, 3, 27, 14, 58, 5, 3, 3, 5, 3, 5, 5, 3, 5, 32, 37, 37, 5, 5, 3, 21,
+  5, 6, 3, 17, 3, 18, 8, 5, 5, 17, 21, 48, 3, 3, 5, 34, 3, 9, 3, 5, 0, 5, 17, 5,
+  8, 3, 6, 59, 6, 5, 5, 13, 3, 24, 5, 5, 60, 42, 5, 5, 16, 5, 5, 24, 61, 3, 24, 9,
+  13, 0, 0, 60, 3, 3, 47, 19, 62, 21, 3, 24, 63, 19, 5, 62, 24, 5, 24, 64, 5, 3, 17, 34,
+  0, 3, 17, 59, 5, 5, 6, 27, 3, 17, 5, 3, 3, 23, 5, 65, 66, 3, 3, 14, 9, 5, 1, 5,
+  14, 4, 5, 0, 14, 17, 43, 4, 5, 67, 14, 24, 3, 3, 5, 21, 3, 3, 49, 37, 6, 48, 68, 3,
+  5, 5, 19, 5, 6, 17, 13, 69, 59, 5, 8, 5, 6, 14, 33, 16, 48, 5, 14, 62, 5, 40, 5, 5,
+  5, 5, 6, 40, 68, 11, 14, 57, 3, 47, 57, 14, 40, 5, 3, 14, 8, 5, 5, 5, 29, 3, 70, 14,
+  3, 24, 3, 0, 14, 14, 63, 7, 31, 56, 8, 3, 3, 3, 14, 6, 17, 5, 5, 13, 17, 6, 9, 6,
+  63, 17, 0, 5, 9, 5, 14, 3, 71, 3, 3, 11, 72, 47, 73, 5, 74, 37, 75, 5, 5, 11, 3, 5,
+  76, 3, 5, 3, 8, 5, 5, 14, 17, 0, 0, 5, 55, 3, 77, 3, 4, 17, 3, 3, 5, 28, 0, 78,
+  5, 9, 8, 1, 21, 9, 9, 20, 14, 9, 5, 79, 4, 5, 13, 3, 5, 9, 8, 24, 17, 14, 3, 24,
+  0, 68, 5, 9, 3, 6, 14, 37, 80, 5, 6, 57, 41, 40, 6, 4, 8, 14, 37, 81, 82, 5, 3, 3,
+  11, 3, 11, 33, 14, 5, 6, 3, 19, 33, 3, 48, 34, 8, 5, 3, 1, 17, 6, 6, 5, 8, 5, 5,
+  5, 4, 5, 5, 40, 3, 5, 29, 3, 3, 14, 28, 6, 3, 5, 29, 14, 83, 28, 5, 84, 5, 9, 5,
+  5, 5, 3, 9, 3, 31, 3, 14, 5, 5, 6, 5, 5, 5, 20, 0, 4, 40, 5, 37, 11, 0, 5, 14,
+  74, 3, 17, 5, 8, 3, 71, 3, 5, 5, 5, 81, 29, 33, 8, 5, 27, 14, 85, 5, 24, 57, 5, 42,
+  3, 5, 0, 15, 29, 2, 34, 6, 14, 37, 11, 14, 5, 0, 6, 3, 5, 14, 14, 5, 3, 3, 6, 37,
+  3, 5, 3, 3, 68, 5, 5, 6, 8, 5, 13, 5, 3, 17, 0, 5, 3, 5, 19, 5, 5, 14, 3, 5,
+  9, 5, 86, 6, 10, 37, 9, 3, 11, 3, 1, 3, 37, 0, 17, 5, 6, 3, 24, 31, 59, 11, 3, 9,
+  5, 5, 3, 5, 5, 3, 24, 17, 74, 3, 5, 52, 68, 5, 5, 24, 14, 37, 5, 85, 52, 5, 11, 37,
+  5, 5, 5, 17, 5, 5, 3, 5, 0, 3, 14, 39, 87, 5, 37, 88, 37, 77, 11, 9, 6, 0, 3, 42,
+  9, 3, 5, 14, 17, 3, 29, 48, 0, 5, 3, 5, 5, 5, 11, 11, 5, 73, 14, 5, 78, 5, 8, 5,
+  5, 17, 3,
+};
+
+static_assert(sizeof(kContractFrames) / sizeof(kContractFrames[0]) == 89u,
+    "universal frame profile census drifted");
+static_assert(sizeof(kRouteContractFrames) / sizeof(kRouteContractFrames[0]) == 915u,
+    "universal frame profile assignment census drifted");
+
 }  // namespace
 
 #if DEHERM_PROFILE_ENABLED
@@ -2514,9 +2840,9 @@ extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
   if (error && error_capacity) error[0] = '\0';
   const auto* operation = defold_hermes::universal_value::find(stable_id);
   if (!operation) return fail(DEHERM_SCRIPT_UNIVERSAL_ROUTE_MISSING, error, error_capacity, "Stable ID is not in the universal-value family");
+  const size_t operationIndex = static_cast<size_t>(operation - defold_hermes::universal_value::operations());
   DEHERM_PROFILE_TRANSPORT_SCOPE(DEHERM_PROFILE_TRANSPORT_TYPED_NATIVE, stable_id,
-      kProfileContractShapes[static_cast<size_t>(operation - defold_hermes::universal_value::operations())],
-      kProfileNames[static_cast<size_t>(operation - defold_hermes::universal_value::operations())]);
+      kProfileContractShapes[operationIndex], kProfileNames[operationIndex]);
   if (argument_count < operation->minimumArgumentCount || argument_count > operation->maximumArgumentCount ||
       argument_count > DEHERM_SCRIPT_UNIVERSAL_MAX_ARGUMENTS || (argument_count && !argument_roots) ||
       input_value_count > DEHERM_SCRIPT_UNIVERSAL_MAX_VALUES || (input_value_count && !input_values) ||
@@ -2536,65 +2862,19 @@ extern "C" DehermScriptUniversalStatus deherm_script_universal_dispatch(
     return fail(DEHERM_SCRIPT_UNIVERSAL_ARENA_EXHAUSTED, error, error_capacity, "Universal output frame violates generated bounds or capacity");
   }
 
-  std::array<ScriptValue, DEHERM_SCRIPT_UNIVERSAL_MAX_ARGUMENTS> arguments{};
-  std::array<ScriptValue, DEHERM_SCRIPT_UNIVERSAL_MAX_RESULTS> results{};
-  std::array<ScriptTableEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> inputTableScratch{};
-  std::array<ScriptTableEntry, DEHERM_SCRIPT_UNIVERSAL_MAX_ENTRIES> outputTableScratch{};
-  ScriptMatrix4Arena matrixArena{};
-  ScriptUrlArena<32> urlArena{1};
-#if defined(DM_PLATFORM_HTML5)
-  BrowserCallbackLeases callbackLeases{};
-#endif
-  DecodeContext decoder{input_values, input_value_count, input_entries, input_entry_count,
-      input_strings, input_string_bytes, input_floats, input_float_count, input_urls, input_url_count,
-      inputTableScratch.data(), 0, &matrixArena, &urlArena,
-#if defined(DM_PLATFORM_HTML5)
-      &callbackLeases,
-#endif
-      error, error_capacity};
-  const uint32_t noAncestors[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
-  for (uint32_t index = 0; index < argument_count; ++index) {
-    if (!decoder.decode(argument_roots[index], &arguments[index], 0, noAncestors, 0)) return decoder.status;
-  }
-
-  ScriptCallFrame frame{};
-  frame.stableId = stable_id;
-  frame.arguments = arguments.data();
-  frame.argumentCount = argument_count;
-  frame.results = results.data();
-  frame.resultCapacity = results.size();
-  frame.stringScratch = output_strings;
-  frame.stringScratchCapacity = output_string_capacity;
-  frame.tableScratch = outputTableScratch.data();
-  frame.tableScratchCapacity = outputTableScratch.size();
-  frame.matrix4Arena = &matrixArena;
-  frame.urlArena = &urlArena;
-  if (!dispatchScriptCall(&frame)) {
-    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, error, error_capacity, scriptBridgeLastError());
-  }
-  if (frame.resultCount < operation->minimumResultCount ||
-      frame.resultCount > operation->maximumResultCount) {
-    for (uint32_t index = 0; index < frame.resultCount && index < results.size(); ++index) releaseGraph(results[index], 0);
-    return fail(DEHERM_SCRIPT_UNIVERSAL_BACKEND_ERROR, error, error_capacity, "Universal backend returned the wrong result count");
-  }
-
-  EncodeContext encoder{output_values, output_value_capacity, 0, output_entries, output_entry_capacity, 0,
-      output_strings, output_string_capacity, frame.stringScratchUsed, output_floats, output_float_capacity, 0,
-      output_urls, output_url_capacity, 0, &matrixArena, &urlArena, error, error_capacity};
-  const void* noPointers[DEHERM_SCRIPT_UNIVERSAL_MAX_DEPTH]{};
-  for (uint32_t index = 0; index < frame.resultCount; ++index) {
-    if (!encoder.encode(results[index], &result_roots[index], 0, noPointers, 0)) {
-      for (uint32_t release = 0; release < frame.resultCount; ++release) releaseGraph(results[release], 0);
-      return encoder.status;
-    }
-  }
-  *output_value_count = encoder.valueUsed;
-  *output_entry_count = encoder.entryUsed;
-  *output_string_bytes = encoder.stringUsed;
-  *output_float_count = encoder.floatUsed;
-  *output_url_count = encoder.urlUsed;
-  *result_count = frame.resultCount;
-  return DEHERM_SCRIPT_UNIVERSAL_OK;
+  // The route's generated frame profile owns the stack scratch. Everything the
+  // body needs is bundled so one dispatcher body serves every profile.
+  const WireFrame wire{
+      input_values, input_value_count, input_entries, input_entry_count,
+      input_strings, input_string_bytes, input_floats, input_float_count,
+      input_urls, input_url_count, argument_roots, argument_count,
+      output_values, output_value_capacity, output_value_count,
+      output_entries, output_entry_capacity, output_entry_count,
+      output_strings, output_string_capacity, output_string_bytes,
+      output_floats, output_float_capacity, output_float_count,
+      output_urls, output_url_capacity, output_url_count,
+      result_roots, result_count, error, error_capacity};
+  return kContractFrames[kRouteContractFrames[operationIndex]](*operation, wire);
 }
 
 extern "C" void deherm_script_universal_release(DehermScriptUniversalValue* value) {

@@ -1,10 +1,10 @@
 ---
 type: Research Note
 title: Measured binding-transport overhead
-description: Compile-time-switched DEHERM_PROFILE telemetry, the generated per-route transport spans behind it, and the first measured cost of the Lua bridge against a raw-Lua baseline.
-tags: [telemetry, performance, bindings, transports, lua, profiling, measurement]
+description: Compile-time-switched DEHERM_PROFILE telemetry, the generated per-route transport spans behind it, the measured cost of the Lua bridge against a raw-Lua baseline, and the contract-sized frame that took the typed-native transport from 733-773 ns to 43-68 ns.
+tags: [telemetry, performance, bindings, transports, lua, profiling, measurement, frame-sizing, memory]
 status: host-harness-measured-engine-unverified
-generated: { by: claude/opus-5, at: 2026-09-18T19:10:00-04:00 }
+generated: { by: claude/opus-5, at: 2026-09-18T20:45:00-04:00 }
 sources:
   - id: dm-profile
     resource: ../../../upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h
@@ -122,7 +122,7 @@ All figures nanoseconds per call.
 | Transport | ns/call | Note |
 | --- | ---: | --- |
 | `c-abi-native` (82 borrowed-handle bindings) | 4.0 | stub provider; framing and validation only |
-| `typed-native` (universal extern_c C ABI) | 725 | stub backend; framing only |
+| `typed-native` (universal extern_c C ABI) | 725 | stub backend; framing only. Superseded - see below |
 
 ## What the number means
 
@@ -181,22 +181,148 @@ are the meaningful output. The ring's own per-shape means for `lua-stack` land
 at 250-345 ns, below the wall-clock ON figure, because the span excludes the
 route lookup and its own exit read.
 
-# The typed-native finding
+# The typed-native finding, and the fix
 
 The `typed-native` extern_c C ABI measured **725 ns per call with a stub backend
 that does nothing** - 180x the `c-abi-native` transport and more than twice the
-complete Lua bridge. The generated dispatcher value-initialises its fixed
-per-call frame scratch on every call: 32 + 4 `ScriptValue` (48 bytes each), two
-256-entry `ScriptTableEntry` arrays (96 bytes each), a `ScriptMatrix4Arena`, and
-a 32-slot `ScriptUrlArena`. That is **53,472 bytes zeroed per call**, which at
-M4 store bandwidth accounts for essentially the whole figure.
+complete Lua bridge. The cause was not the codecs: the generated dispatcher
+value-initialized one fixed per-call frame for every one of its 915 routes -
+32 + 4 `ScriptValue` (48 bytes each), two 256-entry `ScriptTableEntry` arrays
+(96 bytes each), a `ScriptMatrix4Arena` and a 32-slot `ScriptUrlArena`, which is
+**53,472 bytes zeroed per dispatch** whether the route could address any of it or
+not.
 
-This is an allocation-free path by the memory policy's definition - the storage
-is stack-resident and bounded - but it is not a cheap one. The policy's rule
-that hot paths must not touch the general heap says nothing about zeroing 52 KiB
-of stack per dispatch. Sizing the frame to the route's actual contract, or
-skipping the value-initialisation for the unused tail, is the obvious next
-change; neither has been attempted or measured.
+That frame was allocation-free by the memory policy's original definition - it
+is stack-resident, bounded, and never reaches the heap - which is exactly why
+the policy now covers per-call *initialization* as well as allocation. See
+`decisions/memory-and-hot-path-policy.md`.
+
+## Contract-sized frames
+
+`scripts/generate-script-universal-value-bindings.mjs` now derives each route's
+frame from the same projected signature its arity contract comes from. Both
+halves of the signature are walked separately, including inside union variants,
+and the walk answers three structural questions: can this route's parameters
+carry a table, can its returns, and can either reach a `matrix4` or a `url`. A
+constructor whose contents the pinned IR does not inline - `dynamic`, a
+`record-ref` or `named` schema resolved elsewhere, a callback, or a constructor
+a later Defold revision introduces - widens the frame to the family maximum
+rather than narrowing it, so an unrecognized shape costs memory and never loses
+a bound.
+
+Nothing is hand-written per route. The generator interns the distinct frame
+shapes - **89 profiles over 915 routes** - emits one `runContractFrame<...>`
+stub per profile and a dense `uint8` route-to-profile table, and publishes the
+same four capacities on the `Operation` descriptor the dispatcher already
+validates against. A generator test parses both emitted files and asserts the
+descriptor and the stack frame are still the same numbers, because a frame
+narrower than its descriptor would refuse calls the descriptor accepts. The
+per-route footprint is in
+`packages/bindings/generated/defold-script-universal-value-bindings.json`, so a
+dispatch's cost is auditable without a profiler.
+
+There is one dispatcher body, shared by every profile; only the frame shape is
+templated. The decoder's input-table bound now comes from the frame it was
+given rather than from the family maximum macro, which is what makes a
+zero-capacity table frame fail closed instead of writing into a smaller array.
+
+Result across the family: **607 of 915 routes need no table scratch, no Matrix4
+arena and no URL arena at all**, 708 need no table scratch, and the median
+route's frame is **96 bytes**. The mean is 7,209 bytes against the previous flat
+53,472.
+
+## Measured before and after
+
+Machine: Apple M4, 16 GiB, macOS 26.5.2, Apple clang 21.0.0, arm64, load
+average 2.0-4.1 on 10 cores (a quieter host than the Lua-bridge table above,
+which is why the "before" column reads 733-773 rather than 725; the before and
+after binaries were run interleaved, three runs each, on the same host in the
+same minute).
+Build: `CMAKE_BUILD_TYPE=Release` (`-O3 -DNDEBUG`), `DEHERM_PROFILE=OFF`.
+Harness: `native/transport_profile_benchmark.cpp`, 20,000 warm-up calls then 9
+repeats of 100,000 calls; each cell is the mean of three whole-binary runs of
+the best-of-9 repeat mean. The typed-native sweep now selects one route per
+distinct `Narg-Mres` contract shape in stable-id order, so the same route is
+measured on both sides.
+
+| Shape | Route | Frame bytes | Before | After |
+| --- | --- | ---: | ---: | ---: |
+| 0arg-0res | `profiler.dump_frame` | 0 | 733.3 | **43.0** |
+| 0arg-1res | `render.get_height` | 48 | 736.1 | **51.0** |
+| 1arg-0res | `physics.wakeup` | 1,344 | 742.1 | **64.5** |
+| 1arg-1res | `b2d.joint.get_body_b` | 96 | 746.4 | **54.5** |
+| 2arg-0res | `physics.destroy_joint` | 1,392 | 749.7 | **68.4** |
+| 2arg-1res | `resource.create_sound_data` | 27,312 | 739.1 | **413.8** |
+| 3arg-0res | `bullet3d.rigid_body.apply_impulse` | 144 | 736.2 | **55.1** |
+| 4arg-0res | `gui.set` | 27,360 | 745.3 | **421.6** |
+| 4arg-1res | `physics.raycast` | 51,984 | 760.6 | 742.3 |
+| 3arg-3res | `socket.select` | 52,032 | 773.4 | 754.1 |
+
+All figures nanoseconds per call. Every frame before this change was 53,472
+bytes. Run-to-run spread was under 2% on every cell except the before column's
+0arg-0res route (713-762).
+
+Controls in the same runs: `c-abi-native` 4.3 -> 4.1 and 4.1 -> 4.0 ns, and the
+`lua-stack` transport 305-317 -> 302-310 ns for five of its six shapes, with one
+noisy 2arg-0res cell at 375. Neither transport's code changed.
+
+## What the numbers say
+
+The ten points fit a straight line in frame bytes with R^2 = 0.9998:
+
+```
+ns/call = 49.4 + 0.01344 x frame bytes
+```
+
+That is **~49 ns of actual dispatch** - the stable-id lookup, the two bound
+checks, the decode loop, the backend call, the encode loop - plus **13.4 ps per
+byte of frame scratch value-initialized**, or about 74 GB/s of L1-resident zero
+stores, which is a plausible M4 store rate. Extrapolating the fit to the old
+fixed frame predicts 768 ns; the measured before column is 733-773. The
+diagnosis and the fix are the same model.
+
+The three routes that barely moved are the honest cases: `physics.raycast`,
+`socket.select` and `b2d.world.overlap_aabb` take a table in *and* return one,
+so they still carry both 24,576-byte entry arrays and both arenas. `gui.set` and
+`resource.create_sound_data` take a record parameter and return a scalar, so
+they keep one array and pay half.
+
+## Is the remaining zeroing needed?
+
+Measured rather than assumed, and the answer splits:
+
+* **Scratch the generated decoder fills** - the argument array and the input
+  table entries - is provably written before read: `DecodeContext::decode`
+  assigns `*output = {}` before it writes any field, and nothing reads above the
+  counters the decoder itself advances. Its zeroing is dead work. It is *not*
+  removable in C++ as the types stand: `ScriptValue` and `ScriptTableEntry`
+  carry default member initializers, so every declaration form that begins their
+  lifetime also zeroes them, and the alternatives (a byte buffer reinterpreted
+  as entries, or an uninitialized union member) are exactly the constructs the
+  family's ASan/UBSan gate exists to reject. Dropping the initializers from
+  those two hand-written ABI structs would make every other `ScriptValue x;` in
+  the tree silently uninitialized, which is a worse trade than the 3,771 bytes
+  per call it would recover.
+* **Scratch a backend fills** - the result array and the output table entries -
+  is load-bearing and stays. Zeroing is what makes a partially written result
+  graph decode as `undefined` rather than as garbage, and `releaseGraph` walks
+  those slots on the error path.
+
+So the remaining lever is not a zeroing trick; it is retaining fewer bytes. Two
+are already visible and both are blocked on hand-written ABI, not on this
+generator: `ScriptCallFrame::urlArena` is typed `ScriptUrlArena<32>*` and
+`ScriptMatrix4Arena::kCapacity` is fixed at 16, so a route that can reach one
+URL still gets storage for 32 (1,296 bytes, ~17 ns); and the 256-entry table
+bound is a policy number because the IR states no per-route element count, which
+is what the 24,576-byte arrays cost. Resolving `record-ref` schemas to their
+field counts would size most of the remaining table routes precisely.
+
+Behavior is unchanged: the recording engine still drives 915 routes over three
+transports with 0 violations, 0 expectation divergences and 0 transport
+divergences; the reentrancy, cycle, exhaustion, stale-handle and warm
+zero-allocation gates in `native/script_universal_value_capi_test.cpp` pass in
+Release and under ASan/UBSan; and `pnpm test:profile-compile-out` still proves
+the telemetry compiles out.
 
 # Evidence boundary
 

@@ -60,6 +60,79 @@ test("universal-value descriptor runtime compiles, links, and rejects invalid fr
   }
 });
 
+test("per-call frame scratch is sized from the same contract the dispatcher enforces", async () => {
+  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  const descriptors = await readFile(path.join(root, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"), "utf8");
+  const dispatcher = await readFile(path.join(root, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"), "utf8");
+
+  // The operation descriptor publishes the contract; the dispatcher allocates a
+  // stack frame from it. Both are generated, so the only thing worth asserting
+  // is that they are still the same numbers - a frame narrower than the
+  // descriptor would reject calls the descriptor accepts.
+  const declared = [...descriptors.matchAll(/^ {2}\{0x[0-9a-f]{8}u, "([^"]+)", "[^"]*", "[^"]*", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
+    .map(([, id, , maximumArgumentCount, , maximumResultCount, , inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena]) => ({
+      id,
+      maximumArgumentCount: Number(maximumArgumentCount),
+      maximumResultCount: Number(maximumResultCount),
+      inputTableEntryCapacity: Number(inputTableEntryCapacity),
+      outputTableEntryCapacity: Number(outputTableEntryCapacity),
+      matrix4Arena: matrix4Arena === "1",
+      urlArena: urlArena === "1"
+    }));
+  assert.equal(declared.length, report.candidateCount);
+  assert.deepEqual(declared.map(({ id }) => id), report.bindings.map(({ id }) => id));
+
+  const profiles = [...dispatcher.matchAll(/&runContractFrame<(\d+)u, (\d+)u, (\d+)u, (\d+)u, (true|false), (true|false)>,/g)]
+    .map(([, argumentCapacity, resultCapacity, inputEntryCapacity, outputEntryCapacity, matrix4Arena, urlArena]) => ({
+      argumentCapacity: Number(argumentCapacity),
+      resultCapacity: Number(resultCapacity),
+      inputEntryCapacity: Number(inputEntryCapacity),
+      outputEntryCapacity: Number(outputEntryCapacity),
+      matrix4Arena: matrix4Arena === "true",
+      urlArena: urlArena === "true"
+    }));
+  assert.equal(profiles.length, report.frameProfiles.distinct);
+  const assignment = /constexpr uint8_t kRouteContractFrames\[\] = \{([^}]*)\};/.exec(dispatcher)[1]
+    .split(",").map((value) => value.trim()).filter((value) => value.length !== 0).map(Number);
+  assert.equal(assignment.length, report.candidateCount);
+
+  for (let index = 0; index < declared.length; ++index) {
+    const operation = declared[index];
+    const frame = profiles[assignment[index]];
+    const contract = report.bindings[index].frameContract;
+    assert.ok(frame, `${operation.id}: frame profile index is out of range`);
+    assert.deepEqual(frame, {
+      argumentCapacity: contract.argumentCapacity,
+      resultCapacity: contract.resultCapacity,
+      inputEntryCapacity: contract.inputEntryCapacity,
+      outputEntryCapacity: contract.outputEntryCapacity,
+      matrix4Arena: contract.matrix4Arena,
+      urlArena: contract.urlArena
+    }, operation.id);
+    assert.equal(frame.argumentCapacity, operation.maximumArgumentCount, operation.id);
+    assert.equal(frame.resultCapacity, operation.maximumResultCount, operation.id);
+    assert.equal(frame.inputEntryCapacity, operation.inputTableEntryCapacity, operation.id);
+    assert.equal(frame.outputEntryCapacity, operation.outputTableEntryCapacity, operation.id);
+    assert.equal(frame.matrix4Arena, operation.matrix4Arena, operation.id);
+    assert.equal(frame.urlArena, operation.urlArena, operation.id);
+  }
+
+  // A route whose value shapes reach a table, a Matrix4, or a URL keeps the
+  // arena that decodes one; a route whose shapes cannot must not be given one,
+  // or the sizing has stopped following the contract.
+  const reaching = (binding, name) =>
+    binding.defoldValueTypes.includes(name) ||
+    binding.shapeKinds.some((kind) => !["scalar", "enum", "defold-value", "handle", "union", "optional", "void", "sequence", "map", "record", "variadic"].includes(kind));
+  for (const binding of report.bindings) {
+    if (reaching(binding, "url")) assert.ok(binding.frameContract.urlArena, `${binding.id}: URL arena dropped`);
+    if (reaching(binding, "matrix4")) assert.ok(binding.frameContract.matrix4Arena, `${binding.id}: Matrix4 arena dropped`);
+  }
+  const tableFree = report.bindings.filter(({ frameContract }) =>
+    frameContract.inputEntryCapacity === 0 && frameContract.outputEntryCapacity === 0);
+  assert.ok(tableFree.length > report.bindings.length / 2,
+    "most routes should no longer carry table scratch they cannot address");
+});
+
 test("portable C ABI compiles as C, runs recursive/reentrant native behavior, and stays allocation-free when warm", async () => {
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-universal-value-capi-"));
   try {
