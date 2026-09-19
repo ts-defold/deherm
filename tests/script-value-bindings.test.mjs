@@ -249,7 +249,7 @@ test("value operation templates fail closed for unknown and mismatched metadata"
     delete family.selector.typeCodecs["gui.PIVOT"];
   });
   assert.throws(() => generate(fixture.irText, fixture.scalarDispatchText, fixture.patternsText, missingEnumCodec),
-    /gui-node-setters selected 38 routes; reviewed count is 39/);
+    /gui-node-setters route census expected 39, found 38/);
 
   const wrongVmathCount = mutateFamily(fixture.inputs, "vmath-fixed-pod", (family) => {
     family.selector.expectedRouteCount = 10;
@@ -275,7 +275,7 @@ test("value operation templates fail closed for unknown and mismatched metadata"
   reclassifiedPatterns.bindings.find(({ id }) => id === "script:vmath.cross").loweringFamily = "scalar";
   assert.throws(() => generate(fixture.irText, fixture.scalarDispatchText,
     `${JSON.stringify(reclassifiedPatterns)}\n`, fixture.inputs),
-  /vmath-fixed-pod selected 10 routes; reviewed count is 11/);
+  /vmath-fixed-pod route census expected 11, found 10/);
 
   const wrongMatrixCount = mutateFamily(fixture.inputs, "vmath-matrix4", (family) => {
     family.selector.expectedCallShapeCount = 15;
@@ -394,6 +394,6 @@ test("value probes reject unimplemented overloads and marker aliases", async () 
   assert.throws(
     () => generateScriptValueRealEngineProbes(
       `${JSON.stringify(changedInstrumentedSemantics)}\n`, bindingsText),
-    /Instrumented value probe semantics changed/
+    /instrumented probe-set semantics sha256 expected/
   );
 });

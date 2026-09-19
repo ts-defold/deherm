@@ -190,7 +190,7 @@ test("rejects duplicate, omitted, overlapping, and stale route evidence", () => 
 test("rejects stale reviewed Defold source evidence", () => {
   const stale = structuredClone(sourceInputs);
   stale.valueDefinitions[0].sourceText += "\n// changed\n";
-  assert.throws(() => generateScriptApiAccounting(stale), /is stale against/);
+  assert.throws(() => generateScriptApiAccounting(stale), /is stale against|value report source evidence is stale/);
 });
 
 test("check command proves the checked-in report is current", () => {

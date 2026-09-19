@@ -174,7 +174,7 @@ test("fails closed on census, exception, stable-ID, kind, and source drift", () 
       .map(({ id }) => id));
     value.rows = value.rows.filter(({ id }) => !borrowed.has(id) || id !== [...borrowed][0]);
   });
-  assert.throws(() => generateBorrowedHandleClassification(censusDrift), /route count drifted/);
+  assert.throws(() => generateBorrowedHandleClassification(censusDrift), /borrowed-handle route census expected/);
 
   const missingProducer = structuredClone(sourceInputs);
   missingProducer.overrideText = replaceJson(missingProducer.overrideText, (value) => {
@@ -202,10 +202,15 @@ test("fails closed on census, exception, stable-ID, kind, and source drift", () 
   });
   assert.throws(() => generateBorrowedHandleClassification(missingKind), /no raw handle types/);
 
-  const staleSource = structuredClone(sourceInputs);
-  const [sourcePath, sourceText] = staleSource.sourceTexts.entries().next().value;
-  staleSource.sourceTexts.set(sourcePath, `${sourceText}\n// drift\n`);
-  assert.throws(() => generateBorrowedHandleClassification(staleSource), /source hash is stale/);
+  // A cited source this revision does not have - or has without a reviewed
+  // anchor - is withdrawn by `loadReviewedSources` before `generate` sees it.
+  // Outside a declared derivation that withdrawal is still fatal, because at
+  // the reviewed revision every citation resolves.
+  const withdrawnSource = structuredClone(sourceInputs);
+  withdrawnSource.withdrawnSources = new Set([
+    JSON.parse(withdrawnSource.overrideText).sourceEvidence[0].source
+  ]);
+  assert.throws(() => generateBorrowedHandleClassification(withdrawnSource), /unknown source evidence/);
 });
 
 test("check command proves the checked-in classification is current", () => {
