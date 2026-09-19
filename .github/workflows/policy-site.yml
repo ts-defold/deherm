@@ -54,6 +54,9 @@ on:
 # re-upload its entire history every night.
 permissions:
   contents: write
+  # Requesting a Pages build explicitly, rather than relying on the push to
+  # trigger one. See the publish step for why.
+  pages: write
 
 # Two runs must not push the branch concurrently. Queueing rather than
 # cancelling means a push that lands mid-run still publishes, which matters
@@ -139,3 +142,24 @@ jobs:
           fi
           git commit -m "publish: policy site from ${GITHUB_SHA::12}"
           git push origin "HEAD:$branch"
+
+      # Ask for the build rather than assuming the push caused one.
+      #
+      # A push made with GITHUB_TOKEN does not trigger workflow runs - GitHub
+      # suppresses that to stop a workflow re-triggering itself. Pages branch
+      # builds appear to arrive by a different route (their runs record the
+      # event as `dynamic`, not `push`), so this MIGHT publish on its own, but
+      # "might" is not a property worth depending on for the thing that serves
+      # the policies. This endpoint requests a build unconditionally, so
+      # publication does not hinge on which internal path a token push takes.
+      #
+      # Requesting a build when one is already queued is not an error, so this
+      # is safe if the push did trigger one.
+      - name: Request a Pages build
+        if: github.repository == 'ts-defold/deherm' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent
+          echo "Requested a Pages build for ${GITHUB_REPOSITORY}."
