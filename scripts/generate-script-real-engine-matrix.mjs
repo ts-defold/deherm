@@ -304,7 +304,22 @@ async function validateObservations(manifest, scenarios, routeById, loadEvidence
         runtimeRoutes.add(scenario.routeId);
       }
       for (const marker of requiredProbeSetMarkers) {
-        if (!lines.includes(marker)) throw new Error(`${observation.id}: evidence artifact is missing current probe-set marker ${marker}`);
+        // The probe-set fingerprint is a function of the generated surface, so
+        // at any revision other than the one an observation was recorded at it
+        // necessarily differs - the probes themselves are different probes.
+        // That is not stale evidence, it is evidence for another revision, and
+        // refusing on it stops a derivation that has nothing wrong with it. In
+        // an ordinary generation the fingerprint not matching DOES mean the
+        // recorded evidence no longer describes this tree, which is a real
+        // regression and stays fatal.
+        if (lines.includes(marker)) continue;
+        if (!declaredDerivation()) {
+          throw new Error(`${observation.id}: evidence artifact is missing current probe-set marker ${marker}`);
+        }
+        recordAudit({
+          input: "packages/bindings/probes/defold-script-real-engine-matrix.json",
+          id: observation.id, status: VOID, reason: "withdrawn-probe-set", anchorsLost: [marker]
+        });
       }
       const routesWithoutScenarios = routeIds.filter((routeId) => !runtimeRoutes.has(routeId));
       if (routesWithoutScenarios.length) throw new Error(`${observation.id}: runtime route lacks an observed scenario: ${routesWithoutScenarios.join(", ")}`);
