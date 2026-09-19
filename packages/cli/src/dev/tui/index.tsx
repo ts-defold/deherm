@@ -13,13 +13,15 @@ import {
   paletteItems,
   scopeForFocusedId
 } from "./keymap.mjs";
+import { openExternal } from "./open-external.mjs";
 import {
   containsPoint,
   firstVisibleLine,
   logLines,
   pointToCaret,
   selectAllRange,
-  selectedLogText
+  selectedLogText,
+  urlAtCaret
 } from "./logViewport.mjs";
 import { renderCompactLogo, renderLogo } from "./logo.mjs";
 import { closeOverlay, closeTopOverlay, createUiState, normalizeState, openOverlay, topOverlay } from "./state.mjs";
@@ -405,20 +407,47 @@ export async function runDevTui(options) {
       ? (ui.logSelectionScroll ?? 0)
       : firstVisibleLine(lines.length, ui.logScroll, rect.h, ui.logAutoScroll);
     const caret = pointToCaret({ x: raw.x, y: raw.y }, rect, first, lines);
+    // A press ARMS a selection without making one. Selecting on press meant a
+    // bare click mutated the view, and because this view owns the mouse the
+    // terminal never got the click either - so clicking a URL it had underlined
+    // did nothing but scroll the log away.
     if (raw.mouseKind === 3) {
       ui.logDrag = true;
-      ui.logSelectionScroll = first;
-      ui.logSelection = { anchor: caret, active: caret };
-      sync();
+      ui.logPressed = { caret, scroll: first, moved: false };
       return;
     }
-    if (raw.mouseKind === 2 && ui.logDrag && ui.logSelection) {
-      ui.logSelection = { anchor: ui.logSelection.anchor, active: caret };
+    if (raw.mouseKind === 2 && ui.logDrag && ui.logPressed) {
+      // First movement is what turns a press into a selection.
+      if (!ui.logPressed.moved) {
+        if (caret.line === ui.logPressed.caret.line && caret.column === ui.logPressed.caret.column) return;
+        ui.logPressed.moved = true;
+        ui.logSelectionScroll = ui.logPressed.scroll;
+        ui.logSelection = { anchor: ui.logPressed.caret, active: caret };
+        sync();
+        return;
+      }
+      ui.logSelection = { anchor: ui.logSelection?.anchor ?? ui.logPressed.caret, active: caret };
       sync();
       return;
     }
     if (raw.mouseKind === 4 && ui.logDrag) {
+      const pressed = ui.logPressed;
       ui.logDrag = false;
+      ui.logPressed = undefined;
+      // Released without moving: a click. Open a URL if one is under it, and
+      // otherwise leave the view exactly as it was.
+      if (!pressed?.moved) {
+        const url = urlAtCaret(lines, pressed?.caret ?? caret);
+        if (url) {
+          void openExternal(url).catch((error) => emit({
+            type: "log",
+            level: "warn",
+            source: "tui",
+            message: `could not open ${url}: ${error instanceof Error ? error.message : String(error)}`
+          }));
+        }
+        return;
+      }
       const text = selectedLogText(lines, ui.logSelection);
       if (text.length === 0) ui.logSelection = undefined;
       sync();

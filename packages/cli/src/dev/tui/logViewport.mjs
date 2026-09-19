@@ -105,3 +105,29 @@ export function selectionSummary(lines, selection) {
   const text = selectedLogText(lines, selection);
   return `${rows} line${rows === 1 ? "" : "s"} · ${text.length} chars selected · y copies`;
 }
+
+/**
+ * The URL under a caret, if any.
+ *
+ * Terminals underline URLs themselves and open them on click, but only while
+ * they own the mouse. This view enables mouse reporting for drag-selection,
+ * which takes those clicks before the terminal sees them - so the underline
+ * stays and the click stops working. Rather than give up selection or make the
+ * user reach for a bypass modifier, the view resolves the URL itself.
+ *
+ * Bounded by whitespace and then trimmed of punctuation at BOTH ends, because a
+ * URL written into prose collects characters that are not part of it - a
+ * trailing full stop, or the brackets around a parenthetical link.
+ */
+export function urlAtCaret(lines, caret) {
+  const text = lines[caret?.line]?.text;
+  if (!text) return null;
+  let start = caret.column;
+  let end = caret.column;
+  while (start > 0 && !/\s/.test(text[start - 1])) start -= 1;
+  while (end < text.length && !/\s/.test(text[end])) end += 1;
+  const token = text.slice(start, end)
+    .replace(/^[([{<'"]+/, "")
+    .replace(/[)\]}>,.;:'"]+$/, "");
+  return /^https?:\/\/[^\s]+$/.test(token) ? token : null;
+}
