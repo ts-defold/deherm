@@ -189,3 +189,36 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-universal-value-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" })
 ]);
+
+// The Lua-registration ground-truth lane. It derives a target's REGISTERED Lua
+// surface from that target's whole C/C++ source tree and diffs it against the
+// DECLARED surface, so `.script_api` and reference documentation are treated as
+// claims to be checked rather than as inputs to trust.
+//
+// It follows the ownership conventions above - implementation, pinned inputs,
+// generated artifacts, execution order - but owns its own registry rather than
+// joining the script graph, because its inputs cannot be enumerated ahead of the
+// parse: which files register which Lua names is exactly what it decides. The
+// clean-room check copies an enumerated evidence subset into a temporary root,
+// which this lane cannot express, so it is verified by `--check` and by
+// `tests/lua-registration-surface.test.mjs` instead.
+export const luaRegistrationSurfaceGenerator = Object.freeze({
+  sources: Object.freeze([
+    "scripts/generate-lua-registration-surface.mjs",
+    "scripts/lib/lua-c-registration.mjs"
+  ]),
+  pinnedInputs: Object.freeze([
+    "upstream.lock",
+    "packages/bindings/overrides/lua-registration-surface-targets.json",
+    "packages/bindings/generated/defold-script-api-ir.json"
+  ]),
+  artifacts: Object.freeze([
+    "packages/bindings/generated/defold-lua-registration-surface.json"
+  ]),
+  steps: Object.freeze([
+    Object.freeze({ runtime: "node", script: "scripts/generate-lua-registration-surface.mjs" })
+  ]),
+  // Every target's sources are discovered from its declared root or archive
+  // rather than listed, so the source tree itself is the pinned evidence.
+  sourceTreeEvidence: Object.freeze(["upstream/defold/engine"])
+});

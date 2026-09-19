@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "Targets whose registered Lua surface is derived from C/C++ source and diffed against their declared surface. A target names source roots, mutually exclusive build variants, and where the declaration lives. It never names a route or a module: which names exist is what the parse decides.",
+  "targets": [
+    {
+      "id": "defold-engine-box2d-v3",
+      "kind": "engine-tree",
+      "root": "upstream/defold/engine",
+      "sdkHeaderMatch": "(^|/)dmsdk/",
+      "excludePathSegments": [
+        "/test/",
+        "/tests/",
+        "/test_"
+      ],
+      "excludeVariants": [
+        {
+          "path": "scripts/box2d/v2/",
+          "reason": "box2d v2 and v3 define the same registration symbols (ScriptBox2DInitializeBody and friends) and are selected against each other at link time by the app manifest. Linking both into one parse would make every b2d callee ambiguous, so each variant is its own target."
+        }
+      ],
+      "declared": {
+        "kind": "script-ir",
+        "path": "packages/bindings/generated/defold-script-api-ir.json"
+      },
+      "notes": "Registered surface of the pinned engine tree with the Box2D v3 backend selected."
+    },
+    {
+      "id": "defold-engine-box2d-v2",
+      "kind": "engine-tree",
+      "root": "upstream/defold/engine",
+      "sdkHeaderMatch": "(^|/)dmsdk/",
+      "excludePathSegments": [
+        "/test/",
+        "/tests/",
+        "/test_"
+      ],
+      "excludeVariants": [
+        {
+          "path": "scripts/box2d/v3/",
+          "reason": "The mirror of the v3 target: the legacy Box2D v2 backend."
+        }
+      ],
+      "declared": {
+        "kind": "script-ir",
+        "path": "packages/bindings/generated/defold-script-api-ir.json"
+      },
+      "notes": "Registered surface of the pinned engine tree with the legacy Box2D v2 backend selected."
+    },
+    {
+      "id": "extension-defold-xmath",
+      "kind": "extension-root",
+      "root": "tests/fixtures/defold-extension-ingestion/vendor/defold-xmath-f1f27eff87d66e11521aff310e0522ac6cd7c5d6/xmath",
+      "sdkHeaderMatch": "(^|/)dmsdk/",
+      "externalSdkHeaderRoots": [
+        "upstream/defold/engine"
+      ],
+      "declared": {
+        "kind": "script-api"
+      },
+      "notes": "The ingestion fixture vendors interface description only - ext.manifest and .script_api - and no third-party native source. The verifier therefore reports the declaration as unverifiable rather than treating an unchecked declaration as correct. See .agents/docs/research/lua-registration-ground-truth.md for the run against the upstream sources at the pinned revision."
+    },
+    {
+      "id": "extension-defold-astar",
+      "kind": "extension-root",
+      "root": "tests/fixtures/defold-extension-ingestion/vendor/defold-astar-1471c5445b0c0376bd23c377e8ef8d84e52b43bf/astar",
+      "sdkHeaderMatch": "(^|/)dmsdk/",
+      "externalSdkHeaderRoots": [
+        "upstream/defold/engine"
+      ],
+      "declared": {
+        "kind": "script-api"
+      },
+      "notes": "Same as xMath: defold-astar's native source is deliberately not vendored (unresolved licence terms, recorded in extensions.lock.json), so the fixture target is unverifiable by construction."
+    }
+  ]
+}
