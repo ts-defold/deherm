@@ -49,9 +49,9 @@ export async function readChannel(channel, { template, fetchImpl = fetch }) {
  * reported as already covered, because the interesting property of this system
  * is how often the answer is "nothing".
  */
-export async function planChannels({ site, index, fetchImpl = fetch } = {}) {
+export async function planChannels({ site, index, indexPath, fetchImpl = fetch } = {}) {
   const config = site ?? await readSiteConfig();
-  const shipped = index ?? JSON.parse(await readFile(shippedIndexPath, "utf8"));
+  const shipped = index ?? JSON.parse(await readFile(indexPath ?? shippedIndexPath, "utf8"));
   const indexed = new Map(shipped.entries.map((entry) => [entry.defoldRevision, entry]));
   const observations = [];
   for (const channel of config.channels) {
@@ -110,7 +110,13 @@ async function main(argv = process.argv.slice(2)) {
   const [command, ...rest] = argv;
   if (command === "plan" || command === undefined) {
     const json = rest.includes("--json");
-    const plan = await planChannels();
+    const indexFlag = rest.indexOf("--index");
+    const indexPath = indexFlag === -1 ? undefined : rest[indexFlag + 1];
+    if (indexFlag !== -1 && !indexPath) throw new Error("--index requires a path");
+    const known = new Set(["--json", "--index", indexPath].filter(Boolean));
+    const unknown = rest.filter((argument) => !known.has(argument));
+    if (unknown.length) throw new Error(`Unknown plan argument: ${unknown[0]}`);
+    const plan = await planChannels({ indexPath });
     if (json) {
       // `derive` is what a matrix fans out over. An empty list is the steady
       // state and means this run publishes nothing at all.
@@ -134,7 +140,7 @@ async function main(argv = process.argv.slice(2)) {
     console.log(`  bob.jar     ${sizes.bob} bytes sha256 ${replacements.DEFOLD_BOB_SHA256}`);
     return;
   }
-  throw new Error("Usage: track-defold-channels.mjs {plan [--json] | pin <sha> [--write]}");
+  throw new Error("Usage: track-defold-channels.mjs {plan [--json] [--index <manifest>] | pin <sha> [--write]}");
 }
 
 if (process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url) await main();

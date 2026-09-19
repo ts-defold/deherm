@@ -71,7 +71,7 @@ export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
  * policy that assembles them.
  *
  * This list is the single authority. It used to live inline in
- * `.github/workflows/policy-revisions.yml`, where nothing could run it and
+ * `.github/workflows/policy.yml`, where nothing could run it and
  * nothing could check it against the registries.
  */
 export const derivationSteps = Object.freeze([
@@ -267,7 +267,18 @@ export async function materializeWorkspace({ sourceRoot, workspace }) {
       directories.add(directory);
     }
     const source = path.join(sourceRoot, file);
-    const info = await lstat(source);
+    let info;
+    try {
+      info = await lstat(source);
+    } catch (error) {
+      // `git ls-files --cached` includes a tracked path deleted by the working
+      // tree. A derivation exercises the working tree that would be committed,
+      // so the deletion is an input too; attempting to copy the index's stale
+      // pathname made every workflow consolidation impossible to derive before
+      // its deletion commit existed.
+      if (error.code === "ENOENT") continue;
+      throw error;
+    }
     // Tracked symlinks are reproduced as symlinks. Following one would copy a
     // whole vendored extension tree into the workspace, and - where it points
     // outside the repository - would quietly import something `git ls-files`

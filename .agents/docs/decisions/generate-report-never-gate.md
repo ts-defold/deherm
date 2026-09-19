@@ -68,6 +68,12 @@ statement about the API and never a reason a release is blocked. This is the
 rule that makes the other three enforceable: if refusing is always a bug in us,
 there is no temptation to reach for it when the engine surprises us.
 
+**5. Nightly publication is automatic.** Stable, beta, and alpha revisions are
+derived and published to the policy website in the same workflow. The run does
+not open a policy PR and wait. A generator change is reviewed; the Defold API it
+mechanically discovers is authoritative input and is published with whatever
+verification evidence déherm could establish.
+
 ## What may still be fatal, and why it is consistent
 
 Two things, and both are cases of rule 4 - the generator, or the tree it
@@ -96,11 +102,13 @@ it - no mark, no issue), `executed` (additionally observed running in a real
 engine here) and `suspect` (our own evidence CONTRADICTS the documentation:
 registered nowhere, or exercised and a property did not hold).
 
-Only `suspect` earns a mark and an issue, and there are a few dozen. An earlier
-version of this had the default inverted and labelled 450 routes "untested",
-which says nothing true about the route and something untrue about the product.
-Where we have not executed a route, that is recorded as a note about OUR
-harness - a to-do list for us - and is not published as a caveat on the API.
+`suspect` earns a warning and an issue because our evidence contradicts
+Defold. `unproven` earns a distinct annotation and issue only when our generator
+cannot emit or exercise the ordinary derived test for that route. A route that
+merely has not happened to run in the harness is neither: that is recorded as a
+note about OUR harness, not published as a caveat on Defold's API. This keeps
+the default from being inverted into hundreds of meaningless "untested"
+warnings while still making an actual missing generator/test shape visible.
 
 **Upstream bugs become our data.** `engine/engine/src/script/script_engine.cpp`
 documents `@name sys.set_render_enable` and registers

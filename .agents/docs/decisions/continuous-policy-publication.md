@@ -1,0 +1,142 @@
+---
+type: Architecture Decision
+title: Continuous policy generation, engine evidence, and publication
+description: One nightly policy workflow derives every tracked Defold revision, emits every mechanically representable API, records verification without gating publication, and publishes the accumulated policy store directly to the website.
+tags: [decision, generator, policy, ci, conformance, pages]
+status: accepted
+generated: { by: codex/gpt-5, at: 2026-09-19T12:00:00-04:00 }
+sources:
+  - id: generate-report
+    resource: ./generate-report-never-gate.md
+    title: Generate, report, open issues - a generator never refuses
+    author: project:deherm
+  - id: layered-cache
+    resource: ./layered-api-policy-cache.md
+    title: Layered API policy cache
+    author: project:deherm
+  - id: revision-derivation
+    resource: ./revision-parametric-derivation.md
+    title: Revision-parametric derivation
+    author: project:deherm
+---
+
+# Outcome
+
+Déherm continuously mirrors Defold's API policy. A new stable, beta, or alpha
+engine revision must become resolvable by the CLI without waiting for a human to
+merge a policy pull request.
+
+The nightly is one top-level GitHub Actions workflow named `policy`. Its graph
+shows discovery, generation, host parity, real-engine evidence, and website
+publication together. The old `policy-revisions`, `derivation`, `conformance`,
+and `policy-site` workflows are not separate products and must not appear as
+four unrelated top-level runs.
+
+# Authority
+
+Defold is authoritative for the API present at a revision:
+
+* a declaration added by Defold is added;
+* a declaration removed by Defold is removed for that revision;
+* Defold deprecation metadata is carried into generated TypeScript and TSDoc;
+* déherm's reviewed policies provide lowering and ergonomic knowledge, but do
+  not veto the upstream surface;
+* verification evidence describes what déherm observed. It does not decide
+  whether Defold's documented API is allowed to exist.
+
+# Nightly graph
+
+```text
+discover stable / beta / alpha revisions
+                  |
+                  v
+derive each missing revision on Linux, accumulating one policy store
+                  |
+        +---------+-------------------+
+        |                             |
+        v                             v
+reproduce canonical bytes       compile, link, and execute
+on Linux/macOS/Windows          generated routes in real Defold
+        |                             |
+        +--------------+--------------+
+                       v
+publish every usable policy and its evidence
+to the deherm-policy-site branch; request Pages build
+```
+
+The implementation may publish immediately after generation while the two
+evidence lanes finish, or wait for them when their evidence is embedded in the
+same emitted index. It may not wait for a review PR. Pull requests remain useful
+for generator code changes, not as a checkpoint for mechanically derived engine
+revisions.
+
+# Per-revision algorithm
+
+For each revision not already in the website index:
+
+1. Pin the immutable Defold source, reference documentation, Bob archive, and
+   their observed digests in a scratch workspace.
+2. Parse the script API, Lua registration surface, resource schema, public
+   dmSDK headers, target conditions, and extension inputs.
+3. Project every discovered unit through the canonical IR.
+4. Emit the best available implementation for every unit. Specialized fast
+   paths are preferred; the universal/default transport is the fallback.
+5. Emit types, TSDoc, runtime descriptors, native/Static-Hermes/browser glue,
+   compile probes, and runtime probes from the same unit.
+6. Compile and link what the current runner can build.
+7. Exercise generated probes in a real Defold engine wherever the harness can
+   construct the required context.
+8. Record evidence, update issues for contradictions or missing generator
+   capabilities, and publish the usable policy regardless of those evidence
+   gaps.
+
+The derivation is keyed by exact inputs. An already indexed revision is a no-op.
+Content-addressed subtrees shared with older revisions are not rewritten.
+
+# Status model
+
+Status is additive evidence, not an allow-list:
+
+* `supported`: Defold declares/registers the API and déherm emitted it.
+* `executed`: the generated route additionally compiled, linked, and satisfied
+  its generated assertions in a real engine.
+* `suspect`: déherm observed a contradiction, such as a documented name that is
+  not registered or a runtime assertion that failed.
+* `unproven`: déherm could emit a conservative/default route but could not yet
+  construct a meaningful test context, or it lacks a generator shape needed to
+  emit a specialized path.
+
+`suspect` and `unproven` entries remain usable. They carry generated
+documentation annotations and deterministic issue links. Repeated nightlies
+update the existing issue instead of opening duplicates.
+
+# Failure policy
+
+A new or changed Defold API is not a failed nightly. A missing review, moved
+source hash, changed census, unavailable fixture, unexercised route, or absent
+specialization is report data.
+
+The workflow may be red only when it cannot safely publish a coherent store at
+all: malformed authoritative input, corrupt content-addressed output, an index
+that does not resolve its objects, or CI infrastructure preventing publication.
+Even then, all policies derived before the fault and all diagnostic artifacts
+must remain available; one problematic route never suppresses unrelated APIs.
+
+# Publication and consumption
+
+The nightly commits nothing to `main`. It publishes the accumulated immutable
+objects and mutable per-revision index to the `deherm-policy-site` branch, then
+requests the GitHub Pages build. This is automatic and guarded only to the
+canonical `ts-defold/deherm` repository.
+
+`deherm policy` resolves the exact Defold SHA from the project, then consumes
+the website index and verifies every fetched object against its content hash.
+The npm package contains the tested revision as an offline fast path; the
+website is the continuously updated catalogue for every tracked engine.
+
+# Pull-request behavior
+
+A pull request that changes the generator runs the same visible policy graph
+against its checkout, including host parity and real-engine conformance, but it
+cannot publish the website. Merging generator code changes affects future
+nightlies; publishing newly discovered Defold revisions itself is automatic.

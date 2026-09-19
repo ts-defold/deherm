@@ -134,7 +134,7 @@ was generated on macOS 15 with **Apple clang 21.0.0**. Running
 versions produce the same 2141 declarations, the same per-target mangled names
 and the same diagnostics.
 
-CI runs that comparison as `host-parity` in `.github/workflows/derivation.yml`:
+CI runs that comparison as `host-parity` in `.github/workflows/policy.yml`:
 Linux is the sole policy author; the same `--check` runs on `ubuntu-24.04`,
 `macos-15`, and `windows-2025`. A host that cannot reproduce the committed
 inventory fails there, with the diff, rather than producing a second policy

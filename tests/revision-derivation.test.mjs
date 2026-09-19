@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -27,6 +28,7 @@ import {
   derivedSurfaceRoots,
   enginePaths,
   fingerprintDifference,
+  materializeWorkspace,
   ownedArtifactPaths,
   surfaceFingerprint
 } from "../scripts/derive-revision.mjs";
@@ -239,6 +241,19 @@ test("every declared surface root is a repository-relative path", () => {
   for (const entry of derivedSurfaceRoots) {
     assert.ok(!path.isAbsolute(entry) && !entry.split("/").includes(".."), entry);
   }
+});
+
+test("workspace materialization respects tracked working-tree deletions", async () => {
+  const source = await mkdtemp(path.join(tmpdir(), "deherm-materialize-source-"));
+  const workspace = await mkdtemp(path.join(tmpdir(), "deherm-materialize-target-"));
+  await writeFile(path.join(source, "kept.txt"), "kept");
+  await writeFile(path.join(source, "deleted.txt"), "deleted");
+  execFileSync("git", ["init", "-q"], { cwd: source });
+  execFileSync("git", ["add", "kept.txt", "deleted.txt"], { cwd: source });
+  await rm(path.join(source, "deleted.txt"));
+  await materializeWorkspace({ sourceRoot: source, workspace });
+  assert.equal(await readFile(path.join(workspace, "kept.txt"), "utf8"), "kept");
+  await assert.rejects(readFile(path.join(workspace, "deleted.txt")), /ENOENT/);
 });
 
 test("the adoptable set covers the artifacts every ownership registry declares", () => {

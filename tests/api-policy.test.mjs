@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -406,6 +407,21 @@ test("an unreachable channel is an error, never an empty plan", async () => {
     planChannels({ site, index, fetchImpl: async () => ({ ok: true, json: async () => ({ sha1: "not-a-sha" }) }) }),
     /not a Defold revision/
   );
+});
+
+test("channel planning can use the accumulated published manifest instead of the packaged index", async () => {
+  const { planChannels } = await import("../scripts/track-defold-channels.mjs");
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-published-index-"));
+  const indexPath = path.join(directory, "manifest.json");
+  const revision = "f".repeat(40);
+  await writeFile(indexPath, JSON.stringify({ entries: [{ defoldRevision: revision, policyRoot: "root" }] }));
+  const plan = await planChannels({
+    site: { channels: ["stable"], channelInfoUrl: "https://example.test/{channel}/info.json" },
+    indexPath,
+    fetchImpl: async () => ({ ok: true, json: async () => ({ sha1: revision, version: "1.0.0" }) })
+  });
+  assert.deepEqual(plan.derive, []);
+  assert.equal(plan.covered[0].policyRoot, "root");
 });
 
 test("pinning a revision records the digest the archive actually served", async () => {

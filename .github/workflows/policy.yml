@@ -1,0 +1,385 @@
+name: policy
+
+# One workflow owns the complete policy lifecycle. A scheduled run discovers
+# every unindexed Defold channel revision, derives all of them on Linux into one
+# accumulated content-addressed store, validates that store on the other hosts,
+# exercises its generated routes in a real engine, and publishes the usable
+# result. Review state and conformance state are evidence: they are reported,
+# never a gate that hides the rest of Defold's mechanically generated API.
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: Derive this Defold revision instead of reading stable, beta and alpha
+        required: false
+      carry-reviews:
+        description: Carry applicable reviewed lowering hints and report every carry
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: policy-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  plan:
+    name: Discover revisions
+    runs-on: ubuntu-24.04
+    outputs:
+      derive: ${{ steps.plan.outputs.derive }}
+      any: ${{ steps.plan.outputs.any }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: ts-defold/deherm
+          ref: deherm-policy-site
+          path: build/published-policy-site
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - id: plan
+        env:
+          REQUESTED_REVISION: ${{ inputs.revision }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = workflow_dispatch ] && [ -n "$REQUESTED_REVISION" ]; then
+            derive="$(node -e 'process.stdout.write(JSON.stringify([{channel:"manual",sha1:process.env.REQUESTED_REVISION,version:null}]))')"
+          elif [ "${{ github.event_name }}" = schedule ] || [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            derive="$(node scripts/track-defold-channels.mjs plan --json --index build/published-policy-site/v1/index/manifest.json | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(JSON.parse(s).derive)))')"
+          else
+            derive='[]'
+          fi
+          echo "derive=$derive" >> "$GITHUB_OUTPUT"
+          if [ "$derive" = '[]' ]; then
+            echo 'any=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'any=true' >> "$GITHUB_OUTPUT"
+          fi
+          {
+            echo '## Policy plan'
+            echo
+            echo "Event: \`${{ github.event_name }}\`"
+            echo
+            echo "Revisions to derive: \`$derive\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  derive:
+    name: Generate complete policy store
+    needs: plan
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      issues: write
+    outputs:
+      generated: ${{ steps.derive.outputs.generated }}
+      unproven: ${{ steps.derive.outputs.unproven }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: ts-defold/deherm
+          ref: deherm-policy-site
+          path: build/published-policy-site
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.13' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Hydrate the accumulated published store
+        run: node scripts/hydrate-policy-site.mjs --from build/published-policy-site
+
+      - id: sysroot
+        run: sed -n 's/^DMSDK_PARSE_SYSROOT_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: upstream/dmsdk-parse-sysroot
+          key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
+
+      - id: derive
+        name: Derive every new revision without review gates
+        env:
+          DERIVATIONS: ${{ needs.plan.outputs.derive }}
+          CARRY_REVIEWS: ${{ (github.event_name != 'workflow_dispatch' || inputs.carry-reviews) && 'true' || 'false' }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/policy-reports"
+          node -e '
+            for (const row of JSON.parse(process.env.DERIVATIONS)) {
+              process.stdout.write([row.channel, row.sha1, row.version ?? ""].join("\t") + "\n");
+            }
+          ' > "$RUNNER_TEMP/policy-revisions.tsv"
+
+          generated=0
+          unproven=0
+          while IFS=$'\t' read -r channel revision version; do
+            [ -n "$revision" ] || continue
+            workspace="$RUNNER_TEMP/derive-$revision"
+            audit="$RUNNER_TEMP/policy-reports/$revision.audit.ndjson"
+            log="$RUNNER_TEMP/policy-reports/$revision.log"
+            args=(--revision "$revision" --workspace "$workspace" --adopt)
+            if [ "$CARRY_REVIEWS" = true ]; then args+=(--carry-reviews); fi
+            set +e
+            DEHERM_REVISION_AUDIT="$audit" node scripts/derive-revision.mjs "${args[@]}" 2>&1 | tee "$log"
+            status=${PIPESTATUS[0]}
+            set -e
+            {
+              echo "### $channel ${version:-unknown} ($revision)"
+              echo
+              echo '```text'
+              cat "$log"
+              echo '```'
+              node scripts/report-revision-audit.mjs --revision "$revision" || true
+            } >> "$GITHUB_STEP_SUMMARY"
+            if [ "$status" -eq 0 ]; then
+              generated=$((generated + 1))
+            else
+              unproven=$((unproven + 1))
+              printf '%s\t%s\t%s\n' "$channel" "$revision" "$version" >> "$RUNNER_TEMP/policy-reports/unproven.tsv"
+            fi
+          done < "$RUNNER_TEMP/policy-revisions.tsv"
+
+          # Even with no new revision, verify the committed store. When a
+          # revision was not derivable, this still emits every already usable
+          # policy instead of suppressing the entire site.
+          bash scripts/bootstrap-upstreams.sh defold
+          node scripts/generate-api-policy.mjs --prune
+          node scripts/generate-api-policy.mjs --check
+          node scripts/build-policy-site.mjs --out build/policy-site
+          node scripts/check-policy-site-resolution.mjs
+          echo "generated=$generated" >> "$GITHUB_OUTPUT"
+          echo "unproven=$unproven" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update issues for revisions the generator could not finish
+        if: >-
+          steps.derive.outputs.unproven != '0' &&
+          github.repository == 'ts-defold/deherm' &&
+          github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          while IFS=$'\t' read -r channel revision version; do
+            [ -n "$revision" ] || continue
+            title="policy: unproven Defold $revision"
+            body="Automated policy generation could not finish Defold \`$revision\` (${version:-unknown}, observed on \`$channel\`). The rest of the mechanically generated policy store was still published.\n\nRun: $RUN_URL\n\nThis issue tracks the missing generator/default-emission path; review status alone is not a release gate."
+            number="$(gh issue list --state open --search "in:title $title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" 2>/dev/null | head -n1 || true)"
+            if [ -n "$number" ]; then
+              gh issue comment "$number" --body "$body"
+            else
+              gh issue create --title "$title" --body "$body"
+            fi
+          done < "$RUNNER_TEMP/policy-reports/unproven.tsv"
+
+      - name: Pack the exact generated surface
+        run: |
+          tar -czf "$RUNNER_TEMP/policy-surface.tar.gz" \
+            upstream.lock \
+            packages/bindings/generated \
+            packages/sdk/src/generated \
+            packages/static-hermes/src/generated \
+            defold/defold_hermes/include/defold_hermes \
+            defold/defold_hermes/src \
+            defold/defold_hermes/lib/web \
+            examples/runtime-smoke/src/generated \
+            tests/fixtures \
+            .agents/docs/research
+      - uses: actions/upload-artifact@v4
+        with:
+          name: policy-surface
+          path: ${{ runner.temp }}/policy-surface.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: policy-derivation-reports
+          path: ${{ runner.temp }}/policy-reports
+          if-no-files-found: ignore
+
+  host-parity:
+    name: ${{ matrix.role }}
+    needs: derive
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            role: Linux canonical bytes
+            python: python3
+          - os: macos-15
+            role: macOS reproduces Linux
+            python: python3
+          - os: windows-2025
+            role: Windows reproduces Linux
+            python: python
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v5
+        with:
+          name: policy-surface
+          path: ${{ runner.temp }}/policy-surface
+      - name: Install the generated surface
+        run: |
+          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.13' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - id: sysroot
+        run: sed -n 's/^DMSDK_PARSE_SYSROOT_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: upstream/dmsdk-parse-sysroot
+          key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
+      - run: ./scripts/bootstrap-upstreams.sh defold
+      - run: ${{ matrix.python }} scripts/import-defold-sdk.py --check
+      - run: node scripts/generate-dmsdk-sdk.mjs --check
+      - run: node scripts/generate-dmsdk-target-conditionals.mjs --check
+      - run: node scripts/generate-dmsdk-accounting.mjs --check
+      - run: node scripts/generate-api-policy.mjs --check
+
+  engine-conformance:
+    name: Compile, link and run in Defold
+    needs: derive
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    continue-on-error: true
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v7
+        with: { submodules: recursive }
+      - uses: actions/download-artifact@v5
+        with:
+          name: policy-surface
+          path: ${{ runner.temp }}/policy-surface
+      - run: |
+          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '21' }
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: bash scripts/bootstrap-upstreams.sh defold extender ref-doc
+      - run: bash scripts/bootstrap-bob.sh
+      - run: pnpm artifacts:pull
+      - run: pnpm configure:native
+      - id: engine
+        name: Exercise every generated route against a real engine
+        continue-on-error: true
+        run: node scripts/check-headless-conformance.mjs
+      - name: Derive and report per-route verification
+        if: always()
+        run: |
+          node scripts/generate-route-verification.mjs || true
+          {
+            echo '## Real-engine route verification'
+            echo
+            echo "Engine step: \`${{ steps.engine.outcome }}\`"
+            echo
+            echo '```text'
+            node scripts/generate-route-verification.mjs 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: policy-engine-evidence
+          path: |
+            packages/bindings/generated/defold-route-verification.json
+            packages/bindings/generated/defold-headless-conformance-report.json
+          if-no-files-found: ignore
+      - name: Open or update the real-engine evidence issue
+        if: >-
+          always() &&
+          steps.engine.outcome != 'success' &&
+          github.repository == 'ts-defold/deherm' &&
+          github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          revision="$(sed -n 's/^DEFOLD_REV=//p' upstream.lock)"
+          title="policy: real-engine evidence unavailable for $revision"
+          body="The policy was generated and remains published, but the real-engine evidence lane did not complete successfully for \`$revision\`.\n\nRun: $RUN_URL"
+          number="$(gh issue list --state open --search "in:title $title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" 2>/dev/null | head -n1 || true)"
+          if [ -n "$number" ]; then gh issue comment "$number" --body "$body"; else gh issue create --title "$title" --body "$body"; fi
+
+  publish-site:
+    name: Publish policy website
+    needs: derive
+    if: >-
+      needs.derive.result == 'success' &&
+      github.repository == 'ts-defold/deherm' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v5
+        with:
+          name: policy-surface
+          path: ${{ runner.temp }}/policy-surface
+      - run: |
+          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: bash scripts/bootstrap-upstreams.sh defold
+      - run: node scripts/generate-api-policy.mjs --check
+      - run: node scripts/build-policy-site.mjs --out build/policy-site
+      - run: node scripts/check-policy-site-resolution.mjs
+      - name: Publish accumulated policies to deherm-policy-site
+        env:
+          GIT_AUTHOR_NAME: deherm-ci
+          GIT_AUTHOR_EMAIL: noreply@github.com
+          GIT_COMMITTER_NAME: deherm-ci
+          GIT_COMMITTER_EMAIL: noreply@github.com
+        run: |
+          set -euo pipefail
+          branch=deherm-policy-site
+          git fetch origin "$branch" --depth=1
+          git worktree add --detach /tmp/site "origin/$branch"
+          find /tmp/site -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R build/policy-site/. /tmp/site/
+          cd /tmp/site
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'Policy site is already current.'
+          else
+            git commit -m "publish: policy site from ${GITHUB_SHA::12}"
+            git push origin "HEAD:$branch"
+          fi
+      - name: Request a Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent

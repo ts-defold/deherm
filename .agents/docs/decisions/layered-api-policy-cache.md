@@ -365,6 +365,13 @@ Watch `https://d.defold.com/<channel>/info.json` for each tracked channel. When
 a channel's `sha1` moves, derive that revision's policy and publish the objects
 and the index entry.
 
+This is direct publication, not preparation for a review pull request. The
+single `policy` workflow derives all missing channel revisions into one
+accumulated store, runs cross-host reproduction and real-engine evidence lanes,
+reports or opens issues for anything unproven, and pushes the usable result to
+`deherm-policy-site`. Review is for changes to the generator; a mechanically
+derived Defold revision does not wait for a person to authorize its existence.
+
 Because objects are content-addressed, a revision whose declaration inputs did
 not change publishes **nothing** - the subtree hashes already exist and the
 index simply gains one more pointer at them. The job's steady-state cost is one
@@ -440,8 +447,9 @@ guessing, and they are the queue of real parser work.
   *derive* a policy, which the publisher, this project, or the user does once.
 * Committed layer-2 policies make a project's typed surface reproducible across
   machines and CI without network access.
-* A policy is reviewable. A diff showing a parameter changing from required to
-  optional is a visible event rather than a silent regeneration.
+* A policy is inspectable and reproducible. Changes and verification status are
+  visible in the workflow evidence and content-addressed objects without making
+  a human review the publication gate.
 
 # Boundary
 
@@ -542,7 +550,7 @@ the emitted tree and the evidence.
 | The end-to-end consumer proof, including a tampered-object control | `scripts/check-policy-site-resolution.mjs` |
 | The shipped CLI resolver and immutable local policy cache | `packages/cli/src/policy-client.mjs`, `deherm policy` |
 | Channel tracking and revision repinning | `scripts/track-defold-channels.mjs` |
-| Publish and watch | `.github/workflows/policy-site.yml`, `.github/workflows/policy-revisions.yml` |
+| Discover, derive, verify, and publish | `.github/workflows/policy.yml` |
 
 Three details the implementation had to settle that this document left open:
 

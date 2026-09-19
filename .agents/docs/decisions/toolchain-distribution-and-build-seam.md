@@ -394,7 +394,7 @@ artifact a function of every pin in it. That was measured, not theorised:
 changing **only** `DEFOLD_REV` rotated the host-tool tag from `7a3536af` to
 `35787eb7` and the target tag from `d37e4040` to `6fb21b2c`. `hermesc` and
 `shermes` link, read and embed nothing of Defold's, so the nightly repin in
-`.github/workflows/policy-revisions.yml` would have forced a rebuild and a
+the nightly policy derivation would have forced a rebuild and a
 republish of all 25 artifacts for zero byte change - and churned digests users
 had already pinned.
 

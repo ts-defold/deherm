@@ -142,18 +142,14 @@ together with the index.
 
 # CI
 
-`.github/workflows/policy-site.yml` verifies the committed store, emits the
-site, resolves it end to end, and deploys it with `actions/deploy-pages`. It
-derives nothing, so re-running is free; the emitter reports how many files it
-actually had to write, which in the steady state is zero.
-
-`.github/workflows/policy-revisions.yml` reads
+`.github/workflows/policy.yml` owns discovery, derivation, cross-host parity,
+real-engine evidence, and publication in one visible graph. It reads
 `https://d.defold.com/<channel>/info.json` for the tracked channels each day. A
 channel whose sha is already indexed derives and publishes **nothing**. A new
-sha is repinned into `upstream.lock` with the digests the immutable archive
-actually served, derived, verified, and opened as a pull request - never pushed,
-because repinning ground truth is a reviewed decision and a policy diff is meant
-to be a visible event.
+sha is pinned in a scratch workspace with the digests the immutable archive
+actually served, derived, verified as far as the available harness permits, and
+published directly to `deherm-policy-site`. Generator changes are reviewed in
+pull requests; an authoritative Defold revision does not wait in a review queue.
 
 # Open boundaries
 

@@ -145,6 +145,7 @@
     "check:route-verification": "node scripts/generate-route-verification.mjs --check",
     "check:api-policy": "node scripts/generate-api-policy.mjs --check",
     "build:policy-site": "node scripts/build-policy-site.mjs",
+    "hydrate:policy-site": "node scripts/hydrate-policy-site.mjs",
     "check:policy-site": "node scripts/check-policy-site-resolution.mjs",
     "check:end-to-end": "node scripts/check-end-to-end.mjs",
     "plan:end-to-end": "node scripts/check-end-to-end.mjs --plan",

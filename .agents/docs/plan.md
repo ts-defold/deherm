@@ -151,21 +151,26 @@ Exit: native and HTML5 emit the same observable lifecycle transcript.
 
 1. Import all public dmSDK headers with Clang and all public script annotations
    from Defold's pinned ref-doc archive.
-2. Generate a canonical IR and fail CI on unaccounted additions or removals.
+2. Generate a canonical IR for every addition and removal. Emit a conservative
+   default route when no specialized lowering exists, and report/issue any
+   unproven path without suppressing the rest of the API or failing the nightly.
 3. Add explicit lowering policies for handles, records, strings, spans,
    callbacks, ownership, threads, userdata, multiple returns, and platform
    gates.
 4. Compile and link every generated platform surface, including Static Hermes
    `extern_c`, dynamic JSI, and raw Emscripten exports.
-5. Generate release adapters from the manifest's complete dependency closure;
+5. Publish stable, beta, and alpha policy revisions automatically from one
+   visible nightly workflow after generation and evidence collection; policy
+   publication never waits for a review PR.
+6. Generate release adapters from the manifest's complete dependency closure;
    split native code into dead-strippable sections and verify omitted symbols
    in final binaries.
-6. Prototype generated native modules behind the module registry, borrowing
+7. Prototype generated native modules behind the module registry, borrowing
    TurboModule lookup semantics and Nitro's static JSI-binding approach without
    importing React Native lifecycle/autolinking dependencies.
-7. Evaluate hot reload, debugging, multiple worlds, GC/thread affinity,
+8. Evaluate hot reload, debugging, multiple worlds, GC/thread affinity,
    promises, async Defold messages, and mobile/desktop cross-compilation.
-8. Only then evaluate first-class `.ts` script resources/editor integration
+9. Only then evaluate first-class `.ts` script resources/editor integration
    inside the Defold engine.
 
 At every compiler and engine phase, reduce genuine upstream failures and apply
