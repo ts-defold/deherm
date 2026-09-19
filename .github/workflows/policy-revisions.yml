@@ -69,9 +69,13 @@ on:
           Carry reviewed inputs whose revision differs onto the derived revision.
           Every carry is recorded and reported; the byte-level source evidence
           each reviewed input names is still checked against the derived
-          revision, so this cannot make a stale review pass.
+          revision, so this cannot make a stale review pass. Defaults ON,
+          because a scheduled derivation of a NEW revision necessarily meets
+          reviewed inputs naming the old one - refusing there produces nothing,
+          and the census is the output of such a run. Untick it to see where a
+          derivation would stop without any carry.
         type: boolean
-        default: false
+        default: true
 
 permissions:
   contents: write
@@ -153,7 +157,7 @@ jobs:
           node scripts/derive-revision.mjs \
             --revision "${{ matrix.revision.sha1 }}" \
             --workspace "$RUNNER_TEMP/derivation" \
-            ${{ inputs.carry-reviews && '--carry-reviews' || '' }} \
+            ${{ (github.event_name == 'workflow_dispatch' && inputs.carry-reviews == false) && '' || '--carry-reviews' }} \
             --adopt 2>&1 | tee "$RUNNER_TEMP/derivation.txt"
 
       - name: Report
