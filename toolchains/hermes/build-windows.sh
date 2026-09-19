@@ -20,15 +20,26 @@
 # host and target are the same, CMake builds whatever host tool it needs itself,
 # and the two-pass structure and toolchain file both fall away.
 #
-# ── The provenance caveat, which is not small ────────────────────────────────
+# ── What the image is for, and the caveat of not having it ───────────────────
 #
-# Nobody here runs Extender: users bundle through remote Bob against
-# build.defold.com, and that is unaffected by how this archive is produced. What
-# matters is that Extender COMPILES defold_hermes/src/*.cpp and then LINKS this
-# archive into the engine, so the archive must be ABI-compatible with Extender's
-# toolchain. Building inside Extender's own image is what guaranteed that.
+# Extender COMPILES defold_hermes/src/*.cpp and then LINKS this archive into the
+# engine, so the archive must be ABI-compatible with Extender's toolchain.
+# Building inside Extender's own image is what guaranteed that.
 #
-# Building against the runner's MSVC and Windows SDK instead does not, and the
+# The compatibility target is therefore the EXTENDER IMAGE SET DEFOLD PINS, not
+# build.defold.com in particular. Most users bundle through the hosted builder,
+# but self-hosting Extender is a supported Defold deployment - teams run their
+# own for private sources, compliance, build speed, or custom SDKs - and a
+# déherm archive has to link correctly under theirs too. Matching the image is
+# what makes one archive satisfy both, and it is an independent reason the
+# container lane is the one that should ship.
+#
+# Note for anyone self-hosting: they hit this same registry wall. Standing up
+# Extender's Windows builder requires an authenticated Google identity to pull
+# extender-winsdk, exactly as building this archive from it does.
+#
+# Building against the runner's MSVC and Windows SDK instead guarantees no such
+# thing, and the
 # binding constraint is not the core C++ ABI - that has been stable since
 # VS2015. It is that Hermes's JSI surface passes std::string, std::shared_ptr
 # and other standard-library types across the boundary, so both sides must also
