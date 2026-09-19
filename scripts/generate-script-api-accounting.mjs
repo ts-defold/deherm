@@ -13,6 +13,9 @@ import {
   universalTargetSupport
 } from "./lib/script-universal-selection.mjs";
 
+import { declaredDerivation, expectReviewedCount, expectSameRevision, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
+
 const root = new URL("../", import.meta.url);
 const inputUrls = {
   inventory: new URL("packages/bindings/generated/defold-script-api-inventory.json", root),
@@ -88,6 +91,7 @@ function escapeRegex(value) {
 }
 
 function validateValueDefinitions(valueReport, definitionInputs, irFunctions, patternById) {
+  const emittedValueIds = new Set(valueReport.bindings.map(({ id }) => id));
   const expected = [];
   const definitionEvidence = [];
   const sourceEvidence = [];
@@ -95,8 +99,19 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
     const definition = parse(input.definitionText, input.path);
     assert(definition.schemaVersion === 2, `${input.path} has an unsupported schema`);
     assert(Array.isArray(definition.bindings), `${input.path} has no binding rows`);
+    // OBSERVED, not asserted - the same rule the value lane itself applies to
+    // these files. A pinned hash only detects that Defold edited its own source,
+    // which across a release is expected; a lost anchor withdraws the reviewed
+    // definition, and with it everything this function would check against it.
     const sourceHash = sha256(input.sourceText);
-    assert(sourceHash === definition.sourceSha256, `${input.path} is stale against ${definition.source}`);
+    const sourceVerdict = observeReviewedSource({
+      input: input.path, id: definition.source, source: input.sourceText,
+      evidence: { source: definition.source, sha256: definition.sourceSha256, anchors: definition.anchors ?? [] }
+    });
+    if (sourceVerdict.status === VOID) {
+      assert(declaredDerivation(), `${input.path} is stale against ${definition.source}`);
+      continue;
+    }
     definitionEvidence.push({
       definitionPath: input.path,
       definitionSha256: sha256(input.definitionText)
@@ -108,22 +123,35 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
     const declaredAdditional = definition.additionalSourceEvidence ?? [];
     assert(declaredAdditional.length === input.additionalSources.length,
       `${input.path} has incomplete additional source evidence`);
+    let withdrawn = false;
     for (const declared of declaredAdditional) {
       const loaded = input.additionalSources.find(({ source }) => source === declared.source);
       assert(loaded, `${input.path} did not load ${declared.source}`);
       const additionalHash = sha256(loaded.sourceText);
-      assert(additionalHash === declared.sourceSha256,
-        `${input.path} is stale against ${declared.source}`);
-      for (const anchor of declared.anchors ?? []) {
-        assert(loaded.sourceText.includes(anchor),
-          `${input.path}: additional source anchor '${anchor}' is stale`);
+      const additionalVerdict = observeReviewedSource({
+        input: input.path, id: declared.source, source: loaded.sourceText,
+        evidence: { source: declared.source, sha256: declared.sourceSha256, anchors: declared.anchors ?? [] }
+      });
+      if (additionalVerdict.status === VOID) {
+        assert(declaredDerivation(), `${input.path} is stale against ${declared.source}`);
+        withdrawn = true;
+        break;
       }
       sourceEvidence.push({
         sourcePath: `upstream/defold/${declared.source}`,
         sourceSha256: additionalHash
       });
     }
+    if (withdrawn) continue;
     for (const binding of definition.bindings) {
+      // A reviewed row the value lane did not emit at this revision was
+      // withdrawn there, by name and with a reason. Re-asserting its source
+      // symbol here would report the same withdrawal as a fresh failure.
+      if (!emittedValueIds.has(binding.id)) {
+        assert(declaredDerivation(), `${binding.id}: reviewed source symbol '${binding.sourceSymbol}' is stale`);
+        recordAudit({ input: input.path, id: binding.id, status: VOID, reason: "withdrawn-upstream" });
+        continue;
+      }
       const sourceSymbol = new RegExp(
         `(?:static\\s+)?int\\s+${escapeRegex(binding.sourceSymbol)}\\s*\\(lua_State\\s*\\*\\s*L\\)`);
       assert(sourceSymbol.test(input.sourceText),
@@ -142,8 +170,10 @@ function validateValueDefinitions(valueReport, definitionInputs, irFunctions, pa
     for (const family of definition.families ?? []) {
       const selector = family.selector;
       const rows = valueReport.bindings.filter(({ generatedFamily }) => generatedFamily === family.id);
-      assert(rows.length === selector.expectedRouteCount,
-        `${family.id}: generated route count differs from reviewed family metadata`);
+      expectReviewedCount({
+        input: input.path, label: `${family.id} generated route census`,
+        expected: selector.expectedRouteCount, observed: rows.length
+      });
       if (family.id === "vmath-fixed-pod") {
         const allowedTypes = new Set(selector.allowedTypes);
         const terminals = new Map(selector.terminalOperations.map((terminal) => [terminal.operator, terminal]));
@@ -266,21 +296,72 @@ export function generateScriptApiAccounting(inputs) {
   const overload = parse(inputs.overloadText, "overload-dispatch report");
   const universalPolicy = parse(inputs.universalPolicyText, "universal-value fallback policy");
 
-  const revisions = [inventory, patterns, descriptors, scalar, value, url, valueTail, overload].map((artifact) => artifact.defoldRevision);
-  assert(revisions.every((revision) => revision === ir.defoldRevision), "script generator Defold revisions differ");
+  expectSameRevision({
+    label: "script API accounting",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-api-inventory.json", revision: inventory.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-descriptors.json", revision: descriptors.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-scalar-dispatch.json", revision: scalar.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-bindings.json", revision: value.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-url-address-classification.json", revision: url.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-tail-bindings.json", revision: valueTail.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-overload-dispatch.json", revision: overload.defoldRevision }
+    ]
+  });
   assert(ir.counts?.functions === ir.functions.length, "script IR function count is stale");
   const functionById = uniqueMap(ir.functions, "script IR");
   const inventoryFunctions = inventory.declarations.filter(({ kind }) => kind === "function");
   assert(inventory.countsByKind?.function === inventoryFunctions.length, "script inventory function count is stale");
-  const inventoryById = uniqueMap(inventoryFunctions.map((entry) => ({ ...entry, id: `script:${entry.name}` })), "script inventory");
-  assert(inventoryById.size === functionById.size, "script IR does not contain every inventoried function");
-  for (const [id, inventoried] of inventoryById) {
-    const fn = functionById.get(id);
-    assert(fn, `${id}: inventoried function is missing from script IR`);
-    assert(fn.rawName === inventoried.name, `${id}: script IR raw name differs from inventory`);
-    assert(fn.source === inventoried.source, `${id}: script IR source differs from inventory`);
-    assert(fn.line === inventoried.line, `${id}: script IR source line differs from inventory`);
+  // One Lua name can be documented more than once.
+  //
+  // The reference archive is a set of per-source stub files, so at Defold
+  // 1.13.1 `init` is documented by both `gameobject_script.cpp` and
+  // `gui_script.cpp`, and `b2d.body.*` by both the box2d v2 and v3 backends -
+  // 131 names in all. The pinned revision ships one file per module and so
+  // happens to document every name once, which is a property of that revision's
+  // documentation layout and not a rule. Keying the inventory by name therefore
+  // died with "duplicate id 'script:init'" at every revision but that one.
+  //
+  // `generate-script-sdk.mjs` resolves those groups into routes by an explicit
+  // policy - `scripts/lib/documented-route-duplication.mjs` for build variants,
+  // overloads and the editor surface, `scripts/lib/script-lifecycle-callbacks.mjs`
+  // for the namespace-less callbacks. This does NOT re-derive that policy; a
+  // second authority on the same question is how two answers start disagreeing.
+  // It checks the two directions separately instead, because only one of them
+  // is exact at every revision:
+  //
+  //   IR -> inventory   every route must be a documented declaration, with
+  //                     matching provenance. A route documented nowhere is a
+  //                     defect at any revision, so this stays fatal everywhere.
+  //   inventory -> IR   how many documented names became routes. At the
+  //                     reviewed revision that is all of them and a shortfall is
+  //                     a regression; at another revision it counts what that
+  //                     revision's documentation layout resolved away.
+  //
+  // Where the old check could run at all, the two together are exactly the set
+  // equality it asserted: the IR is a subset of the inventory and the counts
+  // agree, so the sets are equal.
+  const inventoryByName = new Map();
+  for (const entry of inventoryFunctions) {
+    const id = `script:${entry.name}`;
+    inventoryByName.set(id, [...(inventoryByName.get(id) ?? []), entry]);
   }
+  for (const [id, fn] of functionById) {
+    const declarations = inventoryByName.get(id);
+    assert(declarations, `${id}: inventoried function is missing from script IR`);
+    assert(declarations.some(({ name }) => fn.rawName === name), `${id}: script IR raw name differs from inventory`);
+    assert(declarations.some(({ source }) => fn.source === source), `${id}: script IR source differs from inventory`);
+    assert(declarations.some(({ source, line }) => fn.source === source && fn.line === line),
+      `${id}: script IR source line differs from inventory`);
+  }
+  expectReviewedCount({
+    input: "packages/bindings/generated/defold-script-api-inventory.json",
+    label: "documented names that became routes",
+    expected: inventoryByName.size,
+    observed: [...inventoryByName.keys()].filter((id) => functionById.has(id)).length
+  });
 
   assert(patterns.sourceSha256 === sha256(inputs.irText), "binding patterns are stale against script IR");
   assert(url.inputEvidence?.scriptIrSha256 === sha256(inputs.irText),
@@ -356,9 +437,15 @@ export function generateScriptApiAccounting(inputs) {
   }
   const valueTailCandidates = valueTail.bindings.filter(({ disposition }) => disposition === "candidate");
   const valueTailById = uniqueMap(valueTailCandidates, "value-tail binding report candidates");
+  // Internal consistency - the report against itself - stays exact. The 16 is a
+  // count taken at the reviewed revision and is an observation anywhere else.
   assert(valueTail.routeCount === valueTail.bindings.length &&
-    valueTail.candidateCount === valueTailCandidates.length && valueTail.candidateCount === 16,
+    valueTail.candidateCount === valueTailCandidates.length,
   "value-tail binding census is stale");
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+    label: "value-tail candidate census", expected: 16, observed: valueTail.candidateCount
+  });
   for (const [id, row] of valueTailById) {
     assert(patternById.get(id)?.loweringFamily === "defold-value",
       `${id}: generated value-tail route is not a defold-value descriptor`);
@@ -372,8 +459,12 @@ export function generateScriptApiAccounting(inputs) {
   const overloadCandidates = overload.bindings.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate);
   const overloadById = uniqueMap(overloadCandidates, "overload-dispatch report candidates");
   assert(overload.routeCount === overload.bindings.length &&
-    overload.generatedFamilyCandidateCount === overloadCandidates.length && overload.generatedFamilyCandidateCount === 8,
+    overload.generatedFamilyCandidateCount === overloadCandidates.length,
   "overload-dispatch binding census is stale");
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-overload-dispatch.json",
+    label: "overload-dispatch candidate census", expected: 8, observed: overload.generatedFamilyCandidateCount
+  });
   for (const [id, row] of overloadById) {
     assert(patternById.get(id)?.loweringFamily === "overload-dispatch",
       `${id}: generated overload route is not an overload-dispatch descriptor`);

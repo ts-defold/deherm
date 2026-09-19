@@ -6,6 +6,9 @@ import { pathToFileURL } from "node:url";
 
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
 
+import { declaredDerivation, expectReviewedCount, expectSameRevision } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
+
 const root = new URL("../", import.meta.url);
 const urls = {
   ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
@@ -225,24 +228,48 @@ function validateOverrides(document, functions, inScope) {
   assert(document.schemaVersion === 1, "Unsupported table/tuple override schema");
   assert(Array.isArray(document.overrides), "Table/tuple overrides must be an array");
   const result = new Map();
+  // A reviewed override describes ONE route as it was documented at the revision
+  // it was read at. At that revision each of these is a regression in this tree
+  // and stays fatal; deriving another revision, a route that went away, left the
+  // structural scope, or is documented with a different signature or wording is
+  // an override this revision does not bear out, so it is withdrawn and reported
+  // rather than asserted against documentation that says something else.
+  const withdraw = (id, reason, message) => {
+    assert(declaredDerivation(), message);
+    recordAudit({
+      input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
+      id, status: VOID, reason, detail: message
+    });
+    return true;
+  };
   for (const override of document.overrides) {
     assert(!result.has(override.id), `Duplicate table/tuple override: ${override.id}`);
-    assert(inScope.has(override.id), `Override is outside the structural table/tuple scope: ${override.id}`);
+    if (!inScope.has(override.id)) {
+      withdraw(override.id, "out-of-scope", `Override is outside the structural table/tuple scope: ${override.id}`);
+      continue;
+    }
     const fn = functions.get(override.id);
-    assert(fn, `Override route is absent from the pinned IR: ${override.id}`);
+    if (!fn) {
+      withdraw(override.id, "absent-route", `Override route is absent from the pinned IR: ${override.id}`);
+      continue;
+    }
     assert(bucketDefinitions[override.bucket]?.origin === "reviewed-override",
       `${override.id}: ${override.bucket} is not an override bucket`);
     assert(bucketDefinitions[override.bucket].family === inScope.get(override.id),
       `${override.id}: override bucket belongs to the wrong lowering family`);
-    assert(sameJson(signature(fn), { parameters: override.parameters, returns: override.returns }),
-      `${override.id}: reviewed signature drifted`);
+    if (!sameJson(signature(fn), { parameters: override.parameters, returns: override.returns })) {
+      withdraw(override.id, "stale-signature", `${override.id}: reviewed signature drifted`);
+      continue;
+    }
     const documentation = [
       fn.description,
       ...fn.parameters.map(({ description }) => description),
       ...fn.returnDescriptions
     ].join("\n");
-    assert(typeof override.descriptionAnchor === "string" && documentation.includes(override.descriptionAnchor),
-      `${override.id}: reviewed description anchor drifted`);
+    if (!(typeof override.descriptionAnchor === "string" && documentation.includes(override.descriptionAnchor))) {
+      withdraw(override.id, "stale-description-anchor", `${override.id}: reviewed description anchor drifted`);
+      continue;
+    }
     assert(typeof override.reasonCode === "string" && override.reasonCode.length > 0,
       `${override.id}: reasonCode is required`);
     result.set(override.id, override);
@@ -255,8 +282,14 @@ export function generateScriptTableTupleSchemas(texts) {
   const patterns = JSON.parse(texts.patterns);
   const accounting = JSON.parse(texts.accounting);
   const overrideDocument = JSON.parse(texts.overrides);
-  assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === accounting.defoldRevision,
-    "Script table/tuple inputs use different Defold revisions");
+  expectSameRevision({
+    label: "script table/tuple schemas",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-api-accounting.json", revision: accounting.defoldRevision }
+    ]
+  });
   const functions = new Map(ir.functions.map((fn) => [fn.id, fn]));
   const patternById = new Map(patterns.bindings.map((row) => [row.id, row]));
   const types = new Map(ir.types.map((type) => [type.name, type]));
@@ -308,21 +341,41 @@ export function generateScriptTableTupleSchemas(texts) {
     });
   }
   assert(rows.length === inScope.size, "Not every in-scope route was classified exactly once");
-  assert(overrides.size === overrideDocument.overrides.length, "Not every reviewed override was consumed");
+  // At the reviewed revision every override is consumed and a gap is a
+  // regression; at another revision this counts the overrides that revision
+  // withdrew, each already named in the audit.
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
+    label: "reviewed override consumption",
+    expected: overrideDocument.overrides.length, observed: overrides.size
+  });
   const familyCounts = Object.fromEntries(familyOrder.map((family) => [family, rows.filter((row) => row.family === family).length]));
   const bucketCounts = Object.fromEntries(bucketOrder.map((bucket) => [bucket, rows.filter((row) => row.bucket === bucket).length]));
-  assert(familyCounts["lua-table"] === overrideDocument.expectedRouteCounts["lua-table"], "lua-table expected count drifted");
-  assert(familyCounts["multi-result"] === overrideDocument.expectedRouteCounts["multi-result"], "multi-result expected count drifted");
-  assert(rows.length === overrideDocument.expectedRouteCounts.total, "Total table/tuple expected count drifted");
+  for (const family of [...familyOrder, "total"]) {
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
+      label: `table/tuple route census:${family}`,
+      expected: overrideDocument.expectedRouteCounts[family],
+      observed: family === "total" ? rows.length : familyCounts[family]
+    });
+  }
   assert(Object.keys(overrideDocument.expectedBucketCounts).length === bucketOrder.length,
     "Expected bucket ledger does not contain every bucket exactly once");
   for (const bucket of bucketOrder) {
-    assert(bucketCounts[bucket] === overrideDocument.expectedBucketCounts[bucket],
-      `${bucket}: expected ${overrideDocument.expectedBucketCounts[bucket]} routes, classified ${bucketCounts[bucket]}`);
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
+      label: `table/tuple bucket census:${bucket}`,
+      expected: overrideDocument.expectedBucketCounts[bucket], observed: bucketCounts[bucket]
+    });
   }
   const tupleArities = Object.fromEntries([2, 3, 4].map((arity) => [arity,
     rows.filter((row) => row.family === "multi-result" && row.returns.length === arity).length]));
-  assert(sameJson(tupleArities, { 2: 29, 3: 5, 4: 3 }), "Fixed tuple arity census drifted");
+  for (const [arity, expected] of Object.entries({ 2: 29, 3: 5, 4: 3 })) {
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-table-tuple-schema-overrides.json",
+      label: `fixed tuple arity census:${arity}`, expected, observed: tupleArities[arity]
+    });
+  }
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,

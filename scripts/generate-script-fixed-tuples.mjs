@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 import { readFile, writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -44,14 +45,28 @@ export async function loadInputs() {
     readFile(urls.schemaOverrides, "utf8"), readFile(urls.registrations, "utf8")
   ]);
   const registrations = JSON.parse(registrationsText);
-  const sources = await Promise.all(registrations.sources.map(async (entry) => ({
-    ...entry,
-    text: await readFile(new URL(`upstream/defold/${entry.path}`, root), "utf8")
-  })));
-  return { irText, patternsText, schemaOverridesText, registrationsText, sources };
+  // Tolerant on purpose: the reviewed registrations cite the whole `bullet3d`
+  // backend, which Defold 1.13.1 does not ship at all. Opening each path with a
+  // bare `readFile` died with ENOENT on the first of them, which is a backend
+  // that revision does not have rather than a broken review. Sources that are
+  // absent - or present with a reviewed anchor gone - are withdrawn, and the
+  // routes their module registers are dropped below.
+  const loaded = await loadReviewedSources({
+    input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
+    defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
+    evidence: registrations.sources,
+    derived: JSON.parse(irText).defoldRevision
+  });
+  const sources = registrations.sources
+    .filter(({ path }) => !loaded.withdrawn.has(path))
+    .map((entry) => ({ ...entry, text: loaded.texts.get(entry.path) }));
+  return {
+    irText, patternsText, schemaOverridesText, registrationsText, sources,
+    withdrawnSources: loaded.withdrawn
+  };
 }
 
-export function generate(irText, patternsText, schemaOverridesText, registrationsText, sources) {
+export function generate(irText, patternsText, schemaOverridesText, registrationsText, sources, withdrawnSources = new Set()) {
   const ir = JSON.parse(irText);
   const patterns = JSON.parse(patternsText);
   const schemaOverrides = JSON.parse(schemaOverridesText);
@@ -59,19 +74,19 @@ export function generate(irText, patternsText, schemaOverridesText, registration
   assert(registrations.schemaVersion === 1, "fixed tuple registration schema drifted");
   const sourceByPrefix = new Map();
   for (const source of sources) {
-    // OBSERVED, not asserted. A pinned hash only detects that Defold edited its
-    // own source, which across a release is expected and is the input to this
-    // generator rather than a failure of it. A moved file becomes an audit line
-    // and a restated pin for this revision. What actually checks this policy
-    // against the revision being generated is the census below, which is read
-    // from that revision's IR.
-    observeReviewedSource({
-      input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
-      id: `${source.path}: fixed-tuple`, source: source.text, evidence: source
-    });
+    // The reviewed hash was observed while loading, where a moved file becomes
+    // an audit line rather than a refusal: a pinned hash only detects that
+    // Defold edited its own source, which across a release is expected and is
+    // the input to this generator. What actually checks this policy against the
+    // revision being generated is the census below, read from that revision's IR.
     assert(!sourceByPrefix.has(source.modulePrefix), `duplicate module source ${source.modulePrefix}`);
     sourceByPrefix.set(source.modulePrefix, source);
   }
+  // A module whose reviewed registration source this revision does not have
+  // registers nothing here. Its routes are withdrawn rather than asserted
+  // against a source that is gone.
+  const withdrawnPrefixes = new Set(registrations.sources
+    .filter(({ path }) => withdrawnSources.has(path)).map(({ modulePrefix }) => modulePrefix));
   const functionById = new Map(ir.functions.map((fn) => [fn.id, fn]));
   const excluded = new Set(schemaOverrides.overrides.map(({ id }) => id));
   const selected = patterns.bindings.filter(({ id, loweringFamily, parameterCodecs, returnCodecs }) =>
@@ -82,11 +97,39 @@ export function generate(irText, patternsText, schemaOverridesText, registration
       id: pattern.id,
       bucket: pattern.returnCodecs.some(({ rawType }) => /(?:^|\|)(?:vector3|vector4|quaternion)(?:\||$)/.test(rawType))
         ? "fixed-value-tuple" : "fixed-scalar-tuple"
-    }));
-  assert(selected.length === registrations.expectedRouteCount, `selected ${selected.length} fixed tuples, expected ${registrations.expectedRouteCount}`);
+    })).filter(({ id }) => {
+      const module = functionById.get(id)?.modulePath.join(".");
+      if (withdrawnPrefixes.has(module)) return false;
+      if (sourceByPrefix.has(module)) return true;
+      // A multi-result route in a module the review never saw. At the reviewed
+      // revision that is a gap in this tree and stays fatal; in a derivation of
+      // another revision it is a module that revision registers and this one
+      // does not, so it is withdrawn and reported rather than emitted with a
+      // context nobody reviewed.
+      assert(declaredDerivation(), `${id}: no exact source registration`);
+      recordAudit({
+        input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
+        id, status: VOID, reason: "unreviewed-module", module
+      });
+      return false;
+    });
+  // The census is evidence at the revision it was counted at and an observation
+  // anywhere else: a revision that registers a different number of fixed tuples
+  // is the measurement, not an error.
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
+    label: "fixed-tuple route census",
+    expected: registrations.expectedRouteCount, observed: selected.length
+  });
   const bucketCounts = Object.fromEntries(Object.keys(registrations.expectedBucketCounts).map((bucket) =>
     [bucket, selected.filter((row) => row.bucket === bucket).length]));
-  assert(JSON.stringify(bucketCounts) === JSON.stringify(registrations.expectedBucketCounts), "fixed tuple bucket counts drifted");
+  for (const [bucket, expected] of Object.entries(registrations.expectedBucketCounts)) {
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
+      label: `fixed-tuple bucket census:${bucket}`,
+      expected, observed: bucketCounts[bucket]
+    });
+  }
   const rows = selected.map((classified) => {
     const fn = functionById.get(classified.id);
     assert(fn, `${classified.id}: absent from pinned IR`);

@@ -71,7 +71,7 @@ test("overload-dispatch rejects already-owned report provenance and identity dri
 
   const count = JSON.parse(inputs.ownedText);
   count.bindingCount = 77;
-  assert.throws(() => generate({ ...inputs, ownedText: JSON.stringify(count) }), /bindingCount drifted from reviewed 78/);
+  assert.throws(() => generate({ ...inputs, ownedText: JSON.stringify(count) }), /already-owned value-binding census expected 78/);
 
   const duplicate = JSON.parse(inputs.ownedText);
   duplicate.bindings[1] = structuredClone(duplicate.bindings[0]);

@@ -45,7 +45,7 @@ test("rejects missing and duplicate accounting classifications", async () => {
       value.rows = value.rows.filter(({ id }) => id !== "script:b2d.body.compute_aabb");
     })
   };
-  assert.throws(() => generateScriptTableTupleSchemas(missing), /lua-table expected count drifted/);
+  assert.throws(() => generateScriptTableTupleSchemas(missing), /table\/tuple route census:lua-table expected/);
 
   const duplicate = {
     ...source,
@@ -65,7 +65,7 @@ test("rejects structural and reviewed semantic drift", async () => {
       type.fields.find(({ rawName }) => rawName === "center").rawType = "vector3[]";
     })
   };
-  assert.throws(() => generateScriptTableTupleSchemas(structural), /flat-record: expected 57 routes, classified 54/);
+  assert.throws(() => generateScriptTableTupleSchemas(structural), /table\/tuple bucket census:flat-record expected 57, found 54/);
 
   const semantic = {
     ...source,

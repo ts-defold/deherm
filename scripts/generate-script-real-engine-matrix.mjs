@@ -4,6 +4,9 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
+import { declaredDerivation, expectSameRevision } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
+
 const root = new URL("../", import.meta.url);
 const inputUrls = {
   manifest: new URL("packages/bindings/probes/defold-script-real-engine-matrix.json", root),
@@ -167,7 +170,17 @@ function importedScenarios(manifest, setups, scalarProbes, valueProbes, routeByI
     const report = reports.get(probeImport.source);
     const knownProbeKeys = new Set(report.probes.map(({ key }) => key));
     for (const [key, setupId] of Object.entries(probeImport.setupByProbeKey)) {
-      if (!knownProbeKeys.has(key)) throw new Error(`${probeImport.source}: setup assigned to unknown probe ${key}`);
+      // A setup for a probe the probe lane withdrew at this revision has
+      // nothing to set up. Fatal at the reviewed revision, where every reviewed
+      // probe is generated; withdrawn with its probe in a declared derivation.
+      if (!knownProbeKeys.has(key)) {
+        if (!declaredDerivation()) throw new Error(`${probeImport.source}: setup assigned to unknown probe ${key}`);
+        recordAudit({
+          input: "packages/bindings/probes/defold-script-real-engine-matrix.json",
+          id: key, status: VOID, reason: "withdrawn-probe", source: probeImport.source
+        });
+        continue;
+      }
       if (!setups.has(setupId)) throw new Error(`${probeImport.source}:${key}: unknown setup ${setupId}`);
     }
     for (const probe of report.probes) {
@@ -234,9 +247,25 @@ async function validateObservations(manifest, scenarios, routeById, loadEvidence
     assertNonEmpty(observation.observedAt, `${observation.id}.observedAt`);
     if (!Array.isArray(observation.routeIds) || observation.routeIds.length === 0) throw new Error(`${observation.id}.routeIds must not be empty`);
     const routeIds = [...new Set(observation.routeIds)].sort(compareText);
-    for (const routeId of routeIds) if (!routeById.has(routeId)) throw new Error(`${observation.id}: unknown route ${routeId}`);
     const scenarioKeys = [...new Set(observation.scenarioKeys ?? [])].sort(compareText);
-    for (const key of scenarioKeys) if (!scenarioByKey.has(key)) throw new Error(`${observation.id}: unknown scenario ${key}`);
+    // An observation is a RECORDED RUN - a real engine, on a real bundle, at one
+    // revision. It is evidence for that revision and for no other, so when this
+    // revision does not have one of the routes or scenarios it names, the whole
+    // observation is withdrawn rather than trimmed: half a recorded run is not a
+    // recorded run. At the reviewed revision every one of these resolves, so
+    // this stays fatal there.
+    const unknown = [
+      ...routeIds.filter((routeId) => !routeById.has(routeId)).map((routeId) => `route ${routeId}`),
+      ...scenarioKeys.filter((key) => !scenarioByKey.has(key)).map((key) => `scenario ${key}`)
+    ];
+    if (unknown.length) {
+      if (!declaredDerivation()) throw new Error(`${observation.id}: unknown ${unknown[0]}`);
+      recordAudit({
+        input: "packages/bindings/probes/defold-script-real-engine-matrix.json",
+        id: observation.id, status: VOID, reason: "withdrawn-observation", anchorsLost: unknown
+      });
+      continue;
+    }
     assertRecord(observation.artifact, `${observation.id}.artifact`);
     assertNonEmpty(observation.artifact.path, `${observation.id}.artifact.path`);
     const artifactPath = observation.artifact.path;
@@ -314,15 +343,19 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   assertNonEmpty(manifest.policy.defaultSetupId, "policy.defaultSetupId");
   if (JSON.stringify(manifest.policy.requiredEvidenceStages) !== JSON.stringify(stages)) throw new Error("requiredEvidenceStages must be compile, link, runtime");
   if (manifest.policy.runtimeRequiresExactScenarioMarker !== true) throw new Error("runtimeRequiresExactScenarioMarker must be true");
-  if (scalarRoutes.defoldRevision !== valueRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== tupleRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== urlRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== valueTailRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== overloadRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== scalarProbes.defoldRevision ||
-      scalarRoutes.defoldRevision !== valueProbes.defoldRevision) {
-    throw new Error("All matrix inputs must use the same Defold revision");
-  }
+  expectSameRevision({
+    label: "script real-engine matrix",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-scalar-dispatch.json", revision: scalarRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-bindings.json", revision: valueRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-fixed-tuples.json", revision: tupleRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-url-address-classification.json", revision: urlRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-tail-bindings.json", revision: valueTailRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-overload-dispatch.json", revision: overloadRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-real-engine-probes.json", revision: scalarProbes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-real-engine-probes.json", revision: valueProbes.defoldRevision }
+    ]
+  });
   const setups = validateSetups(manifest);
   if (!setups.has(manifest.policy.defaultSetupId)) throw new Error(`Unknown default setup ${manifest.policy.defaultSetupId}`);
   const routes = routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailRoutes, overloadRoutes);

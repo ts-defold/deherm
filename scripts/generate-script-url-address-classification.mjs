@@ -2,10 +2,10 @@
 
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision, expectReviewedCount } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -115,15 +115,29 @@ function renderRuntime(report) {
   return { header, source, target };
 }
 
-function validateSources(override, sourceTexts) {
-  assert(sourceTexts.size === override.sourceEvidence.length, "URL source evidence load is incomplete");
+// The cited sources are OBSERVED while loading, where a moved hash becomes an
+// audit line and a lost anchor withdraws that citation for this revision. The
+// hash used to be asserted here, which made Defold editing `script.cpp` between
+// two releases - the ordinary outcome of a release - into a refusal. What
+// classifies the routes is this revision's own binding patterns, checked by the
+// censuses below; the citations are the provenance of the reviewed rules.
+function validateSources(override, sourceTexts, withdrawnSources) {
   for (const evidence of override.sourceEvidence) {
-    const source = sourceTexts.get(evidence.source);
-    assert(typeof source === "string", `${evidence.id}: source was not loaded`);
-    assert(sha256(source) === evidence.sha256, `${evidence.id}: reviewed source hash is stale`);
-    for (const anchor of evidence.anchors) {
-      assert(source.includes(anchor), `${evidence.id}: reviewed source anchor '${anchor}' is stale`);
-    }
+    if (withdrawnSources.has(evidence.source)) continue;
+    assert(typeof sourceTexts.get(evidence.source) === "string", `${evidence.id}: source was not loaded`);
+  }
+}
+
+// A reviewed count map. Fatal in an ordinary generation, reported per key in a
+// declared derivation of another revision, so the report names WHICH module
+// moved instead of dumping two objects at a reader.
+function compareCounts(actual, expected, label) {
+  if (JSON.stringify(actual) === JSON.stringify(expected)) return;
+  for (const key of [...new Set([...Object.keys(expected), ...Object.keys(actual)])].sort(compare)) {
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-url-address-classification.json",
+      label: `${label}:${key}`, expected: expected[key] ?? 0, observed: actual[key] ?? 0
+    });
   }
 }
 
@@ -143,7 +157,8 @@ export function generateScriptUrlAddressClassification(inputs) {
     derived: ir.defoldRevision,
     detail: "the reviewed URL/address value shapes"
   });
-  validateSources(override, inputs.sourceTexts);
+  const withdrawnSources = inputs.withdrawnSources ?? new Set();
+  validateSources(override, inputs.sourceTexts, withdrawnSources);
 
   const irById = uniqueMap(ir.functions, "script API IR");
   uniqueMap(patterns.bindings, "script binding patterns");
@@ -179,12 +194,16 @@ export function generateScriptUrlAddressClassification(inputs) {
   expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "URL/address candidate count",
     expected: override.expectedCounts.urlCandidates, observed: urlCandidateIds.size });
   for (const id of excludedUrlIds) assert(urlCandidateIds.has(id), `${id}: pinned URL exclusion left the candidate set`);
-  assert(remainderIds.size === override.expectedCounts.nonMatrixNonUrl,
-    `non-matrix/non-URL defold-value census drifted: expected ${override.expectedCounts.nonMatrixNonUrl}, got ${remainderIds.size}`);
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "non-matrix/non-URL defold-value census",
+    expected: override.expectedCounts.nonMatrixNonUrl, observed: remainderIds.size });
   const binaryIds = new Set(override.binaryStringRemainderIds);
+  // The reviewed list against its own recorded size is internal consistency and
+  // stays exact; whether each reviewed route is still in this revision's
+  // remainder is a census.
   assert(binaryIds.size === override.expectedCounts.binaryStringRemainder,
     "binary-string reviewed remainder count drifted");
-  for (const id of binaryIds) assert(remainderIds.has(id), `${id}: reviewed binary-string route left the remainder`);
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "binary-string remainder membership",
+    expected: binaryIds.size, observed: [...binaryIds].filter((id) => remainderIds.has(id)).length });
   const rows = [...urlIds].sort(compare).map((id) => {
     const fn = irById.get(id);
     const urlParameters = fn.parameters.flatMap((parameter, index) => parameter.rawType.includes("url") ? [{
@@ -229,22 +248,22 @@ export function generateScriptUrlAddressClassification(inputs) {
   assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length,
     "URL/address route stable-ID collision detected");
   const moduleCounts = countBy(rows, ({ modulePath }) => modulePath.join("."));
-  assert(JSON.stringify(moduleCounts) === JSON.stringify(override.expectedCounts.modules),
-    `URL/address module census drifted: ${JSON.stringify(moduleCounts)}`);
+  compareCounts(moduleCounts, override.expectedCounts.modules, "URL/address module census");
   const urlParameters = rows.flatMap(({ urlParameters }) => urlParameters);
-  assert(urlParameters.length === override.expectedCounts.urlParameters,
-    `URL parameter count drifted: expected ${override.expectedCounts.urlParameters}, got ${urlParameters.length}`);
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "URL parameter count",
+    expected: override.expectedCounts.urlParameters, observed: urlParameters.length });
   const rawUrlParameterTypeCounts = countBy(urlParameters, ({ rawType }) => rawType);
-  assert(JSON.stringify(rawUrlParameterTypeCounts) === JSON.stringify(override.expectedCounts.rawUrlParameterTypes),
-    `URL parameter type census drifted: ${JSON.stringify(rawUrlParameterTypeCounts)}`);
+  compareCounts(rawUrlParameterTypeCounts, override.expectedCounts.rawUrlParameterTypes, "URL parameter type census");
 
   const inputEvidence = {
     scriptIrSha256: sha256(inputs.irText),
     bindingPatternsSha256: sha256(inputs.patternsText),
     classificationOverrideSha256: sha256(inputs.overrideText),
-    defoldSources: [...override.sourceEvidence].sort((a, b) => compare(a.source, b.source)).map(({ id, source, sha256 }) => ({
-      id, path: `upstream/defold/${source}`, sha256
-    }))
+    defoldSources: [...override.sourceEvidence]
+      .filter(({ source }) => !withdrawnSources.has(source))
+      .sort((a, b) => compare(a.source, b.source)).map(({ id, source, sha256 }) => ({
+        id, path: `upstream/defold/${source}`, sha256
+      }))
   };
   inputEvidence.aggregateInputSha256 = sha256([
     inputEvidence.scriptIrSha256,
@@ -290,10 +309,16 @@ export async function loadScriptUrlAddressInputs() {
     readFile(urls.ir, "utf8"), readFile(urls.patterns, "utf8"), readFile(urls.override, "utf8")
   ]);
   const override = parse(overrideText, "URL classification override");
-  const sourceTexts = new Map(await Promise.all(override.sourceEvidence.map(async ({ source }) => [
-    source, await readFile(new URL(`upstream/defold/${source}`, root), "utf8")
-  ])));
-  return { irText, patternsText, overrideText, sourceTexts };
+  const loaded = await loadReviewedSources({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
+    evidence: override.sourceEvidence.map(({ source, sha256, anchors }) => ({ path: source, sha256, anchors })),
+    derived: parse(irText, "script API IR").defoldRevision
+  });
+  return {
+    irText, patternsText, overrideText,
+    sourceTexts: loaded.texts, withdrawnSources: loaded.withdrawn
+  };
 }
 
 async function main(argv = process.argv.slice(2)) {

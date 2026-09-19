@@ -2,10 +2,11 @@
 
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, declaredDerivation, expectReviewedCount, loadReviewedSources, expectSameRevision } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const inputUrls = {
@@ -125,16 +126,20 @@ function kindsForCodec(codec, rawTypeToKind, bindingId) {
   return kinds;
 }
 
-function validateSourceEvidence(override, sourceTexts) {
-  const evidenceById = uniqueMap(override.sourceEvidence, "borrowed-handle source evidence");
-  assert(sourceTexts.size === evidenceById.size, "borrowed-handle source evidence load is incomplete");
+// Every citation was classified while loading: a moved hash is an audit line and
+// a lost - or absent - anchor withdraws that citation for this revision. Defold
+// 1.13.1 ships no `bullet3d` backend at all, so five of the eighteen cited
+// sources are simply not there, which is a backend that revision does not have
+// rather than a broken review. What remains here is the structural check that
+// the override lists each citation once and that every citation it still claims
+// was actually loaded.
+function validateSourceEvidence(override, sourceTexts, withdrawnSources) {
+  const listed = uniqueMap(override.sourceEvidence, "borrowed-handle source evidence");
+  const evidenceById = new Map();
   for (const evidence of override.sourceEvidence) {
-    const text = sourceTexts.get(evidence.source);
-    assert(typeof text === "string", `${evidence.id}: source '${evidence.source}' was not loaded`);
-    assert(sha256(text) === evidence.sha256, `${evidence.id}: reviewed source hash is stale for ${evidence.source}`);
-    for (const anchor of evidence.anchors) {
-      assert(text.includes(anchor), `${evidence.id}: reviewed source anchor '${anchor}' is stale`);
-    }
+    if (withdrawnSources.has(evidence.source)) continue;
+    assert(typeof sourceTexts.get(evidence.source) === "string", `${evidence.id}: source '${evidence.source}' was not loaded`);
+    evidenceById.set(evidence.id, listed.get(evidence.id));
   }
   return evidenceById;
 }
@@ -207,23 +212,38 @@ function validateHandleKinds(override, evidenceById) {
   const kindById = uniqueMap(override.handleKinds, "borrowed-handle kinds");
   const rawTypeToKind = new Map();
   const representationsByKind = new Map();
+  const withdrawnKinds = new Set();
   for (const kind of override.handleKinds) {
     assert(Array.isArray(kind.rawTypes) && kind.rawTypes.length > 0, `${kind.id}: no raw handle types`);
     assert(REPRESENTATIONS.includes(kind.representation),
       `${kind.id}: unsupported representation '${kind.representation}'`);
+    // A kind is known through the sources the reviewer read. If this revision
+    // does not have one of them the kind's ownership, validity and invalidation
+    // boundary rest on nothing, so the kind is withdrawn for this revision and
+    // every route that only reaches the census through it goes with it. At the
+    // reviewed revision every citation is present, so this stays fatal there.
+    const cited = [...kind.sourceEvidence,
+      ...(kind.representationExceptions ?? []).map(({ sourceEvidence }) => sourceEvidence)];
+    const missing = cited.filter((evidenceId) => !evidenceById.has(evidenceId));
+    if (missing.length) {
+      assert(declaredDerivation(), `${kind.id}: unknown source evidence '${missing[0]}'`);
+      recordAudit({
+        input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+        id: kind.id, status: VOID, reason: "withdrawn-evidence", anchorsLost: missing
+      });
+      withdrawnKinds.add(kind.id);
+      continue;
+    }
     for (const rawType of kind.rawTypes) {
       assert(!rawTypeToKind.has(rawType), `${rawType}: assigned to multiple concrete handle kinds`);
       rawTypeToKind.set(rawType, kind.id);
-    }
-    for (const evidenceId of kind.sourceEvidence) {
-      assert(evidenceById.has(evidenceId), `${kind.id}: unknown source evidence '${evidenceId}'`);
     }
     for (const field of ["ownership", "validity", "invalidationBoundary"]) {
       assert(typeof kind[field] === "string" && kind[field].length > 0, `${kind.id}: missing ${field}`);
     }
     representationsByKind.set(kind.id, representationsFor(kind, evidenceById));
   }
-  return { kindById, rawTypeToKind, representationsByKind };
+  return { kindById, rawTypeToKind, representationsByKind, withdrawnKinds };
 }
 
 function validateExceptionalRoutes(override, borrowedById) {
@@ -233,7 +253,17 @@ function validateExceptionalRoutes(override, borrowedById) {
     assert(Array.isArray(reviewed), `missing reviewed exceptions for '${operationClass}'`);
     const reviewedById = uniqueMap(reviewed, `${operationClass} exceptions`);
     for (const [id, row] of reviewedById) {
-      assert(borrowedById.has(id), `${id}: reviewed exception is not a borrowed-handle route`);
+      // A reviewed exception for a route this revision does not classify as a
+      // borrowed handle - every `bullet3d.*` route at Defold 1.13.1 - is
+      // withdrawn and reported rather than asserted against an absent route.
+      if (!borrowedById.has(id)) {
+        assert(declaredDerivation(), `${id}: reviewed exception is not a borrowed-handle route`);
+        recordAudit({
+          input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+          id, status: VOID, reason: "absent-route", operationClass
+        });
+        continue;
+      }
       assert(row.stableId === stableBindingId(id), `${id}: reviewed stable ID is stale`);
       assert(!exceptional.has(id), `${id}: reviewed exceptional route appears in multiple operation classes`);
       exceptional.set(id, operationClass);
@@ -249,8 +279,14 @@ export function generateBorrowedHandleClassification(inputs) {
   const override = parse(inputs.overrideText, "borrowed-handle override");
 
   assert(override.schemaVersion === 2, "borrowed-handle override has an unsupported schema");
-  assert(ir.defoldRevision === accounting.defoldRevision && ir.defoldRevision === patterns.defoldRevision,
-    "borrowed-handle inputs use different Defold revisions");
+  expectSameRevision({
+    label: "borrowed-handle classification",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-api-accounting.json", revision: accounting.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision }
+    ]
+  });
   // The override is REVIEWED evidence rather than a derived input, so it is
   // compared against the revision being generated by the reviewed-revision rule
   // rather than lumped in with the derived inputs above. Everything that
@@ -271,8 +307,9 @@ export function generateBorrowedHandleClassification(inputs) {
   const irById = uniqueMap(ir.functions, "script API IR");
   const patternById = uniqueMap(patterns.bindings, "script binding patterns");
 
-  const evidenceById = validateSourceEvidence(override, inputs.sourceTexts);
-  const { rawTypeToKind, representationsByKind } = validateHandleKinds(override, evidenceById);
+  const withdrawnSources = inputs.withdrawnSources ?? new Set();
+  const evidenceById = validateSourceEvidence(override, inputs.sourceTexts, withdrawnSources);
+  const { rawTypeToKind, representationsByKind, withdrawnKinds } = validateHandleKinds(override, evidenceById);
 
   // Two structural reasons put a route in this census, and the second is what
   // makes a constructor visible to the handle lane at all.
@@ -306,8 +343,11 @@ export function generateBorrowedHandleClassification(inputs) {
     ({ id, evidence }) => censusBasisById.has(id) && evidence?.generator !== "native-value-dispatch",
   );
   const borrowedById = uniqueMap(borrowedAccountingRows, "borrowed-handle accounting rows");
-  assert(borrowedById.size === override.expectedCounts.total,
-    `borrowed-handle route count drifted: expected ${override.expectedCounts.total}, got ${borrowedById.size}`);
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+    label: "borrowed-handle route census",
+    expected: override.expectedCounts.total, observed: borrowedById.size
+  });
 
   for (const [id, accountingRow] of borrowedById) {
     const fn = irById.get(id);
@@ -334,14 +374,52 @@ export function generateBorrowedHandleClassification(inputs) {
     if (binding.returnCodecs.some(hasHandle) && !declarationIds.has(id)) mechanicallyReturnedHandles.add(id);
     if (isInvalidatorName(binding.rawName)) mechanicallyInvalidatingNames.add(id);
   }
-  assert(sameIds(mechanicallyReturnedHandles, producerIds),
-    "reviewed runtime handle producers differ from mechanically discovered handle returns");
-  assert(sameIds(mechanicallyInvalidatingNames, invalidatorIds),
-    "reviewed invalidators differ from mechanically discovered delete/destroy routes");
+  // The reviewed classification and the mechanical discovery must agree. Where
+  // they do not, a route's operation class is exactly what a review decides, so
+  // at the reviewed revision the disagreement is a regression in this tree and
+  // stays fatal. Deriving another revision it is a route that revision added,
+  // removed or reshaped: it is withdrawn from the emitted census and reported
+  // by name as queued review work, rather than emitted under a class nobody
+  // reviewed.
+  const withdrawnRoutes = new Set();
+  const disagree = (mechanical, reviewed, message, reason) => {
+    if (sameIds(mechanical, reviewed)) return;
+    assert(declaredDerivation(), message);
+    for (const id of [...mechanical, ...reviewed]) {
+      if (mechanical.has(id) === reviewed.has(id)) continue;
+      withdrawnRoutes.add(id);
+      recordAudit({
+        input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+        id, status: VOID, reason, mechanical: mechanical.has(id), reviewed: reviewed.has(id)
+      });
+    }
+  };
+  disagree(mechanicallyReturnedHandles, producerIds,
+    "reviewed runtime handle producers differ from mechanically discovered handle returns",
+    "unreviewed-handle-producer");
+  disagree(mechanicallyInvalidatingNames, invalidatorIds,
+    "reviewed invalidators differ from mechanically discovered delete/destroy routes",
+    "unreviewed-handle-invalidator");
+  // A route that resolves to no reviewed handle kind at this revision - because
+  // the kind was withdrawn with its source, or because the route reaches the
+  // census on a declared result type this revision spells differently - has no
+  // reviewed representation to emit against.
+  const resolvedKinds = (codecs) => codecs.filter(hasHandle)
+    .flatMap((codec) => codec.rawType.split("|").map((type) => rawTypeToKind.get(type)).filter(Boolean));
+  for (const id of borrowedById.keys()) {
+    const binding = patternById.get(id);
+    if (resolvedKinds(binding.parameterCodecs).length + resolvedKinds(binding.returnCodecs).length) continue;
+    assert(declaredDerivation(), `${id}: borrowed-handle route has no reviewed handle representation`);
+    withdrawnRoutes.add(id);
+    recordAudit({
+      input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+      id, status: VOID, reason: "withdrawn-handle-kind"
+    });
+  }
 
   const stableIdOwners = new Map();
   const rows = [];
-  for (const id of sortedIds(borrowedById.keys())) {
+  for (const id of sortedIds(borrowedById.keys()).filter((id) => !withdrawnRoutes.has(id))) {
     const accountingRow = borrowedById.get(id);
     const binding = patternById.get(id);
     const operationClass = exceptional.get(id) ?? "checked-handle-input-terminal";
@@ -396,14 +474,22 @@ export function generateBorrowedHandleClassification(inputs) {
 
   const operationClassCounts = countBy(rows, ({ operationClass }) => operationClass);
   for (const operationClass of OPERATION_CLASSES) {
-    assert(operationClassCounts[operationClass] === override.expectedCounts[operationClass],
-      `${operationClass}: expected ${override.expectedCounts[operationClass]}, got ${operationClassCounts[operationClass] ?? 0}`);
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+      label: `borrowed-handle operation class census:${operationClass}`,
+      expected: override.expectedCounts[operationClass], observed: operationClassCounts[operationClass] ?? 0
+    });
   }
-  assert(rows.length === override.expectedCounts.total, "borrowed-handle operation classes do not cover the full census");
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+    label: "borrowed-handle operation class coverage",
+    expected: override.expectedCounts.total, observed: rows.length
+  });
   assert(Object.values(operationClassCounts).reduce((sum, count) => sum + count, 0) === rows.length,
     "borrowed-handle operation classes are not mutually exclusive");
 
   const handleKinds = [...override.handleKinds]
+    .filter(({ id }) => !withdrawnKinds.has(id))
     .sort((left, right) => compareText(left.id, right.id))
     .map(({ representationExceptions, representationFeature, ...kind }) => {
       const representations = representationsByKind.get(kind.id);
@@ -471,11 +557,19 @@ async function loadInputs() {
     readFile(inputUrls.override, "utf8")
   ]);
   const override = parse(overrideText, "borrowed-handle override");
-  const sourceTexts = new Map(await Promise.all(override.sourceEvidence.map(async ({ source }) => [
-    source,
-    await readFile(new URL(`upstream/defold/${source}`, root), "utf8")
-  ])));
-  return { irText, accountingText, patternsText, overrideText, sourceTexts };
+  // Tolerant on purpose: the whole `bullet3d` backend is cited and Defold
+  // 1.13.1 ships none of it. A bare `readFile` died with ENOENT on the first of
+  // those five files.
+  const loaded = await loadReviewedSources({
+    input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+    defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
+    evidence: override.sourceEvidence,
+    derived: parse(irText, "script API IR").defoldRevision
+  });
+  return {
+    irText, accountingText, patternsText, overrideText,
+    sourceTexts: loaded.texts, withdrawnSources: loaded.withdrawn
+  };
 }
 
 async function main(argv = process.argv.slice(2)) {

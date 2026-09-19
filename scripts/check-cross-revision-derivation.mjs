@@ -111,7 +111,14 @@ async function main() {
   const refusals = [];
   for (const step of scriptGenerationSteps) {
     try {
-      await run(process.execPath, [step.script], { cwd: workspace, env, maxBuffer: 32 * 1024 * 1024 });
+      // Each step declares the runtime it is written for, exactly as
+      // `runScriptGeneration` in `generate-script-runtime.mjs` reads it. Running
+      // every step under `process.execPath` handed `scripts/import-defold-script-api.py`
+      // to Node, which reported `ERR_UNKNOWN_FILE_EXTENSION` - a refusal of the
+      // measuring harness, counted against the generator and hiding whatever
+      // that generator really does at another revision.
+      const command = step.runtime === "node" ? process.execPath : step.runtime;
+      await run(command, [step.script], { cwd: workspace, env, maxBuffer: 32 * 1024 * 1024 });
     } catch (error) {
       const text = `${error.stderr ?? ""}${error.stdout ?? ""}`;
       const message = (text.split("\n").find((line) => /^\s*(Error|AssertionError)/.test(line))

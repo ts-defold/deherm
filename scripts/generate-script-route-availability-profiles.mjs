@@ -6,7 +6,8 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision, expectReviewedCount } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, expectReviewedCount, expectSameRevision, declaredDerivation, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const defaultPolicy = "packages/bindings/overrides/script-route-availability-profiles.json";
@@ -97,19 +98,35 @@ function featuresFromManifest(text) {
   };
 }
 
+// The cited registration and build-manifest sources, OBSERVED rather than
+// asserted. A pinned hash only detects that Defold edited its own source, which
+// across a release is expected and is the input to this job; what scopes the
+// reviewed judgement is the anchors, and a lost anchor withdraws that citation
+// for this revision. Outside a declared derivation both still throw the message
+// they always threw.
 async function validateEvidence(evidence, kind) {
   const textByPath = new Map();
+  const withdrawn = new Set();
   for (const item of evidence) {
     let text = textByPath.get(item.path);
     if (text === undefined) {
-      text = await readFile(inputPath(item.path), "utf8");
-      textByPath.set(item.path, text);
+      text = await readFile(inputPath(item.path), "utf8").catch(() => null);
+      if (text !== null) textByPath.set(item.path, text);
     }
-    assert(sha256(text) === item.sha256, `${kind} hash drifted for ${item.path}`);
-    for (const anchor of item.anchors ?? []) {
-      assert(text.includes(anchor), `${kind} anchor '${anchor}' drifted in ${item.path}`);
-    }
+    const verdict = observeReviewedSource({
+      input: "packages/bindings/overrides/script-route-availability-profiles.json",
+      id: `${kind}: ${item.path}`, source: text,
+      evidence: { source: item.path, sha256: item.sha256, anchors: item.anchors ?? [] }
+    });
+    if (verdict.status !== VOID) continue;
+    assert(declaredDerivation(),
+      verdict.reason === "absent" || !verdict.anchorsLost.length
+        ? `${kind} hash drifted for ${item.path}`
+        : `${kind} anchor '${verdict.anchorsLost[0]}' drifted in ${item.path}`);
+    withdrawn.add(item.path);
+    textByPath.delete(item.path);
   }
+  textByPath.withdrawn = withdrawn;
   return textByPath;
 }
 
@@ -150,8 +167,13 @@ async function generate(options) {
   // imported script API IR - and never from the reviewed policy, so a reviewed
   // file can no longer decide which revision the generated surface claims.
   const defoldRevision = scriptIr.defoldRevision;
-  assert(borrowed.defoldRevision === defoldRevision,
-    "Defold revision differs between the script API IR and the borrowed-handle classification");
+  expectSameRevision({
+    label: "script route availability",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: defoldRevision },
+      { path: "packages/bindings/generated/defold-script-borrowed-handle-classification.json", revision: borrowed.defoldRevision }
+    ]
+  });
   assert(Array.isArray(borrowed.rows), "borrowed-handle classification has no rows");
   // Reviewed evidence, compared against the revision being generated. The
   // reviewed feature and profile censuses below, and the SHA-256 of every cited
@@ -193,10 +215,25 @@ async function generate(options) {
   const unavailableScriptRoutesByFeature = new Map();
   for (const exception of policy.documentedButUnregistered) {
     const row = rowsByStableId.get(exception.stableId);
-    assert(row?.id === exception.id, `${exception.id}: documented/unregistered stable ID drifted`);
-    assert(row.rawName.startsWith("b2d."), `${exception.id}: documented/unregistered route is outside Box2D`);
+    // A reviewed documented-but-unregistered route this revision does not
+    // classify, or whose commented registration evidence is gone, is a review
+    // this revision does not bear out. Fatal where it was read; withdrawn and
+    // reported in a declared derivation of another revision.
     const source = registrationTexts.get(exception.source);
-    assert(source?.includes(exception.anchor), `${exception.id}: commented registration evidence drifted`);
+    const failure = row?.id !== exception.id
+      ? [`${exception.id}: documented/unregistered stable ID drifted`, "absent-route"]
+      : !source?.includes(exception.anchor)
+        ? [`${exception.id}: commented registration evidence drifted`, "stale-anchor"]
+        : null;
+    if (failure) {
+      assert(declaredDerivation(), failure[0]);
+      recordAudit({
+        input: "packages/bindings/overrides/script-route-availability-profiles.json",
+        id: exception.id, status: VOID, reason: failure[1], detail: failure[0]
+      });
+      continue;
+    }
+    assert(row.rawName.startsWith("b2d."), `${exception.id}: documented/unregistered route is outside Box2D`);
     const exceptions = unavailableByFeature.get(exception.feature) ?? [];
     unavailableByFeature.set(exception.feature, [...exceptions, { ...routeRow(row), reason: exception.reason }]);
     const scriptRoute = scriptRowsByRawName.get(row.rawName);
@@ -208,6 +245,10 @@ async function generate(options) {
   const registrations = new Map();
   for (const spec of policy.registrations) {
     const text = registrationTexts.get(spec.path);
+    // The citation was withdrawn above - absent at this revision, or present
+    // with a reviewed anchor gone - and is already audited by name. A feature
+    // whose registration source is gone registers nothing here.
+    if (text === undefined) continue;
     const names = registrationNames(text, spec.array, spec.path);
     const fullNames = names.map((name) => `${spec.namespace}.${name}`);
     const key = `${spec.feature}:${spec.namespace}`;

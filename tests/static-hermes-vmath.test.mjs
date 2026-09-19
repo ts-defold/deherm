@@ -78,7 +78,7 @@ test("Static Hermes vmath generation rejects descriptor drift before emitting", 
       "--output-root", path.join(temporary, "output")
     ]);
     assert.notEqual(result.status, 0);
-    assert.match(`${result.stderr}${result.stdout}`, /descriptor-sha256-drift/);
+    assert.match(`${result.stderr}${result.stdout}`, /value-binding descriptor sha256 expected/);
   } finally {
     await rm(temporary, { recursive: true, force: true });
   }

@@ -4,8 +4,8 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
-import { VOID } from "./lib/revision-audit.mjs";
+import { expectReviewedCount, observeReviewedSource, expectSameRevision, declaredDerivation } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -31,7 +31,14 @@ export function generate(inputs) {
   const ir = JSON.parse(inputs.irText), patterns = JSON.parse(inputs.patternsText), frontier = JSON.parse(inputs.frontierText), policy = JSON.parse(inputs.policyText);
   assert(policy.schemaVersion === 1 && Array.isArray(policy.sources) && Array.isArray(policy.routes), "copied-value blocker policy schema is unsupported");
   assert(ir.schemaVersion === 1 && patterns.schemaVersion === 1 && frontier.schemaVersion === 1, "copied-value blocker input schema is unsupported");
-  assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === frontier.defoldRevision, "copied-value blocker inputs use different Defold revisions");
+  expectSameRevision({
+    label: "copied-value record blockers",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-table-record-bindings.json", revision: frontier.defoldRevision }
+    ]
+  });
   assert(patterns.sourceSha256 === sha256(inputs.irText), "copied-value blocker patterns are stale against script IR");
   const sourceByKey = new Map();
   for (const source of policy.sources) { const text = inputs.sourceTexts.get(source.path); assert(!sourceByKey.has(source.key), `${source.key}: duplicate copied-value source`); if (observeReviewedSource({ input: "packages/bindings/overrides/script-copied-value-record-blockers.json", id: source.path, source: text ?? null, evidence: source }).status === VOID) continue; sourceByKey.set(source.key, { ...source, text }); }
@@ -42,15 +49,34 @@ export function generate(inputs) {
     expected: policy.expectedRouteCount, observed: frontierRows.length
   });
   const frontierIds = new Set(frontierRows.map(({ id }) => id)), fnById = new Map(ir.functions.map((fn) => [fn.id, fn]),), patternById = new Map(patterns.bindings.map((row) => [row.id, row]));
-  const seen = new Set(); const routes = policy.routes.map((rule) => {
-    assert(!seen.has(rule.id), `${rule.id}: duplicate copied-value blocker`); seen.add(rule.id); assert(frontierIds.has(rule.id), `${rule.id}: route left the copied-value frontier`);
+  // A reviewed blocker this revision does not bear out - the route left the
+  // frontier, or the source anchor its reason rests on is gone - is withdrawn
+  // and reported rather than asserted. Fatal where the review was read.
+  const withdraw = (id, reason, message) => {
+    assert(declaredDerivation(), message);
+    recordAudit({ input: "packages/bindings/overrides/script-copied-value-record-blockers.json", id, status: VOID, reason, detail: message });
+    return [];
+  };
+  const seen = new Set(); const routes = policy.routes.flatMap((rule) => {
+    assert(!seen.has(rule.id), `${rule.id}: duplicate copied-value blocker`); seen.add(rule.id);
+    if (!frontierIds.has(rule.id)) return withdraw(rule.id, "left-frontier", `${rule.id}: route left the copied-value frontier`);
     const source = sourceByKey.get(rule.source), fn = fnById.get(rule.id), pattern = patternById.get(rule.id);
-    assert(source && fn && pattern && Array.isArray(rule.anchors) && rule.anchors.every((anchor) => source.text.includes(anchor)), `${rule.id}: copied-value source anchor drifted`);
+    if (!(source && fn && pattern && Array.isArray(rule.anchors) && rule.anchors.every((anchor) => source.text.includes(anchor)))) {
+      return withdraw(rule.id, "stale-anchor", `${rule.id}: copied-value source anchor drifted`);
+    }
     assert(pattern.loweringFamily === "lua-table", `${rule.id}: copied-value route is not lua-table`);
-    return { id: rule.id, stableId: stableBindingId(rule.id), modulePath: fn.modulePath, member: fn.member, parameters: fn.parameters.map(({ rawName, rawType, optional }) => ({ name: rawName, rawType, optional })), returns: fn.returns, blocker: rule.blocker, source: `upstream/defold/${source.path}`, sourceSha256: source.sha256, anchors: rule.anchors };
+    return [{ id: rule.id, stableId: stableBindingId(rule.id), modulePath: fn.modulePath, member: fn.member, parameters: fn.parameters.map(({ rawName, rawType, optional }) => ({ name: rawName, rawType, optional })), returns: fn.returns, blocker: rule.blocker, source: `upstream/defold/${source.path}`, sourceSha256: source.sha256, anchors: rule.anchors }];
   }).sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
-  assert(seen.size === frontierIds.size && [...frontierIds].every((id) => seen.has(id)), "copied-value blocker policy does not cover the complete frontier");
-  assert(routes.length === policy.expectedRouteCount && policy.expectedCandidateCount === 0, "copied-value candidate census is unsafe");
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-copied-value-record-blockers.json",
+    label: "copied-value frontier coverage",
+    expected: frontierIds.size, observed: [...frontierIds].filter((id) => seen.has(id)).length
+  });
+  assert(policy.expectedCandidateCount === 0, "copied-value candidate census is unsafe");
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-copied-value-record-blockers.json",
+    label: "copied-value route census", expected: policy.expectedRouteCount, observed: routes.length
+  });
   const blockerCounts = Object.fromEntries([...new Set(routes.map(({ blocker }) => blocker))].sort(compare).map((blocker) => [blocker, routes.filter((route) => route.blocker === blocker).length]));
   const report = { schemaVersion: 1, defoldRevision: ir.defoldRevision, scope: "All copied-Defold-value records blocked by the table-record frontier", routeCount: routes.length, candidateCount: 0, executableCount: 0, blockerCounts, coverageClaim: "No generated runtime is emitted: every route requires captured engine/component/resource/render context or a sparse, discriminator-dependent record schema. A future wave must install exact value, URL/hash, target-context, and sparse-field codecs before promoting any route.", inputEvidence: { scriptIrSha256: sha256(inputs.irText), bindingPatternsSha256: sha256(inputs.patternsText), tableRecordFrontierSha256: sha256(inputs.frontierText), reviewedPolicySha256: sha256(inputs.policyText), defoldSources: policy.sources.map(({ path, sha256: hash }) => ({ path: `upstream/defold/${path}`, sha256: hash })).sort((a, b) => compare(a.path, b.path)) }, routes };
   const target = `// Generated by scripts/generate-script-copied-value-record-blockers.mjs. Do not edit.\nexport const scriptCopiedValueRecordBlockers = ${JSON.stringify(routes.map(({ id, stableId, blocker }) => ({ id, stableId: `0x${stableId.toString(16).padStart(8, "0")}`, blocker })), null, 2)} as const;\nexport const scriptCopiedValueRecordCandidateCount = 0 as const;\nexport function assertScriptCopiedValueRecordTargetSupport(_: number): never { throw new Error("Copied-Defold-value records have no generated provider: see generated blocker metadata"); }\n`;

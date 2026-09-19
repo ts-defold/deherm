@@ -5,7 +5,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, declaredDerivation, expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -144,7 +145,13 @@ export function generate(inputs) {
   assert(patterns.sourceSha256 === sha256(inputs.irText), "overload-dispatch patterns are stale against script IR");
   assert(owned?.schemaVersion === 1, "overload-dispatch already-owned report schema drifted");
   assert(owned.defoldRevision === ir.defoldRevision, "overload-dispatch already-owned report uses a different Defold revision");
-  assert(owned.bindingCount === 78, "overload-dispatch already-owned report bindingCount drifted from reviewed 78");
+  // A census of the value-binding lane recorded at the reviewed revision. It is
+  // fatal in an ordinary generation and an observation in a declared derivation:
+  // a revision with a different number of value bindings is the measurement.
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-overload-dispatch.json",
+    label: "already-owned value-binding census", expected: 78, observed: owned.bindingCount
+  });
   assert(Array.isArray(owned.bindings) && owned.bindings.length === owned.bindingCount,
     "overload-dispatch already-owned report binding array/count drifted");
   const ownedBindingIds = new Set(); const ownedStableIds = new Set();
@@ -201,17 +208,31 @@ export function generate(inputs) {
     assert(!sourceByKey.has(source.key), `${source.key}: duplicate source key`); sourceByKey.set(source.key, source);
   }
   const classified = patterns.bindings.filter((row) => row.loweringFamily === "overload-dispatch");
-  assert(classified.length === override.expected.classifiedRouteCount,
-    `classified ${classified.length} overload-dispatch routes, expected ${override.expected.classifiedRouteCount}`);
+  expectReviewedCount({ input: "packages/bindings/overrides/script-overload-dispatch.json", label: "overload-dispatch classified census",
+    expected: override.expected.classifiedRouteCount, observed: classified.length });
   const ownedIds = new Set(override.alreadyOwned.ids);
   assert(ownedIds.size === override.alreadyOwned.ids.length, "overload-dispatch already-owned ids are duplicated");
-  for (const id of ownedIds) assert(ownedBindingIds.has(id), `${id}: reviewed already-owned route is absent from the Defold-value report`);
+  // Whether each reviewed already-owned route is still in the value-binding
+  // report is a census of that lane at this revision, not a property of this
+  // file: the value lane withdraws routes a revision no longer bears out.
+  expectReviewedCount({ input: "packages/bindings/overrides/script-overload-dispatch.json", label: "already-owned route membership",
+    expected: ownedIds.size, observed: [...ownedIds].filter((id) => ownedBindingIds.has(id)).length });
   const selected = classified.filter(({ id }) => !ownedIds.has(id));
   assert(new Set(selected.map(({ id }) => id)).size === selected.length, "overload-dispatch selected routes contain duplicate ids");
-  assert(selected.length === override.expected.selectedRouteCount,
-    `selected ${selected.length} overload-dispatch routes, expected ${override.expected.selectedRouteCount}`);
-  assert(Object.keys(override.routes).length === selected.length, "overload-dispatch policy coverage drifted");
-  const rows = selected.map((pattern) => {
+  expectReviewedCount({ input: "packages/bindings/overrides/script-overload-dispatch.json", label: "overload-dispatch selected census",
+    expected: override.expected.selectedRouteCount, observed: selected.length });
+  // A classified route with no reviewed policy cannot be emitted - its strategy
+  // and blocker are exactly what a review decides. Fatal at the reviewed
+  // revision; withdrawn and reported in a declared derivation of another.
+  const reviewedSelected = selected.filter((pattern) => {
+    if (override.routes[pattern.id]) return true;
+    assert(declaredDerivation(), `${pattern.id}: missing reviewed policy`);
+    recordAudit({ input: "packages/bindings/overrides/script-overload-dispatch.json", id: pattern.id, status: VOID, reason: "unreviewed-route" });
+    return false;
+  });
+  expectReviewedCount({ input: "packages/bindings/overrides/script-overload-dispatch.json", label: "overload-dispatch policy coverage",
+    expected: Object.keys(override.routes).length, observed: reviewedSelected.length });
+  const rows = reviewedSelected.map((pattern) => {
     const fn = irById.get(pattern.id); const policy = override.routes[pattern.id];
     assert(fn, `${pattern.id}: selected route is absent from pinned IR`); assert(policy, `${pattern.id}: missing reviewed policy`);
     const source = sourceByKey.get(policy.source); assert(source, `${pattern.id}: unknown reviewed source '${policy.source}'`);
@@ -219,17 +240,32 @@ export function generate(inputs) {
     const candidate = policy.strategy === "generated-defold-value-dispatch";
     assert(candidate || policy.strategy === "blocked", `${pattern.id}: unknown reviewed strategy '${policy.strategy}'`);
     assert(candidate || typeof policy.blocker === "string", `${pattern.id}: blocked route has no machine blocker`);
+    // A candidate whose documented overloads this revision spells in a way the
+    // generator cannot read - Defold 1.13.1 writes `fun(t, q1, q2)`, with no
+    // parameter types - has no call shapes to emit. Fatal at the reviewed
+    // revision; withdrawn and reported in a declared derivation of another.
+    let callShapes = [];
+    if (candidate) {
+      try {
+        callShapes = shapesFor(fn);
+      } catch (error) {
+        assert(declaredDerivation(), error.message);
+        recordAudit({ input: "packages/bindings/overrides/script-overload-dispatch.json", id: fn.id, status: VOID, reason: "unreadable-signature", detail: error.message });
+        return null;
+      }
+    }
     return { id: fn.id, stableId: stableBindingId(fn.id), modulePath: fn.modulePath, member: fn.member,
       strategy: policy.strategy, generatedFamilyExecutableCandidate: candidate,
-      callShapes: candidate ? shapesFor(fn) : [], blocker: candidate ? null : policy.blocker,
+      callShapes, blocker: candidate ? null : policy.blocker,
       sourceEvidence: { path: `upstream/defold/${source.path}`, sha256: source.sha256, anchor: policy.anchor },
       targetSupport: candidate ? { nativeDynamicHermes: "generated-executable-shared-script-adapter", nativeStaticHermes: "not-integrated-fail-closed", html5BrowserHost: "not-executable-no-generated-provider" } :
         { nativeDynamicHermes: `blocked-${policy.blocker}`, nativeStaticHermes: `blocked-${policy.blocker}`, html5BrowserHost: `blocked-${policy.blocker}` }
     };
-  }).sort((left, right) => left.stableId - right.stableId);
+  }).filter(Boolean).sort((left, right) => left.stableId - right.stableId);
   assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "overload-dispatch stable-ID collision");
   const candidates = rows.filter(({ generatedFamilyExecutableCandidate }) => generatedFamilyExecutableCandidate);
-  assert(candidates.length === override.expected.candidateCount, `classified ${candidates.length} overload-dispatch candidates, expected ${override.expected.candidateCount}`);
+  expectReviewedCount({ input: "packages/bindings/overrides/script-overload-dispatch.json", label: "overload-dispatch candidate census",
+    expected: override.expected.candidateCount, observed: candidates.length });
   const report = { schemaVersion: 1, defoldRevision: ir.defoldRevision,
     scope: override.scope, routeCount: rows.length, generatedFamilyCandidateCount: candidates.length, blockedCount: rows.length - candidates.length,
     disjointCensus: { classifierOverloadDispatch: classified.length, alreadyOwnedDefoldValue: ownedIds.size, selectedForThisWave: rows.length },
