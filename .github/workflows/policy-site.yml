@@ -47,16 +47,19 @@ on:
       - .github/workflows/policy-site.yml
   workflow_dispatch:
 
+# Publishing is a push to the branch Pages serves, not an Actions deployment,
+# so this needs to write contents and nothing else. See
+# .agents/docs/decisions/layered-api-policy-cache.md: actions/deploy-pages
+# replaces the whole site per deploy, which would make an append-only store
+# re-upload its entire history every night.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
-# Pages allows one in-flight deployment. Queueing rather than cancelling means a
-# push that lands during a deploy still publishes, which matters because the
-# thing being published is additive.
+# Two runs must not push the branch concurrently. Queueing rather than
+# cancelling means a push that lands mid-run still publishes, which matters
+# because the store is additive and each run may carry objects no other run has.
 concurrency:
-  group: pages
+  group: policy-site
   cancel-in-progress: false
 
 jobs:
@@ -105,17 +108,34 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: build/policy-site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-24.04
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      # The push IS the deploy: Pages serves `deherm-policy-site` directly. The
+      # emitted tree is a pure function of the committed store, so it replaces
+      # the branch content wholesale rather than merging - anything not emitted
+      # should not be on the branch. Objects are content-addressed, so this is
+      # still additive in practice: an unchanged revision re-emits identical
+      # bytes and the commit is empty.
+      - name: Publish to the policy site branch
+        if: github.repository == 'ts-defold/deherm' && github.event_name != 'pull_request'
+        env:
+          GIT_AUTHOR_NAME: deherm-ci
+          GIT_AUTHOR_EMAIL: noreply@github.com
+          GIT_COMMITTER_NAME: deherm-ci
+          GIT_COMMITTER_EMAIL: noreply@github.com
+        run: |
+          set -euo pipefail
+          branch=deherm-policy-site
+          # A worktree keeps the emitted tree and the source checkout apart, so
+          # nothing in build/ can leak into the published branch.
+          git fetch origin "$branch" --depth=1
+          git worktree add --detach /tmp/site "origin/$branch"
+          # Replace, do not merge: the branch is a function of the store.
+          find /tmp/site -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -R build/policy-site/. /tmp/site/
+          cd /tmp/site
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Policy site unchanged; publishing nothing."
+            exit 0
+          fi
+          git commit -m "publish: policy site from ${GITHUB_SHA::12}"
+          git push origin "HEAD:$branch"
