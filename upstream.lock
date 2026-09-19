@@ -20,3 +20,25 @@ HERMES_REV=4947871513667919bf2fe225134af3e3a1a3772c
 EMSDK_URL=https://github.com/emscripten-core/emsdk.git
 EMSDK_VERSION=4.0.6
 EMSDK_REV=24fc909c0da13ef641d5ae75e89b5a97f25e37aa
+
+# The C library headers `scripts/import-defold-sdk.py` resolves the dmSDK
+# against. See `.agents/docs/decisions/target-directed-dmsdk-parse.md`.
+#
+# The dmSDK names <stdint.h>, <stddef.h>, <string.h>, <stdio.h>, <stdlib.h>,
+# <math.h>, <assert.h>, <stdarg.h>, <stdbool.h> and <unistd.h>. Left to the
+# deriving host, those come from whatever libc that machine ships, and the
+# derived inventory is then a function of the machine: an Ubuntu runner and a
+# macOS laptop disagreed about 79 of the 121 public headers, starting with
+# `const uint32_t` degrading to `const int`. Parsing with no libc at all is
+# worse than either, because the recovery is silent and wrong - `size_t`
+# becomes `int` and the mangled name goes with it.
+#
+# So the headers are pinned like every other ground truth here. wasi-sysroot is
+# a single host-independent archive (there is no per-host build to choose
+# between), it is Apache-2.0 with LLVM exceptions, and its musl-derived headers
+# are the ones a freestanding parse needs: type spellings and declarations, no
+# platform SDK. Only the include tree is unpacked; the archive's libraries are
+# never linked, because nothing here is compiled.
+DMSDK_PARSE_SYSROOT_URL=https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-25/wasi-sysroot-25.0.tar.gz
+DMSDK_PARSE_SYSROOT_SHA256=d09c62c18efcddffe4b2fdd8c5830109cc8e36130cdbc9acdc0bd1b204c942bb
+DMSDK_PARSE_SYSROOT_INCLUDE=wasi-sysroot-25.0/include/wasm32-wasip1

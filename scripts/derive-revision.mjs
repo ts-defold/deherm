@@ -361,6 +361,28 @@ async function reuseEngineSlice({ workspace, revision, from }) {
   }
 }
 
+/**
+ * Let the workspace share this checkout's pinned dmSDK parse sysroot.
+ *
+ * `scripts/import-defold-sdk.py` fetches and digest-verifies it on demand, so a
+ * workspace without one still derives - it just downloads 62MB again for every
+ * revision in the matrix. A symlink is enough because nothing writes there: the
+ * importer only reads the headers, and it re-verifies nothing it did not fetch
+ * because the cache directory is named by the pinned digest.
+ *
+ * `upstream/` is ignored, so `materializeWorkspace` never copies it.
+ */
+async function reuseParseSysroot({ workspace, sourceRoot }) {
+  const cache = path.join(sourceRoot, "upstream", "dmsdk-parse-sysroot");
+  try {
+    if (!(await stat(cache)).isDirectory()) return;
+  } catch {
+    return;
+  }
+  await mkdir(path.join(workspace, "upstream"), { recursive: true });
+  await symlink(cache, path.join(workspace, "upstream", "dmsdk-parse-sysroot"), "dir");
+}
+
 // ── The derivation ──────────────────────────────────────────────────────────
 
 export async function deriveRevision(options) {
@@ -395,6 +417,7 @@ export async function deriveRevision(options) {
   onProgress(upstreamFrom ? `reusing ${upstreamFrom}` : "fetching the engine slice");
   if (upstreamFrom) await reuseEngineSlice({ workspace, revision, from: upstreamFrom });
   else await fetchEngineSlice({ workspace, revision });
+  await reuseParseSysroot({ workspace, sourceRoot });
 
   // Before running anything: does every reviewed input still speak for this
   // revision's sources? Each generator checks its own and stops at the first

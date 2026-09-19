@@ -11,14 +11,18 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import hashlib
+import io
 import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tarfile
-import tempfile
+import urllib.error
+import urllib.request
 from typing import Any, Iterable
 
 
@@ -313,11 +317,210 @@ def include_roots() -> list[Path]:
 # from the primary parse, so a target whose parse fails costs mangled names
 # rather than declarations.
 def target_triples() -> dict[str, str]:
-    overrides = json.loads((ROOT / "packages/bindings/overrides/dmsdk-target-macros.json").read_text())
-    triples = overrides.get("triples") or {}
+    triples = overrides().get("triples") or {}
     if not triples:
         raise SystemExit("dmsdk-target-macros.json declares no target triples")
     return triples
+
+
+OVERRIDES = ROOT / "packages" / "bindings" / "overrides" / "dmsdk-target-macros.json"
+_OVERRIDES_CACHE: dict[str, Any] | None = None
+
+
+def overrides() -> dict[str, Any]:
+    global _OVERRIDES_CACHE
+    if _OVERRIDES_CACHE is None:
+        _OVERRIDES_CACHE = json.loads(OVERRIDES.read_text())
+    return _OVERRIDES_CACHE
+
+
+def declaration_parse() -> dict[str, Any]:
+    """The declared environment the DECLARATION inventory is taken under.
+
+    Not a bundle target.  It is the assignment in which no platform branch is
+    taken, which is what lets one parse stand for every target and what lets any
+    machine reproduce it - see the override's own `declarationParseComment`.
+    """
+    declared = overrides().get("declarationParse")
+    if not declared or not declared.get("triple"):
+        raise SystemExit(
+            f"{relative(OVERRIDES)} declares no declarationParse.triple; the dmSDK parse "
+            "refuses to fall back on the host's default target"
+        )
+    return declared
+
+
+def lock_value(key: str) -> str:
+    match = re.search(rf"^{key}=(.*)$", (ROOT / "upstream.lock").read_text(), re.MULTILINE)
+    if not match or not match.group(1).strip():
+        raise SystemExit(f"upstream.lock does not pin {key}")
+    return match.group(1).strip()
+
+
+def parse_sysroot() -> Path:
+    """The pinned C library headers the dmSDK is resolved against.
+
+    Fetched on demand and verified against the digest `upstream.lock` pins, the
+    way every other ground truth here is.  Only the include tree is unpacked:
+    nothing is compiled, so the archive's libraries would be dead weight.
+
+    Using the deriving host's libc instead is what made the inventory a function
+    of the machine - see the lock's own note.  A missing sysroot is therefore a
+    hard failure with a named reason, never a silent parse without one.
+    """
+    digest = lock_value("DMSDK_PARSE_SYSROOT_SHA256")
+    include = lock_value("DMSDK_PARSE_SYSROOT_INCLUDE")
+    base = ROOT / "upstream" / "dmsdk-parse-sysroot" / digest[:16]
+    target = base / include
+    if (target / "stdint.h").is_file():
+        return target
+
+    url = lock_value("DMSDK_PARSE_SYSROOT_URL")
+    try:
+        with urllib.request.urlopen(url, timeout=300) as response:
+            payload = response.read()
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
+        raise SystemExit(
+            f"the dmSDK parse sysroot is not present at {relative(base)} and {url} "
+            f"could not be fetched ({error}). Run `pnpm bootstrap:upstreams` on a "
+            "networked machine; the parse will not fall back on this host's libc."
+        )
+    observed = hashlib.sha256(payload).hexdigest()
+    if observed != digest:
+        raise SystemExit(f"{url} served sha256 {observed}, but upstream.lock pins {digest}")
+
+    base.parent.mkdir(parents=True, exist_ok=True)
+    staging = base.with_name(f"{base.name}.incoming")
+    shutil.rmtree(staging, ignore_errors=True)
+    prefix = f"{include}/"
+    with tarfile.open(fileobj=io.BytesIO(payload), mode="r:gz") as archive:
+        members = [item for item in archive.getmembers() if item.name.startswith(prefix)]
+        if not members:
+            raise SystemExit(f"{url} carries no {include}; DMSDK_PARSE_SYSROOT_INCLUDE is wrong")
+        archive.extractall(staging, members=members, filter="data")
+    if not (staging / include / "stdint.h").is_file():
+        raise SystemExit(f"{url} unpacked without {include}/stdint.h")
+    # Rename into place last, so an interrupted fetch leaves no directory that
+    # the next run would mistake for a complete sysroot.
+    shutil.rmtree(base, ignore_errors=True)
+    staging.replace(base)
+    return target
+
+
+# The standard integer type whose SPELLING decides a mangled name, beside the
+# clang predefine that answers it for the target being parsed.
+#
+# The pinned sysroot spells these once, for one ABI: musl derives them from its
+# own `_Addr` and `_Int64`, which wasm32 fixes at `long` and `long long`. Used
+# unchanged for every target, that is wrong wherever the target disagrees -
+# `dmhash_t` is `uint64_t`, which is `unsigned long long` on wasm32 and
+# `unsigned long` on LP64 Linux and Android, so `dmDDF::GetDescriptorFromHash`
+# was looked up as `...Ey` in archives that define `...Em` and reported absent
+# from four targets it is present in. A false absence is worse than no answer.
+#
+# Clang's own `__UINT64_TYPE__` and friends ARE the target's answer, so they are
+# asked instead. musl's `__DEFINED_*` guards exist for exactly this, so the
+# sysroot then defers rather than conflicting.
+SPELLING_PREDEFINES = {
+    "size_t": "__SIZE_TYPE__",
+    "ptrdiff_t": "__PTRDIFF_TYPE__",
+    "intptr_t": "__INTPTR_TYPE__",
+    "uintptr_t": "__UINTPTR_TYPE__",
+    "int8_t": "__INT8_TYPE__",
+    "int16_t": "__INT16_TYPE__",
+    "int32_t": "__INT32_TYPE__",
+    "int64_t": "__INT64_TYPE__",
+    "uint8_t": "__UINT8_TYPE__",
+    "uint16_t": "__UINT16_TYPE__",
+    "uint32_t": "__UINT32_TYPE__",
+    "uint64_t": "__UINT64_TYPE__",
+    "intmax_t": "__INTMAX_TYPE__",
+    "uintmax_t": "__UINTMAX_TYPE__",
+}
+
+
+def spelling_prelude() -> Path:
+    """Write the header that gives every target its own integer spellings.
+
+    Emitted rather than vendored: there is nothing here to review that clang
+    does not already decide, and a checked-in copy would be a restatement of the
+    compiler's answer that could fall out of step with it.
+    """
+    lines = [
+        "// Generated by scripts/import-defold-sdk.py. Do not edit.",
+        "// Each standard integer type is taken from the compiler's own answer for",
+        "// the target being parsed; musl's __DEFINED_* guards make the pinned",
+        "// sysroot defer to it instead of spelling it for one ABI.",
+    ]
+    for name, predefine in SPELLING_PREDEFINES.items():
+        lines += [
+            f"#if defined({predefine}) && !defined(__DEFINED_{name})",
+            f"typedef {predefine} {name};",
+            f"#define __DEFINED_{name}",
+            "#endif",
+        ]
+    path = ROOT / "build" / "dmsdk-parse" / "target-spellings.h"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines) + "\n")
+    return path
+
+
+def parse_flags() -> list[str]:
+    """Everything the parse environment contributes to every clang invocation.
+
+    `-nostdlibinc` removes the host's own include paths while leaving clang's
+    builtin ones, so `<stdint.h>` and `<string.h>` come from the pinned sysroot
+    and from nowhere else.  Without it the flags below would be additions to the
+    host's libc rather than a replacement for it.
+    """
+    declared = declaration_parse()
+    defines = declared.get("defines") or {}
+    return [
+        "-nostdlibinc",
+        f"-isystem{parse_sysroot()}",
+        "-include",
+        str(spelling_prelude()),
+        *(f"-D{name}={value}" for name, value in sorted(defines.items())),
+    ]
+
+
+def assert_platform_neutral() -> list[str]:
+    """Ask clang whether the declared triple really takes no platform branch.
+
+    The override claims the triple defines none of these macros.  That claim is
+    the whole reason one parse can stand for thirteen targets, so it is asked of
+    the compiler rather than asserted in a comment: a clang release that started
+    predefining `__linux__` for this triple would silently change which branch
+    every platform conditional in the dmSDK takes.
+    """
+    declared = declaration_parse()
+    neutral = declared.get("neutralOf") or []
+    if not neutral:
+        return []
+    process = subprocess.run(
+        ["clang++", "-x", "c++", "-std=c++17", "-target", declared["triple"], "-nostdlibinc", "-dM", "-E", "-"],
+        input=b"",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if process.returncode != 0:
+        detail = process.stderr.decode("utf-8", errors="replace").strip().splitlines()[-1:]
+        raise SystemExit(
+            f"clang cannot target {declared['triple']}: {' '.join(detail) or 'no diagnostic'}"
+        )
+    defined = {
+        line.split(" ", 2)[1].split("(", 1)[0]
+        for line in process.stdout.decode("utf-8", errors="replace").splitlines()
+        if line.startswith("#define ")
+    }
+    violated = sorted(name for name in neutral if name in defined)
+    if violated:
+        raise SystemExit(
+            f"{declared['triple']} predefines {', '.join(violated)}, so the declaration parse "
+            f"would take a platform branch. Update {relative(OVERRIDES)}.declarationParse."
+        )
+    return sorted(neutral)
 
 
 def declaration_key(declaration: dict[str, Any]) -> tuple:
@@ -360,7 +563,14 @@ def merge_target_mangling(
                 declaration["mangledNames"] = names
 
 
-def parse_header(header: Path, includes: list[Path], target: str | None = None) -> dict[str, Any]:
+def parse_header(header: Path, includes: list[Path], target: str, flags: list[str]) -> dict[str, Any]:
+    """Parse one header under one ABI.
+
+    `target` is always explicit.  It used to be optional, and omitting it meant
+    "whatever this machine compiles for by default" - which is how the inventory
+    came to be labelled `arm64-macos` and how the nightly that derives a policy
+    came to be pinned to a macOS runner.
+    """
     command = [
         "clang++",
         "-x",
@@ -370,9 +580,9 @@ def parse_header(header: Path, includes: list[Path], target: str | None = None) 
         "-Wno-everything",
         "-Xclang",
         "-ast-dump=json",
-        *(("-target", target) if target else ()),
-        "-DLUA_API=",
-        "-DDM_PLATFORM_OSX=1",
+        "-target",
+        target,
+        *flags,
         *(f"-I{path}" for path in includes),
         str(header),
     ]
@@ -419,24 +629,35 @@ def inventory() -> dict[str, Any]:
         if path.is_file() and path.suffix in {".h", ".hpp"}
     )
     workers = min(8, max(1, os.cpu_count() or 1))
-    with tempfile.TemporaryDirectory(prefix="defold-hermes-sdk-") as temp_name:
-        temp = Path(temp_name)
-        vectormath = DEFOLD / "packages" / "vectormathlibrary-r1649-common.tar.gz"
-        includes = include_roots()
-        if vectormath.exists():
-            with tarfile.open(vectormath) as archive:
-                archive.extractall(temp, filter="data")
-            includes.append(temp / "include")
-        with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-            results = list(executor.map(lambda header: parse_header(header, includes), headers))
-            # One pass per DISTINCT triple; two bundle targets that share an
-            # ABI share a parse.
-            triples = target_triples()
-            per_triple: dict[str, list[dict[str, Any]]] = {}
-            for triple in sorted(set(triples.values())):
-                per_triple[triple] = list(executor.map(
-                    lambda header, t=triple: parse_header(header, includes, t), headers))
-        merge_target_mangling(results, triples, per_triple)
+    declared = declaration_parse()
+    neutral = assert_platform_neutral()
+    flags = parse_flags()
+    # A FIXED path, not a temporary one. Clang spells an unresolved include by
+    # where it was looking, and those strings are recorded as diagnostics: a
+    # per-run temporary directory therefore put a random name into the committed
+    # inventory. Under the repository root it is removed by the same rewrite that
+    # removes the checkout prefix, so the diagnostic reads the same everywhere.
+    temp = ROOT / "build" / "dmsdk-parse" / "vectormath"
+    shutil.rmtree(temp, ignore_errors=True)
+    vectormath = DEFOLD / "packages" / "vectormathlibrary-r1649-common.tar.gz"
+    includes = include_roots()
+    if vectormath.exists():
+        temp.mkdir(parents=True, exist_ok=True)
+        with tarfile.open(vectormath) as archive:
+            archive.extractall(temp, filter="data")
+        includes.append(temp / "include")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
+        results = list(executor.map(
+            lambda header: parse_header(header, includes, declared["triple"], flags), headers))
+        # One pass per DISTINCT triple; two bundle targets that share an
+        # ABI share a parse. Same flags, same headers: only the ABI moves, so a
+        # declaration joins back to the primary parse by its own identity.
+        triples = target_triples()
+        per_triple: dict[str, list[dict[str, Any]]] = {}
+        for triple in sorted(set(triples.values())):
+            per_triple[triple] = list(executor.map(
+                lambda header, t=triple: parse_header(header, includes, t, flags), headers))
+    merge_target_mangling(results, triples, per_triple)
 
     parsed = [item for item in results if "error" not in item]
     failures = [
@@ -459,7 +680,16 @@ def inventory() -> dict[str, Any]:
     return {
         "schemaVersion": 1,
         "defoldRevision": defold_revision(),
-        "platform": "arm64-macos",
+        # What this inventory was parsed as, declared rather than observed. It
+        # used to say `arm64-macos` whatever the parse actually was, which is a
+        # host label rather than a property of the API, and it is the reason the
+        # nightly derivation was pinned to a macOS runner.
+        "parseEnvironment": {
+            "triple": declared["triple"],
+            "platformNeutralOf": neutral,
+            "sysroot": lock_value("DMSDK_PARSE_SYSROOT_INCLUDE"),
+            "sysrootSha256": lock_value("DMSDK_PARSE_SYSROOT_SHA256"),
+        },
         "headerCount": len(headers),
         "parsedHeaderCount": len(parsed),
         "failedHeaderCount": len(failures),
@@ -512,7 +742,13 @@ sources:
 # dmSDK coverage inventory
 
 Pinned revision: `{data['defoldRevision']}`
-Inventory platform: `{data['platform']}`
+Parsed as: `{data['parseEnvironment']['triple']}` against the pinned sysroot
+`{data['parseEnvironment']['sysroot']}`
+(`sha256:{data['parseEnvironment']['sysrootSha256']}`), an assignment that
+defines none of {', '.join(f'`{name}`' for name in data['parseEnvironment']['platformNeutralOf'])}
+and therefore takes no platform branch. This is not a bundle target and says
+nothing about which targets get which declaration; that is
+`packages/bindings/generated/defold-dmsdk-target-conditionals.json`.
 
 Clang parsed **{data['parsedHeaderCount']} of {data['headerCount']}** public
 `dmsdk/**/*.h(pp)` headers and accounted for **{data['declarationCount']}**
@@ -603,7 +839,16 @@ def serialized_outputs() -> tuple[str, str]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--sysroot-only",
+        action="store_true",
+        help="Fetch and verify the pinned parse sysroot, then stop. The bootstrap "
+             "front-loads the download with this; the parse does the same work itself.",
+    )
     args = parser.parse_args()
+    if args.sysroot_only:
+        print(f"dmSDK parse sysroot is ready at {relative(parse_sysroot())}")
+        return 0
     inventory_text, report_text = serialized_outputs()
     outputs = ((INVENTORY, inventory_text), (REPORT, report_text))
     if args.check:

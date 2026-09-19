@@ -243,9 +243,15 @@ async function validateReports(root) {
   "dmSDK projection IR does not have a complete fail-closed 1,361-declaration projection");
   assert(scalar.coverage.reviewed === 31 && scalar.coverage.generated === 26 && scalar.coverage.blocked === 5,
     "scalar report does not have the pinned 26/31 disposition");
+  // 880, not 881. The six `dmGraphics::GetNative*` functions used to return the
+  // Objective-C `id` that only Apple's SDK declares, because the dmSDK was
+  // parsed on a Mac; parsed under the declared platform-neutral environment they
+  // return the `void *` the header itself supplies for every non-Apple target,
+  // which is a shape the census already had. See
+  // `.agents/docs/decisions/target-directed-dmsdk-parse.md`.
   assert(shapes.coverage.runtimePending === 1361 && shapes.coverage.shaped === 1361 &&
-    shapes.coverage.uniqueShapes === 881 && shapes.coverage.tranches === 15,
-  "ABI-shape report does not have the pinned 1,361/881/15 census");
+    shapes.coverage.uniqueShapes === 880 && shapes.coverage.tranches === 15,
+  "ABI-shape report does not have the pinned 1,361/880/15 census");
   assert(enumValue.coverage.discovered === 10 && enumValue.coverage.emitted === 7 &&
     enumValue.coverage.blocked === 3 && enumValue.coverage.remainingWithoutGeneratedAdapters === 1328,
   "enum-value report does not have the pinned 7/10 disposition or 1,328 remainder");

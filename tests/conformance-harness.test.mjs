@@ -19,7 +19,7 @@ test("conformance generator accounts for every script and dmSDK declaration", as
   const plan = buildConformancePlan(inputs, { target: "arm64-macos", contexts: ["*"], shard: "0/1" });
 
   assert.equal(plan.selectedCaseCount, 3066);
-  assert.deepEqual(plan.summary.surface, { dmsdk: 2140, script: 926 });
+  assert.deepEqual(plan.summary.surface, { dmsdk: 2141, script: 926 });
   assert.equal(new Set(plan.cases.map(({ id }) => id)).size, plan.cases.length);
   assert.equal(new Set(plan.cases.map(({ stableId }) => stableId)).size, plan.cases.length);
   const expectedSpecializedScript = inputs.scriptIr.functions.filter(({ runtimeStatus }) => runtimeStatus === "implemented-generated-lua-bridge").length;

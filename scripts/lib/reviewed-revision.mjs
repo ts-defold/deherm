@@ -39,6 +39,7 @@
 // says so; one that moved fails on the substance, which is the failure a
 // reviewer wants, rather than on a string that says nothing about what changed.
 
+import { createHash } from "node:crypto";
 import { appendFileSync } from "node:fs";
 
 const REVISION = /^[0-9a-f]{40}$/;
@@ -110,4 +111,62 @@ export function assertReviewedRevision({ input, reviewed, derived, detail, env =
   const record = { input, reviewed, derived, ...(detail ? { detail } : {}) };
   appendFileSync(ledger, `${JSON.stringify(record)}\n`);
   return { carried: true, ...record };
+}
+
+/**
+ * A reviewed input's claim about ONE Defold source file, checked correctly.
+ *
+ * The rule the generators had was `assert.equal(sha256(source), pinned)`, which
+ * demands the file be byte-identical to when it was read. Across revisions that
+ * can only fail: we are the authoritative generator, and Defold editing its own
+ * source between 1.13.0 and 1.13.1 is the expected outcome, not an error. Worse,
+ * the SHA was asserted BEFORE the anchors, so the check that carries the actual
+ * evidence never ran.
+ *
+ * The two records answer different questions. `anchors` are the exact text the
+ * reviewer's conclusion rests on - for box2d-body, the instance-generation field
+ * and the validity guard. `sha256` only detects that the file moved at all.
+ * Losing an anchor means the review is void. A changed hash with every anchor
+ * intact means the review's subject survived and its surroundings moved, which
+ * is not a reason to refuse.
+ *
+ * So anchors are unconditional, and the hash is a detector whose meaning depends
+ * on what is being generated:
+ *
+ *   * generating for the reviewed revision - a drift is real staleness in this
+ *     tree and stays a hard failure, which is what `pnpm check` relies on;
+ *   * deriving a declared different revision - a drift is recorded to the carry
+ *     ledger and reported, because that is the census the job exists to produce.
+ */
+export function assertReviewedSource({ input, id, source, evidence, reviewed, derived, env = process.env }) {
+  const lost = (evidence.anchors ?? []).filter((anchor) => !source.includes(anchor));
+  if (lost.length) {
+    throw new Error(
+      `${input}: ${id} no longer holds at ${derived}. ` +
+      `${lost.length} of ${evidence.anchors.length} reviewed anchors are gone from ` +
+      `${evidence.source}:\n  ${lost.join("\n  ")}\n` +
+      "The review rested on those lines, so it cannot speak for this revision. Re-review it.");
+  }
+
+  const observed = createHash("sha256").update(source).digest("hex");
+  if (observed === evidence.sha256) return { drifted: false, id, observed };
+
+  const derivation = declaredDerivation(env);
+  if (derivation !== derived || reviewed === derived) {
+    throw new Error(
+      `${input}: ${id} source hash drifted for ${evidence.source}\n` +
+      `  reviewed ${evidence.sha256}\n  observed ${observed}\n` +
+      "Every reviewed anchor still holds, so the review's subject survived; the pinned hash " +
+      "is stale. Update it, or derive another revision with scripts/derive-revision.mjs.");
+  }
+
+  const ledger = env[CARRIED_REVIEW_LEDGER_ENV];
+  if (!ledger) {
+    throw new Error(`${input}: ${id} drifted while deriving ${derived}, but ${CARRIED_REVIEW_LEDGER_ENV} is not set to record it.`);
+  }
+  appendFileSync(ledger, `${JSON.stringify({
+    input, id, source: evidence.source, reviewed: evidence.sha256, observed, derived,
+    anchorsHeld: (evidence.anchors ?? []).length
+  })}\n`);
+  return { drifted: true, id, observed };
 }

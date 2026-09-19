@@ -12,7 +12,7 @@ import {
   rawScriptRootName
 } from "../packages/compiler/src/script-public-api-policy.mjs";
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
-import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, assertReviewedSource } from "./lib/reviewed-revision.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archivePath = path.join(root, "upstream", "ref-doc.zip");
@@ -43,10 +43,18 @@ async function loadSemanticHandleTypes(defoldRevision) {
     assert.ok(!evidenceById.has(evidence.id), `duplicate borrowed-handle evidence id: ${evidence.id}`);
     const sourcePath = path.join(root, "upstream", "defold", evidence.source);
     const source = await readFile(sourcePath, "utf8");
-    assert.equal(sha256(source), evidence.sha256, `${evidence.id}: borrowed-handle source hash drifted`);
-    for (const anchor of evidence.anchors) {
-      assert.ok(source.includes(anchor), `${evidence.id}: borrowed-handle source anchor drifted: ${anchor}`);
-    }
+    // Anchors first, then the hash - the order matters. The anchors are the
+    // text the review's conclusion rests on; the hash only says the file moved.
+    // Asserting the hash first meant a Defold revision that edited anything in
+    // the file aborted before the evidence was ever checked.
+    assertReviewedSource({
+      input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+      id: `${evidence.id}: borrowed-handle`,
+      source,
+      evidence,
+      reviewed: policy.defoldRevision,
+      derived: defoldRevision
+    });
     evidenceById.set(evidence.id, evidence);
   }
 

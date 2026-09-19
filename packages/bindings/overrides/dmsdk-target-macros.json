@@ -212,6 +212,24 @@
       }
     }
   },
+  "declarationParseComment": "The environment `scripts/import-defold-sdk.py` takes the DECLARATION inventory under. It is not a bundle target and must not be read as one: it is the assignment in which NO platform branch is taken, so every `#if defined(<platform>)` in a dmSDK header falls to its `#else`. That is what makes the parse possible without any platform SDK - `graphics_native.h` includes <objc/objc.h>, <Windows.h>, <GL/glx.h> and the Android EGL headers, one per platform, and supplies a `typedef void*` fallback for each - and it is why the inventory can be derived on any machine. Which targets actually get which declaration, and under which spelling, is resolved separately by scripts/generate-dmsdk-target-conditionals.mjs from the same macro assignment declared above; this parse answers only what the declarations ARE. The triple is the one real clang triple that defines none of `__APPLE__`, `__linux__`, `_WIN32`, `ANDROID` or `__EMSCRIPTEN__`, so the neutrality is the compiler's own answer rather than a list of macros undefined by hand.",
+  "declarationParse": {
+    "triple": "wasm32-unknown-unknown",
+    "defines": {
+      "LUA_API": ""
+    },
+    "definesComment": "`LUA_API` is Lua's own linkage decoration, not a platform switch; dmsdk/lua/lua.h leaves it to the build. Emptying it is what every Defold build does and what lets the Lua C API parse at all. No DM_PLATFORM_* macro appears here on purpose.",
+    "neutralOf": [
+      "__APPLE__",
+      "__APPLE_CC__",
+      "__linux__",
+      "_WIN32",
+      "_MSC_VER",
+      "ANDROID",
+      "__ANDROID__",
+      "__EMSCRIPTEN__"
+    ]
+  },
   "triplesComment": "The clang target triple each bundle target is parsed under, so the MANGLED NAME of a declaration is asked of the compiler rather than inferred. Mangling is ABI-specific and not derivable: MSVC's scheme was never published, and an ILP32 target spells size_t and long differently from an LP64 one, so armv7 and wasm32 do not share arm64's symbols. Two targets may legitimately share a triple - the two web targets differ by threading, not by ABI.",
   "triples": {
     "arm64-osx": "arm64-apple-macos",

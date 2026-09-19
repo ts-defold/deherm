@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "../../compiler/src/binding-identity.mjs";
 import { publicScriptModulePath } from "../../compiler/src/script-public-api-policy.mjs";
+import { hostDefoldPlatform } from "./toolchains.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const packageRequire = createRequire(import.meta.url);
@@ -360,7 +361,12 @@ function countBy(items, select) {
 }
 
 export function buildConformancePlan(inputs, options = {}) {
-  const target = options.target ?? inputs.dmsdkIr.platform ?? "arm64-macos";
+  // A conformance run happens on a real machine, so the target is the caller's
+  // to name. It used to default to the dmSDK IR's `platform` field, which was
+  // the parse label rather than anything conformance could run on; the IR now
+  // declares its parse environment instead, and a parse environment is not a
+  // bundle target.
+  const target = options.target ?? hostDefoldPlatform();
   const contexts = options.contexts?.length ? [...new Set(options.contexts)].sort() : ["*"];
   const shard = typeof options.shard === "string" ? parseShard(options.shard) : options.shard ?? { index: 0, count: 1 };
   const surfaces = options.surface && options.surface !== "all" ? [options.surface] : ["script", "dmsdk"];

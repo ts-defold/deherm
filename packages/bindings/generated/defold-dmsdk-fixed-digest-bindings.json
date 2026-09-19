@@ -8,8 +8,8 @@
     "policy": "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json"
   },
   "sourceHashes": {
-    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
-    "shapes": "34a7d990f6e545997a7dfc0854fcfe433c13b90c1b6f5db3e82eff7f09cc2e15",
+    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
+    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
     "policy": "5931ce4592554bb38dc0ebc066d849a09b75e57ae13bd9710707706d937a4781",
     "headers": {
       "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h": "ae6dce231e90fbde3642399b52ed2299b3c8488632492b811af7a2dd38eff560"

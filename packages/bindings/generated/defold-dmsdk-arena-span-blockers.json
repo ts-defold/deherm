@@ -15,15 +15,15 @@
     ]
   },
   "sourceHashes": {
-    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
-    "shapes": "34a7d990f6e545997a7dfc0854fcfe433c13b90c1b6f5db3e82eff7f09cc2e15",
+    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
+    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
     "policy": "bd6084d8e9a4bfe5ee3eb2dd2c0cb6d5f33819b21581d640231fc39aa155d41c",
     "priorWaveReports": {
-      "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "48d9323ca526062edd3972435d1fda438f3dafafbbfdee144de2dc0b6187bcad",
-      "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "e49e4eec451c749907f5a75dcf32bc70564045060cd3a9fbb01bbfc5f5d27bb9",
-      "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "6a0017b8a17f48b06c8bb744dd86a24d357e39d9a16409c23ed8d5aa2fd6d407",
-      "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "d0fff4d888bb132fc6a6b3caeb9096de1f665c77e3667ab2954b3cb851123b82",
-      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "14c849fb3637017715b9657e4ca8185f82fc22592be8846ad9e182b0d4238cb7"
+      "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "4682d8d85b435b949e36224a50952b2507919a24f4ac5fa3d1cd8be4b13545a9",
+      "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "f5ee872f3731b1dde9206d68bd19c0f0e91f57a2f8acd929303ae02c5857686c",
+      "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "14b4b2ae8dacdfa06b3c0379db8c2dee58b940dc4cd74ab4c53ba37ac70b3161",
+      "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "73430ebd5789d7df3c1db8c9275869c830aa4553c730af0c7eca09b05f5c3472",
+      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "666338f9d5a1053c5f69415a5e9b3cbcf86db57116a7ab61835a62314a4b8b5e"
     }
   },
   "scope": "Complete arena-backed-spans census after the five generated prior waves",
@@ -43,31 +43,31 @@
     {
       "report": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
       "policyVersion": "fixed-digest-v1",
-      "sha256": "48d9323ca526062edd3972435d1fda438f3dafafbbfdee144de2dc0b6187bcad",
+      "sha256": "4682d8d85b435b949e36224a50952b2507919a24f4ac5fa3d1cd8be4b13545a9",
       "declarationCount": 4
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
       "policyVersion": "base64-span-v1",
-      "sha256": "e49e4eec451c749907f5a75dcf32bc70564045060cd3a9fbb01bbfc5f5d27bb9",
+      "sha256": "f5ee872f3731b1dde9206d68bd19c0f0e91f57a2f8acd929303ae02c5857686c",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
       "policyVersion": "astc-probe-v1",
-      "sha256": "6a0017b8a17f48b06c8bb744dd86a24d357e39d9a16409c23ed8d5aa2fd6d407",
+      "sha256": "14b4b2ae8dacdfa06b3c0379db8c2dee58b940dc4cd74ab4c53ba37ac70b3161",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
       "policyVersion": "xtea-span-v1",
-      "sha256": "d0fff4d888bb132fc6a6b3caeb9096de1f665c77e3667ab2954b3cb851123b82",
+      "sha256": "73430ebd5789d7df3c1db8c9275869c830aa4553c730af0c7eca09b05f5c3472",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
       "policyVersion": "hash-span-v1",
-      "sha256": "14c849fb3637017715b9657e4ca8185f82fc22592be8846ad9e182b0d4238cb7",
+      "sha256": "666338f9d5a1053c5f69415a5e9b3cbcf86db57116a7ab61835a62314a4b8b5e",
       "declarationCount": 2
     }
   ],
@@ -2307,7 +2307,7 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:696:1863",
+      "id": "dmsdk:dmRender::SetMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:696:1864",
       "symbol": "dmRender::SetMaterialTags",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -2366,7 +2366,7 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:230:2009",
+      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:230:2010",
       "symbol": "dmResource::AddFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -2433,7 +2433,7 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:204:1974",
+      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:204:1975",
       "symbol": "dmResource::AddFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -2500,7 +2500,7 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::CreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:104:1964",
+      "id": "dmsdk:dmResource::CreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:104:1965",
       "symbol": "dmResource::CreateResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -2576,7 +2576,7 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1969",
+      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
       "symbol": "dmResource::GetCanonicalPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -2635,7 +2635,7 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::GetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:170:2003",
+      "id": "dmsdk:dmResource::GetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:170:2004",
       "symbol": "dmResource::GetRaw",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -2704,7 +2704,7 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2052",
+      "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053",
       "symbol": "dmRig::GenerateVertexDataFromAttributes",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -2802,7 +2802,7 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2051",
+      "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2052",
       "symbol": "dmRig::SetMeshWriteAttributeParams",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -2945,7 +2945,7 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::SetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:219:2071",
+      "id": "dmsdk:dmRig::SetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:219:2072",
       "symbol": "dmRig::SetMorphWeights",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -3011,7 +3011,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::CheckTable@upstream/defold/engine/script/src/dmsdk/script/script.h:767:2134",
+      "id": "dmsdk:dmScript::CheckTable@upstream/defold/engine/script/src/dmsdk/script/script.h:767:2135",
       "symbol": "dmScript::CheckTable",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -3075,7 +3075,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::GetStringFromHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:473:2109",
+      "id": "dmsdk:dmScript::GetStringFromHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:473:2110",
       "symbol": "dmScript::GetStringFromHashOrString",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -3139,7 +3139,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2116",
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2117",
       "symbol": "dmScript::JsonToLua",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -3196,7 +3196,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2117",
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2118",
       "symbol": "dmScript::JsonToLua",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -3260,7 +3260,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:546:2118",
+      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:546:2119",
       "symbol": "dmScript::LuaToJson",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -3319,7 +3319,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:559:2119",
+      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:559:2120",
       "symbol": "dmScript::LuaToJson",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -3392,7 +3392,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::PushTable@upstream/defold/engine/script/src/dmsdk/script/script.h:776:2135",
+      "id": "dmsdk:dmScript::PushTable@upstream/defold/engine/script/src/dmsdk/script/script.h:776:2136",
       "symbol": "dmScript::PushTable",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -3449,7 +3449,7 @@
       }
     },
     {
-      "id": "dmsdk:dmScript::UrlToString@upstream/defold/engine/script/src/dmsdk/script/script.h:745:2132",
+      "id": "dmsdk:dmScript::UrlToString@upstream/defold/engine/script/src/dmsdk/script/script.h:745:2133",
       "symbol": "dmScript::UrlToString",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -4263,7 +4263,7 @@
       }
     },
     {
-      "id": "dmsdk:ResourceAddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:353:1908",
+      "id": "dmsdk:ResourceAddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:353:1909",
       "symbol": "ResourceAddFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -4330,7 +4330,7 @@
       }
     },
     {
-      "id": "dmsdk:ResourceCreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:338:1907",
+      "id": "dmsdk:ResourceCreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:338:1908",
       "symbol": "ResourceCreateResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -4406,7 +4406,7 @@
       }
     },
     {
-      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1906",
+      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
       "symbol": "ResourceGetCanonicalPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -4465,7 +4465,7 @@
       }
     },
     {
-      "id": "dmsdk:ResourceGetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:256:1899",
+      "id": "dmsdk:ResourceGetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:256:1900",
       "symbol": "ResourceGetRaw",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",

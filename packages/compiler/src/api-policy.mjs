@@ -218,7 +218,12 @@ export function buildPolicy(inputs) {
     throw error;
   }
   shared.dmsdk = {
-    platform: dmsdkIr.platform,
+    // What the declaration surface was PARSED under, not a platform this policy
+    // is for. The field used to be `platform: "arm64-macos"` - the deriving
+    // host's label, copied into every published policy - so a consumer could
+    // read it as "this policy describes macOS". It describes the whole declared
+    // target set; which target gets which declaration is a separate answer.
+    parseEnvironment: dmsdkIr.parseEnvironment,
     opaqueTypes: normalizePaths(dmsdkIr.opaqueTypes ?? [], repositoryRoot),
     unresolvedTypes: normalizePaths(dmsdkIr.unresolvedTypes ?? [], repositoryRoot)
   };

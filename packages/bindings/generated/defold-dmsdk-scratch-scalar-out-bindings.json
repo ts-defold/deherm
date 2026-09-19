@@ -8,9 +8,9 @@
     "policy": "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"
   },
   "sourceHashes": {
-    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
-    "shapes": "34a7d990f6e545997a7dfc0854fcfe433c13b90c1b6f5db3e82eff7f09cc2e15",
-    "projection": "8a21006ba46b28fdedcb2824bc73504cac9b28390a53920cfbfb70d90aadc82e",
+    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
+    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
+    "projection": "492fc0a14d65270fb510caad4050bdf77ff48b9fa17c00f74e88e11d17dc3dd0",
     "policy": "917118c229b4ad04eef2b1b5e9604f635a94c6b7eeab5524575884cd2594806c"
   },
   "selector": "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
@@ -78,10 +78,10 @@
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out_jsi.hpp": "a8023b0f6e7d8a266c7f02cf8c0f256f438fdb96236b097925825ea772f72e91",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out.h": "81794a71d37798554439e0145a1104d3fba9eb922934e80966adba7db11fb070",
-    "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js": "cb98a310c3fc48a855a94c4174cbec6a5d359ef69e2879cc1fe2e4739f45565f",
+    "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js": "69eed957287511c79f3e8396c25739f97df069b352332c201e683846ad4993dd",
     "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp": "a36fe13e0c060e96604d9a53e2c7145eefcbe3d96c91938f1e4db4b3e4958670",
-    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp": "7e3ce0610b918573eafb37de7da93471e709b021f306023a81160ef538b52cc2",
-    "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp": "60e8833a4f2493ada601b7af2d56dcd5927e3566338e9e9746f4aa0e6da81b37",
+    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp": "7e4a7c844b9830aa4ed94b555dfd084aed4d3d11d9b266b2f92d2945fb68f0e4",
+    "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp": "982e1a9fc34b1b8df03dbe9eb70cbf14a2b693a735cd66f29c67c44ce24057c7",
     "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts": "ad871b1ed12b8708aa7d79a770cf5cd658d46c24c7c960375d1d835f86d1612a",
     "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts": "52d6747f223a66f939c6409f0fd692088587bb47796a43621436a27b1cfd43a1"
   },
@@ -753,8 +753,8 @@
       "shape": "enum:dmGraphics::HandleResult(value:handle:dmGraphics::HTexture:u64,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1517",
-      "projectionId": "dmsdk-projection:eca33e316cda069f77d1a422",
+      "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518",
+      "projectionId": "dmsdk-projection:7577416483312ff059d2b5c6",
       "symbol": "dmGraphics::VulkanCreateDescriptorPool",
       "disposition": "blocked",
       "blockers": [
@@ -768,8 +768,8 @@
       "shape": "scalar:bool(value:scalar:i32,value:scalar:u16,out:pointer:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1565",
-      "projectionId": "dmsdk-projection:af9460bfda13bfb95738ce33",
+      "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1566",
+      "projectionId": "dmsdk-projection:2a3be5f861b12343d3964558",
       "symbol": "dmGui::GetNodeCustomProperty",
       "disposition": "blocked",
       "blockers": [
@@ -823,8 +823,8 @@
       "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)"
     },
     {
-      "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1618",
-      "projectionId": "dmsdk-projection:8b476fd0d829f6b73210ae99",
+      "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1619",
+      "projectionId": "dmsdk-projection:fe0ea178c536591df7e945d1",
       "symbol": "dmHID::FormatGamepadGuid",
       "disposition": "blocked",
       "blockers": [
@@ -841,8 +841,8 @@
       "shape": "scalar:void(in:pointer:record:dmHID::GamepadGuid,inout:cstring-mutable)"
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1617",
-      "projectionId": "dmsdk-projection:9b65dc80078e5d05ef3df6a1",
+      "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1618",
+      "projectionId": "dmsdk-projection:d01cb3fc647486dd3a85a74a",
       "symbol": "dmHID::GetGamepadDeviceGuid",
       "disposition": "blocked",
       "blockers": [
@@ -859,8 +859,8 @@
       "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,inout:pointer:record:dmHID::GamepadGuid)"
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1631",
-      "projectionId": "dmsdk-projection:e2d4d1d0564080e21406d86b",
+      "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1632",
+      "projectionId": "dmsdk-projection:d563fa81c5abd672d77d8324",
       "symbol": "dmHID::GetGamepadHat",
       "disposition": "blocked",
       "blockers": [
@@ -875,8 +875,8 @@
       "shape": "scalar:bool(inout:pointer:record:dmHID::GamepadPacket,value:scalar:u32,out:pointer:scalar:u8)"
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1629",
-      "projectionId": "dmsdk-projection:c5f96bf36577626f84cf7cbc",
+      "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1630",
+      "projectionId": "dmsdk-projection:a756eefbe45784d8948464ae",
       "symbol": "dmHID::GetGamepadPacket",
       "disposition": "blocked",
       "blockers": [
@@ -893,8 +893,8 @@
       "shape": "scalar:bool(value:handle:dmHID::HGamepad:opaque,out:pointer:record:dmHID::GamepadPacket)"
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1615",
-      "projectionId": "dmsdk-projection:9361ce7608a58a0195749364",
+      "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
+      "projectionId": "dmsdk-projection:0fea2181fc7384591424b7b8",
       "symbol": "dmHID::GetGamepadUserId",
       "disposition": "generated-provider-boundary",
       "bindingId": 6,
@@ -926,8 +926,8 @@
       }
     },
     {
-      "id": "dmsdk:dmHID::GetMousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:708:1625",
-      "projectionId": "dmsdk-projection:9b07d4da851a45d734023085",
+      "id": "dmsdk:dmHID::GetMousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:708:1626",
+      "projectionId": "dmsdk-projection:baa3aa48286380c5e337b943",
       "symbol": "dmHID::GetMousePacket",
       "disposition": "blocked",
       "blockers": [
@@ -981,8 +981,8 @@
       "shape": "scalar:void(value:scalar:u32,inout:template:T)"
     },
     {
-      "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1838",
-      "projectionId": "dmsdk-projection:95eb7dc6829329d21b3e3b99",
+      "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1839",
+      "projectionId": "dmsdk-projection:81108965be1a4f5b0f06cf13",
       "symbol": "dmRender::GetConstantValues",
       "disposition": "blocked",
       "blockers": [
@@ -998,8 +998,8 @@
       "shape": "pointer:unknown:dmVMath::Vector4(value:handle:dmRender::HConstant:opaque,inout:pointer:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1854",
-      "projectionId": "dmsdk-projection:a4ce6d3854fff73ca4e19692",
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855",
+      "projectionId": "dmsdk-projection:f49ec821d1f4bb594cab1126",
       "symbol": "dmRender::GetNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -1015,8 +1015,8 @@
       "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1855",
-      "projectionId": "dmsdk-projection:c154562f4d43724843f41758",
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
+      "projectionId": "dmsdk-projection:b8a76dc1df813847d934fb83",
       "symbol": "dmRender::GetNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -1032,8 +1032,8 @@
       "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2001",
-      "projectionId": "dmsdk-projection:4e45f27a61f95498f487d831",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2002",
+      "projectionId": "dmsdk-projection:2dae5903093bf1d57ec153d0",
       "symbol": "dmResource::Get",
       "disposition": "blocked",
       "blockers": [
@@ -1051,8 +1051,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1960",
-      "projectionId": "dmsdk-projection:42154b4dc7aea266b26ca6c8",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1961",
+      "projectionId": "dmsdk-projection:3133c35c8c31ae190649ed79",
       "symbol": "dmResource::Get",
       "disposition": "blocked",
       "blockers": [
@@ -1070,8 +1070,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1962",
-      "projectionId": "dmsdk-projection:907dfb5982fd054ec865b939",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1963",
+      "projectionId": "dmsdk-projection:696b9b15245980d88b6d0c35",
       "symbol": "dmResource::Get",
       "disposition": "blocked",
       "blockers": [
@@ -1088,8 +1088,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2002",
-      "projectionId": "dmsdk-projection:37b317947bdc310665fc85b0",
+      "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2003",
+      "projectionId": "dmsdk-projection:e30a27067b17d6c9d2ff9f58",
       "symbol": "dmResource::GetByHash",
       "disposition": "blocked",
       "blockers": [
@@ -1106,8 +1106,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2008",
-      "projectionId": "dmsdk-projection:2da0bde36a4da27b4b5fa1ea",
+      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2009",
+      "projectionId": "dmsdk-projection:cfab5ef5f082d0b25959c66e",
       "symbol": "dmResource::GetPath",
       "disposition": "blocked",
       "blockers": [
@@ -1123,8 +1123,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1961",
-      "projectionId": "dmsdk-projection:cc0d3a8be5d98b9b2d183548",
+      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1962",
+      "projectionId": "dmsdk-projection:99b383d99ef7a4212d9ae8df",
       "symbol": "dmResource::GetWithExt",
       "disposition": "blocked",
       "blockers": [
@@ -1143,8 +1143,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1963",
-      "projectionId": "dmsdk-projection:2282e8de2d7ebfe5905ba572",
+      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1964",
+      "projectionId": "dmsdk-projection:1db5193382c30d002616a770",
       "symbol": "dmResource::GetWithExt",
       "disposition": "blocked",
       "blockers": [
@@ -1161,8 +1161,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2073",
-      "projectionId": "dmsdk-projection:772691346d8129753eac8242",
+      "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074",
+      "projectionId": "dmsdk-projection:ef767adf63f401b08c88c7b4",
       "symbol": "dmRig::CopyBindPose",
       "disposition": "blocked",
       "blockers": [
@@ -1180,8 +1180,8 @@
       "shape": "scalar:void(inout:scalar:i32,inout:template:dmArray<RigBone>)"
     },
     {
-      "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2053",
-      "projectionId": "dmsdk-projection:a97479e3d3b42e17e32bc02d",
+      "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054",
+      "projectionId": "dmsdk-projection:686510163a4331c3d9667e41",
       "symbol": "dmRig::GenerateVertexData",
       "disposition": "blocked",
       "blockers": [
@@ -1200,8 +1200,8 @@
       "shape": "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:scalar:i32,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)"
     },
     {
-      "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2070",
-      "projectionId": "dmsdk-projection:3e35552afcd19d9ec6cb5be0",
+      "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2071",
+      "projectionId": "dmsdk-projection:66686e8187dd42ee1997433b",
       "symbol": "dmRig::GetMorphWeights",
       "disposition": "blocked",
       "blockers": [
@@ -1216,8 +1216,8 @@
       "shape": "pointer:scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,out:pointer:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2114",
-      "projectionId": "dmsdk-projection:e84ed59b81a53224b19fa402",
+      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2115",
+      "projectionId": "dmsdk-projection:60066fc417e3163b4003aba9",
       "symbol": "dmScript::CheckURL",
       "disposition": "blocked",
       "blockers": [
@@ -1256,8 +1256,8 @@
       "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,out:pointer:unknown:dmGameObject::HComponentWorld,inout:pointer:unknown:dmGameObject::HComponent,inout:pointer:record:dmMessage::URL)"
     },
     {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2130",
-      "projectionId": "dmsdk-projection:70661fd5e9f48af2b4f72c03",
+      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2131",
+      "projectionId": "dmsdk-projection:42221ac68fa341a45dd0c024",
       "symbol": "dmScript::ResolveURL",
       "disposition": "blocked",
       "blockers": [
@@ -1275,8 +1275,8 @@
       "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,out:pointer:record:dmMessage::URL,out:pointer:record:dmMessage::URL)"
     },
     {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2131",
-      "projectionId": "dmsdk-projection:e8d82117970bb933e95ee9df",
+      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2132",
+      "projectionId": "dmsdk-projection:f953659cf441a612cf1bbb9d",
       "symbol": "dmScript::ResolveURL",
       "disposition": "blocked",
       "blockers": [
@@ -1474,8 +1474,8 @@
       "shape": "enum:HttpResult(out:pointer-out:record:HttpRequest)"
     },
     {
-      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1894",
-      "projectionId": "dmsdk-projection:90e5e7a729c519c76e327e2d",
+      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1895",
+      "projectionId": "dmsdk-projection:70f316d9451276692757601a",
       "symbol": "ResourceGet",
       "disposition": "blocked",
       "blockers": [
@@ -1493,8 +1493,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1896",
-      "projectionId": "dmsdk-projection:aaf050735835057c8e50a799",
+      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1897",
+      "projectionId": "dmsdk-projection:a810d6b8e1bcf1c7dfbb593b",
       "symbol": "ResourceGetByHash",
       "disposition": "blocked",
       "blockers": [
@@ -1511,8 +1511,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1897",
-      "projectionId": "dmsdk-projection:de227cbaa1c28482842b7332",
+      "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1898",
+      "projectionId": "dmsdk-projection:1727b14d0f68a19bb3a35904",
       "symbol": "ResourceGetByHashAndExt",
       "disposition": "blocked",
       "blockers": [
@@ -1529,8 +1529,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1904",
-      "projectionId": "dmsdk-projection:fa7f59786615ebf733a690b5",
+      "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1905",
+      "projectionId": "dmsdk-projection:495d7ad9596ac3f7506278ad",
       "symbol": "ResourceGetPath",
       "disposition": "blocked",
       "blockers": [
@@ -1546,8 +1546,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
     },
     {
-      "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1910",
-      "projectionId": "dmsdk-projection:37519e1e5133d9a852053aa2",
+      "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1911",
+      "projectionId": "dmsdk-projection:76fc5854e2ea0d3e1813bcc1",
       "symbol": "ResourceGetTypeFromExtension",
       "disposition": "blocked",
       "blockers": [
@@ -1565,8 +1565,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:pointer:unknown:HResourceType)"
     },
     {
-      "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1911",
-      "projectionId": "dmsdk-projection:05066016c952207ae346d629",
+      "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1912",
+      "projectionId": "dmsdk-projection:0e037ea33481ff7bcd51d7b6",
       "symbol": "ResourceGetTypeFromExtensionHash",
       "disposition": "blocked",
       "blockers": [
@@ -1583,8 +1583,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)"
     },
     {
-      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1895",
-      "projectionId": "dmsdk-projection:ad456017260dc89558d41afd",
+      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1896",
+      "projectionId": "dmsdk-projection:616b819884aed702a5d912bd",
       "symbol": "ResourceGetWithExt",
       "disposition": "blocked",
       "blockers": [
@@ -1603,8 +1603,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)"
     },
     {
-      "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1942",
-      "projectionId": "dmsdk-projection:43eb4d64a7fb0f08d15fa4cb",
+      "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1943",
+      "projectionId": "dmsdk-projection:1e820f6d548921d35cfd780e",
       "symbol": "ResourceRegisterType",
       "disposition": "blocked",
       "blockers": [

@@ -4,8 +4,8 @@
   "sourceIr": "packages/bindings/generated/defold-sdk-ir.json",
   "sourceClassification": "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
   "sourceHashes": {
-    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
-    "classification": "e8255275a115497bef9588a2f50e4f316cb9e72e84a487d0b187bf39aebe9ba4",
+    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
+    "classification": "a6740e8619d3894dc981497ee47c514db5ac668e815738cd1634979fcf941e0b",
     "headers": {
       "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",
       "upstream/defold/engine/dlib/src/dmsdk/dlib/array.h": "38b74d81c9e9f060e2498757e5f1b22c5a5ff42a523470a26b49644f572ff52b",
@@ -111,7 +111,7 @@
   "coverage": {
     "runtimePending": 1361,
     "shaped": 1361,
-    "uniqueShapes": 881,
+    "uniqueShapes": 880,
     "tranches": 15,
     "unshaped": 0
   },
@@ -132,8 +132,8 @@
   },
   "trancheSummary": {
     "borrowed-handle-consumers": 348,
-    "pointer-lifetime-adapters": 240,
-    "manual-triage-required": 143,
+    "pointer-lifetime-adapters": 246,
+    "manual-triage-required": 137,
     "string-codecs": 128,
     "callback-registry": 95,
     "arena-backed-spans": 79,
@@ -152,6 +152,7 @@
     "scalar:void(value:handle:dmGameObject::HComponentType:opaque,value:callback)": 21,
     "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32)": 15,
     "scalar:void(inout:pointer:record:lua_State,value:scalar:i32)": 15,
+    "opaque-pointer()": 11,
     "scalar:i32(value:handle:dmGraphics::HContext:opaque)": 11,
     "scalar:u32()": 11,
     "scalar:void(value:scalar:u32)": 10,
@@ -172,9 +173,7 @@
     "scalar:void(inout:opaque-pointer)": 6,
     "scalar:void(inout:pointer:record:dmGameSystem::CompGuiNodeType,value:callback)": 6,
     "scalar:void(value:callback)": 6,
-    "unknown:id()": 6,
     "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)": 5,
-    "opaque-pointer()": 5,
     "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,value:scalar:i32)": 5,
     "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)": 5,
     "scalar:u32(value:handle:HTextLayout:opaque)": 5,
@@ -1594,7 +1593,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_atpanic@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1681",
+      "id": "dmsdk:dm_lua_atpanic@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1682",
       "symbol": "dm_lua_atpanic",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1634,7 +1633,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_call@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1733",
+      "id": "dmsdk:dm_lua_call@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1734",
       "symbol": "dm_lua_call",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1679,7 +1678,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1688",
+      "id": "dmsdk:dm_lua_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1689",
       "symbol": "dm_lua_checkstack",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1717,7 +1716,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_close@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1679",
+      "id": "dmsdk:dm_lua_close@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1680",
       "symbol": "dm_lua_close",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1748,7 +1747,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_concat@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1744",
+      "id": "dmsdk:dm_lua_concat@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1745",
       "symbol": "dm_lua_concat",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1786,7 +1785,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_cpcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1735",
+      "id": "dmsdk:dm_lua_cpcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1736",
       "symbol": "dm_lua_cpcall",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1833,7 +1832,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_createtable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1723",
+      "id": "dmsdk:dm_lua_createtable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1724",
       "symbol": "dm_lua_createtable",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1878,7 +1877,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_dump@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1737",
+      "id": "dmsdk:dm_lua_dump@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1738",
       "symbol": "dm_lua_dump",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1925,7 +1924,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_equal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1696",
+      "id": "dmsdk:dm_lua_equal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1697",
       "symbol": "dm_lua_equal",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -1970,7 +1969,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_error@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1742",
+      "id": "dmsdk:dm_lua_error@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1743",
       "symbol": "dm_lua_error",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2001,7 +2000,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gc@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1741",
+      "id": "dmsdk:dm_lua_gc@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1742",
       "symbol": "dm_lua_gc",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2046,7 +2045,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1745",
+      "id": "dmsdk:dm_lua_getallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1746",
       "symbol": "dm_lua_getallocf",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2088,7 +2087,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1726",
+      "id": "dmsdk:dm_lua_getfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1727",
       "symbol": "dm_lua_getfenv",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2126,7 +2125,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1720",
+      "id": "dmsdk:dm_lua_getfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1721",
       "symbol": "dm_lua_getfield",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2171,7 +2170,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1758",
+      "id": "dmsdk:dm_lua_gethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1759",
       "symbol": "dm_lua_gethook",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2204,7 +2203,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gethookcount@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1760",
+      "id": "dmsdk:dm_lua_gethookcount@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1761",
       "symbol": "dm_lua_gethookcount",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2235,7 +2234,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gethookmask@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1759",
+      "id": "dmsdk:dm_lua_gethookmask@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1760",
       "symbol": "dm_lua_gethookmask",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2266,7 +2265,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getinfo@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1752",
+      "id": "dmsdk:dm_lua_getinfo@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1753",
       "symbol": "dm_lua_getinfo",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2311,7 +2310,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1753",
+      "id": "dmsdk:dm_lua_getlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1754",
       "symbol": "dm_lua_getlocal",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2356,7 +2355,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1725",
+      "id": "dmsdk:dm_lua_getmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1726",
       "symbol": "dm_lua_getmetatable",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2394,7 +2393,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1751",
+      "id": "dmsdk:dm_lua_getstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1752",
       "symbol": "dm_lua_getstack",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2439,7 +2438,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gettable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1719",
+      "id": "dmsdk:dm_lua_gettable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1720",
       "symbol": "dm_lua_gettable",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2477,7 +2476,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gettop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1682",
+      "id": "dmsdk:dm_lua_gettop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1683",
       "symbol": "dm_lua_gettop",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2508,7 +2507,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1755",
+      "id": "dmsdk:dm_lua_getupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1756",
       "symbol": "dm_lua_getupvalue",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2553,7 +2552,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_insert@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1686",
+      "id": "dmsdk:dm_lua_insert@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1687",
       "symbol": "dm_lua_insert",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2591,7 +2590,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_iscfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1692",
+      "id": "dmsdk:dm_lua_iscfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1693",
       "symbol": "dm_lua_iscfunction",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2629,7 +2628,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_isnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1690",
+      "id": "dmsdk:dm_lua_isnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1691",
       "symbol": "dm_lua_isnumber",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2667,7 +2666,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_isstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1691",
+      "id": "dmsdk:dm_lua_isstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1692",
       "symbol": "dm_lua_isstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2705,7 +2704,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_isuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1693",
+      "id": "dmsdk:dm_lua_isuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1694",
       "symbol": "dm_lua_isuserdata",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2743,7 +2742,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_lessthan@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1698",
+      "id": "dmsdk:dm_lua_lessthan@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1699",
       "symbol": "dm_lua_lessthan",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2788,7 +2787,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_load@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1736",
+      "id": "dmsdk:dm_lua_load@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1737",
       "symbol": "dm_lua_load",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2842,7 +2841,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1678",
+      "id": "dmsdk:dm_lua_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1679",
       "symbol": "dm_lua_newstate",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2882,7 +2881,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_newthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1680",
+      "id": "dmsdk:dm_lua_newthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1681",
       "symbol": "dm_lua_newthread",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2913,7 +2912,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_newuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1724",
+      "id": "dmsdk:dm_lua_newuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1725",
       "symbol": "dm_lua_newuserdata",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2951,7 +2950,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_next@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1743",
+      "id": "dmsdk:dm_lua_next@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1744",
       "symbol": "dm_lua_next",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -2989,7 +2988,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_objlen@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1703",
+      "id": "dmsdk:dm_lua_objlen@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1704",
       "symbol": "dm_lua_objlen",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3027,7 +3026,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1734",
+      "id": "dmsdk:dm_lua_pcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1735",
       "symbol": "dm_lua_pcall",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3079,7 +3078,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1716",
+      "id": "dmsdk:dm_lua_pushboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1717",
       "symbol": "dm_lua_pushboolean",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3117,7 +3116,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushcclosure@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1715",
+      "id": "dmsdk:dm_lua_pushcclosure@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1716",
       "symbol": "dm_lua_pushcclosure",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3164,7 +3163,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1714",
+      "id": "dmsdk:dm_lua_pushfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1715",
       "symbol": "dm_lua_pushfstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3203,7 +3202,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushinteger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1710",
+      "id": "dmsdk:dm_lua_pushinteger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1711",
       "symbol": "dm_lua_pushinteger",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3242,7 +3241,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushlightuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1717",
+      "id": "dmsdk:dm_lua_pushlightuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1718",
       "symbol": "dm_lua_pushlightuserdata",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3280,7 +3279,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushlstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1711",
+      "id": "dmsdk:dm_lua_pushlstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1712",
       "symbol": "dm_lua_pushlstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3325,7 +3324,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushnil@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1708",
+      "id": "dmsdk:dm_lua_pushnil@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1709",
       "symbol": "dm_lua_pushnil",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3356,7 +3355,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1709",
+      "id": "dmsdk:dm_lua_pushnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1710",
       "symbol": "dm_lua_pushnumber",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3395,7 +3394,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1712",
+      "id": "dmsdk:dm_lua_pushstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1713",
       "symbol": "dm_lua_pushstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3433,7 +3432,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1718",
+      "id": "dmsdk:dm_lua_pushthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1719",
       "symbol": "dm_lua_pushthread",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3464,7 +3463,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1684",
+      "id": "dmsdk:dm_lua_pushvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1685",
       "symbol": "dm_lua_pushvalue",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3502,7 +3501,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushvfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1713",
+      "id": "dmsdk:dm_lua_pushvfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1714",
       "symbol": "dm_lua_pushvfstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3550,7 +3549,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawequal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1697",
+      "id": "dmsdk:dm_lua_rawequal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1698",
       "symbol": "dm_lua_rawequal",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3595,7 +3594,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawget@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1721",
+      "id": "dmsdk:dm_lua_rawget@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1722",
       "symbol": "dm_lua_rawget",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3633,7 +3632,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawgeti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1722",
+      "id": "dmsdk:dm_lua_rawgeti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1723",
       "symbol": "dm_lua_rawgeti",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3678,7 +3677,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawset@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1729",
+      "id": "dmsdk:dm_lua_rawset@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1730",
       "symbol": "dm_lua_rawset",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3716,7 +3715,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawseti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1730",
+      "id": "dmsdk:dm_lua_rawseti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1731",
       "symbol": "dm_lua_rawseti",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3761,7 +3760,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_remove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1685",
+      "id": "dmsdk:dm_lua_remove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1686",
       "symbol": "dm_lua_remove",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3799,7 +3798,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_replace@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1687",
+      "id": "dmsdk:dm_lua_replace@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1688",
       "symbol": "dm_lua_replace",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3837,7 +3836,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_resume@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1739",
+      "id": "dmsdk:dm_lua_resume@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1740",
       "symbol": "dm_lua_resume",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3875,7 +3874,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1746",
+      "id": "dmsdk:dm_lua_setallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1747",
       "symbol": "dm_lua_setallocf",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3922,7 +3921,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1732",
+      "id": "dmsdk:dm_lua_setfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1733",
       "symbol": "dm_lua_setfenv",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -3960,7 +3959,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1728",
+      "id": "dmsdk:dm_lua_setfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1729",
       "symbol": "dm_lua_setfield",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4005,7 +4004,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_sethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1757",
+      "id": "dmsdk:dm_lua_sethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1758",
       "symbol": "dm_lua_sethook",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4061,7 +4060,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setlevel@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1747",
+      "id": "dmsdk:dm_lua_setlevel@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1748",
       "symbol": "dm_lua_setlevel",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4099,7 +4098,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1754",
+      "id": "dmsdk:dm_lua_setlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1755",
       "symbol": "dm_lua_setlocal",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4144,7 +4143,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1731",
+      "id": "dmsdk:dm_lua_setmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1732",
       "symbol": "dm_lua_setmetatable",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4182,7 +4181,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_settable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1727",
+      "id": "dmsdk:dm_lua_settable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1728",
       "symbol": "dm_lua_settable",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4220,7 +4219,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_settop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1683",
+      "id": "dmsdk:dm_lua_settop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1684",
       "symbol": "dm_lua_settop",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4258,7 +4257,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1756",
+      "id": "dmsdk:dm_lua_setupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1757",
       "symbol": "dm_lua_setupvalue",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4303,7 +4302,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_status@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1740",
+      "id": "dmsdk:dm_lua_status@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1741",
       "symbol": "dm_lua_status",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4334,7 +4333,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_toboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1701",
+      "id": "dmsdk:dm_lua_toboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1702",
       "symbol": "dm_lua_toboolean",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4372,7 +4371,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tocfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1704",
+      "id": "dmsdk:dm_lua_tocfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1705",
       "symbol": "dm_lua_tocfunction",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4412,7 +4411,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tointeger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1700",
+      "id": "dmsdk:dm_lua_tointeger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1701",
       "symbol": "dm_lua_tointeger",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4451,7 +4450,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tolstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1702",
+      "id": "dmsdk:dm_lua_tolstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1703",
       "symbol": "dm_lua_tolstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4496,7 +4495,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tonumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1699",
+      "id": "dmsdk:dm_lua_tonumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1700",
       "symbol": "dm_lua_tonumber",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4535,7 +4534,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_topointer@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1707",
+      "id": "dmsdk:dm_lua_topointer@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1708",
       "symbol": "dm_lua_topointer",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4573,7 +4572,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tothread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1706",
+      "id": "dmsdk:dm_lua_tothread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1707",
       "symbol": "dm_lua_tothread",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4611,7 +4610,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_touserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1705",
+      "id": "dmsdk:dm_lua_touserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1706",
       "symbol": "dm_lua_touserdata",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4649,7 +4648,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_type@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1694",
+      "id": "dmsdk:dm_lua_type@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1695",
       "symbol": "dm_lua_type",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4687,7 +4686,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_typename@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1695",
+      "id": "dmsdk:dm_lua_typename@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1696",
       "symbol": "dm_lua_typename",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4725,7 +4724,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_xmove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1689",
+      "id": "dmsdk:dm_lua_xmove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1690",
       "symbol": "dm_lua_xmove",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4770,7 +4769,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_yield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1738",
+      "id": "dmsdk:dm_lua_yield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1739",
       "symbol": "dm_lua_yield",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
@@ -4808,7 +4807,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_addlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1666",
+      "id": "dmsdk:dm_luaL_addlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1667",
       "symbol": "dm_luaL_addlstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -4853,7 +4852,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_addstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1667",
+      "id": "dmsdk:dm_luaL_addstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1668",
       "symbol": "dm_luaL_addstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -4891,7 +4890,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_addvalue@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1668",
+      "id": "dmsdk:dm_luaL_addvalue@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1669",
       "symbol": "dm_luaL_addvalue",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -4922,7 +4921,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_argerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1639",
+      "id": "dmsdk:dm_luaL_argerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1640",
       "symbol": "dm_luaL_argerror",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -4967,7 +4966,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_buffinit@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1664",
+      "id": "dmsdk:dm_luaL_buffinit@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1665",
       "symbol": "dm_luaL_buffinit",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5005,7 +5004,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_callmeta@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1637",
+      "id": "dmsdk:dm_luaL_callmeta@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1638",
       "symbol": "dm_luaL_callmeta",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5050,7 +5049,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkany@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1648",
+      "id": "dmsdk:dm_luaL_checkany@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1649",
       "symbol": "dm_luaL_checkany",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5088,7 +5087,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1644",
+      "id": "dmsdk:dm_luaL_checkinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1645",
       "symbol": "dm_luaL_checkinteger",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5127,7 +5126,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checklstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1640",
+      "id": "dmsdk:dm_luaL_checklstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1641",
       "symbol": "dm_luaL_checklstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5172,7 +5171,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checknumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1642",
+      "id": "dmsdk:dm_luaL_checknumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1643",
       "symbol": "dm_luaL_checknumber",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5211,7 +5210,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkoption@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1653",
+      "id": "dmsdk:dm_luaL_checkoption@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1654",
       "symbol": "dm_luaL_checkoption",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5263,7 +5262,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1646",
+      "id": "dmsdk:dm_luaL_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1647",
       "symbol": "dm_luaL_checkstack",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5308,7 +5307,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checktype@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1647",
+      "id": "dmsdk:dm_luaL_checktype@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1648",
       "symbol": "dm_luaL_checktype",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5353,7 +5352,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkudata@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1650",
+      "id": "dmsdk:dm_luaL_checkudata@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1651",
       "symbol": "dm_luaL_checkudata",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5398,7 +5397,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_error@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1652",
+      "id": "dmsdk:dm_luaL_error@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1653",
       "symbol": "dm_luaL_error",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5437,7 +5436,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_findtable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1661",
+      "id": "dmsdk:dm_luaL_findtable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1662",
       "symbol": "dm_luaL_findtable",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5489,7 +5488,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_getmetafield@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1636",
+      "id": "dmsdk:dm_luaL_getmetafield@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1637",
       "symbol": "dm_luaL_getmetafield",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5534,7 +5533,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_gsub@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1660",
+      "id": "dmsdk:dm_luaL_gsub@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1661",
       "symbol": "dm_luaL_gsub",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5586,7 +5585,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_loadbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1657",
+      "id": "dmsdk:dm_luaL_loadbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1658",
       "symbol": "dm_luaL_loadbuffer",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5638,7 +5637,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_loadfile@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1656",
+      "id": "dmsdk:dm_luaL_loadfile@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1657",
       "symbol": "dm_luaL_loadfile",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5676,7 +5675,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_loadstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1658",
+      "id": "dmsdk:dm_luaL_loadstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1659",
       "symbol": "dm_luaL_loadstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5714,7 +5713,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_newmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1649",
+      "id": "dmsdk:dm_luaL_newmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1650",
       "symbol": "dm_luaL_newmetatable",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5752,7 +5751,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1659",
+      "id": "dmsdk:dm_luaL_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1660",
       "symbol": "dm_luaL_newstate",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5775,7 +5774,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_openlib@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1634",
+      "id": "dmsdk:dm_luaL_openlib@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1635",
       "symbol": "dm_luaL_openlib",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5827,7 +5826,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_optinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1645",
+      "id": "dmsdk:dm_luaL_optinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1646",
       "symbol": "dm_luaL_optinteger",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5873,7 +5872,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_optlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1641",
+      "id": "dmsdk:dm_luaL_optlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1642",
       "symbol": "dm_luaL_optlstring",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5925,7 +5924,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_optnumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1643",
+      "id": "dmsdk:dm_luaL_optnumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1644",
       "symbol": "dm_luaL_optnumber",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -5971,7 +5970,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_prepbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1665",
+      "id": "dmsdk:dm_luaL_prepbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1666",
       "symbol": "dm_luaL_prepbuffer",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -6002,7 +6001,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_pushresult@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1669",
+      "id": "dmsdk:dm_luaL_pushresult@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1670",
       "symbol": "dm_luaL_pushresult",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -6033,7 +6032,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_ref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1654",
+      "id": "dmsdk:dm_luaL_ref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1655",
       "symbol": "dm_luaL_ref",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -6071,7 +6070,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_register@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1635",
+      "id": "dmsdk:dm_luaL_register@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1636",
       "symbol": "dm_luaL_register",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -6116,7 +6115,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_typerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1638",
+      "id": "dmsdk:dm_luaL_typerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1639",
       "symbol": "dm_luaL_typerror",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -6161,7 +6160,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_unref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1655",
+      "id": "dmsdk:dm_luaL_unref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1656",
       "symbol": "dm_luaL_unref",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -6206,7 +6205,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_where@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1651",
+      "id": "dmsdk:dm_luaL_where@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1652",
       "symbol": "dm_luaL_where",
       "kind": "function",
       "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
@@ -21538,7 +21537,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidActivity@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:175:1499",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidActivity@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:175:1500",
       "symbol": "dmGraphics::GetNativeAndroidActivity",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21564,7 +21563,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidApp@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:184:1500",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidApp@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:184:1501",
       "symbol": "dmGraphics::GetNativeAndroidApp",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21590,7 +21589,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:148:1496",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:148:1497",
       "symbol": "dmGraphics::GetNativeAndroidEGLContext",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21616,7 +21615,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLSurface@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:157:1497",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLSurface@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:157:1498",
       "symbol": "dmGraphics::GetNativeAndroidEGLSurface",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21642,7 +21641,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidJavaVM@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:166:1498",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidJavaVM@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:166:1499",
       "symbol": "dmGraphics::GetNativeAndroidJavaVM",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21668,7 +21667,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeiOSEAGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:94:1490",
+      "id": "dmsdk:dmGraphics::GetNativeiOSEAGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:94:1491",
       "symbol": "dmGraphics::GetNativeiOSEAGLContext",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21678,22 +21677,23 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "unknown:id()",
+      "shape": "opaque-pointer()",
       "result": {
-        "role": "unknown:id",
-        "direction": "value",
-        "nativeType": "id"
+        "role": "opaque-pointer",
+        "direction": "inout",
+        "nativeType": "id",
+        "alias": "id"
       },
       "parameters": [],
-      "tranche": "manual-triage-required",
+      "tranche": "pointer-lifetime-adapters",
       "blockers": [
         "native-symbol-linkage-unverified",
         "per-target-feature-and-symbol-matrix",
-        "type-lowering-unresolved"
+        "pointer-bounds-direction-lifetime-policy"
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeiOSUIView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:85:1489",
+      "id": "dmsdk:dmGraphics::GetNativeiOSUIView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:85:1490",
       "symbol": "dmGraphics::GetNativeiOSUIView",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21703,22 +21703,23 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "unknown:id()",
+      "shape": "opaque-pointer()",
       "result": {
-        "role": "unknown:id",
-        "direction": "value",
-        "nativeType": "id"
+        "role": "opaque-pointer",
+        "direction": "inout",
+        "nativeType": "id",
+        "alias": "id"
       },
       "parameters": [],
-      "tranche": "manual-triage-required",
+      "tranche": "pointer-lifetime-adapters",
       "blockers": [
         "native-symbol-linkage-unverified",
         "per-target-feature-and-symbol-matrix",
-        "type-lowering-unresolved"
+        "pointer-bounds-direction-lifetime-policy"
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeiOSUIWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:76:1488",
+      "id": "dmsdk:dmGraphics::GetNativeiOSUIWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:76:1489",
       "symbol": "dmGraphics::GetNativeiOSUIWindow",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21728,22 +21729,23 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "unknown:id()",
+      "shape": "opaque-pointer()",
       "result": {
-        "role": "unknown:id",
-        "direction": "value",
-        "nativeType": "id"
+        "role": "opaque-pointer",
+        "direction": "inout",
+        "nativeType": "id",
+        "alias": "id"
       },
       "parameters": [],
-      "tranche": "manual-triage-required",
+      "tranche": "pointer-lifetime-adapters",
       "blockers": [
         "native-symbol-linkage-unverified",
         "per-target-feature-and-symbol-matrix",
-        "type-lowering-unresolved"
+        "pointer-bounds-direction-lifetime-policy"
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeOSXNSOpenGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:121:1493",
+      "id": "dmsdk:dmGraphics::GetNativeOSXNSOpenGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:121:1494",
       "symbol": "dmGraphics::GetNativeOSXNSOpenGLContext",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21753,22 +21755,23 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "unknown:id()",
+      "shape": "opaque-pointer()",
       "result": {
-        "role": "unknown:id",
-        "direction": "value",
-        "nativeType": "id"
+        "role": "opaque-pointer",
+        "direction": "inout",
+        "nativeType": "id",
+        "alias": "id"
       },
       "parameters": [],
-      "tranche": "manual-triage-required",
+      "tranche": "pointer-lifetime-adapters",
       "blockers": [
         "native-symbol-linkage-unverified",
         "per-target-feature-and-symbol-matrix",
-        "type-lowering-unresolved"
+        "pointer-bounds-direction-lifetime-policy"
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeOSXNSView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:112:1492",
+      "id": "dmsdk:dmGraphics::GetNativeOSXNSView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:112:1493",
       "symbol": "dmGraphics::GetNativeOSXNSView",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21778,22 +21781,23 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "unknown:id()",
+      "shape": "opaque-pointer()",
       "result": {
-        "role": "unknown:id",
-        "direction": "value",
-        "nativeType": "id"
+        "role": "opaque-pointer",
+        "direction": "inout",
+        "nativeType": "id",
+        "alias": "id"
       },
       "parameters": [],
-      "tranche": "manual-triage-required",
+      "tranche": "pointer-lifetime-adapters",
       "blockers": [
         "native-symbol-linkage-unverified",
         "per-target-feature-and-symbol-matrix",
-        "type-lowering-unresolved"
+        "pointer-bounds-direction-lifetime-policy"
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeOSXNSWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:103:1491",
+      "id": "dmsdk:dmGraphics::GetNativeOSXNSWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:103:1492",
       "symbol": "dmGraphics::GetNativeOSXNSWindow",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21803,22 +21807,23 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "unknown:id()",
+      "shape": "opaque-pointer()",
       "result": {
-        "role": "unknown:id",
-        "direction": "value",
-        "nativeType": "id"
+        "role": "opaque-pointer",
+        "direction": "inout",
+        "nativeType": "id",
+        "alias": "id"
       },
       "parameters": [],
-      "tranche": "manual-triage-required",
+      "tranche": "pointer-lifetime-adapters",
       "blockers": [
         "native-symbol-linkage-unverified",
         "per-target-feature-and-symbol-matrix",
-        "type-lowering-unresolved"
+        "pointer-bounds-direction-lifetime-policy"
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeWindowsHGLRC@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:139:1495",
+      "id": "dmsdk:dmGraphics::GetNativeWindowsHGLRC@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:139:1496",
       "symbol": "dmGraphics::GetNativeWindowsHGLRC",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21841,7 +21846,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeWindowsHWND@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:130:1494",
+      "id": "dmsdk:dmGraphics::GetNativeWindowsHWND@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:130:1495",
       "symbol": "dmGraphics::GetNativeWindowsHWND",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21864,7 +21869,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeX11GLXContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:202:1502",
+      "id": "dmsdk:dmGraphics::GetNativeX11GLXContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:202:1503",
       "symbol": "dmGraphics::GetNativeX11GLXContext",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -21890,7 +21895,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeX11Window@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:193:1501",
+      "id": "dmsdk:dmGraphics::GetNativeX11Window@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:193:1502",
       "symbol": "dmGraphics::GetNativeX11Window",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
@@ -23522,7 +23527,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::OpenGLGetDefaultFramebufferId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:47:1504",
+      "id": "dmsdk:dmGraphics::OpenGLGetDefaultFramebufferId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:47:1505",
       "symbol": "dmGraphics::OpenGLGetDefaultFramebufferId",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h",
@@ -23555,7 +23560,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::OpenGLGetRenderTargetId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:39:1503",
+      "id": "dmsdk:dmGraphics::OpenGLGetRenderTargetId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:39:1504",
       "symbol": "dmGraphics::OpenGLGetRenderTargetId",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h",
@@ -25217,7 +25222,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1517",
+      "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518",
       "symbol": "dmGraphics::VulkanCreateDescriptorPool",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25266,7 +25271,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:50:1505",
+      "id": "dmsdk:dmGraphics::VulkanGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:50:1506",
       "symbol": "dmGraphics::VulkanGetActiveSwapChainTexture",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25299,7 +25304,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1514",
+      "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1515",
       "symbol": "dmGraphics::VulkanGetCurrentFrameCommandBuffer",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25332,7 +25337,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1508",
+      "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509",
       "symbol": "dmGraphics::VulkanGetDevice",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25365,7 +25370,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1512",
+      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513",
       "symbol": "dmGraphics::VulkanGetGraphicsQueue",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25398,7 +25403,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1511",
+      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1512",
       "symbol": "dmGraphics::VulkanGetGraphicsQueueFamily",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25431,7 +25436,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1515",
+      "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516",
       "symbol": "dmGraphics::VulkanGetImage",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25471,7 +25476,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1516",
+      "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517",
       "symbol": "dmGraphics::VulkanGetImageView",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25511,7 +25516,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1510",
+      "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511",
       "symbol": "dmGraphics::VulkanGetInstance",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25544,7 +25549,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1509",
+      "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510",
       "symbol": "dmGraphics::VulkanGetPhysicalDevice",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25577,7 +25582,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1513",
+      "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514",
       "symbol": "dmGraphics::VulkanGetRenderPass",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25610,7 +25615,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1507",
+      "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1508",
       "symbol": "dmGraphics::VulkanGraphicsCommandQueueToMetal",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25645,7 +25650,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1506",
+      "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1507",
       "symbol": "dmGraphics::VulkanTextureToMetal",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
@@ -25688,7 +25693,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1533",
+      "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1534",
       "symbol": "dmGraphics::WebGPUGetActiveCommandEncoder",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25721,7 +25726,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:56:1532",
+      "id": "dmsdk:dmGraphics::WebGPUGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:56:1533",
       "symbol": "dmGraphics::WebGPUGetActiveSwapChainTexture",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25754,7 +25759,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1527",
+      "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1528",
       "symbol": "dmGraphics::WebGPUGetAdapter",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25787,7 +25792,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1528",
+      "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1529",
       "symbol": "dmGraphics::WebGPUGetDevice",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25820,7 +25825,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1526",
+      "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1527",
       "symbol": "dmGraphics::WebGPUGetInstance",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25853,7 +25858,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1529",
+      "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1530",
       "symbol": "dmGraphics::WebGPUGetQueue",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25886,7 +25891,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1531",
+      "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1532",
       "symbol": "dmGraphics::WebGPUGetTexture",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25926,7 +25931,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1530",
+      "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1531",
       "symbol": "dmGraphics::WebGPUGetTextureView",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25966,7 +25971,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1535",
+      "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1536",
       "symbol": "dmGraphics::WebGPURenderPassBegin",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -25999,7 +26004,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1534",
+      "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1535",
       "symbol": "dmGraphics::WebGPURenderPassEnd",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
@@ -26032,7 +26037,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::DeleteNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:242:1553",
+      "id": "dmsdk:dmGui::DeleteNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:242:1554",
       "symbol": "dmGui::DeleteNode",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26070,7 +26075,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetFirstChildNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:290:1558",
+      "id": "dmsdk:dmGui::GetFirstChildNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:290:1559",
       "symbol": "dmGui::GetFirstChildNode",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26108,7 +26113,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNextNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:299:1559",
+      "id": "dmsdk:dmGui::GetNextNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:299:1560",
       "symbol": "dmGui::GetNextNode",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26146,7 +26151,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1570",
+      "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1571",
       "symbol": "dmGui::GetNodeCustomData",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26186,7 +26191,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1565",
+      "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1566",
       "symbol": "dmGui::GetNodeCustomProperty",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26243,7 +26248,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1569",
+      "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1570",
       "symbol": "dmGui::GetNodeCustomType",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26281,7 +26286,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:261:1555",
+      "id": "dmsdk:dmGui::GetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:261:1556",
       "symbol": "dmGui::GetNodeId",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26319,7 +26324,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:308:1560",
+      "id": "dmsdk:dmGui::GetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:308:1561",
       "symbol": "dmGui::GetNodeIsBone",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26357,7 +26362,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:281:1557",
+      "id": "dmsdk:dmGui::GetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:281:1558",
       "symbol": "dmGui::GetNodeParent",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26395,7 +26400,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:360:1563",
+      "id": "dmsdk:dmGui::GetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:360:1564",
       "symbol": "dmGui::GetNodeProperty",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26442,7 +26447,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1571",
+      "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1572",
       "symbol": "dmGui::GetNodeTextureId",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26480,7 +26485,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetResource@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:474:1574",
+      "id": "dmsdk:dmGui::GetResource@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:474:1575",
       "symbol": "dmGui::GetResource",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26527,7 +26532,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::LuaCheckNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:488:1577",
+      "id": "dmsdk:dmGui::LuaCheckNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:488:1578",
       "symbol": "dmGui::LuaCheckNode",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26567,7 +26572,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::LuaCheckScene@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:487:1576",
+      "id": "dmsdk:dmGui::LuaCheckScene@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:487:1577",
       "symbol": "dmGui::LuaCheckScene",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26600,7 +26605,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1575",
+      "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1576",
       "symbol": "dmGui::LuaPushNode",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26647,7 +26652,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::NewNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:234:1552",
+      "id": "dmsdk:dmGui::NewNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:234:1553",
       "symbol": "dmGui::NewNode",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26709,7 +26714,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1568",
+      "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1569",
       "symbol": "dmGui::SetNodeAdjustMode",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26755,7 +26760,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1566",
+      "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1567",
       "symbol": "dmGui::SetNodeCustomProperty",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26810,7 +26815,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1554",
+      "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1555",
       "symbol": "dmGui::SetNodeId",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26855,7 +26860,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:317:1561",
+      "id": "dmsdk:dmGui::SetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:317:1562",
       "symbol": "dmGui::SetNodeIsBone",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26900,7 +26905,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:272:1556",
+      "id": "dmsdk:dmGui::SetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:272:1557",
       "symbol": "dmGui::SetNodeParent",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -26953,7 +26958,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1564",
+      "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1565",
       "symbol": "dmGui::SetNodeProperty",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -27008,7 +27013,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1572",
+      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1573",
       "symbol": "dmGui::SetNodeTexture",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -27054,7 +27059,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1573",
+      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1574",
       "symbol": "dmGui::SetNodeTexture",
       "kind": "function",
       "header": "upstream/defold/engine/gui/src/dmsdk/gui/gui.h",
@@ -28533,7 +28538,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1628",
+      "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1629",
       "symbol": "dmHID::AddKeyboardChar",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28571,7 +28576,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::AddTouch@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:659:1619",
+      "id": "dmsdk:dmHID::AddTouch@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:659:1620",
       "symbol": "dmHID::AddTouch",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28631,7 +28636,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1618",
+      "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1619",
       "symbol": "dmHID::FormatGamepadGuid",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28671,7 +28676,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepad@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:609:1614",
+      "id": "dmsdk:dmHID::GetGamepad@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:609:1615",
       "symbol": "dmHID::GetGamepad",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28709,7 +28714,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:751:1630",
+      "id": "dmsdk:dmHID::GetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:751:1631",
       "symbol": "dmHID::GetGamepadButton",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28747,7 +28752,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1617",
+      "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1618",
       "symbol": "dmHID::GetGamepadDeviceGuid",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28796,7 +28801,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadDeviceName@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:629:1616",
+      "id": "dmsdk:dmHID::GetGamepadDeviceName@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:629:1617",
       "symbol": "dmHID::GetGamepadDeviceName",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28843,7 +28848,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1631",
+      "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1632",
       "symbol": "dmHID::GetGamepadHat",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28890,7 +28895,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1629",
+      "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1630",
       "symbol": "dmHID::GetGamepadPacket",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28932,7 +28937,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1615",
+      "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
       "symbol": "dmHID::GetGamepadUserId",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -28981,7 +28986,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetKeyboard@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:584:1611",
+      "id": "dmsdk:dmHID::GetKeyboard@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:584:1612",
       "symbol": "dmHID::GetKeyboard",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29019,7 +29024,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetMouse@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:592:1612",
+      "id": "dmsdk:dmHID::GetMouse@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:592:1613",
       "symbol": "dmHID::GetMouse",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29057,7 +29062,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:718:1626",
+      "id": "dmsdk:dmHID::GetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:718:1627",
       "symbol": "dmHID::GetMouseButton",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29097,7 +29102,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetMousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:708:1625",
+      "id": "dmsdk:dmHID::GetMousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:708:1626",
       "symbol": "dmHID::GetMousePacket",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29139,7 +29144,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetTouchDevice@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:600:1613",
+      "id": "dmsdk:dmHID::GetTouchDevice@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:600:1614",
       "symbol": "dmHID::GetTouchDevice",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29177,7 +29182,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1621",
+      "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1622",
       "symbol": "dmHID::SetGamepadAxis",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29222,7 +29227,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:667:1620",
+      "id": "dmsdk:dmHID::SetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:667:1621",
       "symbol": "dmHID::SetGamepadButton",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29267,7 +29272,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetKey@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:726:1627",
+      "id": "dmsdk:dmHID::SetKey@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:726:1628",
       "symbol": "dmHID::SetKey",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29313,7 +29318,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1622",
+      "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1623",
       "symbol": "dmHID::SetMouseButton",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29359,7 +29364,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1623",
+      "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1624",
       "symbol": "dmHID::SetMousePosition",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -29404,7 +29409,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetMouseWheel@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:698:1624",
+      "id": "dmsdk:dmHID::SetMouseWheel@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:698:1625",
       "symbol": "dmHID::SetMouseWheel",
       "kind": "function",
       "header": "upstream/defold/engine/hid/src/dmsdk/hid/hid.h",
@@ -31978,7 +31983,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::AddToRender@upstream/defold/engine/render/src/dmsdk/render/render.h:447:1834",
+      "id": "dmsdk:dmRender::AddToRender@upstream/defold/engine/render/src/dmsdk/render/render.h:447:1835",
       "symbol": "dmRender::AddToRender",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32019,7 +32024,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1869",
+      "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1870",
       "symbol": "dmRender::ApplyMaterialConstants",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32066,7 +32071,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1870",
+      "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1871",
       "symbol": "dmRender::ApplyMaterialSampler",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32125,7 +32130,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ClearMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:688:1862",
+      "id": "dmsdk:dmRender::ClearMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:688:1863",
       "symbol": "dmRender::ClearMaterialTags",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32156,7 +32161,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1848",
+      "id": "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1849",
       "symbol": "dmRender::ClearNamedConstantBuffer",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32187,7 +32192,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::DeleteConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:470:1837",
+      "id": "dmsdk:dmRender::DeleteConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:470:1838",
       "symbol": "dmRender::DeleteConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32218,7 +32223,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::DeleteMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:682:1861",
+      "id": "dmsdk:dmRender::DeleteMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:682:1862",
       "symbol": "dmRender::DeleteMaterial",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32256,7 +32261,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::DeleteNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:551:1847",
+      "id": "dmsdk:dmRender::DeleteNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:551:1848",
       "symbol": "dmRender::DeleteNamedConstantBuffer",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32287,7 +32292,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:513:1842",
+      "id": "dmsdk:dmRender::GetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:513:1843",
       "symbol": "dmRender::GetConstantLocation",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32318,7 +32323,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:497:1840",
+      "id": "dmsdk:dmRender::GetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:497:1841",
       "symbol": "dmRender::GetConstantName",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32349,7 +32354,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1844",
+      "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1845",
       "symbol": "dmRender::GetConstantType",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32380,7 +32385,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1838",
+      "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1839",
       "symbol": "dmRender::GetConstantValues",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32422,7 +32427,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:731:1866",
+      "id": "dmsdk:dmRender::GetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:731:1867",
       "symbol": "dmRender::GetMaterialSampler",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32460,7 +32465,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1867",
+      "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1868",
       "symbol": "dmRender::GetMaterialSamplerNameHash",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32498,7 +32503,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSamplerUnit@upstream/defold/engine/render/src/dmsdk/render/render.h:747:1868",
+      "id": "dmsdk:dmRender::GetMaterialSamplerUnit@upstream/defold/engine/render/src/dmsdk/render/render.h:747:1869",
       "symbol": "dmRender::GetMaterialSamplerUnit",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32536,7 +32541,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialTagListKey@upstream/defold/engine/render/src/dmsdk/render/render.h:455:1835",
+      "id": "dmsdk:dmRender::GetMaterialTagListKey@upstream/defold/engine/render/src/dmsdk/render/render.h:455:1836",
       "symbol": "dmRender::GetMaterialTagListKey",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32567,7 +32572,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1810",
+      "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1811",
       "symbol": "dmRender::GetMaterialVertexSpace",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32598,7 +32603,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1854",
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855",
       "symbol": "dmRender::GetNamedConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32654,7 +32659,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1855",
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
       "symbol": "dmRender::GetNamedConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32717,7 +32722,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1856",
+      "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857",
       "symbol": "dmRender::GetNamedConstantCount",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32748,7 +32753,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1859",
+      "id": "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1860",
       "symbol": "dmRender::GetViewMatrix",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32781,7 +32786,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::IterateNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:660:1858",
+      "id": "dmsdk:dmRender::IterateNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:660:1859",
       "symbol": "dmRender::IterateNamedConstants",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32830,7 +32835,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::NewConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:463:1836",
+      "id": "dmsdk:dmRender::NewConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:463:1837",
       "symbol": "dmRender::NewConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32861,7 +32866,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::NewMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:675:1860",
+      "id": "dmsdk:dmRender::NewMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:675:1861",
       "symbol": "dmRender::NewMaterial",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32899,7 +32904,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::NewNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:544:1846",
+      "id": "dmsdk:dmRender::NewNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:544:1847",
       "symbol": "dmRender::NewNamedConstantBuffer",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32922,7 +32927,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1849",
+      "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1850",
       "symbol": "dmRender::RemoveNamedConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -32960,7 +32965,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1832",
+      "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1833",
       "symbol": "dmRender::RenderListAlloc",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33000,7 +33005,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:416:1830",
+      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:416:1831",
       "symbol": "dmRender::RenderListMakeDispatch",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33056,7 +33061,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:419:1831",
+      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:419:1832",
       "symbol": "dmRender::RenderListMakeDispatch",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33105,7 +33110,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1833",
+      "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1834",
       "symbol": "dmRender::RenderListSubmit",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33152,7 +33157,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderObject::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:204:1816",
+      "id": "dmsdk:dmRender::RenderObject::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:204:1817",
       "symbol": "dmRender::RenderObject::Init",
       "kind": "method",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33174,7 +33179,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderObject::RenderObject@upstream/defold/engine/render/src/dmsdk/render/render.h:203:1815",
+      "id": "dmsdk:dmRender::RenderObject::RenderObject@upstream/defold/engine/render/src/dmsdk/render/render.h:203:1816",
       "symbol": "dmRender::RenderObject::RenderObject",
       "kind": "constructor",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33196,7 +33201,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1843",
+      "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1844",
       "symbol": "dmRender::SetConstantLocation",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33234,7 +33239,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1841",
+      "id": "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1842",
       "symbol": "dmRender::SetConstantName",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33272,7 +33277,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1845",
+      "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846",
       "symbol": "dmRender::SetConstantType",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33310,7 +33315,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1839",
+      "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1840",
       "symbol": "dmRender::SetConstantValues",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33358,7 +33363,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1864",
+      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1865",
       "symbol": "dmRender::SetMaterialSampler",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33446,7 +33451,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1865",
+      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1866",
       "symbol": "dmRender::SetMaterialSampler",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33527,7 +33532,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:696:1863",
+      "id": "dmsdk:dmRender::SetMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:696:1864",
       "symbol": "dmRender::SetMaterialTags",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33576,7 +33581,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1850",
+      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1851",
       "symbol": "dmRender::SetNamedConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33630,7 +33635,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1851",
+      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852",
       "symbol": "dmRender::SetNamedConstant",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33691,7 +33696,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1853",
+      "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854",
       "symbol": "dmRender::SetNamedConstantAtIndex",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33760,7 +33765,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1852",
+      "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853",
       "symbol": "dmRender::SetNamedConstants",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33807,7 +33812,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::StencilTestParams::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:145:1813",
+      "id": "dmsdk:dmRender::StencilTestParams::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:145:1814",
       "symbol": "dmRender::StencilTestParams::Init",
       "kind": "method",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33829,7 +33834,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::StencilTestParams::StencilTestParams@upstream/defold/engine/render/src/dmsdk/render/render.h:144:1812",
+      "id": "dmsdk:dmRender::StencilTestParams::StencilTestParams@upstream/defold/engine/render/src/dmsdk/render/render.h:144:1813",
       "symbol": "dmRender::StencilTestParams::StencilTestParams",
       "kind": "constructor",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
@@ -33851,7 +33856,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:230:2009",
+      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:230:2010",
       "symbol": "dmResource::AddFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -33908,7 +33913,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:204:1974",
+      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:204:1975",
       "symbol": "dmResource::AddFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -33965,7 +33970,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::AllocateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:312:1988",
+      "id": "dmsdk:dmResource::AllocateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:312:1989",
       "symbol": "dmResource::AllocateResourceType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34004,7 +34009,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::CreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:104:1964",
+      "id": "dmsdk:dmResource::CreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:104:1965",
       "symbol": "dmResource::CreateResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34070,7 +34075,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::FreeResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:313:1989",
+      "id": "dmsdk:dmResource::FreeResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:313:1990",
       "symbol": "dmResource::FreeResourceType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34108,7 +34113,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2001",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2002",
       "symbol": "dmResource::Get",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34158,7 +34163,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1960",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1961",
       "symbol": "dmResource::Get",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34208,7 +34213,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1962",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1963",
       "symbol": "dmResource::Get",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34258,7 +34263,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2002",
+      "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2003",
       "symbol": "dmResource::GetByHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34308,7 +34313,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1969",
+      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
       "symbol": "dmResource::GetCanonicalPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34357,7 +34362,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1991",
+      "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1992",
       "symbol": "dmResource::GetContext",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34390,7 +34395,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:176:2004",
+      "id": "dmsdk:dmResource::GetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:176:2005",
       "symbol": "dmResource::GetDescriptor",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34438,7 +34443,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2005",
+      "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2006",
       "symbol": "dmResource::GetDescriptorByHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34486,7 +34491,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1968",
+      "id": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
       "symbol": "dmResource::GetExtFromPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34516,7 +34521,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:322:1993",
+      "id": "dmsdk:dmResource::GetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:322:1994",
       "symbol": "dmResource::GetName",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34548,7 +34553,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2011",
+      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2012",
       "symbol": "dmResource::GetNameHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34579,7 +34584,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:325:1994",
+      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:325:1995",
       "symbol": "dmResource::GetNameHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34610,7 +34615,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2008",
+      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2009",
       "symbol": "dmResource::GetPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34660,7 +34665,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:133:1967",
+      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:133:1968",
       "symbol": "dmResource::GetPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34708,7 +34713,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2015",
+      "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2016",
       "symbol": "dmResource::GetPrevResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34741,7 +34746,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:170:2003",
+      "id": "dmsdk:dmResource::GetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:170:2004",
       "symbol": "dmResource::GetRaw",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34800,7 +34805,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2013",
+      "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2014",
       "symbol": "dmResource::GetResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34833,7 +34838,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2017",
+      "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2018",
       "symbol": "dmResource::GetResourceSize",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34864,7 +34869,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetType@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:288:2018",
+      "id": "dmsdk:dmResource::GetType@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:288:2019",
       "symbol": "dmResource::GetType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -34895,7 +34900,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:285:1985",
+      "id": "dmsdk:dmResource::GetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:285:1986",
       "symbol": "dmResource::GetTypeFromExtension",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34943,7 +34948,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:1986",
+      "id": "dmsdk:dmResource::GetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:1987",
       "symbol": "dmResource::GetTypeFromExtensionHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -34991,7 +34996,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1961",
+      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1962",
       "symbol": "dmResource::GetWithExt",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35048,7 +35053,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1963",
+      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1964",
       "symbol": "dmResource::GetWithExt",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35105,7 +35110,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1976",
+      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1977",
       "symbol": "dmResource::IncRef",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35145,7 +35150,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1977",
+      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1978",
       "symbol": "dmResource::IncRef",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35183,7 +35188,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:204:2007",
+      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:204:2008",
       "symbol": "dmResource::PreloadHint",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -35222,7 +35227,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:123:1966",
+      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:123:1967",
       "symbol": "dmResource::PreloadHint",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35261,7 +35266,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RegisterResourceDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:169:1971",
+      "id": "dmsdk:dmResource::RegisterResourceDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:169:1972",
       "symbol": "dmResource::RegisterResourceDecryptionFunction",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35292,7 +35297,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RegisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:179:1972",
+      "id": "dmsdk:dmResource::RegisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:179:1973",
       "symbol": "dmResource::RegisterResourceReloadedCallback",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35341,7 +35346,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:268:1984",
+      "id": "dmsdk:dmResource::RegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:268:1985",
       "symbol": "dmResource::RegisterType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35426,7 +35431,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:192:2006",
+      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:192:2007",
       "symbol": "dmResource::Release",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -35466,7 +35471,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:112:1965",
+      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:112:1966",
       "symbol": "dmResource::Release",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35506,7 +35511,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:240:2010",
+      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:240:2011",
       "symbol": "dmResource::RemoveFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -35546,7 +35551,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:213:1975",
+      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:213:1976",
       "symbol": "dmResource::RemoveFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35586,7 +35591,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:319:1992",
+      "id": "dmsdk:dmResource::SetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:319:1993",
       "symbol": "dmResource::SetContext",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35626,7 +35631,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2014",
+      "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2015",
       "symbol": "dmResource::SetPrevResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -35666,7 +35671,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2012",
+      "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2013",
       "symbol": "dmResource::SetResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -35706,7 +35711,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2016",
+      "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2017",
       "symbol": "dmResource::SetResourceSize",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
@@ -35744,7 +35749,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetupType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:302:1987",
+      "id": "dmsdk:dmResource::SetupType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:302:1988",
       "symbol": "dmResource::SetupType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35829,7 +35834,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::UnregisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:189:1973",
+      "id": "dmsdk:dmResource::UnregisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:189:1974",
       "symbol": "dmResource::UnregisterResourceReloadedCallback",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35878,7 +35883,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::ValidateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:1990",
+      "id": "dmsdk:dmResource::ValidateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:1991",
       "symbol": "dmResource::ValidateResourceType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
@@ -35910,7 +35915,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2049",
+      "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2050",
       "symbol": "dmRig::CancelAnimation",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -35942,7 +35947,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2073",
+      "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074",
       "symbol": "dmRig::CopyBindPose",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -35983,7 +35988,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::DeleteContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:168:2044",
+      "id": "dmsdk:dmRig::DeleteContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:168:2045",
       "symbol": "dmRig::DeleteContext",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36014,7 +36019,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2053",
+      "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054",
       "symbol": "dmRig::GenerateVertexData",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36079,7 +36084,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2052",
+      "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053",
       "symbol": "dmRig::GenerateVertexDataFromAttributes",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36167,7 +36172,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2050",
+      "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2051",
       "symbol": "dmRig::GetAnimation",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36198,7 +36203,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:212:2067",
+      "id": "dmsdk:dmRig::GetBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:212:2068",
       "symbol": "dmRig::GetBoneCount",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36229,7 +36234,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:202:2057",
+      "id": "dmsdk:dmRig::GetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:202:2058",
       "symbol": "dmRig::GetCursor",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36267,7 +36272,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:210:2065",
+      "id": "dmsdk:dmRig::GetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:210:2066",
       "symbol": "dmRig::GetEnabled",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36298,7 +36303,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:207:2062",
+      "id": "dmsdk:dmRig::GetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:207:2063",
       "symbol": "dmRig::GetIKTarget",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36338,7 +36343,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2068",
+      "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2069",
       "symbol": "dmRig::GetMaxBoneCount",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36369,7 +36374,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2056",
+      "id": "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2057",
       "symbol": "dmRig::GetModel",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36400,7 +36405,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2070",
+      "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2071",
       "symbol": "dmRig::GetMorphWeights",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36449,7 +36454,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2059",
+      "id": "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2060",
       "symbol": "dmRig::GetPlaybackRate",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36480,7 +36485,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:206:2061",
+      "id": "dmsdk:dmRig::GetPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:206:2062",
       "symbol": "dmRig::GetPose",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36514,7 +36519,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2054",
+      "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2055",
       "symbol": "dmRig::GetVertexCount",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36545,7 +36550,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::HasPoseMatrixCacheAnimatedPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:215:2069",
+      "id": "dmsdk:dmRig::HasPoseMatrixCacheAnimatedPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:215:2070",
       "symbol": "dmRig::HasPoseMatrixCacheAnimatedPose",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36576,7 +36581,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::InstanceCreate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:171:2046",
+      "id": "dmsdk:dmRig::InstanceCreate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:171:2047",
       "symbol": "dmRig::InstanceCreate",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36627,7 +36632,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::InstanceDestroy@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:172:2047",
+      "id": "dmsdk:dmRig::InstanceDestroy@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:172:2048",
       "symbol": "dmRig::InstanceDestroy",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36666,7 +36671,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2066",
+      "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2067",
       "symbol": "dmRig::IsValid",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36697,7 +36702,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::NewContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:167:2043",
+      "id": "dmsdk:dmRig::NewContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:167:2044",
       "symbol": "dmRig::NewContext",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36739,7 +36744,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2048",
+      "id": "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2049",
       "symbol": "dmRig::PlayAnimation",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36806,7 +36811,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2063",
+      "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2064",
       "symbol": "dmRig::ResetIKTarget",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36844,7 +36849,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:203:2058",
+      "id": "dmsdk:dmRig::SetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:203:2059",
       "symbol": "dmRig::SetCursor",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36890,7 +36895,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2064",
+      "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2065",
       "symbol": "dmRig::SetEnabled",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36928,7 +36933,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetEventCallback@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:220:2072",
+      "id": "dmsdk:dmRig::SetEventCallback@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:220:2073",
       "symbol": "dmRig::SetEventCallback",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -36984,7 +36989,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2051",
+      "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2052",
       "symbol": "dmRig::SetMeshWriteAttributeParams",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -37117,7 +37122,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2055",
+      "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2056",
       "symbol": "dmRig::SetModel",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -37156,7 +37161,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:219:2071",
+      "id": "dmsdk:dmRig::SetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:219:2072",
       "symbol": "dmRig::SetMorphWeights",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -37212,7 +37217,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2060",
+      "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2061",
       "symbol": "dmRig::SetPlaybackRate",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -37251,7 +37256,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2045",
+      "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2046",
       "symbol": "dmRig::Update",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
@@ -37554,7 +37559,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckHash@upstream/defold/engine/script/src/dmsdk/script/script.h:452:2107",
+      "id": "dmsdk:dmScript::CheckHash@upstream/defold/engine/script/src/dmsdk/script/script.h:452:2108",
       "symbol": "dmScript::CheckHash",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37593,7 +37598,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:462:2108",
+      "id": "dmsdk:dmScript::CheckHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:462:2109",
       "symbol": "dmScript::CheckHashOrString",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37632,7 +37637,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:417:2103",
+      "id": "dmsdk:dmScript::CheckMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:417:2104",
       "symbol": "dmScript::CheckMatrix4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37670,7 +37675,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:379:2099",
+      "id": "dmsdk:dmScript::CheckQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:379:2100",
       "symbol": "dmScript::CheckQuat",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37708,7 +37713,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckTable@upstream/defold/engine/script/src/dmsdk/script/script.h:767:2134",
+      "id": "dmsdk:dmScript::CheckTable@upstream/defold/engine/script/src/dmsdk/script/script.h:767:2135",
       "symbol": "dmScript::CheckTable",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37762,7 +37767,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckTableSize@upstream/defold/engine/script/src/dmsdk/script/script.h:754:2133",
+      "id": "dmsdk:dmScript::CheckTableSize@upstream/defold/engine/script/src/dmsdk/script/script.h:754:2134",
       "symbol": "dmScript::CheckTableSize",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37800,7 +37805,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:508:2113",
+      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:508:2114",
       "symbol": "dmScript::CheckURL",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37838,7 +37843,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2114",
+      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2115",
       "symbol": "dmScript::CheckURL",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37878,7 +37883,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:305:2091",
+      "id": "dmsdk:dmScript::CheckVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:305:2092",
       "symbol": "dmScript::CheckVector3",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37916,7 +37921,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:342:2095",
+      "id": "dmsdk:dmScript::CheckVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:342:2096",
       "symbol": "dmScript::CheckVector4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37954,7 +37959,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CreateCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:611:2121",
+      "id": "dmsdk:dmScript::CreateCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:611:2122",
       "symbol": "dmScript::CreateCallback",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -37992,7 +37997,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::DestroyCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:623:2123",
+      "id": "dmsdk:dmScript::DestroyCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:623:2124",
       "symbol": "dmScript::DestroyCallback",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38023,7 +38028,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetCallbackLuaContext@upstream/defold/engine/script/src/dmsdk/script/script.h:630:2124",
+      "id": "dmsdk:dmScript::GetCallbackLuaContext@upstream/defold/engine/script/src/dmsdk/script/script.h:630:2125",
       "symbol": "dmScript::GetCallbackLuaContext",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38123,7 +38128,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:180:2083",
+      "id": "dmsdk:dmScript::GetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:180:2084",
       "symbol": "dmScript::GetInstance",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38154,7 +38159,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2087",
+      "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2088",
       "symbol": "dmScript::GetLuaState",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38187,7 +38192,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetMainThread@upstream/defold/engine/script/src/dmsdk/script/script.h:259:2086",
+      "id": "dmsdk:dmScript::GetMainThread@upstream/defold/engine/script/src/dmsdk/script/script.h:259:2087",
       "symbol": "dmScript::GetMainThread",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38218,7 +38223,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetStringFromHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:473:2109",
+      "id": "dmsdk:dmScript::GetStringFromHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:473:2110",
       "symbol": "dmScript::GetStringFromHashOrString",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38310,7 +38315,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsCallbackValid@upstream/defold/engine/script/src/dmsdk/script/script.h:617:2122",
+      "id": "dmsdk:dmScript::IsCallbackValid@upstream/defold/engine/script/src/dmsdk/script/script.h:617:2123",
       "symbol": "dmScript::IsCallbackValid",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38341,7 +38346,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsHash@upstream/defold/engine/script/src/dmsdk/script/script.h:426:2104",
+      "id": "dmsdk:dmScript::IsHash@upstream/defold/engine/script/src/dmsdk/script/script.h:426:2105",
       "symbol": "dmScript::IsHash",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38379,7 +38384,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsInstanceValid@upstream/defold/engine/script/src/dmsdk/script/script.h:197:2085",
+      "id": "dmsdk:dmScript::IsInstanceValid@upstream/defold/engine/script/src/dmsdk/script/script.h:197:2086",
       "symbol": "dmScript::IsInstanceValid",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38410,7 +38415,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:397:2101",
+      "id": "dmsdk:dmScript::IsMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:397:2102",
       "symbol": "dmScript::IsMatrix4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38448,7 +38453,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:360:2097",
+      "id": "dmsdk:dmScript::IsQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:360:2098",
       "symbol": "dmScript::IsQuat",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38486,7 +38491,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsURL@upstream/defold/engine/script/src/dmsdk/script/script.h:482:2110",
+      "id": "dmsdk:dmScript::IsURL@upstream/defold/engine/script/src/dmsdk/script/script.h:482:2111",
       "symbol": "dmScript::IsURL",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38524,7 +38529,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:285:2089",
+      "id": "dmsdk:dmScript::IsVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:285:2090",
       "symbol": "dmScript::IsVector3",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38562,7 +38567,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:323:2093",
+      "id": "dmsdk:dmScript::IsVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:323:2094",
       "symbol": "dmScript::IsVector4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38600,7 +38605,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2116",
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2117",
       "symbol": "dmScript::JsonToLua",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38647,7 +38652,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2117",
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2118",
       "symbol": "dmScript::JsonToLua",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38843,7 +38848,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::~LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:75:2078",
+      "id": "dmsdk:dmScript::LuaStackCheck::~LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:75:2079",
       "symbol": "dmScript::LuaStackCheck::~LuaStackCheck",
       "kind": "destructor",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38865,7 +38870,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::Error@upstream/defold/engine/script/src/dmsdk/script/script.h:78:2080",
+      "id": "dmsdk:dmScript::LuaStackCheck::Error@upstream/defold/engine/script/src/dmsdk/script/script.h:78:2081",
       "symbol": "dmScript::LuaStackCheck::Error",
       "kind": "method",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38897,7 +38902,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2077",
+      "id": "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2078",
       "symbol": "dmScript::LuaStackCheck::LuaStackCheck",
       "kind": "constructor",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38950,7 +38955,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::Verify@upstream/defold/engine/script/src/dmsdk/script/script.h:76:2079",
+      "id": "dmsdk:dmScript::LuaStackCheck::Verify@upstream/defold/engine/script/src/dmsdk/script/script.h:76:2080",
       "symbol": "dmScript::LuaStackCheck::Verify",
       "kind": "method",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -38980,7 +38985,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:546:2118",
+      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:546:2119",
       "symbol": "dmScript::LuaToJson",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39029,7 +39034,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:559:2119",
+      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:559:2120",
       "symbol": "dmScript::LuaToJson",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39092,7 +39097,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PCall@upstream/defold/engine/script/src/dmsdk/script/script.h:673:2127",
+      "id": "dmsdk:dmScript::PCall@upstream/defold/engine/script/src/dmsdk/script/script.h:673:2128",
       "symbol": "dmScript::PCall",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39218,7 +39223,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushDDF@upstream/defold/engine/script/src/dmsdk/script/script.h:527:2115",
+      "id": "dmsdk:dmScript::PushDDF@upstream/defold/engine/script/src/dmsdk/script/script.h:527:2116",
       "symbol": "dmScript::PushDDF",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39270,7 +39275,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushHash@upstream/defold/engine/script/src/dmsdk/script/script.h:443:2106",
+      "id": "dmsdk:dmScript::PushHash@upstream/defold/engine/script/src/dmsdk/script/script.h:443:2107",
       "symbol": "dmScript::PushHash",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39309,7 +39314,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:405:2102",
+      "id": "dmsdk:dmScript::PushMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:405:2103",
       "symbol": "dmScript::PushMatrix4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39349,7 +39354,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:368:2098",
+      "id": "dmsdk:dmScript::PushQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:368:2099",
       "symbol": "dmScript::PushQuat",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39389,7 +39394,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushTable@upstream/defold/engine/script/src/dmsdk/script/script.h:776:2135",
+      "id": "dmsdk:dmScript::PushTable@upstream/defold/engine/script/src/dmsdk/script/script.h:776:2136",
       "symbol": "dmScript::PushTable",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39436,7 +39441,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushURL@upstream/defold/engine/script/src/dmsdk/script/script.h:499:2112",
+      "id": "dmsdk:dmScript::PushURL@upstream/defold/engine/script/src/dmsdk/script/script.h:499:2113",
       "symbol": "dmScript::PushURL",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39476,7 +39481,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:294:2090",
+      "id": "dmsdk:dmScript::PushVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:294:2091",
       "symbol": "dmScript::PushVector3",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39516,7 +39521,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:331:2094",
+      "id": "dmsdk:dmScript::PushVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:331:2095",
       "symbol": "dmScript::PushVector4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39556,7 +39561,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::Ref@upstream/defold/engine/script/src/dmsdk/script/script.h:159:2081",
+      "id": "dmsdk:dmScript::Ref@upstream/defold/engine/script/src/dmsdk/script/script.h:159:2082",
       "symbol": "dmScript::Ref",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39594,7 +39599,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::RefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:691:2128",
+      "id": "dmsdk:dmScript::RefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:691:2129",
       "symbol": "dmScript::RefInInstance",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39625,7 +39630,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2130",
+      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2131",
       "symbol": "dmScript::ResolveURL",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39679,7 +39684,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2131",
+      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2132",
       "symbol": "dmScript::ResolveURL",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39735,7 +39740,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::SetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:189:2084",
+      "id": "dmsdk:dmScript::SetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:189:2085",
       "symbol": "dmScript::SetInstance",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39766,7 +39771,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::SetupCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:647:2125",
+      "id": "dmsdk:dmScript::SetupCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:647:2126",
       "symbol": "dmScript::SetupCallback",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39797,7 +39802,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::TeardownCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:661:2126",
+      "id": "dmsdk:dmScript::TeardownCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:661:2127",
       "symbol": "dmScript::TeardownCallback",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39867,7 +39872,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToHash@upstream/defold/engine/script/src/dmsdk/script/script.h:435:2105",
+      "id": "dmsdk:dmScript::ToHash@upstream/defold/engine/script/src/dmsdk/script/script.h:435:2106",
       "symbol": "dmScript::ToHash",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39906,7 +39911,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:388:2100",
+      "id": "dmsdk:dmScript::ToMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:388:2101",
       "symbol": "dmScript::ToMatrix4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39944,7 +39949,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:351:2096",
+      "id": "dmsdk:dmScript::ToQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:351:2097",
       "symbol": "dmScript::ToQuat",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -39982,7 +39987,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToURL@upstream/defold/engine/script/src/dmsdk/script/script.h:491:2111",
+      "id": "dmsdk:dmScript::ToURL@upstream/defold/engine/script/src/dmsdk/script/script.h:491:2112",
       "symbol": "dmScript::ToURL",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -40020,7 +40025,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:276:2088",
+      "id": "dmsdk:dmScript::ToVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:276:2089",
       "symbol": "dmScript::ToVector3",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -40058,7 +40063,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:314:2092",
+      "id": "dmsdk:dmScript::ToVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:314:2093",
       "symbol": "dmScript::ToVector4",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -40096,7 +40101,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::Unref@upstream/defold/engine/script/src/dmsdk/script/script.h:172:2082",
+      "id": "dmsdk:dmScript::Unref@upstream/defold/engine/script/src/dmsdk/script/script.h:172:2083",
       "symbol": "dmScript::Unref",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -40141,7 +40146,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::UnrefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:707:2129",
+      "id": "dmsdk:dmScript::UnrefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:707:2130",
       "symbol": "dmScript::UnrefInInstance",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -40179,7 +40184,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::UrlToString@upstream/defold/engine/script/src/dmsdk/script/script.h:745:2132",
+      "id": "dmsdk:dmScript::UrlToString@upstream/defold/engine/script/src/dmsdk/script/script.h:745:2133",
       "symbol": "dmScript::UrlToString",
       "kind": "function",
       "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
@@ -41280,7 +41285,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2139",
+      "id": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2140",
       "symbol": "dmSound::IsGroupMuted",
       "kind": "function",
       "header": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
@@ -41310,7 +41315,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2137",
+      "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
       "symbol": "dmSound::SetGroupMute",
       "kind": "function",
       "header": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
@@ -41348,7 +41353,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2138",
+      "id": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
       "symbol": "dmSound::ToggleGroupMute",
       "kind": "function",
       "header": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
@@ -51083,7 +51088,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceAddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:353:1908",
+      "id": "dmsdk:ResourceAddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:353:1909",
       "symbol": "ResourceAddFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51140,7 +51145,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceCreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:338:1907",
+      "id": "dmsdk:ResourceCreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:338:1908",
       "symbol": "ResourceCreateResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51206,7 +51211,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1912",
+      "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1913",
       "symbol": "ResourceDescriptorGetNameHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51237,7 +51242,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1916",
+      "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1917",
       "symbol": "ResourceDescriptorGetPrevResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51270,7 +51275,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1914",
+      "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1915",
       "symbol": "ResourceDescriptorGetResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51303,7 +51308,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1918",
+      "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1919",
       "symbol": "ResourceDescriptorGetResourceSize",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51334,7 +51339,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:444:1919",
+      "id": "dmsdk:ResourceDescriptorGetType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:444:1920",
       "symbol": "ResourceDescriptorGetType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51365,7 +51370,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:452:1920",
+      "id": "dmsdk:ResourceDescriptorIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:452:1921",
       "symbol": "ResourceDescriptorIncRef",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51403,7 +51408,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1915",
+      "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1916",
       "symbol": "ResourceDescriptorSetPrevResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51443,7 +51448,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1913",
+      "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1914",
       "symbol": "ResourceDescriptorSetResource",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51483,7 +51488,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1917",
+      "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1918",
       "symbol": "ResourceDescriptorSetResourceSize",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51521,7 +51526,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1894",
+      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1895",
       "symbol": "ResourceGet",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51571,7 +51576,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1896",
+      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1897",
       "symbol": "ResourceGetByHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51621,7 +51626,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1897",
+      "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1898",
       "symbol": "ResourceGetByHashAndExt",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51678,7 +51683,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1906",
+      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
       "symbol": "ResourceGetCanonicalPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51727,7 +51732,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:266:1900",
+      "id": "dmsdk:ResourceGetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:266:1901",
       "symbol": "ResourceGetDescriptor",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51775,7 +51780,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:276:1901",
+      "id": "dmsdk:ResourceGetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:276:1902",
       "symbol": "ResourceGetDescriptorByHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51823,7 +51828,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1905",
+      "id": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
       "symbol": "ResourceGetExtFromPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51853,7 +51858,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1904",
+      "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1905",
       "symbol": "ResourceGetPath",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51903,7 +51908,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:256:1899",
+      "id": "dmsdk:ResourceGetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:256:1900",
       "symbol": "ResourceGetRaw",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -51962,7 +51967,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1910",
+      "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1911",
       "symbol": "ResourceGetTypeFromExtension",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52012,7 +52017,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1911",
+      "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1912",
       "symbol": "ResourceGetTypeFromExtensionHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52062,7 +52067,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1895",
+      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1896",
       "symbol": "ResourceGetWithExt",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52119,7 +52124,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1898",
+      "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1899",
       "symbol": "ResourceIncRef",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52159,7 +52164,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourcePreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:296:1903",
+      "id": "dmsdk:ResourcePreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:296:1904",
       "symbol": "ResourcePreloadHint",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52198,7 +52203,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:187:1893",
+      "id": "dmsdk:ResourceRegisterDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:187:1894",
       "symbol": "ResourceRegisterDecryptionFunction",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52229,7 +52234,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:158:1890",
+      "id": "dmsdk:ResourceRegisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:158:1891",
       "symbol": "ResourceRegisterReloadedCallback",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52278,7 +52283,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1942",
+      "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1943",
       "symbol": "ResourceRegisterType",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52335,7 +52340,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterTypeCreatorDesc@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:779:1951",
+      "id": "dmsdk:ResourceRegisterTypeCreatorDesc@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:779:1952",
       "symbol": "ResourceRegisterTypeCreatorDesc",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52398,7 +52403,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1902",
+      "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1903",
       "symbol": "ResourceRelease",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52438,7 +52443,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:362:1909",
+      "id": "dmsdk:ResourceRemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:362:1910",
       "symbol": "ResourceRemoveFile",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52478,7 +52483,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1921",
+      "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1922",
       "symbol": "ResourceTypeContextGetContextByHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52518,7 +52523,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1929",
+      "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1930",
       "symbol": "ResourceTypeGetContext",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52551,7 +52556,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:551:1931",
+      "id": "dmsdk:ResourceTypeGetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:551:1932",
       "symbol": "ResourceTypeGetName",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52583,7 +52588,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1932",
+      "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1933",
       "symbol": "ResourceTypeGetNameHash",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52614,7 +52619,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetPreloadSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:597:1940",
+      "id": "dmsdk:ResourceTypeGetPreloadSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:597:1941",
       "symbol": "ResourceTypeGetPreloadSize",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52645,7 +52650,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeIsStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:596:1939",
+      "id": "dmsdk:ResourceTypeIsStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:596:1940",
       "symbol": "ResourceTypeIsStreaming",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52676,7 +52681,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeReset@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:600:1941",
+      "id": "dmsdk:ResourceTypeReset@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:600:1942",
       "symbol": "ResourceTypeReset",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52707,7 +52712,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:544:1930",
+      "id": "dmsdk:ResourceTypeSetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:544:1931",
       "symbol": "ResourceTypeSetContext",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52747,7 +52752,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:572:1934",
+      "id": "dmsdk:ResourceTypeSetCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:572:1935",
       "symbol": "ResourceTypeSetCreateFn",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52787,7 +52792,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetDestroyFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:586:1936",
+      "id": "dmsdk:ResourceTypeSetDestroyFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:586:1937",
       "symbol": "ResourceTypeSetDestroyFn",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52827,7 +52832,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetPostCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:579:1935",
+      "id": "dmsdk:ResourceTypeSetPostCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:579:1936",
       "symbol": "ResourceTypeSetPostCreateFn",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52867,7 +52872,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetPreloadFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:565:1933",
+      "id": "dmsdk:ResourceTypeSetPreloadFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:565:1934",
       "symbol": "ResourceTypeSetPreloadFn",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52907,7 +52912,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetRecreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:593:1937",
+      "id": "dmsdk:ResourceTypeSetRecreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:593:1938",
       "symbol": "ResourceTypeSetRecreateFn",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52947,7 +52952,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1938",
+      "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1939",
       "symbol": "ResourceTypeSetStreaming",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -52985,7 +52990,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceUnregisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:168:1891",
+      "id": "dmsdk:ResourceUnregisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:168:1892",
       "symbol": "ResourceUnregisterReloadedCallback",
       "kind": "function",
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
@@ -53926,7 +53931,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowClose@upstream/defold/engine/platform/src/dmsdk/platform/window.h:267:1785",
+      "id": "dmsdk:WindowClose@upstream/defold/engine/platform/src/dmsdk/platform/window.h:267:1786",
       "symbol": "WindowClose",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -53957,7 +53962,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowCreateParamsInitialize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:241:1781",
+      "id": "dmsdk:WindowCreateParamsInitialize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:241:1782",
       "symbol": "WindowCreateParamsInitialize",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -53988,7 +53993,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowDelete@upstream/defold/engine/platform/src/dmsdk/platform/window.h:253:1783",
+      "id": "dmsdk:WindowDelete@upstream/defold/engine/platform/src/dmsdk/platform/window.h:253:1784",
       "symbol": "WindowDelete",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54019,7 +54024,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1791",
+      "id": "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1792",
       "symbol": "WindowGetDisplayScaleFactor",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54050,7 +54055,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetHeight@upstream/defold/engine/platform/src/dmsdk/platform/window.h:293:1789",
+      "id": "dmsdk:WindowGetHeight@upstream/defold/engine/platform/src/dmsdk/platform/window.h:293:1790",
       "symbol": "WindowGetHeight",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54081,7 +54086,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetStateParam@upstream/defold/engine/platform/src/dmsdk/platform/window.h:301:1790",
+      "id": "dmsdk:WindowGetStateParam@upstream/defold/engine/platform/src/dmsdk/platform/window.h:301:1791",
       "symbol": "WindowGetStateParam",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54120,7 +54125,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1788",
+      "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1789",
       "symbol": "WindowGetWidth",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54151,7 +54156,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowIconify@upstream/defold/engine/platform/src/dmsdk/platform/window.h:279:1787",
+      "id": "dmsdk:WindowIconify@upstream/defold/engine/platform/src/dmsdk/platform/window.h:279:1788",
       "symbol": "WindowIconify",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54182,7 +54187,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowNew@upstream/defold/engine/platform/src/dmsdk/platform/window.h:247:1782",
+      "id": "dmsdk:WindowNew@upstream/defold/engine/platform/src/dmsdk/platform/window.h:247:1783",
       "symbol": "WindowNew",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54205,7 +54210,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowOpen@upstream/defold/engine/platform/src/dmsdk/platform/window.h:261:1784",
+      "id": "dmsdk:WindowOpen@upstream/defold/engine/platform/src/dmsdk/platform/window.h:261:1785",
       "symbol": "WindowOpen",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54246,7 +54251,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1793",
+      "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1794",
       "symbol": "WindowPollEvents",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54277,7 +54282,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1792",
+      "id": "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1793",
       "symbol": "WindowSetSize",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",
@@ -54322,7 +54327,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowShow@upstream/defold/engine/platform/src/dmsdk/platform/window.h:273:1786",
+      "id": "dmsdk:WindowShow@upstream/defold/engine/platform/src/dmsdk/platform/window.h:273:1787",
       "symbol": "WindowShow",
       "kind": "function",
       "header": "upstream/defold/engine/platform/src/dmsdk/platform/window.h",

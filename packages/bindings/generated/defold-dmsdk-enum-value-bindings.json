@@ -8,10 +8,10 @@
     "overrides": "packages/bindings/overrides/dmsdk-enum-value-bindings.json"
   },
   "sourceHashes": {
-    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
-    "shapes": "34a7d990f6e545997a7dfc0854fcfe433c13b90c1b6f5db3e82eff7f09cc2e15",
-    "scalarReport": "2753d482e4b1742bb05535f9cd8b5abcea8afc018c7313cafc169bbd4b879a9d",
-    "overrides": "eed3a60e07d0657d54dfee53be4af7e006a93d380f9d25bceb639d1880d76538"
+    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
+    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
+    "scalarReport": "06c12977c35ceab6235c1fefb2d341703b1d1ee7eabc79e2e24caea5f8903e94",
+    "overrides": "04c37e44300225c60101a0602f123fcf528d79c182082d91fd8ce141d83ff9b8"
   },
   "policy": {
     "cEnumRepresentation": "int32_t",
@@ -38,7 +38,7 @@
     "defold/defold_hermes/src/generated_dmsdk_enum_value_graphics.cpp": "4519d315ef92afb6ef248528fc1f9626c933f20cf7a65468a4837b6c7cc953c4",
     "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp": "8657ae4ca94bbbc09bbf7e9f590728cce2290bccbcaf0e6d3b2da6cca9fda995",
     "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp": "b157c0a5ad3b2bcc08a61671bcf43152703ff706c2733be7db866cc5b9763b8d",
-    "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp": "6da336fbb5b7c23992410f52b57d2ee037d36746c6dfb6b69fe0c6089f20db3f",
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp": "90bdf02c75c6ceefc64c195febd0141597b20910e74bb94b19d58b85d5e040ac",
     "defold/defold_hermes/src/generated_dmsdk_enum_value_sound.cpp": "78235899a9eb87dae11cfbb5d66a7be6f8cb03b5fd621aa93c9c9f5f2e17c372",
     "packages/sdk/src/generated/dmsdk/enum-value.ts": "1e819070fc5b7289d5ff12980bd0325cc26535e50e9037dd928ac1fc51523db1"
   },
@@ -392,7 +392,7 @@
       }
     },
     {
-      "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2137",
+      "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
       "symbol": "dmSound::SetGroupMute",
       "kind": "function",
       "header": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",
@@ -440,7 +440,7 @@
       }
     },
     {
-      "id": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2138",
+      "id": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
       "symbol": "dmSound::ToggleGroupMute",
       "kind": "function",
       "header": "upstream/defold/engine/sound/src/dmsdk/sound/sound.h",

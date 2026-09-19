@@ -1,0 +1,122 @@
+name: end-to-end
+
+# Can a user take what we publish and build a game with it?
+#
+# Every other check in this repository verifies one stage against its own
+# inputs. This one runs `scripts/check-end-to-end.mjs`, which runs the stages in
+# the order a user meets them - resolve a published policy, download the
+# published host tools, download the published per-target Hermes archives,
+# scaffold a project, generate and type check it, and have Bob build it for
+# every Defold bundle target we publish.
+#
+# ── Why the matrix is one job per target ────────────────────────────────────
+#
+# The `bob` stage is the only slow one and it is embarrassingly parallel: each
+# target is an independent upload to Extender. Splitting it means one failing
+# target is named in the job list rather than buried in a log, and `fail-fast:
+# false` keeps the other twelve running so a run reports the whole matrix.
+#
+# ── Why this is not on every push ───────────────────────────────────────────
+#
+# The build server is Defold's, not ours. A per-push matrix would send eleven
+# native builds to a service another project pays for, several times a day, for
+# changes that cannot affect them. Nightly plus `workflow_dispatch` keeps the
+# signal and the courtesy. The cheap half - the ledger, the policy resolution,
+# the scaffold, the generator - runs on every push, because that half costs
+# nobody anything and catches most of what breaks.
+
+on:
+  schedule:
+    # After `policy-revisions` has had its window, so a nightly repin is already
+    # in the tree when this builds against it.
+    - cron: '43 6 * * *'
+  push:
+    paths:
+      - scripts/check-end-to-end.mjs
+      - scripts/bob.sh
+      - packages/toolchains/**
+      - .github/workflows/end-to-end.yml
+  workflow_dispatch:
+    inputs:
+      build-server:
+        description: Defold build service to send extension builds to
+        required: false
+        default: https://build.defold.com
+
+permissions:
+  contents: read
+
+concurrency:
+  group: end-to-end-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Everything that needs no build server and no JDK. This is the half that runs
+  # on a push: if the ledger, the published policy, the published tools or the
+  # generator are broken, nothing downstream can be right.
+  local:
+    runs-on: ubuntu-24.04
+    outputs:
+      targets: ${{ steps.plan.outputs.targets }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # The ledger first, and on its own. A target Defold added and nothing here
+      # builds for must fail before any stage runs, because the run would
+      # otherwise report a clean matrix over an incomplete one.
+      - name: Every declared bundle target is exercised or declined by name
+        run: node --test tests/end-to-end-gate.test.mjs
+
+      - id: plan
+        run: |
+          set -euo pipefail
+          node scripts/check-end-to-end.mjs --plan --json > plan.json
+          node -e '
+            const plan = require("./plan.json");
+            const exercised = plan.targets.filter((row) => row.disposition === "exercise").map((row) => row.target);
+            require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, `targets=${JSON.stringify(exercised)}\n`);
+          ' >> "$GITHUB_OUTPUT"
+          node scripts/check-end-to-end.mjs --plan >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Policy, published tools, scaffold and generate
+        run: |
+          node scripts/check-end-to-end.mjs \
+            --stage policy --stage host-tools --stage target-archives \
+            --stage scaffold --stage generate
+
+  # One target, one job. Extender compiles the generated bindings and the whole
+  # extension with that target's real toolchain, so a green job here is the
+  # statement that what we generate compiles for that target AND that Bob can
+  # build the game with it. There is no separate "does it compile" check,
+  # because a separate one would compile with something other than what ships.
+  bob:
+    needs: local
+    if: github.event_name != 'push'
+    name: bob ${{ matrix.target }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.local.outputs.targets) }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '25' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: ./scripts/bootstrap-bob.sh
+
+      - name: Build for ${{ matrix.target }}
+        env:
+          DEFOLD_HERMES_BUILD_SERVER: ${{ inputs.build-server || 'https://build.defold.com' }}
+        run: |
+          node scripts/check-end-to-end.mjs \
+            --target "${{ matrix.target }}" \
+            --stage target-archives --stage scaffold --stage generate --stage bob \
+            --build-server "$DEFOLD_HERMES_BUILD_SERVER"

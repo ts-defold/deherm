@@ -9,8 +9,8 @@ const DehermDmSdkEnumDescriptor kDescriptors[] = {
   { UINT16_C(2), UINT8_C(1), UINT8_C(0), { UINT8_C(4), UINT8_C(0) }, "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397" },
   { UINT16_C(3), UINT8_C(0), UINT8_C(4), { UINT8_C(0), UINT8_C(0) }, "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391" },
   { UINT16_C(4), UINT8_C(1), UINT8_C(0), { UINT8_C(4), UINT8_C(0) }, "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390" },
-  { UINT16_C(5), UINT8_C(2), UINT8_C(4), { UINT8_C(3), UINT8_C(1) }, "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2137" },
-  { UINT16_C(6), UINT8_C(1), UINT8_C(4), { UINT8_C(3), UINT8_C(0) }, "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2138" }
+  { UINT16_C(5), UINT8_C(2), UINT8_C(4), { UINT8_C(3), UINT8_C(1) }, "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138" },
+  { UINT16_C(6), UINT8_C(1), UINT8_C(4), { UINT8_C(3), UINT8_C(0) }, "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139" }
 };
 int32_t unpack_i32(uint64_t raw) { const uint32_t bits=static_cast<uint32_t>(raw); int32_t value=0; static_assert(sizeof(bits)==sizeof(value),"i32 width"); std::memcpy(&value,&bits,sizeof(value)); return value; }
 }

@@ -203,14 +203,14 @@ constexpr DehermDmSdkCStringDescriptor kDescriptors[]={
   {UINT32_C(3006735102),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:231779713b56f6ce6ee07c7f","dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419"},
   {UINT32_C(242908930),1,0,DEHERM_DMSDK_CSTRING_U32,0,"dmsdk-projection:8475d4f3f294fc877bfbd3ef","dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214"},
   {UINT32_C(2606373769),1,0,DEHERM_DMSDK_CSTRING_U64,0,"dmsdk-projection:53d2c77e57af8c8ed773fd5e","dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215"},
-  {UINT32_C(4261926893),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:15f05a3fd97304eddbbb6683","dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1968"},
+  {UINT32_C(2353198740),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:2c28f57f30a6ddea5d202726","dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969"},
   {UINT32_C(2601716781),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:07262e9d56b121403ddcc7fe","dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568"},
   {UINT32_C(2710125394),2,0,DEHERM_DMSDK_CSTRING_I32,0,"dmsdk-projection:8b17042ca3399c474fe2b584","dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183"},
   {UINT32_C(412070535),1,0,DEHERM_DMSDK_CSTRING_BOOL,0,"dmsdk-projection:f764cc372769ea3ac6924545","dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595"},
   {UINT32_C(2305180704),2,0,DEHERM_DMSDK_CSTRING_ENUM,0,"dmsdk-projection:b78e60c5cd486e3c1d293744","dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597"},
   {UINT32_C(1881914853),1,0,DEHERM_DMSDK_CSTRING_ENUM,0,"dmsdk-projection:029cf6c251d40209d3bf013f","dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596"},
   {UINT32_C(4096644126),1,0,DEHERM_DMSDK_CSTRING_U32,0,"dmsdk-projection:01ad907038b03b065cbd792f","dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657"},
-  {UINT32_C(1695400188),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:ae6fdb9151089284fe79c691","dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1905"},
+  {UINT32_C(2686100197),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:e55cbba75cd74800473cbc52","dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906"},
 }; struct FrameScope { DehermDmSdkCStringFrame* frame; ~FrameScope(){deherm_dmsdk_cstring_frame_end(frame);} }; }
 extern "C" {
 uint32_t deherm_dmsdk_cstring_value_count(void){return UINT32_C(14);}

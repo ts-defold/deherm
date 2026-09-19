@@ -8,9 +8,9 @@
     "policy": "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json"
   },
   "sourceHashes": {
-    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
-    "shapes": "34a7d990f6e545997a7dfc0854fcfe433c13b90c1b6f5db3e82eff7f09cc2e15",
-    "projection": "8a21006ba46b28fdedcb2824bc73504cac9b28390a53920cfbfb70d90aadc82e",
+    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
+    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
+    "projection": "492fc0a14d65270fb510caad4050bdf77ff48b9fa17c00f74e88e11d17dc3dd0",
     "policy": "43312983e8fbabd48c3f2355c462308a2d11c46c969050d837bd93ad038b20a9"
   },
   "selector": "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",
@@ -214,10 +214,10 @@
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle_jsi.hpp": "8cc9b660c994f4d9a2ce441f26ab57d87e9bfb6cb585e369cda9b2391059f121",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle.h": "08ddb61aab3b171e59d3a7b80d700f40435bd12c5c60b4c5169be4b35c0d57ce",
-    "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js": "479bd9127d253089baa129ccc4cce663a5747833d072d816d3acd0ed5f14b3cf",
+    "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js": "669f4442c62d75c33a246beffb7854d2b11f387a5825e6846061777f4d7fae85",
     "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp": "77d5d21ea2042f031f072b5d193775a80bbcffa832c4081f87890114bc9055cc",
-    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp": "8f2b99dae7f151ccb67dc0c7394b05dbd518ef754f6a6e5efb2d55b7a2ee09dc",
-    "native/generated_dmsdk_borrowed_handle_header_audit.cpp": "27403e989a50fd50ac8a6a23c51900a304db0ba8c266c823e5fac3f27e972fa1",
+    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp": "c7eabe0dd82e96a7362b71cc5739d66fe478c3b7d8ad9ad0204652e40930879c",
+    "native/generated_dmsdk_borrowed_handle_header_audit.cpp": "69926c44a65a07f6989b55cf543806dda1812760e37ed65b79a1795620a8e300",
     "packages/sdk/src/generated/dmsdk/borrowed-handle.ts": "a95b9833a9be14a8768625449bc3689fc3dcd4ccd52272ff4b04aad6639985ef",
     "packages/static-hermes/src/generated/dmsdk-borrowed-handle.ts": "0b78c09dda1b47099b29088274beaba9458296c08b55efbb11db44755e9f001d"
   },
@@ -2810,8 +2810,8 @@
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:scalar:i32,value:scalar:i32,value:scalar:i32,value:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1514",
-      "projectionId": "dmsdk-projection:78d35d068b5d430d696ddc7a",
+      "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1515",
+      "projectionId": "dmsdk-projection:807f8184962650f5a59e84b3",
       "symbol": "dmGraphics::VulkanGetCurrentFrameCommandBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -2824,8 +2824,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1508",
-      "projectionId": "dmsdk-projection:d2cb51ff15465d41ddfac1f4",
+      "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509",
+      "projectionId": "dmsdk-projection:6d5ff3792d9d2b41799ff159",
       "symbol": "dmGraphics::VulkanGetDevice",
       "disposition": "blocked",
       "blockers": [
@@ -2838,8 +2838,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1512",
-      "projectionId": "dmsdk-projection:44dc12c32eb19e1c42550547",
+      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513",
+      "projectionId": "dmsdk-projection:f9af88a485fab962a29d3c5c",
       "symbol": "dmGraphics::VulkanGetGraphicsQueue",
       "disposition": "blocked",
       "blockers": [
@@ -2852,8 +2852,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1511",
-      "projectionId": "dmsdk-projection:d4b68ac7ebc50cd282f581a4",
+      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1512",
+      "projectionId": "dmsdk-projection:75b7462ee307e1fe64c4b3cd",
       "symbol": "dmGraphics::VulkanGetGraphicsQueueFamily",
       "disposition": "blocked",
       "blockers": [
@@ -2867,8 +2867,8 @@
       "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1515",
-      "projectionId": "dmsdk-projection:c611a64187eb0b1ecd83f039",
+      "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516",
+      "projectionId": "dmsdk-projection:bacf74ddfaa5158917c1eb1f",
       "symbol": "dmGraphics::VulkanGetImage",
       "disposition": "blocked",
       "blockers": [
@@ -2881,8 +2881,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1516",
-      "projectionId": "dmsdk-projection:3f8c2fa5078de96c4cad4c10",
+      "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517",
+      "projectionId": "dmsdk-projection:3a7ca46a46ca0bbf71ef6910",
       "symbol": "dmGraphics::VulkanGetImageView",
       "disposition": "blocked",
       "blockers": [
@@ -2895,8 +2895,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1510",
-      "projectionId": "dmsdk-projection:cdfae4eb6a92bdf9a0d3e66c",
+      "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511",
+      "projectionId": "dmsdk-projection:d7029cc3aaba11b120f0c565",
       "symbol": "dmGraphics::VulkanGetInstance",
       "disposition": "blocked",
       "blockers": [
@@ -2909,8 +2909,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1509",
-      "projectionId": "dmsdk-projection:2d5cee8853aff15c1e1b6095",
+      "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510",
+      "projectionId": "dmsdk-projection:8cc58ac9d1fa52c4b2629a41",
       "symbol": "dmGraphics::VulkanGetPhysicalDevice",
       "disposition": "blocked",
       "blockers": [
@@ -2923,8 +2923,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1513",
-      "projectionId": "dmsdk-projection:71b173b9f427d6e6ec30fcc6",
+      "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514",
+      "projectionId": "dmsdk-projection:3d8207dd1e3f96c00963b086",
       "symbol": "dmGraphics::VulkanGetRenderPass",
       "disposition": "blocked",
       "blockers": [
@@ -2937,8 +2937,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1507",
-      "projectionId": "dmsdk-projection:be277f07cacb1771297b8bd3",
+      "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1508",
+      "projectionId": "dmsdk-projection:64e10e89b014cfa23d33bd63",
       "symbol": "dmGraphics::VulkanGraphicsCommandQueueToMetal",
       "disposition": "blocked",
       "blockers": [
@@ -2953,8 +2953,8 @@
       "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1506",
-      "projectionId": "dmsdk-projection:1d8a58c901fc40c02bb68864",
+      "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1507",
+      "projectionId": "dmsdk-projection:4da81c2d6e998778bef8756d",
       "symbol": "dmGraphics::VulkanTextureToMetal",
       "disposition": "blocked",
       "blockers": [
@@ -2969,8 +2969,8 @@
       "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque,in:handle:dmGraphics::HTexture:u64)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1533",
-      "projectionId": "dmsdk-projection:ac2f65e55274de415d204177",
+      "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1534",
+      "projectionId": "dmsdk-projection:f225b88eb6ea1271385a7185",
       "symbol": "dmGraphics::WebGPUGetActiveCommandEncoder",
       "disposition": "blocked",
       "blockers": [
@@ -2983,8 +2983,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1527",
-      "projectionId": "dmsdk-projection:b7a6bcc58fd9380e4e8e359a",
+      "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1528",
+      "projectionId": "dmsdk-projection:13b7d6a617dee81178f8d63a",
       "symbol": "dmGraphics::WebGPUGetAdapter",
       "disposition": "blocked",
       "blockers": [
@@ -2997,8 +2997,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1528",
-      "projectionId": "dmsdk-projection:54637d5a058ca149f2ba7bac",
+      "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1529",
+      "projectionId": "dmsdk-projection:b6945818d182ee58149468d9",
       "symbol": "dmGraphics::WebGPUGetDevice",
       "disposition": "blocked",
       "blockers": [
@@ -3011,8 +3011,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1526",
-      "projectionId": "dmsdk-projection:6180962f4e38d40c0435947e",
+      "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1527",
+      "projectionId": "dmsdk-projection:ba5fff4480262bfe6cd911b1",
       "symbol": "dmGraphics::WebGPUGetInstance",
       "disposition": "blocked",
       "blockers": [
@@ -3025,8 +3025,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1529",
-      "projectionId": "dmsdk-projection:f1d7f8b54c7157fe37276126",
+      "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1530",
+      "projectionId": "dmsdk-projection:85da05b346ac53af3f4c28ca",
       "symbol": "dmGraphics::WebGPUGetQueue",
       "disposition": "blocked",
       "blockers": [
@@ -3039,8 +3039,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1531",
-      "projectionId": "dmsdk-projection:45dfb4c00ef43bcca29b988f",
+      "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1532",
+      "projectionId": "dmsdk-projection:64c45c37b2be6cae5c111971",
       "symbol": "dmGraphics::WebGPUGetTexture",
       "disposition": "blocked",
       "blockers": [
@@ -3053,8 +3053,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1530",
-      "projectionId": "dmsdk-projection:9eed036fd465e30c410ad483",
+      "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1531",
+      "projectionId": "dmsdk-projection:df673bd543a40501e20e6ad1",
       "symbol": "dmGraphics::WebGPUGetTextureView",
       "disposition": "blocked",
       "blockers": [
@@ -3067,8 +3067,8 @@
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1535",
-      "projectionId": "dmsdk-projection:40a677a35b8112306d6624ad",
+      "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1536",
+      "projectionId": "dmsdk-projection:5101d8708f9e30f9f0a6f9c1",
       "symbol": "dmGraphics::WebGPURenderPassBegin",
       "disposition": "blocked",
       "blockers": [
@@ -3082,8 +3082,8 @@
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1534",
-      "projectionId": "dmsdk-projection:3e01632c871b8ee925e8c065",
+      "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1535",
+      "projectionId": "dmsdk-projection:0033960ac95382e8920e7d83",
       "symbol": "dmGraphics::WebGPURenderPassEnd",
       "disposition": "blocked",
       "blockers": [
@@ -3097,8 +3097,8 @@
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1570",
-      "projectionId": "dmsdk-projection:567debd5996e01326070d703",
+      "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1571",
+      "projectionId": "dmsdk-projection:2af5fdc6b6d80458fca493e4",
       "symbol": "dmGui::GetNodeCustomData",
       "disposition": "blocked",
       "blockers": [
@@ -3112,8 +3112,8 @@
       "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1569",
-      "projectionId": "dmsdk-projection:c97cf83f7aac71e1e4bbfb03",
+      "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1570",
+      "projectionId": "dmsdk-projection:27d27922903d0bef00d3957e",
       "symbol": "dmGui::GetNodeCustomType",
       "disposition": "generated-provider-boundary",
       "bindingId": 29,
@@ -3141,8 +3141,8 @@
       }
     },
     {
-      "id": "dmsdk:dmGui::GetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:261:1555",
-      "projectionId": "dmsdk-projection:774b560f3a023caecc864f88",
+      "id": "dmsdk:dmGui::GetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:261:1556",
+      "projectionId": "dmsdk-projection:fbda6bd6a06185d05c7ff322",
       "symbol": "dmGui::GetNodeId",
       "disposition": "generated-provider-boundary",
       "bindingId": 30,
@@ -3170,8 +3170,8 @@
       }
     },
     {
-      "id": "dmsdk:dmGui::GetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:308:1560",
-      "projectionId": "dmsdk-projection:6ddf08cfd69763c004161585",
+      "id": "dmsdk:dmGui::GetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:308:1561",
+      "projectionId": "dmsdk-projection:9397b476efdf154b4c02a294",
       "symbol": "dmGui::GetNodeIsBone",
       "disposition": "generated-provider-boundary",
       "bindingId": 31,
@@ -3199,8 +3199,8 @@
       }
     },
     {
-      "id": "dmsdk:dmGui::GetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:360:1563",
-      "projectionId": "dmsdk-projection:a95b3f23b1df7d96c7701c9d",
+      "id": "dmsdk:dmGui::GetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:360:1564",
+      "projectionId": "dmsdk-projection:515eddab4dca9f0f5538b715",
       "symbol": "dmGui::GetNodeProperty",
       "disposition": "blocked",
       "blockers": [
@@ -3216,8 +3216,8 @@
       "shape": "unknown:dmVMath::Vector4(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property)"
     },
     {
-      "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1571",
-      "projectionId": "dmsdk-projection:ff9111affb77e66af5e41e93",
+      "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1572",
+      "projectionId": "dmsdk-projection:c13f8b7062e145202c08e875",
       "symbol": "dmGui::GetNodeTextureId",
       "disposition": "generated-provider-boundary",
       "bindingId": 32,
@@ -3245,8 +3245,8 @@
       }
     },
     {
-      "id": "dmsdk:dmGui::GetResource@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:474:1574",
-      "projectionId": "dmsdk-projection:e7d12acf6a6abab457dcb469",
+      "id": "dmsdk:dmGui::GetResource@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:474:1575",
+      "projectionId": "dmsdk-projection:9a11abd2144c5000b8242353",
       "symbol": "dmGui::GetResource",
       "disposition": "blocked",
       "blockers": [
@@ -3260,8 +3260,8 @@
       "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:scalar:u64,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1575",
-      "projectionId": "dmsdk-projection:a48b76eccbd29d7dc43452ba",
+      "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1576",
+      "projectionId": "dmsdk-projection:70491e2372898fb3d81eaaa2",
       "symbol": "dmGui::LuaPushNode",
       "disposition": "blocked",
       "blockers": [
@@ -3278,8 +3278,8 @@
       "shape": "scalar:void(inout:pointer:record:lua_State,value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1568",
-      "projectionId": "dmsdk-projection:3a4e923079020e077023ce9d",
+      "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1569",
+      "projectionId": "dmsdk-projection:8177e2f50648e9ba6fbd1bc7",
       "symbol": "dmGui::SetNodeAdjustMode",
       "disposition": "blocked",
       "blockers": [
@@ -3294,8 +3294,8 @@
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::AdjustMode)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1566",
-      "projectionId": "dmsdk-projection:6f49db6a65856b5b867bd200",
+      "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1567",
+      "projectionId": "dmsdk-projection:d10998df7dfcd130edf41a6c",
       "symbol": "dmGui::SetNodeCustomProperty",
       "disposition": "blocked",
       "blockers": [
@@ -3312,8 +3312,8 @@
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,in:pointer:record:dmGui::CustomProperty)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1554",
-      "projectionId": "dmsdk-projection:b0c7616eb00b247e314536bd",
+      "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1555",
+      "projectionId": "dmsdk-projection:f2ca5fbd98689efe6163f9b3",
       "symbol": "dmGui::SetNodeId",
       "disposition": "blocked",
       "blockers": [
@@ -3326,8 +3326,8 @@
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:317:1561",
-      "projectionId": "dmsdk-projection:b31797450378a46de31efde2",
+      "id": "dmsdk:dmGui::SetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:317:1562",
+      "projectionId": "dmsdk-projection:c484109e45920c4f6766b40d",
       "symbol": "dmGui::SetNodeIsBone",
       "disposition": "blocked",
       "blockers": [
@@ -3340,8 +3340,8 @@
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:bool)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:272:1556",
-      "projectionId": "dmsdk-projection:2a30e865926e5a2e63ec631a",
+      "id": "dmsdk:dmGui::SetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:272:1557",
+      "projectionId": "dmsdk-projection:1712abd8dc6d58d4eb8c9a7a",
       "symbol": "dmGui::SetNodeParent",
       "disposition": "blocked",
       "blockers": [
@@ -3355,8 +3355,8 @@
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:handle:dmGui::HNode:u32,value:scalar:bool)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1564",
-      "projectionId": "dmsdk-projection:c40886bee3450403c79e7777",
+      "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1565",
+      "projectionId": "dmsdk-projection:e4ffecf72e0edddb8209770b",
       "symbol": "dmGui::SetNodeProperty",
       "disposition": "blocked",
       "blockers": [
@@ -3374,8 +3374,8 @@
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property,in:unknown:dmVMath::Vector4)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1572",
-      "projectionId": "dmsdk-projection:7cfc4a3fe7599b4ad929d9ea",
+      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1573",
+      "projectionId": "dmsdk-projection:fc4293512a13819c6e228049",
       "symbol": "dmGui::SetNodeTexture",
       "disposition": "blocked",
       "blockers": [
@@ -3389,8 +3389,8 @@
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1573",
-      "projectionId": "dmsdk-projection:0397c32ca40c970c49198f57",
+      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1574",
+      "projectionId": "dmsdk-projection:43396c32ade6f297474a20b6",
       "symbol": "dmGui::SetNodeTexture",
       "disposition": "blocked",
       "blockers": [
@@ -3405,8 +3405,8 @@
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::NodeTextureType,value:handle:dmGui::HTextureSource:u64)"
     },
     {
-      "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1628",
-      "projectionId": "dmsdk-projection:94bbf93c0681f081d611ec08",
+      "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1629",
+      "projectionId": "dmsdk-projection:5312b2f107a0b41fcf0bee4e",
       "symbol": "dmHID::AddKeyboardChar",
       "disposition": "blocked",
       "blockers": [
@@ -3419,8 +3419,8 @@
       "shape": "scalar:void(value:handle:dmHID::HContext:opaque,value:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmHID::AddTouch@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:659:1619",
-      "projectionId": "dmsdk-projection:df8f256b38bfc7493af06027",
+      "id": "dmsdk:dmHID::AddTouch@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:659:1620",
+      "projectionId": "dmsdk-projection:5315f787a1c12ee6d144ad15",
       "symbol": "dmHID::AddTouch",
       "disposition": "blocked",
       "blockers": [
@@ -3435,8 +3435,8 @@
       "shape": "scalar:void(value:handle:dmHID::HTouchDevice:opaque,value:scalar:i32,value:scalar:i32,value:scalar:u32,value:enum:dmHID::Phase)"
     },
     {
-      "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1621",
-      "projectionId": "dmsdk-projection:1fbe3200e806ed9e4348fdfb",
+      "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1622",
+      "projectionId": "dmsdk-projection:29d639d910beb7f15c0a6950",
       "symbol": "dmHID::SetGamepadAxis",
       "disposition": "blocked",
       "blockers": [
@@ -3449,8 +3449,8 @@
       "shape": "scalar:void(value:handle:dmHID::HGamepad:opaque,value:scalar:u32,value:scalar:f32)"
     },
     {
-      "id": "dmsdk:dmHID::SetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:667:1620",
-      "projectionId": "dmsdk-projection:b55f61b73ae34e72e1f42a9e",
+      "id": "dmsdk:dmHID::SetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:667:1621",
+      "projectionId": "dmsdk-projection:89d01643b20a2f61f83a9d18",
       "symbol": "dmHID::SetGamepadButton",
       "disposition": "blocked",
       "blockers": [
@@ -3463,8 +3463,8 @@
       "shape": "scalar:void(value:handle:dmHID::HGamepad:opaque,value:scalar:u32,value:scalar:bool)"
     },
     {
-      "id": "dmsdk:dmHID::SetKey@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:726:1627",
-      "projectionId": "dmsdk-projection:611962ed77690e7d8e7cafbb",
+      "id": "dmsdk:dmHID::SetKey@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:726:1628",
+      "projectionId": "dmsdk-projection:4106a4efab0b53d02573f6af",
       "symbol": "dmHID::SetKey",
       "disposition": "blocked",
       "blockers": [
@@ -3479,8 +3479,8 @@
       "shape": "scalar:void(value:handle:dmHID::HKeyboard:opaque,value:enum:dmHID::Key,value:scalar:bool)"
     },
     {
-      "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1622",
-      "projectionId": "dmsdk-projection:d9e8b8409690a9da4623c931",
+      "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1623",
+      "projectionId": "dmsdk-projection:d5477b5de08cc1b7fb07e616",
       "symbol": "dmHID::SetMouseButton",
       "disposition": "blocked",
       "blockers": [
@@ -3495,8 +3495,8 @@
       "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:enum:dmHID::MouseButton,value:scalar:bool)"
     },
     {
-      "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1623",
-      "projectionId": "dmsdk-projection:5af00c54fac89c16177862d6",
+      "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1624",
+      "projectionId": "dmsdk-projection:e0303dba30f825b531f5f108",
       "symbol": "dmHID::SetMousePosition",
       "disposition": "blocked",
       "blockers": [
@@ -3509,8 +3509,8 @@
       "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:scalar:i32,value:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmHID::SetMouseWheel@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:698:1624",
-      "projectionId": "dmsdk-projection:ce6a3e1b0e5f91290e5d562b",
+      "id": "dmsdk:dmHID::SetMouseWheel@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:698:1625",
+      "projectionId": "dmsdk-projection:b0bba8f1fc3cf0390a59178e",
       "symbol": "dmHID::SetMouseWheel",
       "disposition": "blocked",
       "blockers": [
@@ -3789,8 +3789,8 @@
       "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
     },
     {
-      "id": "dmsdk:dmRender::AddToRender@upstream/defold/engine/render/src/dmsdk/render/render.h:447:1834",
-      "projectionId": "dmsdk-projection:9631c6d7381855fc62ba3117",
+      "id": "dmsdk:dmRender::AddToRender@upstream/defold/engine/render/src/dmsdk/render/render.h:447:1835",
+      "projectionId": "dmsdk-projection:728285d87e6bcc4db202a7ea",
       "symbol": "dmRender::AddToRender",
       "disposition": "blocked",
       "blockers": [
@@ -3808,8 +3808,8 @@
       "shape": "enum:dmRender::Result(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderObject)"
     },
     {
-      "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1869",
-      "projectionId": "dmsdk-projection:622c3d9ca16027f630338d1e",
+      "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1870",
+      "projectionId": "dmsdk-projection:bf08ac1c42393b1b62f6e2ff",
       "symbol": "dmRender::ApplyMaterialConstants",
       "disposition": "blocked",
       "blockers": [
@@ -3825,8 +3825,8 @@
       "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque,in:pointer:record:dmRender::RenderObject)"
     },
     {
-      "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1870",
-      "projectionId": "dmsdk-projection:5921853e2cc83d1a7430fe9a",
+      "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1871",
+      "projectionId": "dmsdk-projection:d532e2690ce4e96b2035d2c5",
       "symbol": "dmRender::ApplyMaterialSampler",
       "disposition": "blocked",
       "blockers": [
@@ -3839,8 +3839,8 @@
       "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque,value:handle:dmRender::HSampler:opaque,value:scalar:u8,value:handle:dmGraphics::HTexture:u64)"
     },
     {
-      "id": "dmsdk:dmRender::ClearMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:688:1862",
-      "projectionId": "dmsdk-projection:00f72a8c23fdc329719392d6",
+      "id": "dmsdk:dmRender::ClearMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:688:1863",
+      "projectionId": "dmsdk-projection:3a99c83fbdd9f81054479220",
       "symbol": "dmRender::ClearMaterialTags",
       "disposition": "blocked",
       "blockers": [
@@ -3853,8 +3853,8 @@
       "shape": "scalar:void(value:handle:dmRender::HMaterial:opaque)"
     },
     {
-      "id": "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1848",
-      "projectionId": "dmsdk-projection:6a4c4a01742b7e6694464a10",
+      "id": "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1849",
+      "projectionId": "dmsdk-projection:02175dd5bed08ede399f27a9",
       "symbol": "dmRender::ClearNamedConstantBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -3867,8 +3867,8 @@
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque)"
     },
     {
-      "id": "dmsdk:dmRender::GetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:497:1840",
-      "projectionId": "dmsdk-projection:234a8cc4552a1af61736be58",
+      "id": "dmsdk:dmRender::GetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:497:1841",
+      "projectionId": "dmsdk-projection:eecc6f0175295fb1ef8bf093",
       "symbol": "dmRender::GetConstantName",
       "disposition": "generated-provider-boundary",
       "bindingId": 38,
@@ -3896,8 +3896,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1844",
-      "projectionId": "dmsdk-projection:2b1996b0fdeaa14caa6db0ac",
+      "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1845",
+      "projectionId": "dmsdk-projection:ddee9f21c1065960fd082c83",
       "symbol": "dmRender::GetConstantType",
       "disposition": "generated-provider-boundary",
       "bindingId": 39,
@@ -3925,8 +3925,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1867",
-      "projectionId": "dmsdk-projection:fb8dc1a789a23105402e5197",
+      "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1868",
+      "projectionId": "dmsdk-projection:f56b6a44f64d8b76fa24560e",
       "symbol": "dmRender::GetMaterialSamplerNameHash",
       "disposition": "generated-provider-boundary",
       "bindingId": 40,
@@ -3954,8 +3954,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSamplerUnit@upstream/defold/engine/render/src/dmsdk/render/render.h:747:1868",
-      "projectionId": "dmsdk-projection:b0e6be027d8aa65c1289b17c",
+      "id": "dmsdk:dmRender::GetMaterialSamplerUnit@upstream/defold/engine/render/src/dmsdk/render/render.h:747:1869",
+      "projectionId": "dmsdk-projection:6550216a07b0e724faab5d3c",
       "symbol": "dmRender::GetMaterialSamplerUnit",
       "disposition": "generated-provider-boundary",
       "bindingId": 41,
@@ -3983,8 +3983,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialTagListKey@upstream/defold/engine/render/src/dmsdk/render/render.h:455:1835",
-      "projectionId": "dmsdk-projection:5bff1abe6c38024b1d6faeb9",
+      "id": "dmsdk:dmRender::GetMaterialTagListKey@upstream/defold/engine/render/src/dmsdk/render/render.h:455:1836",
+      "projectionId": "dmsdk-projection:d751879fac9efd652f76691e",
       "symbol": "dmRender::GetMaterialTagListKey",
       "disposition": "generated-provider-boundary",
       "bindingId": 42,
@@ -4012,8 +4012,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1810",
-      "projectionId": "dmsdk-projection:c7107f5dcee63f32e45a00e5",
+      "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1811",
+      "projectionId": "dmsdk-projection:baf22c7e34d80d2a19a66b28",
       "symbol": "dmRender::GetMaterialVertexSpace",
       "disposition": "generated-provider-boundary",
       "bindingId": 43,
@@ -4041,8 +4041,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1856",
-      "projectionId": "dmsdk-projection:3215ce6f0fcb3d71f675549d",
+      "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857",
+      "projectionId": "dmsdk-projection:e9fef5b2cdefd34bbe5a8d49",
       "symbol": "dmRender::GetNamedConstantCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 44,
@@ -4070,8 +4070,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1859",
-      "projectionId": "dmsdk-projection:c68b6de22c27fe16a7454e18",
+      "id": "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1860",
+      "projectionId": "dmsdk-projection:99d15244bfe2871adaba425b",
       "symbol": "dmRender::GetViewMatrix",
       "disposition": "blocked",
       "blockers": [
@@ -4086,8 +4086,8 @@
       "shape": "unknown:dmVMath::Matrix4(value:handle:dmRender::HRenderContext:opaque)"
     },
     {
-      "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1849",
-      "projectionId": "dmsdk-projection:9391fccb81bccc95379751b1",
+      "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1850",
+      "projectionId": "dmsdk-projection:ce32ab68f7b0c741e38c2a42",
       "symbol": "dmRender::RemoveNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -4100,8 +4100,8 @@
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1832",
-      "projectionId": "dmsdk-projection:74485654a94b097340270763",
+      "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1833",
+      "projectionId": "dmsdk-projection:4698664325060ae7f861b99b",
       "symbol": "dmRender::RenderListAlloc",
       "disposition": "blocked",
       "blockers": [
@@ -4116,8 +4116,8 @@
       "shape": "pointer:record:dmRender::RenderListEntry(value:handle:dmRender::HRenderContext:opaque,value:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1833",
-      "projectionId": "dmsdk-projection:303b21abf810bbae816b9e05",
+      "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1834",
+      "projectionId": "dmsdk-projection:eabc11e7d38a03ddfc0b6a36",
       "symbol": "dmRender::RenderListSubmit",
       "disposition": "blocked",
       "blockers": [
@@ -4135,8 +4135,8 @@
       "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderListEntry,inout:pointer:record:dmRender::RenderListEntry)"
     },
     {
-      "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1843",
-      "projectionId": "dmsdk-projection:8e257bd526e60a11020e3fa6",
+      "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1844",
+      "projectionId": "dmsdk-projection:7ed0b8aa2e11dd2bf3e8cf67",
       "symbol": "dmRender::SetConstantLocation",
       "disposition": "blocked",
       "blockers": [
@@ -4149,8 +4149,8 @@
       "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:handle:dmGraphics::HUniformLocation:i64)"
     },
     {
-      "id": "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1841",
-      "projectionId": "dmsdk-projection:e92e0c13642c0f7f3531615f",
+      "id": "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1842",
+      "projectionId": "dmsdk-projection:a310d7082b3e7c30a7c76272",
       "symbol": "dmRender::SetConstantName",
       "disposition": "blocked",
       "blockers": [
@@ -4163,8 +4163,8 @@
       "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1845",
-      "projectionId": "dmsdk-projection:ae6c93c6b5e4cfe2211867a3",
+      "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846",
+      "projectionId": "dmsdk-projection:efd338f4d44edc8eb5236164",
       "symbol": "dmRender::SetConstantType",
       "disposition": "blocked",
       "blockers": [
@@ -4177,8 +4177,8 @@
       "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1839",
-      "projectionId": "dmsdk-projection:e8211a11950dc2f0cb04c9f3",
+      "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1840",
+      "projectionId": "dmsdk-projection:dd0e72f17f84dd98ed343a30",
       "symbol": "dmRender::SetConstantValues",
       "disposition": "blocked",
       "blockers": [
@@ -4196,8 +4196,8 @@
       "shape": "enum:dmRender::Result(value:handle:dmRender::HConstant:opaque,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1864",
-      "projectionId": "dmsdk-projection:56d6fa412a4cb963aba895a7",
+      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1865",
+      "projectionId": "dmsdk-projection:fdbdee4ee575c75b470b7947",
       "symbol": "dmRender::SetMaterialSampler",
       "disposition": "blocked",
       "blockers": [
@@ -4215,8 +4215,8 @@
       "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)"
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1865",
-      "projectionId": "dmsdk-projection:f854789888bd5224cbcebfe2",
+      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1866",
+      "projectionId": "dmsdk-projection:9c9c880a5e9f4651587e1310",
       "symbol": "dmRender::SetMaterialSampler",
       "disposition": "blocked",
       "blockers": [
@@ -4233,8 +4233,8 @@
       "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)"
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1850",
-      "projectionId": "dmsdk-projection:b1cc959eca9b1cbcace713c1",
+      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1851",
+      "projectionId": "dmsdk-projection:a1f52e5e232d13c50b870474",
       "symbol": "dmRender::SetNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -4251,8 +4251,8 @@
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1851",
-      "projectionId": "dmsdk-projection:4b17e83f6b554dea1e9f26bf",
+      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852",
+      "projectionId": "dmsdk-projection:75cdadae4829f419a2ceda22",
       "symbol": "dmRender::SetNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -4269,8 +4269,8 @@
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1853",
-      "projectionId": "dmsdk-projection:338c642fc32b8221a851b71c",
+      "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854",
+      "projectionId": "dmsdk-projection:ccff968195e7c1792637a0d5",
       "symbol": "dmRender::SetNamedConstantAtIndex",
       "disposition": "blocked",
       "blockers": [
@@ -4288,8 +4288,8 @@
       "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:scalar:i32)"
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1852",
-      "projectionId": "dmsdk-projection:62887dc18950d3b0548e9c23",
+      "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853",
+      "projectionId": "dmsdk-projection:3e5e7f682c5a73385bb928f5",
       "symbol": "dmRender::SetNamedConstants",
       "disposition": "blocked",
       "blockers": [
@@ -4305,8 +4305,8 @@
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,inout:pointer:unknown:HConstant,value:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1991",
-      "projectionId": "dmsdk-projection:afdd37117ddbf74f502666bd",
+      "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1992",
+      "projectionId": "dmsdk-projection:9c5ee39fea93315424aa28dd",
       "symbol": "dmResource::GetContext",
       "disposition": "blocked",
       "blockers": [
@@ -4320,8 +4320,8 @@
       "shape": "opaque-pointer(value:handle:HResourceType:opaque)"
     },
     {
-      "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2005",
-      "projectionId": "dmsdk-projection:2669231acf7a66fb1d01214e",
+      "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2006",
+      "projectionId": "dmsdk-projection:dfa9e541b1b06c835056d08e",
       "symbol": "dmResource::GetDescriptorByHash",
       "disposition": "blocked",
       "blockers": [
@@ -4338,8 +4338,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HDescriptor)"
     },
     {
-      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2011",
-      "projectionId": "dmsdk-projection:5b6508235804c308f0f9193f",
+      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2012",
+      "projectionId": "dmsdk-projection:e2ff7bacd7df3930d5575f98",
       "symbol": "dmResource::GetNameHash",
       "disposition": "generated-provider-boundary",
       "bindingId": 45,
@@ -4367,8 +4367,8 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:325:1994",
-      "projectionId": "dmsdk-projection:b925d72a5181614e7ac262e4",
+      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:325:1995",
+      "projectionId": "dmsdk-projection:8aabe8bffd46f8ff2553e406",
       "symbol": "dmResource::GetNameHash",
       "disposition": "generated-provider-boundary",
       "bindingId": 46,
@@ -4396,8 +4396,8 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:133:1967",
-      "projectionId": "dmsdk-projection:8fd9689d0eebeff6514a57f5",
+      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:133:1968",
+      "projectionId": "dmsdk-projection:10a26cff3b9cf73a9890ca19",
       "symbol": "dmResource::GetPath",
       "disposition": "blocked",
       "blockers": [
@@ -4415,8 +4415,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2015",
-      "projectionId": "dmsdk-projection:1515b49d5d214a428f457f71",
+      "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2016",
+      "projectionId": "dmsdk-projection:252c14a8e8f2e44885e02259",
       "symbol": "dmResource::GetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -4430,8 +4430,8 @@
       "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)"
     },
     {
-      "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2013",
-      "projectionId": "dmsdk-projection:a961b4794ea588dfa58a5d76",
+      "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2014",
+      "projectionId": "dmsdk-projection:20837cba70f4d9c78a0e3556",
       "symbol": "dmResource::GetResource",
       "disposition": "blocked",
       "blockers": [
@@ -4445,8 +4445,8 @@
       "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)"
     },
     {
-      "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2017",
-      "projectionId": "dmsdk-projection:7eae8cc047ba82f02aea85f9",
+      "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2018",
+      "projectionId": "dmsdk-projection:b7c8027df756e560badcc4fa",
       "symbol": "dmResource::GetResourceSize",
       "disposition": "generated-provider-boundary",
       "bindingId": 47,
@@ -4474,8 +4474,8 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::GetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:1986",
-      "projectionId": "dmsdk-projection:41cd5c7ced2e45e2c382158b",
+      "id": "dmsdk:dmResource::GetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:1987",
+      "projectionId": "dmsdk-projection:c8d49960b3f61c526faa588c",
       "symbol": "dmResource::GetTypeFromExtensionHash",
       "disposition": "blocked",
       "blockers": [
@@ -4492,8 +4492,8 @@
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)"
     },
     {
-      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1976",
-      "projectionId": "dmsdk-projection:183f4f1556f23a01fb0bb79c",
+      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1977",
+      "projectionId": "dmsdk-projection:9607c160f5916238830dff20",
       "symbol": "dmResource::IncRef",
       "disposition": "blocked",
       "blockers": [
@@ -4509,8 +4509,8 @@
       "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1977",
-      "projectionId": "dmsdk-projection:7e65dd96149fcb25093a07fd",
+      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1978",
+      "projectionId": "dmsdk-projection:7b00e74db9b9f08dbad937e5",
       "symbol": "dmResource::IncRef",
       "disposition": "blocked",
       "blockers": [
@@ -4523,8 +4523,8 @@
       "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,value:handle:HResourceDescriptor:opaque)"
     },
     {
-      "id": "dmsdk:dmResource::SetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:319:1992",
-      "projectionId": "dmsdk-projection:caf105082415e24428a62e11",
+      "id": "dmsdk:dmResource::SetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:319:1993",
+      "projectionId": "dmsdk-projection:d7c6b9c0357ca3a622516d7e",
       "symbol": "dmResource::SetContext",
       "disposition": "blocked",
       "blockers": [
@@ -4540,8 +4540,8 @@
       "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2014",
-      "projectionId": "dmsdk-projection:c449e0f6aaa52062b342864a",
+      "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2015",
+      "projectionId": "dmsdk-projection:abec52740f90e362695a6059",
       "symbol": "dmResource::SetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -4557,8 +4557,8 @@
       "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2012",
-      "projectionId": "dmsdk-projection:98cba782bda1acc844516e58",
+      "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2013",
+      "projectionId": "dmsdk-projection:835fb040632c31564f407af3",
       "symbol": "dmResource::SetResource",
       "disposition": "blocked",
       "blockers": [
@@ -4574,8 +4574,8 @@
       "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2016",
-      "projectionId": "dmsdk-projection:88a08aadb4833b0f5c6a9406",
+      "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2017",
+      "projectionId": "dmsdk-projection:868f0a002233d917352869dd",
       "symbol": "dmResource::SetResourceSize",
       "disposition": "blocked",
       "blockers": [
@@ -4588,8 +4588,8 @@
       "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,value:scalar:u32)"
     },
     {
-      "id": "dmsdk:dmResource::ValidateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:1990",
-      "projectionId": "dmsdk-projection:ebc4b55050e1a39e1e324e69",
+      "id": "dmsdk:dmResource::ValidateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:1991",
+      "projectionId": "dmsdk-projection:a16b3c2cbeb5b922fe0ef66f",
       "symbol": "dmResource::ValidateResourceType",
       "disposition": "blocked",
       "blockers": [
@@ -4603,8 +4603,8 @@
       "shape": "enum:dmResource::Result(value:handle:HResourceType:opaque)"
     },
     {
-      "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2049",
-      "projectionId": "dmsdk-projection:e500324b47c2f708532c9fad",
+      "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2050",
+      "projectionId": "dmsdk-projection:ec241b28d1cdb5fa175d51b1",
       "symbol": "dmRig::CancelAnimation",
       "disposition": "blocked",
       "blockers": [
@@ -4618,8 +4618,8 @@
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque)"
     },
     {
-      "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2050",
-      "projectionId": "dmsdk-projection:23b9017db464e120b484da69",
+      "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2051",
+      "projectionId": "dmsdk-projection:29623d4ef9f2b5060b0760eb",
       "symbol": "dmRig::GetAnimation",
       "disposition": "generated-provider-boundary",
       "bindingId": 48,
@@ -4647,8 +4647,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GetBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:212:2067",
-      "projectionId": "dmsdk-projection:d99dec90aa13b092680b71dd",
+      "id": "dmsdk:dmRig::GetBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:212:2068",
+      "projectionId": "dmsdk-projection:91d83017726d0c7e349dd99b",
       "symbol": "dmRig::GetBoneCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 49,
@@ -4676,8 +4676,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:202:2057",
-      "projectionId": "dmsdk-projection:38b82bbf084f4e02c4ff30e4",
+      "id": "dmsdk:dmRig::GetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:202:2058",
+      "projectionId": "dmsdk-projection:51a6bc2a58e47d7124edb26a",
       "symbol": "dmRig::GetCursor",
       "disposition": "generated-provider-boundary",
       "bindingId": 50,
@@ -4705,8 +4705,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:210:2065",
-      "projectionId": "dmsdk-projection:8f20a67cfdcd4bcb6f1bd278",
+      "id": "dmsdk:dmRig::GetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:210:2066",
+      "projectionId": "dmsdk-projection:a47bb4163866618e7585044a",
       "symbol": "dmRig::GetEnabled",
       "disposition": "generated-provider-boundary",
       "bindingId": 51,
@@ -4734,8 +4734,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:207:2062",
-      "projectionId": "dmsdk-projection:35c0fbc4d627be2cfc36e29d",
+      "id": "dmsdk:dmRig::GetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:207:2063",
+      "projectionId": "dmsdk-projection:eaf3f41fb0f3ccbede459b57",
       "symbol": "dmRig::GetIKTarget",
       "disposition": "blocked",
       "blockers": [
@@ -4750,8 +4750,8 @@
       "shape": "pointer:record:dmRig::IKTarget(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2068",
-      "projectionId": "dmsdk-projection:7b78598eeaa6ad16d5eba521",
+      "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2069",
+      "projectionId": "dmsdk-projection:faff30e3945ab4ac36a3c93c",
       "symbol": "dmRig::GetMaxBoneCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 52,
@@ -4779,8 +4779,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2056",
-      "projectionId": "dmsdk-projection:c447a9091daa8589cac63a5d",
+      "id": "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2057",
+      "projectionId": "dmsdk-projection:4d0d600426f389e17266f7a2",
       "symbol": "dmRig::GetModel",
       "disposition": "generated-provider-boundary",
       "bindingId": 53,
@@ -4808,8 +4808,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2059",
-      "projectionId": "dmsdk-projection:6abd2f789a883e8c5b234a57",
+      "id": "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2060",
+      "projectionId": "dmsdk-projection:82decbd7bac53b6e67876ed5",
       "symbol": "dmRig::GetPlaybackRate",
       "disposition": "generated-provider-boundary",
       "bindingId": 54,
@@ -4837,8 +4837,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::GetPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:206:2061",
-      "projectionId": "dmsdk-projection:943e2000eaa860c34a6158f8",
+      "id": "dmsdk:dmRig::GetPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:206:2062",
+      "projectionId": "dmsdk-projection:7cec01c8e94b4bf1163884e4",
       "symbol": "dmRig::GetPose",
       "disposition": "blocked",
       "blockers": [
@@ -4854,8 +4854,8 @@
       "shape": "pointer:unknown:dmArray<BonePose>(value:handle:dmRig::HRigInstance:opaque)"
     },
     {
-      "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2054",
-      "projectionId": "dmsdk-projection:7a2f413c16a3911cab1eeeee",
+      "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2055",
+      "projectionId": "dmsdk-projection:4bbda521ff8c9ec071e7ea3c",
       "symbol": "dmRig::GetVertexCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 55,
@@ -4883,8 +4883,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::HasPoseMatrixCacheAnimatedPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:215:2069",
-      "projectionId": "dmsdk-projection:1fe7d9f5fdb2dc57c49f31df",
+      "id": "dmsdk:dmRig::HasPoseMatrixCacheAnimatedPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:215:2070",
+      "projectionId": "dmsdk-projection:6c6c76a6f544a09bdb08bb18",
       "symbol": "dmRig::HasPoseMatrixCacheAnimatedPose",
       "disposition": "generated-provider-boundary",
       "bindingId": 56,
@@ -4912,8 +4912,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::InstanceDestroy@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:172:2047",
-      "projectionId": "dmsdk-projection:fcc72a481aba99a56d501e88",
+      "id": "dmsdk:dmRig::InstanceDestroy@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:172:2048",
+      "projectionId": "dmsdk-projection:e00290484bc5b6c42d4c746a",
       "symbol": "dmRig::InstanceDestroy",
       "disposition": "blocked",
       "blockers": [
@@ -4927,8 +4927,8 @@
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque)"
     },
     {
-      "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2066",
-      "projectionId": "dmsdk-projection:87f460b79ff10bebe01de452",
+      "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2067",
+      "projectionId": "dmsdk-projection:90f048ce5462eabaf88de483",
       "symbol": "dmRig::IsValid",
       "disposition": "generated-provider-boundary",
       "bindingId": 57,
@@ -4956,8 +4956,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2048",
-      "projectionId": "dmsdk-projection:4b7682ffd70b41f77121fda7",
+      "id": "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2049",
+      "projectionId": "dmsdk-projection:ddfaf61bf9e3e50cc5a48048",
       "symbol": "dmRig::PlayAnimation",
       "disposition": "blocked",
       "blockers": [
@@ -4972,8 +4972,8 @@
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,value:enum:dmRig::RigPlayback,value:scalar:f32,value:scalar:f32,value:scalar:f32)"
     },
     {
-      "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2063",
-      "projectionId": "dmsdk-projection:e3cb9af0958499e658d0a945",
+      "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2064",
+      "projectionId": "dmsdk-projection:97d53a7046e2583d74788f87",
       "symbol": "dmRig::ResetIKTarget",
       "disposition": "generated-provider-boundary",
       "bindingId": 58,
@@ -5001,8 +5001,8 @@
       }
     },
     {
-      "id": "dmsdk:dmRig::SetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:203:2058",
-      "projectionId": "dmsdk-projection:86366a734b3ababef5e1d427",
+      "id": "dmsdk:dmRig::SetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:203:2059",
+      "projectionId": "dmsdk-projection:7ca28b4f901ae9ccdf430cf4",
       "symbol": "dmRig::SetCursor",
       "disposition": "blocked",
       "blockers": [
@@ -5016,8 +5016,8 @@
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32,value:scalar:bool)"
     },
     {
-      "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2064",
-      "projectionId": "dmsdk-projection:e26ce737f3b1868417e431aa",
+      "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2065",
+      "projectionId": "dmsdk-projection:c666c3acd96818238a48dc99",
       "symbol": "dmRig::SetEnabled",
       "disposition": "blocked",
       "blockers": [
@@ -5030,8 +5030,8 @@
       "shape": "scalar:void(value:handle:dmRig::HRigInstance:opaque,value:scalar:bool)"
     },
     {
-      "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2055",
-      "projectionId": "dmsdk-projection:fe8784445a98b8d428e7032e",
+      "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2056",
+      "projectionId": "dmsdk-projection:06a748b95b50bf8e26e60f2a",
       "symbol": "dmRig::SetModel",
       "disposition": "blocked",
       "blockers": [
@@ -5045,8 +5045,8 @@
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2060",
-      "projectionId": "dmsdk-projection:48e84073ec1c0b3feade8e8e",
+      "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2061",
+      "projectionId": "dmsdk-projection:de1919fac271b29349778177",
       "symbol": "dmRig::SetPlaybackRate",
       "disposition": "blocked",
       "blockers": [
@@ -5060,8 +5060,8 @@
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32)"
     },
     {
-      "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2045",
-      "projectionId": "dmsdk-projection:37ce191a5f5f0c63e0cf45bf",
+      "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2046",
+      "projectionId": "dmsdk-projection:f7dd715a661ccd2936a84121",
       "symbol": "dmRig::Update",
       "disposition": "blocked",
       "blockers": [
@@ -5075,8 +5075,8 @@
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:scalar:f32)"
     },
     {
-      "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2087",
-      "projectionId": "dmsdk-projection:a68ec7447145605bfee543f8",
+      "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2088",
+      "projectionId": "dmsdk-projection:be403d67be9476439cda898b",
       "symbol": "dmScript::GetLuaState",
       "disposition": "blocked",
       "blockers": [
@@ -5857,8 +5857,8 @@
       "shape": "enum:ProfileResult(value:handle:HProfile:u32)"
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1912",
-      "projectionId": "dmsdk-projection:2cfa441003a2e2dc060c4fde",
+      "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1913",
+      "projectionId": "dmsdk-projection:94fc7b93e4b13a5227333f10",
       "symbol": "ResourceDescriptorGetNameHash",
       "disposition": "generated-provider-boundary",
       "bindingId": 69,
@@ -5886,8 +5886,8 @@
       }
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1916",
-      "projectionId": "dmsdk-projection:81bda98092cf5c314601813b",
+      "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1917",
+      "projectionId": "dmsdk-projection:7347d52a8866f8c4fe316f9a",
       "symbol": "ResourceDescriptorGetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -5901,8 +5901,8 @@
       "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)"
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1914",
-      "projectionId": "dmsdk-projection:6f84535d29bba8cbf2bd2d99",
+      "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1915",
+      "projectionId": "dmsdk-projection:15b0c8b1f37c515ea7889977",
       "symbol": "ResourceDescriptorGetResource",
       "disposition": "blocked",
       "blockers": [
@@ -5916,8 +5916,8 @@
       "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)"
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1918",
-      "projectionId": "dmsdk-projection:551d8404a6c2c05eb87a718c",
+      "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1919",
+      "projectionId": "dmsdk-projection:75f6add8138a9c0367be55d9",
       "symbol": "ResourceDescriptorGetResourceSize",
       "disposition": "generated-provider-boundary",
       "bindingId": 70,
@@ -5945,8 +5945,8 @@
       }
     },
     {
-      "id": "dmsdk:ResourceDescriptorIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:452:1920",
-      "projectionId": "dmsdk-projection:7a0bf46c6552f8058715152e",
+      "id": "dmsdk:ResourceDescriptorIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:452:1921",
+      "projectionId": "dmsdk-projection:47b7d34b687434be649e833b",
       "symbol": "ResourceDescriptorIncRef",
       "disposition": "blocked",
       "blockers": [
@@ -5959,8 +5959,8 @@
       "shape": "scalar:void(value:handle:HResourceFactory:opaque,value:handle:HResourceDescriptor:opaque)"
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1915",
-      "projectionId": "dmsdk-projection:ec1d2577dc48d29add145f00",
+      "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1916",
+      "projectionId": "dmsdk-projection:7ae76048aeca46d4ae6b54e3",
       "symbol": "ResourceDescriptorSetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -5976,8 +5976,8 @@
       "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1913",
-      "projectionId": "dmsdk-projection:5fd13f2883cd8a47f2c89d03",
+      "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1914",
+      "projectionId": "dmsdk-projection:139fbd3ca8615253680f8125",
       "symbol": "ResourceDescriptorSetResource",
       "disposition": "blocked",
       "blockers": [
@@ -5993,8 +5993,8 @@
       "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1917",
-      "projectionId": "dmsdk-projection:213d5b89f2754d5eafbdf89d",
+      "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1918",
+      "projectionId": "dmsdk-projection:6b7d449ffe2cfc7db44eb6ed",
       "symbol": "ResourceDescriptorSetResourceSize",
       "disposition": "blocked",
       "blockers": [
@@ -6007,8 +6007,8 @@
       "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,value:scalar:u32)"
     },
     {
-      "id": "dmsdk:ResourceGetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:276:1901",
-      "projectionId": "dmsdk-projection:a728bcd55cb91144be2f52eb",
+      "id": "dmsdk:ResourceGetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:276:1902",
+      "projectionId": "dmsdk-projection:069b2288a9cc0934c54aa95c",
       "symbol": "ResourceGetDescriptorByHash",
       "disposition": "blocked",
       "blockers": [
@@ -6025,8 +6025,8 @@
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceDescriptor)"
     },
     {
-      "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1898",
-      "projectionId": "dmsdk-projection:38842db4bb4c85950c7b3b8b",
+      "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1899",
+      "projectionId": "dmsdk-projection:12220483a2ea1ab73c1bd8b0",
       "symbol": "ResourceIncRef",
       "disposition": "blocked",
       "blockers": [
@@ -6042,8 +6042,8 @@
       "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1902",
-      "projectionId": "dmsdk-projection:535deed13459ad459ba582b1",
+      "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1903",
+      "projectionId": "dmsdk-projection:407877661a1ffbfc3fe460d6",
       "symbol": "ResourceRelease",
       "disposition": "blocked",
       "blockers": [
@@ -6059,8 +6059,8 @@
       "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1921",
-      "projectionId": "dmsdk-projection:25e891d1d141188230341a8b",
+      "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1922",
+      "projectionId": "dmsdk-projection:4b15d3948bddb5ead2d74ddc",
       "symbol": "ResourceTypeContextGetContextByHash",
       "disposition": "blocked",
       "blockers": [
@@ -6074,8 +6074,8 @@
       "shape": "opaque-pointer(value:handle:HResourceTypeContext:opaque,value:scalar:u64)"
     },
     {
-      "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1929",
-      "projectionId": "dmsdk-projection:205c27d53bdce82a12f53829",
+      "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1930",
+      "projectionId": "dmsdk-projection:b7befc749c0acdb475e981b0",
       "symbol": "ResourceTypeGetContext",
       "disposition": "blocked",
       "blockers": [
@@ -6089,8 +6089,8 @@
       "shape": "opaque-pointer(value:handle:HResourceType:opaque)"
     },
     {
-      "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1932",
-      "projectionId": "dmsdk-projection:e876bb78aa6d661ba5b815f6",
+      "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1933",
+      "projectionId": "dmsdk-projection:1d3ee5223ed23b45803be288",
       "symbol": "ResourceTypeGetNameHash",
       "disposition": "generated-provider-boundary",
       "bindingId": 71,
@@ -6118,8 +6118,8 @@
       }
     },
     {
-      "id": "dmsdk:ResourceTypeGetPreloadSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:597:1940",
-      "projectionId": "dmsdk-projection:844526ff9edf3334d9bdf7bf",
+      "id": "dmsdk:ResourceTypeGetPreloadSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:597:1941",
+      "projectionId": "dmsdk-projection:14145270aff87430bc309145",
       "symbol": "ResourceTypeGetPreloadSize",
       "disposition": "generated-provider-boundary",
       "bindingId": 72,
@@ -6147,8 +6147,8 @@
       }
     },
     {
-      "id": "dmsdk:ResourceTypeIsStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:596:1939",
-      "projectionId": "dmsdk-projection:2b070ed4c67b539ab6888abc",
+      "id": "dmsdk:ResourceTypeIsStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:596:1940",
+      "projectionId": "dmsdk-projection:c8c6b70496216ae738340cd0",
       "symbol": "ResourceTypeIsStreaming",
       "disposition": "generated-provider-boundary",
       "bindingId": 73,
@@ -6176,8 +6176,8 @@
       }
     },
     {
-      "id": "dmsdk:ResourceTypeReset@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:600:1941",
-      "projectionId": "dmsdk-projection:9c937312c96d38e05734907a",
+      "id": "dmsdk:ResourceTypeReset@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:600:1942",
+      "projectionId": "dmsdk-projection:7d1fe80ad38cf13435ac9590",
       "symbol": "ResourceTypeReset",
       "disposition": "blocked",
       "blockers": [
@@ -6190,8 +6190,8 @@
       "shape": "scalar:void(value:handle:HResourceType:opaque)"
     },
     {
-      "id": "dmsdk:ResourceTypeSetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:544:1930",
-      "projectionId": "dmsdk-projection:a3d7302e2bd173fbf2bfd436",
+      "id": "dmsdk:ResourceTypeSetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:544:1931",
+      "projectionId": "dmsdk-projection:fbc69e80d81bda588b60adbf",
       "symbol": "ResourceTypeSetContext",
       "disposition": "blocked",
       "blockers": [
@@ -6207,8 +6207,8 @@
       "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)"
     },
     {
-      "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1938",
-      "projectionId": "dmsdk-projection:f36a0e8ec095d4ad0229b648",
+      "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1939",
+      "projectionId": "dmsdk-projection:9033f4c92993ab2cdca0ee3a",
       "symbol": "ResourceTypeSetStreaming",
       "disposition": "blocked",
       "blockers": [
@@ -6536,8 +6536,8 @@
       "shape": "scalar:void(value:handle:HTextLayout:opaque,value:scalar:f32)"
     },
     {
-      "id": "dmsdk:WindowClose@upstream/defold/engine/platform/src/dmsdk/platform/window.h:267:1785",
-      "projectionId": "dmsdk-projection:ef7daf07c43605f6027d301f",
+      "id": "dmsdk:WindowClose@upstream/defold/engine/platform/src/dmsdk/platform/window.h:267:1786",
+      "projectionId": "dmsdk-projection:f3a88c7274ba59ccde5d73f3",
       "symbol": "WindowClose",
       "disposition": "blocked",
       "blockers": [
@@ -6550,8 +6550,8 @@
       "shape": "scalar:void(value:handle:HWindow:opaque)"
     },
     {
-      "id": "dmsdk:WindowDelete@upstream/defold/engine/platform/src/dmsdk/platform/window.h:253:1783",
-      "projectionId": "dmsdk-projection:94a3dd39311016ebbe305ed1",
+      "id": "dmsdk:WindowDelete@upstream/defold/engine/platform/src/dmsdk/platform/window.h:253:1784",
+      "projectionId": "dmsdk-projection:81e6fb71a0e2c9f7e26cf230",
       "symbol": "WindowDelete",
       "disposition": "blocked",
       "blockers": [
@@ -6564,8 +6564,8 @@
       "shape": "scalar:void(value:handle:HWindow:opaque)"
     },
     {
-      "id": "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1791",
-      "projectionId": "dmsdk-projection:a705684a7d3a63fd2cae8a7d",
+      "id": "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1792",
+      "projectionId": "dmsdk-projection:8918441528eb2f1aebf4f90d",
       "symbol": "WindowGetDisplayScaleFactor",
       "disposition": "generated-provider-boundary",
       "bindingId": 79,
@@ -6593,8 +6593,8 @@
       }
     },
     {
-      "id": "dmsdk:WindowGetHeight@upstream/defold/engine/platform/src/dmsdk/platform/window.h:293:1789",
-      "projectionId": "dmsdk-projection:c5f14c1af597942ffdae1da4",
+      "id": "dmsdk:WindowGetHeight@upstream/defold/engine/platform/src/dmsdk/platform/window.h:293:1790",
+      "projectionId": "dmsdk-projection:ba313e4bd60ff76e9ed59437",
       "symbol": "WindowGetHeight",
       "disposition": "generated-provider-boundary",
       "bindingId": 80,
@@ -6622,8 +6622,8 @@
       }
     },
     {
-      "id": "dmsdk:WindowGetStateParam@upstream/defold/engine/platform/src/dmsdk/platform/window.h:301:1790",
-      "projectionId": "dmsdk-projection:1b444a8de7d92f429bc4bdd9",
+      "id": "dmsdk:WindowGetStateParam@upstream/defold/engine/platform/src/dmsdk/platform/window.h:301:1791",
+      "projectionId": "dmsdk-projection:cb68bcf797809aa4ff678cca",
       "symbol": "WindowGetStateParam",
       "disposition": "blocked",
       "blockers": [
@@ -6637,8 +6637,8 @@
       "shape": "scalar:u32(value:handle:HWindow:opaque,value:enum:WindowState)"
     },
     {
-      "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1788",
-      "projectionId": "dmsdk-projection:96479d4977fe225f21622776",
+      "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1789",
+      "projectionId": "dmsdk-projection:1c7f9e9a0964b9a7c8258a6a",
       "symbol": "WindowGetWidth",
       "disposition": "generated-provider-boundary",
       "bindingId": 81,
@@ -6666,8 +6666,8 @@
       }
     },
     {
-      "id": "dmsdk:WindowIconify@upstream/defold/engine/platform/src/dmsdk/platform/window.h:279:1787",
-      "projectionId": "dmsdk-projection:8bc814e3a4396819146df05f",
+      "id": "dmsdk:WindowIconify@upstream/defold/engine/platform/src/dmsdk/platform/window.h:279:1788",
+      "projectionId": "dmsdk-projection:05b909a630621389d755c3f1",
       "symbol": "WindowIconify",
       "disposition": "blocked",
       "blockers": [
@@ -6680,8 +6680,8 @@
       "shape": "scalar:void(value:handle:HWindow:opaque)"
     },
     {
-      "id": "dmsdk:WindowOpen@upstream/defold/engine/platform/src/dmsdk/platform/window.h:261:1784",
-      "projectionId": "dmsdk-projection:ac0064ef6d303bccd46501c7",
+      "id": "dmsdk:WindowOpen@upstream/defold/engine/platform/src/dmsdk/platform/window.h:261:1785",
+      "projectionId": "dmsdk-projection:d55ecc7c25ca160a0f12ab1f",
       "symbol": "WindowOpen",
       "disposition": "blocked",
       "blockers": [
@@ -6698,8 +6698,8 @@
       "shape": "enum:WindowResult(value:handle:HWindow:opaque,in:pointer:record:WindowCreateParams)"
     },
     {
-      "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1793",
-      "projectionId": "dmsdk-projection:003723b06cc7a20b7045fb9e",
+      "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1794",
+      "projectionId": "dmsdk-projection:380f14e11c77980102bc251b",
       "symbol": "WindowPollEvents",
       "disposition": "blocked",
       "blockers": [
@@ -6712,8 +6712,8 @@
       "shape": "scalar:void(value:handle:HWindow:opaque)"
     },
     {
-      "id": "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1792",
-      "projectionId": "dmsdk-projection:4aae57aeb94ddbfc769fdb7d",
+      "id": "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1793",
+      "projectionId": "dmsdk-projection:10dd964d4d6488d068b6db0c",
       "symbol": "WindowSetSize",
       "disposition": "blocked",
       "blockers": [
@@ -6726,8 +6726,8 @@
       "shape": "scalar:void(value:handle:HWindow:opaque,value:scalar:u32,value:scalar:u32)"
     },
     {
-      "id": "dmsdk:WindowShow@upstream/defold/engine/platform/src/dmsdk/platform/window.h:273:1786",
-      "projectionId": "dmsdk-projection:4055e1085a34a0dd7e2c19e3",
+      "id": "dmsdk:WindowShow@upstream/defold/engine/platform/src/dmsdk/platform/window.h:273:1787",
+      "projectionId": "dmsdk-projection:542cd647cc15f1cd5f67137d",
       "symbol": "WindowShow",
       "disposition": "blocked",
       "blockers": [

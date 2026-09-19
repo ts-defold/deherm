@@ -47,7 +47,7 @@
 // finding and stays blocked; the point is to stop blocking the ones that are
 // demonstrably there.
 
-import { execFile } from "node:child_process";
+import { execFile, spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -91,6 +91,24 @@ export const variants = Object.freeze(["debug", "release", "headless"]);
  * none and it is reported unmeasured rather than absent.
  */
 export const callableKinds = new Set(["function", "method", "constructor", "destructor"]);
+
+/**
+ * How to invoke one LLVM binutil on this host.
+ *
+ * `xcrun` is Apple's tool locator and exists on no other operating system, so
+ * hardcoding it made this pass macOS-only. The measurement itself is not: it
+ * reads Mach-O, ELF and COFF archives out of Defold's own SDK zip, which is the
+ * same zip everywhere. A tool on PATH is used directly; `xcrun` is the fallback
+ * for a Mac where the binutils live inside Xcode rather than on PATH.
+ */
+const llvmToolCache = new Map();
+function llvmTool(name) {
+  if (!llvmToolCache.has(name)) {
+    const onPath = spawnSync(name, ["--version"], { stdio: "ignore" });
+    llvmToolCache.set(name, onPath.error ? ["xcrun", name] : [name]);
+  }
+  return llvmToolCache.get(name);
+}
 
 const compare = (left, right) => left < right ? -1 : left > right ? 1 : 0;
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
@@ -228,10 +246,20 @@ export function qualifiedName(demangled) {
 async function demangledNames(symbols) {
   const itanium = [...symbols].filter((name) => name.startsWith("_Z") || name.startsWith("__Z"));
   if (itanium.length === 0) return new Set();
-  const { stdout } = await run("xcrun", ["llvm-cxxfilt"], {
-    maxBuffer: 512 * 1024 * 1024,
-    input: itanium.join("\n")
-  }).catch(() => ({ stdout: "" }));
+  // `spawn`, not `execFile`: `execFile` has no `input` option, so the names were
+  // never written and the demangler sat waiting for an end of input that never
+  // came. Every run of this pass hung there.
+  const stdout = await new Promise((resolve) => {
+    const [command, ...prefix] = llvmTool("llvm-cxxfilt");
+    const child = spawn(command, prefix, { stdio: ["pipe", "pipe", "ignore"] });
+    let output = "";
+    child.stdout.setEncoding("utf8");
+    child.stdout.on("data", (chunk) => { output += chunk; });
+    child.on("error", () => resolve(""));
+    child.on("close", () => resolve(output));
+    child.stdin.on("error", () => {});
+    child.stdin.end(itanium.join("\n"));
+  });
   return new Set(stdout.split("\n").map((line) => qualifiedName(line.trim())).filter(Boolean));
 }
 
@@ -244,7 +272,8 @@ async function definedSymbols(file) {
     // rather than needing a per-platform binutils. RAW symbols, not demangled:
     // the IR carries the compiler's own mangled name per ABI, so the join is
     // exact and needs no name reconstruction.
-    ({ stdout } = await run("xcrun", ["llvm-nm", "--defined-only", file], { maxBuffer: 512 * 1024 * 1024 }));
+    const [command, ...prefix] = llvmTool("llvm-nm");
+    ({ stdout } = await run(command, [...prefix, "--defined-only", file], { maxBuffer: 512 * 1024 * 1024 }));
   } catch {
     return null;
   }

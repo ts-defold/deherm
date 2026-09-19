@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "sourcePlatform": "arm64-macos",
   "sourceIr": "packages/bindings/generated/defold-sdk-ir.json",
   "runtimePendingDefinition": "declarations whose disposition is generated-raw-call",
   "coverage": {
@@ -14,7 +13,7 @@
     "note": "Classification is code-generation planning metadata. It is not evidence that a binding adapter was generated, compiled, linked, executed, or conformance-tested."
   },
   "provenanceCaveats": {
-    "diagnosticHeaderCount": 35,
+    "diagnosticHeaderCount": 55,
     "note": "The source IR reports diagnostics only as a header count, so individual declarations cannot yet be marked diagnostic-derived here."
   },
   "familyCatalog": {
@@ -624,7 +623,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_atpanic@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1681",
+      "id": "dmsdk:dm_lua_atpanic@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1682",
       "symbol": "dm_lua_atpanic",
       "signature": "dm_lua_atpanic(lua_State *, lua_CFunction) -> lua_CFunction",
       "kind": "function",
@@ -642,7 +641,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_call@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1733",
+      "id": "dmsdk:dm_lua_call@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1734",
       "symbol": "dm_lua_call",
       "signature": "dm_lua_call(lua_State *, int, int) -> void",
       "kind": "function",
@@ -658,7 +657,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1688",
+      "id": "dmsdk:dm_lua_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1689",
       "symbol": "dm_lua_checkstack",
       "signature": "dm_lua_checkstack(lua_State *, int) -> int",
       "kind": "function",
@@ -674,7 +673,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_close@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1679",
+      "id": "dmsdk:dm_lua_close@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1680",
       "symbol": "dm_lua_close",
       "signature": "dm_lua_close(lua_State *) -> void",
       "kind": "function",
@@ -690,7 +689,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_concat@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1744",
+      "id": "dmsdk:dm_lua_concat@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1745",
       "symbol": "dm_lua_concat",
       "signature": "dm_lua_concat(lua_State *, int) -> void",
       "kind": "function",
@@ -706,7 +705,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_cpcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1735",
+      "id": "dmsdk:dm_lua_cpcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1736",
       "symbol": "dm_lua_cpcall",
       "signature": "dm_lua_cpcall(lua_State *, lua_CFunction, void *) -> int",
       "kind": "function",
@@ -724,7 +723,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_createtable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1723",
+      "id": "dmsdk:dm_lua_createtable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1724",
       "symbol": "dm_lua_createtable",
       "signature": "dm_lua_createtable(lua_State *, int, int) -> void",
       "kind": "function",
@@ -740,7 +739,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_dump@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1737",
+      "id": "dmsdk:dm_lua_dump@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1738",
       "symbol": "dm_lua_dump",
       "signature": "dm_lua_dump(lua_State *, lua_Writer, void *) -> int",
       "kind": "function",
@@ -758,7 +757,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_equal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1696",
+      "id": "dmsdk:dm_lua_equal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1697",
       "symbol": "dm_lua_equal",
       "signature": "dm_lua_equal(lua_State *, int, int) -> int",
       "kind": "function",
@@ -774,7 +773,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_error@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1742",
+      "id": "dmsdk:dm_lua_error@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1743",
       "symbol": "dm_lua_error",
       "signature": "dm_lua_error(lua_State *) -> int",
       "kind": "function",
@@ -790,7 +789,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gc@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1741",
+      "id": "dmsdk:dm_lua_gc@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1742",
       "symbol": "dm_lua_gc",
       "signature": "dm_lua_gc(lua_State *, int, int) -> int",
       "kind": "function",
@@ -806,7 +805,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1745",
+      "id": "dmsdk:dm_lua_getallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1746",
       "symbol": "dm_lua_getallocf",
       "signature": "dm_lua_getallocf(lua_State *, void **) -> lua_Alloc",
       "kind": "function",
@@ -826,7 +825,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1726",
+      "id": "dmsdk:dm_lua_getfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1727",
       "symbol": "dm_lua_getfenv",
       "signature": "dm_lua_getfenv(lua_State *, int) -> void",
       "kind": "function",
@@ -842,7 +841,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1720",
+      "id": "dmsdk:dm_lua_getfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1721",
       "symbol": "dm_lua_getfield",
       "signature": "dm_lua_getfield(lua_State *, int, const char *) -> void",
       "kind": "function",
@@ -858,7 +857,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1758",
+      "id": "dmsdk:dm_lua_gethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1759",
       "symbol": "dm_lua_gethook",
       "signature": "dm_lua_gethook(lua_State *) -> lua_Hook",
       "kind": "function",
@@ -876,7 +875,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gethookcount@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1760",
+      "id": "dmsdk:dm_lua_gethookcount@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1761",
       "symbol": "dm_lua_gethookcount",
       "signature": "dm_lua_gethookcount(lua_State *) -> int",
       "kind": "function",
@@ -892,7 +891,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gethookmask@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1759",
+      "id": "dmsdk:dm_lua_gethookmask@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1760",
       "symbol": "dm_lua_gethookmask",
       "signature": "dm_lua_gethookmask(lua_State *) -> int",
       "kind": "function",
@@ -908,7 +907,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getinfo@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1752",
+      "id": "dmsdk:dm_lua_getinfo@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1753",
       "symbol": "dm_lua_getinfo",
       "signature": "dm_lua_getinfo(lua_State *, const char *, lua_Debug *) -> int",
       "kind": "function",
@@ -924,7 +923,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1753",
+      "id": "dmsdk:dm_lua_getlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1754",
       "symbol": "dm_lua_getlocal",
       "signature": "dm_lua_getlocal(lua_State *, const lua_Debug *, int) -> const char *",
       "kind": "function",
@@ -940,7 +939,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1725",
+      "id": "dmsdk:dm_lua_getmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1726",
       "symbol": "dm_lua_getmetatable",
       "signature": "dm_lua_getmetatable(lua_State *, int) -> int",
       "kind": "function",
@@ -956,7 +955,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1751",
+      "id": "dmsdk:dm_lua_getstack@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1752",
       "symbol": "dm_lua_getstack",
       "signature": "dm_lua_getstack(lua_State *, int, lua_Debug *) -> int",
       "kind": "function",
@@ -972,7 +971,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gettable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1719",
+      "id": "dmsdk:dm_lua_gettable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1720",
       "symbol": "dm_lua_gettable",
       "signature": "dm_lua_gettable(lua_State *, int) -> void",
       "kind": "function",
@@ -988,7 +987,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_gettop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1682",
+      "id": "dmsdk:dm_lua_gettop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1683",
       "symbol": "dm_lua_gettop",
       "signature": "dm_lua_gettop(lua_State *) -> int",
       "kind": "function",
@@ -1004,7 +1003,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_getupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1755",
+      "id": "dmsdk:dm_lua_getupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1756",
       "symbol": "dm_lua_getupvalue",
       "signature": "dm_lua_getupvalue(lua_State *, int, int) -> const char *",
       "kind": "function",
@@ -1020,7 +1019,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_insert@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1686",
+      "id": "dmsdk:dm_lua_insert@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1687",
       "symbol": "dm_lua_insert",
       "signature": "dm_lua_insert(lua_State *, int) -> void",
       "kind": "function",
@@ -1036,7 +1035,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_iscfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1692",
+      "id": "dmsdk:dm_lua_iscfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1693",
       "symbol": "dm_lua_iscfunction",
       "signature": "dm_lua_iscfunction(lua_State *, int) -> int",
       "kind": "function",
@@ -1052,7 +1051,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_isnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1690",
+      "id": "dmsdk:dm_lua_isnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1691",
       "symbol": "dm_lua_isnumber",
       "signature": "dm_lua_isnumber(lua_State *, int) -> int",
       "kind": "function",
@@ -1068,7 +1067,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_isstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1691",
+      "id": "dmsdk:dm_lua_isstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1692",
       "symbol": "dm_lua_isstring",
       "signature": "dm_lua_isstring(lua_State *, int) -> int",
       "kind": "function",
@@ -1084,7 +1083,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_isuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1693",
+      "id": "dmsdk:dm_lua_isuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1694",
       "symbol": "dm_lua_isuserdata",
       "signature": "dm_lua_isuserdata(lua_State *, int) -> int",
       "kind": "function",
@@ -1100,7 +1099,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_lessthan@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1698",
+      "id": "dmsdk:dm_lua_lessthan@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1699",
       "symbol": "dm_lua_lessthan",
       "signature": "dm_lua_lessthan(lua_State *, int, int) -> int",
       "kind": "function",
@@ -1116,7 +1115,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_load@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1736",
+      "id": "dmsdk:dm_lua_load@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1737",
       "symbol": "dm_lua_load",
       "signature": "dm_lua_load(lua_State *, lua_Reader, void *, const char *) -> int",
       "kind": "function",
@@ -1134,7 +1133,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1678",
+      "id": "dmsdk:dm_lua_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1679",
       "symbol": "dm_lua_newstate",
       "signature": "dm_lua_newstate(lua_Alloc, void *) -> lua_State *",
       "kind": "function",
@@ -1152,7 +1151,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_newthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1680",
+      "id": "dmsdk:dm_lua_newthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1681",
       "symbol": "dm_lua_newthread",
       "signature": "dm_lua_newthread(lua_State *) -> lua_State *",
       "kind": "function",
@@ -1168,7 +1167,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_newuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1724",
+      "id": "dmsdk:dm_lua_newuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1725",
       "symbol": "dm_lua_newuserdata",
       "signature": "dm_lua_newuserdata(lua_State *, size_t) -> void *",
       "kind": "function",
@@ -1184,7 +1183,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_next@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1743",
+      "id": "dmsdk:dm_lua_next@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1744",
       "symbol": "dm_lua_next",
       "signature": "dm_lua_next(lua_State *, int) -> int",
       "kind": "function",
@@ -1200,7 +1199,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_objlen@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1703",
+      "id": "dmsdk:dm_lua_objlen@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1704",
       "symbol": "dm_lua_objlen",
       "signature": "dm_lua_objlen(lua_State *, int) -> size_t",
       "kind": "function",
@@ -1216,7 +1215,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1734",
+      "id": "dmsdk:dm_lua_pcall@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1735",
       "symbol": "dm_lua_pcall",
       "signature": "dm_lua_pcall(lua_State *, int, int, int) -> int",
       "kind": "function",
@@ -1232,7 +1231,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1716",
+      "id": "dmsdk:dm_lua_pushboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1717",
       "symbol": "dm_lua_pushboolean",
       "signature": "dm_lua_pushboolean(lua_State *, int) -> void",
       "kind": "function",
@@ -1248,7 +1247,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushcclosure@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1715",
+      "id": "dmsdk:dm_lua_pushcclosure@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1716",
       "symbol": "dm_lua_pushcclosure",
       "signature": "dm_lua_pushcclosure(lua_State *, lua_CFunction, int) -> void",
       "kind": "function",
@@ -1266,7 +1265,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1714",
+      "id": "dmsdk:dm_lua_pushfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1715",
       "symbol": "dm_lua_pushfstring",
       "signature": "dm_lua_pushfstring(lua_State *, const char *) -> const char *",
       "kind": "function",
@@ -1284,7 +1283,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushinteger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1710",
+      "id": "dmsdk:dm_lua_pushinteger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1711",
       "symbol": "dm_lua_pushinteger",
       "signature": "dm_lua_pushinteger(lua_State *, lua_Integer) -> void",
       "kind": "function",
@@ -1302,7 +1301,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushlightuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1717",
+      "id": "dmsdk:dm_lua_pushlightuserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1718",
       "symbol": "dm_lua_pushlightuserdata",
       "signature": "dm_lua_pushlightuserdata(lua_State *, void *) -> void",
       "kind": "function",
@@ -1318,7 +1317,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushlstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1711",
+      "id": "dmsdk:dm_lua_pushlstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1712",
       "symbol": "dm_lua_pushlstring",
       "signature": "dm_lua_pushlstring(lua_State *, const char *, size_t) -> void",
       "kind": "function",
@@ -1334,7 +1333,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushnil@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1708",
+      "id": "dmsdk:dm_lua_pushnil@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1709",
       "symbol": "dm_lua_pushnil",
       "signature": "dm_lua_pushnil(lua_State *) -> void",
       "kind": "function",
@@ -1350,7 +1349,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1709",
+      "id": "dmsdk:dm_lua_pushnumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1710",
       "symbol": "dm_lua_pushnumber",
       "signature": "dm_lua_pushnumber(lua_State *, lua_Number) -> void",
       "kind": "function",
@@ -1368,7 +1367,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1712",
+      "id": "dmsdk:dm_lua_pushstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1713",
       "symbol": "dm_lua_pushstring",
       "signature": "dm_lua_pushstring(lua_State *, const char *) -> void",
       "kind": "function",
@@ -1384,7 +1383,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1718",
+      "id": "dmsdk:dm_lua_pushthread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1719",
       "symbol": "dm_lua_pushthread",
       "signature": "dm_lua_pushthread(lua_State *) -> int",
       "kind": "function",
@@ -1400,7 +1399,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1684",
+      "id": "dmsdk:dm_lua_pushvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1685",
       "symbol": "dm_lua_pushvalue",
       "signature": "dm_lua_pushvalue(lua_State *, int) -> void",
       "kind": "function",
@@ -1416,7 +1415,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_pushvfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1713",
+      "id": "dmsdk:dm_lua_pushvfstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1714",
       "symbol": "dm_lua_pushvfstring",
       "signature": "dm_lua_pushvfstring(lua_State *, const char *, va_list) -> const char *",
       "kind": "function",
@@ -1436,7 +1435,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawequal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1697",
+      "id": "dmsdk:dm_lua_rawequal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1698",
       "symbol": "dm_lua_rawequal",
       "signature": "dm_lua_rawequal(lua_State *, int, int) -> int",
       "kind": "function",
@@ -1452,7 +1451,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawget@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1721",
+      "id": "dmsdk:dm_lua_rawget@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1722",
       "symbol": "dm_lua_rawget",
       "signature": "dm_lua_rawget(lua_State *, int) -> void",
       "kind": "function",
@@ -1468,7 +1467,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawgeti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1722",
+      "id": "dmsdk:dm_lua_rawgeti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1723",
       "symbol": "dm_lua_rawgeti",
       "signature": "dm_lua_rawgeti(lua_State *, int, int) -> void",
       "kind": "function",
@@ -1484,7 +1483,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawset@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1729",
+      "id": "dmsdk:dm_lua_rawset@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1730",
       "symbol": "dm_lua_rawset",
       "signature": "dm_lua_rawset(lua_State *, int) -> void",
       "kind": "function",
@@ -1500,7 +1499,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_rawseti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1730",
+      "id": "dmsdk:dm_lua_rawseti@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1731",
       "symbol": "dm_lua_rawseti",
       "signature": "dm_lua_rawseti(lua_State *, int, int) -> void",
       "kind": "function",
@@ -1516,7 +1515,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_remove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1685",
+      "id": "dmsdk:dm_lua_remove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1686",
       "symbol": "dm_lua_remove",
       "signature": "dm_lua_remove(lua_State *, int) -> void",
       "kind": "function",
@@ -1532,7 +1531,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_replace@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1687",
+      "id": "dmsdk:dm_lua_replace@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1688",
       "symbol": "dm_lua_replace",
       "signature": "dm_lua_replace(lua_State *, int) -> void",
       "kind": "function",
@@ -1548,7 +1547,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_resume@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1739",
+      "id": "dmsdk:dm_lua_resume@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1740",
       "symbol": "dm_lua_resume",
       "signature": "dm_lua_resume(lua_State *, int) -> int",
       "kind": "function",
@@ -1564,7 +1563,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1746",
+      "id": "dmsdk:dm_lua_setallocf@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1747",
       "symbol": "dm_lua_setallocf",
       "signature": "dm_lua_setallocf(lua_State *, lua_Alloc, void *) -> void",
       "kind": "function",
@@ -1582,7 +1581,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1732",
+      "id": "dmsdk:dm_lua_setfenv@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1733",
       "symbol": "dm_lua_setfenv",
       "signature": "dm_lua_setfenv(lua_State *, int) -> int",
       "kind": "function",
@@ -1598,7 +1597,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1728",
+      "id": "dmsdk:dm_lua_setfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1729",
       "symbol": "dm_lua_setfield",
       "signature": "dm_lua_setfield(lua_State *, int, const char *) -> void",
       "kind": "function",
@@ -1614,7 +1613,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_sethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1757",
+      "id": "dmsdk:dm_lua_sethook@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1758",
       "symbol": "dm_lua_sethook",
       "signature": "dm_lua_sethook(lua_State *, lua_Hook, int, int) -> int",
       "kind": "function",
@@ -1634,7 +1633,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setlevel@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1747",
+      "id": "dmsdk:dm_lua_setlevel@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1748",
       "symbol": "dm_lua_setlevel",
       "signature": "dm_lua_setlevel(lua_State *, lua_State *) -> void",
       "kind": "function",
@@ -1650,7 +1649,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1754",
+      "id": "dmsdk:dm_lua_setlocal@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1755",
       "symbol": "dm_lua_setlocal",
       "signature": "dm_lua_setlocal(lua_State *, const lua_Debug *, int) -> const char *",
       "kind": "function",
@@ -1666,7 +1665,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1731",
+      "id": "dmsdk:dm_lua_setmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1732",
       "symbol": "dm_lua_setmetatable",
       "signature": "dm_lua_setmetatable(lua_State *, int) -> int",
       "kind": "function",
@@ -1682,7 +1681,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_settable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1727",
+      "id": "dmsdk:dm_lua_settable@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1728",
       "symbol": "dm_lua_settable",
       "signature": "dm_lua_settable(lua_State *, int) -> void",
       "kind": "function",
@@ -1698,7 +1697,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_settop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1683",
+      "id": "dmsdk:dm_lua_settop@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1684",
       "symbol": "dm_lua_settop",
       "signature": "dm_lua_settop(lua_State *, int) -> void",
       "kind": "function",
@@ -1714,7 +1713,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_setupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1756",
+      "id": "dmsdk:dm_lua_setupvalue@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1757",
       "symbol": "dm_lua_setupvalue",
       "signature": "dm_lua_setupvalue(lua_State *, int, int) -> const char *",
       "kind": "function",
@@ -1730,7 +1729,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_status@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1740",
+      "id": "dmsdk:dm_lua_status@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1741",
       "symbol": "dm_lua_status",
       "signature": "dm_lua_status(lua_State *) -> int",
       "kind": "function",
@@ -1746,7 +1745,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_toboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1701",
+      "id": "dmsdk:dm_lua_toboolean@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1702",
       "symbol": "dm_lua_toboolean",
       "signature": "dm_lua_toboolean(lua_State *, int) -> int",
       "kind": "function",
@@ -1762,7 +1761,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tocfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1704",
+      "id": "dmsdk:dm_lua_tocfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1705",
       "symbol": "dm_lua_tocfunction",
       "signature": "dm_lua_tocfunction(lua_State *, int) -> lua_CFunction",
       "kind": "function",
@@ -1780,7 +1779,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tointeger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1700",
+      "id": "dmsdk:dm_lua_tointeger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1701",
       "symbol": "dm_lua_tointeger",
       "signature": "dm_lua_tointeger(lua_State *, int) -> lua_Integer",
       "kind": "function",
@@ -1798,7 +1797,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tolstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1702",
+      "id": "dmsdk:dm_lua_tolstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1703",
       "symbol": "dm_lua_tolstring",
       "signature": "dm_lua_tolstring(lua_State *, int, size_t *) -> const char *",
       "kind": "function",
@@ -1814,7 +1813,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tonumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1699",
+      "id": "dmsdk:dm_lua_tonumber@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1700",
       "symbol": "dm_lua_tonumber",
       "signature": "dm_lua_tonumber(lua_State *, int) -> lua_Number",
       "kind": "function",
@@ -1832,7 +1831,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_topointer@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1707",
+      "id": "dmsdk:dm_lua_topointer@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1708",
       "symbol": "dm_lua_topointer",
       "signature": "dm_lua_topointer(lua_State *, int) -> const void *",
       "kind": "function",
@@ -1848,7 +1847,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_tothread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1706",
+      "id": "dmsdk:dm_lua_tothread@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1707",
       "symbol": "dm_lua_tothread",
       "signature": "dm_lua_tothread(lua_State *, int) -> lua_State *",
       "kind": "function",
@@ -1864,7 +1863,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_touserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1705",
+      "id": "dmsdk:dm_lua_touserdata@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1706",
       "symbol": "dm_lua_touserdata",
       "signature": "dm_lua_touserdata(lua_State *, int) -> void *",
       "kind": "function",
@@ -1880,7 +1879,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_type@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1694",
+      "id": "dmsdk:dm_lua_type@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1695",
       "symbol": "dm_lua_type",
       "signature": "dm_lua_type(lua_State *, int) -> int",
       "kind": "function",
@@ -1896,7 +1895,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_typename@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1695",
+      "id": "dmsdk:dm_lua_typename@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1696",
       "symbol": "dm_lua_typename",
       "signature": "dm_lua_typename(lua_State *, int) -> const char *",
       "kind": "function",
@@ -1912,7 +1911,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_xmove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1689",
+      "id": "dmsdk:dm_lua_xmove@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1690",
       "symbol": "dm_lua_xmove",
       "signature": "dm_lua_xmove(lua_State *, lua_State *, int) -> void",
       "kind": "function",
@@ -1928,7 +1927,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_lua_yield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1738",
+      "id": "dmsdk:dm_lua_yield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1739",
       "symbol": "dm_lua_yield",
       "signature": "dm_lua_yield(lua_State *, int) -> int",
       "kind": "function",
@@ -1944,7 +1943,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_addlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1666",
+      "id": "dmsdk:dm_luaL_addlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1667",
       "symbol": "dm_luaL_addlstring",
       "signature": "dm_luaL_addlstring(luaL_Buffer *, const char *, size_t) -> void",
       "kind": "function",
@@ -1960,7 +1959,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_addstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1667",
+      "id": "dmsdk:dm_luaL_addstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1668",
       "symbol": "dm_luaL_addstring",
       "signature": "dm_luaL_addstring(luaL_Buffer *, const char *) -> void",
       "kind": "function",
@@ -1976,7 +1975,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_addvalue@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1668",
+      "id": "dmsdk:dm_luaL_addvalue@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1669",
       "symbol": "dm_luaL_addvalue",
       "signature": "dm_luaL_addvalue(luaL_Buffer *) -> void",
       "kind": "function",
@@ -1992,7 +1991,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_argerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1639",
+      "id": "dmsdk:dm_luaL_argerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1640",
       "symbol": "dm_luaL_argerror",
       "signature": "dm_luaL_argerror(lua_State *, int, const char *) -> int",
       "kind": "function",
@@ -2008,7 +2007,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_buffinit@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1664",
+      "id": "dmsdk:dm_luaL_buffinit@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1665",
       "symbol": "dm_luaL_buffinit",
       "signature": "dm_luaL_buffinit(lua_State *, luaL_Buffer *) -> void",
       "kind": "function",
@@ -2024,7 +2023,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_callmeta@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1637",
+      "id": "dmsdk:dm_luaL_callmeta@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1638",
       "symbol": "dm_luaL_callmeta",
       "signature": "dm_luaL_callmeta(lua_State *, int, const char *) -> int",
       "kind": "function",
@@ -2040,7 +2039,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkany@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1648",
+      "id": "dmsdk:dm_luaL_checkany@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1649",
       "symbol": "dm_luaL_checkany",
       "signature": "dm_luaL_checkany(lua_State *, int) -> void",
       "kind": "function",
@@ -2056,7 +2055,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1644",
+      "id": "dmsdk:dm_luaL_checkinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1645",
       "symbol": "dm_luaL_checkinteger",
       "signature": "dm_luaL_checkinteger(lua_State *, int) -> lua_Integer",
       "kind": "function",
@@ -2074,7 +2073,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checklstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1640",
+      "id": "dmsdk:dm_luaL_checklstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1641",
       "symbol": "dm_luaL_checklstring",
       "signature": "dm_luaL_checklstring(lua_State *, int, size_t *) -> const char *",
       "kind": "function",
@@ -2090,7 +2089,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checknumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1642",
+      "id": "dmsdk:dm_luaL_checknumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1643",
       "symbol": "dm_luaL_checknumber",
       "signature": "dm_luaL_checknumber(lua_State *, int) -> lua_Number",
       "kind": "function",
@@ -2108,7 +2107,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkoption@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1653",
+      "id": "dmsdk:dm_luaL_checkoption@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1654",
       "symbol": "dm_luaL_checkoption",
       "signature": "dm_luaL_checkoption(lua_State *, int, const char *, const char *const *) -> int",
       "kind": "function",
@@ -2124,7 +2123,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1646",
+      "id": "dmsdk:dm_luaL_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1647",
       "symbol": "dm_luaL_checkstack",
       "signature": "dm_luaL_checkstack(lua_State *, int, const char *) -> void",
       "kind": "function",
@@ -2140,7 +2139,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checktype@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1647",
+      "id": "dmsdk:dm_luaL_checktype@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1648",
       "symbol": "dm_luaL_checktype",
       "signature": "dm_luaL_checktype(lua_State *, int, int) -> void",
       "kind": "function",
@@ -2156,7 +2155,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_checkudata@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1650",
+      "id": "dmsdk:dm_luaL_checkudata@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1651",
       "symbol": "dm_luaL_checkudata",
       "signature": "dm_luaL_checkudata(lua_State *, int, const char *) -> void *",
       "kind": "function",
@@ -2172,7 +2171,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_error@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1652",
+      "id": "dmsdk:dm_luaL_error@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1653",
       "symbol": "dm_luaL_error",
       "signature": "dm_luaL_error(lua_State *, const char *) -> int",
       "kind": "function",
@@ -2190,7 +2189,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_findtable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1661",
+      "id": "dmsdk:dm_luaL_findtable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1662",
       "symbol": "dm_luaL_findtable",
       "signature": "dm_luaL_findtable(lua_State *, int, const char *, int) -> const char *",
       "kind": "function",
@@ -2206,7 +2205,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_getmetafield@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1636",
+      "id": "dmsdk:dm_luaL_getmetafield@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1637",
       "symbol": "dm_luaL_getmetafield",
       "signature": "dm_luaL_getmetafield(lua_State *, int, const char *) -> int",
       "kind": "function",
@@ -2222,7 +2221,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_gsub@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1660",
+      "id": "dmsdk:dm_luaL_gsub@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1661",
       "symbol": "dm_luaL_gsub",
       "signature": "dm_luaL_gsub(lua_State *, const char *, const char *, const char *) -> const char *",
       "kind": "function",
@@ -2238,7 +2237,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_loadbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1657",
+      "id": "dmsdk:dm_luaL_loadbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1658",
       "symbol": "dm_luaL_loadbuffer",
       "signature": "dm_luaL_loadbuffer(lua_State *, const char *, size_t, const char *) -> int",
       "kind": "function",
@@ -2254,7 +2253,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_loadfile@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1656",
+      "id": "dmsdk:dm_luaL_loadfile@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1657",
       "symbol": "dm_luaL_loadfile",
       "signature": "dm_luaL_loadfile(lua_State *, const char *) -> int",
       "kind": "function",
@@ -2270,7 +2269,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_loadstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1658",
+      "id": "dmsdk:dm_luaL_loadstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1659",
       "symbol": "dm_luaL_loadstring",
       "signature": "dm_luaL_loadstring(lua_State *, const char *) -> int",
       "kind": "function",
@@ -2286,7 +2285,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_newmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1649",
+      "id": "dmsdk:dm_luaL_newmetatable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1650",
       "symbol": "dm_luaL_newmetatable",
       "signature": "dm_luaL_newmetatable(lua_State *, const char *) -> int",
       "kind": "function",
@@ -2302,7 +2301,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1659",
+      "id": "dmsdk:dm_luaL_newstate@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1660",
       "symbol": "dm_luaL_newstate",
       "signature": "dm_luaL_newstate() -> lua_State *",
       "kind": "function",
@@ -2318,7 +2317,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_openlib@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1634",
+      "id": "dmsdk:dm_luaL_openlib@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1635",
       "symbol": "dm_luaL_openlib",
       "signature": "dm_luaL_openlib(lua_State *, const char *, const luaL_Reg *, int) -> void",
       "kind": "function",
@@ -2334,7 +2333,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_optinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1645",
+      "id": "dmsdk:dm_luaL_optinteger@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1646",
       "symbol": "dm_luaL_optinteger",
       "signature": "dm_luaL_optinteger(lua_State *, int, lua_Integer) -> lua_Integer",
       "kind": "function",
@@ -2352,7 +2351,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_optlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1641",
+      "id": "dmsdk:dm_luaL_optlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1642",
       "symbol": "dm_luaL_optlstring",
       "signature": "dm_luaL_optlstring(lua_State *, int, const char *, size_t *) -> const char *",
       "kind": "function",
@@ -2368,7 +2367,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_optnumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1643",
+      "id": "dmsdk:dm_luaL_optnumber@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1644",
       "symbol": "dm_luaL_optnumber",
       "signature": "dm_luaL_optnumber(lua_State *, int, lua_Number) -> lua_Number",
       "kind": "function",
@@ -2386,7 +2385,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_prepbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1665",
+      "id": "dmsdk:dm_luaL_prepbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1666",
       "symbol": "dm_luaL_prepbuffer",
       "signature": "dm_luaL_prepbuffer(luaL_Buffer *) -> char *",
       "kind": "function",
@@ -2402,7 +2401,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_pushresult@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1669",
+      "id": "dmsdk:dm_luaL_pushresult@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1670",
       "symbol": "dm_luaL_pushresult",
       "signature": "dm_luaL_pushresult(luaL_Buffer *) -> void",
       "kind": "function",
@@ -2418,7 +2417,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_ref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1654",
+      "id": "dmsdk:dm_luaL_ref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1655",
       "symbol": "dm_luaL_ref",
       "signature": "dm_luaL_ref(lua_State *, int) -> int",
       "kind": "function",
@@ -2434,7 +2433,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_register@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1635",
+      "id": "dmsdk:dm_luaL_register@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1636",
       "symbol": "dm_luaL_register",
       "signature": "dm_luaL_register(lua_State *, const char *, const luaL_Reg *) -> void",
       "kind": "function",
@@ -2450,7 +2449,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_typerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1638",
+      "id": "dmsdk:dm_luaL_typerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1639",
       "symbol": "dm_luaL_typerror",
       "signature": "dm_luaL_typerror(lua_State *, int, const char *) -> int",
       "kind": "function",
@@ -2466,7 +2465,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_unref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1655",
+      "id": "dmsdk:dm_luaL_unref@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1656",
       "symbol": "dm_luaL_unref",
       "signature": "dm_luaL_unref(lua_State *, int, int) -> void",
       "kind": "function",
@@ -2482,7 +2481,7 @@
       ]
     },
     {
-      "id": "dmsdk:dm_luaL_where@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1651",
+      "id": "dmsdk:dm_luaL_where@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1652",
       "symbol": "dm_luaL_where",
       "signature": "dm_luaL_where(lua_State *, int) -> void",
       "kind": "function",
@@ -9288,7 +9287,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidActivity@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:175:1499",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidActivity@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:175:1500",
       "symbol": "dmGraphics::GetNativeAndroidActivity",
       "signature": "dmGraphics::GetNativeAndroidActivity() -> jobject",
       "kind": "function",
@@ -9306,7 +9305,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidApp@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:184:1500",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidApp@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:184:1501",
       "symbol": "dmGraphics::GetNativeAndroidApp",
       "signature": "dmGraphics::GetNativeAndroidApp() -> android_app *",
       "kind": "function",
@@ -9326,7 +9325,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:148:1496",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:148:1497",
       "symbol": "dmGraphics::GetNativeAndroidEGLContext",
       "signature": "dmGraphics::GetNativeAndroidEGLContext() -> EGLContext",
       "kind": "function",
@@ -9344,7 +9343,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLSurface@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:157:1497",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidEGLSurface@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:157:1498",
       "symbol": "dmGraphics::GetNativeAndroidEGLSurface",
       "signature": "dmGraphics::GetNativeAndroidEGLSurface() -> EGLSurface",
       "kind": "function",
@@ -9362,7 +9361,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeAndroidJavaVM@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:166:1498",
+      "id": "dmsdk:dmGraphics::GetNativeAndroidJavaVM@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:166:1499",
       "symbol": "dmGraphics::GetNativeAndroidJavaVM",
       "signature": "dmGraphics::GetNativeAndroidJavaVM() -> JavaVM *",
       "kind": "function",
@@ -9382,7 +9381,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeiOSEAGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:94:1490",
+      "id": "dmsdk:dmGraphics::GetNativeiOSEAGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:94:1491",
       "symbol": "dmGraphics::GetNativeiOSEAGLContext",
       "signature": "dmGraphics::GetNativeiOSEAGLContext() -> id",
       "kind": "function",
@@ -9400,7 +9399,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeiOSUIView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:85:1489",
+      "id": "dmsdk:dmGraphics::GetNativeiOSUIView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:85:1490",
       "symbol": "dmGraphics::GetNativeiOSUIView",
       "signature": "dmGraphics::GetNativeiOSUIView() -> id",
       "kind": "function",
@@ -9418,7 +9417,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeiOSUIWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:76:1488",
+      "id": "dmsdk:dmGraphics::GetNativeiOSUIWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:76:1489",
       "symbol": "dmGraphics::GetNativeiOSUIWindow",
       "signature": "dmGraphics::GetNativeiOSUIWindow() -> id",
       "kind": "function",
@@ -9436,7 +9435,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeOSXNSOpenGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:121:1493",
+      "id": "dmsdk:dmGraphics::GetNativeOSXNSOpenGLContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:121:1494",
       "symbol": "dmGraphics::GetNativeOSXNSOpenGLContext",
       "signature": "dmGraphics::GetNativeOSXNSOpenGLContext() -> id",
       "kind": "function",
@@ -9454,7 +9453,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeOSXNSView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:112:1492",
+      "id": "dmsdk:dmGraphics::GetNativeOSXNSView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:112:1493",
       "symbol": "dmGraphics::GetNativeOSXNSView",
       "signature": "dmGraphics::GetNativeOSXNSView() -> id",
       "kind": "function",
@@ -9472,7 +9471,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeOSXNSWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:103:1491",
+      "id": "dmsdk:dmGraphics::GetNativeOSXNSWindow@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:103:1492",
       "symbol": "dmGraphics::GetNativeOSXNSWindow",
       "signature": "dmGraphics::GetNativeOSXNSWindow() -> id",
       "kind": "function",
@@ -9490,7 +9489,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeWindowsHGLRC@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:139:1495",
+      "id": "dmsdk:dmGraphics::GetNativeWindowsHGLRC@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:139:1496",
       "symbol": "dmGraphics::GetNativeWindowsHGLRC",
       "signature": "dmGraphics::GetNativeWindowsHGLRC() -> HGLRC",
       "kind": "function",
@@ -9506,7 +9505,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeWindowsHWND@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:130:1494",
+      "id": "dmsdk:dmGraphics::GetNativeWindowsHWND@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:130:1495",
       "symbol": "dmGraphics::GetNativeWindowsHWND",
       "signature": "dmGraphics::GetNativeWindowsHWND() -> HWND",
       "kind": "function",
@@ -9522,7 +9521,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeX11GLXContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:202:1502",
+      "id": "dmsdk:dmGraphics::GetNativeX11GLXContext@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:202:1503",
       "symbol": "dmGraphics::GetNativeX11GLXContext",
       "signature": "dmGraphics::GetNativeX11GLXContext() -> GLXContext",
       "kind": "function",
@@ -9540,7 +9539,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::GetNativeX11Window@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:193:1501",
+      "id": "dmsdk:dmGraphics::GetNativeX11Window@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h:193:1502",
       "symbol": "dmGraphics::GetNativeX11Window",
       "signature": "dmGraphics::GetNativeX11Window() -> Window",
       "kind": "function",
@@ -10238,7 +10237,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::OpenGLGetDefaultFramebufferId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:47:1504",
+      "id": "dmsdk:dmGraphics::OpenGLGetDefaultFramebufferId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:47:1505",
       "symbol": "dmGraphics::OpenGLGetDefaultFramebufferId",
       "signature": "dmGraphics::OpenGLGetDefaultFramebufferId(HContext) -> uint32_t",
       "kind": "function",
@@ -10256,7 +10255,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::OpenGLGetRenderTargetId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:39:1503",
+      "id": "dmsdk:dmGraphics::OpenGLGetRenderTargetId@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:39:1504",
       "symbol": "dmGraphics::OpenGLGetRenderTargetId",
       "signature": "dmGraphics::OpenGLGetRenderTargetId(HContext, HRenderTarget) -> uint32_t",
       "kind": "function",
@@ -10806,7 +10805,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1517",
+      "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518",
       "symbol": "dmGraphics::VulkanCreateDescriptorPool",
       "signature": "dmGraphics::VulkanCreateDescriptorPool(int, uint16_t, int *) -> bool",
       "kind": "function",
@@ -10826,7 +10825,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:50:1505",
+      "id": "dmsdk:dmGraphics::VulkanGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:50:1506",
       "symbol": "dmGraphics::VulkanGetActiveSwapChainTexture",
       "signature": "dmGraphics::VulkanGetActiveSwapChainTexture(HContext) -> HTexture",
       "kind": "function",
@@ -10844,7 +10843,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1514",
+      "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1515",
       "symbol": "dmGraphics::VulkanGetCurrentFrameCommandBuffer",
       "signature": "dmGraphics::VulkanGetCurrentFrameCommandBuffer(HContext) -> int",
       "kind": "function",
@@ -10862,7 +10861,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1508",
+      "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509",
       "symbol": "dmGraphics::VulkanGetDevice",
       "signature": "dmGraphics::VulkanGetDevice(HContext) -> int",
       "kind": "function",
@@ -10880,7 +10879,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1512",
+      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513",
       "symbol": "dmGraphics::VulkanGetGraphicsQueue",
       "signature": "dmGraphics::VulkanGetGraphicsQueue(HContext) -> int",
       "kind": "function",
@@ -10898,7 +10897,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1511",
+      "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1512",
       "symbol": "dmGraphics::VulkanGetGraphicsQueueFamily",
       "signature": "dmGraphics::VulkanGetGraphicsQueueFamily(HContext) -> uint16_t",
       "kind": "function",
@@ -10916,7 +10915,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1515",
+      "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516",
       "symbol": "dmGraphics::VulkanGetImage",
       "signature": "dmGraphics::VulkanGetImage(HContext, HTexture) -> int",
       "kind": "function",
@@ -10934,7 +10933,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1516",
+      "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517",
       "symbol": "dmGraphics::VulkanGetImageView",
       "signature": "dmGraphics::VulkanGetImageView(HContext, HTexture) -> int",
       "kind": "function",
@@ -10952,7 +10951,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1510",
+      "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511",
       "symbol": "dmGraphics::VulkanGetInstance",
       "signature": "dmGraphics::VulkanGetInstance(HContext) -> int",
       "kind": "function",
@@ -10970,7 +10969,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1509",
+      "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510",
       "symbol": "dmGraphics::VulkanGetPhysicalDevice",
       "signature": "dmGraphics::VulkanGetPhysicalDevice(HContext) -> int",
       "kind": "function",
@@ -10988,7 +10987,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1513",
+      "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514",
       "symbol": "dmGraphics::VulkanGetRenderPass",
       "signature": "dmGraphics::VulkanGetRenderPass(HContext) -> int",
       "kind": "function",
@@ -11006,7 +11005,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1507",
+      "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1508",
       "symbol": "dmGraphics::VulkanGraphicsCommandQueueToMetal",
       "signature": "dmGraphics::VulkanGraphicsCommandQueueToMetal(HContext) -> void *",
       "kind": "function",
@@ -11026,7 +11025,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1506",
+      "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1507",
       "symbol": "dmGraphics::VulkanTextureToMetal",
       "signature": "dmGraphics::VulkanTextureToMetal(HContext, const dmGraphics::HTexture &) -> void *",
       "kind": "function",
@@ -11048,7 +11047,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1533",
+      "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1534",
       "symbol": "dmGraphics::WebGPUGetActiveCommandEncoder",
       "signature": "dmGraphics::WebGPUGetActiveCommandEncoder(HContext) -> WGPUCommandEncoder",
       "kind": "function",
@@ -11066,7 +11065,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:56:1532",
+      "id": "dmsdk:dmGraphics::WebGPUGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:56:1533",
       "symbol": "dmGraphics::WebGPUGetActiveSwapChainTexture",
       "signature": "dmGraphics::WebGPUGetActiveSwapChainTexture(HContext) -> HTexture",
       "kind": "function",
@@ -11084,7 +11083,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1527",
+      "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1528",
       "symbol": "dmGraphics::WebGPUGetAdapter",
       "signature": "dmGraphics::WebGPUGetAdapter(HContext) -> WGPUAdapter",
       "kind": "function",
@@ -11102,7 +11101,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1528",
+      "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1529",
       "symbol": "dmGraphics::WebGPUGetDevice",
       "signature": "dmGraphics::WebGPUGetDevice(HContext) -> WGPUDevice",
       "kind": "function",
@@ -11120,7 +11119,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1526",
+      "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1527",
       "symbol": "dmGraphics::WebGPUGetInstance",
       "signature": "dmGraphics::WebGPUGetInstance(HContext) -> WGPUInstance",
       "kind": "function",
@@ -11138,7 +11137,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1529",
+      "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1530",
       "symbol": "dmGraphics::WebGPUGetQueue",
       "signature": "dmGraphics::WebGPUGetQueue(HContext) -> WGPUQueue",
       "kind": "function",
@@ -11156,7 +11155,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1531",
+      "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1532",
       "symbol": "dmGraphics::WebGPUGetTexture",
       "signature": "dmGraphics::WebGPUGetTexture(HContext, HTexture) -> WGPUTexture",
       "kind": "function",
@@ -11174,7 +11173,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1530",
+      "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1531",
       "symbol": "dmGraphics::WebGPUGetTextureView",
       "signature": "dmGraphics::WebGPUGetTextureView(HContext, HTexture) -> WGPUTextureView",
       "kind": "function",
@@ -11192,7 +11191,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1535",
+      "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1536",
       "symbol": "dmGraphics::WebGPURenderPassBegin",
       "signature": "dmGraphics::WebGPURenderPassBegin(HContext) -> void",
       "kind": "function",
@@ -11210,7 +11209,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1534",
+      "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1535",
       "symbol": "dmGraphics::WebGPURenderPassEnd",
       "signature": "dmGraphics::WebGPURenderPassEnd(HContext) -> void",
       "kind": "function",
@@ -11228,7 +11227,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::DeleteNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:242:1553",
+      "id": "dmsdk:dmGui::DeleteNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:242:1554",
       "symbol": "dmGui::DeleteNode",
       "signature": "dmGui::DeleteNode(HScene, HNode) -> void",
       "kind": "function",
@@ -11244,7 +11243,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetFirstChildNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:290:1558",
+      "id": "dmsdk:dmGui::GetFirstChildNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:290:1559",
       "symbol": "dmGui::GetFirstChildNode",
       "signature": "dmGui::GetFirstChildNode(HScene, HNode) -> HNode",
       "kind": "function",
@@ -11260,7 +11259,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNextNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:299:1559",
+      "id": "dmsdk:dmGui::GetNextNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:299:1560",
       "symbol": "dmGui::GetNextNode",
       "signature": "dmGui::GetNextNode(HScene, HNode) -> HNode",
       "kind": "function",
@@ -11276,7 +11275,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1570",
+      "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1571",
       "symbol": "dmGui::GetNodeCustomData",
       "signature": "dmGui::GetNodeCustomData(HScene, HNode) -> void *",
       "kind": "function",
@@ -11294,7 +11293,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1565",
+      "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1566",
       "symbol": "dmGui::GetNodeCustomProperty",
       "signature": "dmGui::GetNodeCustomProperty(HScene, HNode, dmhash_t, CustomProperty *) -> Result",
       "kind": "function",
@@ -11314,7 +11313,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1569",
+      "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1570",
       "symbol": "dmGui::GetNodeCustomType",
       "signature": "dmGui::GetNodeCustomType(HScene, HNode) -> uint32_t",
       "kind": "function",
@@ -11330,7 +11329,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:261:1555",
+      "id": "dmsdk:dmGui::GetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:261:1556",
       "symbol": "dmGui::GetNodeId",
       "signature": "dmGui::GetNodeId(HScene, HNode) -> dmhash_t",
       "kind": "function",
@@ -11346,7 +11345,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:308:1560",
+      "id": "dmsdk:dmGui::GetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:308:1561",
       "symbol": "dmGui::GetNodeIsBone",
       "signature": "dmGui::GetNodeIsBone(HScene, HNode) -> bool",
       "kind": "function",
@@ -11362,7 +11361,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:281:1557",
+      "id": "dmsdk:dmGui::GetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:281:1558",
       "symbol": "dmGui::GetNodeParent",
       "signature": "dmGui::GetNodeParent(HScene, HNode) -> HNode",
       "kind": "function",
@@ -11378,7 +11377,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:360:1563",
+      "id": "dmsdk:dmGui::GetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:360:1564",
       "symbol": "dmGui::GetNodeProperty",
       "signature": "dmGui::GetNodeProperty(HScene, HNode, Property) -> dmVMath::Vector4",
       "kind": "function",
@@ -11394,7 +11393,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1571",
+      "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1572",
       "symbol": "dmGui::GetNodeTextureId",
       "signature": "dmGui::GetNodeTextureId(HScene, HNode) -> dmhash_t",
       "kind": "function",
@@ -11410,7 +11409,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::GetResource@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:474:1574",
+      "id": "dmsdk:dmGui::GetResource@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:474:1575",
       "symbol": "dmGui::GetResource",
       "signature": "dmGui::GetResource(dmGui::HScene, dmhash_t, dmhash_t) -> void *",
       "kind": "function",
@@ -11428,7 +11427,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::LuaCheckNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:488:1577",
+      "id": "dmsdk:dmGui::LuaCheckNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:488:1578",
       "symbol": "dmGui::LuaCheckNode",
       "signature": "dmGui::LuaCheckNode(lua_State *, int) -> HNode",
       "kind": "function",
@@ -11446,7 +11445,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::LuaCheckScene@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:487:1576",
+      "id": "dmsdk:dmGui::LuaCheckScene@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:487:1577",
       "symbol": "dmGui::LuaCheckScene",
       "signature": "dmGui::LuaCheckScene(lua_State *) -> HScene",
       "kind": "function",
@@ -11464,7 +11463,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1575",
+      "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1576",
       "symbol": "dmGui::LuaPushNode",
       "signature": "dmGui::LuaPushNode(lua_State *, dmGui::HScene, dmGui::HNode) -> void",
       "kind": "function",
@@ -11482,7 +11481,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::NewNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:234:1552",
+      "id": "dmsdk:dmGui::NewNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:234:1553",
       "symbol": "dmGui::NewNode",
       "signature": "dmGui::NewNode(HScene, const dmVMath::Point3 &, const dmVMath::Vector3 &, NodeType, uint32_t) -> HNode",
       "kind": "function",
@@ -11500,7 +11499,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1568",
+      "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1569",
       "symbol": "dmGui::SetNodeAdjustMode",
       "signature": "dmGui::SetNodeAdjustMode(HScene, HNode, AdjustMode) -> void",
       "kind": "function",
@@ -11516,7 +11515,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1566",
+      "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1567",
       "symbol": "dmGui::SetNodeCustomProperty",
       "signature": "dmGui::SetNodeCustomProperty(HScene, HNode, dmhash_t, const CustomProperty *) -> Result",
       "kind": "function",
@@ -11534,7 +11533,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1554",
+      "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1555",
       "symbol": "dmGui::SetNodeId",
       "signature": "dmGui::SetNodeId(HScene, HNode, dmhash_t) -> void",
       "kind": "function",
@@ -11550,7 +11549,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:317:1561",
+      "id": "dmsdk:dmGui::SetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:317:1562",
       "symbol": "dmGui::SetNodeIsBone",
       "signature": "dmGui::SetNodeIsBone(HScene, HNode, bool) -> void",
       "kind": "function",
@@ -11566,7 +11565,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:272:1556",
+      "id": "dmsdk:dmGui::SetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:272:1557",
       "symbol": "dmGui::SetNodeParent",
       "signature": "dmGui::SetNodeParent(HScene, HNode, HNode, bool) -> Result",
       "kind": "function",
@@ -11582,7 +11581,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1564",
+      "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1565",
       "symbol": "dmGui::SetNodeProperty",
       "signature": "dmGui::SetNodeProperty(HScene, HNode, Property, const dmVMath::Vector4 &) -> void",
       "kind": "function",
@@ -11600,7 +11599,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1572",
+      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1573",
       "symbol": "dmGui::SetNodeTexture",
       "signature": "dmGui::SetNodeTexture(HScene, HNode, dmhash_t) -> Result",
       "kind": "function",
@@ -11616,7 +11615,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1573",
+      "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1574",
       "symbol": "dmGui::SetNodeTexture",
       "signature": "dmGui::SetNodeTexture(HScene, HNode, NodeTextureType, HTextureSource) -> Result",
       "kind": "function",
@@ -12388,7 +12387,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1628",
+      "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1629",
       "symbol": "dmHID::AddKeyboardChar",
       "signature": "dmHID::AddKeyboardChar(HContext, int) -> void",
       "kind": "function",
@@ -12404,7 +12403,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::AddTouch@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:659:1619",
+      "id": "dmsdk:dmHID::AddTouch@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:659:1620",
       "symbol": "dmHID::AddTouch",
       "signature": "dmHID::AddTouch(HTouchDevice, int32_t, int32_t, uint32_t, Phase) -> void",
       "kind": "function",
@@ -12420,7 +12419,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1618",
+      "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1619",
       "symbol": "dmHID::FormatGamepadGuid",
       "signature": "dmHID::FormatGamepadGuid(const GamepadGuid *, char *) -> void",
       "kind": "function",
@@ -12438,7 +12437,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepad@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:609:1614",
+      "id": "dmsdk:dmHID::GetGamepad@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:609:1615",
       "symbol": "dmHID::GetGamepad",
       "signature": "dmHID::GetGamepad(HContext, uint8_t) -> HGamepad",
       "kind": "function",
@@ -12454,7 +12453,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:751:1630",
+      "id": "dmsdk:dmHID::GetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:751:1631",
       "symbol": "dmHID::GetGamepadButton",
       "signature": "dmHID::GetGamepadButton(GamepadPacket *, uint32_t) -> bool",
       "kind": "function",
@@ -12470,7 +12469,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1617",
+      "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1618",
       "symbol": "dmHID::GetGamepadDeviceGuid",
       "signature": "dmHID::GetGamepadDeviceGuid(HContext, HGamepad, GamepadGuid *) -> bool",
       "kind": "function",
@@ -12490,7 +12489,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadDeviceName@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:629:1616",
+      "id": "dmsdk:dmHID::GetGamepadDeviceName@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:629:1617",
       "symbol": "dmHID::GetGamepadDeviceName",
       "signature": "dmHID::GetGamepadDeviceName(HContext, HGamepad, char *) -> void",
       "kind": "function",
@@ -12508,7 +12507,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1631",
+      "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1632",
       "symbol": "dmHID::GetGamepadHat",
       "signature": "dmHID::GetGamepadHat(GamepadPacket *, uint32_t, uint8_t *) -> bool",
       "kind": "function",
@@ -12526,7 +12525,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1629",
+      "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1630",
       "symbol": "dmHID::GetGamepadPacket",
       "signature": "dmHID::GetGamepadPacket(HGamepad, GamepadPacket *) -> bool",
       "kind": "function",
@@ -12546,7 +12545,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1615",
+      "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
       "symbol": "dmHID::GetGamepadUserId",
       "signature": "dmHID::GetGamepadUserId(HContext, HGamepad, uint32_t *) -> bool",
       "kind": "function",
@@ -12566,7 +12565,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetKeyboard@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:584:1611",
+      "id": "dmsdk:dmHID::GetKeyboard@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:584:1612",
       "symbol": "dmHID::GetKeyboard",
       "signature": "dmHID::GetKeyboard(HContext, uint8_t) -> HKeyboard",
       "kind": "function",
@@ -12582,7 +12581,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetMouse@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:592:1612",
+      "id": "dmsdk:dmHID::GetMouse@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:592:1613",
       "symbol": "dmHID::GetMouse",
       "signature": "dmHID::GetMouse(HContext, uint8_t) -> HMouse",
       "kind": "function",
@@ -12598,7 +12597,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:718:1626",
+      "id": "dmsdk:dmHID::GetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:718:1627",
       "symbol": "dmHID::GetMouseButton",
       "signature": "dmHID::GetMouseButton(MousePacket *, MouseButton) -> bool",
       "kind": "function",
@@ -12616,7 +12615,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetMousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:708:1625",
+      "id": "dmsdk:dmHID::GetMousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:708:1626",
       "symbol": "dmHID::GetMousePacket",
       "signature": "dmHID::GetMousePacket(HMouse, MousePacket *) -> bool",
       "kind": "function",
@@ -12636,7 +12635,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::GetTouchDevice@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:600:1613",
+      "id": "dmsdk:dmHID::GetTouchDevice@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:600:1614",
       "symbol": "dmHID::GetTouchDevice",
       "signature": "dmHID::GetTouchDevice(HContext, uint8_t) -> HTouchDevice",
       "kind": "function",
@@ -12652,7 +12651,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1621",
+      "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1622",
       "symbol": "dmHID::SetGamepadAxis",
       "signature": "dmHID::SetGamepadAxis(HGamepad, uint32_t, float) -> void",
       "kind": "function",
@@ -12668,7 +12667,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:667:1620",
+      "id": "dmsdk:dmHID::SetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:667:1621",
       "symbol": "dmHID::SetGamepadButton",
       "signature": "dmHID::SetGamepadButton(HGamepad, uint32_t, bool) -> void",
       "kind": "function",
@@ -12684,7 +12683,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetKey@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:726:1627",
+      "id": "dmsdk:dmHID::SetKey@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:726:1628",
       "symbol": "dmHID::SetKey",
       "signature": "dmHID::SetKey(HKeyboard, Key, bool) -> void",
       "kind": "function",
@@ -12700,7 +12699,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1622",
+      "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1623",
       "symbol": "dmHID::SetMouseButton",
       "signature": "dmHID::SetMouseButton(HMouse, MouseButton, bool) -> void",
       "kind": "function",
@@ -12716,7 +12715,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1623",
+      "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1624",
       "symbol": "dmHID::SetMousePosition",
       "signature": "dmHID::SetMousePosition(HMouse, int32_t, int32_t) -> void",
       "kind": "function",
@@ -12732,7 +12731,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmHID::SetMouseWheel@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:698:1624",
+      "id": "dmsdk:dmHID::SetMouseWheel@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:698:1625",
       "symbol": "dmHID::SetMouseWheel",
       "signature": "dmHID::SetMouseWheel(HMouse, int32_t) -> void",
       "kind": "function",
@@ -14024,7 +14023,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::AddToRender@upstream/defold/engine/render/src/dmsdk/render/render.h:447:1834",
+      "id": "dmsdk:dmRender::AddToRender@upstream/defold/engine/render/src/dmsdk/render/render.h:447:1835",
       "symbol": "dmRender::AddToRender",
       "signature": "dmRender::AddToRender(HRenderContext, RenderObject *) -> Result",
       "kind": "function",
@@ -14042,7 +14041,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1869",
+      "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1870",
       "symbol": "dmRender::ApplyMaterialConstants",
       "signature": "dmRender::ApplyMaterialConstants(HRenderContext, HMaterial, const RenderObject *) -> void",
       "kind": "function",
@@ -14060,7 +14059,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1870",
+      "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1871",
       "symbol": "dmRender::ApplyMaterialSampler",
       "signature": "dmRender::ApplyMaterialSampler(HRenderContext, HMaterial, HSampler, uint8_t, dmGraphics::HTexture) -> void",
       "kind": "function",
@@ -14076,7 +14075,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ClearMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:688:1862",
+      "id": "dmsdk:dmRender::ClearMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:688:1863",
       "symbol": "dmRender::ClearMaterialTags",
       "signature": "dmRender::ClearMaterialTags(HMaterial) -> void",
       "kind": "function",
@@ -14092,7 +14091,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1848",
+      "id": "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1849",
       "symbol": "dmRender::ClearNamedConstantBuffer",
       "signature": "dmRender::ClearNamedConstantBuffer(HNamedConstantBuffer) -> void",
       "kind": "function",
@@ -14108,7 +14107,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::DeleteConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:470:1837",
+      "id": "dmsdk:dmRender::DeleteConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:470:1838",
       "symbol": "dmRender::DeleteConstant",
       "signature": "dmRender::DeleteConstant(HConstant) -> void",
       "kind": "function",
@@ -14124,7 +14123,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::DeleteMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:682:1861",
+      "id": "dmsdk:dmRender::DeleteMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:682:1862",
       "symbol": "dmRender::DeleteMaterial",
       "signature": "dmRender::DeleteMaterial(HRenderContext, HMaterial) -> void",
       "kind": "function",
@@ -14140,7 +14139,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::DeleteNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:551:1847",
+      "id": "dmsdk:dmRender::DeleteNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:551:1848",
       "symbol": "dmRender::DeleteNamedConstantBuffer",
       "signature": "dmRender::DeleteNamedConstantBuffer(HNamedConstantBuffer) -> void",
       "kind": "function",
@@ -14156,7 +14155,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:513:1842",
+      "id": "dmsdk:dmRender::GetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:513:1843",
       "symbol": "dmRender::GetConstantLocation",
       "signature": "dmRender::GetConstantLocation(HConstant) -> dmGraphics::HUniformLocation",
       "kind": "function",
@@ -14172,7 +14171,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:497:1840",
+      "id": "dmsdk:dmRender::GetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:497:1841",
       "symbol": "dmRender::GetConstantName",
       "signature": "dmRender::GetConstantName(HConstant) -> dmhash_t",
       "kind": "function",
@@ -14188,7 +14187,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1844",
+      "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1845",
       "symbol": "dmRender::GetConstantType",
       "signature": "dmRender::GetConstantType(HConstant) -> int",
       "kind": "function",
@@ -14204,7 +14203,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1838",
+      "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1839",
       "symbol": "dmRender::GetConstantValues",
       "signature": "dmRender::GetConstantValues(HConstant, uint32_t *) -> dmVMath::Vector4 *",
       "kind": "function",
@@ -14224,7 +14223,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:731:1866",
+      "id": "dmsdk:dmRender::GetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:731:1867",
       "symbol": "dmRender::GetMaterialSampler",
       "signature": "dmRender::GetMaterialSampler(HMaterial, uint32_t) -> HSampler",
       "kind": "function",
@@ -14240,7 +14239,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1867",
+      "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1868",
       "symbol": "dmRender::GetMaterialSamplerNameHash",
       "signature": "dmRender::GetMaterialSamplerNameHash(HMaterial, uint32_t) -> dmhash_t",
       "kind": "function",
@@ -14256,7 +14255,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialSamplerUnit@upstream/defold/engine/render/src/dmsdk/render/render.h:747:1868",
+      "id": "dmsdk:dmRender::GetMaterialSamplerUnit@upstream/defold/engine/render/src/dmsdk/render/render.h:747:1869",
       "symbol": "dmRender::GetMaterialSamplerUnit",
       "signature": "dmRender::GetMaterialSamplerUnit(HMaterial, dmhash_t) -> uint32_t",
       "kind": "function",
@@ -14272,7 +14271,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialTagListKey@upstream/defold/engine/render/src/dmsdk/render/render.h:455:1835",
+      "id": "dmsdk:dmRender::GetMaterialTagListKey@upstream/defold/engine/render/src/dmsdk/render/render.h:455:1836",
       "symbol": "dmRender::GetMaterialTagListKey",
       "signature": "dmRender::GetMaterialTagListKey(HMaterial) -> uint32_t",
       "kind": "function",
@@ -14288,7 +14287,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1810",
+      "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1811",
       "symbol": "dmRender::GetMaterialVertexSpace",
       "signature": "dmRender::GetMaterialVertexSpace(HMaterial) -> int",
       "kind": "function",
@@ -14304,7 +14303,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1854",
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855",
       "symbol": "dmRender::GetNamedConstant",
       "signature": "dmRender::GetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 **, uint32_t *) -> bool",
       "kind": "function",
@@ -14324,7 +14323,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1855",
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
       "symbol": "dmRender::GetNamedConstant",
       "signature": "dmRender::GetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 **, uint32_t *, int *) -> bool",
       "kind": "function",
@@ -14344,7 +14343,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1856",
+      "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857",
       "symbol": "dmRender::GetNamedConstantCount",
       "signature": "dmRender::GetNamedConstantCount(HNamedConstantBuffer) -> uint32_t",
       "kind": "function",
@@ -14360,7 +14359,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1859",
+      "id": "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1860",
       "symbol": "dmRender::GetViewMatrix",
       "signature": "dmRender::GetViewMatrix(HRenderContext) -> const dmVMath::Matrix4 &",
       "kind": "function",
@@ -14378,7 +14377,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::IterateNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:660:1858",
+      "id": "dmsdk:dmRender::IterateNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:660:1859",
       "symbol": "dmRender::IterateNamedConstants",
       "signature": "dmRender::IterateNamedConstants(HNamedConstantBuffer, IterateNamedConstantsFn, void *) -> void",
       "kind": "function",
@@ -14398,7 +14397,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::NewConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:463:1836",
+      "id": "dmsdk:dmRender::NewConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:463:1837",
       "symbol": "dmRender::NewConstant",
       "signature": "dmRender::NewConstant(dmhash_t) -> HConstant",
       "kind": "function",
@@ -14414,7 +14413,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::NewMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:675:1860",
+      "id": "dmsdk:dmRender::NewMaterial@upstream/defold/engine/render/src/dmsdk/render/render.h:675:1861",
       "symbol": "dmRender::NewMaterial",
       "signature": "dmRender::NewMaterial(HRenderContext, dmGraphics::HProgram) -> HMaterial",
       "kind": "function",
@@ -14430,7 +14429,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::NewNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:544:1846",
+      "id": "dmsdk:dmRender::NewNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:544:1847",
       "symbol": "dmRender::NewNamedConstantBuffer",
       "signature": "dmRender::NewNamedConstantBuffer() -> HNamedConstantBuffer",
       "kind": "function",
@@ -14446,7 +14445,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1849",
+      "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1850",
       "symbol": "dmRender::RemoveNamedConstant",
       "signature": "dmRender::RemoveNamedConstant(HNamedConstantBuffer, dmhash_t) -> void",
       "kind": "function",
@@ -14462,7 +14461,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1832",
+      "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1833",
       "symbol": "dmRender::RenderListAlloc",
       "signature": "dmRender::RenderListAlloc(HRenderContext, uint32_t) -> RenderListEntry *",
       "kind": "function",
@@ -14480,7 +14479,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:416:1830",
+      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:416:1831",
       "symbol": "dmRender::RenderListMakeDispatch",
       "signature": "dmRender::RenderListMakeDispatch(HRenderContext, RenderListDispatchFn, RenderListVisibilityFn, void *) -> HRenderListDispatch",
       "kind": "function",
@@ -14500,7 +14499,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:419:1831",
+      "id": "dmsdk:dmRender::RenderListMakeDispatch@upstream/defold/engine/render/src/dmsdk/render/render.h:419:1832",
       "symbol": "dmRender::RenderListMakeDispatch",
       "signature": "dmRender::RenderListMakeDispatch(HRenderContext, RenderListDispatchFn, void *) -> HRenderListDispatch",
       "kind": "function",
@@ -14520,7 +14519,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1833",
+      "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1834",
       "symbol": "dmRender::RenderListSubmit",
       "signature": "dmRender::RenderListSubmit(HRenderContext, RenderListEntry *, RenderListEntry *) -> void",
       "kind": "function",
@@ -14538,7 +14537,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderObject::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:204:1816",
+      "id": "dmsdk:dmRender::RenderObject::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:204:1817",
       "symbol": "dmRender::RenderObject::Init",
       "signature": "dmRender::RenderObject::Init() -> void",
       "kind": "method",
@@ -14554,7 +14553,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::RenderObject::RenderObject@upstream/defold/engine/render/src/dmsdk/render/render.h:203:1815",
+      "id": "dmsdk:dmRender::RenderObject::RenderObject@upstream/defold/engine/render/src/dmsdk/render/render.h:203:1816",
       "symbol": "dmRender::RenderObject::RenderObject",
       "signature": "dmRender::RenderObject::RenderObject() -> void",
       "kind": "constructor",
@@ -14570,7 +14569,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1843",
+      "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1844",
       "symbol": "dmRender::SetConstantLocation",
       "signature": "dmRender::SetConstantLocation(HConstant, dmGraphics::HUniformLocation) -> void",
       "kind": "function",
@@ -14586,7 +14585,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1841",
+      "id": "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1842",
       "symbol": "dmRender::SetConstantName",
       "signature": "dmRender::SetConstantName(HConstant, dmhash_t) -> void",
       "kind": "function",
@@ -14602,7 +14601,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1845",
+      "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846",
       "symbol": "dmRender::SetConstantType",
       "signature": "dmRender::SetConstantType(HConstant, int) -> void",
       "kind": "function",
@@ -14618,7 +14617,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1839",
+      "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1840",
       "symbol": "dmRender::SetConstantValues",
       "signature": "dmRender::SetConstantValues(HConstant, dmVMath::Vector4 *, uint32_t) -> Result",
       "kind": "function",
@@ -14636,7 +14635,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1864",
+      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1865",
       "symbol": "dmRender::SetMaterialSampler",
       "signature": "dmRender::SetMaterialSampler(HMaterial, dmhash_t, uint32_t, dmGraphics::TextureWrap, dmGraphics::TextureWrap, dmGraphics::TextureWrap, dmGraphics::TextureFilter, dmGraphics::TextureFilter, float) -> bool",
       "kind": "function",
@@ -14652,7 +14651,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1865",
+      "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1866",
       "symbol": "dmRender::SetMaterialSampler",
       "signature": "dmRender::SetMaterialSampler(HMaterial, dmhash_t, uint32_t, dmGraphics::TextureWrap, dmGraphics::TextureWrap, dmGraphics::TextureFilter, dmGraphics::TextureFilter, float) -> bool",
       "kind": "function",
@@ -14668,7 +14667,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:696:1863",
+      "id": "dmsdk:dmRender::SetMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:696:1864",
       "symbol": "dmRender::SetMaterialTags",
       "signature": "dmRender::SetMaterialTags(HMaterial, uint32_t, const dmhash_t *) -> void",
       "kind": "function",
@@ -14688,7 +14687,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1850",
+      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1851",
       "symbol": "dmRender::SetNamedConstant",
       "signature": "dmRender::SetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 *, uint32_t) -> void",
       "kind": "function",
@@ -14706,7 +14705,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1851",
+      "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852",
       "symbol": "dmRender::SetNamedConstant",
       "signature": "dmRender::SetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 *, uint32_t, int) -> void",
       "kind": "function",
@@ -14724,7 +14723,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1853",
+      "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854",
       "symbol": "dmRender::SetNamedConstantAtIndex",
       "signature": "dmRender::SetNamedConstantAtIndex(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 *, uint32_t, uint32_t, int) -> Result",
       "kind": "function",
@@ -14742,7 +14741,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1852",
+      "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853",
       "symbol": "dmRender::SetNamedConstants",
       "signature": "dmRender::SetNamedConstants(HNamedConstantBuffer, HConstant *, uint32_t) -> void",
       "kind": "function",
@@ -14760,7 +14759,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::StencilTestParams::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:145:1813",
+      "id": "dmsdk:dmRender::StencilTestParams::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:145:1814",
       "symbol": "dmRender::StencilTestParams::Init",
       "signature": "dmRender::StencilTestParams::Init() -> void",
       "kind": "method",
@@ -14776,7 +14775,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRender::StencilTestParams::StencilTestParams@upstream/defold/engine/render/src/dmsdk/render/render.h:144:1812",
+      "id": "dmsdk:dmRender::StencilTestParams::StencilTestParams@upstream/defold/engine/render/src/dmsdk/render/render.h:144:1813",
       "symbol": "dmRender::StencilTestParams::StencilTestParams",
       "signature": "dmRender::StencilTestParams::StencilTestParams() -> void",
       "kind": "constructor",
@@ -14792,7 +14791,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:230:2009",
+      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:230:2010",
       "symbol": "dmResource::AddFile",
       "signature": "dmResource::AddFile(HFactory, const char *, uint32_t, const void *) -> Result",
       "kind": "function",
@@ -14812,7 +14811,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:204:1974",
+      "id": "dmsdk:dmResource::AddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:204:1975",
       "symbol": "dmResource::AddFile",
       "signature": "dmResource::AddFile(HFactory, const char *, uint32_t, const void *) -> Result",
       "kind": "function",
@@ -14832,7 +14831,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::AllocateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:312:1988",
+      "id": "dmsdk:dmResource::AllocateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:312:1989",
       "symbol": "dmResource::AllocateResourceType",
       "signature": "dmResource::AllocateResourceType(HFactory, const char *) -> HResourceType",
       "kind": "function",
@@ -14850,7 +14849,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::CreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:104:1964",
+      "id": "dmsdk:dmResource::CreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:104:1965",
       "symbol": "dmResource::CreateResource",
       "signature": "dmResource::CreateResource(HFactory, const char *, void *, uint32_t, void **) -> Result",
       "kind": "function",
@@ -14872,7 +14871,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::FreeResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:313:1989",
+      "id": "dmsdk:dmResource::FreeResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:313:1990",
       "symbol": "dmResource::FreeResourceType",
       "signature": "dmResource::FreeResourceType(HFactory, HResourceType) -> void",
       "kind": "function",
@@ -14888,7 +14887,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2001",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2002",
       "symbol": "dmResource::Get",
       "signature": "dmResource::Get(HFactory, const char *, void **) -> Result",
       "kind": "function",
@@ -14908,7 +14907,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1960",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1961",
       "symbol": "dmResource::Get",
       "signature": "dmResource::Get(HFactory, const char *, void **) -> Result",
       "kind": "function",
@@ -14928,7 +14927,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1962",
+      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1963",
       "symbol": "dmResource::Get",
       "signature": "dmResource::Get(HFactory, dmhash_t, void **) -> Result",
       "kind": "function",
@@ -14948,7 +14947,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2002",
+      "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2003",
       "symbol": "dmResource::GetByHash",
       "signature": "dmResource::GetByHash(HFactory, dmhash_t, void **) -> Result",
       "kind": "function",
@@ -14968,7 +14967,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1969",
+      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
       "symbol": "dmResource::GetCanonicalPath",
       "signature": "dmResource::GetCanonicalPath(const char *, char *, uint32_t) -> uint32_t",
       "kind": "function",
@@ -14988,7 +14987,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1991",
+      "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1992",
       "symbol": "dmResource::GetContext",
       "signature": "dmResource::GetContext(HResourceType) -> void *",
       "kind": "function",
@@ -15006,7 +15005,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:176:2004",
+      "id": "dmsdk:dmResource::GetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:176:2005",
       "symbol": "dmResource::GetDescriptor",
       "signature": "dmResource::GetDescriptor(HFactory, const char *, HDescriptor *) -> Result",
       "kind": "function",
@@ -15024,7 +15023,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2005",
+      "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2006",
       "symbol": "dmResource::GetDescriptorByHash",
       "signature": "dmResource::GetDescriptorByHash(HFactory, dmhash_t, HDescriptor *) -> Result",
       "kind": "function",
@@ -15042,7 +15041,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1968",
+      "id": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
       "symbol": "dmResource::GetExtFromPath",
       "signature": "dmResource::GetExtFromPath(const char *) -> const char *",
       "kind": "function",
@@ -15058,7 +15057,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:322:1993",
+      "id": "dmsdk:dmResource::GetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:322:1994",
       "symbol": "dmResource::GetName",
       "signature": "dmResource::GetName(HResourceType) -> const char *",
       "kind": "function",
@@ -15076,7 +15075,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2011",
+      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2012",
       "symbol": "dmResource::GetNameHash",
       "signature": "dmResource::GetNameHash(HDescriptor) -> dmhash_t",
       "kind": "function",
@@ -15092,7 +15091,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:325:1994",
+      "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:325:1995",
       "symbol": "dmResource::GetNameHash",
       "signature": "dmResource::GetNameHash(HResourceType) -> dmhash_t",
       "kind": "function",
@@ -15108,7 +15107,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2008",
+      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2009",
       "symbol": "dmResource::GetPath",
       "signature": "dmResource::GetPath(HFactory, const void *, dmhash_t *) -> Result",
       "kind": "function",
@@ -15128,7 +15127,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:133:1967",
+      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:133:1968",
       "symbol": "dmResource::GetPath",
       "signature": "dmResource::GetPath(HFactory, const void *, uint64_t *) -> Result",
       "kind": "function",
@@ -15146,7 +15145,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2015",
+      "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2016",
       "symbol": "dmResource::GetPrevResource",
       "signature": "dmResource::GetPrevResource(HDescriptor) -> void *",
       "kind": "function",
@@ -15164,7 +15163,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:170:2003",
+      "id": "dmsdk:dmResource::GetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:170:2004",
       "symbol": "dmResource::GetRaw",
       "signature": "dmResource::GetRaw(HFactory, const char *, void **, uint32_t *) -> Result",
       "kind": "function",
@@ -15186,7 +15185,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2013",
+      "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2014",
       "symbol": "dmResource::GetResource",
       "signature": "dmResource::GetResource(HDescriptor) -> void *",
       "kind": "function",
@@ -15204,7 +15203,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2017",
+      "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2018",
       "symbol": "dmResource::GetResourceSize",
       "signature": "dmResource::GetResourceSize(HDescriptor) -> uint32_t",
       "kind": "function",
@@ -15220,7 +15219,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetType@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:288:2018",
+      "id": "dmsdk:dmResource::GetType@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:288:2019",
       "symbol": "dmResource::GetType",
       "signature": "dmResource::GetType(HDescriptor) -> HResourceType",
       "kind": "function",
@@ -15236,7 +15235,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:285:1985",
+      "id": "dmsdk:dmResource::GetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:285:1986",
       "symbol": "dmResource::GetTypeFromExtension",
       "signature": "dmResource::GetTypeFromExtension(HFactory, const char *, HResourceType *) -> Result",
       "kind": "function",
@@ -15254,7 +15253,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:1986",
+      "id": "dmsdk:dmResource::GetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:1987",
       "symbol": "dmResource::GetTypeFromExtensionHash",
       "signature": "dmResource::GetTypeFromExtensionHash(HFactory, dmhash_t, HResourceType *) -> Result",
       "kind": "function",
@@ -15272,7 +15271,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1961",
+      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1962",
       "symbol": "dmResource::GetWithExt",
       "signature": "dmResource::GetWithExt(HFactory, const char *, const char *, void **) -> Result",
       "kind": "function",
@@ -15292,7 +15291,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1963",
+      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1964",
       "symbol": "dmResource::GetWithExt",
       "signature": "dmResource::GetWithExt(HFactory, dmhash_t, dmhash_t, void **) -> Result",
       "kind": "function",
@@ -15312,7 +15311,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1976",
+      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1977",
       "symbol": "dmResource::IncRef",
       "signature": "dmResource::IncRef(HFactory, void *) -> void",
       "kind": "function",
@@ -15330,7 +15329,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1977",
+      "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1978",
       "symbol": "dmResource::IncRef",
       "signature": "dmResource::IncRef(HFactory, HResourceDescriptor) -> void",
       "kind": "function",
@@ -15346,7 +15345,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:204:2007",
+      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:204:2008",
       "symbol": "dmResource::PreloadHint",
       "signature": "dmResource::PreloadHint(HPreloadHintInfo, const char *) -> bool",
       "kind": "function",
@@ -15364,7 +15363,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:123:1966",
+      "id": "dmsdk:dmResource::PreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:123:1967",
       "symbol": "dmResource::PreloadHint",
       "signature": "dmResource::PreloadHint(HResourcePreloadHintInfo, const char *) -> bool",
       "kind": "function",
@@ -15382,7 +15381,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RegisterResourceDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:169:1971",
+      "id": "dmsdk:dmResource::RegisterResourceDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:169:1972",
       "symbol": "dmResource::RegisterResourceDecryptionFunction",
       "signature": "dmResource::RegisterResourceDecryptionFunction(FDecryptResource) -> void",
       "kind": "function",
@@ -15398,7 +15397,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RegisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:179:1972",
+      "id": "dmsdk:dmResource::RegisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:179:1973",
       "symbol": "dmResource::RegisterResourceReloadedCallback",
       "signature": "dmResource::RegisterResourceReloadedCallback(HFactory, FResourceReloadedCallback, void *) -> void",
       "kind": "function",
@@ -15418,7 +15417,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:268:1984",
+      "id": "dmsdk:dmResource::RegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:268:1985",
       "symbol": "dmResource::RegisterType",
       "signature": "dmResource::RegisterType(HFactory, const char *, void *, dmResource::FResourcePreload, dmResource::FResourceCreate, dmResource::FResourcePostCreate, dmResource::FResourceDestroy, dmResource::FResourceRecreate) -> Result",
       "kind": "function",
@@ -15438,7 +15437,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:192:2006",
+      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:192:2007",
       "symbol": "dmResource::Release",
       "signature": "dmResource::Release(HFactory, void *) -> void",
       "kind": "function",
@@ -15456,7 +15455,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:112:1965",
+      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:112:1966",
       "symbol": "dmResource::Release",
       "signature": "dmResource::Release(HFactory, void *) -> void",
       "kind": "function",
@@ -15474,7 +15473,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:240:2010",
+      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:240:2011",
       "symbol": "dmResource::RemoveFile",
       "signature": "dmResource::RemoveFile(HFactory, const char *) -> Result",
       "kind": "function",
@@ -15492,7 +15491,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:213:1975",
+      "id": "dmsdk:dmResource::RemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:213:1976",
       "symbol": "dmResource::RemoveFile",
       "signature": "dmResource::RemoveFile(HFactory, const char *) -> Result",
       "kind": "function",
@@ -15510,7 +15509,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:319:1992",
+      "id": "dmsdk:dmResource::SetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:319:1993",
       "symbol": "dmResource::SetContext",
       "signature": "dmResource::SetContext(HResourceType, void *) -> void",
       "kind": "function",
@@ -15528,7 +15527,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2014",
+      "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2015",
       "symbol": "dmResource::SetPrevResource",
       "signature": "dmResource::SetPrevResource(HDescriptor, void *) -> void",
       "kind": "function",
@@ -15546,7 +15545,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2012",
+      "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2013",
       "symbol": "dmResource::SetResource",
       "signature": "dmResource::SetResource(HDescriptor, void *) -> void",
       "kind": "function",
@@ -15564,7 +15563,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2016",
+      "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2017",
       "symbol": "dmResource::SetResourceSize",
       "signature": "dmResource::SetResourceSize(HDescriptor, uint32_t) -> void",
       "kind": "function",
@@ -15580,7 +15579,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::SetupType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:302:1987",
+      "id": "dmsdk:dmResource::SetupType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:302:1988",
       "symbol": "dmResource::SetupType",
       "signature": "dmResource::SetupType(HResourceTypeContext, HResourceType, void *, FResourcePreload, FResourceCreate, FResourcePostCreate, FResourceDestroy, FResourceRecreate) -> Result",
       "kind": "function",
@@ -15600,7 +15599,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::UnregisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:189:1973",
+      "id": "dmsdk:dmResource::UnregisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:189:1974",
       "symbol": "dmResource::UnregisterResourceReloadedCallback",
       "signature": "dmResource::UnregisterResourceReloadedCallback(HFactory, FResourceReloadedCallback, void *) -> void",
       "kind": "function",
@@ -15620,7 +15619,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmResource::ValidateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:1990",
+      "id": "dmsdk:dmResource::ValidateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:1991",
       "symbol": "dmResource::ValidateResourceType",
       "signature": "dmResource::ValidateResourceType(HResourceType) -> Result",
       "kind": "function",
@@ -15636,7 +15635,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2049",
+      "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2050",
       "symbol": "dmRig::CancelAnimation",
       "signature": "dmRig::CancelAnimation(HRigInstance) -> Result",
       "kind": "function",
@@ -15652,7 +15651,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2073",
+      "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074",
       "symbol": "dmRig::CopyBindPose",
       "signature": "dmRig::CopyBindPose(int &, dmArray<RigBone> &) -> void",
       "kind": "function",
@@ -15672,7 +15671,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::DeleteContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:168:2044",
+      "id": "dmsdk:dmRig::DeleteContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:168:2045",
       "symbol": "dmRig::DeleteContext",
       "signature": "dmRig::DeleteContext(HRigContext) -> void",
       "kind": "function",
@@ -15688,7 +15687,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2053",
+      "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054",
       "symbol": "dmRig::GenerateVertexData",
       "signature": "dmRig::GenerateVertexData(HRigContext, dmRig::HRigInstance, int *, const dmVMath::Matrix4 &, RigModelVertex *) -> RigModelVertex *",
       "kind": "function",
@@ -15710,7 +15709,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2052",
+      "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053",
       "symbol": "dmRig::GenerateVertexDataFromAttributes",
       "signature": "dmRig::GenerateVertexDataFromAttributes(dmRig::HRigContext, dmRig::HRigInstance, int *, const dmVMath::Matrix4 &, const dmVMath::Matrix4 &, const dmGraphics::VertexAttributeInfos *, uint32_t, uint8_t *) -> uint8_t *",
       "kind": "function",
@@ -15734,7 +15733,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2050",
+      "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2051",
       "symbol": "dmRig::GetAnimation",
       "signature": "dmRig::GetAnimation(HRigInstance) -> dmhash_t",
       "kind": "function",
@@ -15750,7 +15749,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:212:2067",
+      "id": "dmsdk:dmRig::GetBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:212:2068",
       "symbol": "dmRig::GetBoneCount",
       "signature": "dmRig::GetBoneCount(HRigInstance) -> uint32_t",
       "kind": "function",
@@ -15766,7 +15765,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:202:2057",
+      "id": "dmsdk:dmRig::GetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:202:2058",
       "symbol": "dmRig::GetCursor",
       "signature": "dmRig::GetCursor(HRigInstance, bool) -> float",
       "kind": "function",
@@ -15782,7 +15781,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:210:2065",
+      "id": "dmsdk:dmRig::GetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:210:2066",
       "symbol": "dmRig::GetEnabled",
       "signature": "dmRig::GetEnabled(HRigInstance) -> bool",
       "kind": "function",
@@ -15798,7 +15797,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:207:2062",
+      "id": "dmsdk:dmRig::GetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:207:2063",
       "symbol": "dmRig::GetIKTarget",
       "signature": "dmRig::GetIKTarget(HRigInstance, dmhash_t) -> IKTarget *",
       "kind": "function",
@@ -15816,7 +15815,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2068",
+      "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2069",
       "symbol": "dmRig::GetMaxBoneCount",
       "signature": "dmRig::GetMaxBoneCount(HRigInstance) -> uint32_t",
       "kind": "function",
@@ -15832,7 +15831,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2056",
+      "id": "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2057",
       "symbol": "dmRig::GetModel",
       "signature": "dmRig::GetModel(HRigInstance) -> dmhash_t",
       "kind": "function",
@@ -15848,7 +15847,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2070",
+      "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2071",
       "symbol": "dmRig::GetMorphWeights",
       "signature": "dmRig::GetMorphWeights(HRigInstance, uint64_t, uint32_t *) -> const float *",
       "kind": "function",
@@ -15868,7 +15867,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2059",
+      "id": "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2060",
       "symbol": "dmRig::GetPlaybackRate",
       "signature": "dmRig::GetPlaybackRate(HRigInstance) -> float",
       "kind": "function",
@@ -15884,7 +15883,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:206:2061",
+      "id": "dmsdk:dmRig::GetPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:206:2062",
       "symbol": "dmRig::GetPose",
       "signature": "dmRig::GetPose(HRigInstance) -> dmArray<BonePose> *",
       "kind": "function",
@@ -15904,7 +15903,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2054",
+      "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2055",
       "symbol": "dmRig::GetVertexCount",
       "signature": "dmRig::GetVertexCount(HRigInstance) -> uint32_t",
       "kind": "function",
@@ -15920,7 +15919,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::HasPoseMatrixCacheAnimatedPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:215:2069",
+      "id": "dmsdk:dmRig::HasPoseMatrixCacheAnimatedPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:215:2070",
       "symbol": "dmRig::HasPoseMatrixCacheAnimatedPose",
       "signature": "dmRig::HasPoseMatrixCacheAnimatedPose(HRigInstance) -> bool",
       "kind": "function",
@@ -15936,7 +15935,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::InstanceCreate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:171:2046",
+      "id": "dmsdk:dmRig::InstanceCreate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:171:2047",
       "symbol": "dmRig::InstanceCreate",
       "signature": "dmRig::InstanceCreate(HRigContext, const InstanceCreateParams &, HRigInstance *) -> Result",
       "kind": "function",
@@ -15958,7 +15957,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::InstanceDestroy@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:172:2047",
+      "id": "dmsdk:dmRig::InstanceDestroy@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:172:2048",
       "symbol": "dmRig::InstanceDestroy",
       "signature": "dmRig::InstanceDestroy(HRigContext, HRigInstance) -> Result",
       "kind": "function",
@@ -15974,7 +15973,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2066",
+      "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2067",
       "symbol": "dmRig::IsValid",
       "signature": "dmRig::IsValid(HRigInstance) -> bool",
       "kind": "function",
@@ -15990,7 +15989,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::NewContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:167:2043",
+      "id": "dmsdk:dmRig::NewContext@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:167:2044",
       "symbol": "dmRig::NewContext",
       "signature": "dmRig::NewContext(const NewContextParams &, HRigContext *) -> Result",
       "kind": "function",
@@ -16010,7 +16009,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2048",
+      "id": "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2049",
       "symbol": "dmRig::PlayAnimation",
       "signature": "dmRig::PlayAnimation(HRigInstance, dmhash_t, RigPlayback, float, float, float) -> Result",
       "kind": "function",
@@ -16026,7 +16025,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2063",
+      "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2064",
       "symbol": "dmRig::ResetIKTarget",
       "signature": "dmRig::ResetIKTarget(HRigInstance, dmhash_t) -> bool",
       "kind": "function",
@@ -16042,7 +16041,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:203:2058",
+      "id": "dmsdk:dmRig::SetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:203:2059",
       "symbol": "dmRig::SetCursor",
       "signature": "dmRig::SetCursor(HRigInstance, float, bool) -> Result",
       "kind": "function",
@@ -16058,7 +16057,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2064",
+      "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2065",
       "symbol": "dmRig::SetEnabled",
       "signature": "dmRig::SetEnabled(HRigInstance, bool) -> void",
       "kind": "function",
@@ -16074,7 +16073,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetEventCallback@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:220:2072",
+      "id": "dmsdk:dmRig::SetEventCallback@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:220:2073",
       "symbol": "dmRig::SetEventCallback",
       "signature": "dmRig::SetEventCallback(HRigInstance, RigEventCallback, void *, void *) -> void",
       "kind": "function",
@@ -16094,7 +16093,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2051",
+      "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2052",
       "symbol": "dmRig::SetMeshWriteAttributeParams",
       "signature": "dmRig::SetMeshWriteAttributeParams(dmGraphics::WriteAttributeParams *, const dmGraphics::VertexAttributeInfos *, int, const float **, const float **, const float **, const float **, const float **, const float **, const float **, const float **, const float **, int, const float **, uint32_t) -> void",
       "kind": "function",
@@ -16114,7 +16113,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2055",
+      "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2056",
       "symbol": "dmRig::SetModel",
       "signature": "dmRig::SetModel(HRigInstance, dmhash_t) -> Result",
       "kind": "function",
@@ -16130,7 +16129,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:219:2071",
+      "id": "dmsdk:dmRig::SetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:219:2072",
       "symbol": "dmRig::SetMorphWeights",
       "signature": "dmRig::SetMorphWeights(HRigInstance, uint64_t, const float *, uint32_t) -> void",
       "kind": "function",
@@ -16150,7 +16149,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2060",
+      "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2061",
       "symbol": "dmRig::SetPlaybackRate",
       "signature": "dmRig::SetPlaybackRate(HRigInstance, float) -> Result",
       "kind": "function",
@@ -16166,7 +16165,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2045",
+      "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2046",
       "symbol": "dmRig::Update",
       "signature": "dmRig::Update(HRigContext, float) -> Result",
       "kind": "function",
@@ -16308,7 +16307,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckHash@upstream/defold/engine/script/src/dmsdk/script/script.h:452:2107",
+      "id": "dmsdk:dmScript::CheckHash@upstream/defold/engine/script/src/dmsdk/script/script.h:452:2108",
       "symbol": "dmScript::CheckHash",
       "signature": "dmScript::CheckHash(lua_State *, int) -> dmhash_t",
       "kind": "function",
@@ -16326,7 +16325,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:462:2108",
+      "id": "dmsdk:dmScript::CheckHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:462:2109",
       "symbol": "dmScript::CheckHashOrString",
       "signature": "dmScript::CheckHashOrString(lua_State *, int) -> dmhash_t",
       "kind": "function",
@@ -16344,7 +16343,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:417:2103",
+      "id": "dmsdk:dmScript::CheckMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:417:2104",
       "symbol": "dmScript::CheckMatrix4",
       "signature": "dmScript::CheckMatrix4(lua_State *, int) -> dmVMath::Matrix4 *",
       "kind": "function",
@@ -16360,7 +16359,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:379:2099",
+      "id": "dmsdk:dmScript::CheckQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:379:2100",
       "symbol": "dmScript::CheckQuat",
       "signature": "dmScript::CheckQuat(lua_State *, int) -> dmVMath::Quat *",
       "kind": "function",
@@ -16376,7 +16375,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckTable@upstream/defold/engine/script/src/dmsdk/script/script.h:767:2134",
+      "id": "dmsdk:dmScript::CheckTable@upstream/defold/engine/script/src/dmsdk/script/script.h:767:2135",
       "symbol": "dmScript::CheckTable",
       "signature": "dmScript::CheckTable(lua_State *, char *, uint32_t, int) -> uint32_t",
       "kind": "function",
@@ -16394,7 +16393,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckTableSize@upstream/defold/engine/script/src/dmsdk/script/script.h:754:2133",
+      "id": "dmsdk:dmScript::CheckTableSize@upstream/defold/engine/script/src/dmsdk/script/script.h:754:2134",
       "symbol": "dmScript::CheckTableSize",
       "signature": "dmScript::CheckTableSize(lua_State *, int) -> uint32_t",
       "kind": "function",
@@ -16410,7 +16409,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:508:2113",
+      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:508:2114",
       "symbol": "dmScript::CheckURL",
       "signature": "dmScript::CheckURL(lua_State *, int) -> dmMessage::URL *",
       "kind": "function",
@@ -16426,7 +16425,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2114",
+      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2115",
       "symbol": "dmScript::CheckURL",
       "signature": "dmScript::CheckURL(lua_State *, dmMessage::URL *) -> bool",
       "kind": "function",
@@ -16444,7 +16443,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:305:2091",
+      "id": "dmsdk:dmScript::CheckVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:305:2092",
       "symbol": "dmScript::CheckVector3",
       "signature": "dmScript::CheckVector3(lua_State *, int) -> dmVMath::Vector3 *",
       "kind": "function",
@@ -16460,7 +16459,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CheckVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:342:2095",
+      "id": "dmsdk:dmScript::CheckVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:342:2096",
       "symbol": "dmScript::CheckVector4",
       "signature": "dmScript::CheckVector4(lua_State *, int) -> dmVMath::Vector4 *",
       "kind": "function",
@@ -16476,7 +16475,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::CreateCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:611:2121",
+      "id": "dmsdk:dmScript::CreateCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:611:2122",
       "symbol": "dmScript::CreateCallback",
       "signature": "dmScript::CreateCallback(lua_State *, int) -> LuaCallbackInfo *",
       "kind": "function",
@@ -16492,7 +16491,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::DestroyCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:623:2123",
+      "id": "dmsdk:dmScript::DestroyCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:623:2124",
       "symbol": "dmScript::DestroyCallback",
       "signature": "dmScript::DestroyCallback(LuaCallbackInfo *) -> void",
       "kind": "function",
@@ -16508,7 +16507,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetCallbackLuaContext@upstream/defold/engine/script/src/dmsdk/script/script.h:630:2124",
+      "id": "dmsdk:dmScript::GetCallbackLuaContext@upstream/defold/engine/script/src/dmsdk/script/script.h:630:2125",
       "symbol": "dmScript::GetCallbackLuaContext",
       "signature": "dmScript::GetCallbackLuaContext(LuaCallbackInfo *) -> lua_State *",
       "kind": "function",
@@ -16544,7 +16543,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:180:2083",
+      "id": "dmsdk:dmScript::GetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:180:2084",
       "symbol": "dmScript::GetInstance",
       "signature": "dmScript::GetInstance(lua_State *) -> void",
       "kind": "function",
@@ -16560,7 +16559,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2087",
+      "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2088",
       "symbol": "dmScript::GetLuaState",
       "signature": "dmScript::GetLuaState(HContext) -> lua_State *",
       "kind": "function",
@@ -16578,7 +16577,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetMainThread@upstream/defold/engine/script/src/dmsdk/script/script.h:259:2086",
+      "id": "dmsdk:dmScript::GetMainThread@upstream/defold/engine/script/src/dmsdk/script/script.h:259:2087",
       "symbol": "dmScript::GetMainThread",
       "signature": "dmScript::GetMainThread(lua_State *) -> lua_State *",
       "kind": "function",
@@ -16594,7 +16593,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::GetStringFromHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:473:2109",
+      "id": "dmsdk:dmScript::GetStringFromHashOrString@upstream/defold/engine/script/src/dmsdk/script/script.h:473:2110",
       "symbol": "dmScript::GetStringFromHashOrString",
       "signature": "dmScript::GetStringFromHashOrString(lua_State *, int, char *, uint32_t) -> const char *",
       "kind": "function",
@@ -16628,7 +16627,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsCallbackValid@upstream/defold/engine/script/src/dmsdk/script/script.h:617:2122",
+      "id": "dmsdk:dmScript::IsCallbackValid@upstream/defold/engine/script/src/dmsdk/script/script.h:617:2123",
       "symbol": "dmScript::IsCallbackValid",
       "signature": "dmScript::IsCallbackValid(LuaCallbackInfo *) -> bool",
       "kind": "function",
@@ -16644,7 +16643,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsHash@upstream/defold/engine/script/src/dmsdk/script/script.h:426:2104",
+      "id": "dmsdk:dmScript::IsHash@upstream/defold/engine/script/src/dmsdk/script/script.h:426:2105",
       "symbol": "dmScript::IsHash",
       "signature": "dmScript::IsHash(lua_State *, int) -> bool",
       "kind": "function",
@@ -16660,7 +16659,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsInstanceValid@upstream/defold/engine/script/src/dmsdk/script/script.h:197:2085",
+      "id": "dmsdk:dmScript::IsInstanceValid@upstream/defold/engine/script/src/dmsdk/script/script.h:197:2086",
       "symbol": "dmScript::IsInstanceValid",
       "signature": "dmScript::IsInstanceValid(lua_State *) -> bool",
       "kind": "function",
@@ -16676,7 +16675,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:397:2101",
+      "id": "dmsdk:dmScript::IsMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:397:2102",
       "symbol": "dmScript::IsMatrix4",
       "signature": "dmScript::IsMatrix4(lua_State *, int) -> bool",
       "kind": "function",
@@ -16692,7 +16691,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:360:2097",
+      "id": "dmsdk:dmScript::IsQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:360:2098",
       "symbol": "dmScript::IsQuat",
       "signature": "dmScript::IsQuat(lua_State *, int) -> bool",
       "kind": "function",
@@ -16708,7 +16707,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsURL@upstream/defold/engine/script/src/dmsdk/script/script.h:482:2110",
+      "id": "dmsdk:dmScript::IsURL@upstream/defold/engine/script/src/dmsdk/script/script.h:482:2111",
       "symbol": "dmScript::IsURL",
       "signature": "dmScript::IsURL(lua_State *, int) -> bool",
       "kind": "function",
@@ -16724,7 +16723,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:285:2089",
+      "id": "dmsdk:dmScript::IsVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:285:2090",
       "symbol": "dmScript::IsVector3",
       "signature": "dmScript::IsVector3(lua_State *, int) -> bool",
       "kind": "function",
@@ -16740,7 +16739,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::IsVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:323:2093",
+      "id": "dmsdk:dmScript::IsVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:323:2094",
       "symbol": "dmScript::IsVector4",
       "signature": "dmScript::IsVector4(lua_State *, int) -> bool",
       "kind": "function",
@@ -16756,7 +16755,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2116",
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2117",
       "symbol": "dmScript::JsonToLua",
       "signature": "dmScript::JsonToLua(lua_State *, const char *, size_t) -> int",
       "kind": "function",
@@ -16774,7 +16773,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2117",
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2118",
       "symbol": "dmScript::JsonToLua",
       "signature": "dmScript::JsonToLua(lua_State *, int, const char *, size_t) -> int",
       "kind": "function",
@@ -16864,7 +16863,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::~LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:75:2078",
+      "id": "dmsdk:dmScript::LuaStackCheck::~LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:75:2079",
       "symbol": "dmScript::LuaStackCheck::~LuaStackCheck",
       "signature": "dmScript::LuaStackCheck::~LuaStackCheck() -> void",
       "kind": "destructor",
@@ -16880,7 +16879,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::Error@upstream/defold/engine/script/src/dmsdk/script/script.h:78:2080",
+      "id": "dmsdk:dmScript::LuaStackCheck::Error@upstream/defold/engine/script/src/dmsdk/script/script.h:78:2081",
       "symbol": "dmScript::LuaStackCheck::Error",
       "signature": "dmScript::LuaStackCheck::Error(const char *) -> int",
       "kind": "method",
@@ -16900,7 +16899,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2077",
+      "id": "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2078",
       "symbol": "dmScript::LuaStackCheck::LuaStackCheck",
       "signature": "dmScript::LuaStackCheck::LuaStackCheck(lua_State *, int, const char *, int) -> void",
       "kind": "constructor",
@@ -16918,7 +16917,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaStackCheck::Verify@upstream/defold/engine/script/src/dmsdk/script/script.h:76:2079",
+      "id": "dmsdk:dmScript::LuaStackCheck::Verify@upstream/defold/engine/script/src/dmsdk/script/script.h:76:2080",
       "symbol": "dmScript::LuaStackCheck::Verify",
       "signature": "dmScript::LuaStackCheck::Verify(int) -> void",
       "kind": "method",
@@ -16934,7 +16933,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:546:2118",
+      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:546:2119",
       "symbol": "dmScript::LuaToJson",
       "signature": "dmScript::LuaToJson(lua_State *, char **, size_t *) -> int",
       "kind": "function",
@@ -16954,7 +16953,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:559:2119",
+      "id": "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:559:2120",
       "symbol": "dmScript::LuaToJson",
       "signature": "dmScript::LuaToJson(lua_State *, int, int, char **, size_t *) -> int",
       "kind": "function",
@@ -16974,7 +16973,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PCall@upstream/defold/engine/script/src/dmsdk/script/script.h:673:2127",
+      "id": "dmsdk:dmScript::PCall@upstream/defold/engine/script/src/dmsdk/script/script.h:673:2128",
       "symbol": "dmScript::PCall",
       "signature": "dmScript::PCall(lua_State *, int, int) -> int",
       "kind": "function",
@@ -17028,7 +17027,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushDDF@upstream/defold/engine/script/src/dmsdk/script/script.h:527:2115",
+      "id": "dmsdk:dmScript::PushDDF@upstream/defold/engine/script/src/dmsdk/script/script.h:527:2116",
       "symbol": "dmScript::PushDDF",
       "signature": "dmScript::PushDDF(lua_State *, const dmDDF::Descriptor *, const char *, bool) -> void",
       "kind": "function",
@@ -17044,7 +17043,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushHash@upstream/defold/engine/script/src/dmsdk/script/script.h:443:2106",
+      "id": "dmsdk:dmScript::PushHash@upstream/defold/engine/script/src/dmsdk/script/script.h:443:2107",
       "symbol": "dmScript::PushHash",
       "signature": "dmScript::PushHash(lua_State *, dmhash_t) -> void",
       "kind": "function",
@@ -17062,7 +17061,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:405:2102",
+      "id": "dmsdk:dmScript::PushMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:405:2103",
       "symbol": "dmScript::PushMatrix4",
       "signature": "dmScript::PushMatrix4(lua_State *, const dmVMath::Matrix4 &) -> void",
       "kind": "function",
@@ -17080,7 +17079,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:368:2098",
+      "id": "dmsdk:dmScript::PushQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:368:2099",
       "symbol": "dmScript::PushQuat",
       "signature": "dmScript::PushQuat(lua_State *, const dmVMath::Quat &) -> void",
       "kind": "function",
@@ -17098,7 +17097,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushTable@upstream/defold/engine/script/src/dmsdk/script/script.h:776:2135",
+      "id": "dmsdk:dmScript::PushTable@upstream/defold/engine/script/src/dmsdk/script/script.h:776:2136",
       "symbol": "dmScript::PushTable",
       "signature": "dmScript::PushTable(lua_State *, const char *, uint32_t) -> void",
       "kind": "function",
@@ -17116,7 +17115,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushURL@upstream/defold/engine/script/src/dmsdk/script/script.h:499:2112",
+      "id": "dmsdk:dmScript::PushURL@upstream/defold/engine/script/src/dmsdk/script/script.h:499:2113",
       "symbol": "dmScript::PushURL",
       "signature": "dmScript::PushURL(lua_State *, const dmMessage::URL &) -> void",
       "kind": "function",
@@ -17134,7 +17133,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:294:2090",
+      "id": "dmsdk:dmScript::PushVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:294:2091",
       "symbol": "dmScript::PushVector3",
       "signature": "dmScript::PushVector3(lua_State *, const dmVMath::Vector3 &) -> void",
       "kind": "function",
@@ -17152,7 +17151,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::PushVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:331:2094",
+      "id": "dmsdk:dmScript::PushVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:331:2095",
       "symbol": "dmScript::PushVector4",
       "signature": "dmScript::PushVector4(lua_State *, const dmVMath::Vector4 &) -> void",
       "kind": "function",
@@ -17170,7 +17169,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::Ref@upstream/defold/engine/script/src/dmsdk/script/script.h:159:2081",
+      "id": "dmsdk:dmScript::Ref@upstream/defold/engine/script/src/dmsdk/script/script.h:159:2082",
       "symbol": "dmScript::Ref",
       "signature": "dmScript::Ref(lua_State *, int) -> int",
       "kind": "function",
@@ -17186,7 +17185,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::RefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:691:2128",
+      "id": "dmsdk:dmScript::RefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:691:2129",
       "symbol": "dmScript::RefInInstance",
       "signature": "dmScript::RefInInstance(lua_State *) -> int",
       "kind": "function",
@@ -17202,7 +17201,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2130",
+      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2131",
       "symbol": "dmScript::ResolveURL",
       "signature": "dmScript::ResolveURL(lua_State *, int, dmMessage::URL *, dmMessage::URL *) -> int",
       "kind": "function",
@@ -17220,7 +17219,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2131",
+      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2132",
       "symbol": "dmScript::ResolveURL",
       "signature": "dmScript::ResolveURL(lua_State *, const char *, dmMessage::URL *, dmMessage::URL *) -> dmMessage::Result",
       "kind": "function",
@@ -17240,7 +17239,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::SetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:189:2084",
+      "id": "dmsdk:dmScript::SetInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:189:2085",
       "symbol": "dmScript::SetInstance",
       "signature": "dmScript::SetInstance(lua_State *) -> void",
       "kind": "function",
@@ -17256,7 +17255,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::SetupCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:647:2125",
+      "id": "dmsdk:dmScript::SetupCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:647:2126",
       "symbol": "dmScript::SetupCallback",
       "signature": "dmScript::SetupCallback(LuaCallbackInfo *) -> bool",
       "kind": "function",
@@ -17272,7 +17271,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::TeardownCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:661:2126",
+      "id": "dmsdk:dmScript::TeardownCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:661:2127",
       "symbol": "dmScript::TeardownCallback",
       "signature": "dmScript::TeardownCallback(LuaCallbackInfo *) -> void",
       "kind": "function",
@@ -17306,7 +17305,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToHash@upstream/defold/engine/script/src/dmsdk/script/script.h:435:2105",
+      "id": "dmsdk:dmScript::ToHash@upstream/defold/engine/script/src/dmsdk/script/script.h:435:2106",
       "symbol": "dmScript::ToHash",
       "signature": "dmScript::ToHash(lua_State *, int) -> dmhash_t *",
       "kind": "function",
@@ -17324,7 +17323,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:388:2100",
+      "id": "dmsdk:dmScript::ToMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:388:2101",
       "symbol": "dmScript::ToMatrix4",
       "signature": "dmScript::ToMatrix4(lua_State *, int) -> dmVMath::Matrix4 *",
       "kind": "function",
@@ -17340,7 +17339,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:351:2096",
+      "id": "dmsdk:dmScript::ToQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:351:2097",
       "symbol": "dmScript::ToQuat",
       "signature": "dmScript::ToQuat(lua_State *, int) -> dmVMath::Quat *",
       "kind": "function",
@@ -17356,7 +17355,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToURL@upstream/defold/engine/script/src/dmsdk/script/script.h:491:2111",
+      "id": "dmsdk:dmScript::ToURL@upstream/defold/engine/script/src/dmsdk/script/script.h:491:2112",
       "symbol": "dmScript::ToURL",
       "signature": "dmScript::ToURL(lua_State *, int) -> dmMessage::URL *",
       "kind": "function",
@@ -17372,7 +17371,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:276:2088",
+      "id": "dmsdk:dmScript::ToVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:276:2089",
       "symbol": "dmScript::ToVector3",
       "signature": "dmScript::ToVector3(lua_State *, int) -> dmVMath::Vector3 *",
       "kind": "function",
@@ -17388,7 +17387,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::ToVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:314:2092",
+      "id": "dmsdk:dmScript::ToVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:314:2093",
       "symbol": "dmScript::ToVector4",
       "signature": "dmScript::ToVector4(lua_State *, int) -> dmVMath::Vector4 *",
       "kind": "function",
@@ -17404,7 +17403,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::Unref@upstream/defold/engine/script/src/dmsdk/script/script.h:172:2082",
+      "id": "dmsdk:dmScript::Unref@upstream/defold/engine/script/src/dmsdk/script/script.h:172:2083",
       "symbol": "dmScript::Unref",
       "signature": "dmScript::Unref(lua_State *, int, int) -> void",
       "kind": "function",
@@ -17420,7 +17419,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::UnrefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:707:2129",
+      "id": "dmsdk:dmScript::UnrefInInstance@upstream/defold/engine/script/src/dmsdk/script/script.h:707:2130",
       "symbol": "dmScript::UnrefInInstance",
       "signature": "dmScript::UnrefInInstance(lua_State *, int) -> void",
       "kind": "function",
@@ -17436,7 +17435,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmScript::UrlToString@upstream/defold/engine/script/src/dmsdk/script/script.h:745:2132",
+      "id": "dmsdk:dmScript::UrlToString@upstream/defold/engine/script/src/dmsdk/script/script.h:745:2133",
       "symbol": "dmScript::UrlToString",
       "signature": "dmScript::UrlToString(const dmMessage::URL *, char *, uint32_t) -> const char *",
       "kind": "function",
@@ -17886,7 +17885,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2139",
+      "id": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2140",
       "symbol": "dmSound::IsGroupMuted",
       "signature": "dmSound::IsGroupMuted(dmhash_t) -> bool",
       "kind": "function",
@@ -17902,7 +17901,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2137",
+      "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
       "symbol": "dmSound::SetGroupMute",
       "signature": "dmSound::SetGroupMute(dmhash_t, bool) -> Result",
       "kind": "function",
@@ -17918,7 +17917,7 @@
       ]
     },
     {
-      "id": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2138",
+      "id": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
       "symbol": "dmSound::ToggleGroupMute",
       "signature": "dmSound::ToggleGroupMute(dmhash_t) -> Result",
       "kind": "function",
@@ -22419,7 +22418,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceAddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:353:1908",
+      "id": "dmsdk:ResourceAddFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:353:1909",
       "symbol": "ResourceAddFile",
       "signature": "ResourceAddFile(HResourceFactory, const char *, uint32_t, const void *) -> ResourceResult",
       "kind": "function",
@@ -22439,7 +22438,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceCreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:338:1907",
+      "id": "dmsdk:ResourceCreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:338:1908",
       "symbol": "ResourceCreateResource",
       "signature": "ResourceCreateResource(HResourceFactory, const char *, void *, uint32_t, void **) -> ResourceResult",
       "kind": "function",
@@ -22461,7 +22460,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1912",
+      "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1913",
       "symbol": "ResourceDescriptorGetNameHash",
       "signature": "ResourceDescriptorGetNameHash(HResourceDescriptor) -> dmhash_t",
       "kind": "function",
@@ -22477,7 +22476,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1916",
+      "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1917",
       "symbol": "ResourceDescriptorGetPrevResource",
       "signature": "ResourceDescriptorGetPrevResource(HResourceDescriptor) -> void *",
       "kind": "function",
@@ -22495,7 +22494,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1914",
+      "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1915",
       "symbol": "ResourceDescriptorGetResource",
       "signature": "ResourceDescriptorGetResource(HResourceDescriptor) -> void *",
       "kind": "function",
@@ -22513,7 +22512,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1918",
+      "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1919",
       "symbol": "ResourceDescriptorGetResourceSize",
       "signature": "ResourceDescriptorGetResourceSize(HResourceDescriptor) -> uint32_t",
       "kind": "function",
@@ -22529,7 +22528,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorGetType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:444:1919",
+      "id": "dmsdk:ResourceDescriptorGetType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:444:1920",
       "symbol": "ResourceDescriptorGetType",
       "signature": "ResourceDescriptorGetType(HResourceDescriptor) -> HResourceType",
       "kind": "function",
@@ -22545,7 +22544,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:452:1920",
+      "id": "dmsdk:ResourceDescriptorIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:452:1921",
       "symbol": "ResourceDescriptorIncRef",
       "signature": "ResourceDescriptorIncRef(HResourceFactory, HResourceDescriptor) -> void",
       "kind": "function",
@@ -22561,7 +22560,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1915",
+      "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1916",
       "symbol": "ResourceDescriptorSetPrevResource",
       "signature": "ResourceDescriptorSetPrevResource(HResourceDescriptor, void *) -> void",
       "kind": "function",
@@ -22579,7 +22578,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1913",
+      "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1914",
       "symbol": "ResourceDescriptorSetResource",
       "signature": "ResourceDescriptorSetResource(HResourceDescriptor, void *) -> void",
       "kind": "function",
@@ -22597,7 +22596,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1917",
+      "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1918",
       "symbol": "ResourceDescriptorSetResourceSize",
       "signature": "ResourceDescriptorSetResourceSize(HResourceDescriptor, uint32_t) -> void",
       "kind": "function",
@@ -22613,7 +22612,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1894",
+      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1895",
       "symbol": "ResourceGet",
       "signature": "ResourceGet(HResourceFactory, const char *, void **) -> ResourceResult",
       "kind": "function",
@@ -22633,7 +22632,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1896",
+      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1897",
       "symbol": "ResourceGetByHash",
       "signature": "ResourceGetByHash(HResourceFactory, dmhash_t, void **) -> ResourceResult",
       "kind": "function",
@@ -22653,7 +22652,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1897",
+      "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1898",
       "symbol": "ResourceGetByHashAndExt",
       "signature": "ResourceGetByHashAndExt(HResourceFactory, dmhash_t, dmhash_t, void **) -> ResourceResult",
       "kind": "function",
@@ -22673,7 +22672,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1906",
+      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
       "symbol": "ResourceGetCanonicalPath",
       "signature": "ResourceGetCanonicalPath(const char *, char *, uint32_t) -> uint32_t",
       "kind": "function",
@@ -22693,7 +22692,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:266:1900",
+      "id": "dmsdk:ResourceGetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:266:1901",
       "symbol": "ResourceGetDescriptor",
       "signature": "ResourceGetDescriptor(HResourceFactory, const char *, HResourceDescriptor *) -> ResourceResult",
       "kind": "function",
@@ -22711,7 +22710,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:276:1901",
+      "id": "dmsdk:ResourceGetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:276:1902",
       "symbol": "ResourceGetDescriptorByHash",
       "signature": "ResourceGetDescriptorByHash(HResourceFactory, dmhash_t, HResourceDescriptor *) -> ResourceResult",
       "kind": "function",
@@ -22729,7 +22728,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1905",
+      "id": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
       "symbol": "ResourceGetExtFromPath",
       "signature": "ResourceGetExtFromPath(const char *) -> const char *",
       "kind": "function",
@@ -22745,7 +22744,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1904",
+      "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1905",
       "symbol": "ResourceGetPath",
       "signature": "ResourceGetPath(HResourceFactory, const void *, dmhash_t *) -> ResourceResult",
       "kind": "function",
@@ -22765,7 +22764,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:256:1899",
+      "id": "dmsdk:ResourceGetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:256:1900",
       "symbol": "ResourceGetRaw",
       "signature": "ResourceGetRaw(HResourceFactory, const char *, void **, uint32_t *) -> ResourceResult",
       "kind": "function",
@@ -22787,7 +22786,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1910",
+      "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1911",
       "symbol": "ResourceGetTypeFromExtension",
       "signature": "ResourceGetTypeFromExtension(HResourceFactory, const char *, HResourceType *) -> ResourceResult",
       "kind": "function",
@@ -22807,7 +22806,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1911",
+      "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1912",
       "symbol": "ResourceGetTypeFromExtensionHash",
       "signature": "ResourceGetTypeFromExtensionHash(HResourceFactory, dmhash_t, HResourceType *) -> ResourceResult",
       "kind": "function",
@@ -22827,7 +22826,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1895",
+      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1896",
       "symbol": "ResourceGetWithExt",
       "signature": "ResourceGetWithExt(HResourceFactory, const char *, const char *, void **) -> ResourceResult",
       "kind": "function",
@@ -22847,7 +22846,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1898",
+      "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1899",
       "symbol": "ResourceIncRef",
       "signature": "ResourceIncRef(HResourceFactory, void *) -> void",
       "kind": "function",
@@ -22865,7 +22864,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourcePreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:296:1903",
+      "id": "dmsdk:ResourcePreloadHint@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:296:1904",
       "symbol": "ResourcePreloadHint",
       "signature": "ResourcePreloadHint(HResourcePreloadHintInfo, const char *) -> bool",
       "kind": "function",
@@ -22883,7 +22882,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:187:1893",
+      "id": "dmsdk:ResourceRegisterDecryptionFunction@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:187:1894",
       "symbol": "ResourceRegisterDecryptionFunction",
       "signature": "ResourceRegisterDecryptionFunction(FResourceDecryption) -> void",
       "kind": "function",
@@ -22899,7 +22898,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:158:1890",
+      "id": "dmsdk:ResourceRegisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:158:1891",
       "symbol": "ResourceRegisterReloadedCallback",
       "signature": "ResourceRegisterReloadedCallback(HResourceFactory, FResourceReloadedCallback, void *) -> void",
       "kind": "function",
@@ -22919,7 +22918,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1942",
+      "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1943",
       "symbol": "ResourceRegisterType",
       "signature": "ResourceRegisterType(HResourceFactory, const char *, void *, HResourceType *) -> ResourceResult",
       "kind": "function",
@@ -22939,7 +22938,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRegisterTypeCreatorDesc@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:779:1951",
+      "id": "dmsdk:ResourceRegisterTypeCreatorDesc@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:779:1952",
       "symbol": "ResourceRegisterTypeCreatorDesc",
       "signature": "ResourceRegisterTypeCreatorDesc(void *, uint32_t, const char *, FResourceTypeRegister, FResourceTypeDeregister) -> void",
       "kind": "function",
@@ -22959,7 +22958,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1902",
+      "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1903",
       "symbol": "ResourceRelease",
       "signature": "ResourceRelease(HResourceFactory, void *) -> void",
       "kind": "function",
@@ -22977,7 +22976,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceRemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:362:1909",
+      "id": "dmsdk:ResourceRemoveFile@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:362:1910",
       "symbol": "ResourceRemoveFile",
       "signature": "ResourceRemoveFile(HResourceFactory, const char *) -> ResourceResult",
       "kind": "function",
@@ -22995,7 +22994,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1921",
+      "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1922",
       "symbol": "ResourceTypeContextGetContextByHash",
       "signature": "ResourceTypeContextGetContextByHash(HResourceTypeContext, dmhash_t) -> void *",
       "kind": "function",
@@ -23013,7 +23012,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1929",
+      "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1930",
       "symbol": "ResourceTypeGetContext",
       "signature": "ResourceTypeGetContext(HResourceType) -> void *",
       "kind": "function",
@@ -23031,7 +23030,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:551:1931",
+      "id": "dmsdk:ResourceTypeGetName@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:551:1932",
       "symbol": "ResourceTypeGetName",
       "signature": "ResourceTypeGetName(HResourceType) -> const char *",
       "kind": "function",
@@ -23049,7 +23048,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1932",
+      "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1933",
       "symbol": "ResourceTypeGetNameHash",
       "signature": "ResourceTypeGetNameHash(HResourceType) -> dmhash_t",
       "kind": "function",
@@ -23065,7 +23064,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeGetPreloadSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:597:1940",
+      "id": "dmsdk:ResourceTypeGetPreloadSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:597:1941",
       "symbol": "ResourceTypeGetPreloadSize",
       "signature": "ResourceTypeGetPreloadSize(HResourceType) -> uint32_t",
       "kind": "function",
@@ -23081,7 +23080,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeIsStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:596:1939",
+      "id": "dmsdk:ResourceTypeIsStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:596:1940",
       "symbol": "ResourceTypeIsStreaming",
       "signature": "ResourceTypeIsStreaming(HResourceType) -> bool",
       "kind": "function",
@@ -23097,7 +23096,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeReset@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:600:1941",
+      "id": "dmsdk:ResourceTypeReset@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:600:1942",
       "symbol": "ResourceTypeReset",
       "signature": "ResourceTypeReset(HResourceType) -> void",
       "kind": "function",
@@ -23113,7 +23112,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:544:1930",
+      "id": "dmsdk:ResourceTypeSetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:544:1931",
       "symbol": "ResourceTypeSetContext",
       "signature": "ResourceTypeSetContext(HResourceType, void *) -> void",
       "kind": "function",
@@ -23131,7 +23130,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:572:1934",
+      "id": "dmsdk:ResourceTypeSetCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:572:1935",
       "symbol": "ResourceTypeSetCreateFn",
       "signature": "ResourceTypeSetCreateFn(HResourceType, FResourceCreate) -> void",
       "kind": "function",
@@ -23149,7 +23148,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetDestroyFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:586:1936",
+      "id": "dmsdk:ResourceTypeSetDestroyFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:586:1937",
       "symbol": "ResourceTypeSetDestroyFn",
       "signature": "ResourceTypeSetDestroyFn(HResourceType, FResourceDestroy) -> void",
       "kind": "function",
@@ -23167,7 +23166,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetPostCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:579:1935",
+      "id": "dmsdk:ResourceTypeSetPostCreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:579:1936",
       "symbol": "ResourceTypeSetPostCreateFn",
       "signature": "ResourceTypeSetPostCreateFn(HResourceType, FResourcePostCreate) -> void",
       "kind": "function",
@@ -23185,7 +23184,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetPreloadFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:565:1933",
+      "id": "dmsdk:ResourceTypeSetPreloadFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:565:1934",
       "symbol": "ResourceTypeSetPreloadFn",
       "signature": "ResourceTypeSetPreloadFn(HResourceType, FResourcePreload) -> void",
       "kind": "function",
@@ -23203,7 +23202,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetRecreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:593:1937",
+      "id": "dmsdk:ResourceTypeSetRecreateFn@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:593:1938",
       "symbol": "ResourceTypeSetRecreateFn",
       "signature": "ResourceTypeSetRecreateFn(HResourceType, FResourceRecreate) -> void",
       "kind": "function",
@@ -23221,7 +23220,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1938",
+      "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1939",
       "symbol": "ResourceTypeSetStreaming",
       "signature": "ResourceTypeSetStreaming(HResourceType, uint32_t) -> void",
       "kind": "function",
@@ -23237,7 +23236,7 @@
       ]
     },
     {
-      "id": "dmsdk:ResourceUnregisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:168:1891",
+      "id": "dmsdk:ResourceUnregisterReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:168:1892",
       "symbol": "ResourceUnregisterReloadedCallback",
       "signature": "ResourceUnregisterReloadedCallback(HResourceFactory, FResourceReloadedCallback, void *) -> void",
       "kind": "function",
@@ -23679,7 +23678,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowClose@upstream/defold/engine/platform/src/dmsdk/platform/window.h:267:1785",
+      "id": "dmsdk:WindowClose@upstream/defold/engine/platform/src/dmsdk/platform/window.h:267:1786",
       "symbol": "WindowClose",
       "signature": "WindowClose(HWindow) -> void",
       "kind": "function",
@@ -23695,7 +23694,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowCreateParamsInitialize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:241:1781",
+      "id": "dmsdk:WindowCreateParamsInitialize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:241:1782",
       "symbol": "WindowCreateParamsInitialize",
       "signature": "WindowCreateParamsInitialize(WindowCreateParams *) -> void",
       "kind": "function",
@@ -23711,7 +23710,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowDelete@upstream/defold/engine/platform/src/dmsdk/platform/window.h:253:1783",
+      "id": "dmsdk:WindowDelete@upstream/defold/engine/platform/src/dmsdk/platform/window.h:253:1784",
       "symbol": "WindowDelete",
       "signature": "WindowDelete(HWindow) -> void",
       "kind": "function",
@@ -23727,7 +23726,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1791",
+      "id": "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1792",
       "symbol": "WindowGetDisplayScaleFactor",
       "signature": "WindowGetDisplayScaleFactor(HWindow) -> float",
       "kind": "function",
@@ -23743,7 +23742,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetHeight@upstream/defold/engine/platform/src/dmsdk/platform/window.h:293:1789",
+      "id": "dmsdk:WindowGetHeight@upstream/defold/engine/platform/src/dmsdk/platform/window.h:293:1790",
       "symbol": "WindowGetHeight",
       "signature": "WindowGetHeight(HWindow) -> uint32_t",
       "kind": "function",
@@ -23759,7 +23758,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetStateParam@upstream/defold/engine/platform/src/dmsdk/platform/window.h:301:1790",
+      "id": "dmsdk:WindowGetStateParam@upstream/defold/engine/platform/src/dmsdk/platform/window.h:301:1791",
       "symbol": "WindowGetStateParam",
       "signature": "WindowGetStateParam(HWindow, WindowState) -> uint32_t",
       "kind": "function",
@@ -23775,7 +23774,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1788",
+      "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1789",
       "symbol": "WindowGetWidth",
       "signature": "WindowGetWidth(HWindow) -> uint32_t",
       "kind": "function",
@@ -23791,7 +23790,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowIconify@upstream/defold/engine/platform/src/dmsdk/platform/window.h:279:1787",
+      "id": "dmsdk:WindowIconify@upstream/defold/engine/platform/src/dmsdk/platform/window.h:279:1788",
       "symbol": "WindowIconify",
       "signature": "WindowIconify(HWindow) -> void",
       "kind": "function",
@@ -23807,7 +23806,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowNew@upstream/defold/engine/platform/src/dmsdk/platform/window.h:247:1782",
+      "id": "dmsdk:WindowNew@upstream/defold/engine/platform/src/dmsdk/platform/window.h:247:1783",
       "symbol": "WindowNew",
       "signature": "WindowNew() -> HWindow",
       "kind": "function",
@@ -23823,7 +23822,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowOpen@upstream/defold/engine/platform/src/dmsdk/platform/window.h:261:1784",
+      "id": "dmsdk:WindowOpen@upstream/defold/engine/platform/src/dmsdk/platform/window.h:261:1785",
       "symbol": "WindowOpen",
       "signature": "WindowOpen(HWindow, const WindowCreateParams *) -> WindowResult",
       "kind": "function",
@@ -23841,7 +23840,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1793",
+      "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1794",
       "symbol": "WindowPollEvents",
       "signature": "WindowPollEvents(HWindow) -> void",
       "kind": "function",
@@ -23857,7 +23856,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1792",
+      "id": "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1793",
       "symbol": "WindowSetSize",
       "signature": "WindowSetSize(HWindow, uint32_t, uint32_t) -> void",
       "kind": "function",
@@ -23873,7 +23872,7 @@
       ]
     },
     {
-      "id": "dmsdk:WindowShow@upstream/defold/engine/platform/src/dmsdk/platform/window.h:273:1786",
+      "id": "dmsdk:WindowShow@upstream/defold/engine/platform/src/dmsdk/platform/window.h:273:1787",
       "symbol": "WindowShow",
       "signature": "WindowShow(HWindow) -> void",
       "kind": "function",

@@ -15,10 +15,16 @@ sources:
 # dmSDK coverage inventory
 
 Pinned revision: `7f0f554f41f9dce1e0ddff99bf08200657d1ee05`
-Inventory platform: `arm64-macos`
+Parsed as: `wasm32-unknown-unknown` against the pinned sysroot
+`wasi-sysroot-25.0/include/wasm32-wasip1`
+(`sha256:d09c62c18efcddffe4b2fdd8c5830109cc8e36130cdbc9acdc0bd1b204c942bb`), an assignment that
+defines none of `ANDROID`, `_MSC_VER`, `_WIN32`, `__ANDROID__`, `__APPLE_CC__`, `__APPLE__`, `__EMSCRIPTEN__`, `__linux__`
+and therefore takes no platform branch. This is not a bundle target and says
+nothing about which targets get which declaration; that is
+`packages/bindings/generated/defold-dmsdk-target-conditionals.json`.
 
 Clang parsed **121 of 121** public
-`dmsdk/**/*.h(pp)` headers and accounted for **2140**
+`dmsdk/**/*.h(pp)` headers and accounted for **2141**
 declarations. A declaration is accounted for when it is either a type-only
 dependency, a direct scalar ABI candidate, or explicitly blocked on a lowering
 policy. Nothing is silently discarded.
@@ -29,7 +35,7 @@ policy. Nothing is silently discarded.
 | --- | ---: |
 | `direct-candidate` | 23 |
 | `needs-policy` | 1354 |
-| `type-only` | 763 |
+| `type-only` | 764 |
 
 `needs-policy` is the generator queue: pointers, ownership, callbacks,
 lifetimes, templates, arrays/spans, named handles, and wide integers must gain
@@ -51,7 +57,7 @@ coverage gates.
 | `function-template` | 20 |
 | `method` | 113 |
 | `record` | 289 |
-| `type-alias` | 305 |
+| `type-alias` | 306 |
 | `variable` | 52 |
 
 ## Parse failures
@@ -60,7 +66,7 @@ None.
 
 ## Partial-AST diagnostics
 
-35 headers emitted Clang diagnostics, mostly because generated DDF headers are build artifacts not present in a source checkout. Clang still produced a target-header AST for the inventory. These headers must be re-imported against the packaged Defold SDK before code emission.
+55 headers emitted Clang diagnostics, mostly because generated DDF headers are build artifacts not present in a source checkout. Clang still produced a target-header AST for the inventory. These headers must be re-imported against the packaged Defold SDK before code emission.
 
 The machine-readable inventory is
 `packages/bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it

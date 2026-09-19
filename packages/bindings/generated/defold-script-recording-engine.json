@@ -3,12 +3,12 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "33bd214c823b6194a19f9929b52423f3aba6a06a5144d88bbc30123645ac108c",
+  "planSha256": "305b79a02ab25037fc01a81036a944c85fdfc27bdd12e7b21b53476b5327715d",
   "inputHashes": {
     "projection": "a3370e1a8e88b4c4cfdf4b9a9464b3a3d189ea7e597f884ceae516281910cf57",
     "universal": "ffdc662711897b646b97eba185323bef9d31701b9f7b62a13a980eda9354f325",
     "handleLowering": "8935a4f13609c99ada06019dd252aaae3666f64ce1ed8fbc1d9ffc9538914aa9",
-    "loweringPlan": "e9004a7e1add7e18f2b70da8340d8832d46e1314705555ea6ad3998ae4791d4c"
+    "loweringPlan": "f67e3640b83338504a3a493360624601515de7ea4352b45a849aa5c1ccffe72f"
   },
   "planInputDrift": [],
   "transports": {
@@ -56545,11 +56545,11 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "2ad4cb7d66658cbc452acf9996371072acb3cd1c3c055c0dbbac7fc67ab99fc0",
+    "header": "dc5c2ee2662d4e09348834d88a0426d3eb914735d32f2b85bfdc7f4d6b76ac82",
     "tables": "df47c2547e5f4a3fa3822861b0aea9b4989641b8f00d1bfb2c46949656dd8775",
     "provider": "576c3fb87089a0b968abe465b809de407d0027a286dd165c783325f853c63171",
     "driver": "04230cea34fba2a1418c110364ee6f101525b393106b6a42f26e7ff2644c86e2",
     "driverJs": "5dc503db68fb631b0db31a39c7db5796a8c44491c655522194158426a2f48744",
-    "expectedTrace": "0c501fef4958c6e5f68d310817ec10224a9b63398fd0156408ad9e858a8736da"
+    "expectedTrace": "17ec293c520191ba69d06584979a2651c0d177393e77fed9472a70e203d04080"
   }
 }

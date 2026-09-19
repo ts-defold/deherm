@@ -10,6 +10,7 @@ import { strToU8, zipSync } from "fflate";
 
 import { buildProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes, installNativeExtension, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
+import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
@@ -313,7 +314,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
     generatedScalarDispatch: 90,
     universalStableId: 915
   });
-  assert.equal(manifest.coverage.dmsdk.declarations, 2140);
+  assert.equal(manifest.coverage.dmsdk.declarations, 2141);
   assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, 0);
   assert.equal(manifest.coverage.dmsdk.runtimeDeclarations, 1361);
   assert.equal(manifest.coverage.dmsdk.universalRecipes, 1361);
@@ -324,8 +325,11 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
     usageMaterializedFallback: 1213,
     projectMaterialized: 0
   });
-  assert.equal(manifest.platform, "arm64-macos");
-  assert.equal(manifest.coverage.dmsdk.diagnosticHeaders, 35);
+  // The conformance target is the HOST this run would execute on, not a label
+  // copied out of the dmSDK IR - the IR no longer carries one, because its parse
+  // is deliberately not any platform.
+  assert.equal(manifest.platform, hostDefoldPlatform());
+  assert.equal(manifest.coverage.dmsdk.diagnosticHeaders, 55);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "script", "types.ts"), "utf8"), /export interface MsgApi/);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8")).bindingCount, 90);

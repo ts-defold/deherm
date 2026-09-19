@@ -6,12 +6,18 @@ bob_jar="$repo_root/build/tooling/bob.jar"
 action="${1:-build}"
 shift || true
 
+# JAVA_HOME, then whatever is on PATH, then the Homebrew location. PATH used to
+# be missing from that list, so this script could only run on a Mac with
+# Homebrew's openjdk@25 - which is not where a Linux CI runner's JDK lives.
 java_bin="${JAVA_HOME:+$JAVA_HOME/bin/java}"
+if [[ -z "$java_bin" || ! -x "$java_bin" ]]; then
+  java_bin="$(command -v java || true)"
+fi
 if [[ -z "$java_bin" || ! -x "$java_bin" ]]; then
   java_bin="/opt/homebrew/opt/openjdk@25/bin/java"
 fi
 if [[ ! -x "$java_bin" ]]; then
-  echo "JDK 25 is required. Set JAVA_HOME or install Homebrew openjdk@25." >&2
+  echo "A JDK is required. Set JAVA_HOME, put java on PATH, or install Homebrew openjdk@25." >&2
   exit 1
 fi
 if [[ ! -f "$bob_jar" ]]; then

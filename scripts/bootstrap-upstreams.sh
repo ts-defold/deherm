@@ -35,7 +35,7 @@ checkout_revision() {
 if [[ $# -gt 0 ]]; then
   requested=("$@")
 else
-  requested=(defold hermes extender ref-doc)
+  requested=(defold hermes extender ref-doc parse-sysroot)
 fi
 
 wants() {
@@ -49,10 +49,10 @@ wants() {
 
 for candidate in "${requested[@]}"; do
   case "$candidate" in
-    defold | hermes | extender | ref-doc) ;;
+    defold | hermes | extender | ref-doc | parse-sysroot) ;;
     *)
       echo "Unknown upstream component: $candidate" >&2
-      echo "Expected one or more of: defold hermes extender ref-doc" >&2
+      echo "Expected one or more of: defold hermes extender ref-doc parse-sysroot" >&2
       exit 2
       ;;
   esac
@@ -67,4 +67,13 @@ if wants ref-doc; then
   mkdir -p "$repo_root/upstream"
   curl -fL "$DEFOLD_REF_DOC_URL" -o "$ref_doc"
   printf '%s  %s\n' "$DEFOLD_REF_DOC_SHA256" "$ref_doc" | shasum -a 256 -c -
+fi
+
+# The pinned C library headers the dmSDK declaration parse resolves against.
+# `scripts/import-defold-sdk.py` fetches and verifies these itself when they are
+# absent, so this only front-loads the download for a machine that is being set
+# up; it is the same digest either way. See
+# `.agents/docs/decisions/target-directed-dmsdk-parse.md`.
+if wants parse-sysroot; then
+  python3 "$repo_root/scripts/import-defold-sdk.py" --sysroot-only
 fi

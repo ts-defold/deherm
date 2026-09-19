@@ -50,7 +50,7 @@ function fixture(overrides = {}) {
     },
     dmsdkIr: {
       defoldRevision: "a".repeat(40),
-      platform: "arm64-macos",
+      parseEnvironment: { triple: "wasm32-unknown-unknown", platformNeutralOf: ["__APPLE__"], sysroot: "s", sysrootSha256: "b".repeat(64) },
       declarations: [
         { id: "dmsdk:dmGui::X", name: "dmGui::X", header: "upstream/defold/engine/gui/src/dmsdk/gui/gui.h", kind: "record" },
         { id: "dmsdk:dmGameObject::Y", name: "dmGameObject::Y", header: "upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h", kind: "record" }

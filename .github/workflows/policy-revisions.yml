@@ -121,13 +121,13 @@ jobs:
   derive:
     needs: plan
     if: needs.plan.outputs.any == 'true'
-    # arm64 macOS, still. `scripts/import-defold-sdk.py` parses the dmSDK with
-    # the HOST clang and labels its output `arm64-macos` unconditionally, so
-    # deriving on a Linux runner would produce an IR labelled for a platform it
-    # was not parsed for. That is a defect in the importer rather than a
-    # property of the API it derives, and it is what this pin exists to work
-    # around until the parse is target-directed.
-    runs-on: macos-15
+    # Linux, like every other job here. The dmSDK parse is target-directed and
+    # resolves against a digest-pinned sysroot, so the inventory - and therefore
+    # the policy root - is a function of the Defold revision and the declared
+    # targets rather than of the runner. See
+    # `.agents/docs/decisions/target-directed-dmsdk-parse.md`; the equality is
+    # measured by the `host-parity` job in `derivation.yml`, not assumed here.
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -139,6 +139,20 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # The pinned C library headers the dmSDK parse resolves against. The
+      # importer fetches them on demand and verifies the digest either way; the
+      # cache only saves the download, and its key is the digest, so a repin
+      # misses rather than serving the wrong bytes.
+      - id: sysroot
+        run: |
+          set -euo pipefail
+          sed -n 's/^DMSDK_PARSE_SYSROOT_SHA256=//p' upstream.lock \
+            | awk '{ print "digest=" $0 }' >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: upstream/dmsdk-parse-sysroot
+          key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
 
       # One step. It materialises a workspace, repins `upstream.lock` there to
       # the observed revision with the digests the immutable archive served,

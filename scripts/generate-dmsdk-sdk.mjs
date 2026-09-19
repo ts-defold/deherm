@@ -216,7 +216,7 @@ function enrich(inventory) {
   return {
     schemaVersion: 1,
     defoldRevision: inventory.defoldRevision,
-    platform: inventory.platform,
+    parseEnvironment: inventory.parseEnvironment,
     headerCount: inventory.headerCount,
     parsedHeaderCount: inventory.parsedHeaderCount,
     failedHeaderCount: inventory.failedHeaderCount,

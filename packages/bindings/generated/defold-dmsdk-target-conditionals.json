@@ -12,7 +12,7 @@
   ],
   "inputEvidence": {
     "macros": "packages/bindings/overrides/dmsdk-target-macros.json",
-    "macrosSha256": "cbf030bcedd5cbe08c0db3c26be128ce4cfded045178e3d54ccb3378a8050d24",
+    "macrosSha256": "2595db6302f82c143f73bcf27906a1c97c51d904b6c2e80bdb0b73277af910d8",
     "buildInput": "upstream/defold/share/extender/build_input.yml",
     "buildInputSha256": "75e3402cd5e42f8492ad70408143cd01a6dbd9b554efb586e32372cae771446d",
     "variantManifests": {
@@ -32,7 +32,7 @@
     "bundleTargets": "packages/toolchains/defold-bundle-targets.json",
     "bundleTargetsSha256": "65a25d0043db47b09903d8b07b1708f59de16f425700203888e63dd35204db44",
     "inventory": "packages/bindings/generated/defold-sdk-inventory.json",
-    "inventorySha256": "07e4b3fa1ec073430b01a4bafb454ac46b5c2d47209195fab31f9026b74cfdbd"
+    "inventorySha256": "7c8222aecb5e2892a2b06dc0bd7b910440cbf8a8163f6eddd206728007eece9d"
   },
   "buildVariants": {
     "note": "Every target is resolved once per build variant and the three are required to agree; a header conditional that disagreed would fail this pass rather than be averaged away. `NDEBUG` and `DM_PROFILE_NULL` - the two macros dmsdk/dlib/profile.h gates its entire API on - are defined by no variant, so an extension is compiled against the full profiler API in all three. The debug/release difference is which archive is linked, and that is measured in the symbol evidence.",
@@ -225,11 +225,11 @@
     "headers": 121,
     "targetInvariantHeaders": 103,
     "targetVaryingHeaders": 18,
-    "declarations": 2140,
-    "targetConditionalDeclarations": 43,
+    "declarations": 2141,
+    "targetConditionalDeclarations": 44,
     "declarationsAbsentSomewhere": 0,
     "declarationsRespelledSomewhere": 4,
-    "declarationsPlatformSuppliedSomewhere": 17,
+    "declarationsPlatformSuppliedSomewhere": 18,
     "targetInvariantDeclarations": 2097,
     "unresolvedDeclarations": 0,
     "gatedTypeNames": 60
@@ -5338,6 +5338,39 @@
       ],
       "absentIn": [
         "x86_64-win32"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "id",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 22,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__APPLE_CC__)",
+        "include": "objc/objc.h",
+        "line": 20
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-linux",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-ios",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "x86_64-osx"
       ],
       "unresolvedIn": []
     },

@@ -92,14 +92,14 @@
     },
     {
       "id": "resource-extension-cpp-js-utf8",
-      "declarationIds": ["dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1968"],
+      "declarationIds": ["dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969"],
       "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
       "result": {"nullability": "nullable", "encoding": "native-null-terminated-bytes-decoded-as-utf8"},
       "sourceEvidence": ["resource-extension-cpp"]
     },
     {
       "id": "resource-extension-c-js-utf8",
-      "declarationIds": ["dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1905"],
+      "declarationIds": ["dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906"],
       "input": {"nullability": "non-null", "encoding": "js-string-utf8-no-embedded-nul"},
       "result": {"nullability": "nullable", "encoding": "native-null-terminated-bytes-decoded-as-utf8"},
       "sourceEvidence": ["resource-extension-c"]
