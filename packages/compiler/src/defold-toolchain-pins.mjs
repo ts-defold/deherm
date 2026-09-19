@@ -92,7 +92,11 @@ function evaluate(name, expression, bound) {
 export function parseSdkPins(source) {
   const bound = {};
   const refusals = [];
-  for (const line of source.split("\n")) {
+  // Git checks out the authoritative Python source with CRLF on Windows. Parse
+  // logical source text, not the host checkout's newline encoding: otherwise a
+  // trailing `\r` prevents comment stripping and can cascade into false missing
+  // pins when a later expression references the rejected declaration.
+  for (const line of source.replace(/\r\n?/g, "\n").split("\n")) {
     if (/^\s/.test(line) || line.startsWith("#")) continue;
     const match = ASSIGNMENT.exec(line.replace(/\s+#.*$/, ""));
     if (!match) continue;

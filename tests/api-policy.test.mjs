@@ -317,6 +317,21 @@ test("sdk.py pins are read verbatim, including its derived compositions", () => 
   assert.ok(refusals.some((row) => row.symbol === "DYNAMO_HOME"));
 });
 
+test("sdk.py pin parsing is independent of checkout newline encoding", () => {
+  const source = [
+    'VERSION_XCODE="26.5" # comment',
+    'ANDROID_NDK_API_VERSION="19" # Android 4.4',
+    'PACKAGES_XCODE_TOOLCHAIN="XcodeDefault%s.xctoolchain" % VERSION_XCODE'
+  ].join("\r\n");
+  const { bound, refusals } = parseSdkPins(source);
+  assert.deepEqual(refusals, []);
+  assert.deepEqual(bound, {
+    VERSION_XCODE: "26.5",
+    ANDROID_NDK_API_VERSION: "19",
+    PACKAGES_XCODE_TOOLCHAIN: "XcodeDefault26.5.xctoolchain"
+  });
+});
+
 test("a pin that moves out of sdk.py is a hard failure, not a silent omission", () => {
   assert.throws(
     () => buildToolchainPins({ sdkSource: 'VERSION_XCODE="26.5"', buildInputPlatforms: [] }),
