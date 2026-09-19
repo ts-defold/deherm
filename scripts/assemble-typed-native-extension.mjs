@@ -93,13 +93,36 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+// Prefer the SHIPPED shermes over a local build.
+//
+// This path used to hardcode build/native/bin/shermes, so the artifact CI
+// publishes and users download was never the one that actually ran - the
+// toolchain was declared, built and vendored, and then bypassed. Resolving
+// through the host-compiler manifest makes the repository dogfood the same
+// binary a user gets, which is the only way a regression in the published tool
+// is discoverable here rather than in someone's project.
+//
+// The local build stays as a fallback, because a checkout that has built Hermes
+// but not yet vendored the release still has to work.
+async function resolveShermes(explicit) {
+  if (explicit) return explicit;
+  try {
+    const { requireHostTool } = await import("../packages/cli/src/host-compilers.mjs");
+    const tool = await requireHostTool("shermes");
+    if (tool?.path) return tool.path;
+  } catch {
+    // Fall through: an unvendored checkout is a normal development state.
+  }
+  return path.join(repositoryRoot, "build/native/bin/shermes");
+}
+
 function parseArguments(argv) {
   const options = {
     project: null,
     target: process.env.DEFOLD_HERMES_PLATFORM || hostDefoldPlatform(),
     reconcile: false,
     profile: false,
-    shermes: path.join(repositoryRoot, "build/native/bin/shermes"),
+    shermes: null,
     hermesInclude: path.join(repositoryRoot, "upstream/hermes/include"),
     hermesConfigInclude: path.join(repositoryRoot, "build/native/hermes/lib/config")
   };
@@ -535,7 +558,8 @@ export async function assemble(options) {
   await mkdir(stagingDirectory, { recursive: true });
   const output = path.join(stagingDirectory, `${kUnitName}.c`);
   await writeFile(path.join(repositoryRoot, relativeInput), unitSource);
-  const result = spawnSync(options.shermes, [
+  const shermesPath = await resolveShermes(options.shermes);
+  const result = spawnSync(shermesPath, [
     "-typed", "-strict", "-O", "-emit-c",
     `-exported-unit=${kUnitName}`,
     relativeInput, "-o", output

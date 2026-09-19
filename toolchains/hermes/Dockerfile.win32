@@ -28,7 +28,7 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DHERMES_ENABLE_TOOLS=OFF \
       -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_DEBUGGER=OFF \
-      -DHERMES_ENABLE_INTL=ON \
+      -DHERMES_ENABLE_INTL=OFF \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
     cmake --build /work/build --target hermesvm_a jsi --parallel && \
     package-msvc /work/build /out/hermes.lib

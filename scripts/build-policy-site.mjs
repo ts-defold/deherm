@@ -52,6 +52,21 @@ async function walk(directory, prefix = "") {
 
 const planPath = path.join(root, "packages", "bindings", "generated", "defold-binding-lowering-plan.json");
 const wordmarkPath = path.join(root, "docs", "assets", "brand", "deherm-wordmark-basalt-heart.png");
+// A 1.91:1 card, because the wordmark's own 3:1 is cropped badly by every
+// unfurler. Regenerate with sips: fit the wordmark to 1000px wide, then pad to
+// 1200x630 with the page background (262626) so the card has no seam.
+const ogImagePath = path.join(root, "docs", "assets", "brand", "deherm-og.png");
+
+// Intrinsic size straight from the PNG's IHDR, so the markup can pin the
+// aspect ratio and the browser reserves the space before the image loads.
+// Hardcoding it would silently drift the moment the asset is replaced.
+function pngSize(bytes) {
+  const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  if (bytes.length < 24 || !bytes.subarray(0, 8).equals(signature)) {
+    throw new Error("Expected a PNG when reading intrinsic image dimensions");
+  }
+  return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
+}
 
 const escapeHtml = (value) => String(value)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -60,14 +75,31 @@ const escapeHtml = (value) => String(value)
 // tell what the store is and where the project lives; the policies themselves
 // are machine-fetched and explain nothing to a browser. Prose about the design
 // belongs in the decision record, not on the artifact host.
-function landingPage({ site, plan, defoldRevision }) {
+function landingPage({ site, plan, defoldRevision, wordmark, ogImage }) {
   const published = `${site.baseUrl.replace(/\/$/, "")}${site.pathPrefix ? `/${site.pathPrefix}` : ""}`;
   return `<!doctype html>
 <html lang="en">
 <meta charset="utf-8">
-<title>deherm policy store</title>
+<title>d\u00e9herm \u2014 TypeScript for Defold</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Content-addressed Defold API policies derived from engine sources.">
+<meta name="description" content="d\u00e9herm is a TypeScript runtime and tool kit for Defold. Use TypeScript anywhere Defold runs, powered by Hermes, the same JS runtime used by react-native.">
+<link rel="canonical" href="${escapeHtml(published)}/">
+<meta name="theme-color" content="#262626">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="d\u00e9herm">
+<meta property="og:title" content="d\u00e9herm \u2014 TypeScript for Defold">
+<meta property="og:description" content="Use TypeScript anywhere Defold runs, powered by Hermes, the same JS runtime used by react-native.">
+<meta property="og:url" content="${escapeHtml(published)}/">
+<meta property="og:image" content="${escapeHtml(published)}/deherm-og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="${ogImage.width}">
+<meta property="og:image:height" content="${ogImage.height}">
+<meta property="og:image:alt" content="d\u00e9herm">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="d\u00e9herm \u2014 TypeScript for Defold">
+<meta name="twitter:description" content="Use TypeScript anywhere Defold runs, powered by Hermes, the same JS runtime used by react-native.">
+<meta name="twitter:image" content="${escapeHtml(published)}/deherm-og.png">
+<meta name="twitter:image:alt" content="d\u00e9herm">
 <style>
   :root {
     --basalt: #262626; --basalt-2: #303030; --basalt-3: #3a3a3a;
@@ -81,7 +113,7 @@ function landingPage({ site, plan, defoldRevision }) {
   }
   .wrap { max-width: 58rem; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
   header { text-align: center; margin-bottom: 2.5rem; }
-  header img { width: 100%; max-width: 30rem; height: auto; }
+  header img { width: 100%; max-width: 30rem; height: auto; aspect-ratio: ${wordmark.width} / ${wordmark.height}; }
   .alpha {
     display: inline-block; margin-top: 1.25rem; padding: .3rem .7rem;
     border: 1px solid var(--heart); border-radius: 999px;
@@ -118,7 +150,7 @@ function landingPage({ site, plan, defoldRevision }) {
 
 <div class="wrap">
 <header>
-  <img src="deherm-wordmark.png" alt="d\u00e9herm">
+  <img src="deherm-wordmark.png" alt="d\u00e9herm" width="${wordmark.width}" height="${wordmark.height}" fetchpriority="high">
   <p class="tagline">Content-addressed Defold API policies, derived from engine sources.</p>
   <span class="alpha">Early alpha &middot; nothing here is stable</span>
 </header>
@@ -193,12 +225,20 @@ export async function buildPolicySite(options = {}) {
   files.set([...prefix, site.layoutVersion, "index", "manifest.json"].join("/"),
     Buffer.from(`${JSON.stringify(served, null, 2)}\n`));
   const plan = JSON.parse(await readFile(options.planPath ?? planPath, "utf8"));
-  files.set([...prefix, "index.html"].join("/"),
-    Buffer.from(landingPage({ site, plan, defoldRevision: plan.defoldRevision })));
-  // The wordmark is the only non-generated byte the site serves. It sits beside
-  // index.html rather than under the layout prefix, because it belongs to the
-  // page and not to the versioned object scheme.
-  files.set([...prefix, "deherm-wordmark.png"].join("/"), await readFile(wordmarkPath));
+  // The wordmark and the unfurl card are the only non-generated bytes the site
+  // serves. They sit beside index.html rather than under the layout prefix,
+  // because they belong to the page and not to the versioned object scheme.
+  const wordmarkBytes = await readFile(wordmarkPath);
+  const ogImageBytes = await readFile(ogImagePath);
+  files.set([...prefix, "index.html"].join("/"), Buffer.from(landingPage({
+    site,
+    plan,
+    defoldRevision: plan.defoldRevision,
+    wordmark: pngSize(wordmarkBytes),
+    ogImage: pngSize(ogImageBytes)
+  })));
+  files.set([...prefix, "deherm-wordmark.png"].join("/"), wordmarkBytes);
+  files.set([...prefix, "deherm-og.png"].join("/"), ogImageBytes);
   // Pages runs Jekyll unless told not to, and Jekyll drops paths it considers
   // private. Content-addressed names are hex, but this costs nothing and removes
   // a class of silent 404.
