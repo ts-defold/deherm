@@ -70,6 +70,8 @@ importers:
 
   packages/compiler: {}
 
+  packages/defold-netcode: {}
+
   packages/generator: {}
 
   packages/polyfills: {}
