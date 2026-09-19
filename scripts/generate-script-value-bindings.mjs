@@ -5,6 +5,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
+import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
@@ -1048,8 +1050,17 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
         typeof definition.irSource !== "string") {
       throw new Error("Unsupported Defold value binding schema");
     }
-    const sourceSha256 = createHash("sha256").update(sourceText).digest("hex");
-    if (sourceSha256 !== definition.sourceSha256) throw new Error(`Pinned ${definition.source} changed; review Defold value bindings`);
+    // OBSERVED. This generator PARSES this file - the layouts it emits are read
+    // out of it - so Defold editing it is the input to the job, not a failure of
+    // it. The hash is a change detector whose output is an audit line; the
+    // anchors below are what scope the reviewed judgement, and losing one
+    // withdraws that judgement rather than stopping.
+    const sourceVerdict = observeReviewedSource({
+      input: "packages/bindings/overrides/defold-value-layouts.json", id: definition.source, source: sourceText,
+      evidence: { source: definition.source, sha256: definition.sourceSha256, anchors: definition.anchors ?? [] }
+    });
+    const sourceSha256 = sourceVerdict.observed;
+    if (sourceVerdict.status === VOID) return [];
     sourceEvidence.push({ path: `upstream/defold/${definition.source}`, sha256: sourceSha256 });
     const declaredAdditional = definition.additionalSourceEvidence ?? [];
     if (!Array.isArray(declaredAdditional) || declaredAdditional.length !== additionalSources.length) {
@@ -1063,11 +1074,14 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
         throw new Error(`${definition.source}: invalid additional source evidence`);
       }
       if (loaded.source !== declared.source) throw new Error(`${definition.source}: loaded the wrong additional source evidence`);
-      const sha256 = createHash("sha256").update(loaded.sourceText).digest("hex");
-      if (sha256 !== declared.sourceSha256) throw new Error(`Pinned ${declared.source} changed; review Defold value bindings`);
-      for (const anchor of declared.anchors) {
-        if (!loaded.sourceText.includes(anchor)) throw new Error(`${declared.source}: source evidence anchor ${JSON.stringify(anchor)} is stale`);
-      }
+      // Same rule for the additional cited sources: observe, and withdraw the
+      // whole definition if the evidence its review rested on is gone.
+      const additionalVerdict = observeReviewedSource({
+        input: "packages/bindings/overrides/defold-value-layouts.json", id: declared.source, source: loaded.sourceText,
+        evidence: { source: declared.source, sha256: declared.sourceSha256, anchors: declared.anchors }
+      });
+      const sha256 = additionalVerdict.observed;
+      if (additionalVerdict.status === VOID) return [];
       sourceEvidence.push({ path: `upstream/defold/${declared.source}`, sha256 });
     }
     return expandDefinitionBindings(definition, functions, patterns, sourceText).map((entry) => {

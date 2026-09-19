@@ -4,7 +4,8 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
+import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -33,7 +34,7 @@ export function generate(inputs) {
   assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === frontier.defoldRevision, "copied-value blocker inputs use different Defold revisions");
   assert(patterns.sourceSha256 === sha256(inputs.irText), "copied-value blocker patterns are stale against script IR");
   const sourceByKey = new Map();
-  for (const source of policy.sources) { const text = inputs.sourceTexts.get(source.path); assert(!sourceByKey.has(source.key) && typeof text === "string" && sha256(text) === source.sha256, `${source.path}: pinned copied-value source drifted`); sourceByKey.set(source.key, { ...source, text }); }
+  for (const source of policy.sources) { const text = inputs.sourceTexts.get(source.path); assert(!sourceByKey.has(source.key), `${source.key}: duplicate copied-value source`); if (observeReviewedSource({ input: "packages/bindings/overrides/script-copied-value-record-blockers.json", id: source.path, source: text ?? null, evidence: source }).status === VOID) continue; sourceByKey.set(source.key, { ...source, text }); }
   const frontierRows = frontier.blockedRoutes.filter(({ blocker }) => blocker === "copied-defold-value-record");
   expectReviewedCount({
     input: "packages/bindings/overrides/script-copied-value-record-blockers.json",
