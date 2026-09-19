@@ -5,7 +5,7 @@ import { spawn } from "node:child_process";
 import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { downloadReleaseAssets } from "../packages/cli/src/release-assets.mjs";
+import { downloadReleaseAssets, extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
 import { fileURLToPath } from "node:url";
 
 import { allTargetNames, buildInputPath, deriveBundleTargets, readBundleTargets } from "./generate-defold-bundle-targets.mjs";
@@ -14,7 +14,14 @@ import { allTargetNames, buildInputPath, deriveBundleTargets, readBundleTargets 
 // pin and the per-target build recipe, and only the `sdk` and `targets` fields
 // of the derived bundle-target list, so a Defold repin that moves nothing but
 // `defoldRevision` no longer rebuilds and republishes ten unchanged archives.
-import { expectedAssetNames, familyTag, fingerprintFamily, targetLibraryName } from "./lib/artifact-releases.mjs";
+import {
+  expectedAssetNames,
+  familyRelease,
+  fingerprintFamily,
+  publishedAssets,
+  targetDebugLibraryName,
+  targetLibraryName
+} from "./lib/artifact-releases.mjs";
 
 const FAMILY = "native-artifacts";
 
@@ -65,26 +72,61 @@ async function expectedAssets() {
   return expectedAssetNames(FAMILY, { root });
 }
 
+/**
+ * Where the debugger-enabled sibling of a target's library lives in the tree:
+ * beside the release archive, under the name it carries inside the published
+ * tarball. Derived rather than stored, so the two names cannot disagree.
+ */
+export function debugLibraryPath(target, artifact) {
+  return path.posix.join(path.posix.dirname(artifact.library), targetDebugLibraryName(target, artifact));
+}
+
 async function install(downloadRoot) {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
   const available = await filesBelow(path.resolve(downloadRoot));
   const installed = [];
   for (const [target, artifact] of Object.entries(manifest.targets)) {
     if (!installable(artifact)) continue;
-    const name = targetLibraryName(target, artifact);
-    const candidates = available.filter((file) => path.basename(file) === name && file.split(path.sep).includes(`hermes-${target}`));
+    // The archive unpacks into a directory named for the row it answers for, so
+    // both libraries are found the same way and neither is matched by parsing a
+    // flat asset name.
+    const find = (name) => {
+      const candidates = available.filter((file) =>
+        path.basename(file) === name && file.split(path.sep).includes(`hermes-${target}`));
+      if (candidates.length > 1) throw new Error(`Expected one ${name} in hermes-${target}, found ${candidates.length}`);
+      return candidates[0] ?? null;
+    };
+    const release = find(targetLibraryName(target, artifact));
     // A download that carries nothing for a target leaves that target alone, so
     // one platform's build failing in CI never silently unpins another's digest.
-    if (candidates.length === 0) continue;
-    if (candidates.length !== 1) throw new Error(`Expected one ${name} in hermes-${target}, found ${candidates.length}`);
-    const destination = path.join(root, artifact.library);
-    await mkdir(path.dirname(destination), { recursive: true });
-    await cp(candidates[0], destination);
-    const bytes = await readFile(destination);
-    if (bytes.byteLength < 1_000_000) throw new Error(`${target} artifact is implausibly small (${bytes.byteLength} bytes)`);
+    if (!release) continue;
+
+    const place = async (source, relative) => {
+      const destination = path.join(root, relative);
+      await mkdir(path.dirname(destination), { recursive: true });
+      await cp(source, destination);
+      const bytes = await readFile(destination);
+      if (bytes.byteLength < 1_000_000) throw new Error(`${relative} is implausibly small (${bytes.byteLength} bytes)`);
+      return bytes;
+    };
+
+    const bytes = await place(release, artifact.library);
     artifact.status = "vendored";
     artifact.sha256 = digest(bytes);
     artifact.bytes = bytes.byteLength;
+
+    // The debugger-enabled variant is a second compilation, shipped in the same
+    // archive. It is recorded when present rather than required, because the
+    // locally-packaged macOS artifact is produced by one `libtool` invocation
+    // that has no second build behind it.
+    const debug = find(targetDebugLibraryName(target, artifact));
+    if (debug) {
+      const debugRelative = debugLibraryPath(target, artifact);
+      const debugBytes = await place(debug, debugRelative);
+      artifact.debugLibrary = debugRelative;
+      artifact.debugSha256 = digest(debugBytes);
+      artifact.debugBytes = debugBytes.byteLength;
+    }
     installed.push(target);
   }
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -162,6 +204,25 @@ async function report() {
         row.detail = `missing ${artifact.library}`;
         row.invalid = true;
       }
+      // The debugger-enabled sibling is checked only when the manifest claims
+      // one. A target vendored before the archives existed, or packaged locally
+      // by scripts/package-defold-extension.sh, simply has none - and inventing
+      // a requirement here would mark every such target invalid.
+      if (!row.invalid && artifact.debugLibrary) {
+        row.debugLibrary = artifact.debugLibrary;
+        try {
+          const debugBytes = await readFile(path.join(root, artifact.debugLibrary));
+          if (digest(debugBytes) !== artifact.debugSha256) {
+            row.detail = "debug library checksum mismatch";
+            row.invalid = true;
+          } else {
+            row.detail += `, debug ${artifact.debugSha256.slice(0, 12)} (${debugBytes.byteLength} bytes)`;
+          }
+        } catch {
+          row.detail = `missing ${artifact.debugLibrary}`;
+          row.invalid = true;
+        }
+      }
     } else if (artifact.status === "vendored-source") {
       try {
         await stat(path.join(root, artifact.library));
@@ -228,6 +289,13 @@ function run(command, args) {
 
 const [command, ...args] = process.argv.slice(2);
 if (command === "fingerprint") console.log(await fingerprintFamily(FAMILY, { root }));
+// The TAG, derived where the expected-asset listing is derived. The workflow
+// used to build it by concatenating a prefix onto `fingerprint` output, which
+// put the prefix in two places and let the tag and the asset listing be
+// computed from different rules; truncating the digest would have made that
+// divergence quiet instead of obvious.
+else if (command === "tag") console.log((await familyRelease(FAMILY, { root })).tag);
+else if (command === "release-metadata") console.log(JSON.stringify(await familyRelease(FAMILY, { root }), null, 2));
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
   const installed = await install(args[0]);
@@ -245,34 +313,40 @@ else if (command === "pull") {
   // this checkout's own input fingerprint, because the artifacts are
   // content-addressed: many déherm versions share one artifact release.
   const tagIndex = args.indexOf("--tag");
-  const tag = tagIndex >= 0 ? args[tagIndex + 1] : await familyTag(FAMILY, { root });
+  const tag = tagIndex >= 0 ? args[tagIndex + 1] : (await familyRelease(FAMILY, { root })).tag;
   const destination = path.join(root, "build", "native-artifact-downloads", tag);
   await mkdir(destination, { recursive: true });
   // By URL, not through `gh`: a user vendoring artifacts should not need a
   // second CLI or an authenticated session. The asset names come from the same
   // listing the CI completeness check uses, so no release listing is fetched to
   // discover them - see packages/cli/src/release-assets.mjs.
+  const rows = await publishedAssets(FAMILY, { root });
   const { missing } = await downloadReleaseAssets({
     tag,
-    assets: await expectedAssets(),
+    assets: rows.map((row) => row.asset),
     destination,
     optional: args.includes("--partial"),
     onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
   });
   if (missing.length) console.log(`${missing.length} asset(s) not published for these inputs`);
-  // Release assets are flat files named hermes-<target>-<library>; `install`
-  // matches on the directory segment, so unpack each into its own.
-  for (const file of await filesBelow(destination)) {
-    const base = path.basename(file);
-    const match = /^hermes-(?<target>.+?)-(?<library>libhermes\.a|hermes\.lib)$/.exec(base);
-    if (!match) continue;
-    const target = path.join(destination, `hermes-${match.groups.target}`, match.groups.library);
-    await mkdir(path.dirname(target), { recursive: true });
-    await cp(file, target);
+  // Each asset is one reproducible .tar.gz holding a target's release and
+  // debugger-enabled libraries. Unpack each into a directory named for the row
+  // that asked for it, which is what `install` matches on - so nothing here has
+  // to re-derive structure by parsing the name it just requested.
+  const absent = new Set(missing);
+  for (const row of rows) {
+    if (absent.has(row.asset)) continue;
+    await extractReleaseArchive({
+      archive: path.join(destination, row.asset),
+      destination: path.join(destination, `hermes-${row.target}`)
+    });
   }
   const installed = await install(destination);
   console.log(`installed ${installed.length} native artifact(s): ${installed.join(", ") || "none"}`);
   await verify(!args.includes("--partial"), false);
 } else {
-  throw new Error("Usage: manage-native-artifacts.mjs {fingerprint|expected-assets|report|verify [--complete] [--json]|install <dir>|record <target>|pull [--tag <tag>] [--partial]}");
+  throw new Error(
+    "Usage: manage-native-artifacts.mjs {fingerprint|tag|release-metadata|expected-assets|report|" +
+    "verify [--complete] [--json]|install <dir>|record <target>|pull [--tag <tag>] [--partial]}"
+  );
 }

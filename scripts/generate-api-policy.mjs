@@ -44,7 +44,7 @@ import {
 } from "../packages/compiler/src/api-policy.mjs";
 import { buildToolchainPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
-import { artifactFamilies, artifactFamilyNames, familyTag, publishedAssets } from "./lib/artifact-releases.mjs";
+import { artifactFamilies, artifactFamilyNames, familyRelease, publishedAssets } from "./lib/artifact-releases.mjs";
 import { apiPolicyGenerator } from "./lib/script-generator-pipeline.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -155,17 +155,28 @@ export async function buildArtifactReferences(options = {}) {
   for (const name of artifactFamilyNames) {
     const family = artifactFamilies[name];
     const assets = {};
+    const contents = {};
     for (const row of await publishedAssets(name, { root: sourceRoot })) {
-      // Host rows carry a tool as well as a host, because one host publishes
-      // several binaries under one key; a target row is one archive.
-      if (row.tool) (assets[row.host] ??= {})[row.tool] = row.asset;
-      else assets[row.target] = row.asset;
+      // One archive per matrix row, so one asset name per key. `contents` says
+      // what unpacks out of it - the tools, or the release and debugger-enabled
+      // libraries - because a consumer that has downloaded the file still has
+      // to know which member to use.
+      const key = row.host ?? row.target;
+      assets[key] = row.asset;
+      contents[key] = row.files;
     }
+    const release = await familyRelease(name, { root: sourceRoot });
     families[name] = {
-      tag: await familyTag(name, { root: sourceRoot }),
+      tag: release.tag,
+      // The FULL digest the tag truncates to 16 hex. The tag is what a human
+      // reads and a URL carries; this is what provenance is asserted over, and
+      // keeping both here is what lets the short tag stay short without the
+      // index losing the claim.
+      fingerprint: release.fingerprint,
       indexedBy: family.tools ? "host" : "bundleTarget",
       summary: family.summary,
-      assets
+      assets,
+      contents
     };
   }
   return families;
@@ -229,11 +240,11 @@ export async function derivePolicy(options = {}) {
     repositoryRoot: sourceRoot
   });
   assertNoRevisionLeak({ rootBytes: policy.rootBytes, objects: policy.objects, revision: defoldRevision });
-  // Derived after the leak check on purpose: the artifact references belong to
-  // the index entry, never to a content-addressed object, and this keeps them
-  // out of anything the check walks.
-  const artifactReferences = options.artifactReferences ?? await buildArtifactReferences({ sourceRoot });
-  return { ...policy, defoldRevision, generator, toolchain, reconciliation, artifacts: artifactReferences };
+  // No artifact references here. They are a function of the build recipe rather
+  // than of the engine, so they are emitted at publish time into a sibling
+  // document and never enter the store - see buildArtifactReferences and
+  // artifactsPath.
+  return { ...policy, defoldRevision, generator, toolchain, reconciliation };
 }
 
 // ── The store ───────────────────────────────────────────────────────────────
@@ -317,15 +328,19 @@ function buildShippedIndex({ site, entries }) {
       "from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes " +
       "nightlies daily, so an index that had to be re-released to stay current would be a pin, " +
       "not an index. The policy an entry names is content-addressed and therefore " +
-      "self-verifying, so a substituted policy fails its own hash check. A fetched entry also " +
-      "carries the release tags and asset names of the Hermes archives and host tools that " +
-      "build for it; expand base.releaseAsset with a tag and an asset to get a download URL " +
-      "without hardcoding a forge.",
+      "self-verifying, so a substituted policy fails its own hash check. An entry carries NO " +
+      "artifact references: release tags are a function of the build recipe rather than of the " +
+      "engine, so embedding them made a Dockerfile edit drift an unrelated revision's entry. " +
+      "Fetch v1/artifacts/<defold-sha>.json for the Hermes archives and host tools that build " +
+      "for a revision, then expand base.releaseAsset with a tag and an asset to get a download " +
+      "URL without hardcoding a forge. That document is emitted at publish time and is the one " +
+      "served document that is legitimately rewritten.",
     base: {
       url: site.baseUrl,
       pathPrefix: site.pathPrefix,
       layoutVersion: site.layoutVersion,
       index: `${site.layoutVersion}/index/{defoldRevision}.json`,
+      artifacts: `${site.layoutVersion}/artifacts/{defoldRevision}.json`,
       policy: `${site.layoutVersion}/policy/{policyRoot}.json`,
       object: `${site.layoutVersion}/object/{subtreeHash}.json`,
       // Absolute, unlike the three above: artifacts are large binaries served by
@@ -378,8 +393,7 @@ export async function writeStore({ policy, site, check }) {
   const entry = buildIndexEntry({
     defoldRevision: policy.defoldRevision,
     policyRoot: policy.rootHash,
-    generator: policy.generator,
-    artifacts: policy.artifacts
+    generator: policy.generator
   });
   planned.set(indexPath(layout, policy.defoldRevision), `${serializeObject(entry)}\n`);
 

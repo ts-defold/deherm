@@ -463,22 +463,22 @@ export function assertNoRevisionLeak({ rootBytes, objects, revision }) {
 /**
  * One Defold revision's resolution point.
  *
- * `artifacts` is optional, and deliberately so: entries written before the
- * policy store and the artifact releases were linked carry none, and rewriting
- * them to add one would break the rule that an entry is written once. It is the
- * only part of an entry that is not a function of the engine revision - it
- * names the release tags and asset names the build recipe currently publishes -
- * which is why it lives here, in the one document that is allowed to know the
- * revision, and never inside a content-addressed policy object.
+ * An entry is a pure function of the engine revision, and carries no artifact
+ * references. Embedding them here was tried and reverted: release tags are a
+ * function of the BUILD RECIPE, not of the engine, so a change to a Dockerfile
+ * rotated a tag, which drifted the entry, which failed the store check - a
+ * build-script edit invalidating the derived API surface of an unrelated engine
+ * revision. It also broke the write-once rule the entry's trust argument rests
+ * on. The artifact mapping now lives in a sibling document emitted at publish
+ * time; see artifactsPath.
  */
-export function buildIndexEntry({ defoldRevision, policyRoot, generator, artifacts = null }) {
+export function buildIndexEntry({ defoldRevision, policyRoot, generator }) {
   return {
     schemaVersion: POLICY_SCHEMA_VERSION,
     kind: "deherm.policy.index-entry",
     defoldRevision,
     policyRoot,
-    generator,
-    ...(artifacts ? { artifacts } : {})
+    generator
   };
 }
 
@@ -494,3 +494,18 @@ export function policyPath(layoutVersion, rootHash) {
 export function indexPath(layoutVersion, revision) {
   return `${layoutVersion}/index/${revision}.json`;
 }
+
+/**
+ * Where the artifact mapping for a revision is served.
+ *
+ * Deliberately NOT part of the content-addressed store and never committed: it
+ * names the release tags the current build recipe publishes, so it changes when
+ * the recipe changes and not when the engine does. Emitting it at publish time
+ * keeps the store a pure function of the engine revision, and keeps a change to
+ * a build script from invalidating a policy derived months earlier.
+ */
+export function artifactsPath(layoutVersion, revision) {
+  return `${layoutVersion}/artifacts/${revision}.json`;
+}
+
+export const ARTIFACTS_DOCUMENT_KIND = "deherm.policy.artifacts";

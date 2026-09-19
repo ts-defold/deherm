@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the two host compilers déherm ships per user host.
 #
-#   build-host-compilers.sh <hermes-source> <work-dir> <output-dir>
+#   build-host-compilers.sh <hermes-source> <work-dir> <output-dir> [archive.tar.gz]
 #
 # hermesc compiles TypeScript/JavaScript to Hermes bytecode; shermes lowers
 # typed TypeScript to C. Both are pure compilers - text in, text out - so
@@ -16,6 +16,12 @@ set -euo pipefail
 hermes_source="$1"
 work="$2"
 output="$3"
+# Optional: when given, the two compilers are also packaged into one
+# reproducible .tar.gz, which is what the release publishes. Packaging lives
+# here rather than in the workflow so that `scripts/lib/artifact-releases.mjs`
+# hashes it - a change to how the published bytes are assembled must rotate the
+# tag, and the workflow is not in any family's input set.
+archive="${4:-}"
 
 # Each host build runs on a runner of that host's own architecture, so there is
 # no cross-compilation here and nothing to import: this build *is* the one that
@@ -52,3 +58,7 @@ for binary in "${produced[@]}"; do
   "$binary" --version >/dev/null
 done
 echo "build-host-compilers: wrote ${produced[*]}"
+
+if [[ -n "$archive" ]]; then
+  bash "$(dirname "${BASH_SOURCE[0]}")/package-archive.sh" "$archive" "${produced[@]}"
+fi

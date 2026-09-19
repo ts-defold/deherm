@@ -75,6 +75,13 @@ jobs:
         with: { node-version: '22', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
+      # The policy derivation reads Defold's own declarations -
+      # build_tools/sdk.py for the toolchain pins and
+      # share/extender/build_input.yml for the platform list - and `upstream/`
+      # is not committed. Only the Defold tree is named: Hermes and extender are
+      # not consulted here, and cloning them would cost more than this job.
+      - run: bash scripts/bootstrap-upstreams.sh defold
+
       # The store must be internally consistent before any of it is served: every
       # object an index entry reaches has to exist and hash to its own path, and
       # nothing unreferenced may sit in the store. A `--check` failure here means

@@ -5,6 +5,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 COPY upstream/hermes /src/hermes
 COPY toolchains/hermes/windows-msvc.cmake /toolchain/windows-msvc.cmake
 COPY toolchains/hermes/package-msvc.sh /usr/local/bin/package-msvc
+COPY toolchains/hermes/package-archive.sh /usr/local/bin/package-archive
 WORKDIR /work
 
 # Hermes compiles its own internal JavaScript to bytecode during the build, so
@@ -33,5 +34,28 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
     cmake --build /work/build --target hermesvm_a jsi --parallel && \
     package-msvc /work/build /out/hermes.lib
 
+# The development library: a SECOND compilation with the debugger, which also
+# turns on HERMES_MEMORY_INSTRUMENTATION (chained at the pinned tree's
+# CMakeLists.txt:245). It is not a link-time switch and not interchangeable
+# with the release library - a JS debugger needs interpreter frames to stop in,
+# and release lowers reachable routes to typed-native AOT C where those frames
+# do not exist - so both travel in one archive and the consumer picks.
+RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_TOOLCHAIN_FILE=/toolchain/windows-msvc.cmake \
+      -DIMPORT_HOST_COMPILERS=/work/host/ImportHostCompilers.cmake \
+      -DHERMES_ENABLE_TEST_SUITE=OFF \
+      -DHERMES_ENABLE_TOOLS=OFF \
+      -DHERMES_ENABLE_NAPI=OFF \
+      -DHERMES_ENABLE_DEBUGGER=ON \
+      -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_BUILD_SHARED_JSI=OFF && \
+    cmake --build /work/build-debug --target hermesvm_a jsi --parallel && \
+    package-msvc /work/build-debug /out/hermes.debug.lib
+
+# Named for the family, not the target: the workflow uploads this under
+# `hermes-x86_64-win32.tar.gz`, and renaming a file does not change its bytes.
+RUN package-archive /out/hermes.tar.gz /out/hermes.lib /out/hermes.debug.lib
+
 FROM scratch
-COPY --from=0 /out/hermes.lib /hermes.lib
+COPY --from=0 /out/hermes.tar.gz /hermes.tar.gz

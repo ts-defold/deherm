@@ -69,10 +69,20 @@ digest. `toolchains/hermes/` already holds the Linux and Windows container
 definitions. Release assets rather than workflow artifacts, because a workflow
 artifact expires, is scoped to one run, and needs an authenticated API call to
 fetch - none of which survives to a user six months after a release. The tag is
-the SHA-256 fingerprint of the inputs that determine the artifact, so the
-artifacts are content-addressed: many déherm versions share one release, and a
-rebuild whose inputs have not changed finds the release already present and does
-nothing.
+derived from the SHA-256 fingerprint of the inputs that determine the artifact,
+so the artifacts are content-addressed: many déherm versions share one release,
+and a rebuild whose inputs have not changed finds the release already present
+and does nothing.
+
+Each asset is one reproducible `.tar.gz` per matrix row, written by
+`toolchains/hermes/package-archive.sh`. A target's archive carries its release
+library **and** a debugger-enabled second compilation; a host's carries that
+family's compilers. A release asset is a single file, so two libraries could
+never have been two assets - and a flat asset also loses the executable bit,
+which GitHub does not store, and encodes structure in a name the download side
+then has to parse back out. `pull` extracts with `tar -xzf`, which is present on
+macOS, on Linux, and on Windows 10 1803 and later as bsdtar, so the URL-only
+vendoring path still needs no second CLI and no npm dependency.
 
 ## What a fingerprint may hash, and what it may not
 
@@ -137,9 +147,9 @@ failed install.
 
 `packages/toolchains/host-compilers.json` is the pinned record for all three
 host tools, managed by `scripts/manage-host-compilers.mjs` with the same
-`fingerprint`/`install`/`record`/`verify`/`stage`/`pull` verbs as the target
-archives. `fingerprint` and `expected-assets` take a family name, because the
-three tools are published under two tags; `pull` fetches both unless `--family`
+`fingerprint`/`tag`/`install`/`record`/`verify`/`stage`/`pull` verbs as the
+target archives. `fingerprint`, `tag` and `expected-assets` take a family name,
+because the three tools are published under two tags; `pull` fetches both unless `--family`
 names one, and `--tag` requires `--family` since a tag addresses exactly one
 release. Resolution (`packages/cli/src/host-compilers.mjs`) checks the installed
 package first and the in-tree staging directory second, verifies the SHA-256 of
@@ -340,11 +350,42 @@ Every published artifact is addressed by a SHA-256 fingerprint of the inputs
 that determine its bytes, declared once in `scripts/lib/artifact-releases.mjs`.
 There are three families, and they used to be two.
 
-| Family | Tag | Consumes | Does **not** consume |
+Each family declares its own `tagPrefix` and `assetPrefix` in that file; the
+tag is `<tagPrefix>-<fp16>` and every asset is `<assetPrefix>-<row>.tar.gz`, so
+neither spelling is restated here.
+
+| Family | Asset per row | Consumes | Does **not** consume |
 | --- | --- | --- | --- |
-| Hermes host compilers | `hermes-host-<fp>` | `HERMES_URL`, `HERMES_REV`, `build-host-compilers.sh` | anything of Defold's, anything of Go's |
-| The transform compiler | `dehermc-<fp>` | `ttscVersion`, `packages/compiler/go.mod`, the ttsc Go sources, `build-dehermc.sh` | `upstream.lock` at all |
-| Target archives | `native-artifacts-<fp>` | `HERMES_URL`, `HERMES_REV`, the per-target build recipe, and the `sdk` and `targets` fields of `defold-bundle-targets.json` | `DEFOLD_REV`, `sourceSha256` |
+| Hermes host compilers | one archive per host: hermesc + shermes | `HERMES_URL`, `HERMES_REV`, `build-host-compilers.sh`, `package-archive.sh` | anything of Defold's, anything of Go's |
+| The transform compiler | one archive per host: dehermc | `ttscVersion`, `packages/compiler/go.mod`, the ttsc Go sources, `build-dehermc.sh`, `package-archive.sh` | `upstream.lock` at all |
+| Target archives | one archive per bundle target: the library + its `.debug` sibling | `HERMES_URL`, `HERMES_REV`, the per-target build recipe, `package-archive.sh`, and the `sdk` and `targets` fields of `defold-bundle-targets.json` | `DEFOLD_REV`, `sourceSha256` |
+
+`package-archive.sh` is in all three input sets because it decides the published
+**bytes** as directly as the compiler does: a changed `--mtime`, member order or
+compression level produces a different file from the same build outputs. It was
+the easy input to forget, being neither a compiler nor a pin.
+
+## Why the tag carries only 16 hex digits
+
+`<fp16>` is the first 16 hex digits of the fingerprint, not all 64.
+`native-artifacts-<64 hex>` is 81 characters; it appeared in the release list,
+in every download URL, in the workflow summary and in the policy index, at a
+length no one can compare by eye or quote in a bug report. 64 bits leaves a
+collision probability around 1 in 10^11 over a population measured in thousands
+of releases, and a collision would need two **different** input sets to agree -
+not an attack surface, because the tag is derived from this checkout's own files
+rather than accepted from anyone. The full digest is not discarded: it is in the
+release notes, beside the tag in the policy index, and is still what
+`manage-*.mjs fingerprint` prints, so every provenance claim is made over all
+256 bits. The release also gets a human **title** rather than a restatement of
+its tag.
+
+Tag derivation lives in exactly one place - `familyRelease` in
+`scripts/lib/artifact-releases.mjs`, surfaced as `manage-*.mjs tag`. The
+workflow used to assemble tags by concatenating a prefix onto `fingerprint`
+output, which put the prefix in two places while the expected-asset listing was
+derived from only one; truncating the digest would have made that divergence
+silent instead of loud.
 
 ## Why the lock is hashed by key
 
@@ -376,8 +417,8 @@ target archives and a `defoldRevision` edit does not.
 `hermesc`/`shermes` and `dehermc` are both indexed by the user's host, and that
 is the only thing they share. One `host-tools-<fp>` tag meant a Go transform
 edit republished ten unchanged LLVM compilers and a Hermes repin republished
-five unchanged Go binaries. The asset names are unchanged; only which release
-holds them moved.
+five unchanged Go binaries. Each now publishes one archive per host: one
+carrying hermesc and shermes, one carrying dehermc.
 
 ## What is still deliberately over-hashed
 
@@ -399,19 +440,74 @@ assets that release actually holds rather than on the tag's existence.
 | Lane | Runner | Produces |
 | --- | --- | --- |
 | `linux` | `ubuntu-24.04`, `ubuntu-24.04-arm` | `x86_64-linux`, `arm64-linux` via `Dockerfile.linux` |
-| `windows` | `ubuntu-24.04` | `x86_64-win32` via `Dockerfile.win32`, merged to one `hermes.lib` |
+| `windows` | `ubuntu-24.04` | `x86_64-win32` via `Dockerfile.win32`, merged to `hermes.lib` + `hermes.debug.lib` |
 | `android` | `ubuntu-24.04` | `armv7`, `arm64`, `x86_64` via `Dockerfile.android` and the engine's NDK pin |
 | `apple` | `macos-15` | `arm64-osx`, `x86_64-osx`, `arm64-ios`, `arm64_sim-ios` via `build-apple.sh` |
-| `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts, into `hermes-host-<fp>` |
-| `go-compiler` | one `ubuntu-24.04` | `dehermc` for all five hosts, `CGO_ENABLED=0`, into `dehermc-<fp>` |
+| `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts, into the `hermes-host` family's release |
+| `go-compiler` | one `ubuntu-24.04` | `dehermc` for all five hosts, `CGO_ENABLED=0`, into the `dehermc` family's release |
 
 iOS and macOS x64 need the Apple SDKs, so they have no container path and run on
 a macOS runner. Android needs the NDK, pinned by digest inside the container
 rather than trusted from the network.
 
-Every cross build first builds host `hermesc`/`shermes` and passes them through
-`-DIMPORT_HOST_COMPILERS`, because Hermes compiles its own internal JavaScript to
-bytecode during the build and cannot execute the binaries it is producing.
+Every target lane builds its library **twice**. The second compilation sets
+`-DHERMES_ENABLE_DEBUGGER=ON`, which chains on `HERMES_MEMORY_INSTRUMENTATION`
+at the pinned tree's `CMakeLists.txt:245`, and lands in the same archive as
+`libhermes.debug.a` (`hermes.debug.lib` on Windows). It is a second compilation
+rather than a link-time switch because the debugger changes what the VM is built
+to do, and the two are not interchangeable: a JS debugger needs interpreter
+frames to stop in, and a release build lowers reachable routes to typed-native
+AOT C where those frames do not exist. So the debugger belongs to development
+builds, and shipping both in one asset is what lets one download serve both.
+
+Every **cross** build first builds host `hermesc`/`shermes` and passes them
+through `-DIMPORT_HOST_COMPILERS`, because Hermes compiles its own internal
+JavaScript to bytecode during the build and cannot execute the binaries it is
+producing. The two **native** lanes - `Dockerfile.linux` and the
+`windows-native` fallback - set `-DHERMES_ENABLE_TOOLS=ON` instead: host and
+target are the same machine, so CMake builds and runs hermesc itself, and a
+second host tree would only duplicate it. With `TOOLS=OFF` those lanes had no
+rule producing `bin/hermesc` at all and died at ninja graph load on
+`API/hermes/extensions/ExtensionsBytecode.hbc`. `TOOLS` was off to avoid a
+`$<TARGET_FILE:hermes>` generator expression that appears only under
+`external/node-api-tests` and `external/node-api-cts`; `HERMES_ENABLE_NAPI=OFF`
+already removes both, so the reason was gone and only the workaround remained.
+
+## The Android lane is blocked on unicode, not on a flag
+
+The three Android targets do not build. `-DHERMES_IS_ANDROID=ON` reaches
+`find_package(fbjni REQUIRED CONFIG)` at the pinned tree's
+`CMakeLists.txt:777`, but removing the flag only moves the failure, because
+`include/hermes/Platform/Unicode/PlatformUnicode.h` selects the unicode backend
+from `__ANDROID__` - a **preprocessor** macro the NDK toolchain defines - and
+not from that CMake option. The NDK build therefore compiles
+`PlatformUnicodeJava.cpp`, whose first include is `<fbjni/fbjni.h>`.
+
+What the NDK actually offers, read out of the central directory of the pinned
+`android-ndk-r25b-linux.zip`:
+
+* **No fbjni.** No archive entry matches `fbjni`. The Java backend would also
+  need `com/facebook/hermes/unicode/AndroidUnicodeUtils` on the APK classpath
+  and fbjni initialised with the process's JavaVM; React Native ships both in
+  its Hermes AAR, and a Defold APK carries neither.
+* **ICU headers at every level, `libicu.so` only at API 31+.** The sysroot
+  carries `usr/include/unicode/*.h` unconditionally, and `libicu.so` only under
+  `.../31/`, `.../32/` and `.../33/`. The pinned engine builds Android at API 19
+  (armv7) and 21 (64-bit), so there is nothing to link at Defold's floor - and
+  even at 31 it is a **shared** library the engine would then have to satisfy.
+
+`HERMES_UNICODE_LITE` is not an option: `PlatformUnicodeLite.cpp` has empty
+`convertToCase` and `normalize` bodies and a `dateFormat` returning the literal
+string `"dateFormat not implemented"`. `String.cpp:985` has an ASCII fast path,
+so this is not a harmless stub - it silently breaks `toUpperCase`/`toLowerCase`
+for every non-ASCII string.
+
+What remains is a statically linked ICU built for Android inside
+`Dockerfile.android` and merged into the archive. That satisfies the
+no-shared-dependency constraint, and it introduces a new pinned upstream with
+real size consequences (ICU data), so it is a decision to take here rather than
+a CI fix to slip in. Until it is taken, the lane fails at the named `find_package`
+and `Dockerfile.android` records why.
 
 `wasm_pthread-web` is the one `blocked` target. The web lane runs scripts on the
 browser's own engine through the Emscripten glue, and every recorded observation

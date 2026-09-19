@@ -1,3 +1,50 @@
+# Hermes for the Linux Defold bundle targets.
+#
+# ── Why HERMES_ENABLE_TOOLS is ON here ───────────────────────────────────────
+#
+# Hermes compiles its own internal JavaScript to bytecode during the build:
+# `API/hermes/extensions/ExtensionsBytecode.hbc` is produced by running hermesc,
+# and `hermesapi_obj` - which `hermesvm_a` pulls in - depends on the `.inc` file
+# hexdumped from it. hermesc itself lives under `tools/`, which the pinned
+# tree's CMakeLists.txt adds only when HERMES_ENABLE_TOOLS is ON. With it OFF
+# there is no rule producing `bin/hermesc` at all, and the build died at graph
+# load:
+#
+#   ninja: error: 'bin/hermesc', needed by
+#   'API/hermes/extensions/ExtensionsBytecode.hbc', missing and no known rule
+#   to make it
+#
+# The container lanes solve this with a HOST pass and -DIMPORT_HOST_COMPILERS,
+# because their host and target differ and CMake would otherwise try to execute
+# an Android or Windows binary on the builder. This build has no such problem:
+# host and target are the same machine, so CMake can build hermesc and run it.
+# Adding a host pass here would build the same compiler into a second tree for
+# no gain, and would make the two passes' flags a thing to keep in sync.
+#
+# TOOLS was turned OFF originally because `$<TARGET_FILE:hermes>` - a generator
+# expression naming the `hermes` CLI - failed to evaluate. That expression
+# appears only in `external/node-api-tests` and `external/node-api-cts`, both of
+# which are reached through Node-API, and HERMES_ENABLE_NAPI is OFF below. So
+# the reason is gone; only the workaround remained.
+#
+# Building the tools costs build time and produces binaries this lane does not
+# publish - hermesc and shermes are published per USER HOST by
+# build-host-compilers.sh, not per bundle target. `--target hermesvm_a jsi`
+# still names what we want, and ninja builds hermesc only because the archive
+# genuinely depends on it.
+#
+# ── Why two builds ───────────────────────────────────────────────────────────
+#
+# The archive carries a release library and a debugger-enabled one, and the two
+# are a second COMPILATION rather than a link-time switch:
+# HERMES_ENABLE_DEBUGGER changes what the VM is built to do, and chains on
+# HERMES_MEMORY_INSTRUMENTATION at the pinned tree's CMakeLists.txt:245. They
+# are not interchangeable either - a JS debugger needs interpreter frames to
+# stop in, and a release build lowers reachable routes to typed-native AOT C
+# where those frames do not exist - so the debugger belongs to development
+# builds only, and shipping both in one archive is what lets one download serve
+# both.
+
 FROM ubuntu:24.04
 
 ARG TARGET_ARCH=x86_64
@@ -7,13 +54,16 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 
 COPY upstream/hermes /src/hermes
 COPY toolchains/hermes/package-posix.sh /usr/local/bin/package-posix
+COPY toolchains/hermes/package-archive.sh /usr/local/bin/package-archive
 WORKDIR /work
+
+# The release library: the flags this lane has always used.
 RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_C_COMPILER=clang \
       -DCMAKE_CXX_COMPILER=clang++ \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
-      -DHERMES_ENABLE_TOOLS=OFF \
+      -DHERMES_ENABLE_TOOLS=ON \
       -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_DEBUGGER=OFF \
       -DHERMES_ENABLE_INTL=OFF \
@@ -22,5 +72,27 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
     cmake --build /work/build --target hermesvm_a jsi --parallel && \
     package-posix /work/build /out/libhermes.a
 
+# The development library: identical but for the debugger, in its own build
+# tree so neither variant can pick up the other's objects.
+RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_C_COMPILER=clang \
+      -DCMAKE_CXX_COMPILER=clang++ \
+      -DHERMES_ENABLE_TEST_SUITE=OFF \
+      -DHERMES_ENABLE_TOOLS=ON \
+      -DHERMES_ENABLE_NAPI=OFF \
+      -DHERMES_ENABLE_DEBUGGER=ON \
+      -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_USE_STATIC_ICU=ON \
+      -DHERMES_BUILD_SHARED_JSI=OFF && \
+    cmake --build /work/build-debug --target hermesvm_a jsi --parallel && \
+    package-posix /work/build-debug /out/libhermes.debug.a
+
+# One reproducible archive, named for the family rather than the target: the
+# workflow uploads it under `hermes-<target>.tar.gz`, and renaming a file does
+# not change its bytes. Keeping the target out of the recipe keeps this
+# Dockerfile free of a build argument it would otherwise only echo.
+RUN package-archive /out/hermes.tar.gz /out/libhermes.a /out/libhermes.debug.a
+
 FROM scratch
-COPY --from=0 /out/libhermes.a /libhermes.a
+COPY --from=0 /out/hermes.tar.gz /hermes.tar.gz

@@ -17,17 +17,38 @@
 # retry below is still worth having, but it was treating a symptom.
 #
 # So the file is copied to a staging directory under the name it must carry, and
-# that copy is uploaded. The download side already expects these flat names -
-# `manage-native-artifacts.mjs pull` parses `hermes-<target>-<library>` - so this
-# restores the contract the rest of the tooling was already written against.
+# that copy is uploaded. That name comes from
+# `scripts/lib/artifact-releases.mjs`, which is the same listing the download
+# side requests and the CI completeness check compares against; it is also the
+# last path segment of the download URL, so it is load-bearing rather than
+# cosmetic. Renaming here is free: the archive's BYTES are fixed by
+# package-archive.sh, and a copy under a different name is the same file.
+#
+# ── Why the title and notes are passed in ────────────────────────────────────
+#
+# The release used to be created with `--title "$tag"`, which made the title a
+# restatement of the tag: a release list where every row reads
+# `native-artifacts-<digest>` is a list of digests. The human title and the
+# release notes are derived once, with the tag, in
+# scripts/lib/artifact-releases.mjs, and the plan job passes them here - so
+# there is no second place that decides what a release is called.
+#
+# RELEASE_FINGERPRINT is the FULL 64-hex digest. The tag carries a 16-hex
+# prefix of it so it can be read and quoted; the notes carry all of it, because
+# that is where provenance is asserted.
 #
 # Usage: upload-release-asset.sh <tag> <repo> <file> <asset-name>
+#   env: RELEASE_TITLE, RELEASE_FINGERPRINT, RELEASE_NOTES
 set -euo pipefail
 
 tag="$1"
 repo="$2"
 file="$3"
 asset_name="$4"
+
+release_title="${RELEASE_TITLE:?RELEASE_TITLE is required; the plan job derives it with the tag}"
+release_fingerprint="${RELEASE_FINGERPRINT:?RELEASE_FINGERPRINT is required; it is the full digest the tag truncates}"
+release_notes="${RELEASE_NOTES:-Input fingerprint (SHA-256): \`${release_fingerprint}\`}"
 
 if [[ ! -f "$file" ]]; then
   echo "upload-release-asset: $file does not exist" >&2
@@ -58,8 +79,8 @@ ensure_release() {
   fi
   gh release create "$tag" \
     --repo "$repo" \
-    --title "$tag" \
-    --notes "Content-addressed build artifacts. The tag is the SHA-256 fingerprint of the inputs that determine these bytes - the pinned upstream revisions AND the build recipe, because the recipe changes the output - so many deherm versions share one release and a rebuild with unchanged inputs is a no-op. Vendor with \`node scripts/manage-native-artifacts.mjs pull\` or \`node scripts/manage-host-compilers.mjs pull\`, which resolve assets by URL and need no gh." \
+    --title "$release_title" \
+    --notes "$release_notes" \
     --prerelease >/dev/null 2>&1 || true
   gh release view "$tag" --repo "$repo" >/dev/null 2>&1
 }

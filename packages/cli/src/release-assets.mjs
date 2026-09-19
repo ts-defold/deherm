@@ -26,8 +26,12 @@
 // silently does, since `#` sets a display label and not the name - both collides
 // across lanes and makes the URL unresolvable.
 
+import { execFile } from "node:child_process";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 export const defaultReleaseRepository = "ts-defold/deherm";
 
@@ -121,4 +125,38 @@ export async function downloadReleaseAssets({
     }
   }
   return { downloaded, missing };
+}
+
+/**
+ * Unpack one published `.tar.gz` into a directory.
+ *
+ * ── Why `tar` and not a Node extractor ───────────────────────────────────────
+ *
+ * `tar -xzf` is present on all three hosts déherm targets without installing
+ * anything: GNU tar on Linux, bsdtar on macOS, and bsdtar shipped in
+ * `%SystemRoot%\System32\tar.exe` on Windows 10 1803 and later. Node has no
+ * tar in its standard library, so the alternative is an npm dependency in the
+ * package a user installs to compile their game - which is exactly the cost the
+ * URL-only `pull` path exists to avoid. If a future host makes this untrue, the
+ * failure is loud (tar is simply not found) rather than a silently different
+ * unpacking.
+ *
+ * The archives are flat by construction - see
+ * `toolchains/hermes/package-archive.sh`, which stages by basename - so there
+ * is no path traversal surface here and no directory structure to preserve.
+ */
+export async function extractReleaseArchive({ archive, destination }) {
+  await mkdir(destination, { recursive: true });
+  try {
+    await execFileAsync("tar", ["-xzf", path.resolve(archive), "-C", path.resolve(destination)]);
+  } catch (error) {
+    if (error?.code === "ENOENT") {
+      throw new Error(
+        `Extracting ${path.basename(archive)} needs \`tar\`, which is not on PATH. ` +
+        "tar ships with macOS, with every Linux distribution, and with Windows 10 1803 and later."
+      );
+    }
+    throw new Error(`tar could not extract ${path.basename(archive)}: ${error?.stderr?.trim() || error?.message}`);
+  }
+  return destination;
 }

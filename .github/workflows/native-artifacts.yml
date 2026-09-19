@@ -8,17 +8,17 @@ name: native-artifacts
 #   * target libraries - one libhermes.a per Defold BUNDLE TARGET, because Bob
 #     uploads it to Extender for whatever platform is being bundled. A user on
 #     macOS bundling for Android needs the Android archive and none of their own.
-#     Tagged `native-artifacts-<fp>`.
+#     Tagged `native-artifacts-<short fp>`.
 #   * host compilers - hermesc and shermes per USER HOST, because they run on
 #     the user's machine. Both are pure compilers, so shipping them imposes no
 #     native toolchain requirement on the user. Each pair must be built on a
 #     runner of its own architecture: they are LLVM, and a cross build would
-#     need a second toolchain per host. Tagged `hermes-host-<fp>`.
+#     need a second toolchain per host. Tagged `hermes-host-<short fp>`.
 #   * the transform compiler - dehermc, also per USER HOST, but pure Go with
 #     CGO_ENABLED=0, so ONE runner cross-compiles the whole matrix. It is the
 #     cheapest artifact déherm ships and the one whose absence used to make
 #     every user's first build run a `go build` of the typescript-go compiler.
-#     Tagged `dehermc-<fp>`.
+#     Tagged `dehermc-<short fp>`.
 #
 # The two host families shared one `host-tools-<fp>` tag until the fingerprints
 # were split to their true input sets. They share no input: a Go transform edit
@@ -35,14 +35,32 @@ name: native-artifacts
 # A workflow artifact expires (90 days by default), is scoped to one run, and
 # needs an authenticated API call to fetch. None of that survives to a user six
 # months after a déherm release. These are published as GitHub RELEASE ASSETS
-# under a tag that is the SHA-256 fingerprint of the inputs that determine that
-# family's artifact - the lock KEYS it consumes, its build recipe, and for the
-# target archives the `sdk` and `targets` fields of the derived bundle-target
-# list. Keys and fields, never whole files: hashing all of `upstream.lock` made
-# hermesc a function of `DEFOLD_REV`, so a nightly Defold repin republished all
-# 25 artifacts for zero byte change. The artifacts are content-addressed: many
-# déherm versions share one artifact release, and a rebuild whose inputs have
-# not changed finds the release already present and does nothing.
+# under a tag derived from the SHA-256 fingerprint of the inputs that determine
+# that family's artifact - the lock KEYS it consumes, its build recipe, the
+# archive packager, and for the target archives the `sdk` and `targets` fields
+# of the derived bundle-target list. Keys and fields, never whole files: hashing
+# all of `upstream.lock` made hermesc a function of `DEFOLD_REV`, so a nightly
+# Defold repin republished all 25 artifacts for zero byte change. The artifacts
+# are content-addressed: many déherm versions share one artifact release, and a
+# rebuild whose inputs have not changed finds the release already present and
+# does nothing.
+#
+# The tag carries the first 16 hex digits of that fingerprint, not all 64. The
+# full digest went into the release list, into every download URL and into the
+# policy index entry, at a length no one can compare by eye or quote in a bug
+# report; 64 bits is ample to separate a population of releases derived from
+# this checkout's own files. The full digest is still recorded - in the release
+# notes and beside the tag in the policy index entry - so every provenance claim
+# is still made over all 256 bits.
+#
+# ── What an asset is ────────────────────────────────────────────────────────
+#
+# One reproducible `.tar.gz` per matrix row. A target's archive holds its
+# release library AND a debugger-enabled second compilation; a host's holds that
+# family's compilers. A release asset is a single file, so two libraries could
+# not be two assets; flat assets also lose the executable bit, which GitHub does
+# not store, and encoded structure in a name that the download side then had to
+# parse back out with a per-family regular expression.
 #
 # Vendor a completed run with:
 #   node scripts/manage-native-artifacts.mjs pull [--tag <tag>] --partial
@@ -80,6 +98,15 @@ jobs:
       target_tag: ${{ steps.compute.outputs.target_tag }}
       hermes_host_tag: ${{ steps.compute.outputs.hermes_host_tag }}
       dehermc_tag: ${{ steps.compute.outputs.dehermc_tag }}
+      # The FULL digest the tag truncates, and the human release title. Both are
+      # derived beside the tag in scripts/lib/artifact-releases.mjs and carried
+      # to the upload step, so nothing downstream re-derives either.
+      target_fingerprint: ${{ steps.compute.outputs.target_fingerprint }}
+      hermes_host_fingerprint: ${{ steps.compute.outputs.hermes_host_fingerprint }}
+      dehermc_fingerprint: ${{ steps.compute.outputs.dehermc_fingerprint }}
+      target_title: ${{ steps.compute.outputs.target_title }}
+      hermes_host_title: ${{ steps.compute.outputs.hermes_host_title }}
+      dehermc_title: ${{ steps.compute.outputs.dehermc_title }}
       target_exists: ${{ steps.compute.outputs.target_exists }}
       hermes_host_exists: ${{ steps.compute.outputs.hermes_host_exists }}
       dehermc_exists: ${{ steps.compute.outputs.dehermc_exists }}
@@ -105,12 +132,26 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          target_tag="native-artifacts-$(node scripts/manage-native-artifacts.mjs fingerprint)"
-          hermes_host_tag="hermes-host-$(node scripts/manage-host-compilers.mjs fingerprint hermes-host)"
-          dehermc_tag="dehermc-$(node scripts/manage-host-compilers.mjs fingerprint dehermc)"
-          echo "target_tag=$target_tag" >> "$GITHUB_OUTPUT"
-          echo "hermes_host_tag=$hermes_host_tag" >> "$GITHUB_OUTPUT"
-          echo "dehermc_tag=$dehermc_tag" >> "$GITHUB_OUTPUT"
+          # The tag is asked for, never assembled. It used to be built here by
+          # concatenating a prefix onto `fingerprint` output, which put the
+          # prefix in two places - this file and artifact-releases.mjs - while
+          # the expected-asset listing was derived from only one of them.
+          # Truncating the digest into the tag would have turned that into a
+          # silent divergence, so the concatenation is gone.
+          emit() {
+            local prefix="$1"; shift
+            local metadata; metadata="$("$@")"
+            node -e '
+              const [prefix, metadata] = process.argv.slice(1);
+              const { tag, fingerprint, title } = JSON.parse(metadata);
+              require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT,
+                `${prefix}_tag=${tag}\n${prefix}_fingerprint=${fingerprint}\n${prefix}_title=${title}\n`);
+            ' "$prefix" "$metadata"
+            node -e 'process.stdout.write(JSON.parse(process.argv[1]).tag)' "$metadata"
+          }
+          target_tag="$(emit target node scripts/manage-native-artifacts.mjs release-metadata)"
+          hermes_host_tag="$(emit hermes_host node scripts/manage-host-compilers.mjs release-metadata hermes-host)"
+          dehermc_tag="$(emit dehermc node scripts/manage-host-compilers.mjs release-metadata dehermc)"
           # A COMPLETE release means these exact inputs have already been built,
           # and rebuilding would produce the same bytes at best while churning
           # the digests users pinned at worst.
@@ -204,20 +245,27 @@ jobs:
         with:
           go-version-file: packages/compiler/go.mod
           cache: false
-      - run: bash toolchains/go/build-dehermc.sh ${{ matrix.host }} build/artifacts/host-compilers/${{ matrix.host }}/bin
+      # The build script packages the archive itself, so what determines the
+      # published bytes is inside an input this family fingerprints. A packaging
+      # step written here would not be - the workflow is in no family's input
+      # set - and a change to it would publish different bytes under a tag users
+      # had already pinned.
+      - run: |
+          bash toolchains/go/build-dehermc.sh ${{ matrix.host }} \
+            build/artifacts/host-compilers/${{ matrix.host }}/bin \
+            build/artifacts/dehermc-${{ matrix.host }}.tar.gz
       # A binary that cannot answer for itself is not shippable. `version` is
       # the identity `deherm doctor` reads back.
       - if: matrix.host == 'linux-x64'
         run: build/artifacts/host-compilers/linux-x64/bin/dehermc version
       - env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.dehermc_title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.dehermc_fingerprint }}
         run: |
-          set -euo pipefail
-          for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
-            bash scripts/ci/upload-release-asset.sh \
-              "${{ needs.plan.outputs.dehermc_tag }}" "${{ github.repository }}" \
-              "$file" "host-compilers-${{ matrix.host }}-$(basename "$file")"
-          done
+          bash scripts/ci/upload-release-asset.sh \
+            "${{ needs.plan.outputs.dehermc_tag }}" "${{ github.repository }}" \
+            "build/artifacts/dehermc-${{ matrix.host }}.tar.gz" "dehermc-${{ matrix.host }}.tar.gz"
 
   # ── Target libraries: one libhermes.a per Defold bundle target ──────────────
 
@@ -243,12 +291,17 @@ jobs:
       # every build lane costs more than the build it prepares for.
       - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: docker buildx build --platform ${{ matrix.docker_platform }} --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} -f toolchains/hermes/Dockerfile.linux .
+      # The container emits `hermes.tar.gz`, already reproducible, already
+      # holding both the release and debugger-enabled libraries. The upload
+      # names it for the target; renaming a file does not change its bytes.
       - env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a" "hermes-${{ matrix.defold_platform }}-libhermes.a"
+            "build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz" "hermes-${{ matrix.defold_platform }}.tar.gz"
 
   # ── Windows: Defold's own toolchain when we can reach it ────────────────────
   #
@@ -284,10 +337,12 @@ jobs:
       - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
       - env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/x86_64-win32/hermes.lib" "hermes-x86_64-win32-hermes.lib"
+            "build/artifacts/x86_64-win32/hermes.tar.gz" "hermes-x86_64-win32.tar.gz"
 
   # The fallback when no registry credential is configured. build-windows.sh
   # records why this artifact makes a weaker provenance claim than every other
@@ -309,13 +364,15 @@ jobs:
           bash toolchains/hermes/build-windows.sh \
             "$PWD/upstream/hermes" \
             "$PWD/build/win32" \
-            "$PWD/build/artifacts/x86_64-win32/hermes.lib"
+            "$PWD/build/artifacts/x86_64-win32/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/x86_64-win32/hermes.lib" "hermes-x86_64-win32-hermes.lib"
+            "build/artifacts/x86_64-win32/hermes.tar.gz" "hermes-x86_64-win32.tar.gz"
 
   android:
     needs: plan
@@ -351,10 +408,12 @@ jobs:
             -f toolchains/hermes/Dockerfile.android .
       - env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a" "hermes-${{ matrix.defold_platform }}-libhermes.a"
+            "build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz" "hermes-${{ matrix.defold_platform }}.tar.gz"
 
   # macOS x64, iOS and the iOS simulator need the Apple SDKs, so there is no
   # container path for them. One macOS runner builds all four Apple targets and
@@ -383,13 +442,15 @@ jobs:
             ${{ matrix.defold_platform }} \
             "$PWD/upstream/hermes" \
             "$PWD/build/hermes/${{ matrix.defold_platform }}" \
-            "$PWD/build/artifacts/${{ matrix.defold_platform }}/libhermes.a"
+            "$PWD/build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.target_fingerprint }}
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a" "hermes-${{ matrix.defold_platform }}-libhermes.a"
+            "build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz" "hermes-${{ matrix.defold_platform }}.tar.gz"
 
   # ── Host compilers: hermesc and shermes, one pair per user host ─────────────
   #
@@ -434,20 +495,23 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - if: runner.os == 'Windows'
         run: choco install ninja --no-progress -y
+      # The build script packages hermesc and shermes into one archive itself,
+      # so the step that decides the published bytes is inside an input this
+      # family fingerprints rather than in this file, which is in none.
       - run: |
           bash toolchains/hermes/build-host-compilers.sh \
             "$PWD/upstream/hermes" \
             "$PWD/build/host-compilers/${{ matrix.host }}" \
-            "$PWD/build/artifacts/host-compilers/${{ matrix.host }}/bin"
+            "$PWD/build/artifacts/host-compilers/${{ matrix.host }}/bin" \
+            "$PWD/build/artifacts/hermes-host-${{ matrix.host }}.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.hermes_host_title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.hermes_host_fingerprint }}
         run: |
-          set -euo pipefail
-          for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
-            bash scripts/ci/upload-release-asset.sh \
-              "${{ needs.plan.outputs.hermes_host_tag }}" "${{ github.repository }}" \
-              "$file" "host-compilers-${{ matrix.host }}-$(basename "$file")"
-          done
+          bash scripts/ci/upload-release-asset.sh \
+            "${{ needs.plan.outputs.hermes_host_tag }}" "${{ github.repository }}" \
+            "build/artifacts/hermes-host-${{ matrix.host }}.tar.gz" "hermes-host-${{ matrix.host }}.tar.gz"
 
   # A run that published nothing verifiable is a run that taught us nothing.
   # This reports what each release now carries, so the gap between the matrix

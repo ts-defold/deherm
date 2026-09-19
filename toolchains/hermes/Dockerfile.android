@@ -78,6 +78,7 @@ ENV ANDROID_NDK_HOME=/opt/android-ndk-r${NDK_VERSION}
 
 COPY upstream/hermes /src/hermes
 COPY toolchains/hermes/package-posix.sh /usr/local/bin/package-posix
+COPY toolchains/hermes/package-archive.sh /usr/local/bin/package-archive
 WORKDIR /work
 
 # Hermes cross builds need hermesc and shermes for the *host*, because the build
@@ -93,6 +94,43 @@ RUN cmake -S /src/hermes -B /work/host -G Ninja \
       -DHERMES_ENABLE_INTL=OFF && \
     cmake --build /work/host --target hermesc shermes --parallel
 
+# ── The unresolved Android unicode blocker ──────────────────────────────────
+#
+# This lane does not build. HERMES_IS_ANDROID=ON was added to satisfy the ICU
+# requirement at the pinned tree's CMakeLists.txt:635, and it reaches
+# CMakeLists.txt:777 `find_package(fbjni REQUIRED CONFIG)`, which fails. That
+# flag is not the real problem, though - removing it only moves the failure:
+#
+#   * `include/hermes/Platform/Unicode/PlatformUnicode.h` picks the unicode
+#     backend from the PREPROCESSOR, not from HERMES_IS_ANDROID. `__ANDROID__`
+#     is defined by the NDK toolchain, so PlatformUnicodeJava.cpp is the
+#     translation unit that compiles, and its first include is <fbjni/fbjni.h>.
+#   * fbjni is not in the NDK. Verified against the central directory of the
+#     pinned android-ndk-r25b-linux.zip: no entry matches "fbjni".
+#   * The Java backend also needs the class
+#     `com/facebook/hermes/unicode/AndroidUnicodeUtils` on the APK's classpath
+#     and fbjni initialised with the process's JavaVM. React Native ships both
+#     in its Hermes AAR; a Defold APK carries neither.
+#   * ICU is in the NDK, but only from API 31. Same verification: the sysroot
+#     carries `usr/include/unicode/*.h` for every level, and `libicu.so` ONLY
+#     under `.../31/`, `.../32/` and `.../33/`. The pinned engine builds Android
+#     at API 19 (armv7) and 21 (64-bit) - see the `sdk` block of
+#     packages/toolchains/defold-bundle-targets.json - so there is no libicu to
+#     link at Defold's floor, and even at 31 it would be a SHARED library the
+#     engine would then have to satisfy.
+#   * HERMES_UNICODE_LITE is forbidden and rightly so: PlatformUnicodeLite.cpp
+#     has empty `convertToCase` and `normalize` bodies and a `dateFormat` that
+#     returns the literal string "dateFormat not implemented". String.cpp:985
+#     has an ASCII fast path, so this is not a no-op - it silently breaks
+#     toUpperCase/toLowerCase for every non-ASCII string.
+#
+# What is left is a statically linked ICU built for Android inside this image
+# and merged into the archive. That satisfies the no-shared-dependency
+# constraint, and it is a new pinned upstream with real size consequences (ICU
+# data), so it is a decision to record in .agents/docs/decisions/ rather than
+# something to slip into a CI fix. The flag stays as it is until that decision
+# is taken, so the failure remains the specific one described above rather than
+# a different one a week later.
 RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake \
@@ -112,5 +150,35 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
     NM=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm \
     package-posix /work/build /out/libhermes.a
 
+# The development library: a SECOND compilation with the debugger, which also
+# turns on HERMES_MEMORY_INSTRUMENTATION (chained at the pinned tree's
+# CMakeLists.txt:245). Not a link-time switch and not interchangeable with the
+# release library - a JS debugger needs interpreter frames to stop in, and
+# release lowers reachable routes to typed-native AOT C where those frames do
+# not exist - so both travel in one archive.
+RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake \
+      -DANDROID_ABI=${ANDROID_ABI} \
+      -DANDROID_PLATFORM=android-${ANDROID_API} \
+      -DANDROID_STL=c++_static \
+      -DHERMES_IS_ANDROID=ON \
+      -DIMPORT_HOST_COMPILERS=/work/host/ImportHostCompilers.cmake \
+      -DHERMES_ENABLE_TEST_SUITE=OFF \
+      -DHERMES_ENABLE_TOOLS=OFF \
+      -DHERMES_ENABLE_NAPI=OFF \
+      -DHERMES_ENABLE_DEBUGGER=ON \
+      -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_BUILD_SHARED_JSI=OFF && \
+    cmake --build /work/build-debug --target hermesvm_a jsi --parallel && \
+    AR=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar \
+    NM=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm \
+    package-posix /work/build-debug /out/libhermes.debug.a
+
+# Named for the family, not the ABI: the workflow uploads this under
+# `hermes-<defold target>.tar.gz`, and renaming a file does not change its
+# bytes - so the recipe needs no build argument it would only echo.
+RUN package-archive /out/hermes.tar.gz /out/libhermes.a /out/libhermes.debug.a
+
 FROM scratch
-COPY --from=0 /out/libhermes.a /libhermes.a
+COPY --from=0 /out/hermes.tar.gz /hermes.tar.gz

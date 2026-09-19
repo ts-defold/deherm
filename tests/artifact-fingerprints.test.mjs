@@ -13,6 +13,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
+import { buildArtifactReferences } from "../scripts/generate-api-policy.mjs";
 import {
   artifactFamilies,
   artifactFamilyNames,
@@ -183,37 +184,53 @@ test("the two host families partition the host tool matrix, with no tool in both
 
   // And the same partition at the asset level: splitting the tag would be
   // pointless if one family still uploaded the other's binaries.
+  //
+  // One archive per HOST per family now, not one asset per tool: a release
+  // asset is a single file, so hermesc and shermes travel together and dehermc
+  // travels alone. The count therefore tracks the families, and the tool-level
+  // partition is the assertion above.
   const assets = Object.fromEntries(await Promise.all(
     hostArtifactFamilyNames.map(async (name) => [name, await expectedAssetNames(name)])
   ));
   const flat = hostArtifactFamilyNames.flatMap((name) => assets[name]);
   assert.equal(new Set(flat).size, flat.length, "two families expect the same asset");
-  assert.equal(flat.length, Object.keys(manifest.hosts).length * declared.length);
+  assert.equal(flat.length, Object.keys(manifest.hosts).length * hostArtifactFamilyNames.length);
 });
 
-test("the shipped policy index hands a client everything it needs to build a download URL", async () => {
+test("a client can build a download URL, and the index entry stays free of artifacts", async () => {
   const shipped = JSON.parse(await readFile(
     path.join(repositoryRoot, "packages/bindings/generated/defold-policy-index.json"), "utf8"));
   // Absolute, because release storage is not the policy site. What matters is
   // that the forge appears in index DATA and never in a consumer's code.
   assert.equal(shipped.base.releaseAsset, releaseAssetUrlTemplate());
   assert.match(shipped.base.releaseAsset, /\{tag\}.*\{asset\}/);
+  // The template that leads to the artifacts document. Without it a client has
+  // the entry and no way to reach the tags.
+  assert.match(shipped.base.artifacts, /\{defoldRevision\}/);
 
   const entry = JSON.parse(await readFile(path.join(
     repositoryRoot,
     "packages/bindings/generated/policy/v1/index",
     `${shipped.entries[0].defoldRevision}.json`
   ), "utf8"));
-  // The tags in the committed entry are the tags this checkout's inputs name.
-  // If these drift, a user resolving the index downloads artifacts built from
-  // inputs this checkout no longer has.
+  // The regression this guards: artifact tags are a function of the BUILD
+  // RECIPE, not of the engine revision. While they lived in the entry, editing
+  // a Dockerfile rotated a tag, which drifted the entry, which failed the store
+  // check - a build-script edit invalidating the derived API surface of an
+  // unrelated engine revision, and breaking the write-once rule the entry's
+  // trust argument rests on.
+  assert.ok(!("artifacts" in entry), "the committed index entry must not carry artifact references");
+
+  // The mapping itself is emitted at publish time, so it is asserted against
+  // the live derivation rather than against a committed file.
+  const references = await buildArtifactReferences();
   for (const name of artifactFamilyNames) {
-    assert.equal(entry.artifacts[name].tag, await familyTag(name), `${name} tag in the index entry is stale`);
+    assert.equal(references[name].tag, await familyTag(name), `${name} tag is stale`);
     assert.deepEqual(
-      Object.values(entry.artifacts[name].assets).flatMap((value) => typeof value === "string" ? [value] : Object.values(value)).sort(),
+      Object.values(references[name].assets).sort(),
       [...await expectedAssetNames(name)].sort()
     );
   }
-  assert.equal(entry.artifacts["native-artifacts"].indexedBy, "bundleTarget");
-  assert.equal(entry.artifacts["hermes-host"].indexedBy, "host");
+  assert.equal(references["native-artifacts"].indexedBy, "bundleTarget");
+  assert.equal(references["hermes-host"].indexedBy, "host");
 });

@@ -1,12 +1,13 @@
 {
   "schemaVersion": 1,
   "kind": "deherm.policy.index",
-  "comment": "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision Defold has already published, and its policyRoot is written once and never rewritten, because that revision's declaration inputs are fixed forever. Consumers FETCH the entry they need from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes nightlies daily, so an index that had to be re-released to stay current would be a pin, not an index. The policy an entry names is content-addressed and therefore self-verifying, so a substituted policy fails its own hash check. A fetched entry also carries the release tags and asset names of the Hermes archives and host tools that build for it; expand base.releaseAsset with a tag and an asset to get a download URL without hardcoding a forge.",
+  "comment": "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision Defold has already published, and its policyRoot is written once and never rewritten, because that revision's declaration inputs are fixed forever. Consumers FETCH the entry they need from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes nightlies daily, so an index that had to be re-released to stay current would be a pin, not an index. The policy an entry names is content-addressed and therefore self-verifying, so a substituted policy fails its own hash check. An entry carries NO artifact references: release tags are a function of the build recipe rather than of the engine, so embedding them made a Dockerfile edit drift an unrelated revision's entry. Fetch v1/artifacts/<defold-sha>.json for the Hermes archives and host tools that build for a revision, then expand base.releaseAsset with a tag and an asset to get a download URL without hardcoding a forge. That document is emitted at publish time and is the one served document that is legitimately rewritten.",
   "base": {
     "url": "https://ts-defold.dev/deherm",
     "pathPrefix": "",
     "layoutVersion": "v1",
     "index": "v1/index/{defoldRevision}.json",
+    "artifacts": "v1/artifacts/{defoldRevision}.json",
     "policy": "v1/policy/{policyRoot}.json",
     "object": "v1/object/{subtreeHash}.json",
     "releaseAsset": "https://github.com/ts-defold/deherm/releases/download/{tag}/{asset}"
@@ -20,8 +21,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "c3666e4cd4e4b65efb66f224b8c7d90ff770fc123e69c0c5139895f61b4df9c1",
-      "generator": "sha256:d533a1c6f66a4504836f17b508bda31ac558bbef2c56c8936b9accb6f5ef584f"
+      "policyRoot": "e68ad2c596a931e5004a55c772821b7db870bd4e6d9d495891ef48bb15cfa51d",
+      "generator": "sha256:71275f96197485f10c842dd917ff24d55f939decbc41d9c5cea2c7a8b14ad996"
     }
   ]
 }

@@ -18,7 +18,7 @@ import { spawn } from "node:child_process";
 import { chmod, cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { downloadReleaseAssets } from "../packages/cli/src/release-assets.mjs";
+import { downloadReleaseAssets, extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
 import { fileURLToPath } from "node:url";
 
 // What determines the bytes of a host tool is declared in one place for all
@@ -32,9 +32,10 @@ import {
   artifactFamilies,
   expectedAssetNames,
   familyForHostTool,
-  familyTag,
+  familyRelease,
   fingerprintFamily,
-  hostArtifactFamilyNames
+  hostArtifactFamilyNames,
+  publishedAssets
 } from "./lib/artifact-releases.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -284,6 +285,12 @@ async function expectedAssets(family) {
 }
 
 if (command === "fingerprint") console.log(await fingerprintFamily(requireHostFamily(args[0]), { root }));
+// The TAG, derived beside the expected-asset listing rather than assembled from
+// a prefix in YAML and a digest from here. See ./lib/artifact-releases.mjs.
+else if (command === "tag") console.log((await familyRelease(requireHostFamily(args[0]), { root })).tag);
+else if (command === "release-metadata") {
+  console.log(JSON.stringify(await familyRelease(requireHostFamily(args[0]), { root }), null, 2));
+}
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
   const installed = await install(args[0]);
@@ -317,29 +324,37 @@ else if (command === "pull") {
   const families = familyIndex >= 0 ? [requireHostFamily(args[familyIndex + 1])] : hostArtifactFamilyNames;
   const installed = [];
   for (const family of families) {
-    const tag = tagIndex >= 0 ? args[tagIndex + 1] : await familyTag(family, { root });
+    const tag = tagIndex >= 0 ? args[tagIndex + 1] : (await familyRelease(family, { root })).tag;
     const destination = path.join(root, "build", "host-compiler-downloads", tag);
     await mkdir(destination, { recursive: true });
     // By URL, not through `gh` - see packages/cli/src/release-assets.mjs. The
     // asset names are the same listing CI checks the release against, so nothing
     // is fetched to discover what to fetch.
+    const rows = await publishedAssets(family, { root });
     const { missing } = await downloadReleaseAssets({
       tag,
-      assets: await expectedAssets(family),
+      assets: rows.map((row) => row.asset),
       destination,
       optional: args.includes("--partial"),
       onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
     });
     if (missing.length) console.log(`${missing.length} ${family} asset(s) not published for these inputs`);
-    // Release assets are flat files named host-compilers-<host>-<tool>[.exe];
-    // `install` matches on the directory segment, so unpack each into its own.
-    for (const file of await filesBelow(destination)) {
-      const base = path.basename(file);
-      const match = /^host-compilers-(?<host>[^-]+-[^-]+)-(?<tool>.+?)(?<extension>\.exe)?$/.exec(base);
-      if (!match) continue;
-      const target = path.join(destination, `host-compilers-${match.groups.host}`, `${match.groups.tool}${match.groups.extension ?? ""}`);
-      await mkdir(path.dirname(target), { recursive: true });
-      await cp(file, target);
+    // Each asset is one reproducible .tar.gz holding that host's tools for this
+    // family - hermesc and shermes together, or dehermc alone. Unpack each into
+    // the directory `install` matches on, which is the row it was requested
+    // for; the flat names the download side used to parse are gone, and with
+    // them the second, differently-spelled parser they needed.
+    //
+    // The archive also carries the executable bit, which a bare release asset
+    // does not - `install` still chmods, because a tarball produced by some
+    // future path might not.
+    const absent = new Set(missing);
+    for (const row of rows) {
+      if (absent.has(row.asset)) continue;
+      await extractReleaseArchive({
+        archive: path.join(destination, row.asset),
+        destination: path.join(destination, `host-compilers-${row.host}`, "bin")
+      });
     }
     installed.push(...await install(destination));
   }
@@ -386,6 +401,8 @@ else if (command === "pull") {
   throw new Error(
     "Usage: manage-host-compilers.mjs {" +
     `fingerprint <${hostArtifactFamilyNames.join("|")}>|` +
+    `tag <${hostArtifactFamilyNames.join("|")}>|` +
+    `release-metadata <${hostArtifactFamilyNames.join("|")}>|` +
     `expected-assets <${hostArtifactFamilyNames.join("|")}>|` +
     "report|verify [--complete] [--json]|install <dir>|record <host> [tool]|" +
     "stage <host> <build dir> [tool]|pull [--family <name>] [--tag <tag>] [--partial]}"

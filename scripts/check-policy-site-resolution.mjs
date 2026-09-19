@@ -93,6 +93,16 @@ export async function resolvePolicy({ index, fetchImpl = fetch }) {
     const indexRelative = expand(index.base.index, { defoldRevision: asserted.defoldRevision });
     const entry = JSON.parse(await get(indexRelative));
     trace.push(`${indexRelative} -> policyRoot ${entry.policyRoot}`);
+    // A SIBLING of the entry, not part of it: release tags are a function of
+    // the build recipe, so embedding them made a Dockerfile edit drift an
+    // unrelated revision's entry. Fetching it here is what proves a consumer
+    // still gets from a revision to a download without that coupling.
+    const artifactsRelative = expand(index.base.artifacts, { defoldRevision: asserted.defoldRevision });
+    const artifacts = JSON.parse(await get(artifactsRelative));
+    if (artifacts.defoldRevision !== asserted.defoldRevision) {
+      throw new Error(`${asserted.defoldRevision}: artifacts document names ${artifacts.defoldRevision}`);
+    }
+    trace.push(`${artifactsRelative} -> ${Object.keys(artifacts.artifacts ?? {}).length} families`);
     // The shipped index is the released authority. A fetched index may extend it
     // for revisions published after that release, but never overrides an entry
     // the package already asserts.
@@ -112,29 +122,38 @@ export async function resolvePolicy({ index, fetchImpl = fetch }) {
       subtrees[namespace] = JSON.parse(bytes);
     }
     trace.push(`verified ${Object.keys(subtrees).length} objects against their own paths`);
-    results.push({ revision: asserted.defoldRevision, entry, policy, subtrees });
+    results.push({ revision: asserted.defoldRevision, entry, artifacts, policy, subtrees });
   }
   return { trace, results };
 }
 
 /**
  * Build one artifact download URL the way a consumer would: the tag and the
- * asset name come from the index entry it just fetched, and the URL shape comes
- * from the index's own `base.releaseAsset` template. Nothing here knows what a
- * forge is called.
+ * asset name come from the ARTIFACTS document for the revision - a sibling of
+ * the index entry, not part of it, because release tags are a function of the
+ * build recipe rather than of the engine - and the URL shape comes from the
+ * index's own `base.releaseAsset` template. Nothing here knows what a forge is
+ * called.
  *
- * A key the entry does not name is a refusal, not an invented URL. Guessing
- * `hermes-<target>-libhermes.a` would produce a plausible URL for a target that
- * was never built, and a 404 six months later is a worse diagnostic than a
- * failure here.
+ * A key the document does not name is a refusal, not an invented URL. Guessing
+ * `hermes-<target>.tar.gz` would produce a plausible URL for a target that was
+ * never built, and a 404 six months later is a worse diagnostic than a failure
+ * here.
  */
-export function resolveArtifactUrl({ index, entry, family, key, tool = null }) {
-  const reference = entry.artifacts?.[family];
-  if (!reference) throw new Error(`${entry.defoldRevision}: the index entry names no ${family} artifacts`);
-  const named = reference.assets[key];
-  const asset = tool ? named?.[tool] : named;
-  if (typeof asset !== "string") {
-    throw new Error(`${family} publishes nothing for ${key}${tool ? ` ${tool}` : ""}`);
+export function resolveArtifactUrl({ index, artifacts, family, key, member = null }) {
+  const reference = artifacts?.artifacts?.[family];
+  if (!reference) throw new Error(`${artifacts?.defoldRevision}: the artifacts document names no ${family} artifacts`);
+  const asset = reference.assets?.[key];
+  if (typeof asset !== "string") throw new Error(`${family} publishes nothing for ${key}`);
+  // One archive per row, so a caller asks for the MEMBER it needs and the
+  // document says whether that member unpacks out of this archive. Checking it
+  // here means a rename inside an archive fails at resolution rather than as a
+  // missing file after extraction.
+  if (member) {
+    const contents = reference.contents?.[key] ?? [];
+    if (!contents.includes(member)) {
+      throw new Error(`${family} ${key} carries ${contents.join(", ") || "nothing"}, not ${member}`);
+    }
   }
   return { url: expand(index.base.releaseAsset, { tag: reference.tag, asset }), tag: reference.tag, asset };
 }
@@ -213,13 +232,21 @@ async function main() {
         `(catalogSha256 ${handshake.catalogSha256.slice(0, 12)})`);
     }
 
-    // The artifact half of the entry, resolved from index data alone. One
-    // bundle-target archive and one host compiler, because the two are indexed
-    // differently and a consumer that conflated them would download the wrong
-    // file for the right-looking reason.
-    for (const { revision, entry } of results) {
-      for (const [family, key, tool] of [["native-artifacts", "arm64-osx", null], ["hermes-host", "linux-x64", "hermesc"]]) {
-        const resolved = resolveArtifactUrl({ index, entry, family, key, tool });
+    // The artifact half, resolved from served data alone. It is a SIBLING of
+    // the index entry rather than part of it: release tags are a function of
+    // the build recipe, so embedding them made a Dockerfile edit drift an
+    // unrelated revision's entry. Fetching it here is what proves a consumer
+    // can still get from a revision to a download without that coupling.
+    //
+    // One bundle-target archive and one host archive, because the two are
+    // indexed differently and a consumer that conflated them would download the
+    // wrong file for the right-looking reason.
+    for (const { revision, artifacts } of results) {
+      for (const [family, key, member] of [
+        ["native-artifacts", "arm64-osx", "libhermes.a"],
+        ["hermes-host", "linux-x64", "hermesc"]
+      ]) {
+        const resolved = resolveArtifactUrl({ index, artifacts, family, key, member });
         // The vendoring path builds the same URL from the same tag and asset
         // without ever reading the index. If these two disagree, a user who
         // followed the index would download something `pull` would not.
@@ -227,13 +254,13 @@ async function main() {
         if (resolved.url !== vendored) {
           throw new Error(`index template resolved ${resolved.url} but release-assets.mjs builds ${vendored}`);
         }
-        lines.push(`  ${revision} ${family} ${key}${tool ? `/${tool}` : ""} -> ${resolved.url}`);
+        lines.push(`  ${revision} ${family} ${key}${member ? `[${member}]` : ""} -> ${resolved.url}`);
       }
       // Negative control for the same reason the tampered object exists below:
       // a resolver that answers for a target nobody built is not resolving.
       let refused = null;
       try {
-        resolveArtifactUrl({ index, entry, family: "native-artifacts", key: "x86-osx" });
+        resolveArtifactUrl({ index, artifacts, family: "native-artifacts", key: "x86-osx" });
       } catch (error) {
         refused = error.message;
       }

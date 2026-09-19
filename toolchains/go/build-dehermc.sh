@@ -9,9 +9,15 @@
 # are LLVM. This one needs a single runner and about a minute per host.
 #
 # Usage:
-#   toolchains/go/build-dehermc.sh <host key> <output bin directory>
+#   toolchains/go/build-dehermc.sh <host key> <output bin directory> [archive.tar.gz]
 #
 #   <host key>  darwin-arm64 | darwin-x64 | linux-x64 | linux-arm64 | win32-x64
+#
+# The optional third argument packages the binary into the reproducible .tar.gz
+# the release publishes. Packaging lives here rather than in the workflow so
+# that scripts/lib/artifact-releases.mjs hashes it: a change to how the
+# published bytes are assembled has to rotate the tag, and the workflow is not
+# in any family's input set.
 #
 # Determinism is the point of the flag set, not a nicety: the digest recorded in
 # packages/toolchains/host-compilers.json is only meaningful if the same inputs
@@ -34,6 +40,7 @@ set -euo pipefail
 
 host_key="${1:?usage: build-dehermc.sh <host key> <output bin directory>}"
 output_dir="${2:?usage: build-dehermc.sh <host key> <output bin directory>}"
+archive="${3:-}"
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 module_dir="${DEHERM_COMPILER_MODULE:-$repo_root/packages/compiler}"
@@ -111,3 +118,7 @@ env \
 
 chmod 0755 "$binary"
 echo "build-dehermc.sh: wrote $binary ($(wc -c < "$binary" | tr -d ' ') bytes)"
+
+if [ -n "$archive" ]; then
+  bash "$repo_root/toolchains/hermes/package-archive.sh" "$archive" "$binary"
+fi
