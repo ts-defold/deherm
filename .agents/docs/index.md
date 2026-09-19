@@ -28,6 +28,7 @@ okf_version: "0.2"
 * [Hybrid TypeScript toolchain](decisions/hybrid-toolchain.md) - Lua scripts plus Hermes modules, coordinated by TypeScript 7 and ttsc.
 * [Runtime profiles and reachability](decisions/runtime-profiles-and-reachability.md) - Precompiled development runtimes, release-only AOT, and cross-layer tree shaking.
 * [Delivery model](decisions/delivery-model.md) - What ships as a Defold library/native extension and what would require a fork.
+* [Release reachability and native lowering](decisions/release-reachability-and-native-lowering.md) - ttsc resolves the exact called symbols, release emits only those, and reachable code is lowered from bytecode to extern_c native.
 * [Toolchain distribution and the build seam](decisions/toolchain-distribution-and-build-seam.md) - CI-built per-target Hermes archives, per-host hermesc/shermes, and generated C assembled into the extension for Bob and Extender.
 * [Layered API policy cache](decisions/layered-api-policy-cache.md) - Source-derived Lua surfaces extracted once, shipped and committed as hash-keyed policies, reparsed only on mismatch.
 * [Project extension discovery](decisions/project-extension-discovery.md) - How the npm CLI discovers local and resolved extensions and decides which binding route is safe.
