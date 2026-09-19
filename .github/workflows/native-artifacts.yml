@@ -91,13 +91,14 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 # Serialize. Runs with identical inputs compute the SAME tag, so concurrent runs
-# race each other creating that release and clobbering each other's assets -
-# which has already cost this repository a release that ended up holding two
-# assets of fifteen. Queue rather than cancel: these lanes take tens of minutes
-# and a cancelled run can leave a release half-populated, which the plan job's
-# completeness check would then have to repair on the next push.
+# would schedule duplicate work against one release; the older clobbering
+# uploader once left that release holding two assets of fifteen. Uploads are now
+# immutable too, but queueing still avoids wasting two fleets on the same rows.
+# Queue rather than cancel: these lanes take tens of minutes and a cancelled run
+# can leave a release half-populated for the next plan to repair.
 concurrency:
   group: native-artifacts
   cancel-in-progress: false
@@ -122,18 +123,24 @@ jobs:
       target_title: ${{ steps.compute.outputs.target_title }}
       hermes_host_title: ${{ steps.compute.outputs.hermes_host_title }}
       dehermc_title: ${{ steps.compute.outputs.dehermc_title }}
-      linux_matrix: ${{ steps.compute.outputs.linux_matrix }}
-      windows_matrix: ${{ steps.compute.outputs.windows_matrix }}
-      android_matrix: ${{ steps.compute.outputs.android_matrix }}
-      apple_matrix: ${{ steps.compute.outputs.apple_matrix }}
-      hermes_host_matrix: ${{ steps.compute.outputs.hermes_host_matrix }}
-      dehermc_matrix: ${{ steps.compute.outputs.dehermc_matrix }}
+      # Only numeric slots cross the job-output boundary. GitHub's secret
+      # scanner rejected all six full JSON matrices in run 35460053961 even
+      # though they contained only public target and asset names. Static slot
+      # maps below recover the executor fields without moving arbitrary strings
+      # through that heuristic.
+      linux_rows: ${{ steps.compute.outputs.linux_rows }}
+      windows_rows: ${{ steps.compute.outputs.windows_rows }}
+      android_rows: ${{ steps.compute.outputs.android_rows }}
+      apple_rows: ${{ steps.compute.outputs.apple_rows }}
+      hermes_host_rows: ${{ steps.compute.outputs.hermes_host_rows }}
+      dehermc_rows: ${{ steps.compute.outputs.dehermc_rows }}
       linux_any: ${{ steps.compute.outputs.linux_any }}
       windows_any: ${{ steps.compute.outputs.windows_any }}
       android_any: ${{ steps.compute.outputs.android_any }}
       apple_any: ${{ steps.compute.outputs.apple_any }}
       hermes_host_any: ${{ steps.compute.outputs.hermes_host_any }}
       dehermc_any: ${{ steps.compute.outputs.dehermc_any }}
+      build_any: ${{ steps.compute.outputs.build_any }}
       android_ndk_version: ${{ steps.sdk.outputs.android_ndk_version }}
       android_ndk_api: ${{ steps.sdk.outputs.android_ndk_api }}
       android_64_ndk_api: ${{ steps.sdk.outputs.android_64_ndk_api }}
@@ -231,11 +238,14 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.dehermc_matrix) }}
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.dehermc_rows) }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with: { node-version: '22' }
+      - name: Resolve the canonical build row
+        run: node scripts/plan-native-artifact-builds.mjs --describe-row "dehermc=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: pnpm/action-setup@v6
       # The ttsc Go module - and the typescript-go checkout under its shim/ -
       # arrives with the npm package, pinned by pnpm-lock.yaml. It is not
@@ -252,13 +262,15 @@ jobs:
       # set - and a change to it would publish different bytes under a tag users
       # had already pinned.
       - run: |
-          bash toolchains/go/build-dehermc.sh ${{ matrix.host }} \
-            build/artifacts/host-compilers/${{ matrix.host }}/bin \
-            build/artifacts/dehermc-${{ matrix.host }}.tar.gz
+          bash toolchains/go/build-dehermc.sh "$HOST" \
+            "build/artifacts/host-compilers/$HOST/bin" \
+            "build/artifacts/dehermc-$HOST.tar.gz"
       # A binary that cannot answer for itself is not shippable. `version` is
       # the identity `deherm doctor` reads back.
-      - if: matrix.host == 'linux-x64'
-        run: build/artifacts/host-compilers/linux-x64/bin/dehermc version
+      - run: |
+          if [ "$HOST" = linux-x64 ]; then
+            build/artifacts/host-compilers/linux-x64/bin/dehermc version
+          fi
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.dehermc_title }}
@@ -266,7 +278,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.dehermc_tag }}" "${{ github.repository }}" \
-            "build/artifacts/dehermc-${{ matrix.host }}.tar.gz" "${{ matrix.asset }}"
+            "build/artifacts/dehermc-$HOST.tar.gz" "$ASSET"
 
   # ── Target libraries: one libhermes.a per Defold bundle target ──────────────
 
@@ -275,11 +287,16 @@ jobs:
     if: needs.plan.outputs.linux_any == 'true'
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.linux_matrix) }}
-    runs-on: ${{ matrix.runner }}
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.linux_rows) }}
+    runs-on: ${{ fromJSON('["ubuntu-24.04","ubuntu-24.04-arm"]')[matrix.row] }}
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/setup-node@v7
+        with: { node-version: '22' }
+      - name: Resolve the canonical build row
+        run: node scripts/plan-native-artifact-builds.mjs --describe-row "linux=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: docker/setup-buildx-action@v3
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
@@ -287,10 +304,10 @@ jobs:
       - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: |
           docker buildx build \
-            --platform ${{ matrix.docker_platform }} \
-            --cache-from type=gha,scope=hermes-${{ matrix.target }} \
-            --cache-to type=gha,mode=max,scope=hermes-${{ matrix.target }} \
-            --output type=local,dest=build/artifacts/${{ matrix.target }} \
+            --platform "$DOCKER_PLATFORM" \
+            --cache-from "type=gha,scope=hermes-$TARGET" \
+            --cache-to "type=gha,mode=max,scope=hermes-$TARGET" \
+            --output "type=local,dest=build/artifacts/$TARGET" \
             -f toolchains/hermes/Dockerfile.linux .
       # The container emits `hermes.tar.gz`, already reproducible, already
       # holding both the release and debugger-enabled libraries. The upload
@@ -302,7 +319,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
+            "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # ── Windows: Defold's own toolchain when we can reach it ────────────────────
   #
@@ -321,10 +338,15 @@ jobs:
     if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential == 'true'
     runs-on: ubuntu-24.04
     strategy:
-      matrix: ${{ fromJSON(needs.plan.outputs.windows_matrix) }}
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.windows_rows) }}
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/setup-node@v7
+        with: { node-version: '22' }
+      - name: Resolve the canonical build row
+        run: node scripts/plan-native-artifact-builds.mjs --describe-row "windows=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: docker/setup-buildx-action@v3
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
@@ -341,9 +363,9 @@ jobs:
       - run: |
           docker buildx build \
             --platform linux/amd64 \
-            --cache-from type=gha,scope=hermes-${{ matrix.target }} \
-            --cache-to type=gha,mode=max,scope=hermes-${{ matrix.target }} \
-            --output type=local,dest=build/artifacts/${{ matrix.target }} \
+            --cache-from "type=gha,scope=hermes-$TARGET" \
+            --cache-to "type=gha,mode=max,scope=hermes-$TARGET" \
+            --output "type=local,dest=build/artifacts/$TARGET" \
             -f toolchains/hermes/Dockerfile.win32 .
       - env:
           GH_TOKEN: ${{ github.token }}
@@ -352,7 +374,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
+            "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # The fallback when no registry credential is configured. build-windows.sh
   # records why this artifact makes a weaker provenance claim than every other
@@ -362,13 +384,18 @@ jobs:
     if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential != 'true'
     runs-on: windows-2022
     strategy:
-      matrix: ${{ fromJSON(needs.plan.outputs.windows_matrix) }}
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.windows_rows) }}
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/setup-node@v7
+        with: { node-version: '22' }
+      - name: Resolve the canonical build row
+        run: node scripts/plan-native-artifact-builds.mjs --describe-row "windows=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - run: bash scripts/bootstrap-upstreams.sh hermes
       # Entering the MSVC environment. This was ilammy/msvc-dev-cmd@v1, which
       # is unmaintained (last push 2024-04) and whose newest release still
@@ -399,7 +426,7 @@ jobs:
           bash toolchains/hermes/build-windows.sh \
             "$PWD/upstream/hermes" \
             "$PWD/build/win32" \
-            "$PWD/build/artifacts/${{ matrix.target }}/hermes.tar.gz"
+            "$PWD/build/artifacts/$TARGET/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
@@ -407,32 +434,42 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
+            "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   android:
     needs: plan
     if: needs.plan.outputs.android_any == 'true'
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.android_matrix) }}
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.android_rows) }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/setup-node@v7
+        with: { node-version: '22' }
+      - name: Resolve the canonical build row
+        run: node scripts/plan-native-artifact-builds.mjs --describe-row "android=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       - uses: docker/setup-buildx-action@v3
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
       - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: |
+          case "$API_KIND" in
+            android_ndk_api) android_api="${{ needs.plan.outputs.android_ndk_api }}" ;;
+            android_64_ndk_api) android_api="${{ needs.plan.outputs.android_64_ndk_api }}" ;;
+            *) echo "Unknown Android API kind: $API_KIND" >&2; exit 2 ;;
+          esac
           docker buildx build \
             --platform linux/amd64 \
-            --build-arg ANDROID_ABI=${{ matrix.abi }} \
-            --build-arg ANDROID_API=${{ needs.plan.outputs[matrix.api_kind] }} \
+            --build-arg "ANDROID_ABI=$ANDROID_ABI" \
+            --build-arg "ANDROID_API=$android_api" \
             --build-arg NDK_VERSION=${{ needs.plan.outputs.android_ndk_version }} \
-            --cache-from type=gha,scope=hermes-${{ matrix.target }} \
-            --cache-to type=gha,mode=max,scope=hermes-${{ matrix.target }} \
-            --output type=local,dest=build/artifacts/${{ matrix.target }} \
+            --cache-from "type=gha,scope=hermes-$TARGET" \
+            --cache-to "type=gha,mode=max,scope=hermes-$TARGET" \
+            --output "type=local,dest=build/artifacts/$TARGET" \
             -f toolchains/hermes/Dockerfile.android .
       - env:
           GH_TOKEN: ${{ github.token }}
@@ -441,7 +478,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
+            "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # macOS x64, iOS and the iOS simulator need the Apple SDKs, so there is no
   # container path for them. One macOS runner builds all four Apple targets and
@@ -452,13 +489,18 @@ jobs:
     runs-on: macos-15
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.apple_matrix) }}
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.apple_rows) }}
     env:
       DEFOLD_MACOSX_VERSION_MIN: ${{ needs.plan.outputs.macosx_version_min }}
       DEFOLD_IPHONEOS_VERSION_MIN: ${{ needs.plan.outputs.iphoneos_version_min }}
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/setup-node@v7
+        with: { node-version: '22' }
+      - name: Resolve the canonical build row
+        run: node scripts/plan-native-artifact-builds.mjs --describe-row "apple=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
@@ -466,10 +508,10 @@ jobs:
       - run: brew install ninja cmake
       - run: |
           bash toolchains/hermes/build-apple.sh \
-            ${{ matrix.target }} \
+            "$TARGET" \
             "$PWD/upstream/hermes" \
-            "$PWD/build/hermes/${{ matrix.target }}" \
-            "$PWD/build/artifacts/${{ matrix.target }}/hermes.tar.gz"
+            "$PWD/build/hermes/$TARGET" \
+            "$PWD/build/artifacts/$TARGET/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
@@ -477,7 +519,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
+            "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
   # ── Host compilers: hermesc and shermes, one pair per user host ─────────────
   #
@@ -490,14 +532,19 @@ jobs:
     strategy:
       fail-fast: false
       # ubuntu-22.04 rather than 24.04 sets the shipped glibc floor at 2.35.
-      matrix: ${{ fromJSON(needs.plan.outputs.hermes_host_matrix) }}
-    runs-on: ${{ matrix.runner }}
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.hermes_host_rows) }}
+    runs-on: ${{ fromJSON('["macos-15","macos-15-intel","ubuntu-22.04","ubuntu-22.04-arm","windows-2022"]')[matrix.row] }}
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: actions/setup-node@v7
+        with: { node-version: '22' }
+      - name: Resolve the canonical build row
+        run: node scripts/plan-native-artifact-builds.mjs --describe-row "hermes_host=${{ matrix.row }}" --github-env "$GITHUB_ENV"
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
@@ -520,9 +567,9 @@ jobs:
       - run: |
           bash toolchains/hermes/build-host-compilers.sh \
             "$PWD/upstream/hermes" \
-            "$PWD/build/host-compilers/${{ matrix.host }}" \
-            "$PWD/build/artifacts/host-compilers/${{ matrix.host }}/bin" \
-            "$PWD/build/artifacts/hermes-host-${{ matrix.host }}.tar.gz"
+            "$PWD/build/host-compilers/$HOST" \
+            "$PWD/build/artifacts/host-compilers/$HOST/bin" \
+            "$PWD/build/artifacts/hermes-host-$HOST.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.hermes_host_title }}
@@ -530,7 +577,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.hermes_host_tag }}" "${{ github.repository }}" \
-            "build/artifacts/hermes-host-${{ matrix.host }}.tar.gz" "${{ matrix.asset }}"
+            "build/artifacts/hermes-host-$HOST.tar.gz" "$ASSET"
 
   # A run that published nothing verifiable is a run that taught us nothing.
   # This reports what each release now carries, so the gap between the matrix
@@ -558,3 +605,37 @@ jobs:
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
           done
+      - name: Verify every fingerprinted row is published
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p build/ci-final-assets
+          present() {
+            local tag="$1" destination="$2"
+            if gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+              gh release view "$tag" --repo "${{ github.repository }}" \
+                --json assets --jq '.assets[].name' | sort -u > "$destination"
+            else
+              : > "$destination"
+            fi
+          }
+          present "${{ needs.plan.outputs.target_tag }}" build/ci-final-assets/native-artifacts.txt
+          present "${{ needs.plan.outputs.hermes_host_tag }}" build/ci-final-assets/hermes-host.txt
+          present "${{ needs.plan.outputs.dehermc_tag }}" build/ci-final-assets/dehermc.txt
+          node scripts/plan-native-artifact-builds.mjs \
+            --present native-artifacts=build/ci-final-assets/native-artifacts.txt \
+            --present hermes-host=build/ci-final-assets/hermes-host.txt \
+            --present dehermc=build/ci-final-assets/dehermc.txt \
+            > build/ci-final-assets/plan.json
+          node -e '
+            const plan = require("./build/ci-final-assets/plan.json");
+            const missing = Object.entries(plan.assets).flatMap(([family, row]) =>
+              row.missing.map((asset) => `${family}: ${asset}`));
+            if (missing.length) throw new Error(`fingerprinted release rows remain unpublished:\n${missing.join("\n")}`);
+          '
+      - name: Run end-to-end only after changed artifacts are published
+        if: needs.plan.outputs.build_any == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"

@@ -446,6 +446,17 @@ that appears in two lanes. The upload boundary repeats the existence check and
 never uses `--clobber`, so a manual dispatch or an external publisher that wins
 after planning cannot overwrite immutable bytes.
 
+Only integer row slots cross GitHub's job-output boundary. Run
+`35460053961` proved that GitHub's secret-output heuristic can discard a full
+public JSON matrix: all six matrix outputs were omitted as "may contain secret",
+then `fromJSON('')` prevented the expensive jobs from starting. The planner now
+emits compact numeric slot arrays; after checkout, the same planner resolves a
+slot back to its canonical target, asset, ABI and host through
+`--describe-row`. Runner selection is the only static slot map left in YAML,
+because `runs-on` must be known before checkout. Unit tests prove slot outputs
+contain integers only and representative slots round-trip to the exact executor
+row. A GitHub masking heuristic can therefore no longer erase target metadata.
+
 Workflow-level concurrency remains one queued `native-artifacts` group with
 `cancel-in-progress: false`. This is intentionally broader than a branch: two
 branches can compute the same content-addressed tag, so branch-scoped locks
@@ -455,6 +466,15 @@ a release. Docker target lanes additionally use BuildKit's GitHub Actions cache
 scoped by bundle target. The cache is only a compile accelerator: BuildKit
 validates its content graph, and the release identity remains the declared
 family fingerprint plus asset name.
+
+The summary job re-reads all three releases and fails if any planned row is
+still absent. When a run actually published changed artifacts, and only after
+that completeness check passes, it dispatches the end-to-end workflow on the
+same ref. A toolchain fingerprint no longer triggers end-to-end directly on the
+original push: that raced publication and deterministically asked the consumer
+test to download a release which could not exist yet. Script-only end-to-end
+changes still run their cheap local stage directly; nightlies and the
+post-publication dispatch retain the full Bob matrix.
 
 | Lane | Runner | Produces |
 | --- | --- | --- |
