@@ -287,7 +287,7 @@ jobs:
         with: { distribution: temurin, java-version: '25' }
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: bash scripts/bootstrap-upstreams.sh defold extender ref-doc
+      - run: bash scripts/bootstrap-upstreams.sh defold hermes extender ref-doc
       - id: engine
         name: Materialize the runtime and exercise every generated route
         continue-on-error: true
