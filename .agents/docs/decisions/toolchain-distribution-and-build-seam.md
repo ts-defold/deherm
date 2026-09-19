@@ -479,7 +479,7 @@ post-publication dispatch retain the full Bob matrix.
 | Lane | Runner | Produces |
 | --- | --- | --- |
 | `linux` | `ubuntu-24.04`, `ubuntu-24.04-arm` | `x86_64-linux`, `arm64-linux` via `Dockerfile.linux` |
-| `windows` | `ubuntu-24.04` | `x86_64-win32` via `Dockerfile.win32`, merged to `hermes.lib` + `hermes.debug.lib` |
+| `windows-native` | `windows-2022` | `x86_64-win32` via native MSVC, merged to `hermes.lib` + `hermes.debug.lib` |
 | `android` | `ubuntu-24.04` | `armv7`, `arm64`, `x86_64` via `Dockerfile.android` and the engine's NDK pin |
 | `apple` | `macos-15` | `arm64-osx`, `x86_64-osx`, `arm64-ios`, `arm64_sim-ios` via `build-apple.sh` |
 | `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts, into the `hermes-host` family's release |
@@ -488,6 +488,14 @@ post-publication dispatch retain the full Bob matrix.
 iOS and macOS x64 need the Apple SDKs, so they have no container path and run on
 a macOS runner. Android needs the NDK, pinned by digest inside the container
 rather than trusted from the network.
+
+`Dockerfile.win32` remains a manually dispatched canary for Defold's Extender
+image. Its current C++ standard-library probe is not yet proven, so it is
+advisory and non-blocking; normal release publication uses `windows-native`.
+This is deliberate evidence handling, not a silent fallback: the native lane is
+always scheduled for a missing Windows artifact, while a manually requested
+container run can expose and diagnose cross-toolchain drift without withholding
+the rest of the fingerprinted release.
 
 Every target lane builds its library **twice**. The second compilation sets
 `-DHERMES_ENABLE_DEBUGGER=ON`, which chains on `HERMES_MEMORY_INSTRUMENTATION`

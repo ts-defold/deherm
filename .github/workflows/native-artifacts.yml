@@ -73,6 +73,7 @@ name: native-artifacts
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     paths:
       - upstream.lock
       - toolchains/hermes/**
@@ -329,13 +330,14 @@ jobs:
   # surface's standard-library types require both sides to agree on.
   #
   # That registry refuses anonymous pulls but serves any AUTHENTICATED Google
-  # identity, so a service account credential is the whole difference. When one
-  # is configured this lane runs; when it is not - a fork, or a checkout without
-  # the secret - `windows-native` runs instead and produces a weaker artifact
-  # rather than no artifact. Exactly one of the two ever runs.
+  # identity. The cross toolchain remains an explicit manual canary until its
+  # C++ standard-library probe is proven against the current image; release
+  # publication always runs the native MSVC lane below. A manual canary may run
+  # beside it, but is advisory and cannot block a complete release.
   windows:
     needs: plan
-    if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential == 'true'
+    if: github.event_name == 'workflow_dispatch' && needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential == 'true'
+    continue-on-error: true
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -376,12 +378,13 @@ jobs:
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
             "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
-  # The fallback when no registry credential is configured. build-windows.sh
-  # records why this artifact makes a weaker provenance claim than every other
-  # lane's.
+  # The release-producing Windows lane. It uses the platform's native MSVC
+  # environment, so the standard library and CRT are exercised by the compiler
+  # that will produce the published archive rather than inferred by a partial
+  # cross-toolchain file.
   windows-native:
     needs: plan
-    if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential != 'true'
+    if: needs.plan.outputs.windows_any == 'true'
     runs-on: windows-2022
     strategy:
       matrix:
@@ -464,7 +467,7 @@ jobs:
           esac
           docker buildx build \
             --platform linux/amd64 \
-            --build-arg "ANDROID_ABI=$ANDROID_ABI" \
+            --build-arg "ANDROID_ABI=$ABI" \
             --build-arg "ANDROID_API=$android_api" \
             --build-arg NDK_VERSION=${{ needs.plan.outputs.android_ndk_version }} \
             --cache-from "type=gha,scope=hermes-$TARGET" \

@@ -264,7 +264,6 @@ jobs:
     needs: derive
     runs-on: ubuntu-24.04
     timeout-minutes: 90
-    continue-on-error: true
     permissions:
       contents: read
       issues: write
@@ -286,13 +285,14 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: bash scripts/bootstrap-upstreams.sh defold extender ref-doc
-      - run: bash scripts/bootstrap-bob.sh
-      - run: pnpm artifacts:pull
-      - run: pnpm configure:native
       - id: engine
-        name: Exercise every generated route against a real engine
+        name: Materialize the runtime and exercise every generated route
         continue-on-error: true
-        run: node scripts/check-headless-conformance.mjs
+        run: |
+          bash scripts/bootstrap-bob.sh
+          pnpm artifacts:pull
+          pnpm configure:native
+          node scripts/check-headless-conformance.mjs
       - name: Derive and report per-route verification
         if: always()
         run: |

@@ -117,3 +117,13 @@ test("pre-checkout runner slot maps agree with the planner", async () => {
   assert.match(workflow, /fromJSON\('\["ubuntu-24\.04","ubuntu-24\.04-arm"\]'\)\[matrix\.row\]/u);
   assert.match(workflow, /fromJSON\('\["macos-15","macos-15-intel","ubuntu-22\.04","ubuntu-22\.04-arm","windows-2022"\]'\)\[matrix\.row\]/u);
 });
+
+test("release publication uses authoritative platform inputs", async () => {
+  const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
+
+  assert.match(workflow, /push:\s+branches: \[main\]/u);
+  assert.match(workflow, /--build-arg "ANDROID_ABI=\$ABI"/u);
+  assert.doesNotMatch(workflow, /ANDROID_ABI=\$ANDROID_ABI/u);
+  assert.match(workflow, /windows-native:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true'/u);
+  assert.match(workflow, /windows:[\s\S]*?if: github\.event_name == 'workflow_dispatch'/u);
+});
