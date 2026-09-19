@@ -1,12 +1,21 @@
 # War Battles Online core vertical slice
 
-This directory contains an engine-independent, server-authoritative TypeScript
-simulation, a backend-neutral online transport boundary, and a complete visible
-Defold frontend for a 32-player War Battles expansion. The Defold resources now
-compile, the example exposes the monorepo native extension to Bob, and the
-arm64-macOS custom engine has executed its generated GUI TypeScript component
-through Dynamic Hermes. This is packaged local gameplay evidence, not Static
-Hermes, HTML5 browser-host, whole-API, allocation, or QUIC deployment evidence.
+This directory contains two things: the built Defold project under `defold/`,
+which is a port of the Defold **War Battles tutorial** to deherm TypeScript
+components, and an engine-independent, server-authoritative TypeScript
+simulation plus backend-neutral online transport boundary for a 32-player
+expansion of it.
+
+The built game is the tutorial: a tilemap level, a player game object that moves
+and spawns rockets from a factory, kinematic rocket/tank collision groups, and
+one GUI score node. The arm64-macOS custom engine has executed that whole loop
+through Dynamic Hermes; see [defold/PLAYABLE-BLOCKERS.md](./defold/PLAYABLE-BLOCKERS.md)
+for the exact observed markers. This is packaged local gameplay evidence, not
+Static Hermes, HTML5 browser-host, whole-API, allocation, or QUIC deployment
+evidence.
+
+The 32-player presentation mockup that used to be the built scene is retained,
+unbuilt, under [`defold/reference/`](./defold/reference/README.md).
 
 ## What is implemented
 
@@ -31,10 +40,14 @@ Hermes, HTML5 browser-host, whole-API, allocation, or QUIC deployment evidence.
   otherwise a cancellable reliable-stream fallback is explicit.
 - A pinned, self-hosted Colyseus H3 Docker browser gate that exposes both TCP
   and UDP and refuses to count a WebSocket connection as a passing result.
-- A generated `.gui.ts`/`.gui_script` Defold frontend with WASD controls,
-  independent tank turrets, 31 deterministic bots, a player-following camera,
-  a 160-node projectile render pool, HUD, upgrades, and restart loop. The scene
-  includes a fail-closed, artifact-hashed packaged runtime observation.
+- A generated `.script.ts`/`.gui.ts` War Battles tutorial port that runs as
+  Defold game objects: tilemap, player sprite with arrow-key movement, a rocket
+  factory with a typed `dir` vector3 property, kinematic `rockets`/`tanks`
+  collision groups, a once-forward explosion, and a single GUI score node.
+- A retained, unbuilt `reference/battle.gui` presentation mockup with WASD
+  controls, independent tank turrets, 31 deterministic bots, a player-following
+  camera, a 160-node projectile render pool, HUD, upgrades, and restart loop.
+  It remains the visual target for a later presentation phase.
 - A headless match runner with deterministic bots, all three weapons, upgrade
   purchases, snapshot restore/replay, a portable binary replay, and a 32-player
   ten-minute simulated soak fixture.

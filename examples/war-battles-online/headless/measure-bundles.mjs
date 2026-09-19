@@ -13,7 +13,7 @@ const headless = await bundle(join(root, "headless/run-match.mjs"), {
   target: "node22",
   external: [],
 });
-const defold = await bundle(join(root, "defold/main/battle.gui.ts"), {
+const defold = await bundle(join(root, "defold/reference/battle.gui.ts"), {
   platform: "neutral",
   target: "es2020",
   external: ["@deherm/project"],
