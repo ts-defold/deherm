@@ -266,19 +266,46 @@ hash the bytes, compare to the path. A hostile or corrupted mirror cannot
 substitute content without changing the hash, so the transport needs no trust
 beyond availability.
 
-The **index does** need trust - it is the only mutable mapping, and it is what
-says which policy belongs to a Defold revision. It is small (a pair of hashes
-per revision), so it ships inside the npm package and is the released
-authority. A fetched index may extend the shipped one for revisions published
-after that release, but never overrides an entry the package already asserts.
+The index is **not one mutable file**, and it is not shipped as an authority.
+It is one small immutable document per Defold revision:
+
+```
+<base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "generator": "<rev>" }
+```
+
+Keyed by a sha Defold has already published, each entry is written once and
+never rewritten, because a given revision's declaration inputs are fixed
+forever. The caller resolves the sha it needs from
+`d.defold.com/<channel>/info.json` and fetches exactly that one document.
+
+This is the point on which an earlier draft of this decision was wrong. It said
+the index ships inside the package and is the released authority, with fetched
+entries permitted only to extend it. That cannot hold: Defold publishes
+nightlies daily, this project does not control their cadence, and a shipped
+authoritative index would require a package release per engine revision - dozens
+a day - purely to stay current with something upstream. An index that must be
+re-released to stay true is not an index, it is a pin.
+
+So the index is fetched, and its trust comes from the same place the objects'
+does. An entry names a `policyRoot`, and the policy it names is content-addressed
+and therefore self-verifying: a substituted policy fails its own hash check. What
+an index entry can still do is point at the *wrong* valid policy for a revision,
+which is why entries are immutable and the nightly job never rewrites one.
 
 ## What ships in the package
 
-Exactly **one** policy: the revision the package was built against. That covers
-the common case of a current déherm with a current Defold at zero network cost,
-without the package growing by a policy for every engine release ever shipped.
-Everything else resolves through the layers already defined: packaged, then
-user cache, then project cache, then the static site, then local derivation.
+Three things, none of which grow with the number of engine releases:
+
+* **The base URL**, as data. Relocating to a different host or CDN is a
+  configuration edit, never a code change or a release.
+* **Exactly one policy** - the revision the package was tested against. This is
+  an offline fast path, not an authority: it covers a current déherm against a
+  current Defold at zero network cost, and is simply the first layer to match.
+* **Nothing keyed per revision.** No accumulating index, no policy set that
+  grows with engine history.
+
+Everything else resolves through the layers already defined: packaged, then user
+cache, then project cache, then the static site, then local derivation.
 
 ## The nightly job
 
@@ -295,6 +322,54 @@ surface actually moves.
 The same job is the natural home for re-running the registration verifier
 against each new revision, since a disagreement between the documented surface
 and the C that registers it is exactly what a new engine release can introduce.
+
+## Where the objects are stored, and what is never committed
+
+Publication has two artifacts with different lifetimes, and committing them to
+the same place is the mistake to avoid.
+
+`main` carries **exactly one** policy - the revision the package was built
+against - and its single index line. That moves only when the Defold pin moves,
+which is already a human-authored change. **The nightly job commits nothing to
+`main`.** The index is the trust anchor: it is the one mutable mapping, it ships
+in the package, and it is what asserts which policy belongs to a revision. An
+automated commit to `main` would hand whatever can run CI a silent authority
+over exactly that, for no benefit - nothing reads the published objects from the
+working tree.
+
+The objects and the per-revision index entries live on an **orphan branch**,
+`deherm-policy-site`, and **GitHub Pages serves that branch directly**. Pages is
+configured as *Deploy from a branch*, root folder - not as *GitHub Actions*.
+
+The forcing reason is that `actions/deploy-pages` **replaces the entire site on
+every deploy**: the uploaded artifact *is* the site, and nothing merges. For a
+store that only ever appends, that inverts the cost. Every nightly run would
+have to upload every object ever published in order to keep them reachable, so
+the transport cost grows with the store's whole history rather than with the
+night's additions - and the run would eventually be dominated by re-publishing
+bytes that have not changed since the first release. Serving the branch makes
+publication exactly what the data model already is: add the new objects, push,
+done.
+
+So the nightly job checks the orphan branch out beside the work tree, derives,
+writes only objects whose hashes are absent, and pushes. The push *is* the
+deploy; there is no second mechanism. Because every object is re-derivable, the
+branch stays disposable: if the derivation changes, it can be reset and rebuilt
+rather than migrated.
+
+Two constraints come with branch-served Pages and are requirements, not notes:
+
+* **`.nojekyll` at the branch root, from its first commit.** Branch deploys run
+  Jekyll by default, which would exclude files by name and process thousands of
+  objects for nothing.
+* **Roughly ten branch builds per hour, and a 1 GB soft site limit.** Nightly
+  publication is far inside the build rate. The size limit is the number to
+  watch as revisions accumulate, and is why subtree sharing - not whole policy
+  copies per revision - is load-bearing rather than an optimisation.
+
+The push is guarded on the canonical repository so a fork or a pull-request run
+cannot publish, and `contents: write` is scoped to that job alone rather than at
+workflow top level.
 
 # What a policy records
 
