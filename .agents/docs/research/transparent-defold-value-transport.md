@@ -64,11 +64,25 @@ sizes, element types, ordering, and typedef chains come from the source text.
 | `url` | `dmMessage::URL` | 4 x `uint64_t` (socket, reserved, path, fragment) | u64 lane quad |
 
 The generator walks the complete script projection for every `defold-value`
-constructor name and fails when one is neither transparent nor explicitly
-classified opaque. The thirteen opaque names — `node`, `buffer_data`,
+constructor name. A reviewed transparent entry still requires source-derived
+layout evidence, and reviewed opaque entries retain their semantic reason. A
+name introduced by another Defold revision no longer aborts the entire policy
+derivation: it is emitted as a machine-readable
+`source-derived-conservative-fallback`, remains callable through the generated
+universal value transport, and is excluded only from the transparent
+typed-native tier. The report emits a warning for every such name. An explicit
+policy entry for an API absent from the selected revision is recorded as
+dormant rather than treated as an error; availability is a normal per-revision
+policy difference.
+
+This fallback is a coverage contract, not a performance claim. It records
+`specialized-layout-unproven` until the source-derived fixed layout, retained
+handle kind, or enum domain is promoted into a reviewed specialization. The
+thirteen reviewed opaque names — `node`, `buffer_data`,
 `buffer_stream`, `resource_data`, `constant_buffer`, `render_target`, `texture`,
 `render_predicate`, `timer_handle`, `vector`, and the three enum-token domains —
-carry an explicit machine-readable reason and fail closed.
+carry an explicit machine-readable reason. Follow-up specialization work is
+tracked in the linked repository issue in the Open boundaries section below.
 
 The Vector3 row is why layout may not be guessed: its storage is four float32
 even though only three lanes carry meaning. The 4-tuple doc arity and the
@@ -112,3 +126,11 @@ Defold layout change fails generation instead of silently reshaping the ABI.
 physics and socket `handle` kinds. Both need the retained-handle transport: the
 C ABI already models handles as opaque tokens with generation checks, which is a
 sound typing, but the typed frame does not yet own the retained registry lease.
+
+# Open boundaries
+
+Revision-specific conservative value entries are deliberately usable before
+their optimized typed-native representation is proven. The generator and
+policy report name every entry, its universal fallback, and the missing proof.
+The tracking issue URL is added here when the repository issue is created; CI
+must not fail solely because this optimization queue is non-empty.

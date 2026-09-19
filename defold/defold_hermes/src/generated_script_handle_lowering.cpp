@@ -1442,14 +1442,14 @@ int protectedDetectRuntimeProfile(lua_State* state) {
   for (uint8_t index = 0; index < kRuntimeProfileCount; ++index) {
     if (output.mismatches[index] != 0) continue;
     output.matchingProfileMask = static_cast<uint8_t>(output.matchingProfileMask | kRuntimeProfiles[index].mask);
-    match = &kRuntimeProfiles[index];
+    if (!match) match = &kRuntimeProfiles[index];
     ++matches;
   }
-  if (matches == 1) {
+  if (matches >= 1) {
     output.profile = match;
     output.status = RuntimeProfileDetectionStatus::kMatched;
   } else {
-    output.status = matches == 0 ? RuntimeProfileDetectionStatus::kNoMatch : RuntimeProfileDetectionStatus::kAmbiguous;
+    output.status = RuntimeProfileDetectionStatus::kNoMatch;
   }
   return 0;
 }

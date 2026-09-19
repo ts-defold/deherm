@@ -51,9 +51,9 @@
     "scriptCopiedValueBlockers": "e566aacdeef63899975d2c90f04e0009edce83e166f2a358b978180ac57bb98c",
     "scriptOpaqueRecordBlockers": "3e943b8df5a247ad63d303eaef5ffb73f676ee70eaae0546aada88ab1d5e4239",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "f32347ae73567a16f17d5477a4882bf19822d5552d810301607a34d5678b72e4",
-    "scriptUniversalValue": "1a61f303faee8737af5e14747dce3be4181117c713a51c577e97024b3326c5ba",
-    "defoldValueLayouts": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
+    "scriptHandleLowering": "46873b8992b356d389917037a1486d463f3b025f9e0e77eb023cb9faeb20077b",
+    "scriptUniversalValue": "4009a87553f414393052183e65622a08cd3935a26dc0ec20a46275f300841d1a",
+    "defoldValueLayouts": "1af3bd85aafa17ba19e3faf53b63f846510aec26e4432d556e791aa94e4afde3",
     "dmsdkProjection": "492fc0a14d65270fb510caad4050bdf77ff48b9fa17c00f74e88e11d17dc3dd0",
     "dmsdkUniversal": "7da597ce8d428c30e57e1e1713cfae11824347bef10af1f9d039693c936f9ed0",
     "dmsdkScalarThunks": "06c12977c35ceab6235c1fefb2d341703b1d1ee7eabc79e2e24caea5f8903e94",
@@ -74,9 +74,9 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "9d42794244c2c37a4df3effe88f6bbfbfa4d5e9d1a532dce1250f0678519d8e5",
+  "cacheKey": "edae126e3fb4073233eed236c73bf4eb52295faebd0d9b6ef8f2dc508aa13326",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
   "outputBytes": 16076740,
-  "outputSha256": "133079c928d4ec0257c2e64fc5f64aa4d493a59f3f081b48aa1945d581424b9a",
-  "planSha256": "e53581335a808045fc4271ea8d52dfdefbff755068aebd21cce77d2f060dce88"
+  "outputSha256": "196a8b1692a485de57e36c1bab7fc9431a0ae3b45f0942e495a3d4301ce288f9",
+  "planSha256": "1d43d7d842b40510860b3e03cde74c2b8a223ba04b9cc38ca446a55818f79c9b"
 }

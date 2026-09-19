@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { generatedScriptArtifacts } from "../scripts/lib/script-generator-pipeline.mjs";
+import { buildRecordingEngineModel } from "../packages/compiler/src/script-recording-engine.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-script-recording-engine.json");
@@ -13,6 +15,33 @@ const reportPath = path.join(root, "packages/bindings/generated/defold-script-re
 function run(command, args, options = {}) {
   return execFileSync(command, args, { cwd: root, stdio: "pipe", encoding: "utf8", ...options });
 }
+
+test("a lowering plan from another revision becomes an explicit recording fallback", async () => {
+  const paths = {
+    projection: "packages/bindings/generated/defold-script-projection-ir.json",
+    universal: "packages/bindings/generated/defold-script-universal-value-bindings.json",
+    handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
+    loweringPlan: "packages/bindings/generated/defold-binding-lowering-plan.json"
+  };
+  const texts = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([key, relative]) => [
+    key,
+    await readFile(path.join(root, relative), "utf8")
+  ])));
+  const inputs = Object.fromEntries(Object.entries(texts).map(([key, text]) => [key, JSON.parse(text)]));
+  inputs.loweringPlan.defoldRevision = "0".repeat(40);
+  inputs.inputHashes = Object.fromEntries(Object.entries(texts).map(([key, text]) => [
+    key,
+    createHash("sha256").update(text).digest("hex")
+  ]));
+
+  const report = buildRecordingEngineModel(inputs);
+
+  assert.match(report.planSha256, /^[0-9a-f]{64}$/);
+  assert.equal(report.planFallback.code, "canonical-lowering-plan-revision-unavailable");
+  assert.equal(report.planFallback.routeCount, inputs.universal.bindings.length);
+  assert.ok(report.routes.every(({ loweringPlanEvidence }) =>
+    loweringPlanEvidence === "projection-derived-unverified-fallback"));
+});
 
 test("the recording engine is generated from the same IR as the bindings, and is deterministic", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));

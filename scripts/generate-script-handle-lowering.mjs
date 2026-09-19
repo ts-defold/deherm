@@ -46,6 +46,57 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+/**
+ * Named Defold build profiles can be observationally equal for this generated
+ * router in a particular engine revision. Collapse detection to one stable
+ * representative and keep feature-scoped handle capture only when every
+ * equivalent profile agrees that the handle kind is capturable.
+ */
+export function assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds) {
+  const bySurface = new Map();
+  for (const profile of runtimeProfiles) {
+    const group = bySurface.get(profile.adapterSurfaceSha256) ?? [];
+    group.push(profile);
+    bySurface.set(profile.adapterSurfaceSha256, group);
+  }
+  const groups = [...bySurface.entries()]
+    .map(([adapterSurfaceSha256, profiles]) => ({
+      adapterSurfaceSha256,
+      profiles: profiles.sort((left, right) => compareCodeUnits(left.id, right.id))
+    }))
+    .sort((left, right) => compareCodeUnits(left.profiles[0].id, right.profiles[0].id));
+  const collapsed = [];
+  for (const group of groups) {
+    const equivalentProfileIds = group.profiles.map(({ id }) => id);
+    const equivalentProfileMask = group.profiles.reduce((mask, profile) => mask | profile.mask, 0);
+    const canonicalProfileId = equivalentProfileIds[0];
+    for (const profile of group.profiles) {
+      profile.equivalentProfileIds = equivalentProfileIds;
+      profile.equivalentProfileMask = equivalentProfileMask;
+      profile.detectionCanonicalProfileId = canonicalProfileId;
+    }
+    if (group.profiles.length === 1) continue;
+    const conservativelyUnavailableHandleKinds = [];
+    for (const kind of handleKinds) {
+      const availableInAll = group.profiles.every(({ mask }) => (kind.capturableProfileMask & mask) !== 0);
+      if (availableInAll) continue;
+      kind.capturableProfileMask &= ~equivalentProfileMask;
+      kind.capturableProfiles = kind.capturableProfiles.filter((id) => !equivalentProfileIds.includes(id));
+      conservativelyUnavailableHandleKinds.push(kind.id);
+    }
+    collapsed.push({
+      adapterSurfaceSha256: group.adapterSurfaceSha256,
+      canonicalProfileId,
+      equivalentProfileIds,
+      equivalentProfileMask,
+      conservativelyUnavailableHandleKinds: conservativelyUnavailableHandleKinds.sort(compareCodeUnits),
+      proof: "identical-generated-router-availability-vector",
+      alert: "named-runtime-profiles-observationally-equivalent"
+    });
+  }
+  return collapsed;
+}
+
 function parseJson(text, label) {
   try {
     return JSON.parse(text);
@@ -566,14 +617,14 @@ int protectedDetectRuntimeProfile(lua_State* state) {
   for (uint8_t index = 0; index < kRuntimeProfileCount; ++index) {
     if (output.mismatches[index] != 0) continue;
     output.matchingProfileMask = static_cast<uint8_t>(output.matchingProfileMask | kRuntimeProfiles[index].mask);
-    match = &kRuntimeProfiles[index];
+    if (!match) match = &kRuntimeProfiles[index];
     ++matches;
   }
-  if (matches == 1) {
+  if (matches >= 1) {
     output.profile = match;
     output.status = RuntimeProfileDetectionStatus::kMatched;
   } else {
-    output.status = matches == 0 ? RuntimeProfileDetectionStatus::kNoMatch : RuntimeProfileDetectionStatus::kAmbiguous;
+    output.status = RuntimeProfileDetectionStatus::kNoMatch;
   }
   return 0;
 }
@@ -1228,14 +1279,12 @@ export function generateScriptHandleLowering(textInputs) {
       .join("");
     profile.adapterSurfaceSha256 = sha256(surface);
   }
+  const runtimeProfileEquivalence = assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds);
   const executableSymbols = routes
     .filter((route) => route.generation.router === "emitted")
     .map((route) => `${route.modulePath.join(".")}.${route.member}`);
   if (new Set(executableSymbols).size !== executableSymbols.length) {
     throw new Error("runtime profile detection requires unique executable Lua symbols");
-  }
-  if (new Set(runtimeProfiles.map(({ adapterSurfaceSha256 }) => adapterSurfaceSha256)).size !== runtimeProfiles.length) {
-    throw new Error("runtime profile Lua availability fingerprints are ambiguous");
   }
 
   const report = {
@@ -1293,6 +1342,7 @@ export function generateScriptHandleLowering(textInputs) {
     argumentCodecs,
     resultCodecs,
     runtimeProfiles,
+    runtimeProfileEquivalence,
     routes
   };
   report.semanticPolicyHoles = {
@@ -1344,6 +1394,9 @@ export async function run(argv = process.argv.slice(2), root = repositoryRoot) {
     }
   }
   process.stdout.write(`${check ? "Verified" : "Generated"} ${report.coverage.descriptorRowsEmitted} handle descriptors: ${report.coverage.adapterExecutableRoutes} adapter-executable/harness-covered, ${report.coverage.blocked} blocked; JSI/engine/Static/browser runtime evidence remains unverified.\n`);
+  if (report.runtimeProfileEquivalence.length > 0) {
+    process.stderr.write(`warning: ${report.runtimeProfileEquivalence.length} runtime profile equivalence class(es) share an identical generated Lua availability vector; deterministic conservative representatives emitted: ${report.runtimeProfileEquivalence.map(({ equivalentProfileIds }) => equivalentProfileIds.join("=")).join(", ")}\n`);
+  }
   return report;
 }
 

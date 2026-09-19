@@ -4450,7 +4450,12 @@
       "routeSetSha256": "f0b71c047ed49a3ce96d9fec21f215d5279d1a67d6cf7b1ca2850a237d5b2e08",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 139,
-      "adapterSurfaceSha256": "2542ef35fadab778e291b4c72a5fddb32efe30ec11c1a8f993618ffffec6c54c"
+      "adapterSurfaceSha256": "2542ef35fadab778e291b4c72a5fddb32efe30ec11c1a8f993618ffffec6c54c",
+      "equivalentProfileIds": [
+        "bullet-only"
+      ],
+      "equivalentProfileMask": 1,
+      "detectionCanonicalProfileId": "bullet-only"
     },
     {
       "index": 1,
@@ -4463,7 +4468,12 @@
       "routeSetSha256": "86aa4a3c9f3bf3e25be216cde81f7c10bbb82c0b1d9bc253549ee5c822ac8730",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 253,
-      "adapterSurfaceSha256": "480a3e44d1938092328e0e0ba1e69148085d5de3de8d3482bc95a814c25d4753"
+      "adapterSurfaceSha256": "480a3e44d1938092328e0e0ba1e69148085d5de3de8d3482bc95a814c25d4753",
+      "equivalentProfileIds": [
+        "default-legacy-bullet"
+      ],
+      "equivalentProfileMask": 2,
+      "detectionCanonicalProfileId": "default-legacy-bullet"
     },
     {
       "index": 2,
@@ -4476,7 +4486,12 @@
       "routeSetSha256": "1d71f8ec8f69147743c11df72bafe9601ffbcf65f8cc568e71d01f6cf5ca389b",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 122,
-      "adapterSurfaceSha256": "038223ce569435c47e7a7ec6e3b3ec16b184c4ec08d5183ff8c02aeefcc5f13f"
+      "adapterSurfaceSha256": "038223ce569435c47e7a7ec6e3b3ec16b184c4ec08d5183ff8c02aeefcc5f13f",
+      "equivalentProfileIds": [
+        "legacy-no-bullet"
+      ],
+      "equivalentProfileMask": 4,
+      "detectionCanonicalProfileId": "legacy-no-bullet"
     },
     {
       "index": 3,
@@ -4489,7 +4504,12 @@
       "routeSetSha256": "e98ea2491703ab70fb825391d82e9a4b989bcaef00390e439e3df9a600aba91a",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 8,
-      "adapterSurfaceSha256": "cb6675359c4a61c21ef72c715fc756b2af76cfc551761301939478f0c7327c23"
+      "adapterSurfaceSha256": "cb6675359c4a61c21ef72c715fc756b2af76cfc551761301939478f0c7327c23",
+      "equivalentProfileIds": [
+        "no-physics"
+      ],
+      "equivalentProfileMask": 8,
+      "detectionCanonicalProfileId": "no-physics"
     },
     {
       "index": 4,
@@ -4502,7 +4522,12 @@
       "routeSetSha256": "4986f1ce48a4ac0794db982c2aba6df98f50d0b8d1be96d2b47d87ef40e487fa",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 318,
-      "adapterSurfaceSha256": "5297363ad7b0d160eeb26396ac0046ab0a8a687ff80b448ff2463a97016c8199"
+      "adapterSurfaceSha256": "5297363ad7b0d160eeb26396ac0046ab0a8a687ff80b448ff2463a97016c8199",
+      "equivalentProfileIds": [
+        "v3-bullet"
+      ],
+      "equivalentProfileMask": 16,
+      "detectionCanonicalProfileId": "v3-bullet"
     },
     {
       "index": 5,
@@ -4515,9 +4540,15 @@
       "routeSetSha256": "84e476bd290eb2b22320e97a361882270a777c77dbb5eb40749ca46f08a6b493",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 187,
-      "adapterSurfaceSha256": "4f5a2d9d9f549a5daf5721fc49991f2205ef89dfaa2a9cf0ac29905efd0522c7"
+      "adapterSurfaceSha256": "4f5a2d9d9f549a5daf5721fc49991f2205ef89dfaa2a9cf0ac29905efd0522c7",
+      "equivalentProfileIds": [
+        "v3-no-bullet"
+      ],
+      "equivalentProfileMask": 32,
+      "detectionCanonicalProfileId": "v3-no-bullet"
     }
   ],
+  "runtimeProfileEquivalence": [],
   "routes": [
     {
       "index": 0,

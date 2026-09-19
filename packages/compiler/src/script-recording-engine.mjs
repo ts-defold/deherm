@@ -12,6 +12,8 @@
 // contract index so a later real-engine differential can diff against it per
 // contract.
 
+import { createHash } from "node:crypto";
+
 const SHAPE = Object.freeze({
   undefined: 0,
   null: 1,
@@ -85,6 +87,10 @@ function canonicalJson(value) {
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
   const keys = Object.keys(value).sort(compareCodeUnits);
   return `{${keys.map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+}
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 function compareCodeUnits(left, right) {
@@ -202,10 +208,9 @@ export function buildRecordingEngineModel(inputs) {
   const { projection, universal, handleLowering, loweringPlan, inputHashes } = inputs;
 
   assert(loweringPlan.schemaVersion === 2, "recording engine requires canonical lowering plan schema v2");
-  assert(projection.defoldRevision === loweringPlan.defoldRevision,
-    "script projection and lowering plan pin different Defold revisions");
-  assert(universal.defoldRevision === loweringPlan.defoldRevision,
-    "universal value bindings and lowering plan pin different Defold revisions");
+  assert(projection.defoldRevision === universal.defoldRevision,
+    "script projection and universal value bindings pin different Defold revisions");
+  const canonicalPlanMatchesRevision = projection.defoldRevision === loweringPlan.defoldRevision;
 
   // The plan is joined by exact route identity, so a byte-level drift in any
   // declared plan input is recorded rather than silently ignored. Contract
@@ -230,9 +235,33 @@ export function buildRecordingEngineModel(inputs) {
   const shapes = new ShapeTable(text);
 
   const projectionRows = new Map(projection.rows.map((row) => [row.id, row]));
-  const planUnits = new Map(loweringPlan.units
+  const planUnits = new Map((canonicalPlanMatchesRevision ? loweringPlan.units : [])
     .filter((unit) => unit.identity.surface === "script")
     .map((unit) => [unit.identity.id, unit]));
+
+  const projectionContract = (row) => ({
+    context: row.context?.token ?? "unspecified",
+    ownership: row.effects?.ownership?.token ?? "unverified",
+    lifetime: row.effects?.lifetime?.token ?? "unverified",
+    thread: "defold-script-thread-from-context",
+    callback: row.effects?.callback?.token ?? "unverified",
+    invalidation: row.effects?.invalidation?.token ?? "unverified",
+    errorModel: "status-return-and-target-exception",
+    scratch: "caller-owned-bounded-reentrant-scratch"
+  });
+  const fallbackContracts = [...new Set(universal.bindings.map((binding) => {
+    const row = projectionRows.get(binding.id);
+    assert(row, `universal binding ${binding.id} has no projection row`);
+    return canonicalJson(projectionContract(row));
+  }))].sort(compareCodeUnits);
+  const fallbackContractIndex = new Map(fallbackContracts.map((contract, index) => [contract, index]));
+  const fallbackMarshallingPrograms = Object.freeze({
+    typescriptSdk: 0,
+    dynamicHermesJsi: 0,
+    staticHermesCAbi: 0,
+    luaStack: 0,
+    browserWasmHost: 0
+  });
 
   const blockers = [];
   const recordBlocker = (routeId, code, detail) => {
@@ -331,8 +360,15 @@ export function buildRecordingEngineModel(inputs) {
   for (const binding of [...universal.bindings].sort((left, right) => compareCodeUnits(left.id, right.id))) {
     const row = projectionRows.get(binding.id);
     assert(row, `universal binding ${binding.id} has no projection row`);
-    const unit = planUnits.get(binding.id);
-    assert(unit, `universal binding ${binding.id} has no canonical plan unit`);
+    const canonicalUnit = planUnits.get(binding.id);
+    const fallbackContract = projectionContract(row);
+    const fallbackIdentity = canonicalJson(fallbackContract);
+    const unit = canonicalUnit ?? {
+      contract: fallbackContract,
+      contractDetails: fallbackContractIndex.get(fallbackIdentity),
+      backends: Object.fromEntries(Object.entries(fallbackMarshallingPrograms)
+        .map(([backend, marshallingProgram]) => [backend, { marshallingProgram }]))
+    };
 
     const parameters = row.signature.parameters ?? [];
     const returns = row.signature.returns ?? [];
@@ -351,6 +387,7 @@ export function buildRecordingEngineModel(inputs) {
       contractTokens: unit.contract,
       marshallingPrograms: Object.fromEntries(Object.entries(unit.backends)
         .map(([backend, disposition]) => [backend, disposition.marshallingProgram])),
+      loweringPlanEvidence: canonicalUnit ? "canonical-plan" : "projection-derived-unverified-fallback",
       context: row.context?.token ?? "unspecified",
       arity: { minimum: binding.minimumArgumentCount, maximum: binding.maximumArgumentCount, driven: argumentCount },
       results: {
@@ -491,7 +528,23 @@ export function buildRecordingEngineModel(inputs) {
       "interned contract index so a later real-engine differential can diff",
       "against them per contract."
     ].join(" "),
-    planSha256: loweringPlan.planSha256,
+    planSha256: canonicalPlanMatchesRevision ? loweringPlan.planSha256 : sha256(canonicalJson({
+      kind: "projection-derived-recording-fallback",
+      revision: projection.defoldRevision,
+      projection: inputHashes.projection,
+      universal: inputHashes.universal,
+      handleLowering: inputHashes.handleLowering,
+      contracts: fallbackContracts
+    })),
+    planFallback: canonicalPlanMatchesRevision ? null : {
+      code: "canonical-lowering-plan-revision-unavailable",
+      severity: "warning",
+      requestedRevision: projection.defoldRevision,
+      availableRevision: loweringPlan.defoldRevision,
+      fallback: "projection-derived-contract-and-universal-marshalling",
+      routeCount: routes.length,
+      proof: "generated-and-recording-harness-unverified-for-this-revision"
+    },
     inputHashes,
     planInputDrift,
     transports: {

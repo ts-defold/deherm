@@ -196,3 +196,26 @@ What is *not* established: nothing here re-reviews anything automatically, and
 nothing here lets a stale review pass. A review whose anchors are gone does not
 quietly carry - its entry is withdrawn and named. What changed is that this is a
 policy difference to review rather than an error that stops the run.
+
+## Availability-equivalent profiles are a normal revision result
+
+A revision may make two named app-manifest profiles expose the same generated
+Lua router surface. This does not make the API ambiguous: for every route the
+router can call, the profiles agree. The handle-lowering generator emits an
+equivalence class, chooses its lexicographically first profile as the
+deterministic detection representative, and records a warning. Feature-scoped
+handle capture is retained only when every profile in the equivalence class
+agrees, so the fallback is conservative without making the whole revision
+underivable. A later specialized distinction is optimization and capability
+work, not a reason for the nightly to fail.
+
+## A pinned canonical plan cannot block another revision
+
+The recording engine consumes the repository-wide canonical lowering plan when
+that plan names the revision being derived. When it does not, the recording
+generator derives a conservative contract table directly from that revision's
+script projection and universal binding catalog. Every route remains present,
+the report marks `canonical-lowering-plan-revision-unavailable`, and recording
+evidence is explicitly unverified for that revision. A missing optimized plan
+therefore creates follow-up work; it does not suppress the API or stop the
+nightly policy.

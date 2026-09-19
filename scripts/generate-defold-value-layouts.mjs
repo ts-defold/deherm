@@ -182,11 +182,7 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
   const names = [...collectDefoldValueNames(projection.rows.map((row) => row.signature))].sort(compare);
   const classified = new Set([...Object.keys(policy.transparent), ...Object.keys(policy.opaque)]);
   const unclassified = names.filter((name) => !classified.has(name));
-  assert(unclassified.length === 0,
-    `Defold value types have no declared layout policy: ${unclassified.join(", ")}`);
   const unreachable = [...classified].filter((name) => !names.includes(name)).sort(compare);
-  assert(unreachable.length === 0,
-    `Defold value layout policy classifies types the pinned projection never uses: ${unreachable.join(", ")}`);
 
   const transparent = {};
   for (const name of Object.keys(policy.transparent).sort(compare)) {
@@ -200,23 +196,51 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
   }
   const opaque = {};
   for (const name of Object.keys(policy.opaque).sort(compare)) {
+    if (!names.includes(name)) continue;
     const reason = policy.opaque[name];
     assert(policy.opaqueReasons[reason], `${name}: undeclared opaque reason ${reason}`);
-    opaque[name] = { reason, note: policy.opaqueReasons[reason] };
+    opaque[name] = {
+      reason,
+      note: policy.opaqueReasons[reason],
+      classification: "reviewed",
+      proof: "reviewed-semantic-classification",
+      fallbackTransport: "script-universal-value"
+    };
+  }
+  for (const name of unclassified) {
+    opaque[name] = {
+      reason: "source-derived-conservative-fallback",
+      note: "This Defold revision documents the value name, but no reviewed fixed-layout or retained-handle specialization exists yet. It remains available through the generated universal value transport and is excluded only from transparent typed-native lowering.",
+      classification: "generated",
+      proof: "source-derived-name; specialized-layout-unproven",
+      fallbackTransport: "script-universal-value",
+      alert: "specialized-layout-unproven"
+    };
   }
 
   return {
     schemaVersion: 1,
     defoldRevision: projection.defoldRevision,
-    scope: "Fixed-layout Defold script value types derived from the pinned dmSDK headers, plus explicit blockers for the engine-owned value types that have no pinned public layout. Layout only; this is not compile, link, runtime, or conformance evidence.",
+    scope: "Fixed-layout Defold script value types derived from the pinned dmSDK headers, reviewed opaque classifications, and generated conservative opaque fallbacks for revision-specific names. Conservative entries remain usable through the universal value transport but are excluded from transparent typed-native lowering until specialized layout evidence exists. Layout only; this is not compile, link, runtime, or conformance evidence.",
     policySha256: sha256(JSON.stringify(policy)),
     sourceSha256: Object.fromEntries(Object.entries(sourcePaths).sort(([left], [right]) => compare(left, right))
       .map(([alias, file]) => [alias, { path: file, sha256: sha256(sources[alias]) }])),
     coverage: {
       projectedValueTypes: names.length,
       transparent: Object.keys(transparent).length,
-      opaque: Object.keys(opaque).length
+      opaque: Object.keys(opaque).length,
+      reviewedOpaque: Object.values(opaque).filter(({ classification }) => classification === "reviewed").length,
+      conservativeOpaque: unclassified.length,
+      dormantPolicyEntries: unreachable.length
     },
+    alerts: unclassified.map((name) => ({
+      code: "specialized-layout-unproven",
+      valueType: name,
+      severity: "warning",
+      fallbackTransport: "script-universal-value",
+      effect: "available through the universal transport; excluded from transparent typed-native lowering"
+    })),
+    dormantPolicyEntries: unreachable,
     transports: {
       "float-lanes": "Copied as exact float32 lanes through the typed frame. No arena and no ownership.",
       "float-arena": "Copied through the caller-owned bounded float arena because the record exceeds the four inline lanes.",
@@ -291,6 +315,9 @@ export async function run(argv = process.argv.slice(2)) {
   await writeOrCheck(path.join(options.outputRoot, relativePaths.report), `${JSON.stringify(report, null, 2)}\n`, options.check);
   await writeOrCheck(path.join(options.outputRoot, relativePaths.header), renderHeader(report), options.check);
   process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.transparent} transparent and ${report.coverage.opaque} opaque Defold value layouts from ${Object.keys(sourcePaths).length} pinned headers.\n`);
+  if (report.coverage.conservativeOpaque > 0) {
+    process.stderr.write(`warning: ${report.coverage.conservativeOpaque} revision-specific Defold value type(s) use the generated universal fallback; transparent typed-native layout remains unproven: ${report.alerts.map(({ valueType }) => valueType).join(", ")}\n`);
+  }
   return report;
 }
 
