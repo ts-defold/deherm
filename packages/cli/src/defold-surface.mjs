@@ -1,0 +1,258 @@
+// Layer-0 of the layered API policy cache: the generated Defold engine surface
+// for one immutable engine revision.
+//
+// See `.agents/docs/decisions/layered-api-policy-cache.md`. Layer 0 is keyed by
+// the Defold revision alone and is produced once per revision, never per
+// `deherm generate`. The déherm package ships exactly one layer-0 surface - the
+// revision it was built against - and any other revision has to come from a
+// cache directory that a surface build populated.
+//
+// Two things are deliberately kept apart here and were conflated before:
+//
+//   * the Defold revision, which decides the engine surface, and
+//   * the native input set, which decides the project's extension surface.
+//
+// They move independently: a user upgrades Defold without touching extensions,
+// or vendors an extension without touching Defold. The generation cache key is
+// therefore a Merkle root over two sibling nodes rather than one digest over
+// everything, so changing one leaves the other's subtree valid and a root
+// mismatch resolves down to the leaf that actually moved.
+
+import { createHash } from "node:crypto";
+import { readFile, stat } from "node:fs/promises";
+import { homedir } from "node:os";
+import path from "node:path";
+
+import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
+
+// Every file a surface layer must provide, by the key the generator uses for it.
+// `ir` files are the version-specific binding IR; `sdk` is the generated
+// TypeScript surface derived from them. A layer that is missing any of these is
+// incomplete and is not used.
+export const surfaceIrFiles = Object.freeze({
+  scriptIrPath: "defold-script-api-ir.json",
+  dmsdkIrPath: "defold-sdk-ir.json",
+  scriptDispatchPath: "defold-script-scalar-dispatch.json",
+  scriptAccountingPath: "defold-script-api-accounting.json",
+  scriptUniversalPath: "defold-script-universal-value-bindings.json",
+  scriptProfilesPath: "defold-script-route-availability-profiles.json",
+  loweringPlanPath: "defold-binding-lowering-plan.json",
+  loweringPlanSentinelPath: "defold-binding-lowering-plan.sentinel.json",
+  dmsdkThunksPath: "defold-dmsdk-scalar-thunks.json",
+  dmsdkUniversalPath: "defold-dmsdk-universal-bindings.json"
+});
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function canonical(value) {
+  if (Array.isArray(value)) return value.map(canonical);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
+  }
+  return value;
+}
+
+function digestOf(value) {
+  return sha256(JSON.stringify(canonical(value)));
+}
+
+export function defoldSurfaceCacheHome(env = process.env) {
+  if (env.DEHERM_CACHE_HOME) return path.resolve(env.DEHERM_CACHE_HOME);
+  if (env.XDG_CACHE_HOME) return path.join(path.resolve(env.XDG_CACHE_HOME), "deherm");
+  return path.join(homedir(), ".cache", "deherm");
+}
+
+/**
+ * Where a layer-0 surface for `revision` may live, most preferred first.
+ *
+ * The packaged layer is listed first and costs nothing; the user cache is
+ * shared across that user's projects; the project cache makes a checkout
+ * self-contained for CI. None of them require network access - populating one
+ * does, and that is a separate, explicit step.
+ */
+export function defoldSurfaceSearchPath(revision, options = {}) {
+  const packageRoot = options.packageRoot;
+  const projectRoot = options.projectRoot;
+  const layers = [];
+  if (packageRoot) {
+    layers.push({
+      layer: "packaged",
+      irRoot: path.join(packageRoot, "packages", "bindings", "generated"),
+      sdkRoot: path.join(packageRoot, "packages", "sdk", "src"),
+      descriptor: null
+    });
+  }
+  const cacheHome = defoldSurfaceCacheHome(options.env ?? process.env);
+  layers.push({
+    layer: "user-cache",
+    root: path.join(cacheHome, "surfaces", revision),
+    irRoot: path.join(cacheHome, "surfaces", revision, "ir"),
+    sdkRoot: path.join(cacheHome, "surfaces", revision, "sdk"),
+    descriptor: path.join(cacheHome, "surfaces", revision, "surface.json")
+  });
+  if (projectRoot) {
+    const root = path.join(projectRoot, ".deherm", "cache", "surfaces", revision);
+    layers.push({
+      layer: "project-cache",
+      root,
+      irRoot: path.join(root, "ir"),
+      sdkRoot: path.join(root, "sdk"),
+      descriptor: path.join(root, "surface.json")
+    });
+  }
+  return layers;
+}
+
+async function layerProvides(candidate, revision) {
+  const missing = [];
+  for (const relative of Object.values(surfaceIrFiles)) {
+    const file = path.join(candidate.irRoot, relative);
+    try {
+      const information = await stat(file);
+      if (!information.isFile()) missing.push(relative);
+    } catch {
+      missing.push(relative);
+    }
+  }
+  if (missing.length) return { ok: false, missing };
+  let declared;
+  try {
+    declared = JSON.parse(await readFile(path.join(candidate.irRoot, surfaceIrFiles.scriptIrPath), "utf8")).defoldRevision;
+  } catch (error) {
+    return { ok: false, missing: [], error: error.message };
+  }
+  if (declared !== revision) return { ok: false, missing: [], revision: declared };
+  return { ok: true, missing: [] };
+}
+
+export class DefoldSurfaceError extends Error {
+  constructor(blocker) {
+    super(blocker.message);
+    this.name = "DefoldSurfaceError";
+    this.code = blocker.code;
+    this.blocker = blocker;
+  }
+}
+
+/**
+ * Resolve the layer-0 surface for one Defold revision, or explain precisely why
+ * there is none. Never falls back to a different revision's surface.
+ */
+export async function resolveDefoldSurface(revision, options = {}) {
+  if (!DEFOLD_REVISION_PATTERN.test(String(revision))) {
+    throw new Error(`A Defold surface is keyed by a 40-character engine SHA, got ${JSON.stringify(revision)}`);
+  }
+  const searched = [];
+  for (const candidate of defoldSurfaceSearchPath(revision, options)) {
+    const result = await layerProvides(candidate, revision);
+    if (result.ok) {
+      return {
+        schemaVersion: 1,
+        revision,
+        layer: candidate.layer,
+        irRoot: candidate.irRoot,
+        sdkRoot: candidate.sdkRoot,
+        paths: Object.fromEntries(Object.entries(surfaceIrFiles)
+          .map(([key, relative]) => [key, path.join(candidate.irRoot, relative)])),
+        searched,
+        blocker: null
+      };
+    }
+    searched.push({
+      layer: candidate.layer,
+      root: candidate.root ?? candidate.irRoot,
+      reason: result.revision ? `holds Defold ${result.revision}` :
+        result.error ? `unreadable: ${result.error}` :
+        result.missing.length === Object.keys(surfaceIrFiles).length ? "absent" :
+        `incomplete, missing ${result.missing.join(", ")}`
+    });
+  }
+  return {
+    schemaVersion: 1,
+    revision,
+    layer: null,
+    irRoot: null,
+    sdkRoot: null,
+    paths: null,
+    searched,
+    blocker: {
+      code: "defold-surface-not-cached",
+      message: [
+        `No generated Defold API surface is available for engine revision ${revision}.`,
+        "Searched:",
+        ...searched.map((entry) => `  - ${entry.layer}: ${entry.root} (${entry.reason})`),
+        "Building one for a revision reads that revision's engine/share/ref-doc.zip from",
+        "https://d.defold.com/archive/<revision>/ and its engine source tree, so it needs network access",
+        "and is a separate, explicit step - never something `deherm generate` does silently.",
+        "Until that surface exists, generating for this revision would mean emitting another revision's",
+        "signatures, which is refused."
+      ].join("\n")
+    }
+  };
+}
+
+export function assertResolvedDefoldSurface(surface) {
+  if (surface.blocker) throw new DefoldSurfaceError(surface.blocker);
+  return surface;
+}
+
+// --- Generation cache key -------------------------------------------------
+//
+// A Merkle root over two independent subtrees. `engine` covers everything the
+// Defold revision decides; `native` covers everything the project's own native
+// input set decides. Leaf and node ordering is path-sorted so the root is a
+// function of content and structure only.
+
+function extensionLeaves(extension) {
+  const leaves = [];
+  for (const api of extension.scriptApis ?? []) {
+    leaves.push({ path: api.path, kind: "script-api", digest: digestOf(api.declarations ?? []) });
+  }
+  for (const header of extension.publicHeaders ?? []) {
+    leaves.push({ path: header, kind: "public-header", digest: null });
+  }
+  for (const source of extension.sourceFiles ?? []) {
+    leaves.push({ path: source, kind: "native-source", digest: null });
+  }
+  return leaves.sort((left, right) => left.path < right.path ? -1 : left.path > right.path ? 1 : 0);
+}
+
+export function buildGenerationMerkle({ defoldRevision, surface, extensions = [], engineProfiles = null, generator = null }) {
+  const engineNode = {
+    kind: "engine",
+    defoldRevision,
+    surfaceLayer: surface?.layer ?? null,
+    surfaceInputs: surface?.inputs ?? null,
+    engineProfiles
+  };
+  const nativeChildren = [...extensions]
+    .map((extension) => {
+      const leaves = extensionLeaves(extension);
+      return {
+        kind: "extension",
+        name: extension.name,
+        // The archive or tree the extension came from, which is what a layer-1
+        // or layer-2 policy would be keyed by.
+        origin: extension.archive ?? extension.root ?? extension.manifestPath,
+        manifestPath: extension.manifestPath,
+        leaves,
+        digest: digestOf(leaves)
+      };
+    })
+    .sort((left, right) => left.manifestPath < right.manifestPath ? -1 : left.manifestPath > right.manifestPath ? 1 : 0);
+  const nativeNode = { kind: "native-inputs", children: nativeChildren };
+  const engineRoot = digestOf(engineNode);
+  const nativeRoot = digestOf(nativeNode);
+  return {
+    schemaVersion: 1,
+    // The two keys are named separately on purpose: a caller can ask "did the
+    // engine move" and "did the native inputs move" without rehashing, and a
+    // root mismatch is attributable before anything is regenerated.
+    engineRoot,
+    nativeRoot,
+    root: digestOf({ generator, engineRoot, nativeRoot }),
+    nodes: { engine: engineNode, native: nativeNode }
+  };
+}

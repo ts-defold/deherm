@@ -114,6 +114,55 @@ decides what we *assert*. A collision in the former costs a missed reparse; a
 collision in the latter would corrupt evidence, which is why the two are not
 interchangeable.
 
+# One policy per revision, stored content-addressed
+
+Defold ships releases and nightlies indefinitely, so "a policy per revision"
+sounds like unbounded storage and "branch policies by hand" sounds like
+unbounded bookkeeping. Neither is required, because **a policy is a function of
+the engine's declaration inputs, not of the version string.**
+
+If the Lua C registration arrays, the `.proto` files and the dmSDK headers did
+not change between two revisions, the derived policy is byte-identical. Most
+point releases change little or nothing in that surface.
+
+So:
+
+* Policies are keyed by **their own content hash**, never by the Defold sha.
+* A small index maps **Defold sha -> policy root**. Many shas point at one
+  policy, and the index is the only thing that grows per revision - a pair of
+  hashes.
+* Supporting every version therefore costs nothing like storing every version.
+
+## Branching falls out of the Merkle structure
+
+The policy root is a hash over per-namespace subtrees, not over one blob. If
+only `gui` changed between two revisions, `gui`'s subtree hash differs and every
+other subtree is **shared**. Storage is additive by construction: a new revision
+contributes only the subtrees that actually moved, with no delta format and no
+merge logic to maintain.
+
+This is why the subtree boundary has to be decided up front. A single-file
+policy hashes as one unit and shares nothing between revisions, which would
+force explicit deltas later to recover what structure gives for free.
+
+For scale: the registration surface alone is roughly 5 MB and the script API IR
+roughly 2 MB, so a full policy is single-digit megabytes. Whole copies at
+nightly frequency would not hold; content-addressed subtrees across releases
+will.
+
+## Consequences
+
+* **Future revisions need no prediction.** A revision never seen before is not
+  an error state: the user derives a policy from source once, and the
+  sha-to-root mapping that produces is exactly what would otherwise be
+  published. Local derivation and CI derivation are the same operation.
+* **Parser improvements are visible, not silent.** Improving the derivation
+  changes the content hash, so the index records which generator revision
+  produced each policy and a stale policy is detectably stale rather than
+  quietly trusted.
+* **Unchanged inputs publish nothing.** Re-deriving a revision whose inputs did
+  not move yields the same hash and no new object.
+
 # What a policy records
 
 Not only what was resolved, but what was refused. Each entry carries its
@@ -140,3 +189,60 @@ A policy is source-derived evidence about a *declared surface*. It is not
 runtime evidence. It does not establish that a registered function behaves as
 its C body suggests, only that the registration and stack usage say what they
 say. Runtime conformance remains the headless engine harness's job.
+
+# Layer 0 in the CLI
+
+`packages/cli/src/defold-surface.mjs` resolves layer 0 by Defold revision
+alone, across three roots, stopping at the first that holds a complete surface
+for that exact revision:
+
+1. **packaged** - `packages/bindings/generated` plus `packages/sdk/src`, the one
+   revision the installed déherm package was built against;
+2. **user cache** - `$DEHERM_CACHE_HOME`/`$XDG_CACHE_HOME`/`~/.cache/deherm`
+   under `surfaces/<revision>/`, shared across that user's projects;
+3. **project cache** - `<project>/.deherm/cache/surfaces/<revision>/`, so a
+   checkout can be self-contained for CI.
+
+A layer is used only when its own `defold-script-api-ir.json` declares the
+requested revision and every file the generator reads is present. A revision
+with no surface is a `defold-surface-not-cached` blocker naming each root and
+why it did not answer. It never falls through to a different revision's
+surface, because that is exactly the defect: signatures that compile and are
+wrong.
+
+Producing a surface for a new revision reads that revision's
+`engine/share/ref-doc.zip` and engine source tree, so it needs network access
+and is a separate explicit step - never something `deherm generate` does on its
+own. A revision already in a cache regenerates entirely offline.
+
+## The two roots, kept apart
+
+`buildGenerationMerkle` produces three keys, and the split is the point:
+
+* `engineRoot` covers everything the Defold revision decides - the resolved
+  revision, which layer served its surface, that surface's input digests, and
+  the engine profile selection;
+* `nativeRoot` covers everything the project's native input set decides - one
+  child per extension, keyed by its manifest path, carrying a leaf per
+  `.script_api`, public header and native source;
+* `root` combines them with the generator identity.
+
+An engine upgrade moves `engineRoot` and leaves every extension's subtree
+valid; vendoring an extension moves one child and `nativeRoot` and leaves the
+engine surface valid. Children and leaves are path-sorted, so the root is a
+function of content and structure only. `deherm verify-generated` recomputes all
+three and refuses a generated tree whose recorded root no longer follows from
+the inputs.
+
+The generation Merkle uses SHA-256 rather than the Murmur2-64A named above, and
+deliberately: this root is written into `deherm.lock` and the generated
+manifest, and `verify-generated` refuses a tree whose recorded root does not
+follow from its inputs. That makes it an assertion a third party checks, not
+just a private "did this change" decision, so it sits on the SHA-256 side of the
+boundary. Murmur stays right for the per-extension policy keys of layers 1-3,
+which decide only whether to reparse.
+
+The current leaves digest each `.script_api`'s parsed declarations and name
+headers and sources by path. Content-hashing every header and source file is
+the next step and is what a layer-1 or layer-2 policy key will need; the shape
+of the tree does not change when it lands.

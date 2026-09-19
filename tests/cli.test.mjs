@@ -14,12 +14,19 @@ import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameP
 import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 
+// Every fixture states the Defold revision it targets. Generation resolves the
+// revision from the project rather than assuming the packaged one, so a fixture
+// that names none is now refused - which is the behaviour under test in
+// `defold-revision.test.mjs`.
+const bundledDefoldRevision = JSON.parse(
+  await readFile(path.resolve("packages/bindings/generated/defold-script-api-ir.json"), "utf8")).defoldRevision;
+
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "defold-hermes-cli-"));
   await mkdir(path.join(root, "camera", "src"), { recursive: true });
   await mkdir(path.join(root, "camera", "include"), { recursive: true });
   await mkdir(path.join(root, ".internal", "lib"), { recursive: true });
-  await writeFile(path.join(root, "game.project"), `[project]\ntitle = Fixture\ndependencies#0 = https://token:secret@example.com/math.zip?signature=private#fragment\n`);
+  await writeFile(path.join(root, "game.project"), `[project]\ntitle = Fixture\ndependencies#0 = https://token:secret@example.com/math.zip?signature=private#fragment\n\n[defold_hermes]\ndefold_sdk = ${bundledDefoldRevision}\n`);
   await writeFile(path.join(root, "camera", "ext.manifest"), `name: Camera\nplatforms:\n  arm64-osx: {}\n`);
   await writeFile(path.join(root, "camera", "include", "camera.h"), "bool CameraStart(void);\n");
   await writeFile(path.join(root, "camera", "src", "camera.cpp"), "// fixture\n");
@@ -681,7 +688,7 @@ test("project generation rejects output outside the project", async () => {
 
 test("project inspection derives per-platform engine profiles from Defold's app manifest", async () => {
   const project = await fixture();
-  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Fixture\n[native_extension]\napp_manifest = /game.appmanifest\n`);
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Fixture\n[native_extension]\napp_manifest = /game.appmanifest\n[defold_hermes]\ndefold_sdk = ${bundledDefoldRevision}\n`);
   await writeFile(path.join(project, "game.appmanifest"), `
 platforms:
   arm64-ios:

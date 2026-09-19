@@ -1,5 +1,20 @@
-import { mkdir, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+
+import { normalizeDefoldRevision } from "./defold-revision.mjs";
+
+const packageRoot = path.resolve(import.meta.dirname, "../../..");
+
+// A scaffold has no editor, no Bob and no build to witness an engine revision,
+// so it states the one this package can actually generate for. That is a
+// declaration the project makes about itself, checked against Bob or a real
+// build the moment either exists - not a silent default applied at generation
+// time, which is the failure this whole lane exists to remove.
+async function packagedDefoldRevision() {
+  const ir = JSON.parse(await readFile(
+    path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json"), "utf8"));
+  return normalizeDefoldRevision(ir.defoldRevision, "the packaged Defold script API IR revision");
+}
 
 function projectSlug(value) {
   const slug = String(value)
@@ -15,12 +30,12 @@ function projectTitle(value) {
   return title || "My déherm Game";
 }
 
-function templateFiles({ name, packageVersion }) {
+function templateFiles({ name, packageVersion, defoldRevision }) {
   const title = projectTitle(name);
   const packageName = projectSlug(title);
   const dependency = packageVersion === "0.0.0" ? "latest" : `^${packageVersion}`;
   return new Map([
-    ["game.project", `[project]\ntitle = ${title}\nversion = 0.1.0\ncustom_resources = /deherm\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 1\n\n[library]\ninclude_dirs = defold_hermes\n\n[defold_hermes]\napp = /deherm/app.dehermc\n`],
+    ["game.project", `[project]\ntitle = ${title}\nversion = 0.1.0\ncustom_resources = /deherm\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 1\n\n[library]\ninclude_dirs = defold_hermes\n\n[defold_hermes]\napp = /deherm/app.dehermc\ndefold_sdk = ${defoldRevision}\n`],
     ["main/main.collection", `name: "main"\ninstances {\n  id: "controller"\n  prototype: "/main/controller.go"\n}\n`],
     ["main/controller.go", `components {\n  id: "script"\n  component: "/src/main.script"\n}\n`],
     ["src/main.script.ts", `import { defineComponent } from "@deherm/project";\n\nexport default defineComponent({\n  init(): void {\n    console.log("${title.replaceAll("\\", "\\\\").replaceAll('"', '\\"')} is running with déherm");\n  },\n\n  update(_self, _dt: number): void {\n    // Game logic lives here. This file generates /src/main.script.\n  },\n});\n`],
@@ -50,11 +65,14 @@ export async function createDefoldProject(options = {}) {
     throw new Error(`Refusing to scaffold into non-empty directory ${target}`);
   }
   const name = projectTitle(options.name ?? path.basename(target));
-  const files = templateFiles({ name, packageVersion: options.packageVersion ?? "0.0.0" });
+  const defoldRevision = options.defoldRevision
+    ? normalizeDefoldRevision(options.defoldRevision, "createDefoldProject defoldRevision")
+    : await packagedDefoldRevision();
+  const files = templateFiles({ name, packageVersion: options.packageVersion ?? "0.0.0", defoldRevision });
   for (const [relative, source] of files) {
     const output = path.join(target, relative);
     await mkdir(path.dirname(output), { recursive: true });
     await writeFile(output, source, { flag: "wx" });
   }
-  return { projectRoot: target, name, files: [...files.keys()] };
+  return { projectRoot: target, name, defoldRevision, files: [...files.keys()] };
 }

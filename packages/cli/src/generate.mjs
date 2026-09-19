@@ -12,6 +12,16 @@ import {
   publicScriptModulePath
 } from "../../compiler/src/script-public-api-policy.mjs";
 import { verifyProjectBuildArtifacts } from "./build-artifacts.mjs";
+import {
+  assertResolvedDefoldRevision,
+  defoldResolutionRecord,
+  resolveDefoldRevision
+} from "./defold-revision.mjs";
+import {
+  assertResolvedDefoldSurface,
+  buildGenerationMerkle,
+  resolveDefoldSurface
+} from "./defold-surface.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
 import { defoldToolchain } from "./toolchains.mjs";
 
@@ -881,19 +891,28 @@ async function readConfinedFile(baseRoot, relative, label) {
   return readFile(resolvedTarget);
 }
 
-async function bundledCoreSdk(requestedRevision) {
-  const sdkSourceRoot = path.join(packageRoot, "packages", "sdk", "src");
-  const scriptIrPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json");
-  const dmsdkIrPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-sdk-ir.json");
-  const scriptDispatchPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-scalar-dispatch.json");
-  const scriptAccountingPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-accounting.json");
-  const scriptUniversalPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-universal-value-bindings.json");
-  const scriptProfilesPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-script-route-availability-profiles.json");
-  const loweringPlanPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.json");
-  const loweringPlanSentinelPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.sentinel.json");
+// Read the layer-0 API surface for one resolved Defold revision.
+//
+// The surface is addressed through `resolveDefoldSurface`, not through the
+// packaged directory, because the packaged directory holds exactly one
+// revision's surface and a project on any other revision must be served from a
+// revision-keyed cache or refused. `requestedRevision` is not a filter applied
+// to a fixed answer any more: it is the key.
+async function coreSdkForRevision(requestedRevision, options = {}) {
+  const surface = assertResolvedDefoldSurface(await resolveDefoldSurface(requestedRevision, {
+    packageRoot,
+    projectRoot: options.projectRoot,
+    env: options.env
+  }));
+  const sdkSourceRoot = surface.sdkRoot;
+  const {
+    scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath,
+    scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath
+  } = surface.paths;
+  // The lowering-plan generator is package code, not engine surface: it is the
+  // program that produced the plan, and its digest authenticates the plan
+  // whichever revision the plan describes.
   const loweringPlanGeneratorPath = path.join(packageRoot, "packages", "compiler", "src", "generate-binding-lowering-plan.mjs");
-  const dmsdkThunksPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-dmsdk-scalar-thunks.json");
-  const dmsdkUniversalPath = path.join(packageRoot, "packages", "bindings", "generated", "defold-dmsdk-universal-bindings.json");
   const [scriptSource, dmsdkSource, scriptDispatchSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, dmsdkUniversalSource, packageSource] = await Promise.all([
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
@@ -922,8 +941,8 @@ async function bundledCoreSdk(requestedRevision) {
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
-  if (requestedRevision && requestedRevision !== scriptIr.defoldRevision) {
-    throw new Error(`This package contains Defold ${scriptIr.defoldRevision}, not requested ${requestedRevision}; version-resolved download generation is not available yet`);
+  if (scriptIr.defoldRevision !== requestedRevision) {
+    throw new Error(`The ${surface.layer} Defold API surface at ${surface.irRoot} declares ${scriptIr.defoldRevision}, not the resolved revision ${requestedRevision}`);
   }
   const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
   if (loweringPlan.schemaVersion !== 2) {
@@ -945,6 +964,8 @@ async function bundledCoreSdk(requestedRevision) {
   const sdkSourceSha256 = await directoryDigest(sdkSourceRoot);
   return {
     revision: scriptIr.defoldRevision,
+    surfaceLayer: surface.layer,
+    sdkSourceRoot,
     packageVersion: JSON.parse(packageSource).version,
     platform: dmsdkIr.platform,
     scriptIr,
@@ -1139,7 +1160,17 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   if (!resolvedRelativeRoot || resolvedRelativeRoot === ".." || resolvedRelativeRoot.startsWith(`..${path.sep}`) || path.isAbsolute(resolvedRelativeRoot)) {
     throw new Error("Generated output resolves outside the Defold project");
   }
-  const core = await bundledCoreSdk(options.defoldSdk);
+  // Which Defold revision does this project build against? Answered from the
+  // project's own evidence before anything version-specific is read, and a
+  // blocker rather than an assumption when it cannot be answered.
+  const revisionResolution = options.defoldRevisionResolution ?? await resolveDefoldRevision({
+    projectRoot: inventory.projectRoot,
+    explicit: options.defoldSdk,
+    bob: options.bob,
+    env: options.env
+  });
+  const defoldRevision = assertResolvedDefoldRevision(revisionResolution);
+  const core = await coreSdkForRevision(defoldRevision, { projectRoot: inventory.projectRoot, env: options.env });
   const toolchain = defoldToolchain(core.revision);
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const portableInventory = { ...inventory, projectRoot: "." };
@@ -1151,6 +1182,16 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     engineProfiles
   });
   const generationKey = generation.cacheKey;
+  // The Defold revision and the native input set are independent cache keys.
+  // The Merkle root carries both, so a root mismatch resolves down to whichever
+  // subtree actually moved instead of reporting that "something changed".
+  const merkle = buildGenerationMerkle({
+    defoldRevision: core.revision,
+    surface: { layer: core.surfaceLayer, inputs: core.inputs },
+    extensions: inventory.extensions,
+    engineProfiles,
+    generator: { package: "@ts-defold/deherm", version: core.packageVersion, projectGeneratorSha256: generation.projectGeneratorSha256 }
+  });
   if (options.force !== true) {
     try {
       const [manifestSource, lockSource] = await Promise.all([
@@ -1164,6 +1205,10 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
         return {
           root,
           defoldRevision: core.revision,
+          defoldResolution: defoldResolutionRecord(revisionResolution),
+          defoldSurfaceLayer: core.surfaceLayer,
+          generationMerkle: { engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
+          revisionDiagnostics: revisionResolution.diagnostics ?? [],
           moduleCount: bindingIr.modules.length,
           projection: bindingIr.coverage,
           typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),
@@ -1201,15 +1246,15 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await rm(contextsRoot, { recursive: true, force: true });
   await mkdir(modulesRoot, { recursive: true });
   await mkdir(contextsRoot, { recursive: true });
-  await cp(path.join(packageRoot, "packages", "sdk", "src", "address.ts"), path.join(sdkRoot, "address.ts"));
-  await cp(path.join(packageRoot, "packages", "sdk", "src", "component.ts"), path.join(sdkRoot, "component.ts"));
+  await cp(path.join(core.sdkSourceRoot, "address.ts"), path.join(sdkRoot, "address.ts"));
+  await cp(path.join(core.sdkSourceRoot, "component.ts"), path.join(sdkRoot, "component.ts"));
   await cp(
-    path.join(packageRoot, "packages", "sdk", "src", "generated", "script"),
+    path.join(core.sdkSourceRoot, "generated", "script"),
     path.join(sdkRoot, "generated", "script"),
     { recursive: true }
   );
   await cp(
-    path.join(packageRoot, "packages", "sdk", "src", "generated", "dmsdk"),
+    path.join(core.sdkSourceRoot, "generated", "dmsdk"),
     path.join(sdkRoot, "generated", "dmsdk"),
     { recursive: true }
   );
@@ -1271,6 +1316,13 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
     toolchain,
     generation,
+    // How the Defold revision above was decided, and from which layer-0 surface
+    // its API was read. Recorded so a regeneration, a teammate, or CI can see
+    // that it was resolved from evidence rather than assumed, and so a later run
+    // can reuse the answer without re-deriving it.
+    defoldResolution: defoldResolutionRecord(revisionResolution),
+    defoldSurface: { layer: core.surfaceLayer },
+    generationMerkle: { schemaVersion: merkle.schemaVersion, engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
     inputs: core.inputs,
     generatedOutputs,
     generatedSdkSha256,
@@ -1338,6 +1390,9 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
     toolchain,
     generation,
+    defoldResolution: defoldResolutionRecord(revisionResolution),
+    defoldSurface: { layer: core.surfaceLayer },
+    generationMerkle: { schemaVersion: merkle.schemaVersion, engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
     inputs: core.inputs,
     generatedOutputs,
     generatedSdkSha256,
@@ -1363,6 +1418,10 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   return {
     root,
     defoldRevision: core.revision,
+    defoldResolution: defoldResolutionRecord(revisionResolution),
+    defoldSurfaceLayer: core.surfaceLayer,
+    generationMerkle: { engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
+    revisionDiagnostics: revisionResolution.diagnostics ?? [],
     moduleCount: modules.length,
     projection: bindingIr.coverage,
     cached: false,
@@ -1412,7 +1471,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   ]);
   const manifest = JSON.parse(manifestBytes.toString("utf8"));
   const lock = JSON.parse(lockBytes.toString("utf8"));
-  const core = await bundledCoreSdk(manifest.defoldRevision);
+  const core = await coreSdkForRevision(manifest.defoldRevision, { projectRoot });
   if (JSON.stringify(manifest.inputs) !== JSON.stringify(core.inputs)) {
     throw new Error("Generated manifest inputs do not match this installed deherm package");
   }
@@ -1500,9 +1559,30 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   for (const key of ["schemaVersion", "defoldRevision", "platform"]) {
     if (lock[key] !== manifest[key]) throw new Error(`deherm.lock ${key} differs from generated manifest`);
   }
+  // The recorded revision must be the one the resolution decided, and the
+  // generation's Merkle root must still be a function of the engine surface and
+  // the native input set that were actually used.
+  if (manifest.defoldResolution?.revision !== manifest.defoldRevision) {
+    throw new Error("Generated manifest does not record how its Defold revision was resolved");
+  }
+  const expectedMerkle = buildGenerationMerkle({
+    defoldRevision: core.revision,
+    surface: { layer: core.surfaceLayer, inputs: core.inputs },
+    extensions: inventory.extensions,
+    engineProfiles: manifest.engineProfiles,
+    generator: { package: "@ts-defold/deherm", version: core.packageVersion, projectGeneratorSha256: expectedGeneration.projectGeneratorSha256 }
+  });
+  if (manifest.generationMerkle?.engineRoot !== expectedMerkle.engineRoot ||
+      manifest.generationMerkle?.nativeRoot !== expectedMerkle.nativeRoot ||
+      manifest.generationMerkle?.root !== expectedMerkle.root) {
+    throw new Error("Generated manifest generation Merkle root is stale or invalid");
+  }
   if (JSON.stringify(lock.generator) !== JSON.stringify(manifest.generator) ||
       JSON.stringify(lock.toolchain) !== JSON.stringify(manifest.toolchain) ||
       JSON.stringify(lock.generation) !== JSON.stringify(manifest.generation) ||
+      JSON.stringify(lock.defoldResolution) !== JSON.stringify(manifest.defoldResolution) ||
+      JSON.stringify(lock.defoldSurface) !== JSON.stringify(manifest.defoldSurface) ||
+      JSON.stringify(lock.generationMerkle) !== JSON.stringify(manifest.generationMerkle) ||
       JSON.stringify(lock.inputs) !== JSON.stringify(manifest.inputs) ||
       JSON.stringify(lock.generatedOutputs) !== JSON.stringify(manifest.generatedOutputs) ||
       lock.generatedSdkSha256 !== manifest.generatedSdkSha256 ||
@@ -1518,6 +1598,8 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   return {
     root,
     defoldRevision: manifest.defoldRevision,
+    defoldResolution: manifest.defoldResolution,
+    generationMerkle: manifest.generationMerkle,
     planSha256,
     checkedFiles: Object.keys(verified).length,
     verified,
