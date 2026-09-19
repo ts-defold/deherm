@@ -47,6 +47,9 @@ on:
       - upstream.lock
       - toolchains/hermes/**
       - toolchains/go/**
+      # A change to this workflow must re-test itself; otherwise a fix to a
+      # build lane cannot be verified without an unrelated input also moving.
+      - .github/workflows/native-artifacts.yml
       - packages/compiler/go.mod
       - packages/compiler/ttsc/**
       - packages/toolchains/defold-bundle-targets.json
