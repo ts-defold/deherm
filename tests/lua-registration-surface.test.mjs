@@ -131,7 +131,12 @@ test("argument arity, types, and optionality are read out of the C function body
   // `lua_toboolean` never raises, so slot 1 is optional in the C body whatever
   // the documentation claims.
   assert.deepEqual(use.parameters[0], {
-    index: 1, optional: true, types: ["boolean"], accessors: ["lua_toboolean"], evidence: "probed"
+    index: 1,
+    optional: true,
+    types: ["boolean"],
+    accessors: ["lua_toboolean"],
+    evidence: "probed",
+    requirementUnconditional: false
   });
   // The optional slot is typed through a helper whose own body reads it.
   assert.deepEqual(use.parameters[1].types, ["number"]);

@@ -405,12 +405,72 @@ function registeredRoutes(interpretation, project, helpers, blockers) {
   return { routes, constants, commentedOut };
 }
 
+// Codes for a body construct that leaves an argument position unread. Any of
+// them means the derived argument window is a lower bound rather than a bound,
+// so an arity or a missing-slot verdict read off it would be an artefact of the
+// parse rather than a disagreement between the two descriptions.
+const INDEX_UNDECIDABLE = new Set(["dynamic-stack-index", "relative-stack-index", "unresolved-helper-overload"]);
+
+// A slot whose documented optionality and whose C body disagree. Naming the
+// defect is the point: the two directions are not the same kind of problem, and
+// only one of them makes a generated signature unsound.
+function classifyOptionality(declaredParameter, derivedParameter) {
+  if (declaredParameter.optional && !derivedParameter.optional) {
+    // A requirement read off an accessor inside a branch holds only on that
+    // branch, so it does not prove the engine refuses the omission. Refuse to
+    // classify rather than correct a signature on conditional evidence.
+    if (!derivedParameter.requirementUnconditional) {
+      return {
+        classification: "branch-dependent-requirement",
+        defect: "undecided",
+        severity: "undecided",
+        correction: "none"
+      };
+    }
+    // The documentation permits a call the engine refuses. A binding that
+    // follows the declaration emits an optional parameter whose omission raises
+    // a Lua error at runtime, so the declaration is what must give way.
+    return {
+      classification: "documentation-permits-refused-call",
+      defect: "declaration",
+      severity: "blocking",
+      correction: "require-slot"
+    };
+  }
+  if (derivedParameter.evidence === "defaulted") {
+    // The C body defaults the slot with `luaL_opt*`. The engine advertises a
+    // default the declaration withholds, so the declaration is narrower than the
+    // implementation and widening it is safe.
+    return {
+      classification: "documentation-withholds-default",
+      defect: "declaration",
+      severity: "advisory",
+      correction: "relax-slot"
+    };
+  }
+  // The slot is read with a non-raising accessor or behind an explicit presence
+  // guard: omitting the argument is not refused, it is silently substituted with
+  // the accessor's zero value. The documented requirement is the narrower and
+  // safer contract and following it emits no call the engine rejects, so this is
+  // engine laxity to report rather than a signature to change.
+  return {
+    classification: derivedParameter.evidence === "presence-guarded"
+      ? "engine-guards-omission"
+      : "engine-tolerates-omission",
+    defect: "neither",
+    severity: "advisory",
+    correction: "none"
+  };
+}
+
 function diffRoute(registered, declared) {
   const analysis = registered.body;
   const parameters = [];
   let disagreements = 0;
   let undecided = 0;
   const declaredCount = declared.parameters.length;
+  // A body the parser could not fully read cannot bound the argument window.
+  const indexUndecidable = Boolean(analysis?.undecided.some((item) => INDEX_UNDECIDABLE.has(item.code)));
   const slots = Math.max(declaredCount, analysis ? analysis.arity.max : 0);
   for (let index = 0; index < slots; index += 1) {
     const declaredParameter = declared.parameters[index] ?? null;
@@ -421,8 +481,17 @@ function diffRoute(registered, declared) {
       continue;
     }
     if (!derivedParameter) {
-      parameters.push({ index: index + 1, declared: declaredParameter, derived: null, verdict: analysis ? "declared-only" : "undecided", reason: analysis ? null : "no-body-analysis" });
-      if (analysis) disagreements += 1; else undecided += 1;
+      // Saying "documented but never read" needs the body to have been read to
+      // the end of its argument window; an undecidable index means it was not.
+      const decidable = analysis && !indexUndecidable;
+      parameters.push({
+        index: index + 1,
+        declared: declaredParameter,
+        derived: null,
+        verdict: decidable ? "declared-only" : "undecided",
+        reason: analysis ? (decidable ? null : "undecided-stack-index") : "no-body-analysis"
+      });
+      if (decidable) disagreements += 1; else undecided += 1;
       continue;
     }
     const type = compareParameterType(declaredParameter.type, derivedParameter.types);
@@ -430,10 +499,16 @@ function diffRoute(registered, declared) {
       ? { verdict: "undecided", reason: "no-stack-access" }
       : derivedParameter.optional === declaredParameter.optional
         ? { verdict: "agree", reason: null }
-        : {
-          verdict: "disagree",
-          reason: `declared ${declaredParameter.optional ? "optional" : "required"}, derived ${derivedParameter.optional ? "optional" : "required"} from ${derivedParameter.evidence} accessor ${derivedParameter.accessors.join(",") || "<none>"}`
-        };
+        : (() => {
+          const classified = classifyOptionality(declaredParameter, derivedParameter);
+          return {
+            // A conditional requirement is not a disagreement: the parse could
+            // not decide whether the engine refuses the omission.
+            verdict: classified.severity === "undecided" ? "undecided" : "disagree",
+            reason: `declared ${declaredParameter.optional ? "optional" : "required"}, derived ${derivedParameter.optional ? "optional" : "required"} from ${derivedParameter.evidence} accessor ${derivedParameter.accessors.join(",") || "<none>"}`,
+            ...classified
+          };
+        })();
     const verdict = type.verdict === "disagree" || optionalityVerdict.verdict === "disagree"
       ? "disagree"
       : type.verdict === "undecided" || optionalityVerdict.verdict === "undecided"
@@ -451,22 +526,20 @@ function diffRoute(registered, declared) {
     });
   }
   const declaredMinimum = declared.parameters.filter((parameter) => !parameter.optional).length;
+  const arityVerdict = () => {
+    // A slot the parser could not place leaves the derived window open at the
+    // top, so neither bound can be compared with the declaration.
+    if (indexUndecidable) return { verdict: "undecided", reason: "undecided-stack-index" };
+    if (analysis.arity.max !== declaredCount) return { verdict: "disagree", reason: null };
+    if (analysis.arity.min === declaredMinimum) return { verdict: "agree", reason: null };
+    // The C body branches on the argument count, so its `luaL_check*` calls do
+    // not settle the minimum. Report undecided, not agreement.
+    return analysis.arity.branchDependent
+      ? { verdict: "undecided", reason: "branch-dependent-minimum" }
+      : { verdict: "disagree", reason: null };
+  };
   const arity = analysis
-    ? {
-      derived: analysis.arity,
-      declaredMinimum,
-      declaredMaximum: declaredCount,
-      verdict: analysis.arity.max !== declaredCount
-        ? "disagree"
-        : analysis.arity.min === declaredMinimum
-          ? "agree"
-          // The C body branches on the argument count, so its `luaL_check*`
-          // calls do not settle the minimum. Report undecided, not agreement.
-          : analysis.arity.branchDependent ? "undecided" : "disagree",
-      reason: analysis.arity.max === declaredCount && analysis.arity.min !== declaredMinimum && analysis.arity.branchDependent
-        ? "branch-dependent-minimum"
-        : null
-    }
+    ? { derived: analysis.arity, declaredMinimum, declaredMaximum: declaredCount, ...arityVerdict() }
     : { derived: null, declaredMinimum, declaredMaximum: declaredCount, verdict: "undecided", reason: "no-body-analysis" };
   const results = analysis
     ? {

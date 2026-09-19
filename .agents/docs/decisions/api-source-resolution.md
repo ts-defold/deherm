@@ -32,6 +32,26 @@ The CLI resolves the engine SHA in this order:
 
 Resolution fails rather than combining inputs from different SHAs.
 
+# Revision resolution order
+
+The Defold revision a generation targets is resolved in this order, and the
+first that answers wins:
+
+1. **An explicit parameter.** `--defold-sdk <sha>` is a first-class input, not a
+   fallback or an escape hatch. A user may be building in CI against several
+   Defold versions at once, prebuilding for themselves, or targeting a revision
+   their working tree does not name. That is not predictable from the project,
+   so an explicit answer must always be accepted and must always win.
+2. **Detection from the project.** What the project itself declares -
+   `game.project`, its dependency URLs, Bob's resolved state.
+3. **Refusal.** If neither answers, generation stops with a diagnostic naming
+   what it looked at. It never falls back to whatever revision this package was
+   built against.
+
+The failure this ordering exists to prevent is silent, not loud: emitting
+bindings for one Defold revision into a project using another produces types
+that compile and are wrong.
+
 # Canonical inputs
 
 For one resolved SHA, generation consumes:

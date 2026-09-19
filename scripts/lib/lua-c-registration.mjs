@@ -201,20 +201,29 @@ function splitArguments(text) {
 function collectMacros(text) {
   const object = new Map();
   const functionLike = new Map();
+  // A translation unit may `#undef` a function macro and define the same name
+  // again. Keeping every definition with its offset lets an invocation be
+  // expanded with the definition that was in effect where it appears, rather
+  // than with whichever one happened to come last in the file.
+  const functionLikeHistory = new Map();
   const expression = /^[ \t]*#[ \t]*define[ \t]+([A-Za-z_]\w*)(\(([^)]*)\))?[ \t]*([\s\S]*?)(?<!\\)\n/gm;
   for (const match of text.matchAll(expression)) {
     const [, name, parenthesised, parameterText, body] = match;
     const value = body.replace(/\\\r?\n/g, "\n");
     if (parenthesised) {
-      functionLike.set(name, {
+      const record = {
+        name,
+        at: match.index,
         parameters: parameterText.split(",").map((item) => item.trim()).filter(Boolean),
         body: value
-      });
+      };
+      functionLike.set(name, record);
+      functionLikeHistory.set(name, [...(functionLikeHistory.get(name) ?? []), record]);
     } else {
       object.set(name, value.trim());
     }
   }
-  return { object, functionLike };
+  return { object, functionLike, functionLikeHistory };
 }
 
 function stringLiteral(value) {
@@ -259,6 +268,30 @@ function stripDirectives(code) {
   }).join("\n");
 }
 
+// `String.prototype.replace` reads `$` sequences in the replacement text. A
+// macro argument is literal source, so its dollars are escaped before it is
+// substituted.
+function literalReplacement(value) {
+  return value.replace(/\$/g, "$$$$");
+}
+
+// Substitute one function-macro invocation's arguments into its body with C's
+// own operator precedence: `#param` stringifies, but the second `#` of a `##`
+// token paste does not, so `LuaGet##name` pastes to `LuaGetPosition` instead of
+// degrading to `LuaGet#"Position"`.
+export function substituteMacroArguments(macro, rawArguments) {
+  let expansion = macro.body;
+  macro.parameters.forEach((parameter, position) => {
+    const argument = (rawArguments[position] ?? "").trim();
+    expansion = expansion
+      .replace(new RegExp(`(^|[^#])#\\s*${parameter}\\b`, "g"), `$1${literalReplacement(JSON.stringify(argument))}`)
+      .replace(new RegExp(`\\b${parameter}\\b`, "g"), literalReplacement(argument));
+  });
+  // Token paste joins the two sides into one identifier, so it is removed only
+  // after every parameter has been substituted.
+  return expansion.replace(/\s*##\s*/g, "");
+}
+
 // Expand function-like macro invocations inside one function body so the
 // SET_CONSTANT / SETCONSTANT idioms the engine uses become ordinary calls.
 function expandFunctionMacros(body, macros) {
@@ -274,14 +307,7 @@ function expandFunctionMacros(body, macros) {
         if (close < 0) break;
         const rawArguments = splitArguments(text.slice(open + 1, close));
         if (macro.parameters.length && rawArguments.length !== macro.parameters.length) break;
-        let expansion = macro.body;
-        macro.parameters.forEach((parameter, position) => {
-          const argument = (rawArguments[position] ?? "").trim();
-          expansion = expansion
-            .replace(new RegExp(`#\\s*${parameter}\\b`, "g"), JSON.stringify(argument))
-            .replace(new RegExp(`\\b${parameter}\\b`, "g"), argument);
-        });
-        expansion = expansion.replace(/##/g, "");
+        const expansion = substituteMacroArguments(macro, rawArguments);
         text = `${text.slice(0, match.index + (match[1] ? 1 : 0))}${expansion}${text.slice(close + 1)}`;
         changed = true;
         expression.lastIndex = 0;
@@ -434,31 +460,91 @@ function parseRegistrationArrays(file) {
   return arrays;
 }
 
-function parseFunctionDefinitions(file) {
-  const definitions = new Map();
-  const expression = /(^|[\s*&>])([A-Za-z_]\w*)\s*\(([^;{}()]*(?:\([^()]*\)[^;{}()]*)*)\)\s*(?:const\s*)?\{/g;
-  for (const match of file.code.matchAll(expression)) {
+const FUNCTION_DEFINITION =
+  /(^|[\s*&>])([A-Za-z_]\w*)\s*\(([^;{}()]*(?:\([^()]*\)[^;{}()]*)*)\)\s*(?:const\s*)?\{/g;
+
+// Read every function definition out of one span of code. `origin` describes
+// where that span came from, so a definition produced by expanding a file-scope
+// macro invocation carries the invocation's own file and line rather than a
+// position inside a synthesised string.
+function collectFunctionDefinitions(code, origin, into) {
+  const expression = new RegExp(FUNCTION_DEFINITION.source, "g");
+  for (const match of code.matchAll(expression)) {
     const name = match[2];
     if (KEYWORDS.has(name)) continue;
-    const before = file.code.slice(Math.max(0, match.index - 200), match.index + match[1].length);
+    const before = code.slice(Math.max(0, match.index - 200), match.index + match[1].length);
     if (!/[\w*&>\]]\s*$/.test(before)) continue;
     const previousToken = /([A-Za-z_]\w*)\s*[\s*&]*$/.exec(before);
     if (previousToken && KEYWORDS.has(previousToken[1])) continue;
-    const open = file.code.indexOf("{", match.index + match[0].length - 1);
-    const close = matchBrace(file.code, open);
+    const open = code.indexOf("{", match.index + match[0].length - 1);
+    const close = matchBrace(code, open);
     if (close < 0) continue;
     const record = {
       name,
-      path: file.path,
-      line: lineAt(file.lines, match.index),
+      path: origin.path,
+      line: origin.line ?? lineAt(origin.file.lines, match.index),
       signature: match[3],
       bodyStart: open + 1,
       bodyEnd: close,
-      code: file.code.slice(open + 1, close),
-      file
+      code: code.slice(open + 1, close),
+      file: origin.file,
+      macroExpanded: origin.macroExpanded ?? false
     };
-    const existing = definitions.get(name);
-    if (existing) existing.push(record); else definitions.set(name, [record]);
+    const existing = into.get(name);
+    if (existing) existing.push(record); else into.set(name, [record]);
+  }
+  return into;
+}
+
+// A file-scope function-like macro invocation can *be* a function definition:
+// `BIT_OP(bit_band, &=)` and `GET_CAMERA_DATA_PROPERTY_FN(FarZ, lua_pushnumber)`
+// each expand to a whole `static int name(lua_State* L) { ... }`. Expanding
+// those invocations in place is what lets the registered symbol they produce be
+// read like any other body, instead of being refused as undefined.
+//
+// Only macros whose own body declares a `lua_State*` parameter list are
+// considered, the invocation is expanded with the definition that was in effect
+// at that point in the file, and a name that already has a written definition is
+// never displaced by an expansion.
+function collectMacroGeneratedDefinitions(file, written) {
+  const generated = new Map();
+  const definitionShape = /[A-Za-z_]\w*\s*\(\s*(?:const\s+)?(?:struct\s+)?lua_State\s*\*/;
+  for (const [name, history] of file.macros.functionLikeHistory) {
+    if (!history.some((macro) => definitionShape.test(macro.body))) continue;
+    const invocation = new RegExp(`(^|[^\\w#])${name}\\s*\\(`, "g");
+    for (const match of file.code.matchAll(invocation)) {
+      const open = match.index + match[0].length - 1;
+      const close = matchParen(file.code, open);
+      if (close < 0) continue;
+      // The definitions inside a function body are locals of that body, and the
+      // ordinary body-level expansion already covers them.
+      if (written.some((record) => match.index > record.bodyStart && match.index < record.bodyEnd)) continue;
+      const inEffect = history.filter((macro) => macro.at < match.index).pop();
+      if (!inEffect || !definitionShape.test(inEffect.body)) continue;
+      const rawArguments = splitArguments(file.code.slice(open + 1, close));
+      if (inEffect.parameters.length !== rawArguments.length) continue;
+      // A macro body may itself invoke another macro that supplies the rest of
+      // the definitions - `LUAGETSETV3` writes the getter and then delegates the
+      // setter to `LUASET` - so the expansion is run back through the ordinary
+      // nested expansion before its definitions are read.
+      const expansion = expandFunctionMacros(substituteMacroArguments(inEffect, rawArguments), file.macros);
+      collectFunctionDefinitions(expansion, {
+        path: file.path,
+        file,
+        line: lineAt(file.lines, match.index),
+        macroExpanded: true
+      }, generated);
+    }
+  }
+  return generated;
+}
+
+function parseFunctionDefinitions(file) {
+  const definitions = collectFunctionDefinitions(file.code, { path: file.path, file }, new Map());
+  const written = [...definitions.values()].flat();
+  for (const [name, records] of collectMacroGeneratedDefinitions(file, written)) {
+    if (definitions.has(name)) continue;
+    definitions.set(name, records);
   }
   return definitions;
 }
@@ -507,11 +593,24 @@ export function collectSdkStackHelpers(headers) {
   // read, its family comes from the verb prefix and its accepted types from its
   // own name suffix and declared return type. Nothing is listed by hand: a
   // helper added in a later dmSDK revision is picked up by re-reading headers.
-  const helpers = new Map();
+  const index = new HelperIndex();
   const expression =
     /(^|[\s;{}])((?:const\s+)?[A-Za-z_][\w:]*(?:\s*<[^>;{}]*>)?\s*[*&]?)\s+(Check|Resolve|To|Is|Opt|Peek)([A-Za-z0-9_]*)\s*\(\s*(?:const\s+)?(?:struct\s+)?lua_State\s*\*\s*\w+\s*,([^)]*)\)\s*;/g;
+  // Every `lua_State*`-first declaration, whether or not it takes a stack index.
+  // This is what makes `CheckGOInstance(L)` a recognised overload of the two-
+  // argument helper rather than an unreadable call to it.
+  const anySignature =
+    /(^|[\s;{}])(?:const\s+)?[A-Za-z_][\w:]*(?:\s*<[^>;{}]*>)?\s*[*&]?\s+([A-Za-z_]\w*)\s*\(\s*(?:const\s+)?(?:struct\s+)?lua_State\s*\*\s*\w*\s*((?:,[^)]*)?)\)\s*;/g;
   for (const header of headers) {
     const { code } = lex(header.text);
+    for (const match of code.matchAll(anySignature)) {
+      const rest = match[3].replace(/^,/, "").trim();
+      const parts = rest ? splitArguments(rest) : [];
+      // A trailing `...` is recorded as a negative fixed-argument count, which
+      // `hasSignature` reads as "this many or more".
+      const variadic = parts.length > 0 && parts[parts.length - 1].trim() === "...";
+      index.noteSignature(match[2], variadic ? -parts.length : parts.length + 1);
+    }
     for (const match of code.matchAll(expression)) {
       const returnType = match[2].trim();
       const verb = match[3];
@@ -526,19 +625,25 @@ export function collectSdkStackHelpers(headers) {
       const fromName = suffix.split(/Or(?=[A-Z])/).map((part) => luaTypeFromCType(part)).filter(Boolean);
       const fromReturn = luaTypeFromCType(returnType);
       const types = fromName.length ? fromName : fromReturn ? [fromReturn] : [];
-      const existing = helpers.get(name);
-      helpers.set(name, {
+      // The analysed call text keeps the lua_State argument in slot 0.
+      const arity = parts.length + 1;
+      const argument = indexPosition + 1;
+      const existing = index.resolve(null, name, arity)?.slots?.find((slot) => slot.argument === argument);
+      index.store({
         name,
-        family,
-        types: [...new Set([...(existing?.types ?? []), ...types])].sort(compareText),
-        // The analysed call text keeps the lua_State argument in slot 0.
-        indexArgument: indexPosition + 1,
+        arity,
+        slots: [{
+          argument,
+          parameter: null,
+          family,
+          types: [...new Set([...(existing?.types ?? []), ...types])].sort(compareText)
+        }],
         origin: "declaration",
         source: header.path
       });
     }
   }
-  return helpers;
+  return index;
 }
 
 // A Lua user type is named where it is registered, so `TYPE_HASH_BODY` can be
@@ -585,27 +690,149 @@ function specialize(types) {
   return (specific.length ? specific : unique).sort(compareText);
 }
 
-// A helper index resolves a called name the way C does: a file-static helper
-// shadows anything with the same name elsewhere in the target. Box2D defines a
+// A helper index resolves a called name the way C++ does: a file-static helper
+// shadows anything with the same name elsewhere in the target, and an overload
+// set is selected by the number of arguments the call supplies. Box2D defines a
 // separate static `CheckVec2` in five translation units, so a purely global
-// index would have to give all five up as ambiguous.
+// index would have to give all five up as ambiguous; the engine also overloads
+// `GuiScriptInstance_Check(L, index)` against `GuiScriptInstance_Check(L)`,
+// where only the first addresses an argument slot at all.
 export class HelperIndex {
-  constructor(global = new Map(), byFile = new Map()) {
+  constructor(global = new Map(), byFile = new Map(), signatures = new Map()) {
+    // name -> argument count -> record. The argument count counts the
+    // `lua_State*` in slot 0, matching the analysed call text.
     this.global = global;
+    // path -> name -> argument count -> record.
     this.byFile = byFile;
+    // name -> set of argument counts of every `lua_State*`-first signature seen,
+    // whether or not that overload addresses a stack index.
+    this.signatures = signatures;
   }
 
-  resolve(path, name) {
-    return this.byFile.get(path)?.get(name) ?? this.global.get(name);
+  resolve(path, name, argumentCount) {
+    const scoped = this.byFile.get(path)?.get(name);
+    const shared = this.global.get(name);
+    if (!scoped && !shared) return undefined;
+    if (argumentCount === undefined) {
+      const pool = scoped ?? shared;
+      return pool.size === 1 ? [...pool.values()][0] : undefined;
+    }
+    return scoped?.get(argumentCount) ?? shared?.get(argumentCount);
+  }
+
+  // True when the target declares or defines an overload of `name` taking this
+  // many arguments. A call that matches such an overload but resolves to no
+  // record is decided rather than unparseable: that overload reads no argument
+  // slot, so the call proves nothing about one. A signature written with a
+  // trailing `...` matches every argument count from its fixed prefix upward.
+  hasSignature(name, argumentCount) {
+    const seen = this.signatures.get(name);
+    if (!seen) return false;
+    if (seen.has(argumentCount)) return true;
+    for (const fixed of seen) if (fixed < 0 && argumentCount >= -fixed) return true;
+    return false;
+  }
+
+  // Whether this name carries any argument-accessor record at all.
+  hasRecords(path, name) {
+    return Boolean(this.byFile.get(path)?.get(name)?.size || this.global.get(name)?.size);
+  }
+
+  noteSignature(name, argumentCount) {
+    let seen = this.signatures.get(name);
+    if (!seen) { seen = new Set(); this.signatures.set(name, seen); }
+    seen.add(argumentCount);
+  }
+
+  store(record, { path = null } = {}) {
+    const scope = path === null
+      ? this.global
+      : this.byFile.get(path) ?? this.byFile.set(path, new Map()).get(path);
+    const pool = scope.get(record.name) ?? scope.set(record.name, new Map()).get(record.name);
+    pool.set(record.arity, record);
+    this.noteSignature(record.name, record.arity);
   }
 
   get size() {
-    return this.global.size + [...this.byFile.values()].reduce((count, item) => count + item.size, 0);
+    return this.values().length;
   }
 
   values() {
-    return [...this.global.values(), ...[...this.byFile.values()].flatMap((item) => [...item.values()])];
+    const pools = [
+      ...this.global.values(),
+      ...[...this.byFile.values()].flatMap((item) => [...item.values()])
+    ];
+    return pools.flatMap((pool) => [...pool.values()]);
   }
+}
+
+// `luaL_typerror(L, narg, tname)` and `luaL_argerror(L, narg, extramsg)` are the
+// two auxlib calls that raise *about one argument*: both take the slot in their
+// second position. Reaching one at the top level of a function body - outside
+// every branch - is an unconditional refusal of that argument on the path that
+// falls through to it.
+const ARGUMENT_RAISE = /\b(?:luaL_typerror|luaL_argerror)\s*\(\s*[A-Za-z_]\w*\s*,\s*([A-Za-z_]\w*)\s*[,)]/g;
+
+// Brace depth at every offset of a function body. Depth 0 is the body's own
+// statement sequence: a call there runs on every path that reaches it, while a
+// call at depth 1 or more sits inside a branch or a loop and proves only what
+// that branch does.
+function braceDepths(code) {
+  const depths = new Int32Array(code.length + 1);
+  let depth = 0;
+  for (let at = 0; at < code.length; at += 1) {
+    depths[at] = depth;
+    if (code[at] === "{") depth += 1;
+    else if (code[at] === "}") depth -= 1;
+  }
+  depths[code.length] = depth;
+  return depths;
+}
+
+function raisesOnSlot(code, parameterName) {
+  const expression = new RegExp(ARGUMENT_RAISE.source, "g");
+  const depths = braceDepths(code);
+  for (const match of code.matchAll(expression)) {
+    if (match[1] !== parameterName) continue;
+    if (depths[match.index] === 0) return true;
+  }
+  return false;
+}
+
+// `int top = lua_gettop(L); if (index <= top && ...)` is a presence test written
+// as arithmetic rather than as `lua_isnone`. Whatever the helper does with the
+// slot below that comparison, it has already handled the slot being absent.
+function guardsPresence(code, parameterName) {
+  const countNames = new Set(["top"]);
+  for (const match of code.matchAll(/\b(?:const\s+)?(?:int|uint32_t|int32_t|size_t)\s+([A-Za-z_]\w*)\s*=\s*lua_gettop\s*\(/g)) {
+    countNames.add(match[1]);
+  }
+  for (const name of countNames) {
+    if (new RegExp(`\\b${parameterName}\\s*(?:<=|<|>=|>|==|!=)\\s*${name}\\b`).test(code)) return true;
+    if (new RegExp(`\\b${name}\\s*(?:<=|<|>=|>|==|!=)\\s*${parameterName}\\b`).test(code)) return true;
+  }
+  // The same test written without a local: `if (lua_gettop(L) == instance_arg)`.
+  const direct = String.raw`lua_gettop\s*\(\s*\w+\s*\)`;
+  if (new RegExp(`\\b${parameterName}\\s*(?:<=|<|>=|>|==|!=)\\s*${direct}`).test(code)) return true;
+  if (new RegExp(`${direct}\\s*(?:<=|<|>=|>|==|!=)\\s*\\b${parameterName}\\b`).test(code)) return true;
+  return false;
+}
+
+// A helper's slot carries two kinds of evidence: the contract written into its
+// declared name (`Check*` raises, `Opt*` defaults, `To*`/`Is*` observe) and what
+// reading its body recognised. They are combined, not replaced, because each is
+// incomplete on its own.
+//
+// An explicit absence test in the body wins outright: it is positive evidence
+// that the helper handles a missing argument. Failing that, a `required` from
+// either side wins, because the body scan is a *lower* bound - a body that
+// raises down a path the parser cannot follow reads as a probe - and demoting a
+// required slot to optional emits a signature that permits a call the engine
+// refuses. Over-requiring is visible at compile time; under-requiring is not.
+function mergeFamily(fromBody, fromDeclaration) {
+  if (fromBody === "presence") return "presence";
+  if (fromBody === "required" || fromDeclaration === "required") return "required";
+  return fromBody ?? fromDeclaration ?? "probe";
 }
 
 // Derive what a helper proves about its own `index` slot by reading its body:
@@ -614,32 +841,39 @@ export class HelperIndex {
 // the type hash that `b2Body` was registered under. Helpers that call helpers
 // are resolved to a fixed point.
 export function collectBodyDerivedHelpers(project, declared, userTypes) {
-  const index = new HelperIndex(new Map(declared), new Map());
+  const index = new HelperIndex(new Map(declared.global), new Map(), new Map(declared.signatures));
   const candidates = [];
   for (const [name, definitions] of project.functionsByName) {
     for (const definition of definitions) {
       if (!/^\s*(?:const\s+)?(?:struct\s+)?lua_State\s*\*/.test(definition.signature)) continue;
+      const arity = splitArguments(definition.signature).length;
+      // Every `lua_State*`-first definition is a known overload, including the
+      // ones that address no stack index at all.
+      index.noteSignature(name, arity);
       const parameters = integerParameters(definition.signature);
       if (!parameters.length) continue;
+      // Two definitions of a name that take different argument counts are
+      // overloads, which the arity-keyed index separates; two that take the
+      // same count are distinct file-static helpers sharing a spelling, and
+      // only file scope tells them apart. A definition produced by expanding a
+      // macro invocation is local to the file that wrote the invocation, and
+      // its offsets do not index the file text, so its storage class cannot be
+      // read from around it either.
+      const sameArity = definitions.filter((item) =>
+        splitArguments(item.signature).length === arity).length;
       candidates.push({
         name,
         definition,
-        parameters,
-        // A file-static helper is visible only in its own translation unit.
-        fileScoped: definitions.length > 1 ||
-          /(^|[\s*&])static\s[^;{}]*$/.test(definition.file.code.slice(Math.max(0, definition.bodyStart - 300), definition.bodyStart))
+        arity,
+        fileScoped: sameArity > 1 || definition.macroExpanded ||
+          /(^|[\s*&])static\s[^;{}]*$/.test(definition.file.code.slice(Math.max(0, definition.bodyStart - 300), definition.bodyStart)),
+        parameters
       });
     }
   }
 
   function store(candidate, record) {
-    if (candidate.fileScoped) {
-      let bucket = index.byFile.get(candidate.definition.path);
-      if (!bucket) { bucket = new Map(); index.byFile.set(candidate.definition.path, bucket); }
-      bucket.set(candidate.name, record);
-      return;
-    }
-    index.global.set(candidate.name, record);
+    index.store(record, { path: candidate.fileScoped ? candidate.definition.path : null });
   }
 
   for (let round = 0; round < 6; round += 1) {
@@ -648,48 +882,73 @@ export function collectBodyDerivedHelpers(project, declared, userTypes) {
       const definition = candidate.definition;
       const code = expandFunctionMacros(definition.code, definition.file.macros);
       const calls = callsIn(code);
-      let chosen = null;
+      // A helper may address more than one slot: Box2D's
+      // `CheckJointDefBodies(L, 1, 2, &a, &b, &world)` reads two argument
+      // positions in one call. Every integer parameter the body shows stack
+      // evidence for becomes a slot of the helper, so the caller's second
+      // argument is not left looking unread.
+      const chosen = [];
       for (const parameter of candidate.parameters) {
         const types = new Set();
-        let family = null;
+        // A helper that reaches an argument-raising call for its own slot on the
+        // fall-through path refuses a missing or wrongly typed argument, however
+        // it read the slot on the way there. `CheckHashOrString` returns early
+        // for a hash and for a string and then runs `luaL_typerror(L, index, .)`
+        // unconditionally, so its slot is required even though every accessor it
+        // used is non-raising - which is the difference between a helper that
+        // defaults a missing argument and one that rejects it.
+        const seen = new Set();
+        if (guardsPresence(code, parameter.name)) seen.add("presence");
+        if (raisesOnSlot(code, parameter.name)) seen.add("required");
         for (const call of calls) {
           const args = splitArguments(call.argumentsText);
           if (/^(?:Check|To|Is)UserType$/.test(call.name)) {
             if ((args[1] ?? "").trim() !== parameter.name) continue;
             types.add(userTypes.get((args[2] ?? "").trim()) ?? "userdata");
-            if (call.name === "CheckUserType") family = "required";
-            else if (family === null) family = "probe";
+            seen.add(call.name === "CheckUserType" ? "required" : "probe");
             continue;
           }
           const core = CORE_ACCESSORS[call.name];
-          const known = core ? null : index.resolve(definition.path, call.name);
+          const known = core ? null : index.resolve(definition.path, call.name, args.length);
           if (!core && !known) continue;
-          const slotArgument = core ? 1 : known.indexArgument;
-          if ((args[slotArgument] ?? "").trim() !== parameter.name) continue;
-          const callFamily = core ? core.family : known.family;
-          for (const type of core ? (core.type ? [core.type] : []) : known.types) types.add(type);
-          if (callFamily === "required") family = "required";
-          else if (callFamily && family === null) family = callFamily;
+          for (const inner of core ? [{ argument: 1, family: core.family, types: core.type ? [core.type] : [] }] : known.slots) {
+            if ((args[inner.argument] ?? "").trim() !== parameter.name) continue;
+            for (const type of inner.types) types.add(type);
+            if (inner.family) seen.add(inner.family);
+          }
         }
+        // A presence test on the slot dominates everything else the body does
+        // with it. Box2D's `CheckMaxResults` opens with
+        // `if (lua_isnoneornil(L, index)) return 0;` and only then calls
+        // `luaL_checkinteger`, so the `luaL_check*` sits on the else-path and
+        // the helper accepts a missing argument. Letting the check win there
+        // would emit a required parameter for a slot the engine defaults.
+        const family = seen.has("presence") ? "presence"
+          : seen.has("required") ? "required"
+            : seen.has("optional") ? "optional"
+              : seen.has("probe") ? "probe" : null;
         if (!types.size && family === null) continue;
-        chosen = { parameter, types, family };
-        break;
+        chosen.push({ parameter, types, family });
       }
-      if (!chosen) continue;
-      const previous = index.resolve(definition.path, candidate.name);
+      if (!chosen.length) continue;
+      const previous = index.resolve(definition.path, candidate.name, candidate.arity);
+      const priorSlot = (position) => previous?.slots?.find((item) => item.argument === position);
       const record = {
         name: candidate.name,
-        family: chosen.family ?? previous?.family ?? "probe",
-        // Declaration-derived and body-derived types describe the same slot, so
-        // they are unioned and then specialised.
-        types: specialize([...(previous?.types ?? []), ...chosen.types]),
-        indexArgument: chosen.parameter.position,
-        indexParameter: chosen.parameter.name,
+        arity: candidate.arity,
+        slots: chosen.map((item) => ({
+          argument: item.parameter.position,
+          parameter: item.parameter.name,
+          family: mergeFamily(item.family, priorSlot(item.parameter.position)?.family ?? null),
+          // Declaration-derived and body-derived types describe the same slot,
+          // so they are unioned and then specialised.
+          types: specialize([...(priorSlot(item.parameter.position)?.types ?? []), ...item.types])
+        })),
         origin: "body",
         source: `${definition.path}:${definition.line}`
       };
-      const before = previous ? JSON.stringify([previous.family, previous.types, previous.indexArgument, previous.origin]) : "";
-      if (before !== JSON.stringify([record.family, record.types, record.indexArgument, record.origin])) {
+      const identity = (item) => JSON.stringify([item?.slots ?? null, item?.origin ?? null]);
+      if (identity(previous) !== identity(record)) {
         store(candidate, record);
         changed = true;
       }
@@ -1108,9 +1367,14 @@ function propagateIntegerLocals(code, resolveHelper) {
     if (value === null) {
       const callee = match[3];
       const args = splitArguments(match[4] ?? "");
-      const slot = callee === "AbsIndex" || callee === "lua_absindex" ? 1 : resolveHelper?.(callee)?.indexArgument ?? -1;
-      const literal = slot > 0 ? /^-?\d+$/.exec((args[slot] ?? "").trim()) : null;
-      value = literal ? literal[0] : null;
+      // `int def_index = CheckDefinitionTable(L, 3);` hands back the index of the
+      // slot it was given, so the local names slot 3. A helper addressing more
+      // than one slot cannot say which index it returned, so it is not followed.
+      const helper = callee === "AbsIndex" || callee === "lua_absindex" ? null : resolveHelper?.(callee, args.length);
+      const slot = helper ? (helper.slots.length === 1 ? helper.slots[0].argument : -1)
+        : callee === "AbsIndex" || callee === "lua_absindex" ? 1 : -1;
+      const literal = slot > 0 ? integerLiteral(args[slot]) : null;
+      value = literal === null ? null : String(literal);
     }
     if (value === null) { assignments.set(name, null); continue; }
     if (assignments.has(name)) { assignments.set(name, null); continue; }
@@ -1128,16 +1392,39 @@ function propagateIntegerLocals(code, resolveHelper) {
   return code;
 }
 
+// A stack index reaches the parser as source text. Parenthesised additive
+// arithmetic over integer literals is folded, because macro expansion routinely
+// produces one: `SHAPE_ARG(1)` becomes `luaL_checknumber(L, 1 + 2)`, which names
+// slot 3 exactly. Nothing beyond `+` and `-` over literals is evaluated.
 function integerLiteral(value) {
-  const trimmed = String(value ?? "").trim();
-  return /^-?\d+$/.test(trimmed) ? Number.parseInt(trimmed, 10) : null;
+  let trimmed = String(value ?? "").trim();
+  while (/^\(.*\)$/.test(trimmed) && matchParen(trimmed, 0) === trimmed.length - 1) {
+    trimmed = trimmed.slice(1, -1).trim();
+  }
+  if (/^-?\d+$/.test(trimmed)) return Number.parseInt(trimmed, 10);
+  if (!/^-?\d+(?:\s*[-+]\s*-?\d+)+$/.test(trimmed)) return null;
+  const terms = trimmed.match(/[-+]?\s*-?\d+/g) ?? [];
+  let total = 0;
+  for (const term of terms) total += Number.parseInt(term.replace(/\s+/g, ""), 10);
+  return total;
+}
+
+// `LUA_REGISTRYINDEX`, `LUA_GLOBALSINDEX`, `LUA_ENVIRONINDEX` and
+// `lua_upvalueindex(n)` are Lua pseudo-indices, not positions in the argument
+// window. A call that addresses one is reading the registry, the globals table
+// or an upvalue, and so proves nothing about any argument - the same conclusion
+// the parser already draws for an explicitly negative index.
+const PSEUDO_INDEX = /^(?:LUA_(?:REGISTRY|GLOBALS|ENVIRON)INDEX|lua_upvalueindex\s*\()/;
+
+function pseudoIndex(value) {
+  return PSEUDO_INDEX.test(String(value ?? "").trim());
 }
 
 export function analyzeFunctionBody(definition, helperIndex, project) {
   const file = definition.file;
   const code = propagateIntegerLocals(
     expandFunctionMacros(definition.code, file.macros),
-    (name) => helperIndex.resolve(definition.path, name));
+    (name, argumentCount) => helperIndex.resolve(definition.path, name, argumentCount));
   const slots = new Map();
   const undecided = [];
   const pushes = [];
@@ -1160,16 +1447,27 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
   function slot(position) {
     let record = slots.get(position);
     if (!record) {
-      record = { index: position, required: false, optional: false, presenceGuarded: false, types: new Set(), accessors: new Set() };
+      record = {
+        index: position,
+        required: false,
+        // Whether a raising accessor reached the slot at the body's own
+        // statement level rather than inside a branch.
+        requiredUnconditionally: false,
+        optional: false,
+        presenceGuarded: false,
+        types: new Set(),
+        accessors: new Set()
+      };
       slots.set(position, record);
     }
     return record;
   }
 
+  const depths = braceDepths(code);
   for (const call of callsIn(code)) {
     const args = splitArguments(call.argumentsText);
     const core = CORE_ACCESSORS[call.name];
-    const helper = core ? undefined : helperIndex.resolve(definition.path, call.name);
+    const helper = core ? undefined : helperIndex.resolve(definition.path, call.name, args.length);
     if (call.name === "lua_gettop") { usesGettop = true; continue; }
     if (PUSH_TYPES[call.name] !== undefined) { pushes.push({ name: call.name, type: PUSH_TYPES[call.name] }); continue; }
     if (call.namespace === "dmScript" && /^Push/.test(call.name)) {
@@ -1177,6 +1475,7 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
       continue;
     }
     if (call.name === "luaL_checktype" || call.name === "luaL_checkudata") {
+      if (pseudoIndex(args[1])) continue;
       const position = integerLiteral(args[1]);
       if (position === null) {
         undecided.push({ code: "dynamic-stack-index", detail: `${call.name}(${args.join(", ")})` });
@@ -1185,6 +1484,7 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
       if (position <= 0) { undecided.push({ code: "relative-stack-index", detail: `${call.name}(${args.join(", ")})` }); continue; }
       const record = slot(position);
       record.required = true;
+      if (depths[call.start] === 0) record.requiredUnconditionally = true;
       record.accessors.add(call.name);
       const token = (args[2] ?? "").trim();
       const mapped = call.name === "luaL_checkudata" ? "userdata" : LUA_TYPE_TOKENS[token];
@@ -1192,23 +1492,48 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
       else if (call.name !== "luaL_checkudata") undecided.push({ code: "unknown-lua-type-token", detail: token });
       continue;
     }
-    if (!core && !helper) continue;
-    const family = core ? core.family : helper.family;
-    const types = core ? (core.type ? [core.type] : []) : helper.types;
-    const indexArgument = core ? 1 : helper.indexArgument;
-    const raw = args[indexArgument];
-    const position = integerLiteral(raw);
-    if (position === null) {
-      undecided.push({ code: "dynamic-stack-index", detail: `${call.namespace ? `${call.namespace}::` : ""}${call.name}(${args.join(", ")})` });
+    const spelled = `${call.namespace ? `${call.namespace}::` : ""}${call.name}`;
+    if (!core && !helper) {
+      // The target declares or defines an overload of this name taking exactly
+      // these arguments, and that overload addresses no stack index:
+      // `GuiScriptInstance_Check(L)` reads the running instance out of the
+      // registry, while `GuiScriptInstance_Check(L, index)` reads a slot. The
+      // call is decided - it proves nothing about any argument - so it is not a
+      // blocker. A name with helper records but no overload at this argument
+      // count is a different matter and stays unparseable.
+      if (helperIndex.hasSignature(call.name, args.length)) continue;
+      // A name that was never an argument accessor is an ordinary call, not an
+      // overload the parser failed on.
+      if (helperIndex.hasRecords(definition.path, call.name)) {
+        undecided.push({
+          code: "unresolved-helper-overload",
+          detail: `${spelled}(${args.join(", ")}) matches no ${call.name} overload taking ${args.length} arguments`
+        });
+      }
       continue;
     }
-    if (position <= 0) continue; // A relative index addresses a pushed value, not an argument.
-    const record = slot(position);
-    record.accessors.add(`${call.namespace ? `${call.namespace}::` : ""}${call.name}`);
-    if (family === "required") record.required = true;
-    if (family === "optional") record.optional = true;
-    if (family === "presence") record.presenceGuarded = true;
-    for (const type of types) record.types.add(type);
+    const addressed = core
+      ? [{ argument: 1, family: core.family, types: core.type ? [core.type] : [] }]
+      : helper.slots;
+    for (const { argument, family, types } of addressed) {
+      const raw = args[argument];
+      if (pseudoIndex(raw)) continue;
+      const position = integerLiteral(raw);
+      if (position === null) {
+        undecided.push({ code: "dynamic-stack-index", detail: `${spelled}(${args.join(", ")})` });
+        continue;
+      }
+      if (position <= 0) continue; // A relative index addresses a pushed value, not an argument.
+      const record = slot(position);
+      record.accessors.add(spelled);
+      if (family === "required") {
+        record.required = true;
+        if (depths[call.start] === 0) record.requiredUnconditionally = true;
+      }
+      if (family === "optional") record.optional = true;
+      if (family === "presence") record.presenceGuarded = true;
+      for (const type of types) record.types.add(type);
+    }
   }
 
   for (const delegate of delegates) {
@@ -1216,7 +1541,10 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
     for (const parameter of inner.parameters) {
       if (parameter.evidence === "no-stack-access") continue;
       const record = slot(parameter.index);
-      if (parameter.evidence === "checked") record.required = true;
+      if (parameter.evidence === "checked") {
+        record.required = true;
+        if (parameter.requirementUnconditional) record.requiredUnconditionally = true;
+      }
       if (parameter.evidence === "defaulted") record.optional = true;
       if (parameter.evidence === "presence-guarded") record.presenceGuarded = true;
       for (const type of parameter.types) record.types.add(type);
@@ -1284,7 +1612,8 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
         optional: null,
         types: [],
         accessors: [],
-        evidence: "no-stack-access"
+        evidence: "no-stack-access",
+        requirementUnconditional: false
       });
       continue;
     }
@@ -1295,7 +1624,10 @@ export function analyzeFunctionBody(definition, helperIndex, project) {
         : record.optional || record.presenceGuarded || position > minimum,
       types: [...record.types].sort(compareText),
       accessors: [...record.accessors].sort(compareText),
-      evidence: record.required ? "checked" : record.optional ? "defaulted" : record.presenceGuarded ? "presence-guarded" : "probed"
+      evidence: record.required ? "checked" : record.optional ? "defaulted" : record.presenceGuarded ? "presence-guarded" : "probed",
+      // A requirement read off a call inside a branch is conditional on that
+      // branch, so it does not prove the slot is always refused when missing.
+      requirementUnconditional: record.required && record.requiredUnconditionally
     });
   }
 
