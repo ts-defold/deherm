@@ -125,10 +125,33 @@ matrix is already per-target for this reason. A route proven on `jsi` is not
 thereby proven on `direct-memory`, and one retained in a development link is not
 thereby present in a release one.
 
-What still has to be enforced is only that the projections agree where they
-claim to: the ttsc symbol set and the bundler module graph must not disagree
-about what a build reaches, and dynamic access must be declared rather than
-inferred, so a projection's reachable set is a statement rather than a guess.
+## Where the hazard actually lives
+
+Multiple projections are a benefit, not a risk. The risk sits one level down, in
+the primitives every projection is built from: value marshalling, handle
+lifetime and generation, context resolution, scratch and arena discipline, the
+error model, callback lifetime, address resolution.
+
+A primitive is correct when it **resolves deterministically to the same
+observable behaviour in every environment it is projected into**, or when its
+difference is declared as a capability rather than discovered at runtime. Given
+that, more projections cost nothing: each is the same semantics reached by a
+different mechanism. Given a primitive that resolves differently on `jsi` than
+on `typed-native`, every projection multiplies the defect instead of containing
+it.
+
+So the obligation is on the primitives, and it is checkable rather than
+aspirational. The generated recording engine drives one contract across every
+drivable transport and diffs the traces, which is precisely a test that a
+primitive resolves identically: 915 routes over `jsi`, `direct-memory` and
+`typed-native` currently produce zero cross-transport divergences. A divergence
+there is the single most valuable signal this project can get, because it means
+a primitive - not a projection - is wrong.
+
+The remaining enforcement is narrow: the ttsc symbol set and the bundler module
+graph must not disagree about what a build reaches, and dynamic access must be
+declared rather than inferred, so a projection's reachable set is a statement
+rather than a guess.
 
 # Native lowering as a tier, not a target
 
