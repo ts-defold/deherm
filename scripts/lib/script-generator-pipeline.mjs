@@ -30,10 +30,12 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-route-availability-profiles.mjs",
   "scripts/generate-script-projection-ir.mjs",
   "scripts/generate-script-handle-lowering.mjs",
+  "scripts/generate-script-recording-engine.mjs",
   "scripts/generate-script-runtime.mjs",
   "scripts/lib/binding-identity.mjs",
   "packages/compiler/src/binding-identity.mjs",
   "packages/compiler/src/component-proxy-contract.mjs",
+  "packages/compiler/src/script-recording-engine.mjs",
   "scripts/lib/script-generator-pipeline.mjs",
   "packages/compiler/src/script-public-api-policy.mjs",
   "scripts/lib/script-universal-selection.mjs",
@@ -72,7 +74,11 @@ export const scriptPinnedInputs = Object.freeze([
   "packages/bindings/overrides/static-hermes-vmath.json",
   "packages/bindings/probes/defold-script-real-engine-matrix.json",
   "packages/bindings/probes/defold-script-real-engine-probes.json",
-  "packages/bindings/probes/defold-script-value-real-engine-probes.json"
+  "packages/bindings/probes/defold-script-value-real-engine-probes.json",
+  // The canonical lowering plan is an immutable declared authority with its own
+  // deep-check gate. The recording engine joins it by exact route identity and
+  // records any byte-level drift against the plan's own declared input hashes.
+  "packages/bindings/generated/defold-binding-lowering-plan.json"
 ]);
 
 export const generatedScriptArtifacts = Object.freeze([
@@ -157,7 +163,14 @@ export const generatedScriptArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",
   "defold/defold_hermes/include/defold_hermes/generated_script_handle_lowering.hpp",
   "defold/defold_hermes/src/generated_script_handle_lowering.cpp",
-  "packages/sdk/src/generated/script/handle-lowering.ts"
+  "packages/sdk/src/generated/script/handle-lowering.ts",
+  "packages/bindings/generated/defold-script-recording-engine.json",
+  "tests/fixtures/generated_script_recording_engine.h",
+  "tests/fixtures/generated_script_recording_tables.cpp",
+  "tests/fixtures/generated_script_recording_provider.cpp",
+  "tests/fixtures/generated_script_recording_driver.cpp",
+  "tests/fixtures/generated_script_recording_driver.js",
+  "tests/fixtures/generated_script_recording_expected_trace.txt"
 ]);
 
 export const scriptGenerationSteps = Object.freeze([
@@ -187,7 +200,8 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-projection-ir.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-defold-value-layouts.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-universal-value-bindings.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" })
 ]);
 
 // The Lua-registration ground-truth lane. It derives a target's REGISTERED Lua
@@ -221,4 +235,32 @@ export const luaRegistrationSurfaceGenerator = Object.freeze({
   // Every target's sources are discovered from its declared root or archive
   // rather than listed, so the source tree itself is the pinned evidence.
   sourceTreeEvidence: Object.freeze(["upstream/defold/engine"])
+});
+
+// The resource-declaration schema is derived from Bob's own builder annotations
+// and the pinned `.proto` files they name, so like the registration surface its
+// inputs are a source tree rather than an enumerable file list. It therefore
+// owns its artifacts here instead of joining `scriptGenerationSteps`, whose
+// clean room copies an enumerated evidence subset.
+export const resourceNamespaceGenerator = Object.freeze({
+  sources: Object.freeze([
+    "scripts/generate-defold-resource-schema.mjs",
+    "scripts/generate-script-resource-namespace-classification.mjs"
+  ]),
+  pinnedInputs: Object.freeze([
+    "upstream.lock",
+    "packages/bindings/generated/defold-script-api-ir.json"
+  ]),
+  artifacts: Object.freeze([
+    "packages/bindings/generated/defold-resource-declaration-schema.json",
+    "packages/bindings/generated/defold-script-resource-namespaces.json"
+  ]),
+  steps: Object.freeze([
+    Object.freeze({ runtime: "node", script: "scripts/generate-defold-resource-schema.mjs" }),
+    Object.freeze({ runtime: "node", script: "scripts/generate-script-resource-namespace-classification.mjs" })
+  ]),
+  sourceTreeEvidence: Object.freeze([
+    "upstream/defold/engine",
+    "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline"
+  ])
 });

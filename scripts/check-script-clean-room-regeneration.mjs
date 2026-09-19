@@ -224,6 +224,11 @@ async function walkFiles(root, relative = "") {
 export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultRepositoryRoot) {
   const candidates = new Set();
   for (const file of await walkFiles(path.join(repositoryRoot, "packages/bindings/generated"))) {
+    // `defold-script-resource-namespaces.json` carries the `defold-script-`
+    // prefix but belongs to `resourceNamespaceGenerator`, whose evidence is a
+    // source tree rather than an enumerable input list, so this clean room
+    // cannot regenerate it and must not claim to own it.
+    if (file === "defold-script-resource-namespaces.json") continue;
     if (/^(?:defold-script-|defold-static-hermes-|defold-value-layouts|war-battles-script-)/.test(file)) {
       candidates.add(`packages/bindings/generated/${file}`);
     }
@@ -253,6 +258,11 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
     if (file === "generated_script_universal_value.js") {
       candidates.add(`defold/defold_hermes/lib/web/${file}`);
     }
+  }
+  // The generated recording engine is a harness fixture rather than shipped
+  // extension source, so it is discovered by its own generator-owned prefix.
+  for (const file of await walkFiles(path.join(repositoryRoot, "tests/fixtures"))) {
+    if (/^generated_script_recording_/.test(file)) candidates.add(`tests/fixtures/${file}`);
   }
   for (const documentation of [
     ".agents/docs/research/script-api-coverage.md",
