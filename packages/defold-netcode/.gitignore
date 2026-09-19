@@ -1,0 +1,3 @@
+# Build and test artefacts. The digest of the host library is recorded in
+# native-lib-digests.json; the bytes themselves are rebuildable and not tracked.
+build/

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "scope": "Digests of the netcode sources vendored into the defold_netcode extension, and the upstream revision they were derived from.",
+  "upstream": {
+    "url": "https://github.com/mas-bandwidth/netcode.git",
+    "revision": "47a156b17df9110c1a2d5d8cbf5b7768d1838a47",
+    "version": "1.4.8",
+    "licence": "BSD-3-Clause",
+    "sodiumBaseline": "libsodium-1.0.22",
+    "sodiumLicence": "ISC"
+  },
+  "derivation": {
+    "producer": "packages/defold-netcode/scripts/vendor-netcode.mjs",
+    "method": "git clone at NETCODE_REV, verbatim file copy, sha256 per file",
+    "files": 6
+  },
+  "files": [
+    {
+      "path": "extension/defold_netcode/include/sodium.h",
+      "bytes": 48771,
+      "sha256": "790c509baf462d02517d3b204d8b618a96f2be235ee1b619e061066b82376fe9"
+    },
+    {
+      "path": "extension/defold_netcode/licenses/LIBSODIUM.txt",
+      "bytes": 823,
+      "sha256": "508a76d186356c0dd807a670ef510964f8724557024796a2c426c6c0e19ab683"
+    },
+    {
+      "path": "extension/defold_netcode/licenses/NETCODE.txt",
+      "bytes": 1507,
+      "sha256": "d277868ac585adc27dc81f2e2395c0948976fcd68fbbca60178b1892baafe2e7"
+    },
+    {
+      "path": "extension/defold_netcode/src/vendor/netcode.c",
+      "bytes": 406556,
+      "sha256": "e0373f6e29bfdd763e43df504c997bb2cc24994b6f52e8392ecc9ee35bf90ae7"
+    },
+    {
+      "path": "extension/defold_netcode/src/vendor/netcode.h",
+      "bytes": 18170,
+      "sha256": "fc9c008a10c030ee97e509e9d8087e63b940f20ca229c9940a021fbc170bc13a"
+    },
+    {
+      "path": "extension/defold_netcode/src/vendor/sodium.c",
+      "bytes": 196739,
+      "sha256": "b2bf049faccbcf18725c6805cdafe409f332604477e17e4224df152ee3eb0dd5"
+    }
+  ],
+  "treeSha256": "ea3a52ac6bb8d428d39df42ceb2afe32cf02168c906824edb55ffbd92b2d43be"
+}

@@ -1,0 +1,39 @@
+# Revisions verified with git ls-remote on 2026-09-19.
+#
+# netcode is the secure client/server protocol this package wraps. The repository
+# to take it from is not the one the name suggests, and the difference matters:
+#
+#   - https://netcode.io is NOT this protocol. That domain hosts Endel Dreyer's
+#     pure-Zig QUIC/TLS1.3/HTTP3/WebTransport stack; its own "netcode" multiplayer
+#     server is listed as "coming soon". Nothing there implements this wire format.
+#   - https://github.com/networkprotocol/netcode and .../netcode.io both REDIRECT
+#     to mas-bandwidth/netcode (verified: all three report the same HEAD).
+#   - The GitHub API reports mas-bandwidth/netcode as language C, licence
+#     BSD-3-Clause, not archived. It is C, not Zig. There is no Zig reference
+#     implementation to choose instead.
+#
+# So the source is C, permissively licensed, and compiles from source on every
+# Defold bundle target. That is why this package vendors SOURCE and lets Extender
+# compile it, rather than shipping thirteen precompiled static libraries: a
+# per-target `.a` would have to be built, digest-pinned and kept in step for each
+# of the thirteen triples in packages/bindings/overrides/dmsdk-target-macros.json,
+# and would buy nothing a pinned source digest does not already buy.
+NETCODE_URL=https://github.com/mas-bandwidth/netcode.git
+NETCODE_REF=main
+NETCODE_REV=47a156b17df9110c1a2d5d8cbf5b7768d1838a47
+NETCODE_VERSION=1.4.8
+NETCODE_LICENCE=BSD-3-Clause
+
+# The crypto is a vendored libsodium subset that ships inside the netcode tree
+# (sodium/sodium.c + sodium/sodium.h, amalgamated from libsodium 1.0.22). It is
+# ISC licensed. It is pinned by the same revision as netcode itself - it is not a
+# separate checkout - and its digests are recorded beside netcode's in
+# vendor-digests.json.
+NETCODE_SODIUM_BASELINE=libsodium-1.0.22
+NETCODE_SODIUM_LICENCE=ISC
+
+# The Emscripten SDK the HTML5 compile of the vendored sources was verified
+# under. This must stay equal to EMSDK_VERSION in the repository-root
+# upstream.lock, because Extender compiles the web targets with Defold's own
+# Emscripten and that is the version this repository pins for it.
+NETCODE_VERIFIED_EMSDK_VERSION=4.0.6

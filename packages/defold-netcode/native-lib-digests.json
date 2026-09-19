@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "scope": "Digest of the host static library built from the vendored netcode sources by scripts/build-and-test.sh. This library is a build and test artefact; Extender compiles the same sources from source for every bundle target.",
+  "vendorTreeSha256": "ea3a52ac6bb8d428d39df42ceb2afe32cf02168c906824edb55ffbd92b2d43be",
+  "evidenceBoundary": {
+    "compilation": "observed",
+    "linkage": "observed",
+    "hostDatagramRuntime": "observed",
+    "udpRuntime": "not-claimed",
+    "extenderCompilation": "not-claimed",
+    "engineRuntime": "not-claimed"
+  },
+  "host": {
+    "target": "arm64-osx",
+    "system": "Darwin",
+    "architecture": "arm64",
+    "compiler": "Apple clang version 21.0.0 (clang-2100.1.1.101)"
+  },
+  "library": {
+    "path": "build/lib/arm64-osx/libdefold_netcode.a",
+    "bytes": 135384,
+    "sha256": "fc72000cec38a0bfff83abd33dd706f61ed4162cc79694c575ae118257faaa3f"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@deherm/defold-netcode",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Defold native extension wrapping the netcode secure client/server UDP protocol, with a C API for the Static Hermes adapter and a standard Lua API.",
+  "license": "MIT",
+  "type": "module",
+  "files": [
+    "extension/",
+    "upstream.lock",
+    "vendor-digests.json"
+  ],
+  "scripts": {
+    "vendor": "node scripts/vendor-netcode.mjs",
+    "check:vendor": "node scripts/vendor-netcode.mjs --check",
+    "build": "./scripts/build-and-test.sh",
+    "check": "node scripts/vendor-netcode.mjs --check && ./scripts/build-and-test.sh --verify"
+  }
+}
