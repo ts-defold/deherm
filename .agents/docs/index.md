@@ -71,6 +71,7 @@ okf_version: "0.2"
 * [React and hooks over Defold GUI](research/react-defold-gui.md) - Recommended custom React renderer, dense commit bridge, Yoga/Clay tradeoff, and Static Hermes conformance gates.
 * [War Battles source audit and port map](research/war-battles-port-map.md) - Pinned tutorial and TSDefold baselines, exact API/message/property demand, proxy requirements, licensing, and runtime acceptance trace.
 * [Static Hermes TS2Flow upstream fix](research/static-hermes-ts2flow-upstream.md) - Reproduction, official-test evidence, draft PR, and temporary patch policy for typed function return annotations.
+* [Hermes-X upstream evaluation](research/hermes-x-evaluation.md) - Commit-level comparison of the fast-moving personal fork, its preview branches, and the staged gates for a safe déherm pin.
 * [Local Extender runtime evidence](research/local-extender-runtime-evidence.md) - Pinned macOS arm64 Bob/Extender build, bundle, runtime transcript, reproduced failures, and proof boundaries.
 * [Fixed multi-result tuple lowering](research/fixed-tuple-lowering.md) - Generated exact-arity Lua tuple descriptors, copied result semantics, reachability, and proof boundary.
 * [Generated URL and address frontier](research/script-url-address-generator-frontier.md) - Exact 70-route census and composite four-lane Defold URL arena foundation.
