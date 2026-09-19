@@ -599,9 +599,28 @@ set(DEHERM_DEFOLD_SDK_DIR
   "${CMAKE_CURRENT_SOURCE_DIR}/upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk"
   CACHE PATH "Pinned Defold SDK payload used by the headless conformance driver")
 
+# The Defold SDK's platform directory, and the directory our own Hermes archive
+# lives in. The two use different spellings for the same platform - Defold's SDK
+# says `arm64-macos` where the bundle target says `arm64-osx` - so both are
+# named rather than derived from each other.
+#
+# Only the Apple arm64 branch existed, which made the headless conformance
+# driver an Apple-only target and pushed its CI job onto a macOS runner. The
+# archives were never the obstacle: `native-artifacts.yml` publishes
+# hermes-x86_64-linux and hermes-arm64-linux alongside the Apple ones, and the
+# pinned SDK ships libengine.a for both. The mapping was simply missing.
 if(APPLE AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
   set(DEHERM_DEFOLD_SDK_PLATFORM "arm64-macos")
   set(DEHERM_EXTENSION_LIB_PLATFORM "arm64-osx")
+elseif(APPLE)
+  set(DEHERM_DEFOLD_SDK_PLATFORM "x86_64-macos")
+  set(DEHERM_EXTENSION_LIB_PLATFORM "x86_64-osx")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)$")
+  set(DEHERM_DEFOLD_SDK_PLATFORM "arm64-linux")
+  set(DEHERM_EXTENSION_LIB_PLATFORM "arm64-linux")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(DEHERM_DEFOLD_SDK_PLATFORM "x86_64-linux")
+  set(DEHERM_EXTENSION_LIB_PLATFORM "x86_64-linux")
 endif()
 
 set(DEHERM_HEADLESS_SDK_LIB_DIR "${DEHERM_DEFOLD_SDK_DIR}/lib/${DEHERM_DEFOLD_SDK_PLATFORM}")

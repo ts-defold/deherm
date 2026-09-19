@@ -27,23 +27,33 @@
 // `generate-script-api-accounting.mjs` naming eight routes - which mislabelled
 // `go.property` (it IS registered) and missed eighteen others.
 //
-// ── The statuses ───────────────────────────────────────────────────────────
+// ── The statuses, and where the default sits ───────────────────────────────
 //
-//   verified    Observed executing inside a real headless Defold engine.
-//               Nothing further happens. This is the steady state.
+// The default is that a route WORKS. Defold documents it, the engine registers
+// it, and Defold maintains this product with a reputation attached - they do
+// not ship a Lua API that is broken. Our own execution evidence is a bonus on
+// top of that, not the bar for shipping something unmarked. An earlier version
+// of this report had it backwards and labelled 450 routes "untested", which
+// says nothing true about the route and everything untrue about the product.
 //
-//   unverified  Exercised and did not behave: blocked at runtime, or a
-//               property mismatched. The route still ships. It carries the
-//               disposition and wants an issue.
+//   supported   Defold documents it and the engine registers it. This is the
+//               product's own contract and it is the overwhelming majority.
+//               No mark, no warning, no issue. If it turns out to be wrong,
+//               someone opens a bug - which is how every library works.
 //
-//   untested    No runtime evidence, with the derived reason - a missing
-//               fixture context, a route unavailable in the runtime profile
-//               that was exercised, an unmodelled parameter shape. Not a
-//               judgement about the route, a statement about our harness.
+//   executed    Additionally observed running inside a real headless Defold
+//               engine here. A stronger claim than `supported`, freely made
+//               where we have it, and never a prerequisite.
 //
-// The registration axis is recorded beside it and answers a different
-// question - does the engine register this name at all - which is how
-// `sys.set_render_enable` is visible as a route that cannot dispatch.
+//   suspect     Our own evidence CONTRADICTS the documentation: the engine
+//               registers no such name, or we exercised it and a property did
+//               not hold. This is the only status that earns a mark and an
+//               issue, and there are a few dozen of them rather than hundreds.
+//
+// Where we did not execute a route, the reason is recorded as a note about our
+// harness - a missing fixture context, a route belonging to a runtime profile
+// this run did not exercise. That is a to-do list for us. It is not a caveat
+// on the route and it is not published as one.
 
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -141,18 +151,21 @@ async function main() {
   const rows = ir.functions.map((fn) => {
     const luaName = fn.rawName;
     const disposition = runtime.get(fn.id) ?? null;
-    const status = disposition === "observed" ? "verified"
-      : disposition ? "unverified"
-      : "untested";
     const registered = registeredSomewhere.has(luaName)
       ? "registered"
       : declaredUnregistered.has(luaName) ? "declared-but-unregistered" : "no-registration-evidence";
+    // Only our own evidence contradicting the documentation makes a route
+    // suspect. Not having run it here does not.
+    const contradicted = registered === "declared-but-unregistered" || disposition === "mismatched";
+    const status = contradicted ? "suspect" : disposition === "observed" ? "executed" : "supported";
     return {
       id: fn.id,
       luaName,
       status,
       ...(disposition ? { disposition } : {}),
-      ...(status === "untested" ? { reason: untestedReason.get(fn.id) ?? "not-in-conformance-plan" } : {}),
+      // A note about OUR harness, for our own queue - never published as a
+      // caveat on the route.
+      ...(status === "supported" ? { notExecutedHere: untestedReason.get(fn.id) ?? "not-in-conformance-plan" } : {}),
       ...(mismatchDetail.has(fn.id) ? { mismatch: mismatchDetail.get(fn.id) } : {}),
       ...(arityDisagreement.has(luaName) ? { arityDisagreement: arityDisagreement.get(luaName) } : {}),
       registration: registered,
@@ -169,11 +182,10 @@ async function main() {
     return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a < b ? -1 : 1));
   };
 
-  // What wants an issue: a route that ships but whose own evidence says it
-  // cannot work. Everything else is either fine or merely untested by us, and
-  // an issue for "we have not got round to testing it" is noise.
-  const wantsIssue = rows.filter((row) =>
-    row.status === "unverified" || row.registration === "declared-but-unregistered");
+  // What wants an issue: exactly the suspects. A route we simply have not run
+  // here is not a defect and an issue saying so would be noise in someone
+  // else's tracker.
+  const wantsIssue = rows.filter((row) => row.status === "suspect");
 
   const artifact = {
     schemaVersion: 1,
@@ -188,10 +200,12 @@ async function main() {
     routeCount: rows.length,
     statusCounts: tally((row) => row.status),
     registrationCounts: tally((row) => row.registration),
-    untestedReasonCounts: (() => {
+    // Our own coverage queue, kept deliberately separate from the statuses so
+    // it cannot be mistaken for a statement about the API.
+    harnessCoverageGaps: (() => {
       const counts = {};
-      for (const row of rows.filter(({ status }) => status === "untested")) {
-        const family = String(row.reason).split(":")[0];
+      for (const row of rows.filter(({ notExecutedHere }) => notExecutedHere)) {
+        const family = String(row.notExecutedHere).split(":")[0];
         counts[family] = (counts[family] ?? 0) + 1;
       }
       return Object.fromEntries(Object.entries(counts).sort(([, a], [, b]) => b - a));
@@ -216,12 +230,14 @@ async function main() {
   console.log(`${check ? "Verified" : "Generated"} route verification for ${rows.length} documented routes at ${ir.defoldRevision}:`);
   console.log(`  ${Object.entries(artifact.statusCounts).map(([k, v]) => `${v} ${k}`).join(", ")}`);
   console.log(`  registration: ${Object.entries(artifact.registrationCounts).map(([k, v]) => `${v} ${k}`).join(", ")}`);
-  if (Object.keys(artifact.untestedReasonCounts).length) {
-    console.log(`  untested because: ${Object.entries(artifact.untestedReasonCounts).map(([k, v]) => `${v} ${k}`).join(", ")}`);
+  if (Object.keys(artifact.harnessCoverageGaps).length) {
+    const total = Object.values(artifact.harnessCoverageGaps).reduce((sum, value) => sum + value, 0);
+    console.log(`  our harness has not executed ${total} of them here (our queue, not a caveat on the API):`);
+    console.log(`    ${Object.entries(artifact.harnessCoverageGaps).map(([k, v]) => `${v} ${k}`).join(", ")}`);
   }
   console.log(`  ${artifact.arityDisagreementCount} route(s) where the documented arity and the parsed C implementation disagree (reported, not a verdict)`);
   if (wantsIssue.length) {
-    console.log(`  ${wantsIssue.length} route(s) ship with evidence against them and want an issue:`);
+    console.log(`  ${wantsIssue.length} suspect - our evidence contradicts the documentation, and these want an issue:`);
     for (const row of wantsIssue.slice(0, 25)) {
       console.log(`    ${row.luaName} - ${row.status}${row.disposition ? ` (${row.disposition})` : ""}, ${row.registration}${row.declaredAt ? ` at ${row.declaredAt}` : ""}`);
     }

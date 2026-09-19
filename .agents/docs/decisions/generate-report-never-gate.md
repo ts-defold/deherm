@@ -87,10 +87,20 @@ Neither is a judgement about the engine. Both say our own output is wrong.
 
 # Consequences
 
-**Verification becomes a spectrum, and it is published.** `verified`,
-`unverified` and `untested` are derived per route per target, and they are part
-of what the generator produces. A user asking "does `sys.set_render_enable`
-work?" gets an answer with evidence behind it rather than silence.
+**Verification is published, and its default is that the route works.** Defold
+maintains this engine, documents its Lua API and registers it; that is the
+product's contract and it is the overwhelming majority of the surface. Our own
+execution evidence is a bonus on top, never the bar for shipping something
+unmarked. The three statuses are `supported` (Defold documents and registers
+it - no mark, no issue), `executed` (additionally observed running in a real
+engine here) and `suspect` (our own evidence CONTRADICTS the documentation:
+registered nowhere, or exercised and a property did not hold).
+
+Only `suspect` earns a mark and an issue, and there are a few dozen. An earlier
+version of this had the default inverted and labelled 450 routes "untested",
+which says nothing true about the route and something untrue about the product.
+Where we have not executed a route, that is recorded as a note about OUR
+harness - a to-do list for us - and is not published as a caveat on the API.
 
 **Upstream bugs become our data.** `engine/engine/src/script/script_engine.cpp`
 documents `@name sys.set_render_enable` and registers
