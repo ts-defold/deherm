@@ -282,7 +282,7 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
       - uses: actions/setup-java@v5
-        with: { distribution: temurin, java-version: '21' }
+        with: { distribution: temurin, java-version: '25' }
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: bash scripts/bootstrap-upstreams.sh defold extender ref-doc
