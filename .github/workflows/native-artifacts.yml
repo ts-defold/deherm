@@ -74,6 +74,11 @@ jobs:
       android_64_ndk_api: ${{ steps.sdk.outputs.android_64_ndk_api }}
       iphoneos_version_min: ${{ steps.sdk.outputs.iphoneos_version_min }}
       macosx_version_min: ${{ steps.sdk.outputs.macosx_version_min }}
+      # Whether the Defold registry credential is configured. Secrets cannot be
+      # read in a job-level `if`, so the decision is made once here and the two
+      # windows lanes key off it - which also keeps them mutually exclusive
+      # rather than both racing the same asset.
+      registry_credential: ${{ steps.credential.outputs.available }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -129,6 +134,15 @@ jobs:
       # derived from upstream/defold/build_tools/sdk.py. Reading them here keeps
       # the container and Xcode invocations from carrying a second, drifting
       # copy.
+      - id: credential
+        env:
+          GCP_ARTIFACT_REGISTRY_KEY: ${{ secrets.GCP_ARTIFACT_REGISTRY_KEY }}
+        run: |
+          if [ -n "$GCP_ARTIFACT_REGISTRY_KEY" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
       - id: sdk
         run: |
           node -e '
@@ -249,12 +263,51 @@ jobs:
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
             "build/artifacts/${{ matrix.defold_platform }}/libhermes.a" "hermes-${{ matrix.defold_platform }}-libhermes.a"
 
+  # ── Windows: Defold's own toolchain when we can reach it ────────────────────
+  #
+  # Dockerfile.win32 builds inside extender-winsdk, the image Extender itself
+  # uses, which is what makes the archive ABI-exact against the toolchain that
+  # will link it - including the MSVC STL version and CRT linkage that the JSI
+  # surface's standard-library types require both sides to agree on.
+  #
+  # That registry refuses anonymous pulls but serves any AUTHENTICATED Google
+  # identity, so a service account credential is the whole difference. When one
+  # is configured this lane runs; when it is not - a fork, or a checkout without
+  # the secret - `windows-native` runs instead and produces a weaker artifact
+  # rather than no artifact. Exactly one of the two ever runs.
   windows:
     needs: [plan, releases]
-    if: needs.plan.outputs.target_exists != 'true'
-    # Native, not the Docker cross build: Defold's extender-winsdk image denies
-    # unauthenticated pulls and cannot be rebuilt without their private package
-    # host. build-windows.sh carries the full reasoning and the caveat.
+    if: needs.plan.outputs.target_exists != 'true' && needs.plan.outputs.registry_credential == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      # `upstream/` is not committed - it is bootstrapped reproducibly from
+      # upstream.lock. Only the Hermes tree is named, because cloning Defold on
+      # every build lane costs more than the build it prepares for.
+      - run: bash scripts/bootstrap-upstreams.sh hermes
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_ARTIFACT_REGISTRY_KEY }}
+      # The credential needs no role on Defold's project: the grant is to
+      # authenticated identities, not to named principals. It only has to be a
+      # real Google identity that can mint a token.
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
+      - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/ci/upload-release-asset.sh \
+            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "build/artifacts/x86_64-win32/hermes.lib" "hermes-x86_64-win32-hermes.lib"
+
+  # The fallback when no registry credential is configured. build-windows.sh
+  # records why this artifact makes a weaker provenance claim than every other
+  # lane's.
+  windows-native:
+    needs: [plan, releases]
+    if: needs.plan.outputs.target_exists != 'true' && needs.plan.outputs.registry_credential != 'true'
     runs-on: windows-2022
     defaults:
       run:
@@ -262,9 +315,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
-      # `upstream/` is not committed - it is bootstrapped reproducibly from
-      # upstream.lock. Only the Hermes tree is named, because cloning Defold on
-      # every build lane costs more than the build it prepares for.
       - run: bash scripts/bootstrap-upstreams.sh hermes
       - uses: ilammy/msvc-dev-cmd@v1
       - run: choco install ninja --no-progress -y

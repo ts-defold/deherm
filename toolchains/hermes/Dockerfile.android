@@ -89,7 +89,8 @@ RUN cmake -S /src/hermes -B /work/host -G Ninja \
       -DCMAKE_C_COMPILER=clang \
       -DCMAKE_CXX_COMPILER=clang++ \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
-      -DHERMES_ENABLE_INTL=OFF && \
+      -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_UNICODE_LITE=ON && \
     cmake --build /work/host --target hermesc shermes --parallel
 
 RUN cmake -S /src/hermes -B /work/build -G Ninja \
@@ -98,9 +99,11 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DANDROID_ABI=${ANDROID_ABI} \
       -DANDROID_PLATFORM=android-${ANDROID_API} \
       -DANDROID_STL=c++_static \
+      -DHERMES_IS_ANDROID=ON \
       -DIMPORT_HOST_COMPILERS=/work/host/ImportHostCompilers.cmake \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
       -DHERMES_ENABLE_TOOLS=OFF \
+      -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_DEBUGGER=OFF \
       -DHERMES_ENABLE_INTL=OFF \
       -DHERMES_BUILD_SHARED_JSI=OFF && \

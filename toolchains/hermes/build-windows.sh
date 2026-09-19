@@ -62,8 +62,10 @@ cmake -S "$hermes_source" -B "$work" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DHERMES_ENABLE_TEST_SUITE=OFF \
   -DHERMES_ENABLE_TOOLS=OFF \
+  -DHERMES_ENABLE_NAPI=OFF \
   -DHERMES_ENABLE_DEBUGGER=OFF \
   -DHERMES_ENABLE_INTL=OFF \
+  -DHERMES_UNICODE_LITE=ON \
   -DHERMES_BUILD_SHARED_JSI=OFF
 cmake --build "$work" --target hermesvm_a jsi --parallel
 

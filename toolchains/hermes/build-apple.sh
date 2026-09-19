@@ -78,6 +78,7 @@ cmake -S "$hermes_source" -B "$cross_build" -G Ninja \
   -DIMPORT_HOST_COMPILERS="$host_build/ImportHostCompilers.cmake" \
   -DHERMES_ENABLE_TEST_SUITE=OFF \
   -DHERMES_ENABLE_TOOLS=OFF \
+  -DHERMES_ENABLE_NAPI=OFF \
   -DHERMES_ENABLE_DEBUGGER=OFF \
   -DHERMES_ENABLE_INTL=OFF \
   -DHERMES_BUILD_SHARED_JSI=OFF

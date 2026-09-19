@@ -14,8 +14,10 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DCMAKE_CXX_COMPILER=clang++ \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
       -DHERMES_ENABLE_TOOLS=OFF \
+      -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_DEBUGGER=OFF \
       -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_UNICODE_LITE=ON \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
     cmake --build /work/build --target hermesvm_a jsi --parallel && \
     package-posix /work/build /out/libhermes.a

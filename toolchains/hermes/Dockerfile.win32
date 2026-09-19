@@ -13,7 +13,8 @@ WORKDIR /work
 RUN cmake -S /src/hermes -B /work/host -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
-      -DHERMES_ENABLE_INTL=OFF && \
+      -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_UNICODE_LITE=ON && \
     cmake --build /work/host --target hermesc shermes --parallel
 
 # One hermes.lib, not loose parts: manage-native-artifacts.mjs installs the
@@ -25,8 +26,10 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DIMPORT_HOST_COMPILERS=/work/host/ImportHostCompilers.cmake \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
       -DHERMES_ENABLE_TOOLS=OFF \
+      -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_DEBUGGER=OFF \
       -DHERMES_ENABLE_INTL=OFF \
+      -DHERMES_UNICODE_LITE=ON \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
     cmake --build /work/build --target hermesvm_a jsi --parallel && \
     package-msvc /work/build /out/hermes.lib
