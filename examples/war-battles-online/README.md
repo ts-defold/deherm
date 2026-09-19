@@ -10,9 +10,20 @@ The built game is the tutorial: a tilemap level, a player game object that moves
 and spawns rockets from a factory, kinematic rocket/tank collision groups, and
 one GUI score node. The arm64-macOS custom engine has executed that whole loop
 through Dynamic Hermes; see [defold/PLAYABLE-BLOCKERS.md](./defold/PLAYABLE-BLOCKERS.md)
-for the exact observed markers. This is packaged local gameplay evidence, not
-Static Hermes, HTML5 browser-host, whole-API, allocation, or QUIC deployment
-evidence.
+for the exact observed markers.
+
+A packaged `wasm-web` bundle of the same scene has executed that whole loop in
+headless Chrome through the browser host, with no Hermes present: run
+`pnpm runtime:browser` from this package, or `pnpm test:html5:war-battles` from
+the repository root, after bundling for `wasm-web`. The gate serves the bundle
+on a scoped loopback port, drives a dedicated Chrome profile over CDP, asserts
+the bundle fingerprint and the exact marker set, and tears down everything it
+created. The recorded observation is
+[`evidence/browser-runtime-wasm-web.json`](./evidence/browser-runtime-wasm-web.json).
+Nothing inspects the canvas, so neither run is a visual claim.
+
+This is packaged local gameplay evidence, not Static Hermes, whole-API,
+allocation, or QUIC deployment evidence.
 
 The 32-player presentation mockup that used to be the built scene is retained,
 unbuilt, under [`defold/reference/`](./defold/reference/README.md).

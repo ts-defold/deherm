@@ -12,20 +12,20 @@
     "conformance": "not-claimed"
   },
   "inputHashes": {
-    "scriptProjection": "cf99a0ff41cb72628f81e139624a96bd971e0b6ce4e5780c011edf9462a9e7b2",
+    "scriptProjection": "4de82f5733210c41c7db0a8f36bec521cf2582a95d062fe130c9b0b62b140410",
     "scriptScalarDispatch": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "scriptValueBindings": "d3617de137832821c331e27cefc3bb27aa01e8a7ce33baf9335c311f333153ef",
-    "scriptFixedTuples": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
+    "scriptValueBindings": "fb76b3c56345d38463c65d1644fcdfc47c70fd779152897eae7cb5502345c021",
+    "scriptFixedTuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "scriptDynamicValues": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "scriptValueTail": "75aa9201d8d6bbbc9ea99527f2ca64a808e565a11ef57e383d372fdb17949474",
-    "scriptOverloadDispatch": "22466ef160c49a372e333e2e6c3dfe4b5dd98f51b21aa4ce2508e7389fd4dd6b",
-    "scriptTableRecords": "e7d3af7b93ba353204746d2519354b161ff5695aefd7e3da58ca962644d6ac40",
+    "scriptValueTail": "b779a6ae47e27d7c04517974f6907009c74b5e5764e7355410622b07dd91cda7",
+    "scriptOverloadDispatch": "8cbc942aa9bbae6ff4ee8eec8982c767810c92cf118952ad382334ac8c68761c",
+    "scriptTableRecords": "e8a264a76429b0f4c18e6dcf52d8732e7ad2c0fae2bdf708874da972bbe130b9",
     "scriptCallbackLifecycle": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "scriptCopiedValueBlockers": "ce0edf415cdb628929f883d4ffb8af6b143a369f743b2f47d45ebb1b579b7b0d",
-    "scriptOpaqueRecordBlockers": "2624be71dcc7c7ae15b2c9c5c05914e24dcbc0a8a06307ce29b565294f229847",
+    "scriptCopiedValueBlockers": "aa438714ea6be2cab1e7f4d0ca7966163e7b3de2f314c96f0675199795c4c6a5",
+    "scriptOpaqueRecordBlockers": "4f8d96b6cb0245b05a688378254bbe707be11991e4e6cf0fd652e1b6398ab4a6",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "6978d1160295eedcc2dae6a0adb5909bb0cd9d7c57a871739c01e37b21d7f36b",
-    "scriptUniversalValue": "f1b454b15d8c1a970422e2707696bfba360e8ff7649d992054eb7856ca7e2e48",
+    "scriptHandleLowering": "5a1bb08aca326f703e5f65f43db38ed7f2fd8d491a0c5d356f234b1cc9b63afa",
+    "scriptUniversalValue": "bdd64114c6521fe278e3db4d649007cd5fa5f420dcae33ac9765ba27e5765df2",
     "defoldValueLayouts": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
     "dmsdkProjection": "052a5bb57b3c247abc5e0810321ed19b1cddb886b6ecc2d4348b96f44bf5e1bf",
     "dmsdkUniversal": "cff89257532f6661ef563bc0f0892a31dc582a12e871b362568428deaa5d759d",
@@ -48,20 +48,20 @@
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
   "inputCanonicalHashes": {
-    "scriptProjection": "3918c1d4364a2750ec08b65c9831e044831965fc159e16c69d02e331268aedc4",
+    "scriptProjection": "07a2693b01b4af9c7085198d096e73e9197de891149bda501d0b45a0a2b4d1ce",
     "scriptScalarDispatch": "098ac76471ecf7ef73d3cfdfaebcece8ac69198ae753e4bd99ad1ceee6f546cc",
-    "scriptValueBindings": "f0a060bfdf9bb235bf417756a7a929751400b2462d24febf52673479dbfbc633",
-    "scriptFixedTuples": "c48aa1e3a4cd5160b781c9971017b192c7844a8dbee5701768b2fe353dc797f9",
+    "scriptValueBindings": "71ac3ae558ef9568e31f31c028b2b07f9fbc9edc8018518f25869ef00beea0ba",
+    "scriptFixedTuples": "985cc2541d2fd278c59bfc0f0aa5f0083b5a94073ff3a7b6f83cd315ecdf9628",
     "scriptDynamicValues": "b987ff960b43ae0fc45d3a6d7002e2b54eca98fc26c35a421d8e7fcc74416326",
-    "scriptValueTail": "1500f0628b6ef2d1fb2f1618e188a76b6dc82c68ce0a8041668be135c103ff12",
-    "scriptOverloadDispatch": "6b75845a623681bbb298ae4f4ad24bf10392bea566dd7154e9c939becc7beb51",
-    "scriptTableRecords": "8ae6a93b87a2acda6badfba131654cba48fd9ab54eb713e770b2c2881460fd42",
+    "scriptValueTail": "eef7946b777e2ed64190afcf45600f41c4d26f91f116523e4739d09fc3c60332",
+    "scriptOverloadDispatch": "899e4b965a856214d4886de1aaec0569155f4ef0700221b9949d914ff665c40e",
+    "scriptTableRecords": "fc6526344c00d95051437cd5e53e1591b852fe666209e033f09a54da347a4534",
     "scriptCallbackLifecycle": "ae1ea85b129434f31fd28655f78177ead8eab7d8d2e4ea39d19fc8f915b9c1df",
-    "scriptCopiedValueBlockers": "79d564b94b3c8b8bfeb8c325926ad9dc9ae2e4be9f85b8ca6a978719b1257479",
-    "scriptOpaqueRecordBlockers": "a57059aab262d04de59c0e329fbc91c913206feac1185782d6bba367a53122b5",
+    "scriptCopiedValueBlockers": "5ffa7960737306c7a2ab34b352edfb7056ff990919245d33fc95beeca6b69902",
+    "scriptOpaqueRecordBlockers": "b31838f482e5c3608757d6d282f21c2ffd748519fc2576bc67704b86bfce6770",
     "scriptUrlAddress": "0c30abae7994fb4f4ba13e53958732c2f5ec4814e3669afeabe379d6180f258f",
-    "scriptHandleLowering": "241d0d4d943862ffe9168d262e2e0b3c90fbc0157eb7f66d6d248f4d10004481",
-    "scriptUniversalValue": "b32b87bca42785169a6c9d225b0bc0d7e91610605fd809cd2ddb309a80784bbf",
+    "scriptHandleLowering": "181ab07b89f0e26b580a4cde02435e27e0c82298b8037a4d000049ffeb835517",
+    "scriptUniversalValue": "b43cf3cc537141cbc681d8e4370181e1d9e08e66435b6980f35006322f33fb67",
     "defoldValueLayouts": "3e8d4fba5bf78f6d2be3e9c7aaa4839b2c0ccb63b866611cdab88be649e914d5",
     "dmsdkProjection": "55cf215b5552622e10f546249c769853850345dcaddbc45e533382acb10eb93b",
     "dmsdkUniversal": "138c208e8516c3e0b27322b3c8d4ae33ef26261b479677803033ed3fbd7b4ca5",
@@ -234081,7 +234081,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -237352,7 +237352,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -237520,7 +237520,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -237580,7 +237580,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -237638,7 +237638,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238027,7 +238027,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238085,7 +238085,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238146,7 +238146,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238317,7 +238317,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238375,7 +238375,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238433,7 +238433,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238491,7 +238491,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238551,7 +238551,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -238609,7 +238609,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -243762,7 +243762,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -247259,7 +247259,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "blocked-missing-handle-producer"
           }
@@ -250518,7 +250518,7 @@
             "context": "ScriptInstance"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -251503,7 +251503,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -252263,7 +252263,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -252570,7 +252570,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -253267,7 +253267,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -253338,7 +253338,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -256900,7 +256900,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -258727,7 +258727,7 @@
             "context": "GuiScriptInstance"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -259946,7 +259946,7 @@
             "context": "GuiScriptInstance"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -260664,7 +260664,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -260733,7 +260733,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -260802,7 +260802,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -260871,7 +260871,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -260940,7 +260940,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261009,7 +261009,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261080,7 +261080,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261149,7 +261149,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261220,7 +261220,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261289,7 +261289,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261358,7 +261358,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261427,7 +261427,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261498,7 +261498,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261569,7 +261569,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261638,7 +261638,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261707,7 +261707,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261778,7 +261778,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261909,7 +261909,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -261978,7 +261978,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262049,7 +262049,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262118,7 +262118,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262189,7 +262189,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262258,7 +262258,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262329,7 +262329,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262398,7 +262398,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262467,7 +262467,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262538,7 +262538,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262663,7 +262663,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262788,7 +262788,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262857,7 +262857,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262928,7 +262928,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -262999,7 +262999,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263068,7 +263068,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263137,7 +263137,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263206,7 +263206,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263277,7 +263277,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263409,7 +263409,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263478,7 +263478,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263547,7 +263547,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -263616,7 +263616,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -265717,7 +265717,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -272443,7 +272443,7 @@
             "context": "ScriptInstance"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -272504,7 +272504,7 @@
             "context": "ScriptInstance"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -274816,7 +274816,7 @@
             "context": "ScriptInstance"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -275840,7 +275840,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -275907,7 +275907,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276038,7 +276038,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276107,7 +276107,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276181,7 +276181,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276252,7 +276252,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276446,7 +276446,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276519,7 +276519,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276589,7 +276589,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276659,7 +276659,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276729,7 +276729,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276799,7 +276799,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276869,7 +276869,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -276939,7 +276939,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277009,7 +277009,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277079,7 +277079,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277214,7 +277214,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277342,7 +277342,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277411,7 +277411,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277479,7 +277479,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277546,7 +277546,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277615,7 +277615,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277683,7 +277683,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277751,7 +277751,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277821,7 +277821,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277889,7 +277889,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -277957,7 +277957,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -278022,7 +278022,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -278036,7 +278036,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -278150,7 +278150,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -278323,7 +278323,7 @@
           },
           "targetClaims": {
             "arm64DynamicHermes": "generated-executable",
-            "html5BrowserHost": "not-executable"
+            "html5BrowserHost": "generated-executable"
           }
         }
       ],
@@ -278602,7 +278602,7 @@
             "context": "Global"
           },
           "targetClaims": {
-            "html5BrowserHost": "not-executable",
+            "html5BrowserHost": "generated-executable-through-universal-transport",
             "nativeHermes": "generated-executable",
             "publicTypeScriptFixture": "reachable"
           }
@@ -466526,5 +466526,5 @@
       }
     }
   ],
-  "planSha256": "12e47a842832b04354c4129c7d50ed420711a15151559a0a1e70a08cf7788ad2"
+  "planSha256": "5dd80fa316281a652ab02ec27aca64ea799f77240af128ca29f8bb4bc8fc90ab"
 }

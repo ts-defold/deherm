@@ -93,7 +93,10 @@ test("Defold value and handle bindings are deterministic structured descriptors"
     operation.parameters.layout === "column-major-16-float32" &&
     operation.parameters.storage === "generation-checked-frame-arena" &&
     generatedProbe?.state === "planned" &&
-    targetSupport.html5BrowserHost.status === "not-executable"), true);
+    // The Matrix4 lane has no Emscripten primitive C ABI of its own, so the
+    // browser reaches these routes through the universal transport instead.
+    targetSupport.html5BrowserHost.status === "generated-executable" &&
+    targetSupport.html5BrowserHost.backend === "universal-direct-memory-transport"), true);
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:vmath.matrix4_compose").implementedCallShapes,
     [["Vector3", "Quaternion", "Vector3"], ["Vector4", "Quaternion", "Vector3"]]);
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:vmath.matrix4_translation").implementedCallShapes,
@@ -105,8 +108,12 @@ test("Defold value and handle bindings are deterministic structured descriptors"
   assert.match(report.allocationClaim, /reverse-hash table/i);
   assert.equal(report.bindings.find(({ id }) => id === "script:hash")
     .targetSupport.html5BrowserHost.status, "generated-executable");
+  // Only the primitive hash template has its own Emscripten C ABI. Every other
+  // route in this family is declared executable in the browser through the
+  // universal direct-memory transport, never through this family's lane.
   assert.equal(report.bindings.filter(({ id }) => id !== "script:hash").every(({ targetSupport }) =>
-    targetSupport.html5BrowserHost.status === "not-executable"), true);
+    targetSupport.html5BrowserHost.status === "generated-executable" &&
+    targetSupport.html5BrowserHost.backend === "universal-direct-memory-transport"), true);
 });
 
 test("generated value implementation stays POD-native and fail-closed", async () => {
@@ -132,8 +139,12 @@ test("generated value implementation stays POD-native and fail-closed", async ()
   assert.match(types, /defoldValueBrand: unique symbol/);
   assert.match(types, /\[defoldValueBrand\]: "vector3"/);
   assert.match(types, /\[defoldValueBrand\]: "quaternion"/);
-  assert.match(targetSupport, /script:gui\.set_text is not executable in the HTML5 browser host/);
-  assert.doesNotMatch(targetSupport, /script:hash is not executable/);
+  // The specialized POD lane is native-only, but every one of its routes still
+  // reaches the browser through the generated universal direct-memory provider,
+  // so this family's browser gate carries no route. The browser blockers that
+  // remain are machine-derived by the universal generator.
+  assert.doesNotMatch(targetSupport, /is not executable in the HTML5 browser host/);
+  assert.match(targetSupport, /if \(target !== "html5-browser-host"\) return;/);
   assert.match(arena, /struct alignas\(16\) ScriptMatrix4Arena/);
   assert.match(arena, /value\.data != &slot/);
   assert.match(arena, /generation != slot\.generation/);

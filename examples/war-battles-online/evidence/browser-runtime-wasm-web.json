@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "scope": "Packaged wasm-web browser execution of the War Battles port. Marker and CDP evidence only; no visual claim.",
+  "platform": "wasm-web",
+  "bundleFingerprint": "384587f0da2ed4a92cd76fb48b3c648061f7d63917c177d3335e407c4d8bae66",
+  "bundleSha256": "87ad8a36ad9632132410b715e829741ec766f994d0508dd58e2c443bb05214fd",
+  "state": {
+    "documentReady": "complete",
+    "engineStarted": true,
+    "hostRuntime": "browser",
+    "componentsRegistered": 5,
+    "scriptBridgeInstalled": true,
+    "scriptBridgeTarget": "html5-browser-host",
+    "modules": [
+      "DmSdkScalar",
+      "DmSdkUniversalRaw",
+      "ExampleMath",
+      "Timer"
+    ],
+    "bundleFingerprint": "384587f0da2ed4a92cd76fb48b3c648061f7d63917c177d3335e407c4d8bae66",
+    "canvas": {
+      "width": 756,
+      "height": 425
+    }
+  },
+  "requiredEngineMarkers": [
+    "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
+    "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
+    "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'"
+  ],
+  "requiredGameMarkers": [
+    "war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
+    "war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
+    "war-battles:ui-init",
+    "war-battles:player-init:560.0:360.0",
+    "war-battles:player-fire:560.0:360.0:1.00:0.00",
+    "war-battles:rocket-init:1.00:0.00",
+    "war-battles:rocket-hit",
+    "war-battles:score:100",
+    "war-battles:rocket-explosion-done",
+    "war-battles:player-moved:1592.0:1072.0"
+  ],
+  "observedGameMarkers": [
+    "war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
+    "war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
+    "war-battles:ui-init",
+    "war-battles:player-init:560.0:360.0",
+    "war-battles:rocket-init:1.00:0.00",
+    "war-battles:player-fire:560.0:360.0:1.00:0.00",
+    "war-battles:rocket-hit",
+    "war-battles:score:100",
+    "war-battles:rocket-explosion-done",
+    "war-battles:player-moved:1592.0:1072.0"
+  ],
+  "cameraSampleCount": 11,
+  "cameraClampStates": [
+    "none",
+    "x",
+    "xy"
+  ],
+  "pageErrors": []
+}

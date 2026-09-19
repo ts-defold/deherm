@@ -138,6 +138,7 @@ export const generatedScriptArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h",
   "defold/defold_hermes/src/generated_script_universal_static_frame.cpp",
   "packages/sdk/src/generated/script/universal-value-bindings.ts",
+  "packages/sdk/src/generated/script/browser-target-support.ts",
   "packages/static-hermes/src/generated/script-universal-value.ts",
   "defold/defold_hermes/lib/web/generated_script_universal_value.js",
   "packages/bindings/generated/defold-script-copied-value-record-blockers.json",

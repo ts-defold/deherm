@@ -992,19 +992,25 @@ function targetSupport(binding) {
     : binding.operation.parameters.addressed === ADDRESSED_TRANSFORM_BACKEND
     ? "generated-native-pod-with-addressed-captured-lua"
     : "generated-native-pod";
-  const browserExecutable = binding.operation.template === "hash-string";
+  const browserPrimitive = binding.operation.template === "hash-string";
+  // This family's specialized lane is a native POD/captured-Lua path, so only
+  // the primitive template has a direct Emscripten C ABI. The route itself is
+  // still reachable in the browser: `callScriptApi` dispatches one stable ID
+  // through the generated universal direct-memory provider, which selects the
+  // optimized lane only where it exists. Availability therefore belongs to the
+  // universal transport, which owns its own machine-derived browser gate.
   return {
     arm64DynamicHermes: {
       status: "generated-executable",
       backend: nativeBackend,
       evidence: "native-focused-test-not-packaged-engine-proof"
     },
-    html5BrowserHost: browserExecutable
+    html5BrowserHost: browserPrimitive
       ? { status: "generated-executable", backend: "emscripten-primitive-c-abi" }
       : {
-          status: "not-executable",
-          backend: "unavailable",
-          reason: "html5-browser-host-codec-or-context-not-implemented"
+          status: "generated-executable",
+          backend: "universal-direct-memory-transport",
+          reason: "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
         }
   };
 }

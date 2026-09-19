@@ -10,7 +10,7 @@ inline constexpr char kLuaModuleName[] = "_deherm_";
 inline constexpr std::string_view kCapabilityState = "native-provider-capability-present";
 inline constexpr std::string_view kHarnessEvidenceState = "native-lua-and-dynamic-hermes-harness-proven";
 inline constexpr bool kPackagedDefoldEngineVerified = false;
-inline constexpr std::string_view kDiagnostic = "deherm component proxies are unavailable on this target: native Lua and dynamic-Hermes harnesses pass, but Static Hermes, browser-host, and packaged-Defold execution remain unverified";
+inline constexpr std::string_view kDiagnostic = "deherm component proxies are unavailable on this target: native Lua, dynamic-Hermes, and browser-host providers are installed, but Static Hermes has no component C ABI and packaged-Defold execution remains unverified";
 inline constexpr std::array<const char*, 6> kRequiredLuaMethods{{
   "attachComponent",
   "dispatchLifecycle",

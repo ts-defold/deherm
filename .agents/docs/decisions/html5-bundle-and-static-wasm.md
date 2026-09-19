@@ -93,8 +93,39 @@ and rejects cycles, stale tokens, or exhausted bounds. The canonical plan conseq
 `browserWasmHost`: 888 non-callback routes plus 23 retained callbacks.
 `socket.newtry` and `socket.protect` remain gated because they return Lua
 higher-order closures with varargs/pcall semantics rather than registering an
-engine callback. A fresh packaged HTML5 run is still required before promoting
-the prior scalar/hash browser evidence to this wider provider.
+engine callback. A fresh packaged HTML5 bundle of the War Battles port has since
+executed that wider provider in headless Chrome; see
+`.agents/docs/research/local-extender-runtime-evidence.md`.
+
+# Browser component attachment
+
+A bundle registers an application lifecycle, a component registry, or both.
+`runtime.cpp` applies that rule for dynamic Hermes; the browser bootstrap now
+applies the identical rule, so a component-only bundle such as the War Battles
+port loads in the browser.
+
+Defold's generated Lua component proxies run inside the Wasm engine while the
+TypeScript component definitions run in the browser's own JavaScript engine.
+`component_web_backend.cpp` implements the same `BackendApi` the Hermes backend
+implements: it publishes the dispatching game object as the active
+current-instance context, pushes the bounded script-adapter component context,
+encodes the Lua `self`, editor properties, and lifecycle arguments into the
+generated universal wire format, and calls the browser provider. That provider
+owns a fixed-capacity generational slot pool of 1,024 instances, one `self`
+object per live attachment, and decodes every value with the generated
+`decodeWireRoots`, so the browser observes exactly the value shapes the native
+runtime materializes. Encoding uses four static arenas, so a hook that
+re-enters component dispatch gets its own frame and the fifth frame fails
+closed.
+
+The SDK's per-family browser gates were a pre-universal artifact. `callScriptApi`
+dispatches one stable ID through a single bridge, and the browser bridge is the
+generated universal direct-memory provider, so the specialized native POD and
+fixed-tuple lanes being native-only never made a route unreachable in the
+browser. Those two gates now carry no route. The one browser gate that remains
+is machine-derived from the universal generator's own callback lifecycle
+ledger, and it blocks exactly `socket.newtry` and `socket.protect`, whose
+results are higher-order Lua closures.
 
 The current spike evaluates the archived IIFE. That is acceptable for proving
 the bridge but is not the final production loader because strict Content

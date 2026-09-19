@@ -66,7 +66,9 @@ var LibraryDefoldHermes = {
     '$DEFOLD_HERMES_GENERATED_MODULES',
     '$DEFOLD_HERMES_WEB_CALLBACKS',
     '$DEFOLD_HERMES_SCRIPT_UNIVERSAL',
-    '$UTF8ToString'
+    '$DEFOLD_HERMES_COMPONENTS',
+    '$UTF8ToString',
+    '$stringToUTF8'
   ],
   $DEFOLD_HERMES_BRIDGE: {
     app: null,
@@ -77,6 +79,8 @@ var LibraryDefoldHermes = {
       globalThis.__defoldHostV1 = undefined;
       globalThis.__defoldModulesV1 = undefined;
       globalThis.__defoldScriptBridgeV1 = undefined;
+      globalThis.__defoldComponentsV1 = undefined;
+      DEFOLD_HERMES_COMPONENTS.reset();
       DEFOLD_HERMES_WEB_CALLBACKS.reset();
     },
 
@@ -101,12 +105,27 @@ var LibraryDefoldHermes = {
 
       try {
         (0, eval)(source + '\n//# sourceURL=defold-hermes://app.js');
-        DEFOLD_HERMES_BRIDGE.app = globalThis.__defoldAppV1;
-        if (!DEFOLD_HERMES_BRIDGE.app) throw new Error('Application did not register');
+        DEFOLD_HERMES_BRIDGE.app = globalThis.__defoldAppV1 || null;
+        // A bundle registers an application lifecycle, a component registry, or
+        // both. `runtime.cpp` applies exactly this rule for dynamic Hermes.
+        var components = globalThis.__defoldComponentsV1;
+        var hasComponents = Boolean(components) && typeof components === 'object';
+        if (!DEFOLD_HERMES_BRIDGE.app && !hasComponents) {
+          throw new Error('Bundle registered neither __defoldAppV1 nor __defoldComponentsV1');
+        }
+        if (hasComponents) DEFOLD_HERMES_COMPONENTS.activate();
       } catch (error) {
         DEFOLD_HERMES_BRIDGE.reset();
         throw error;
       }
+    },
+
+    fingerprint: function(buffer, capacity) {
+      var value = globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__;
+      if (typeof value !== 'string' || value.length !== 64 || !/^[0-9a-f]{64}$/.test(value)) return 0;
+      if (!capacity) return 0;
+      stringToUTF8(value, buffer, capacity);
+      return value.length;
     },
 
     init: function() {
@@ -138,6 +157,11 @@ var LibraryDefoldHermes = {
   ],
   defoldHermesWebLoad: function(sourcePointer, sourceSize) {
     DEFOLD_HERMES_BRIDGE.load(sourcePointer, sourceSize);
+  },
+
+  defoldHermesWebBundleFingerprint__deps: ['$DEFOLD_HERMES_BRIDGE', '$stringToUTF8'],
+  defoldHermesWebBundleFingerprint: function(buffer, capacity) {
+    return DEFOLD_HERMES_BRIDGE.fingerprint(buffer, capacity);
   },
 
   defoldHermesWebUpdate__deps: ['$DEFOLD_HERMES_BRIDGE'],

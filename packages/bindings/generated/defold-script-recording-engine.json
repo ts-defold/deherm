@@ -3,12 +3,12 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "12e47a842832b04354c4129c7d50ed420711a15151559a0a1e70a08cf7788ad2",
+  "planSha256": "5dd80fa316281a652ab02ec27aca64ea799f77240af128ca29f8bb4bc8fc90ab",
   "inputHashes": {
-    "projection": "cf99a0ff41cb72628f81e139624a96bd971e0b6ce4e5780c011edf9462a9e7b2",
-    "universal": "f1b454b15d8c1a970422e2707696bfba360e8ff7649d992054eb7856ca7e2e48",
-    "handleLowering": "6978d1160295eedcc2dae6a0adb5909bb0cd9d7c57a871739c01e37b21d7f36b",
-    "loweringPlan": "be16906f4472132f4306bc3f1a7c997f9be5f7823f2702b2bffea8c2c9ec3c8a"
+    "projection": "4de82f5733210c41c7db0a8f36bec521cf2582a95d062fe130c9b0b62b140410",
+    "universal": "bdd64114c6521fe278e3db4d649007cd5fa5f420dcae33ac9765ba27e5765df2",
+    "handleLowering": "5a1bb08aca326f703e5f65f43db38ed7f2fd8d491a0c5d356f234b1cc9b63afa",
+    "loweringPlan": "356badf21c8a415d13b21dc368bc391e5f851fe29d80148d4ee6f127f4e7fcd3"
   },
   "planInputDrift": [],
   "transports": {
@@ -56545,11 +56545,11 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "f8b2852620051f5d8f80a2e4d84e2735166668b7526b95ae3f999400855a5c17",
+    "header": "7029d9c8b8d3eb649063a9d581b840d69e00073e3e8d806f3273a28722bc155c",
     "tables": "4eab6a0f9bf8f04a096fcfc85c72376f50fa379d5ee434a70a0a2d9365f51c24",
     "provider": "576c3fb87089a0b968abe465b809de407d0027a286dd165c783325f853c63171",
     "driver": "04230cea34fba2a1418c110364ee6f101525b393106b6a42f26e7ff2644c86e2",
     "driverJs": "5dc503db68fb631b0db31a39c7db5796a8c44491c655522194158426a2f48744",
-    "expectedTrace": "ed06e3437075eed81950d6f00b3d4afe9d4fe4f3b5209986714ccba86ea114a3"
+    "expectedTrace": "38632b1783c166b4bbbe5fedd7c95248e48a059c30f1a122eabf7531edd9438a"
   }
 }

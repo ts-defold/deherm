@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generator": "packages/compiler/src/generate-binding-lowering-plan.mjs",
-  "generatorSha256": "1bd1c7777d650723079897b9079dff5503b2e0e68dddba13cdea744daff7934b",
+  "generatorSha256": "17608b28c21ddeb26bc27a702ac6536d84d82c6471e850e6e6d929c4986007a6",
   "inputPaths": {
     "scriptProjection": "packages/bindings/generated/defold-script-projection-ir.json",
     "scriptScalarDispatch": "packages/bindings/generated/defold-script-scalar-dispatch.json",
@@ -39,20 +39,20 @@
     "browserWasmHost": "packages/bindings/targets/browser-wasm-host.json"
   },
   "inputHashes": {
-    "scriptProjection": "cf99a0ff41cb72628f81e139624a96bd971e0b6ce4e5780c011edf9462a9e7b2",
+    "scriptProjection": "4de82f5733210c41c7db0a8f36bec521cf2582a95d062fe130c9b0b62b140410",
     "scriptScalarDispatch": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "scriptValueBindings": "d3617de137832821c331e27cefc3bb27aa01e8a7ce33baf9335c311f333153ef",
-    "scriptFixedTuples": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
+    "scriptValueBindings": "fb76b3c56345d38463c65d1644fcdfc47c70fd779152897eae7cb5502345c021",
+    "scriptFixedTuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "scriptDynamicValues": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "scriptValueTail": "75aa9201d8d6bbbc9ea99527f2ca64a808e565a11ef57e383d372fdb17949474",
-    "scriptOverloadDispatch": "22466ef160c49a372e333e2e6c3dfe4b5dd98f51b21aa4ce2508e7389fd4dd6b",
-    "scriptTableRecords": "e7d3af7b93ba353204746d2519354b161ff5695aefd7e3da58ca962644d6ac40",
+    "scriptValueTail": "b779a6ae47e27d7c04517974f6907009c74b5e5764e7355410622b07dd91cda7",
+    "scriptOverloadDispatch": "8cbc942aa9bbae6ff4ee8eec8982c767810c92cf118952ad382334ac8c68761c",
+    "scriptTableRecords": "e8a264a76429b0f4c18e6dcf52d8732e7ad2c0fae2bdf708874da972bbe130b9",
     "scriptCallbackLifecycle": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "scriptCopiedValueBlockers": "ce0edf415cdb628929f883d4ffb8af6b143a369f743b2f47d45ebb1b579b7b0d",
-    "scriptOpaqueRecordBlockers": "2624be71dcc7c7ae15b2c9c5c05914e24dcbc0a8a06307ce29b565294f229847",
+    "scriptCopiedValueBlockers": "aa438714ea6be2cab1e7f4d0ca7966163e7b3de2f314c96f0675199795c4c6a5",
+    "scriptOpaqueRecordBlockers": "4f8d96b6cb0245b05a688378254bbe707be11991e4e6cf0fd652e1b6398ab4a6",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "6978d1160295eedcc2dae6a0adb5909bb0cd9d7c57a871739c01e37b21d7f36b",
-    "scriptUniversalValue": "f1b454b15d8c1a970422e2707696bfba360e8ff7649d992054eb7856ca7e2e48",
+    "scriptHandleLowering": "5a1bb08aca326f703e5f65f43db38ed7f2fd8d491a0c5d356f234b1cc9b63afa",
+    "scriptUniversalValue": "bdd64114c6521fe278e3db4d649007cd5fa5f420dcae33ac9765ba27e5765df2",
     "defoldValueLayouts": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
     "dmsdkProjection": "052a5bb57b3c247abc5e0810321ed19b1cddb886b6ecc2d4348b96f44bf5e1bf",
     "dmsdkUniversal": "cff89257532f6661ef563bc0f0892a31dc582a12e871b362568428deaa5d759d",
@@ -74,9 +74,9 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "f0c54d53d7461317a691350bfad521159ddc3b777b148759b8e1e877b48cc7d3",
+  "cacheKey": "7733adf16804c7869cd60b3335309e6dcca98331b40a13c3ab45ba0779497cdd",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
-  "outputBytes": 15872758,
-  "outputSha256": "be16906f4472132f4306bc3f1a7c997f9be5f7823f2702b2bffea8c2c9ec3c8a",
-  "planSha256": "12e47a842832b04354c4129c7d50ed420711a15151559a0a1e70a08cf7788ad2"
+  "outputBytes": 15874036,
+  "outputSha256": "356badf21c8a415d13b21dc368bc391e5f851fe29d80148d4ee6f127f4e7fcd3",
+  "planSha256": "5dd80fa316281a652ab02ec27aca64ea799f77240af128ca29f8bb4bc8fc90ab"
 }

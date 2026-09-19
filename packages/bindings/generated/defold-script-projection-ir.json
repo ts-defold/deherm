@@ -22,21 +22,21 @@
   "inputHashes": {
     "ir": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "patterns": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "accounting": "75369da9d5d5f00c99ba41d65476216840c854bc57341f1c2d25075d3cfe03fa",
-    "values": "d3617de137832821c331e27cefc3bb27aa01e8a7ce33baf9335c311f333153ef",
+    "accounting": "2124afd2041fc8192a11b42acfa96035e30294e8470561be024f110ebcae5f56",
+    "values": "fb76b3c56345d38463c65d1644fcdfc47c70fd779152897eae7cb5502345c021",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "handles": "032ce2e670aa8781d6cc95e652ff6fe3af0f1b0c9c082edd02cee81ee646c7c6",
+    "handles": "8884e9042789b27655162577651feb63a79ce9c0611938817f439826cc44b3b9",
     "urls": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "tuples": "781c15218e26a642ff879bb224a42f11896396b0b458df07e71817b8069175ad",
+    "tuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "dynamics": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "tails": "75aa9201d8d6bbbc9ea99527f2ca64a808e565a11ef57e383d372fdb17949474",
-    "overloads": "22466ef160c49a372e333e2e6c3dfe4b5dd98f51b21aa4ce2508e7389fd4dd6b",
-    "tableSchemas": "e1288d5cdd2513213aebe4c3ecb43827f97ddff742ae29c6b3227277bfa10d2a",
-    "tableRecords": "e7d3af7b93ba353204746d2519354b161ff5695aefd7e3da58ca962644d6ac40",
-    "copiedRecords": "ce0edf415cdb628929f883d4ffb8af6b143a369f743b2f47d45ebb1b579b7b0d",
-    "opaqueRecords": "2624be71dcc7c7ae15b2c9c5c05914e24dcbc0a8a06307ce29b565294f229847",
-    "engineMatrix": "c23d73361cc94ab3e90aeed56fe8a2de6760c33dbc7eed51649094f4c8b8c2b1",
-    "availabilityProfiles": "c454b9d1343a517da9ec223caaecab248edb118ba21913017a48deb0f88be4cf"
+    "tails": "b779a6ae47e27d7c04517974f6907009c74b5e5764e7355410622b07dd91cda7",
+    "overloads": "8cbc942aa9bbae6ff4ee8eec8982c767810c92cf118952ad382334ac8c68761c",
+    "tableSchemas": "268c4b15a9bcdd0f4d8f1b8e22862cc8acfc38eabf54cd497be79c560d15736d",
+    "tableRecords": "e8a264a76429b0f4c18e6dcf52d8732e7ad2c0fae2bdf708874da972bbe130b9",
+    "copiedRecords": "aa438714ea6be2cab1e7f4d0ca7966163e7b3de2f314c96f0675199795c4c6a5",
+    "opaqueRecords": "4f8d96b6cb0245b05a688378254bbe707be11991e4e6cf0fd652e1b6398ab4a6",
+    "engineMatrix": "04fbb1eb8c217ecbd0b5d52ede7b6320941170d74b988b3ac038cc9c17b62bd1",
+    "availabilityProfiles": "a15b5fae86aa4f91ec093c27098a03f0d6ac8f830615e9eff4922a049db8a216"
   },
   "routeCount": 926,
   "generationCounts": {
@@ -41310,7 +41310,7 @@
             "source": "script:bullet3d.collision_object.get_world_transform",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -45956,7 +45956,7 @@
             "source": "script:bullet3d.constraint.get_6dof_motor",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -46231,7 +46231,7 @@
             "source": "script:bullet3d.constraint.get_anchors",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -46371,7 +46371,7 @@
             "source": "script:bullet3d.constraint.get_angles",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -46511,7 +46511,7 @@
             "source": "script:bullet3d.constraint.get_axes",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -47044,7 +47044,7 @@
             "source": "script:bullet3d.constraint.get_cone_twist_limits",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -47184,7 +47184,7 @@
             "source": "script:bullet3d.constraint.get_frame_a",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -47324,7 +47324,7 @@
             "source": "script:bullet3d.constraint.get_frame_b",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -47590,7 +47590,7 @@
             "source": "script:bullet3d.constraint.get_hinge_limits",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -47738,7 +47738,7 @@
             "source": "script:bullet3d.constraint.get_hinge_motor",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -47887,7 +47887,7 @@
             "source": "script:bullet3d.constraint.get_limit",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -48027,7 +48027,7 @@
             "source": "script:bullet3d.constraint.get_pivots",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -48183,7 +48183,7 @@
             "source": "script:bullet3d.constraint.get_slider_limits",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -48340,7 +48340,7 @@
             "source": "script:bullet3d.constraint.get_slider_motor",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -54744,7 +54744,7 @@
             "source": "script:bullet3d.rigid_body.get_damping",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -58857,7 +58857,7 @@
             "source": "script:bullet3d.shape.get_local_transform",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "blocked-missing-handle-producer"
             }
           }
@@ -66123,7 +66123,7 @@
             "source": "script:collectionproxy.set_collection",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }
@@ -68254,9 +68254,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -70019,9 +70019,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -70723,9 +70723,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -72438,9 +72438,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -72576,9 +72576,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -77475,9 +77475,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -79593,7 +79593,7 @@
             "source": "script:gui.get_type",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }
@@ -81162,7 +81162,7 @@
             "source": "script:gui.new_texture",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }
@@ -82283,9 +82283,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -82404,9 +82404,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -82525,9 +82525,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -82646,9 +82646,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -82767,9 +82767,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -82888,9 +82888,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83018,9 +83018,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83139,9 +83139,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83269,9 +83269,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83390,9 +83390,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83511,9 +83511,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83632,9 +83632,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83762,9 +83762,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -83892,9 +83892,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -84013,9 +84013,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -84134,9 +84134,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -84264,9 +84264,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -84501,9 +84501,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -84622,9 +84622,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -84752,9 +84752,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -84873,9 +84873,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -85003,9 +85003,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -85133,9 +85133,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -85263,9 +85263,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -85384,9 +85384,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -85505,9 +85505,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -85635,9 +85635,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -85863,9 +85863,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86091,9 +86091,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86212,9 +86212,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86342,9 +86342,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86472,9 +86472,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86593,9 +86593,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86714,9 +86714,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86844,9 +86844,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -86974,9 +86974,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -87265,9 +87265,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -87386,9 +87386,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -87507,9 +87507,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -87628,9 +87628,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -92686,9 +92686,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -107756,7 +107756,7 @@
             "source": "script:sound.get_peak",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }
@@ -107896,7 +107896,7 @@
             "source": "script:sound.get_rms",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }
@@ -112973,7 +112973,7 @@
             "source": "script:tilemap.get_bounds",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }
@@ -115516,9 +115516,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -115650,9 +115650,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -115927,9 +115927,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -116052,9 +116052,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -116188,9 +116188,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -116326,9 +116326,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -116704,9 +116704,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -116854,9 +116854,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117022,9 +117022,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117163,9 +117163,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117331,9 +117331,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117481,9 +117481,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117604,9 +117604,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117727,9 +117727,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117850,9 +117850,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -117973,9 +117973,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -118224,9 +118224,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -118471,9 +118471,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -118596,9 +118596,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -118728,9 +118728,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -118846,9 +118846,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -118980,9 +118980,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -119123,9 +119123,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -119257,9 +119257,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -119382,9 +119382,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -119505,9 +119505,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -119630,9 +119630,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -119755,9 +119755,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -119891,7 +119891,7 @@
             "source": "script:vmath.quat_to_euler",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }
@@ -120019,9 +120019,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -120385,9 +120385,9 @@
                 "evidence": "native-focused-test-not-packaged-engine-proof"
               },
               "html5BrowserHost": {
-                "status": "not-executable",
-                "backend": "unavailable",
-                "reason": "html5-browser-host-codec-or-context-not-implemented"
+                "status": "generated-executable",
+                "backend": "universal-direct-memory-transport",
+                "reason": "specialized-native-pod-lane-is-native-only-route-executes-through-the-universal-browser-provider"
               }
             }
           }
@@ -121003,7 +121003,7 @@
             "source": "script:window.get_size",
             "support": {
               "nativeHermes": "generated-executable",
-              "html5BrowserHost": "not-executable",
+              "html5BrowserHost": "generated-executable-through-universal-transport",
               "publicTypeScriptFixture": "reachable"
             }
           }

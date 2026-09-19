@@ -52,6 +52,20 @@ fi
 platform="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
 variant="${DEFOLD_HERMES_VARIANT:-debug}"
 
+# The smoke project under defold/ is the default Bob root. A product example is
+# an ordinary Defold project with the same extension link, so the same wrapper
+# builds it when DEFOLD_HERMES_PROJECT names its directory. The value is a path
+# relative to the repository root or an absolute path; nothing else changes.
+project_root="${DEFOLD_HERMES_PROJECT:-defold}"
+case "$project_root" in
+  /*) ;;
+  *) project_root="$repo_root/$project_root" ;;
+esac
+if [[ ! -f "$project_root/game.project" ]]; then
+  echo "No game.project under $project_root." >&2
+  exit 1
+fi
+
 case "$platform" in
   *-web)
     # HTML5 executes authored JavaScript in the browser. The extension's
@@ -72,11 +86,11 @@ esac
 # fingerprint binding - this project's smoke bundle is one; a recorded bundle
 # that disagrees with its sources still fails the build.
 if [[ "${DEFOLD_HERMES_SKIP_BUNDLE_CHECK:-0}" != "1" ]]; then
-  node "$repo_root/bin/deherm.mjs" verify-bundle --project "$repo_root/defold" --allow-unbound
+  node "$repo_root/bin/deherm.mjs" verify-bundle --project "$project_root" --allow-unbound
 fi
 
 arguments=(
-  --root "$repo_root/defold"
+  --root "$project_root"
   --output build/bob
   --bundle-output build/bundle
   --platform "$platform"

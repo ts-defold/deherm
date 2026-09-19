@@ -19,11 +19,17 @@
 #include <defold_hermes/lua_capi.hpp>
 #include <defold_hermes/script_bridge_capi.hpp>
 #include <defold_hermes/script_scalar_lua_adapter.hpp>
+#include <defold_hermes/static_unit_registry.h>
+#include <defold_hermes/deherm_profile.hpp>
 
 #include <cstdlib>
 #include <memory>
 #include <stdexcept>
 #include <string>
+
+#if defined(DM_PLATFORM_HTML5)
+#include <defold_hermes/component_web_backend.hpp>
+#endif
 
 #if !defined(DM_PLATFORM_HTML5)
 #include <defold_hermes/component_hermes_backend.hpp>
@@ -47,7 +53,9 @@ void* gBundleResource = nullptr;
 std::string gBundlePath;
 std::unique_ptr<defold_hermes::lua_bridge::LuaBridge> gLuaBridge;
 std::unique_ptr<defold_hermes::lua_bridge::scalar::ScriptAdapter> gScriptBridge;
-#if !defined(DM_PLATFORM_HTML5)
+#if defined(DM_PLATFORM_HTML5)
+std::unique_ptr<defold_hermes::component_proxy::WebBackend> gComponentWebBackend;
+#else
 std::unique_ptr<defold_hermes::component_proxy::HermesBackend> gComponentHermesBackend;
 #endif
 std::unique_ptr<defold_hermes::component_proxy::LuaRuntime> gComponentLuaRuntime;
@@ -189,6 +197,8 @@ void TerminalSetRotation(void*, void* instance, const float* xyzw) noexcept {
 #if defined(DM_PLATFORM_HTML5)
 
 extern "C" void defoldHermesWebLoad(const char* source, uint32_t sourceSize);
+extern "C" uint32_t defoldHermesWebBundleFingerprint(char* buffer, uint32_t capacity);
+extern "C" uint32_t defoldHermesWebComponentRevision();
 extern "C" void defoldHermesWebInit();
 extern "C" void defoldHermesWebUpdate(double dt);
 extern "C" void defoldHermesWebFinalize();
@@ -307,6 +317,16 @@ bool ActivateBundle(bool initial) {
     return false;
   }
   defoldHermesWebLoad(bundle.data, bundle.size);
+  {
+    char fingerprint[65]{};
+    const uint32_t length = defoldHermesWebBundleFingerprint(fingerprint, sizeof(fingerprint));
+    dmLogInfo(
+        "DEHERM_EVENT bundle-activated fingerprint=%s resource_generation=%llu runtime_id=%u initial=%s",
+        length == 64 ? fingerprint : "unavailable",
+        static_cast<unsigned long long>(bundle.generation),
+        defoldHermesWebComponentRevision(),
+        initial ? "true" : "false");
+  }
 #else
   std::unique_ptr<defold_hermes::Runtime> candidate;
   bool candidateRejected = false;
@@ -316,6 +336,23 @@ bool ActivateBundle(bool initial) {
   try {
     candidate = std::make_unique<defold_hermes::Runtime>(gHost);
     candidateRuntimeId = candidate->identity();
+    // Mixing seam. Any AOT unit a build materialised is evaluated into this
+    // runtime first, so the bytecode bundle loaded immediately below shares one
+    // Hermes runtime with `shermes`-compiled native code. A unit that installs
+    // itself over `__defoldScriptBridgeV1` therefore takes the routes it claims
+    // through `extern_c`, and every other route keeps crossing over JSI in the
+    // same binary.
+    size_t staticUnitCount = 0;
+    const auto* staticUnits = deherm_static_units(&staticUnitCount);
+    if (staticUnitCount) {
+      candidate->evaluateStaticUnits(
+          reinterpret_cast<const defold_hermes::StaticUnitCreator*>(staticUnits),
+          staticUnitCount);
+      dmLogInfo(
+          "DEHERM_EVENT static-units-evaluated count=%u runtime_id=%u",
+          static_cast<unsigned>(staticUnitCount),
+          candidateRuntimeId);
+    }
     candidate->load(
         std::string(bundle.data, bundle.size),
         std::string("deherm://") + gBundlePath);
@@ -671,18 +708,17 @@ void RegisterLuaBootstrap(lua_State* state) {
   lua_pop(state, 1);
 }
 
-#if !defined(DM_PLATFORM_HTML5)
 defold_hermes::lua_bridge::scalar::ScriptAdapter* CurrentComponentScriptAdapter(void*) noexcept {
   return gScriptBridge.get();
 }
 
 bool EnsureComponentRuntime(void*, lua_State* state) noexcept {
-  // Loading a Hermes bundle evaluates its module body immediately. Generated
-  // component modules may construct hashes/URLs at module scope, so the Lua
-  // dispatch table must already be installed before evaluation starts.
+  // Loading a bundle evaluates its module body immediately, in Hermes and in
+  // the browser alike. Generated component modules may construct hashes/URLs at
+  // module scope, so the Lua dispatch table must already be installed before
+  // evaluation starts.
   return EnsureScriptBridgeReady(state) && EnsureBundleLoaded();
 }
-#endif
 
 dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   const char* appPath = dmConfigFile::GetString(
@@ -729,16 +765,22 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
   }
   RegisterLuaBootstrap(params->m_L);
 #if defined(DM_PLATFORM_HTML5)
-  defold_hermes::component_proxy::registerUnavailableLuaApi(params->m_L);
+  gComponentWebBackend = std::make_unique<defold_hermes::component_proxy::WebBackend>(
+      nullptr, CurrentComponentScriptAdapter, EnsureComponentRuntime);
+  const defold_hermes::component_proxy::BackendApi componentBackendApi =
+      gComponentWebBackend->api();
 #else
   gComponentHermesBackend = std::make_unique<defold_hermes::component_proxy::HermesBackend>(
       nullptr, CurrentComponentRuntime, CurrentComponentScriptAdapter, EnsureComponentRuntime);
+  const defold_hermes::component_proxy::BackendApi componentBackendApi =
+      gComponentHermesBackend->api();
+#endif
   const defold_hermes::component_proxy::InstanceApi componentInstanceApi = {
     dmScript::GetInstance,
     dmScript::SetInstance
   };
   gComponentLuaRuntime = std::make_unique<defold_hermes::component_proxy::LuaRuntime>(
-      gComponentHermesBackend->api(), componentInstanceApi);
+      componentBackendApi, componentInstanceApi);
   gComponentLuaRuntime->registerLuaApi(params->m_L);
   gComponentInstanceAttachment.live = true;
   if (!defold_hermes::game_object::installCurrentInstanceApi(
@@ -747,7 +789,11 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
     InvalidateComponentInstanceAttachment();
     gComponentLuaRuntime->shutdown();
     gComponentLuaRuntime.reset();
+#if defined(DM_PLATFORM_HTML5)
+    gComponentWebBackend.reset();
+#else
     gComponentHermesBackend.reset();
+#endif
     defold_hermes::game_object::uninstallTerminalApi();
     gLuaBridge->shutdown();
     gLuaBridge.reset();
@@ -755,12 +801,126 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
     gBundlePath.clear();
     return dmExtension::RESULT_INIT_ERROR;
   }
-#endif
   defold_hermes::installLuaTimerCapi(LuaTimerDelay, LuaTimerCancel, LuaTimerTrigger);
 
   dmLogInfo("TypeScript bundle is waiting for script instance attachment");
   return dmExtension::RESULT_OK;
 }
+
+#if DEHERM_PROFILE_ENABLED
+// Transport-span reporter.
+//
+// The producer ring carries one 32-byte record per binding crossing, tagged
+// with the transport that performed it. Draining it here and folding it into a
+// bounded per-(transport, route) table turns "which transport did this call
+// take" from an inference into an observation: a route that reached the engine
+// through `extern_c` reports `typed-native`, and one that crossed the JSI host
+// function reports `jsi`, in the same process and the same frame.
+//
+// The table is fixed and never grows; an overflowing census says so rather than
+// allocating.
+struct TransportCensusEntry {
+  uint32_t transport;
+  uint32_t stableId;
+  uint64_t calls;
+  uint64_t nanoseconds;
+  uint64_t failures;
+};
+
+const uint32_t kTransportCensusCapacity = 512;
+TransportCensusEntry gTransportCensus[kTransportCensusCapacity];
+uint32_t gTransportCensusCount = 0;
+uint64_t gTransportCensusOverflow = 0;
+uint64_t gTransportCensusReported = 0;
+uint64_t gTransportLastReportMicros = 0;
+
+const char* TransportName(uint32_t transport) {
+  switch (transport) {
+    case DEHERM_PROFILE_TRANSPORT_LUA_STACK: return "lua-stack";
+    case DEHERM_PROFILE_TRANSPORT_C_ABI_NATIVE: return "c-abi-native";
+    case DEHERM_PROFILE_TRANSPORT_TYPED_NATIVE: return "typed-native";
+    case DEHERM_PROFILE_TRANSPORT_JSI: return "jsi";
+    case DEHERM_PROFILE_TRANSPORT_DIRECT_MEMORY: return "direct-memory";
+    case DEHERM_PROFILE_TRANSPORT_RAW_LUA: return "raw-lua";
+    default: return "unknown";
+  }
+}
+
+void FoldTransportSpans() {
+  defold_hermes::profile::Record batch[256];
+  for (;;) {
+    const uint32_t count = defold_hermes::profile::drain(batch, 256);
+    if (!count) break;
+    for (uint32_t index = 0; index < count; ++index) {
+      const auto& record = batch[index];
+      if (record.kind != DEHERM_PROFILE_KIND_TRANSPORT_SPAN) continue;
+      const uint32_t transport = static_cast<uint32_t>(record.value_b & 0xFFu);
+      const uint32_t status = static_cast<uint32_t>((record.value_b >> 24) & 0xFFu);
+      TransportCensusEntry* entry = nullptr;
+      for (uint32_t slot = 0; slot < gTransportCensusCount; ++slot) {
+        if (gTransportCensus[slot].transport == transport &&
+            gTransportCensus[slot].stableId == record.stable_id) {
+          entry = &gTransportCensus[slot];
+          break;
+        }
+      }
+      if (!entry) {
+        if (gTransportCensusCount == kTransportCensusCapacity) {
+          ++gTransportCensusOverflow;
+          continue;
+        }
+        entry = &gTransportCensus[gTransportCensusCount++];
+        entry->transport = transport;
+        entry->stableId = record.stable_id;
+        entry->calls = 0;
+        entry->nanoseconds = 0;
+        entry->failures = 0;
+      }
+      ++entry->calls;
+      entry->nanoseconds += record.value_a;
+      if (status == DEHERM_PROFILE_STATUS_FAILED) ++entry->failures;
+    }
+    if (count < 256) break;
+  }
+}
+
+void ReportTransportCensus(const char* reason) {
+  FoldTransportSpans();
+  const auto& ring = defold_hermes::profile::ring();
+  dmLogInfo(
+      "DEHERM_EVENT transport-census-begin reason=%s routes=%u produced=%llu dropped=%llu overflow=%llu",
+      reason,
+      gTransportCensusCount,
+      static_cast<unsigned long long>(ring.produced),
+      static_cast<unsigned long long>(ring.dropped),
+      static_cast<unsigned long long>(gTransportCensusOverflow));
+  for (uint32_t index = 0; index < gTransportCensusCount; ++index) {
+    const auto& entry = gTransportCensus[index];
+    dmLogInfo(
+        "DEHERM_EVENT transport-span transport=%s stable_id=0x%08x calls=%llu total_ns=%llu mean_ns=%llu failures=%llu",
+        TransportName(entry.transport),
+        entry.stableId,
+        static_cast<unsigned long long>(entry.calls),
+        static_cast<unsigned long long>(entry.nanoseconds),
+        static_cast<unsigned long long>(entry.calls ? entry.nanoseconds / entry.calls : 0),
+        static_cast<unsigned long long>(entry.failures));
+  }
+  dmLogInfo("DEHERM_EVENT transport-census-end reason=%s", reason);
+  ++gTransportCensusReported;
+}
+
+void EmitTransportCensus() {
+  const uint64_t now = dmTime::GetTime();
+  FoldTransportSpans();
+  if (!gTransportLastReportMicros) {
+    gTransportLastReportMicros = now;
+    return;
+  }
+  if (now - gTransportLastReportMicros < 2000000u) return;
+  gTransportLastReportMicros = now;
+  ReportTransportCensus("periodic");
+}
+#endif  // DEHERM_PROFILE_ENABLED
 
 #if !defined(DM_PLATFORM_HTML5)
 // Telemetry is emitted from the engine-driven extension update rather than the
@@ -818,6 +978,9 @@ dmExtension::Result UpdateExtension(dmExtension::Params*) {
 #if !defined(DM_PLATFORM_HTML5)
   EmitTelemetry();
 #endif
+#if DEHERM_PROFILE_ENABLED
+  EmitTransportCensus();
+#endif
   return dmExtension::RESULT_OK;
 }
 
@@ -839,6 +1002,10 @@ void OnEventExtension(dmExtension::Params*, const dmExtension::Event* event) {
 
 dmExtension::Result FinalizeExtension(dmExtension::Params*) {
   FinalizeAttachedApplication("extension finalize");
+#if DEHERM_PROFILE_ENABLED
+  // Final fold, after every component `final()` has run its last binding calls.
+  ReportTransportCensus("finalize");
+#endif
   DetachCapturedLuaInstances();
   gLoggedFirstExtensionUpdate = false;
   gTelemetryLastEmitMicros = 0;
@@ -851,7 +1018,9 @@ dmExtension::Result FinalizeExtension(dmExtension::Params*) {
   defold_hermes::uninstallScriptBridgeApi();
   if (gComponentLuaRuntime) gComponentLuaRuntime->shutdown();
   gComponentLuaRuntime.reset();
-#if !defined(DM_PLATFORM_HTML5)
+#if defined(DM_PLATFORM_HTML5)
+  gComponentWebBackend.reset();
+#else
   gComponentHermesBackend.reset();
 #endif
   if (gScriptBridge) gScriptBridge->shutdown();

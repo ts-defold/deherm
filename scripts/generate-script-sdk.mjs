@@ -568,6 +568,7 @@ function generateRuntime() {
   return `${banner}
 import { assertValueRouteTargetSupport } from "./value-target-support";
 import { assertFixedTupleTargetSupport } from "./fixed-tuple-target-support";
+import { assertBrowserRouteTargetSupport } from "./browser-target-support";
 
 export interface DefoldScriptBridge {
   /** Stable-ID universal call surface. Primitive scalar values are the first executable lane. */
@@ -598,6 +599,7 @@ export function callScriptApi(stableId: number, args: readonly unknown[]): unkno
   const installed = bridge();
   assertValueRouteTargetSupport(stableId, installed.target);
   assertFixedTupleTargetSupport(installed.target, stableId);
+  assertBrowserRouteTargetSupport(stableId, installed.target);
   return installed.call(stableId, args);
 }
 

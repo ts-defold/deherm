@@ -41,41 +41,42 @@
     "compilerRegistry": "deterministic-full-inventory-generated-and-bundled",
     "componentOnlyBootstrap": "native-runtime-and-lazy-extension-attach-path-implemented",
     "scriptAdapterContextSelection": "fixed-depth-16-reentrant-stack-no-hot-path-registry-allocation",
-    "eventCodec": "caller-stack-owned-256-fields-256-elements-depth-8-recursive-object-array-codec"
+    "eventCodec": "caller-stack-owned-256-fields-256-elements-depth-8-recursive-object-array-codec",
+    "browserProvider": "fixed-capacity-1024-slot-generational-browser-registry-over-the-generated-universal-direct-memory-wire-format"
   },
   "methodDisposition": {
     "attachComponent": {
       "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
       "nativeStaticHermes": "fail-closed-no-component-c-abi",
-      "html5BrowserHost": "fail-closed-no-component-provider"
+      "html5BrowserHost": "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned"
     },
     "dispatchLifecycle": {
       "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
       "nativeStaticHermes": "fail-closed-no-component-c-abi",
-      "html5BrowserHost": "fail-closed-no-component-provider"
+      "html5BrowserHost": "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned"
     },
     "dispatchMessage": {
       "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
       "nativeStaticHermes": "fail-closed-no-component-c-abi",
-      "html5BrowserHost": "fail-closed-no-component-provider"
+      "html5BrowserHost": "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned"
     },
     "dispatchInput": {
       "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
       "nativeStaticHermes": "fail-closed-no-component-c-abi",
-      "html5BrowserHost": "fail-closed-no-component-provider"
+      "html5BrowserHost": "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned"
     },
     "dispatchReload": {
       "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
       "nativeStaticHermes": "fail-closed-no-component-c-abi",
-      "html5BrowserHost": "fail-closed-no-component-provider"
+      "html5BrowserHost": "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned"
     },
     "detachComponent": {
       "nativeDynamicHermes": "provider-compiled-native-lua-and-dynamic-hermes-harness-proven-packaged-engine-unverified",
       "nativeStaticHermes": "fail-closed-no-component-c-abi",
-      "html5BrowserHost": "fail-closed-no-component-provider"
+      "html5BrowserHost": "provider-compiled-browser-universal-direct-memory-transport-packaged-browser-gate-is-example-owned"
     }
   },
-  "diagnostic": "deherm component proxies are unavailable on this target: native Lua and dynamic-Hermes harnesses pass, but Static Hermes, browser-host, and packaged-Defold execution remain unverified",
+  "diagnostic": "deherm component proxies are unavailable on this target: native Lua, dynamic-Hermes, and browser-host providers are installed, but Static Hermes has no component C ABI and packaged-Defold execution remains unverified",
   "evidence": {
     "generation": "component generator emits context/property metadata plus a complete import registry; bundling emits exact component usage and a keyed sentinel",
     "nativeCompile": "component provider and Hermes backend compile in a dedicated native target",
@@ -83,7 +84,7 @@
     "dynamicHermesHarness": "Lua-to-Hermes property/lifecycle/message/input/reload/final/detach, wide nested event payloads, and runtime-generation rebind execution are tested for all three contexts",
     "packagedDefoldEngine": "unverified",
     "staticHermesRuntime": "unverified",
-    "browserRuntime": "unverified"
+    "browserRuntime": "generated browser provider attaches, dispatches, and detaches component instances over the universal direct-memory wire format; packaged browser execution is asserted by an example-owned HTML5 runtime gate that is deliberately not an input to this generator"
   },
   "provenance": {
     "proxyGenerator": {
@@ -96,15 +97,15 @@
     },
     "runtimeHeader": {
       "path": "defold/defold_hermes/include/defold_hermes/runtime.hpp",
-      "sha256": "a5e8e0f7ff24de169e5e1cba2ba782671f7a2ba1706e3ee29af65b0c89dc7f74"
+      "sha256": "28a258f5b4b0a1bd0828f99e4572529c180a7b0f7b80bc3fdf914fa64991baf2"
     },
     "runtimeSource": {
       "path": "defold/defold_hermes/src/runtime.cpp",
-      "sha256": "30f949a5ac331ae2cdd00b68bea4c9ffaa895008cc3b536ca139aed042ae5c92"
+      "sha256": "3137d27383f2d695f62358ef75e1da0c58c18cc460eaf597697e8a5abf4ca70c"
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
-      "sha256": "718c116934fc67aeef9e56b8bcced92e73dca1c4beafa3e98b20f22415b3e2da"
+      "sha256": "3ac16b222c9a81b8c968fdd3e291f5e5939697e5375aabb39155ec8175f5fbbb"
     },
     "luaProvider": {
       "path": "defold/defold_hermes/include/defold_hermes/component_proxy_lua_gate.hpp",
@@ -113,6 +114,14 @@
     "hermesBackend": {
       "path": "defold/defold_hermes/src/component_hermes_backend.cpp",
       "sha256": "b598030bc9136228288cc8a805df5ee2a6ab18f483b916f69be21cad2817f332"
+    },
+    "webBackend": {
+      "path": "defold/defold_hermes/src/component_web_backend.cpp",
+      "sha256": "a82160dd06352dd3156465fbfd3b5443ef3050c2322cb462a5fce654a1c6c61e"
+    },
+    "browserProvider": {
+      "path": "defold/defold_hermes/lib/web/component_bridge.js",
+      "sha256": "1ed1e040e1b67fbdc0e26440168b99512d25327a610deb0147005b7ffda32e1d"
     },
     "adapterSource": {
       "path": "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",

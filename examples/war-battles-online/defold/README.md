@@ -151,6 +151,25 @@ local Extender (`pnpm extender:status`). Never use a remote build server.
 
 Run the built game with `pnpm play` from the example package.
 
+For the browser, bundle the same project for `wasm-web` and run the HTML5
+runtime gate:
+
+```sh
+/opt/homebrew/opt/openjdk@25/bin/java -jar build/tooling/bob.jar \
+  --root examples/war-battles-online/defold \
+  --output build/bob --bundle-output build/bundle \
+  --platform wasm-web --architectures wasm-web \
+  --variant debug --archive \
+  --build-server http://localhost:9010 \
+  resolve build bundle
+
+pnpm runtime:browser
+```
+
+`scripts/bob.sh` builds this project directly when `DEFOLD_HERMES_PROJECT`
+names it, so `DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold pnpm
+bob:web:bundle` is the wrapped equivalent.
+
 See [PLAYABLE-BLOCKERS.md](./PLAYABLE-BLOCKERS.md) for the exact observed
 boundary and the remaining blockers, and [reference/README.md](./reference/README.md)
 for the retained presentation mockup.

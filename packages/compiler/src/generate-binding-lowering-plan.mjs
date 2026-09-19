@@ -309,6 +309,9 @@ const allowedTargetClaimStatuses = new Set([
   "blocked-captured-instance-url-construction-context",
   "blocked-box2d-joint-handle-codec",
   "generated-executable-shared-script-adapter",
+  // A specialized native lane is absent on the target, but the route still
+  // executes there through the generated universal transport.
+  "generated-executable-through-universal-transport",
   "not-integrated-fail-closed",
   "blocked-render-target-table-and-resource-lifetime-codecs",
   "blocked-box2d-handle-and-structured-fixture-codecs",

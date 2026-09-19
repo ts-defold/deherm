@@ -574,6 +574,65 @@ War Battles run.
 The harness is available as `pnpm runtime:packaged`, with explicit record and
 stale-artifact check variants in the War Battles workspace package.
 
+## War Battles in a browser on 2026-09-18
+
+The War Battles port is a component-only bundle: its behaviour lives entirely in
+generated Lua component proxies that attach TypeScript components. Before this
+change the HTML5 extension installed a fail-closed component API, so every one
+of its scripts errored at `init` and the bundle never loaded. Three independent
+gates were stale against the universal browser lane:
+
+1. the HTML5 branch of `InitializeExtension` registered the unavailable
+   component API instead of a provider;
+2. the browser bootstrap rejected any bundle without `__defoldAppV1`;
+3. the SDK's per-family browser gates threw for 77 value routes and 24
+   fixed-tuple routes that the canonical plan already marks `emit` for
+   `browserWasmHost`.
+
+All three were fixed at their source. A fresh `wasm-web` bundle was then built
+through the pinned local Extender and driven by
+`examples/war-battles-online/integration/check-browser-runtime.mjs`, which
+serves the bundle on a scoped loopback port, launches a dedicated headless
+Chrome profile, reloads once, asserts the marker set, and tears down the server,
+browser, and profile it created:
+
+```sh
+/opt/homebrew/opt/openjdk@25/bin/java -jar build/tooling/bob.jar \
+  --root examples/war-battles-online/defold \
+  --output build/bob --bundle-output build/bundle \
+  --platform wasm-web --architectures wasm-web --variant debug --archive \
+  --build-server http://localhost:9010 \
+  resolve build bundle
+
+pnpm test:html5:war-battles
+```
+
+The gate exited zero and recorded
+`examples/war-battles-online/evidence/browser-runtime-wasm-web.json`. The
+browser reported `engineStarted`, `hostRuntime: "browser"`, script bridge target
+`html5-browser-host`, five registered components, and bundle fingerprint
+`384587f0da2ed4a92cd76fb48b3c648061f7d63917c177d3335e407c4d8bae66`, identical to
+the source `deherm/app.dehermc`. The run emitted, in the engine's own log,
+every required game-owned marker: `camera-init` and `camera-bounds`, `ui-init`,
+`player-init:560.0:360.0`, `player-fire:560.0:360.0:1.00:0.00`,
+`rocket-init:1.00:0.00`, `rocket-hit`, `score:100`,
+`rocket-explosion-done`, `player-moved:1592.0:1072.0`, and eleven `camera:`
+samples covering the `none`, `x`, and `xy` clamp states. There was no JavaScript
+exception and no page error other than the ignored `favicon.ico` 404.
+
+This is the tutorial's whole demonstration chain executing in a browser:
+component attachment in three contexts, editor property specialization, a
+factory spawn whose spawned object attaches its own component, a Box2D
+collision message, a sprite animation completion callback returning through the
+browser callback trampoline, GUI node mutation, and a camera following the
+player across a scrolling world into both clamps.
+
+It is not a visual claim. Nothing in this repository inspects the canvas. The
+evidence is the marker transcript, the CDP-observed page state, and the absence
+of page errors. It also does not promote Static Hermes, the production external
+bundle loader, input handling from a real device, audio, or whole-API browser
+conformance.
+
 # Open evidence gaps
 
 The next promotion gate should rebuild this proof from a clean checkout in

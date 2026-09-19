@@ -3,7 +3,7 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "All lua-table and multi-result routes in the exact script API pattern ledger, including generated fixed tuples",
   "evidencePolicy": "Planning/schema classification only. This artifact does not claim compilation, linkage, packaged-engine execution, or runtime behavior.",
-  "inputSha256": "894119b1020266ebe4c312aba86fc5e02c17481c42ace8777fcdf59ec112deb2",
+  "inputSha256": "4760cf77458cea03cfbacfe64501bdd87ad93e95b7235eb99e1377507302935f",
   "routeCount": 185,
   "familyCounts": {
     "lua-table": 148,

@@ -14,7 +14,7 @@
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "reviewedPolicySha256": "9b77b1d4d4bd5079b7b509d78b996014c04a29097cf937a1b1d61681367cfa3a",
-    "alreadyOwnedReportSha256": "d3617de137832821c331e27cefc3bb27aa01e8a7ce33baf9335c311f333153ef"
+    "alreadyOwnedReportSha256": "fb76b3c56345d38463c65d1644fcdfc47c70fd779152897eae7cb5502345c021"
   },
   "evidencePolicy": "Pinned source hashes and anchors record the reviewed registration surface. The eight candidates are installed in the shared native-dynamic ScriptAdapter/JSI router; real Defold Lua 5.1 tests reach every candidate descriptor and a local Bob/Extender arm64-osx bundle links the extension. Packaged-engine semantic execution, Static Hermes, and browser-host execution remain unclaimed.",
   "allocationPolicy": "Dispatch performs a sorted static descriptor lookup, scans only reviewed fixed call shapes, and uses cached Lua references plus caller-owned frame arenas. The warmed native test observes zero C++ operator-new calls; Lua, Hermes, and engine-internal allocation is outside that claim.",
