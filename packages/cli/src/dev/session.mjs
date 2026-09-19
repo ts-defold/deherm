@@ -227,6 +227,12 @@ export async function runDevSession(options = {}) {
     mirrors: [sourceMirror, buildMirror],
     resourcePath,
     useTtsc: options.useTtsc,
+    // Hermes parses JavaScript on every load unless handed bytecode. hermesc is
+    // published per host precisely so this costs the user no native toolchain,
+    // and until now nothing invoked it - every build shipped source. Dev keeps
+    // -Og -g2 so a stack trace still names a line; a release build optimises.
+    bytecode: options.bytecode !== false,
+    bytecodeOptimize: options.bytecodeOptimize === true,
     // Bob archives the mirrored bundle without knowing what produced it. Each
     // successful build therefore rewrites the binding in deherm.lock, so the
     // relation between the artifact on Bob's input path and the sources it came

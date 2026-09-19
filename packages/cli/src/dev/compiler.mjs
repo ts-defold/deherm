@@ -1,4 +1,5 @@
-import { mkdir, rename, rm, writeFile } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { context } from "esbuild";
@@ -27,6 +28,36 @@ async function writeAtomically(file, contents) {
 function normalizeResourcePath(value) {
   const resource = value.replaceAll("\\", "/");
   return resource.startsWith("/") ? resource : `/${resource}`;
+}
+
+// Compile the bundle to Hermes bytecode with the SHIPPED hermesc.
+//
+// Hermes parses JavaScript at load time unless it is handed bytecode, so a
+// bundle shipped as source pays that parse on every start. hermesc is one of
+// the tools deherm publishes per host precisely so this step never requires a
+// native toolchain on the user's machine - and nothing called it, so every
+// build shipped source and the published compiler was never the one that ran.
+//
+// Resolved through the host-compiler manifest rather than a build directory, so
+// the repository exercises the same binary a user downloads. Failing closed is
+// deliberate: a bundle that silently stays source is exactly the "someone
+// forgot to run deherm" failure this seam exists to prevent.
+//
+// -O for release. Dev keeps -Og -g2 so a stack trace still names a line.
+async function emitBytecode(outputFile, { optimize }) {
+  const { requireHostTool } = await import("../host-compilers.mjs");
+  const tool = await requireHostTool("hermesc");
+  const bytecodeFile = `${outputFile}.hbc`;
+  const result = spawnSync(tool.path, [
+    ...(optimize ? ["-O"] : ["-Og", "-g2"]),
+    "-emit-binary",
+    `-out=${bytecodeFile}`,
+    outputFile
+  ], { encoding: "utf8" });
+  if (result.status !== 0) {
+    throw new Error(`hermesc failed for ${outputFile}: ${result.stderr || result.stdout || "no output"}`);
+  }
+  return { file: bytecodeFile, bytes: (await stat(bytecodeFile)).size, optimized: Boolean(optimize) };
 }
 
 export async function createIncrementalCompiler(options) {
@@ -126,12 +157,23 @@ export async function createIncrementalCompiler(options) {
         await writeAtomically(artifact.path, artifact.contents);
       }
       await writeAtomically(outputFile, finalSource);
+      // Bytecode is produced from the written bundle, after the fingerprint is
+      // stamped, so the .hbc corresponds to the exact bytes on disk.
+      const bytecode = options.bytecode
+        ? await emitBytecode(outputFile, { optimize: options.bytecodeOptimize !== false })
+        : null;
       const sourceMap = result.outputFiles.find(({ path: file }) => path.resolve(file) === `${outputFile}.map`);
       for (const mirror of mirrors) {
         if (sourcemap && sourceMap) {
           await writeAtomically(`${mirror}.map`, sourceMap.contents);
         }
         await writeAtomically(mirror, finalSource);
+        // The bytecode travels with the bundle it was compiled from. Bob
+        // archives the mirror, so a .hbc left only beside outputFile would
+        // never reach the engine.
+        if (bytecode) {
+          await writeAtomically(`${mirror}.hbc`, await readFile(bytecode.file));
+        }
       }
       // Every file the bundler read is a build input, whether or not it
       // contributed bytes: a type-only module can still change the emitted
@@ -153,7 +195,7 @@ export async function createIncrementalCompiler(options) {
         modules
       };
       previousBytes = bytes;
-      const build = { fingerprint, outputFile, mirrors, resourcePaths: [resourcePath], sources, configuration, metrics };
+      const build = { fingerprint, outputFile, bytecode, mirrors, resourcePaths: [resourcePath], sources, configuration, metrics };
       await options.afterRebuild?.(build);
       return build;
     },
