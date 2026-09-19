@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.policy.artifacts",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "artifacts": {
+    "hermes-host": {
+      "tag": "hermes-ac8f704fb529",
+      "fingerprint": "ac8f704fb529a245f3be7afdfe4321b34878ebae637dfa0540591f5687912313",
+      "indexedBy": "host",
+      "summary": "hermesc and shermes, per user host",
+      "assets": {
+        "darwin-arm64": "hermes-host-darwin-arm64.tar.gz",
+        "darwin-x64": "hermes-host-darwin-x64.tar.gz",
+        "linux-arm64": "hermes-host-linux-arm64.tar.gz",
+        "linux-x64": "hermes-host-linux-x64.tar.gz",
+        "win32-x64": "hermes-host-win32-x64.tar.gz"
+      },
+      "contents": {
+        "darwin-arm64": [
+          "hermesc",
+          "shermes"
+        ],
+        "darwin-x64": [
+          "hermesc",
+          "shermes"
+        ],
+        "linux-arm64": [
+          "hermesc",
+          "shermes"
+        ],
+        "linux-x64": [
+          "hermesc",
+          "shermes"
+        ],
+        "win32-x64": [
+          "hermesc.exe",
+          "shermes.exe"
+        ]
+      }
+    },
+    "dehermc": {
+      "tag": "tools-a2e89ca9eb60",
+      "fingerprint": "a2e89ca9eb6034f57abeace2ffb1953923dd78d4dbcfcea73b17f7120d96b1c0",
+      "indexedBy": "host",
+      "summary": "dehermc, déherm's TypeScript transform compiler, per user host",
+      "assets": {
+        "darwin-arm64": "dehermc-darwin-arm64.tar.gz",
+        "darwin-x64": "dehermc-darwin-x64.tar.gz",
+        "linux-arm64": "dehermc-linux-arm64.tar.gz",
+        "linux-x64": "dehermc-linux-x64.tar.gz",
+        "win32-x64": "dehermc-win32-x64.tar.gz"
+      },
+      "contents": {
+        "darwin-arm64": [
+          "dehermc"
+        ],
+        "darwin-x64": [
+          "dehermc"
+        ],
+        "linux-arm64": [
+          "dehermc"
+        ],
+        "linux-x64": [
+          "dehermc"
+        ],
+        "win32-x64": [
+          "dehermc.exe"
+        ]
+      }
+    },
+    "native-artifacts": {
+      "tag": "libs-3fd31ed84473",
+      "fingerprint": "3fd31ed844735a58136cba3abd0a567fcbf8d4a849130a8102e79dba08490614",
+      "indexedBy": "bundleTarget",
+      "summary": "libhermes.a / hermes.lib, per Defold bundle target",
+      "assets": {
+        "arm64_sim-ios": "hermes-arm64_sim-ios.tar.gz",
+        "arm64-android": "hermes-arm64-android.tar.gz",
+        "arm64-ios": "hermes-arm64-ios.tar.gz",
+        "arm64-linux": "hermes-arm64-linux.tar.gz",
+        "arm64-osx": "hermes-arm64-osx.tar.gz",
+        "armv7-android": "hermes-armv7-android.tar.gz",
+        "x86_64-android": "hermes-x86_64-android.tar.gz",
+        "x86_64-linux": "hermes-x86_64-linux.tar.gz",
+        "x86_64-osx": "hermes-x86_64-osx.tar.gz",
+        "x86_64-win32": "hermes-x86_64-win32.tar.gz"
+      },
+      "contents": {
+        "arm64_sim-ios": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "arm64-android": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "arm64-ios": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "arm64-linux": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "arm64-osx": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "armv7-android": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "x86_64-android": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "x86_64-linux": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "x86_64-osx": [
+          "libhermes.a",
+          "libhermes.debug.a"
+        ],
+        "x86_64-win32": [
+          "hermes.lib",
+          "hermes.debug.lib"
+        ]
+      }
+    }
+  }
+}
