@@ -12,7 +12,8 @@ import {
   rawScriptRootName
 } from "../packages/compiler/src/script-public-api-policy.mjs";
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
-import { assertReviewedRevision, assertReviewedSource } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID } from "./lib/revision-audit.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archivePath = path.join(root, "upstream", "ref-doc.zip");
@@ -38,16 +39,21 @@ async function loadSemanticHandleTypes(defoldRevision) {
     detail: "the semantic handle kinds the generated script types are built from"
   });
 
+  // Each cited source is OBSERVED, not asserted. A file whose bytes moved while
+  // every reviewed anchor survived still carries its evidence, so its handle
+  // kinds are emitted for this revision and the audit carries the new hash. A
+  // file that lost an anchor has no evidence left, so its handle kinds are
+  // withdrawn FOR THIS REVISION - the raw types they covered fall back to
+  // unreviewed and are emitted as opaque rather than as a semantic kind we can
+  // no longer justify. Withdrawal is a per-revision policy difference and a
+  // queued review, reported in the CI summary; it is not a failure.
   const evidenceById = new Map();
+  const withdrawn = new Set();
   for (const evidence of policy.sourceEvidence) {
     assert.ok(!evidenceById.has(evidence.id), `duplicate borrowed-handle evidence id: ${evidence.id}`);
     const sourcePath = path.join(root, "upstream", "defold", evidence.source);
-    const source = await readFile(sourcePath, "utf8");
-    // Anchors first, then the hash - the order matters. The anchors are the
-    // text the review's conclusion rests on; the hash only says the file moved.
-    // Asserting the hash first meant a Defold revision that edited anything in
-    // the file aborted before the evidence was ever checked.
-    assertReviewedSource({
+    const source = await readFile(sourcePath, "utf8").catch(() => null);
+    const verdict = observeReviewedSource({
       input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
       id: `${evidence.id}: borrowed-handle`,
       source,
@@ -55,6 +61,7 @@ async function loadSemanticHandleTypes(defoldRevision) {
       reviewed: policy.defoldRevision,
       derived: defoldRevision
     });
+    if (verdict.status === VOID) withdrawn.add(evidence.id);
     evidenceById.set(evidence.id, evidence);
   }
 
@@ -64,6 +71,9 @@ async function loadSemanticHandleTypes(defoldRevision) {
     for (const evidenceId of kind.sourceEvidence) {
       assert.ok(evidenceById.has(evidenceId), `${kind.id}: unknown borrowed-handle source evidence: ${evidenceId}`);
     }
+    // A kind rests on all of its cited evidence. If any of it went void at this
+    // revision, the kind is not claimed here.
+    if (kind.sourceEvidence.some((evidenceId) => withdrawn.has(evidenceId))) continue;
     for (const rawType of kind.rawTypes) {
       assert.ok(!rawTypeToKind.has(rawType), `${rawType}: assigned to multiple semantic handle kinds`);
       rawTypeToKind.set(rawType, kind.id);

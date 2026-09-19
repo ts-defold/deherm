@@ -18,16 +18,13 @@
 // inputs therefore join this census by being written in the shape every existing
 // one already uses, instead of by being added to a list somebody must remember.
 
-import { createHash } from "node:crypto";
 import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
+import { HOLDS, VOID, classifyReviewedSource } from "./revision-audit.mjs";
+
 const OVERRIDES = "packages/bindings/overrides";
 const SHA256 = /^[0-9a-f]{64}$/;
-
-function sha256(text) {
-  return createHash("sha256").update(text).digest("hex");
-}
 
 /** Where a reviewed claim's path points, relative to the repository root. */
 export function evidencePath(value) {
@@ -68,8 +65,11 @@ export function reviewedClaims(input, document) {
  * Check every reviewed claim in a tree against the Defold checkout it holds.
  *
  * `holds` is a claim whose file is present, hashes to what the review recorded
- * and still contains every anchor. Anything else is reported with the reason,
- * and is a review that has to be redone before this revision can be derived.
+ * and still contains every anchor. Everything else is reported with its status:
+ * `moved` (the file changed, every anchor survived - the entry still applies)
+ * or `void` (an anchor, or the file, is gone - the entry is withdrawn for this
+ * revision and a re-review is queued). This is a census, not a gate: no status
+ * here stops a revision from being derived or released.
  */
 export async function auditReviewedEvidence(treeRoot) {
   const directory = path.join(treeRoot, OVERRIDES);
@@ -86,41 +86,32 @@ export async function auditReviewedEvidence(treeRoot) {
         text = await readFile(path.join(treeRoot, claim.file), "utf8").catch(() => null);
         cache.set(claim.file, text);
       }
-      if (text === null) {
-        drifted.push({ ...claim, reason: "absent", observed: null });
+      const verdict = classifyReviewedSource(text, claim);
+      if (verdict.status === HOLDS) {
+        holds.push({ ...claim, ...verdict });
         continue;
       }
-      const observed = sha256(text);
-      if (observed !== claim.sha256) {
-        // An anchor that still holds in a moved file is worth reporting: it says
-        // the review's subject survived and only its surroundings changed, which
-        // is a much smaller re-review than one whose anchors are gone too.
-        const surviving = claim.anchors.filter((anchor) => text.includes(anchor));
-        drifted.push({
-          ...claim,
-          reason: "content",
-          observed,
-          anchorsHeld: surviving.length,
-          anchorsLost: claim.anchors.filter((anchor) => !text.includes(anchor))
-        });
-        continue;
-      }
-      const lost = claim.anchors.filter((anchor) => !text.includes(anchor));
-      if (lost.length) {
-        drifted.push({ ...claim, reason: "anchor", observed, anchorsHeld: claim.anchors.length - lost.length, anchorsLost: lost });
-        continue;
-      }
-      holds.push(claim);
+      // `moved` and `void` are both reported, and they mean different things.
+      // `moved` - the file changed and every reviewed anchor survived - is the
+      // ordinary result of a Defold release and changes nothing about what we
+      // emit. `void` is the one that does: the evidence is gone, so the entry
+      // is withdrawn for this revision. Neither blocks. See
+      // `scripts/lib/revision-audit.mjs`.
+      drifted.push({ ...claim, ...verdict });
     }
   }
   const byInput = {};
   for (const row of drifted) byInput[row.input] = (byInput[row.input] ?? 0) + 1;
+  const withdrawn = drifted.filter((row) => row.status === VOID);
   return {
     inputCount: inputs.length,
     claimCount: holds.length + drifted.length,
     fileCount: cache.size,
     holds,
     drifted,
+    // The count that actually matters to a reader: how many reviewed entries
+    // stopped applying. `drifted` is dominated by files Defold merely edited.
+    withdrawn,
     driftedByInput: Object.fromEntries(Object.entries(byInput).sort(([left], [right]) => left < right ? -1 : 1))
   };
 }

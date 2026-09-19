@@ -5,6 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -138,7 +139,16 @@ export function generateScriptDefoldValueTail(inputs) {
   const sourceByKey = new Map();
   for (const source of policy.sources) {
     assert(!sourceByKey.has(source.key) && inputs.sourceTexts.has(source.path), `${source.path}: value-tail source is missing or duplicated`);
-    assert(sha256(inputs.sourceTexts.get(source.path)) === source.sha256, `${source.path}: pinned value-tail source hash drifted`);
+    // OBSERVED, not asserted. A pinned hash only detects that Defold edited its
+    // own source, which across a release is expected and is the input to this
+    // generator rather than a failure of it. A moved file becomes an audit line
+    // and a restated pin for this revision. What actually checks this policy
+    // against the revision being generated is the census below, which is read
+    // from that revision's IR.
+    observeReviewedSource({
+      input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+      id: `${source.path}: value-tail`, source: inputs.sourceTexts.get(source.path), evidence: source
+    });
     sourceByKey.set(source.key, source);
   }
   const patternRows = patterns.bindings.filter(({ loweringFamily }) => loweringFamily === "defold-value");

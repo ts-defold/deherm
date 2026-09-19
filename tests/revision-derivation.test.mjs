@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -8,8 +9,18 @@ import {
   CARRIED_REVIEW_LEDGER_ENV,
   DERIVED_REVISION_ENV,
   assertReviewedRevision,
-  declaredDerivation
+  declaredDerivation,
+  observeReviewedSource
 } from "../scripts/lib/reviewed-revision.mjs";
+import {
+  HOLDS,
+  MOVED,
+  REVISION_AUDIT_ENV,
+  VOID,
+  classifyReviewedSource,
+  readAudit,
+  renderAuditSummary
+} from "../scripts/lib/revision-audit.mjs";
 import { auditReviewedEvidence, evidencePath, reviewedClaims } from "../scripts/lib/reviewed-evidence.mjs";
 import {
   derivationSteps,
@@ -58,12 +69,14 @@ test("a declared derivation may carry a review, and the carry is recorded", asyn
   assert.deepEqual(recorded, [{ input: "reviewed.json", reviewed: pinned, derived: other, detail: "the reviewed census" }]);
 });
 
-test("a carry with nowhere to be recorded is refused rather than made silently", () => {
+test("a carry with nowhere to be recorded still happens - reporting is not a gate", () => {
+  // This used to throw when the ledger environment was unset, which made the
+  // REPORTING mechanism into another gate: a derivation that was otherwise fine
+  // failed because of how it had been configured to describe itself. A carry
+  // that cannot reach the ledger is a thinner report, not a failed derivation.
   const env = { [DERIVED_REVISION_ENV]: other };
-  assert.throws(
-    () => assertReviewedRevision({ input: "reviewed.json", reviewed: pinned, derived: other, env }),
-    (error) => error.message.includes(CARRIED_REVIEW_LEDGER_ENV)
-  );
+  const result = assertReviewedRevision({ input: "reviewed.json", reviewed: pinned, derived: other, env });
+  assert.equal(result.carried, true);
 });
 
 test("a malformed derivation declaration is an error, never a quiet 'not deriving'", () => {
@@ -75,6 +88,85 @@ test("a malformed derivation declaration is an error, never a quiet 'not derivin
 test("a non-revision on either side is refused before anything is compared", () => {
   assert.throws(() => assertReviewedRevision({ input: "reviewed.json", reviewed: pinned, derived: "unknown", env: {} }));
   assert.throws(() => assertReviewedRevision({ input: "reviewed.json", reviewed: null, derived: pinned, env: {} }));
+});
+
+// ── A moved Defold source is a new policy entry, never a failure ────────────
+//
+// The rule these pin is the one in `scripts/lib/revision-audit.mjs`: the source
+// hash is a change detector whose output is a report, and the only observation
+// that changes what we emit is a reviewed anchor that is gone.
+
+const anchored = {
+  source: "engine/a.cpp",
+  sha256: createHash("sha256").update("int f() { return GUARD; }").digest("hex"),
+  anchors: ["GUARD"]
+};
+
+test("an unchanged source holds", () => {
+  const verdict = classifyReviewedSource("int f() { return GUARD; }", anchored);
+  assert.equal(verdict.status, HOLDS);
+  assert.deepEqual(verdict.anchorsLost, []);
+});
+
+test("a source Defold edited around the anchor MOVED, and still applies", () => {
+  // The exact case that used to abort every derivation: Defold touched the
+  // file, the reviewed evidence is untouched.
+  const verdict = classifyReviewedSource("// a new comment\nint f() { return GUARD; }", anchored);
+  assert.equal(verdict.status, MOVED);
+  assert.equal(verdict.anchorsHeld, 1);
+  assert.deepEqual(verdict.anchorsLost, []);
+  assert.notEqual(verdict.observed, anchored.sha256);
+});
+
+test("a source that lost its anchor is VOID, and an absent source is too", () => {
+  const lost = classifyReviewedSource("int f() { return 0; }", anchored);
+  assert.equal(lost.status, VOID);
+  assert.deepEqual(lost.anchorsLost, ["GUARD"]);
+
+  const gone = classifyReviewedSource(null, anchored);
+  assert.equal(gone.status, VOID);
+  assert.equal(gone.reason, "absent");
+  assert.equal(gone.observed, null);
+});
+
+test("observing a source records an audit line and never throws", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-audit-"));
+  const audit = path.join(directory, "audit.ndjson");
+  const env = { [REVISION_AUDIT_ENV]: audit };
+  const verdict = observeReviewedSource({
+    input: "overrides/x.json", id: "a", source: "int f() { return 0; }",
+    evidence: anchored, reviewed: pinned, derived: other, env
+  });
+  assert.equal(verdict.status, VOID);
+  const rows = readAudit(audit);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].status, VOID);
+  assert.equal(rows[0].derived, other);
+  assert.deepEqual(rows[0].anchorsLost, ["GUARD"]);
+});
+
+test("an audit with nowhere to be written loses the report, not the run", () => {
+  // Same rule as the carry ledger above, and for the same reason.
+  const env = { [REVISION_AUDIT_ENV]: "/dev/null/not-a-directory/audit.ndjson" };
+  const verdict = observeReviewedSource({
+    input: "overrides/x.json", id: "a", source: "int f() { return GUARD; }",
+    evidence: anchored, reviewed: pinned, derived: pinned, env
+  });
+  assert.equal(verdict.status, HOLDS);
+});
+
+test("repeated observations of one claim count once in a summary", () => {
+  // A derivation runs a chain of generators and several read the same reviewed
+  // source; the summary reports claims, not reads.
+  const rows = [
+    { input: "overrides/x.json", id: "a", status: MOVED, source: "engine/a.cpp" },
+    { input: "overrides/x.json", id: "a", status: MOVED, source: "engine/a.cpp" },
+    { input: "overrides/x.json", id: "b", status: VOID, source: "engine/b.cpp", anchorsLost: ["GONE"] }
+  ];
+  const summary = renderAuditSummary(rows, { revision: other });
+  assert.match(summary, /\| moved \| 2 \|/);
+  assert.match(summary, /Withdrawn for this revision/);
+  assert.match(summary, /GONE/);
 });
 
 // ── The reviewed-evidence census ────────────────────────────────────────────

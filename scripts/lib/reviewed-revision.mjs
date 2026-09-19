@@ -30,17 +30,24 @@
 //   * recorded, to a ledger the derivation reports and a reviewer reads; and
 //   * never a substitute for the substantive checks. Each of these generators
 //     re-verifies its reviewed input against the revision being derived - the
-//     SHA-256 and anchors of every cited Defold source file, the expected route
-//     and feature censuses, the membership of every reviewed route id in the
-//     mechanically discovered one. Those run unchanged and are strictly
-//     stronger than a string comparison: they read that revision's bytes.
+//     anchors of every cited Defold source file, the expected route and feature
+//     censuses, the membership of every reviewed route id in the mechanically
+//     discovered one. Those run unchanged and are strictly stronger than a
+//     string comparison: they read that revision's bytes.
 //
-// A revision whose declared surface did not move therefore derives cleanly and
-// says so; one that moved fails on the substance, which is the failure a
-// reviewer wants, rather than on a string that says nothing about what changed.
+// ── What a moved source file is, and is not ────────────────────────────────
+//
+// It is NOT a failure. A cited Defold file whose bytes changed is the ordinary
+// outcome of a Defold release, and generating for that change is this project's
+// entire job. A changed hash means a new policy entry for that revision, so we
+// know how to emit code for it and can add, remove or swap an entry per
+// version. It never blocks a release. `observeReviewedSource` below therefore
+// classifies and reports rather than throwing, and `scripts/lib/revision-audit.mjs`
+// explains the three classifications and what each does to what we emit.
 
-import { createHash } from "node:crypto";
 import { appendFileSync } from "node:fs";
+
+import { classifyReviewedSource, recordAudit } from "./revision-audit.mjs";
 
 const REVISION = /^[0-9a-f]{40}$/;
 
@@ -101,72 +108,75 @@ export function assertReviewedRevision({ input, reviewed, derived, detail, env =
     );
   }
 
-  const ledger = env[CARRIED_REVIEW_LEDGER_ENV];
-  if (!ledger) {
-    throw new Error(
-      `${input}: carrying a review from ${reviewed} to ${derived} requires ` +
-      `${CARRIED_REVIEW_LEDGER_ENV}, so the carry can be reported. It is not set.`
-    );
-  }
+  // The carry is recorded, always - to the ledger when a derivation named one,
+  // and to the revision audit regardless. An unset ledger used to be fatal here,
+  // which made the reporting mechanism itself into a gate. A carry that cannot
+  // be written to the ledger is a thinner report, not a failed derivation.
   const record = { input, reviewed, derived, ...(detail ? { detail } : {}) };
-  appendFileSync(ledger, `${JSON.stringify(record)}\n`);
+  const ledger = env[CARRIED_REVIEW_LEDGER_ENV];
+  if (ledger) {
+    try {
+      appendFileSync(ledger, `${JSON.stringify(record)}\n`);
+    } catch {
+      // See above.
+    }
+  }
+  recordAudit({ ...record, id: input, status: "carried", reason: "revision" }, env);
   return { carried: true, ...record };
 }
 
 /**
- * A reviewed input's claim about ONE Defold source file, checked correctly.
+ * A reviewed input's claim about ONE Defold source file, observed.
  *
- * The rule the generators had was `assert.equal(sha256(source), pinned)`, which
- * demands the file be byte-identical to when it was read. Across revisions that
- * can only fail: we are the authoritative generator, and Defold editing its own
- * source between 1.13.0 and 1.13.1 is the expected outcome, not an error. Worse,
- * the SHA was asserted BEFORE the anchors, so the check that carries the actual
- * evidence never ran.
+ * This used to be an assertion: `sha256(source) === evidence.sha256`, or throw.
+ * It is not one any more, and the reason is the whole design of this project.
  *
- * The two records answer different questions. `anchors` are the exact text the
- * reviewer's conclusion rests on - for box2d-body, the instance-generation field
- * and the validity guard. `sha256` only detects that the file moved at all.
- * Losing an anchor means the review is void. A changed hash with every anchor
- * intact means the review's subject survived and its surroundings moved, which
- * is not a reason to refuse.
+ * We are the authoritative generator for what changes between Defold revisions.
+ * Defold editing its own C++ between 1.13.0 and 1.13.1 is the input to that
+ * job, not a failure of it. A changed source hash is a NEW POLICY ENTRY for
+ * that revision - so we know how to emit code for it, and so an entry can be
+ * added, removed or swapped per version - and it never blocks a release.
  *
- * So anchors are unconditional, and the hash is a detector whose meaning depends
- * on what is being generated:
+ * What the two records mean is unchanged, and it is worth restating because the
+ * old code had them backwards. `anchors` are the exact text the reviewer's
+ * conclusion rests on. `sha256` only detects that the file moved at all. The
+ * old code asserted the hash BEFORE the anchors, so the record carrying the
+ * actual evidence never ran: any Defold revision that touched anything in the
+ * file aborted first.
  *
- *   * generating for the reviewed revision - a drift is real staleness in this
- *     tree and stays a hard failure, which is what `pnpm check` relies on;
- *   * deriving a declared different revision - a drift is recorded to the carry
- *     ledger and reported, because that is the census the job exists to produce.
+ * So: this classifies, records an audit line, and returns. It does not throw.
+ * The caller reads `status` and decides what to emit:
+ *
+ *   holds / moved - the reviewed entry applies to this revision. `moved` also
+ *                   carries the observed hash so the pin can be restated.
+ *   void          - an anchor is gone, so the evidence for emitting is gone.
+ *                   The caller withdraws that entry for this revision and the
+ *                   affected routes degrade to unreviewed. That is a policy
+ *                   difference between revisions, reported by name in the CI
+ *                   summary as queued review work - not a build failure.
+ *
+ * @returns {{status: string, reason: string, observed: string|null,
+ *            anchorsHeld: number, anchorsLost: string[], id: string}}
  */
-export function assertReviewedSource({ input, id, source, evidence, reviewed, derived, env = process.env }) {
-  const lost = (evidence.anchors ?? []).filter((anchor) => !source.includes(anchor));
-  if (lost.length) {
-    throw new Error(
-      `${input}: ${id} no longer holds at ${derived}. ` +
-      `${lost.length} of ${evidence.anchors.length} reviewed anchors are gone from ` +
-      `${evidence.source}:\n  ${lost.join("\n  ")}\n` +
-      "The review rested on those lines, so it cannot speak for this revision. Re-review it.");
+export function observeReviewedSource({ input, id, source, evidence, reviewed, derived, env = process.env }) {
+  const verdict = classifyReviewedSource(source, evidence);
+  // Every observation is recorded, `holds` included. An audit that only carried
+  // what moved could report "3 moved" without the denominator that makes 3
+  // readable, and could not tell "nothing moved" apart from "nothing ran".
+  {
+    recordAudit({
+      input,
+      id,
+      source: evidence.source ?? evidence.path ?? null,
+      status: verdict.status,
+      reason: verdict.reason,
+      reviewedSha: evidence.sha256,
+      observed: verdict.observed,
+      anchorsHeld: verdict.anchorsHeld,
+      anchorsLost: verdict.anchorsLost,
+      reviewed,
+      derived
+    }, env);
   }
-
-  const observed = createHash("sha256").update(source).digest("hex");
-  if (observed === evidence.sha256) return { drifted: false, id, observed };
-
-  const derivation = declaredDerivation(env);
-  if (derivation !== derived || reviewed === derived) {
-    throw new Error(
-      `${input}: ${id} source hash drifted for ${evidence.source}\n` +
-      `  reviewed ${evidence.sha256}\n  observed ${observed}\n` +
-      "Every reviewed anchor still holds, so the review's subject survived; the pinned hash " +
-      "is stale. Update it, or derive another revision with scripts/derive-revision.mjs.");
-  }
-
-  const ledger = env[CARRIED_REVIEW_LEDGER_ENV];
-  if (!ledger) {
-    throw new Error(`${input}: ${id} drifted while deriving ${derived}, but ${CARRIED_REVIEW_LEDGER_ENV} is not set to record it.`);
-  }
-  appendFileSync(ledger, `${JSON.stringify({
-    input, id, source: evidence.source, reviewed: evidence.sha256, observed, derived,
-    anchorsHeld: (evidence.anchors ?? []).length
-  })}\n`);
-  return { drifted: true, id, observed };
+  return { ...verdict, id };
 }

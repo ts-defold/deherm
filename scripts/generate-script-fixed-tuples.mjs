@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -19,7 +19,6 @@ const urls = {
 };
 
 function assert(value, message) { if (!value) throw new Error(message); }
-function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
 function compare(left, right) { return left < right ? -1 : left > right ? 1 : 0; }
 function hex(id) { return `0x${id.toString(16).padStart(8, "0")}`; }
 function cpp(value) { return JSON.stringify(value); }
@@ -60,7 +59,16 @@ export function generate(irText, patternsText, schemaOverridesText, registration
   assert(registrations.schemaVersion === 1, "fixed tuple registration schema drifted");
   const sourceByPrefix = new Map();
   for (const source of sources) {
-    assert(sha256(source.text) === source.sha256, `${source.path}: pinned source hash drifted`);
+    // OBSERVED, not asserted. A pinned hash only detects that Defold edited its
+    // own source, which across a release is expected and is the input to this
+    // generator rather than a failure of it. A moved file becomes an audit line
+    // and a restated pin for this revision. What actually checks this policy
+    // against the revision being generated is the census below, which is read
+    // from that revision's IR.
+    observeReviewedSource({
+      input: "packages/bindings/overrides/script-fixed-tuple-registrations.json",
+      id: `${source.path}: fixed-tuple`, source: source.text, evidence: source
+    });
     assert(!sourceByPrefix.has(source.modulePrefix), `duplicate module source ${source.modulePrefix}`);
     sourceByPrefix.set(source.modulePrefix, source);
   }

@@ -368,25 +368,31 @@ jobs:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
       - run: bash scripts/bootstrap-upstreams.sh hermes
-      # KNOWN STALE PIN. Every other action here now runs on Node 24; this one
-      # cannot. ilammy/msvc-dev-cmd's newest release, v1.13.0, still declares
-      # `using: node20`, the repository is unmaintained, and the request to
-      # publish a Node 24 build (ilammy/msvc-dev-cmd#94) is open with no
-      # release behind it. So the Node 20 deprecation warning on this lane is
-      # real and is not fixed by a version bump - there is no version to bump
-      # to. When GitHub finishes removing the Node 20 runtime this step stops
-      # resolving and this lane fails outright rather than warning.
+      # Entering the MSVC environment. This was ilammy/msvc-dev-cmd@v1, which
+      # is unmaintained (last push 2024-04) and whose newest release still
+      # declares `using: node20`; when GitHub finished removing the Node 20
+      # runtime that step stopped resolving and took both Windows lanes with
+      # it. There is no version to bump to - the request to publish a Node 24
+      # build (ilammy/msvc-dev-cmd#94) has no release behind it.
       #
-      # Replacing it is a behavioural change to how the MSVC environment is
-      # entered, so it is left for a deliberate decision rather than folded
-      # into a version sweep. The two candidates:
-      #   - egor-tensin/vs-shell: composite action, pure PowerShell, no Node
-      #     runtime at all, so it cannot deprecate this way again.
-      #   - TheMrMilchmann/setup-msvc-dev: maintained JS action, closest
-      #     drop-in for the inputs this action accepts.
+      # aminya/setup-cpp is the replacement: it is the most popular maintained
+      # action in this space, it declares `using: node24`, and it is the only
+      # candidate that covers the WHOLE step rather than part of it. `vcvarsall`
+      # enters the developer environment (exporting INCLUDE/LIB/PATH the same
+      # way vcvarsall.bat does, which is what build-windows.sh consumes) and
+      # `ninja` installs the generator, so it subsumes the chocolatey install
+      # below it as well. The alternatives were narrower: egor-tensin/vs-shell
+      # and TheMrMilchmann/setup-msvc-dev set up the environment but ship no
+      # generator, and microsoft/setup-msbuild puts msbuild on PATH without
+      # putting cl.exe there at all.
+      #
+      # Pinned to an exact release, not a floating major, because this step
+      # decides which compiler produces published bytes.
       # The same pin appears in the host-compilers lane below.
-      - uses: ilammy/msvc-dev-cmd@v1
-      - run: choco install ninja --no-progress -y
+      - uses: aminya/setup-cpp@v1.10.1
+        with:
+          vcvarsall: true
+          ninja: true
       - run: |
           bash toolchains/hermes/build-windows.sh \
             "$PWD/upstream/hermes" \
@@ -518,12 +524,14 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang cmake lld ninja-build python3
       - if: runner.os == 'macOS'
         run: brew install ninja cmake
-      # KNOWN STALE PIN - see the windows-native lane above for why this one
-      # action is still on Node 20 and what would replace it.
+      # MSVC environment plus the ninja generator - see the windows-native lane
+      # above for why this replaced ilammy/msvc-dev-cmd and why it is pinned
+      # to an exact release.
       - if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
-      - if: runner.os == 'Windows'
-        run: choco install ninja --no-progress -y
+        uses: aminya/setup-cpp@v1.10.1
+        with:
+          vcvarsall: true
+          ninja: true
       # The build script packages hermesc and shermes into one archive itself,
       # so the step that decides the published bytes is inside an input this
       # family fingerprints rather than in this file, which is in none.

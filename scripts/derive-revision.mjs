@@ -438,14 +438,18 @@ export async function deriveRevision(options) {
     delete env[CARRIED_REVIEW_LEDGER_ENV];
   }
 
+  // The evidence census does NOT gate the derivation. It used to: any drifted
+  // claim stopped the run, which meant a Defold release that edited a cited
+  // file - the ordinary case, and the thing this job exists to derive for -
+  // produced nothing. A moved source is a new policy entry for that revision,
+  // not an error, and a withdrawn entry is a policy difference that shows up in
+  // the diff a reviewer reads. See `scripts/lib/revision-audit.mjs`.
+  //
+  // What still blocks is a generator that actually refuses (recorded below) and
+  // the proof that this checkout's committed surface did not move.
   const steps = [];
   let blocker = null;
-  if (evidence.drifted.length && !carryReviews) {
-    blocker = {
-      kind: "reviewed-evidence",
-      message: `${evidence.drifted.length} of ${evidence.claimCount} reviewed claims do not hold at ${revision}`
-    };
-  } else if (!auditOnly) {
+  if (!auditOnly) {
     for (const step of derivationSteps) {
       const label = `${step.script}${step.args ? ` ${step.args.join(" ")}` : ""}`;
       onProgress(label);
@@ -605,11 +609,14 @@ async function main(argv = process.argv.slice(2)) {
   if (evidence.driftedCount) {
     for (const [input, count] of Object.entries(evidence.driftedByInput)) {
       const rows = evidence.drifted.filter((row) => row.input === input);
-      const absent = rows.filter((row) => row.reason === "absent").length;
-      const anchored = rows.filter((row) => row.reason === "content" && (row.anchorsLost ?? []).length === 0).length;
+      const moved = rows.filter((row) => row.status === "moved").length;
+      const withdrawn = rows.filter((row) => row.status === "void");
       console.log(`  ${count} in ${input}` +
-        (absent ? `, ${absent} whose source does not exist at this revision` : "") +
-        (anchored ? `, ${anchored} whose reviewed anchors all survive the change` : ""));
+        (moved ? `, ${moved} moved with every reviewed anchor intact (entry still applies)` : "") +
+        (withdrawn.length ? `, ${withdrawn.length} WITHDRAWN for this revision` : ""));
+      for (const row of withdrawn) {
+        console.log(`      ${row.id ?? row.file} - ${row.reason === "absent" ? "source absent at this revision" : `lost ${row.anchorsLost.length} reviewed anchor(s)`}`);
+      }
     }
   }
   console.log("");

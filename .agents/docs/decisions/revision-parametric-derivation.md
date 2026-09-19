@@ -113,13 +113,43 @@ That rule, `scripts/lib/reviewed-revision.mjs`, refuses exactly as before for an
 ordinary generation, naming both revisions. The one thing it adds is that a
 **declared derivation of one named revision** may carry a review forward, and a
 carry is opt-in per invocation, scoped to the single revision named in the
-environment so a stale export cannot license a different derivation, recorded to
-a ledger the derivation reports, and never a substitute for the substantive
-checks. Those run unchanged and against the revision being derived: the SHA-256
-and anchors of every cited Defold source, the expected route and feature
-censuses, the membership of every reviewed route id in the mechanically
-discovered one. They read that revision's bytes, which a string comparison never
-did.
+environment so a stale export cannot license a different derivation, recorded,
+and never a substitute for the substantive checks. Those run against the
+revision being derived: the anchors of every cited Defold source, the expected
+route and feature censuses, the membership of every reviewed route id in the
+mechanically discovered one. They read that revision's bytes, which a string
+comparison never did.
+
+## A changed Defold source is a new policy entry, not a failure
+
+**Superseded:** the SHA-256 of a cited Defold source used to be asserted, and a
+drift aborted the generator that read it. That is backwards. This project is the
+authoritative generator for what changes between Defold revisions, so Defold
+editing its own C++ between two releases is the *input* to the job rather than a
+failure of it - and gating on it meant the nightly produced nothing in exactly
+the case it exists for.
+
+The rule now: **the ABI is what is load-bearing, and a changed ABI is a new
+policy entry for that revision** - so we know how to emit code for it, and so an
+entry can be added, removed or swapped per version. It never blocks a release.
+`scripts/lib/revision-audit.mjs` classifies each cited source and records an
+audit line; `scripts/report-revision-audit.mjs` renders the audit into the CI job
+summary. The three classifications:
+
+| | what happened | what it does to what we emit |
+| --- | --- | --- |
+| `holds` | the file hashes to what the review recorded | nothing; the entry applies |
+| `moved` | the file changed, every reviewed anchor survived | nothing; the entry applies and the audit carries the new hash so the pin can be restated |
+| `void` | a reviewed anchor is gone, or the file is | the entry is **withdrawn for this revision** - routes it covered degrade to unreviewed |
+
+Only `void` changes anything, because it is the only case where the evidence for
+emitting is gone. A withdrawal is a per-revision policy difference that shows up
+as a visible change in the derivation's pull request - the reviewable event - and
+as queued review work named in the run summary. It is still not a build failure.
+
+The same reasoning removed two smaller gates of the same shape, where the
+*reporting mechanism* could fail a run: an unset carry ledger, and an unwritable
+audit path. A report that cannot be written is a lost report.
 
 ## Audit every reviewed input before running anything
 
@@ -153,7 +183,16 @@ difference requiring real review; deriving a revision whose declared surface did
 not move is what the carry mechanism and the content-addressed store make cheap,
 and is the steady state the nightly was designed for.
 
+Those counts were measured under the superseded rule, where any drifted claim -
+including one whose reviewed anchors all survived - counted against derivability.
+Under the rule above the 15 absent sources remain `void` and are withdrawn for
+that revision; the rest are re-classified by whether their anchors survived, and
+only the ones that lost an anchor still withdraw. The `bullet3d` finding is
+unchanged and is the substantive one: that backend is present on `dev` and absent
+from stable, so six reviewed inputs cite sources 1.13.1 does not have, and the
+entries resting on them are withdrawn there rather than guessed at.
+
 What is *not* established: nothing here re-reviews anything automatically, and
-nothing here lets a stale review pass. A carried review whose evidence moved
-still fails, at the evidence, with the file and both hashes named - which is what
-happened on the 1.13.1 run and is the correct outcome.
+nothing here lets a stale review pass. A review whose anchors are gone does not
+quietly carry - its entry is withdrawn and named. What changed is that this is a
+policy difference to review rather than an error that stops the run.

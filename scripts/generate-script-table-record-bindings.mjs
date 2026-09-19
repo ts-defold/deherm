@@ -5,6 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -184,7 +185,22 @@ export function generate(inputs) {
   assert(patterns.sourceSha256 === sha256(inputs.irText), "table-record binding patterns are stale against script IR");
   assert(accounting.inputEvidence?.scriptIrSha256 === sha256(inputs.irText) && accounting.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText), "table-record accounting provenance is stale");
   const sourceByKey = new Map();
-  for (const source of policy.sources) { assert(!sourceByKey.has(source.key), `${source.key}: duplicate table-record source`); const text = inputs.sourceTexts.get(source.path); assert(typeof text === "string" && sha256(text) === source.sha256, `${source.path}: pinned table-record source hash drifted`); sourceByKey.set(source.key, { ...source, text }); }
+  for (const source of policy.sources) {
+    assert(!sourceByKey.has(source.key), `${source.key}: duplicate table-record source`);
+    const text = inputs.sourceTexts.get(source.path);
+    assert(typeof text === "string", `${source.path}: pinned table-record source was not loaded`);
+    // OBSERVED, not asserted. A pinned hash only detects that Defold edited its
+    // own source, which across a release is expected and is the input to this
+    // generator rather than a failure of it. A moved file becomes an audit line
+    // and a restated pin for this revision. What actually checks this policy
+    // against the revision being generated is the census below, which is read
+    // from that revision's IR.
+    observeReviewedSource({
+      input: "packages/bindings/overrides/script-table-record-bindings.json",
+      id: `${source.key}: table-record`, source: text, evidence: source
+    });
+    sourceByKey.set(source.key, { ...source, text });
+  }
   const fnById = new Map(ir.functions.map((fn) => [fn.id, fn])), patternById = new Map(patterns.bindings.map((row) => [row.id, row])), schemaById = new Map(schemas.rows.map((row) => [row.id, row])), types = new Map(ir.types.map((type) => [type.name, type]));
   const tableRoutes = accounting.rows.filter(({ id, evidence }) =>
     patternById.get(id)?.loweringFamily === "lua-table" && evidence?.generator !== "native-value-dispatch");
