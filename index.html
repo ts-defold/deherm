@@ -1,21 +1,133 @@
 <!doctype html>
+<html lang="en">
 <meta charset="utf-8">
 <title>deherm policy store</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Content-addressed Defold API policies derived from engine sources.">
 <style>
-  body { font: 15px/1.6 system-ui, sans-serif; max-width: 42rem; margin: 4rem auto; padding: 0 1.5rem; }
-  code { background: #f4f4f5; padding: .1em .35em; border-radius: 3px; }
-  pre { background: #f4f4f5; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+  :root {
+    --basalt: #262626; --basalt-2: #303030; --basalt-3: #3a3a3a; --basalt-4: #585858;
+    --ink: #e8e6e3; --ink-dim: #a5a19c;
+    --ember: #d75f00; --amber: #d78700; --sand: #d7af5f; --slate: #5f5f87; --cyan: #00afd7;
+    --heart: #d70000;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--basalt); color: var(--ink);
+    font: 15px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 56rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+  header { text-align: center; margin-bottom: 3rem; }
+  header img { width: 100%; max-width: 34rem; height: auto; }
+  .tagline { color: var(--ink-dim); margin: 1rem 0 0; }
+  .alpha {
+    display: inline-block; margin-top: 1.25rem; padding: .3rem .7rem;
+    border: 1px solid var(--heart); border-radius: 999px;
+    color: #ff6b6b; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
+  }
+  h2 {
+    font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--sand); margin: 3rem 0 1rem; font-weight: 600;
+  }
+  p { color: var(--ink-dim); }
+  p strong { color: var(--ink); font-weight: 600; }
+  a { color: var(--cyan); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  code { background: var(--basalt-2); padding: .12em .4em; border-radius: 3px; font-size: .9em; }
+  pre {
+    background: var(--basalt-2); border: 1px solid var(--basalt-3); border-left: 3px solid var(--ember);
+    padding: 1rem 1.15rem; border-radius: 5px; overflow-x: auto; font-size: .82rem; line-height: 1.7;
+  }
+  pre code { background: none; padding: 0; }
+  .facts { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+  .fact { background: var(--basalt-2); border: 1px solid var(--basalt-3); border-radius: 6px; padding: 1rem; }
+  .fact b { display: block; font-size: 1.7rem; font-weight: 600; color: var(--amber); line-height: 1.2; }
+  .fact span { display: block; font-size: .78rem; color: var(--ink); margin-top: .35rem; }
+  .fact em { display: block; font-size: .72rem; color: var(--ink-dim); font-style: normal; margin-top: .3rem; }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th, td { text-align: left; padding: .5rem .6rem; border-bottom: 1px solid var(--basalt-3); }
+  th { color: var(--ink-dim); font-weight: 500; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; color: var(--amber); }
+  .bar { height: 3px; background: var(--basalt-4); border-radius: 2px; overflow: hidden; min-width: 4rem; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--ember), var(--sand)); }
+  .note { border-left: 3px solid var(--slate); padding: .1rem 0 .1rem 1rem; color: var(--ink-dim); font-size: .88rem; }
+  footer {
+    margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--basalt-3);
+    color: var(--ink-dim); font-size: .78rem;
+  }
 </style>
-<h1>deherm policy store</h1>
+
+<div class="wrap">
+<header>
+  <img src="deherm-wordmark.png" alt="déherm">
+  <p class="tagline">Content-addressed Defold API policies, derived from engine sources.</p>
+  <span class="alpha">Early alpha &middot; nothing here is stable</span>
+</header>
+
 <p>
-  Content-addressed API policies derived from Defold engine sources. Every
-  object is immutable and self-verifying: hash the bytes, compare to the path.
+  A <strong>policy</strong> is the source-derived record of a Lua-shaped surface:
+  which functions are registered, under which module, with which parameter types,
+  arity, optionality, results and constants &mdash; plus every construct the parser
+  refused, with its reason. Documentation is not authority; the Lua C registration
+  and the C function body are.
 </p>
-<pre>/v1/index/&lt;defold-sha&gt;.json   -&gt; { policyRoot, generator }
-/v1/policy/&lt;root-hash&gt;.json   -&gt; the policy root, naming its subtrees
-/v1/object/&lt;subtree-hash&gt;.json -&gt; one namespace's derived surface</pre>
+
+<h2>The URL scheme is the key</h2>
+<pre><code>https://ts-defold.dev/deherm/v1/index/&lt;defold-sha&gt;.json    &rarr; { policyRoot, generator }
+https://ts-defold.dev/deherm/v1/policy/&lt;root-hash&gt;.json    &rarr; names its subtrees
+https://ts-defold.dev/deherm/v1/object/&lt;subtree-hash&gt;.json &rarr; one namespace's surface</code></pre>
+
+<p class="note">
+  Every object under <code>policy/</code> and <code>object/</code> is
+  <strong>immutable and self-verifying</strong>: fetch it, hash the bytes with
+  SHA-256, and compare to the hash in the path. A hostile or corrupted mirror
+  cannot substitute content without changing the hash, so the transport needs no
+  trust beyond availability. An index entry is keyed by a revision Defold has
+  already published and is written once, never rewritten &mdash; so it is fetched
+  per revision rather than shipped as a growing manifest. Unchanged subtrees
+  across revisions are the same URL, and therefore already in your cache.
+</p>
+
+<h2>Derived surface</h2>
+<div class="facts">
+  <div class="fact"><b>1</b><span>Revision indexed</span><em>Defold engine revisions with a published policy</em></div>
+  <div class="fact"><b>56</b><span>Objects</span><em>content-addressed namespace subtrees, shared across revisions</em></div>
+  <div class="fact"><b>926</b><span>Script routes</span><em>Lua-registered functions the compiler projects</em></div>
+  <div class="fact"><b>1,361</b><span>dmSDK declarations</span><em>native runtime declarations carried alongside them</em></div>
+  <div class="fact"><b>504</b><span>Marshalling programs</span><em>distinct argument and result conversion programs</em></div>
+  <div class="fact"><b>224</b><span>Interned contracts</span><em>after interning; many routes share one contract</em></div>
+</div>
+
+<h2>Transport selection</h2>
+<table>
+  <tr><th>Runtime</th><th>Transport</th><th>Routes</th><th style="width:30%"></th></tr>
+  <tr><td>hermes</td><td><code>jsi</code></td><td class="num">913 / 913</td><td><div class="bar"><i style="width:100.0%"></i></div></td></tr>
+  <tr><td>hermes</td><td><code>lua-stack</code></td><td class="num">911 / 913</td><td><div class="bar"><i style="width:99.8%"></i></div></td></tr>
+  <tr><td>hermes</td><td><code>typed-native</code></td><td class="num">325 / 913</td><td><div class="bar"><i style="width:35.6%"></i></div></td></tr>
+  <tr><td>browser</td><td><code>direct-memory</code></td><td class="num">911 / 911</td><td><div class="bar"><i style="width:100.0%"></i></div></td></tr>
+</table>
+<p class="note">
+  A transport is how a route reaches the engine <em>within</em> a runtime &mdash;
+  not a separate engine. This is transport selection only: it is not compile,
+  link, runtime, or conformance evidence.
+</p>
+
+<h2>Why a static site</h2>
 <p>
-  This branch is generated. It is re-derivable from
-  <code>ts-defold/deherm</code> and carries no history worth preserving.
+  Release assets suit a handful of large files with semantic tags. They suit
+  thousands of small content-addressed blobs badly. Here the path <em>is</em> the
+  hash, so a revision whose declaration inputs did not change publishes nothing
+  at all &mdash; the subtree hashes already exist, and the index simply gains one
+  more pointer at them.
 </p>
+
+<footer>
+  Defold <code>7f0f554f41f9</code>
+  &middot; plan <code>4476671f1511</code>
+  &middot; layout <code>v1</code>
+  <br>
+  Source: <a href="https://github.com/ts-defold/deherm">ts-defold/deherm</a>.
+  This branch is generated and re-derivable; it carries no history worth preserving.
+</footer>
+</div>
+</html>
