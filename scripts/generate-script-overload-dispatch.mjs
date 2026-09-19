@@ -5,6 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -128,8 +129,18 @@ export function generate(inputs) {
   const override = JSON.parse(inputs.overrideText); const owned = JSON.parse(inputs.ownedText);
   assert(override.schemaVersion === 1, "overload-dispatch override schema drifted");
   assert(ir.schemaVersion === 1 && patterns.schemaVersion === 1, "overload-dispatch input schema drifted");
-  assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === override.defoldRevision,
-    "overload-dispatch inputs use different Defold revisions");
+  assert(ir.defoldRevision === patterns.defoldRevision, "overload-dispatch inputs use different Defold revisions");
+  // Reviewed evidence, compared against the revision being generated. The
+  // reviewed call shapes are re-checked below against this revision's IR - every
+  // reviewed route must still exist, still be classified `defold-value`, and
+  // still match its recorded census - so the substance is verified at the
+  // revision even when the review was performed at another one.
+  assertReviewedRevision({
+    input: "packages/bindings/overrides/script-overload-dispatch.json",
+    reviewed: override.defoldRevision,
+    derived: ir.defoldRevision,
+    detail: "the reviewed overload call shapes"
+  });
   assert(patterns.sourceSha256 === sha256(inputs.irText), "overload-dispatch patterns are stale against script IR");
   assert(owned?.schemaVersion === 1, "overload-dispatch already-owned report schema drifted");
   assert(owned.defoldRevision === ir.defoldRevision, "overload-dispatch already-owned report uses a different Defold revision");

@@ -31,6 +31,7 @@ okf_version: "0.2"
 * [Release reachability and native lowering](decisions/release-reachability-and-native-lowering.md) - ttsc resolves the exact called symbols, release emits only those, and reachable code is lowered from bytecode to extern_c native.
 * [Toolchain distribution and the build seam](decisions/toolchain-distribution-and-build-seam.md) - CI-built per-target Hermes archives, per-host hermesc/shermes, and generated C assembled into the extension for Bob and Extender.
 * [Layered API policy cache](decisions/layered-api-policy-cache.md) - Source-derived Lua surfaces extracted once, shipped and committed as hash-keyed policies, reparsed only on mismatch.
+* [Revision-parametric derivation](decisions/revision-parametric-derivation.md) - Deriving a revision other than the pinned one happens in a scratch workspace, with the committed surface proven untouched and every reviewed input audited against that revision first.
 * [Project extension discovery](decisions/project-extension-discovery.md) - How the npm CLI discovers local and resolved extensions and decides which binding route is safe.
 * [TypeScript game-object components](decisions/typescript-components.md) - Generated `.script` proxies now, with a compatible native component backend later.
 * [TypeScript execution contexts](decisions/typescript-execution-contexts.md) - `.script.ts`, `.gui.ts`, `.render.ts`, and shared `.ts` drive generated proxies, types, VS Code diagnostics, and runtime attachment checks.

@@ -3,8 +3,9 @@ name: policy-revisions
 # Watch Defold's release channels and derive a policy for any revision the index
 # does not already cover.
 #
-# See `.agents/docs/decisions/layered-api-policy-cache.md` ("The nightly job")
-# and `.agents/docs/decisions/api-source-resolution.md` ("A channel is a moving
+# See `.agents/docs/decisions/layered-api-policy-cache.md` ("The nightly job"),
+# `.agents/docs/decisions/revision-parametric-derivation.md`, and
+# `.agents/docs/decisions/api-source-resolution.md` ("A channel is a moving
 # pointer, never a pin").
 #
 # ── The property that makes this cheap ──────────────────────────────────────
@@ -17,9 +18,23 @@ name: policy-revisions
 # new, `generate-api-policy.mjs` reports how many objects were actually added -
 # often zero.
 #
+# ── The derivation never touches the checkout ──────────────────────────────
+#
+# `scripts/derive-revision.mjs` materialises this checkout into a scratch
+# workspace, repins and regenerates THERE, and fingerprints the committed
+# surface before and after to prove it did not move. That is what makes deriving
+# a revision other than the pinned one possible at all: the whole generated
+# surface is written to fixed repository paths for exactly one revision, so
+# regenerating in place would overwrite the surface `pnpm check` verifies.
+#
+# It is also why this job no longer runs the generators itself. The chain, its
+# order, the engine slice it needs and the paths it may write are declared in
+# that script, where a test can check them against the ownership registries;
+# inline in a workflow, nothing could run them and nothing could check them.
+#
 # ── Why this opens a pull request instead of pushing ────────────────────────
 #
-# Deriving a revision changes what this repository treats as ground truth:
+# Adopting a derivation changes what this repository treats as ground truth:
 # `upstream.lock` is repinned to that revision with the digests the immutable
 # archive actually served. That is a reviewed decision, not an automated one,
 # and a policy is reviewable on purpose - a diff showing a parameter change from
@@ -27,16 +42,16 @@ name: policy-revisions
 # repinned lock, the regenerated surface, the new policy objects and the index
 # entry together, so the review sees the whole derivation.
 #
-# ── Why macOS, and the determinism caveat this job cannot fix ───────────────
+# ── Why a run can end with no pull request, and that being the point ────────
 #
-# The dmSDK IR is produced by parsing public headers with the HOST clang, and
-# `scripts/import-defold-sdk.py` labels its output `arm64-macos` unconditionally.
-# Deriving it on a Linux runner would therefore produce an IR labelled for a
-# platform it was not parsed for, and a different clang can legitimately produce
-# a different AST. Until that generator records and pins its own toolchain, this
-# job runs on an arm64 macOS runner to match the label, and the resulting policy
-# root is compared against a local derivation during review rather than trusted
-# because CI produced it.
+# A reviewed input under `packages/bindings/overrides/` records the SHA-256 and
+# the exact text anchors of every Defold source its review rests on. When those
+# move, the review does not hold at the new revision and no amount of automation
+# can decide what it should say instead. The derivation audits all of them up
+# front and reports the whole census - which sources moved, which no longer
+# exist at that revision, and which kept every reviewed anchor and so need only
+# a confirming read - instead of stopping at the first and saying nothing about
+# the rest. That census IS the output of such a run.
 
 on:
   schedule:
@@ -49,6 +64,14 @@ on:
       revision:
         description: Derive this Defold revision instead of reading the channels
         required: false
+      carry-reviews:
+        description: >-
+          Carry reviewed inputs whose revision differs onto the derived revision.
+          Every carry is recorded and reported; the byte-level source evidence
+          each reviewed input names is still checked against the derived
+          revision, so this cannot make a stale review pass.
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -94,8 +117,12 @@ jobs:
   derive:
     needs: plan
     if: needs.plan.outputs.any == 'true'
-    # arm64 macOS, to match the platform label the dmSDK inventory writes. See
-    # the determinism caveat in this file's header.
+    # arm64 macOS, still. `scripts/import-defold-sdk.py` parses the dmSDK with
+    # the HOST clang and labels its output `arm64-macos` unconditionally, so
+    # deriving on a Linux runner would produce an IR labelled for a platform it
+    # was not parsed for. That is a defect in the importer rather than a
+    # property of the API it derives, and it is what this pin exists to work
+    # around until the parse is target-directed.
     runs-on: macos-15
     strategy:
       fail-fast: false
@@ -109,80 +136,53 @@ jobs:
         with: { node-version: '22', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
-      # Repin ground truth to the observed revision, recording the SHA-256 of
-      # what the immutable archive actually served rather than a recalled
-      # constant.
-      - name: Pin Defold ${{ matrix.revision.sha1 }}
-        run: node scripts/track-defold-channels.mjs pin "${{ matrix.revision.sha1 }}" --write
-
-      # The smallest deterministic slice of the engine the generators read.
-      # A full checkout is 1.4 GB; these paths are roughly 115 MB.
-      - name: Fetch the engine slice
+      # One step. It materialises a workspace, repins `upstream.lock` there to
+      # the observed revision with the digests the immutable archive served,
+      # fetches the engine slice, audits every reviewed input against that
+      # revision's sources, runs the whole derivation chain, proves this
+      # checkout's committed surface did not move, and only then adopts the
+      # derived surface into the working tree for the pull request.
+      #
+      # `--adopt` refuses a blocked derivation, so a run that could not derive
+      # cannot open a pull request carrying a half-regenerated surface.
+      - name: Derive ${{ matrix.revision.sha1 }}
+        id: derive
+        continue-on-error: true
         run: |
           set -euo pipefail
-          source ./upstream.lock
-          mkdir -p upstream/defold
-          git -C upstream/defold init -q
-          git -C upstream/defold remote add origin "$DEFOLD_URL"
-          git -C upstream/defold config core.sparseCheckout true
-          git -C upstream/defold sparse-checkout set \
-            engine \
-            build_tools/sdk.py \
-            share/extender/build_input.yml \
-            com.dynamo.cr/com.dynamo.cr.bob/src \
-            editor/test/resources/test_project/app_manifest
-          git -C upstream/defold fetch --depth=1 --filter=blob:none origin "$DEFOLD_REV"
-          git -C upstream/defold checkout --detach "$DEFOLD_REV"
-          curl -fL "$DEFOLD_REF_DOC_URL" -o upstream/ref-doc.zip
-          shasum -a 256 -c <<< "$DEFOLD_REF_DOC_SHA256  upstream/ref-doc.zip"
-
-      # Derive the surface this revision declares, then the policy over it. The
-      # order is the one the ownership registries imply: the declared surface
-      # first, the source-derived registration ground truth over it, then the
-      # generators that consume the registration gate, then the policy.
-      - name: Derive the surface
-        run: |
-          set -euo pipefail
-          python3 scripts/import-defold-sdk.py
-          python3 scripts/import-defold-script-api.py
-          node scripts/generate-script-sdk.mjs
-          node scripts/generate-lua-registration-surface.mjs
-          node scripts/generate-defold-resource-schema.mjs
-          node scripts/generate-script-resource-namespace-classification.mjs
-          node scripts/generate-dmsdk-sdk.mjs
-          node scripts/generate-script-runtime.mjs
-
-      # `--prune` removes objects no index entry reaches any more. It cannot
-      # remove an object a previously published revision still points at, because
-      # that revision's index entry is still in the store.
-      - name: Derive the policy
-        id: policy
-        run: |
-          set -euo pipefail
-          node scripts/generate-api-policy.mjs --prune | tee /tmp/policy.txt
-          node scripts/generate-api-policy.mjs --check
-          node scripts/build-policy-site.mjs --out build/policy-site
-          node scripts/check-policy-site-resolution.mjs
+          node scripts/derive-revision.mjs \
+            --revision "${{ matrix.revision.sha1 }}" \
+            --workspace "$RUNNER_TEMP/derivation" \
+            ${{ inputs.carry-reviews && '--carry-reviews' || '' }} \
+            --adopt 2>&1 | tee "$RUNNER_TEMP/derivation.txt"
 
       - name: Report
+        if: always()
         run: |
           {
             echo "### ${{ matrix.revision.channel }} ${{ matrix.revision.version }} (${{ matrix.revision.sha1 }})"
             echo
             echo '```'
-            cat /tmp/policy.txt
-            echo '```'
-            echo
-            echo "Objects added by this revision (empty means its declared surface did not move):"
-            echo '```'
-            git status --porcelain packages/bindings/generated/policy | sed -n '1,40p'
+            cat "$RUNNER_TEMP/derivation.txt" || echo "the derivation produced no output"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+
+      # Publication artefacts, derived from the adopted surface. These are the
+      # consumer-facing checks: the site must build and a client must be able to
+      # resolve a revision through it end to end, including the tampered-object
+      # control.
+      - name: Check the published shape
+        if: steps.derive.outcome == 'success'
+        run: |
+          set -euo pipefail
+          node scripts/build-policy-site.mjs --out build/policy-site
+          node scripts/check-policy-site-resolution.mjs
 
       # A pull request, never a push: repinning upstream.lock and moving a
       # derived surface are reviewed decisions. Deploying happens from main, by
       # the policy-site workflow, after that review.
       - uses: peter-evans/create-pull-request@v7
+        if: steps.derive.outcome == 'success'
         with:
           branch: policy/defold-${{ matrix.revision.sha1 }}
           base: main
@@ -202,13 +202,29 @@ jobs:
 
             * Subtree hashes that did not change are not in this diff; the policy root and
               the index entry always are.
-            * The dmSDK IR is parsed with the runner's clang. Compare the policy root
-              against a local derivation before merging.
+            * The derivation ran in a scratch workspace and proved this checkout's
+              committed surface did not move before adopting anything. The run summary
+              carries the reviewed-evidence census and any carried reviews.
             * `upstream.lock` digests were computed from what `d.defold.com/archive`
               served during this run.
+          # Every path the derivation's own ownership registries declare it may
+          # write. The previous list named four of them, so a merged pull request
+          # could carry a regenerated script IR with none of the generated C++,
+          # TypeScript or harness fixtures derived from it.
           add-paths: |
             upstream.lock
             packages/bindings/generated
             packages/sdk/src/generated
-            .agents/docs/research/sdk-coverage.md
-            .agents/docs/research/script-api-coverage.md
+            packages/static-hermes/src/generated
+            defold/defold_hermes/include/defold_hermes
+            defold/defold_hermes/src
+            defold/defold_hermes/lib/web
+            examples/runtime-smoke/src/generated
+            tests/fixtures
+            .agents/docs/research
+
+      - name: Fail the job when the revision could not be derived
+        if: steps.derive.outcome != 'success'
+        run: |
+          echo "Defold ${{ matrix.revision.sha1 }} could not be derived; see the run summary." >&2
+          exit 1

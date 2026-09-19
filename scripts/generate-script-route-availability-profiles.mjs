@@ -6,6 +6,7 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const defaultPolicy = "packages/bindings/overrides/script-route-availability-profiles.json";
@@ -145,9 +146,22 @@ async function generate(options) {
   const scriptIr = scriptIrInput.value;
 
   assert(policy.schemaVersion === 1, "unsupported policy schema");
-  assert(borrowed.defoldRevision === policy.defoldRevision, "Defold revision differs between policy and borrowed-handle classification");
+  // The revision this report speaks for comes from a DERIVED input - the
+  // imported script API IR - and never from the reviewed policy, so a reviewed
+  // file can no longer decide which revision the generated surface claims.
+  const defoldRevision = scriptIr.defoldRevision;
+  assert(borrowed.defoldRevision === defoldRevision,
+    "Defold revision differs between the script API IR and the borrowed-handle classification");
   assert(Array.isArray(borrowed.rows), "borrowed-handle classification has no rows");
-  assert(scriptIr.defoldRevision === policy.defoldRevision, "Defold revision differs between policy and script API IR");
+  // Reviewed evidence, compared against the revision being generated. The
+  // reviewed feature and profile censuses below, and the SHA-256 of every cited
+  // registration and build-manifest source, are re-checked at that revision.
+  assertReviewedRevision({
+    input: options.policy,
+    reviewed: policy.defoldRevision,
+    derived: defoldRevision,
+    detail: "the reviewed route availability profiles"
+  });
   assert(Array.isArray(scriptIr.functions), "script API IR has no functions");
   const documentedNames = new Set(scriptIr.functions.map(({ rawName }) => rawName));
   const scriptRowsByRawName = new Map(scriptIr.functions.map((row) => [row.rawName, scriptRouteRow(row)]));
@@ -311,7 +325,7 @@ async function generate(options) {
       runtimeHandshake: {
         schema: "deherm.script-route-capabilities/v1",
         profileId: manifest.id,
-        defoldRevision: policy.defoldRevision,
+        defoldRevision,
         capabilityBits: manifest.features.reduce((bits, feature) => bits | featureBits[feature], 0),
         routeCount: availableRoutes.length,
         routeSetSha256: routeHash
@@ -345,7 +359,7 @@ async function generate(options) {
     "profile expectations and manifest evidence differ");
 
   const catalogMaterial = {
-    defoldRevision: policy.defoldRevision,
+    defoldRevision,
     profiles: Object.fromEntries(Object.entries(routeProfiles).map(([id, profile]) => [id, {
       features: profile.features,
       capabilityBits: profiles[id].runtimeHandshake.capabilityBits,
@@ -357,7 +371,7 @@ async function generate(options) {
     profile.runtimeHandshake = {
       schema: "deherm.script-route-capabilities/v1",
       profileId: id,
-      defoldRevision: policy.defoldRevision,
+      defoldRevision,
       capabilityBits: profiles[id].runtimeHandshake.capabilityBits,
       routeCount: profile.availableRouteCount,
       routeSetSha256: routeSetSha256(profile.availableRoutes),
@@ -373,7 +387,7 @@ async function generate(options) {
 
   const report = {
     schemaVersion: 1,
-    defoldRevision: policy.defoldRevision,
+    defoldRevision,
     catalogSha256,
     inputEvidence: {
       policy: options.policy,

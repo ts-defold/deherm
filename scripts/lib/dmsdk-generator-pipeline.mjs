@@ -21,6 +21,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-universal-bindings.mjs",
   "scripts/generate-dmsdk-runtime.mjs",
   "scripts/lib/dmsdk-generator-pipeline.mjs",
+  "scripts/lib/reviewed-revision.mjs",
   "packages/compiler/src/dmsdk-universal-materializer-core.mjs",
   "packages/compiler/src/dmsdk-universal-materializer.mjs"
 ]);

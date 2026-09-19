@@ -12,6 +12,7 @@ import {
   rawScriptRootName
 } from "../packages/compiler/src/script-public-api-policy.mjs";
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
+import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archivePath = path.join(root, "upstream", "ref-doc.zip");
@@ -26,7 +27,16 @@ const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 async function loadSemanticHandleTypes(defoldRevision) {
   const policy = JSON.parse(await readFile(handleClassificationPath, "utf8"));
   assert.equal(policy.schemaVersion, 2, "borrowed-handle classification schema is unsupported");
-  assert.equal(policy.defoldRevision, defoldRevision, "borrowed-handle classification Defold revision drifted");
+  // The reviewed revision, compared against the revision BEING GENERATED. The
+  // byte-level evidence below - every cited source file's SHA-256 and anchors,
+  // read from the checkout of that revision - is what actually establishes that
+  // the review still holds, and runs whether or not the revisions are equal.
+  assertReviewedRevision({
+    input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+    reviewed: policy.defoldRevision,
+    derived: defoldRevision,
+    detail: "the semantic handle kinds the generated script types are built from"
+  });
 
   const evidenceById = new Map();
   for (const evidence of policy.sourceEvidence) {

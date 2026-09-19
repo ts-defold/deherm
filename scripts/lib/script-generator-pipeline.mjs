@@ -41,6 +41,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/lib/script-universal-selection.mjs",
   "scripts/lib/semantic-handle-kinds.mjs",
   "scripts/lib/script-semantic-overrides.mjs",
+  "scripts/lib/reviewed-revision.mjs",
   "packages/cli/src/names.mjs"
 ]);
 
@@ -228,7 +229,8 @@ export const scriptGenerationSteps = Object.freeze([
 export const luaRegistrationSurfaceGenerator = Object.freeze({
   sources: Object.freeze([
     "scripts/generate-lua-registration-surface.mjs",
-    "scripts/lib/lua-c-registration.mjs"
+    "scripts/lib/lua-c-registration.mjs",
+    "scripts/lib/reviewed-revision.mjs"
   ]),
   pinnedInputs: Object.freeze([
     "upstream.lock",

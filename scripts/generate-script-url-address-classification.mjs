@@ -5,6 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -131,8 +132,17 @@ export function generateScriptUrlAddressClassification(inputs) {
   const patterns = parse(inputs.patternsText, "script binding patterns");
   const override = parse(inputs.overrideText, "URL classification override");
   assert(override.schemaVersion === 1, "URL classification override has an unsupported schema");
-  assert(ir.defoldRevision === patterns.defoldRevision &&
-    ir.defoldRevision === override.defoldRevision, "URL classification inputs use different Defold revisions");
+  assert(ir.defoldRevision === patterns.defoldRevision, "URL classification inputs use different Defold revisions");
+  // Reviewed evidence, compared against the revision being generated.
+  // `validateSources` immediately re-reads every cited Defold source at that
+  // revision and checks its SHA-256 and anchors, which is the check that
+  // actually establishes whether the review still holds.
+  assertReviewedRevision({
+    input: "packages/bindings/overrides/script-url-address-classification.json",
+    reviewed: override.defoldRevision,
+    derived: ir.defoldRevision,
+    detail: "the reviewed URL/address value shapes"
+  });
   validateSources(override, inputs.sourceTexts);
 
   const irById = uniqueMap(ir.functions, "script API IR");

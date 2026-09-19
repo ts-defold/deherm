@@ -20,6 +20,7 @@ import { fileURLToPath } from "node:url";
 import { unzipSync } from "fflate";
 import { parse as parseYaml } from "yaml";
 
+import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
 import {
   analyzeFunctionBody,
   buildProject,
@@ -957,6 +958,20 @@ async function generate(options) {
   const policy = JSON.parse(policyText);
   assert(policy.schemaVersion === 1, "unsupported policy schema");
   assert(Array.isArray(policy.targets) && policy.targets.length, "policy declares no targets");
+  // The revision this report speaks for is the one `upstream.lock` pins, because
+  // that is the checkout whose C sources are about to be parsed. It used to be
+  // whatever the reviewed target policy said, which was never compared against
+  // anything: a reviewed file could name one revision while the parse read
+  // another, and nothing downstream could tell.
+  const lock = await readFile(join(repositoryRoot, "upstream.lock"), "utf8");
+  const defoldRevision = lock.match(/^DEFOLD_REV=([0-9a-f]{40})$/m)?.[1];
+  assert(defoldRevision, "upstream.lock does not pin an exact Defold revision");
+  assertReviewedRevision({
+    input: options.policy,
+    reviewed: policy.defoldRevision,
+    derived: defoldRevision,
+    detail: "the reviewed registration-surface targets and their source roots"
+  });
 
   const targets = {};
   for (const target of policy.targets) {
@@ -971,7 +986,7 @@ async function generate(options) {
   const report = {
     schemaVersion: 1,
     generator: "scripts/generate-lua-registration-surface.mjs",
-    defoldRevision: policy.defoldRevision,
+    defoldRevision,
     contract: {
       groundTruth: "The Lua C API registration arrays and the C function bodies that read the Lua stack.",
       declaredSurface: "The `.script_api` declaration, or the pinned script API IR for the engine.",
@@ -995,7 +1010,7 @@ async function generate(options) {
   const gate = {
     schemaVersion: 1,
     generator: "scripts/generate-lua-registration-surface.mjs",
-    defoldRevision: policy.defoldRevision,
+    defoldRevision,
     scope: "The subset of the registered-vs-declared findings that a downstream generator may act on: each one is backed by positive evidence in C source and holds in every mutually exclusive engine build variant. Absence of a registration is reported in the surface report and never gated.",
     actions: {
       "block-emission": "The documented route is not callable under this name. A generated binding must not emit it as a callable route.",
