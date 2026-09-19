@@ -4,6 +4,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
+
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relativeOutputs = {
   report: "packages/bindings/generated/defold-static-hermes-vmath.json",
@@ -67,13 +69,23 @@ function flattenedParameters(shape) {
 function assertDescriptor(descriptor, config, descriptorRaw) {
   assert.equal(config.schemaVersion, 1, "Unsupported Static Hermes vmath config schema");
   assert.equal(descriptor.schemaVersion, 1, "Unsupported value-binding descriptor schema");
-  assert.equal(
-    sha256(descriptorRaw),
-    config.descriptorSha256,
-    "Static Hermes vmath descriptor-sha256-drift: review the changed value-binding descriptor and update the pinned override"
-  );
+  // The pinned hash of the value-binding descriptor is a reviewed fact about the
+  // revision it was taken at. In an ordinary generation a difference means the
+  // descriptor changed underneath a review that has not been redone, and that
+  // stays fatal. Deriving another revision it says only that the value lane
+  // emitted that revision's routes, which is the measurement being taken.
+  expectReviewedCount({
+    input: "packages/bindings/overrides/static-hermes-vmath.json",
+    label: "value-binding descriptor sha256",
+    expected: config.descriptorSha256, observed: sha256(descriptorRaw)
+  });
+  // Internal consistency: the descriptor against itself. True at any revision.
   assert.equal(descriptor.bindingCount, descriptor.bindings.length, "Descriptor bindingCount drift");
-  assert.equal(descriptor.bindings.length, config.expectedCoverage.descriptorBindings, "Descriptor coverage drift");
+  expectReviewedCount({
+    input: "packages/bindings/overrides/static-hermes-vmath.json",
+    label: "value-binding descriptor coverage",
+    expected: config.expectedCoverage.descriptorBindings, observed: descriptor.bindings.length
+  });
 }
 
 function classify(descriptor, config) {
@@ -136,7 +148,14 @@ function validateCoverage(descriptor, selected, exclusions, config) {
     structuredResultExclusions: exclusions.filter((entry) => entry.reason.includes("aggregate-return")).length,
     outOfScopeBindings: exclusions.filter((entry) => entry.reason === "out-of-scope-non-vmath").length
   };
-  assert.deepEqual(coverage, config.expectedCoverage, "Static Hermes vmath coverage drift");
+  // Reported per bucket, so a derivation names WHICH count moved rather than
+  // printing two objects at a reader.
+  for (const [bucket, expected] of Object.entries(config.expectedCoverage)) {
+    expectReviewedCount({
+      input: "packages/bindings/overrides/static-hermes-vmath.json",
+      label: `Static Hermes vmath coverage:${bucket}`, expected, observed: coverage[bucket]
+    });
+  }
   assert.equal(selected.length + exclusions.length, descriptor.bindings.length, "Classification is not exhaustive");
   return coverage;
 }

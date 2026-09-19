@@ -5,8 +5,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
-import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
-import { VOID } from "./lib/revision-audit.mjs";
+import { declaredDerivation, expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { MOVED, VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
@@ -119,7 +119,59 @@ function luaRegistration(source, member) {
   return null;
 }
 
-function expandDefinitionBindings(definition, functions, patterns, source) {
+// A reviewed claim this revision no longer bears out.
+//
+// At the reviewed revision every one of these is a regression in this tree and
+// stays fatal, with the message it always had. Deriving another revision, the
+// evidence the review rested on is simply not there - `script_vmath.cpp` was
+// rewritten, a registration moved - so the entry is WITHDRAWN for this revision
+// and reported by name as queued review work, which is what a per-revision
+// policy store is for.
+function withdrawReviewed(id, reason, message) {
+  if (!declaredDerivation()) throw new Error(message);
+  recordAudit({
+    input: "packages/bindings/overrides/defold-value-layouts.json",
+    id, status: VOID, reason, detail: message
+  });
+  return false;
+}
+
+// `deriveCallShapes` for a route whose documented signature this revision spells
+// in a way the generator cannot read - Defold 1.13.1 documents overloads as
+// `fun(n)`, with neither parameter types nor a result, where the pinned revision
+// writes `fun(v: vector3): number`. Without types there are no call shapes, so
+// there is nothing to emit; the route is withdrawn and reported. Outside a
+// declared derivation `withdrawReviewed` rethrows the original message, so an
+// ordinary generation still fails exactly as before.
+function reviewedCallShapes(fn, codecOverrides = new Map()) {
+  try {
+    return deriveCallShapes(fn, codecOverrides);
+  } catch (error) {
+    withdrawReviewed(fn.id, "unreadable-signature", error.message);
+    return null;
+  }
+}
+
+// Whether a documented route belongs to the definition being expanded.
+//
+// `irSource` names the file in the reference archive the reviewer read. That
+// file name is a property of how the archive is PACKAGED, not of the engine's
+// API: Defold 1.13.1 ships one documentation file per C++ translation unit
+// (`doc/src-script_vmath.cpp_doc.lua`) where the pinned revision ships one per
+// module (`doc/vmath.lua`). Holding the reviewed file name against another
+// revision withdrew every value binding in the tree over a repackaging.
+//
+// So when a declared derivation finds that this revision's IR has no such file
+// at all, the layout moved and the scope falls back to the route identity,
+// which already carries the module (`script:vmath.vector3`) and is unique in
+// the IR. Every selector that uses this also matches on `modulePath`, so the
+// scope is not widened. When the file IS present - every ordinary generation -
+// the exact comparison runs unchanged.
+function inDefinitionSource(fn, definition, layoutMoved) {
+  return layoutMoved ? true : fn.source === definition.irSource;
+}
+
+function expandDefinitionBindings(definition, functions, patterns, source, layoutMoved) {
   const expanded = [...(definition.bindings ?? [])];
   for (const family of definition.families ?? []) {
     const selector = family?.selector;
@@ -137,19 +189,28 @@ function expandDefinitionBindings(definition, functions, patterns, source) {
         throw new Error("gui-node-setters family contains an unsupported codec mapping");
       }
       const selected = [...functions.values()].filter((fn) =>
-        fn.source === definition.irSource && equal(fn.modulePath, selector.modulePath) &&
+        inDefinitionSource(fn, definition, layoutMoved) && equal(fn.modulePath, selector.modulePath) &&
         !selector.excludedIds.includes(fn.id) &&
         fn.member.startsWith(selector.memberPrefix) &&
         fn.parameters[0]?.rawType === selector.firstParameterType &&
         fn.returns.length === selector.resultCount &&
         fn.parameters.every(({ rawType }) => split(rawType).every((type) => codecOverrides.has(type))));
-      if (selected.length !== selector.expectedRouteCount) {
-        throw new Error(`gui-node-setters selected ${selected.length} routes; reviewed count is ${selector.expectedRouteCount}`);
-      }
+      // The reviewed count is evidence at the revision it was counted at and an
+      // observation anywhere else: a revision with a different number of gui
+      // node setters is the measurement this derivation exists to take.
+      expectReviewedCount({
+        input: "packages/bindings/overrides/script-gui-structured-bindings.json",
+        label: "gui-node-setters route census",
+        expected: selector.expectedRouteCount, observed: selected.length
+      });
       for (const fn of selected) {
         const registration = luaRegistration(source, fn.member);
-        if (!registration) throw new Error(`${fn.id}: no pinned Gui_methods registration was found`);
-        const callShapes = deriveCallShapes(fn, codecOverrides);
+        if (!registration) {
+          withdrawReviewed(fn.id, "absent-registration", `${fn.id}: no pinned Gui_methods registration was found`);
+          continue;
+        }
+        const callShapes = reviewedCallShapes(fn, codecOverrides);
+        if (!callShapes) continue;
         expanded.push({
           id: fn.id,
           sourceSymbol: registration.symbol,
@@ -185,23 +246,30 @@ function expandDefinitionBindings(definition, functions, patterns, source) {
       const allowed = new Set(allowedTypes);
       const selected = [...functions.values()].filter((fn) => {
         const pattern = patterns.get(fn.id);
-        return fn.source === definition.irSource && equal(fn.modulePath, selector.modulePath) &&
+        return inDefinitionSource(fn, definition, layoutMoved) && equal(fn.modulePath, selector.modulePath) &&
           pattern?.loweringFamily === selector.loweringFamily && !selector.excludedIds.includes(fn.id) &&
           fn.parameters.every(({ rawType }) => split(rawType).every((type) => allowed.has(type))) &&
           fn.returns.length === 1 && fn.returns.every((type) => allowed.has(type));
       });
-      if (selected.length !== selector.expectedRouteCount) {
-        throw new Error(`vmath-fixed-pod selected ${selected.length} routes; reviewed count is ${selector.expectedRouteCount}`);
-      }
+      expectReviewedCount({
+        input: "packages/bindings/overrides/script-defold-value-bindings.json",
+        label: "vmath-fixed-pod route census",
+        expected: selector.expectedRouteCount, observed: selected.length
+      });
       const seenOperators = new Set();
       for (const fn of selected) {
         const registration = luaRegistration(source, fn.member);
-        if (!registration) throw new Error(`${fn.id}: no pinned vmath methods registration was found`);
+        if (!registration) {
+          if (withdrawReviewed(fn.id, "absent-registration", `${fn.id}: no pinned vmath methods registration was found`)) continue;
+          continue;
+        }
         const body = functionSource(source, registration.symbol, fn.id);
         const matches = selector.terminalOperations.filter(({ sourceAnchor }) =>
           typeof sourceAnchor === "string" && body.includes(sourceAnchor));
         if (matches.length !== 1) {
-          throw new Error(`${fn.id}: expected exactly one reviewed vmath terminal operation, found ${matches.length}`);
+          withdrawReviewed(fn.id, "stale-terminal-anchor",
+            `${fn.id}: expected exactly one reviewed vmath terminal operation, found ${matches.length}`);
+          continue;
         }
         const terminal = matches[0];
         if (typeof terminal.operator !== "string" || seenOperators.has(terminal.operator) ||
@@ -210,8 +278,9 @@ function expandDefinitionBindings(definition, functions, patterns, source) {
             !Array.isArray(terminal.probe.arguments) || !terminal.probe.expectation) {
           throw new Error(`${fn.id}: invalid or duplicate reviewed vmath terminal operation`);
         }
+        const callShapes = reviewedCallShapes(fn);
+        if (!callShapes) continue;
         seenOperators.add(terminal.operator);
-        const callShapes = deriveCallShapes(fn);
         expanded.push({
           id: fn.id,
           sourceSymbol: registration.symbol,
@@ -227,9 +296,13 @@ function expandDefinitionBindings(definition, functions, patterns, source) {
           generatedProbe: terminal.probe
         });
       }
-      if (seenOperators.size !== selector.terminalOperations.length) {
-        throw new Error("vmath-fixed-pod terminal operations do not map one-to-one to selected routes");
-      }
+      // One operator per selected route is structural and stays exact; how many
+      // of the reviewed terminals a revision still registers is a census.
+      expectReviewedCount({
+        input: "packages/bindings/overrides/script-defold-value-bindings.json",
+        label: "vmath-fixed-pod terminal-operation census",
+        expected: selector.terminalOperations.length, observed: seenOperators.size
+      });
       continue;
     }
     if (family?.id === "vmath-matrix4") {
@@ -253,14 +326,23 @@ function expandDefinitionBindings(definition, functions, patterns, source) {
       const required = new Set(selector.requiredIds);
       const allowed = new Set(allowedTypes);
       const selected = [...functions.values()].filter((fn) => required.has(fn.id) &&
-        fn.source === definition.irSource && equal(fn.modulePath, selector.modulePath) &&
+        inDefinitionSource(fn, definition, layoutMoved) && equal(fn.modulePath, selector.modulePath) &&
         patterns.get(fn.id)?.loweringFamily === selector.loweringFamily &&
         fn.parameters.every(({ rawType }) => split(rawType).every((type) => allowed.has(type))) &&
         fn.returns.length === 1 && fn.returns.every((type) => allowed.has(type)));
-      if (selected.length !== selector.expectedRouteCount ||
-          selected.reduce((count, fn) => count + deriveCallShapes(fn).length, 0) !== selector.expectedCallShapeCount) {
-        throw new Error("vmath-matrix4 selector no longer resolves the reviewed 14 routes / 16 call shapes");
-      }
+      // Two counts, reported separately so a derivation says which one moved
+      // rather than "no longer resolves the reviewed 14 routes / 16 call shapes".
+      expectReviewedCount({
+        input: "packages/bindings/overrides/script-defold-value-bindings.json",
+        label: "vmath-matrix4 route census",
+        expected: selector.expectedRouteCount, observed: selected.length
+      });
+      expectReviewedCount({
+        input: "packages/bindings/overrides/script-defold-value-bindings.json",
+        label: "vmath-matrix4 call-shape census",
+        expected: selector.expectedCallShapeCount,
+        observed: selected.reduce((count, fn) => count + (reviewedCallShapes(fn)?.length ?? 0), 0)
+      });
       const terminals = new Map(selector.terminalOperations.map((entry) => [entry.id, entry]));
       if (terminals.size !== selector.terminalOperations.length) {
         throw new Error("vmath-matrix4 terminal IDs must be unique");
@@ -268,14 +350,19 @@ function expandDefinitionBindings(definition, functions, patterns, source) {
       for (const fn of selected) {
         const terminal = terminals.get(fn.id);
         const registration = luaRegistration(source, fn.member);
-        if (!terminal || !registration) throw new Error(`${fn.id}: no reviewed Matrix4 terminal or registration`);
+        if (!terminal || !registration) {
+          withdrawReviewed(fn.id, "absent-registration", `${fn.id}: no reviewed Matrix4 terminal or registration`);
+          continue;
+        }
         const body = functionSource(source, registration.symbol, fn.id);
         if (typeof terminal.operator !== "string" || typeof terminal.sourceAnchor !== "string" ||
             !body.includes(terminal.sourceAnchor) || !Array.isArray(terminal.implementedCallShapes) ||
             typeof terminal.resultCodec !== "string" || !terminal.probe) {
-          throw new Error(`${fn.id}: invalid or stale reviewed Matrix4 terminal operation`);
+          withdrawReviewed(fn.id, "stale-terminal-anchor", `${fn.id}: invalid or stale reviewed Matrix4 terminal operation`);
+          continue;
         }
-        const callShapes = deriveCallShapes(fn);
+        const callShapes = reviewedCallShapes(fn);
+        if (!callShapes) continue;
         expanded.push({
           id: fn.id,
           sourceSymbol: registration.symbol,
@@ -1084,9 +1171,32 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
       if (additionalVerdict.status === VOID) return [];
       sourceEvidence.push({ path: `upstream/defold/${declared.source}`, sha256 });
     }
-    return expandDefinitionBindings(definition, functions, patterns, sourceText).map((entry) => {
+    // Does this revision's reference archive still carry the documentation file
+    // the review was scoped to? See `inDefinitionSource`.
+    const layoutMoved = declaredDerivation() !== null &&
+      ![...functions.values()].some((fn) => fn.source === definition.irSource);
+    if (layoutMoved) {
+      recordAudit({
+        input: "packages/bindings/overrides/defold-value-layouts.json", id: definition.irSource,
+        status: MOVED, reason: "documentation-layout"
+      });
+    }
+    return expandDefinitionBindings(definition, functions, patterns, sourceText, layoutMoved).flatMap((entry) => {
     const fn = functions.get(entry.id);
-    if (!fn || fn.source !== definition.irSource) throw new Error(`${entry.id}: missing pinned ${definition.irSource} IR`);
+    // A reviewed route this revision does not document where the review found
+    // it. At the reviewed revision that is a regression in this tree and stays
+    // fatal; deriving another revision it is a route that moved or went away -
+    // Defold 1.13.1 documents vmath in `doc/src-script_vmath.cpp_doc.lua`, not
+    // `doc/vmath.lua` - so the reviewed entry is withdrawn and reported rather
+    // than emitted against documentation that is not there.
+    if (!fn || !inDefinitionSource(fn, definition, layoutMoved)) {
+      if (!declaredDerivation()) throw new Error(`${entry.id}: missing pinned ${definition.irSource} IR`);
+      recordAudit({
+        input: "packages/bindings/overrides/defold-value-layouts.json", id: entry.id, status: VOID,
+        reason: "absent-route", source: definition.irSource, observed: fn?.source ?? null
+      });
+      return [];
+    }
     const scopedSource = entry.generatedFamily
       ? sourceText
       : functionSource(sourceText, entry.sourceSymbol, entry.id);
@@ -1094,20 +1204,39 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
       ? []
       : Array.isArray(entry.sourceOperation) ? entry.sourceOperation : [entry.sourceOperation];
     if (sourceOperations.some((anchor) => typeof anchor !== "string" || !scopedSource.includes(anchor))) {
-      throw new Error(`${entry.id}: scoped source operation evidence is stale`);
+      withdrawReviewed(entry.id, "stale-source-anchor", `${entry.id}: scoped source operation evidence is stale`);
+      return [];
     }
     if (entry.callShapes.some((shape) => shape.some((codec) => !CODECS.has(codec)))) throw new Error(`${entry.id}: unsupported codec`);
     const familyCodecs = new Map(Object.entries(entry.familyTypeCodecs ?? {}));
-    const derived = deriveCallShapes(fn, familyCodecs);
-    if (!equal(derived, entry.callShapes)) throw new Error(`${entry.id}: reviewed call shapes differ from pinned IR: ${JSON.stringify(derived)}`);
+    const derived = reviewedCallShapes(fn, familyCodecs);
+    if (!derived) return [];
+    if (!equal(derived, entry.callShapes)) {
+      withdrawReviewed(entry.id, "stale-call-shapes",
+        `${entry.id}: reviewed call shapes differ from pinned IR: ${JSON.stringify(derived)}`);
+      return [];
+    }
     const implementedCallShapes = entry.implementedCallShapes ?? entry.callShapes;
     if (implementedCallShapes.some((shape) => shape.some((codec) => !CODECS.has(codec))) ||
         implementedCallShapes.some((shape) =>
           !derived.some((candidate) => equal(candidate, shape)) && !isIrCompatibleShape(fn, shape))) {
-      throw new Error(`${entry.id}: implemented call shape is not present in pinned IR`);
+      withdrawReviewed(entry.id, "stale-call-shapes", `${entry.id}: implemented call shape is not present in pinned IR`);
+      return [];
     }
-    const derivedResult = deriveResultCodec(fn);
-    if (derivedResult !== entry.resultCodec) throw new Error(`${entry.id}: reviewed result codec ${entry.resultCodec} differs from pinned IR ${derivedResult}`);
+    // Same rule for the result: a documented result shape this generator cannot
+    // read at this revision withdraws the route rather than stopping the chain.
+    let derivedResult;
+    try {
+      derivedResult = deriveResultCodec(fn);
+    } catch (error) {
+      withdrawReviewed(entry.id, "unreadable-signature", error.message);
+      return [];
+    }
+    if (derivedResult !== entry.resultCodec) {
+      withdrawReviewed(entry.id, "stale-result-codec",
+        `${entry.id}: reviewed result codec ${entry.resultCodec} differs from pinned IR ${derivedResult}`);
+      return [];
+    }
     const id = stableBindingId(entry.id);
     const scalarOwner = scalarStableIds.get(id);
     if (scalarOwner) throw new Error(`${entry.id}: stable ID collides with scalar binding ${scalarOwner}`);
@@ -1125,7 +1254,7 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
       targetSupport: targetSupport(entry)
     };
     validateOperation(binding, scopedSource, definition, sourceText);
-    return binding;
+    return [binding];
     });
   }).sort((left, right) => left.stableId - right.stableId);
 

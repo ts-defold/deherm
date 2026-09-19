@@ -4,7 +4,8 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -111,11 +112,35 @@ export function generate(patternsText, irText, overridesText, sources) {
     patternIds.add(pattern.id);
   }
   const selected = patterns.bindings.filter((row) => row.loweringFamily === "dynamic-values");
-  assert(selected.length === overrides.expectedRouteCount,
-    `selected ${selected.length} dynamic-value routes, expected ${overrides.expectedRouteCount}`);
-  assert(Object.keys(overrides.routes).length === selected.length, "dynamic-value override coverage drifted");
+  // The census is evidence at the revision it was counted at and an observation
+  // anywhere else: Defold 1.13.1 classifies 17 dynamic-value routes where the
+  // review counted 14, and 17 is the answer rather than an error.
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-dynamic-value-bindings.json",
+    label: "dynamic-value route census",
+    expected: overrides.expectedRouteCount, observed: selected.length
+  });
+  // A classified route with no reviewed rule cannot be emitted - its strategy,
+  // argument floor and blocker are exactly what a review decides. At the
+  // reviewed revision that is a gap in this tree and stays fatal; in a declared
+  // derivation it is a route this revision has and the review never saw, so it
+  // is withdrawn and reported as queued review work.
+  const reviewedSelected = selected.filter((pattern) => {
+    if (overrides.routes[pattern.id]) return true;
+    assert(declaredDerivation(), `${pattern.id}: missing reviewed dynamic-value rule`);
+    recordAudit({
+      input: "packages/bindings/overrides/script-dynamic-value-bindings.json",
+      id: pattern.id, status: VOID, reason: "unreviewed-route"
+    });
+    return false;
+  });
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-dynamic-value-bindings.json",
+    label: "dynamic-value override coverage",
+    expected: Object.keys(overrides.routes).length, observed: reviewedSelected.length
+  });
   const irById = new Map(ir.functions.map((fn) => [fn.id, fn]));
-  const rows = selected.map((pattern) => {
+  const rows = reviewedSelected.map((pattern) => {
     const rule = overrides.routes[pattern.id];
     assert(rule, `${pattern.id}: missing reviewed dynamic-value rule`);
     const fn = irById.get(pattern.id);
@@ -162,8 +187,11 @@ export function generate(patternsText, irText, overridesText, sources) {
   assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "dynamic-value stable ID collision");
   const candidates = rows.filter((row) => row.generatedFamilyExecutableCandidate);
   const blocked = rows.filter((row) => !row.generatedFamilyExecutableCandidate);
-  assert(candidates.length === overrides.expectedCandidateCount,
-    `classified ${candidates.length} dynamic-value candidates, expected ${overrides.expectedCandidateCount}`);
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-dynamic-value-bindings.json",
+    label: "dynamic-value candidate census",
+    expected: overrides.expectedCandidateCount, observed: candidates.length
+  });
   const report = {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,

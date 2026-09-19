@@ -5,7 +5,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -175,7 +176,17 @@ export function generateScriptDefoldValueTail(inputs) {
       for (const id of group.ids) {
         assert(!seen.has(id), `${id}: value-tail policy duplicates a route`); seen.add(id);
         const fn = fnById.get(id); const pattern = patternById.get(id);
-        assert(fn && pattern, `${id}: reviewed value-tail route is no longer the unimplemented defold-value tail`);
+        // A reviewed tail route this revision does not leave in the tail - it
+        // went away, or another lane now owns it. Fatal at the reviewed
+        // revision; withdrawn and reported in a declared derivation.
+        if (!fn || !pattern) {
+          assert(declaredDerivation(), `${id}: reviewed value-tail route is no longer the unimplemented defold-value tail`);
+          recordAudit({
+            input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+            id, status: VOID, reason: "absent-route", family: family.id
+          });
+          continue;
+        }
         const entry = { id, stableId: stableBindingId(id), modulePath: fn.modulePath, member: fn.member, sourcePath: source.path, disposition: family.disposition, family: family.id, backend: family.backend ?? null, requiredContext: family.requiredContext };
         if (family.disposition === "candidate") {
           const found = registration(text, fn.member, group.registration);
@@ -190,11 +201,22 @@ export function generateScriptDefoldValueTail(inputs) {
       }
     }
   }
-  assert(seen.size === tailPatterns.length && [...patternById].every(([id]) => seen.has(id)), "value-tail policy does not cover every remaining defold-value route");
+  // The reviewed policy must cover the whole remaining tail. At the reviewed
+  // revision a gap is a regression in this tree; deriving another revision it
+  // counts the routes that revision added to or removed from the tail.
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+    label: "value-tail policy coverage",
+    expected: tailPatterns.length, observed: [...patternById].filter(([id]) => seen.has(id)).length
+  });
   rows.sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
   assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "value-tail stable ID collision");
   const candidates = rows.filter(({ disposition }) => disposition === "candidate");
-  assert(candidates.length === policy.expectedCandidateCount, `value-tail candidate count drifted: expected ${policy.expectedCandidateCount}, got ${candidates.length}`);
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+    label: "value-tail candidate census",
+    expected: policy.expectedCandidateCount, observed: candidates.length
+  });
   const report = {
     schemaVersion: 1, defoldRevision: ir.defoldRevision,
     scope: "the complete remaining defold-value tail after the generated native value-binding wave",
