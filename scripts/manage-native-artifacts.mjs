@@ -66,6 +66,27 @@ function installable(artifact) {
   return artifact.status === "vendored" || artifact.status === "required-missing";
 }
 
+// The asset names this workflow is expected to publish for a complete release.
+//
+// A release EXISTING is not evidence that it is complete: the first run of the
+// native-artifacts workflow created both releases and then every Hermes lane
+// failed, leaving an empty release that the next run's existence check happily
+// treated as already built. The skip has to be keyed on the assets, not on the
+// tag.
+//
+// `installable` is the same predicate `install` uses, so a target that is
+// blocked or retired upstream is not expected here and does not hold a release
+// open forever.
+async function expectedAssets() {
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const names = [];
+  for (const [target, artifact] of Object.entries(manifest.targets)) {
+    if (!installable(artifact)) continue;
+    names.push(`hermes-${target}-${expectedFile(target, artifact)}`);
+  }
+  return names.sort();
+}
+
 async function install(downloadRoot) {
   const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
   const available = await filesBelow(path.resolve(downloadRoot));
@@ -237,6 +258,7 @@ else if (command === "install") {
   if (!args[0]) throw new Error("record requires a target, for example arm64-osx");
   console.log(`recorded ${args[0]} ${await record(args[0])}`);
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
+else if (command === "expected-assets") console.log((await expectedAssets()).join("\n"));
 else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
 else if (command === "pull") {
   // Release assets, not workflow artifacts. A workflow artifact expires, is
@@ -263,5 +285,5 @@ else if (command === "pull") {
   console.log(`installed ${installed.length} native artifact(s): ${installed.join(", ") || "none"}`);
   await verify(!args.includes("--partial"), false);
 } else {
-  throw new Error("Usage: manage-native-artifacts.mjs {fingerprint|report|verify [--complete] [--json]|install <dir>|record <target>|pull [--tag <tag>] [--partial]}");
+  throw new Error("Usage: manage-native-artifacts.mjs {fingerprint|expected-assets|report|verify [--complete] [--json]|install <dir>|record <target>|pull [--tag <tag>] [--partial]}");
 }

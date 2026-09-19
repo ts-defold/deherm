@@ -90,15 +90,37 @@ jobs:
           host_tag="host-tools-$(node scripts/manage-host-compilers.mjs fingerprint)"
           echo "target_tag=$target_tag" >> "$GITHUB_OUTPUT"
           echo "host_tag=$host_tag" >> "$GITHUB_OUTPUT"
-          # An existing release means these exact inputs have already been
-          # built. Rebuilding would produce the same bytes at best and churn
+          # A COMPLETE release means these exact inputs have already been built,
+          # and rebuilding would produce the same bytes at best while churning
           # the digests users pinned at worst.
-          if gh release view "$target_tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+          #
+          # Completeness is decided on the assets, never on the tag. The first
+          # run of this workflow created both releases and then failed every
+          # build lane, leaving one release empty and the other holding two
+          # assets of fifteen - and an existence check would have treated both
+          # as finished forever, reporting success for a workflow that had
+          # built nothing.
+          complete() {
+            local tag="$1" expected="$2"
+            gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1 || return 1
+            local present
+            present="$(gh release view "$tag" --repo "${{ github.repository }}" \
+              --json assets --jq '.assets[].name' | sort)"
+            local missing
+            missing="$(comm -23 <(printf '%s\n' "$expected" | sort) <(printf '%s\n' "$present"))"
+            if [ -n "$missing" ]; then
+              echo "release $tag is incomplete; missing:" >&2
+              printf '  %s\n' $missing >&2
+              return 1
+            fi
+          }
+
+          if complete "$target_tag" "$(node scripts/manage-native-artifacts.mjs expected-assets)"; then
             echo "target_exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "target_exists=false" >> "$GITHUB_OUTPUT"
           fi
-          if gh release view "$host_tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+          if complete "$host_tag" "$(node scripts/manage-host-compilers.mjs expected-assets)"; then
             echo "host_exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "host_exists=false" >> "$GITHUB_OUTPUT"

@@ -4,6 +4,24 @@
 
 # déherm
 
+> [!CAUTION]
+> **Early alpha. Not ready for use.**
+>
+> This repository is public so its CI can publish build artifacts and its
+> generated API policies can be served from GitHub Pages. That is the only
+> reason it is public. It is not an announcement, a release, or an invitation
+> to depend on it.
+>
+> Nothing here is stable: package names, the generated API surface, the policy
+> URL scheme, the native artifact layout and the extension ABI all change
+> without notice or migration notes. Published artifacts may be deleted or
+> rebuilt with different bytes under the same tag.
+
+> [!WARNING]
+> Issues and pull requests are welcome as discussion, but there is no support,
+> no release cadence, and no compatibility commitment yet. If you build
+> something on this, expect to rebuild it.
+
 An experimental TypeScript runtime for Defold, backed by Hermes on native
 targets and the browser's JavaScript engine on HTML5.
 

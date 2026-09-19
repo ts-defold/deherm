@@ -266,6 +266,27 @@ function run(command, args) {
 }
 
 const [command, ...args] = process.argv.slice(2);
+// The asset names a complete host-tools release carries.
+//
+// A release EXISTING is not evidence that it is complete. The first run of the
+// native-artifacts workflow created this release and then most lanes failed,
+// leaving two assets of fifteen behind a tag the next run treated as done. The
+// skip has to be keyed on the assets themselves.
+//
+// Blocked tools are excluded, matching `report`, so a tool that is deliberately
+// not published does not hold the release open forever.
+async function expectedAssets() {
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const names = [];
+  for (const [host, record] of Object.entries(manifest.hosts)) {
+    for (const toolRecord of Object.values(record.tools)) {
+      if (toolRecord.status === "blocked") continue;
+      names.push(`host-compilers-${host}-${path.basename(toolRecord.file)}`);
+    }
+  }
+  return names.sort();
+}
+
 if (command === "fingerprint") console.log(await fingerprint());
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
@@ -280,6 +301,7 @@ else if (command === "install") {
   await writeManifest(manifest);
   console.log(`recorded ${args[0]} ${Object.entries(recorded).map(([tool, value]) => `${tool}=${value.sha256}`).join(" ")}`);
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
+else if (command === "expected-assets") console.log((await expectedAssets()).join("\n"));
 else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
 else if (command === "pull") {
   // Release assets, not workflow artifacts: a workflow artifact expires, is
@@ -340,5 +362,5 @@ else if (command === "pull") {
   await writeManifest(manifest);
   console.log(`staged ${key} ${staged.join(", ")}`);
 } else {
-  throw new Error("Usage: manage-host-compilers.mjs {fingerprint|report|verify [--complete] [--json]|install <dir>|record <host> [tool]|stage <host> <build dir> [tool]|pull [--tag <tag>] [--partial]}");
+  throw new Error("Usage: manage-host-compilers.mjs {fingerprint|expected-assets|report [--complete] [--json]|install <dir>|record <host> [tool]|stage <host> <build dir> [tool]|pull [--tag <tag>] [--partial]}");
 }
