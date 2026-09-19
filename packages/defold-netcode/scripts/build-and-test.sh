@@ -146,6 +146,42 @@ if [[ -n "${EMSDK_ROOT:-}" ]]; then
     -o "$build/wasm/override_loopback.js"
   echo "==> conformance: the same session under wasm"
   "$node_bin" "$build/wasm/override_loopback.js"
+
+  # The adapter's call path: the same API driven entirely from JavaScript
+  # through exported C symbols and the wasm heap, which is how the web adapter
+  # reaches a native extension: flat scalars, buffers as heap offsets, nothing
+  # handed back for the caller to free. Emscripten 4.x has WASM_BIGINT on by
+  # default, so the uint64 arguments are BigInt at the boundary rather than the
+  # low/high pairs older toolchains split them into; the test names that rather
+  # than discovering it, because it is the one place the flat ABI is not the
+  # same shape on both sides.
+  echo
+  echo "==> adapter call path: the C API driven from JavaScript"
+  "$emcc" -O2 -DNDEBUG -w "-I$extension/include" "${sources[@]}" \
+    -sMODULARIZE=1 -sEXPORT_NAME=createNetcodeModule -sALLOW_MEMORY_GROWTH=1 \
+    -sEXPORTED_RUNTIME_METHODS=HEAPU8,HEAP32 \
+    -sEXPORTED_FUNCTIONS="$(node -e '
+      const names = [
+        "malloc", "free",
+        "deherm_netcode_init", "deherm_netcode_term", "deherm_netcode_set_log_level", "deherm_netcode_time",
+        "deherm_netcode_client_create", "deherm_netcode_client_create_error", "deherm_netcode_client_destroy",
+        "deherm_netcode_client_connect", "deherm_netcode_client_update", "deherm_netcode_client_state",
+        "deherm_netcode_client_index", "deherm_netcode_client_disconnect", "deherm_netcode_client_send",
+        "deherm_netcode_client_receive", "deherm_netcode_client_push_datagram",
+        "deherm_netcode_client_pop_datagram", "deherm_netcode_client_dropped_outbound",
+        "deherm_netcode_server_create", "deherm_netcode_server_create_error", "deherm_netcode_server_destroy",
+        "deherm_netcode_server_start", "deherm_netcode_server_stop", "deherm_netcode_server_running",
+        "deherm_netcode_server_update", "deherm_netcode_server_num_connected_clients",
+        "deherm_netcode_server_client_connected", "deherm_netcode_server_client_id",
+        "deherm_netcode_server_disconnect_client", "deherm_netcode_server_send",
+        "deherm_netcode_server_receive", "deherm_netcode_server_set_peer_address",
+        "deherm_netcode_server_push_datagram", "deherm_netcode_server_pop_datagram",
+        "deherm_netcode_generate_connect_token",
+      ];
+      process.stdout.write(JSON.stringify(names.map((name) => "_" + name)));
+    ')" \
+    -o "$build/wasm/adapter_call_path.js"
+  "$node_bin" "$package_root/tests/adapter-call-path.mjs"
 fi
 
 library_sha="$(shasum -a 256 "$library" | cut -d' ' -f1)"

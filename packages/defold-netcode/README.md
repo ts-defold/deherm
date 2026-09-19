@@ -49,7 +49,11 @@ extension/defold_netcode/      the liftable Defold extension - copy this folder
 scripts/vendor-netcode.mjs     re-derive the vendored sources; --check verifies
 scripts/build-and-test.sh      host build + conformance; --verify pins the digest
 scripts/check-extension-syntax.py   all six DM_PLATFORM_* translations
-tests/                         the conformance test and its socket poison
+tests/
+  override_loopback.c          the conformance test: a session with no socket
+  socket_poison.c              aborting socket/bind/sendto/recvfrom
+  poison_selftest.c            proves the poison can fail
+  adapter-call-path.mjs        the C API driven from JavaScript, wasm
 upstream.lock                  the pinned netcode revision and why that repo
 vendor-digests.json            sha256 per vendored file
 native-lib-digests.json        sha256 of the host library, plus evidence boundary
@@ -165,7 +169,8 @@ node scripts/vendor-netcode.mjs --check
 # Same, but fails if the digest moved (same host, same compiler).
 ./scripts/build-and-test.sh --verify
 
-# Also compile and run the conformance suite under wasm.
+# Also compile and run the conformance suite under wasm, plus the adapter call
+# path - the same API driven from JavaScript through exported symbols alone.
 EMSDK_ROOT=/path/to/emsdk ./scripts/build-and-test.sh
 
 # All six DM_PLATFORM_* translations. EMSDK_ROOT enables the HTML5 one.
