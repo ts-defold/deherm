@@ -47,9 +47,6 @@ on:
       - upstream.lock
       - toolchains/hermes/**
       - toolchains/go/**
-      # A change to this workflow must re-test itself; otherwise a fix to a
-      # build lane cannot be verified without an unrelated input also moving.
-      - .github/workflows/native-artifacts.yml
       - packages/compiler/go.mod
       - packages/compiler/ttsc/**
       - packages/toolchains/defold-bundle-targets.json
@@ -194,9 +191,9 @@ jobs:
         run: |
           set -euo pipefail
           for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
-            gh release upload "${{ needs.plan.outputs.host_tag }}" \
-              "$file#host-compilers-${{ matrix.host }}-$(basename "$file")" \
-              --repo "${{ github.repository }}" --clobber
+            bash scripts/ci/upload-release-asset.sh \
+              "${{ needs.plan.outputs.host_tag }}" "${{ github.repository }}" \
+              "$file" "host-compilers-${{ matrix.host }}-$(basename "$file")"
           done
 
   # ── Target libraries: one libhermes.a per Defold bundle target ──────────────
@@ -218,13 +215,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
+      # `upstream/` is not committed - it is bootstrapped reproducibly from
+      # upstream.lock. Only the Hermes tree is named, because cloning Defold on
+      # every build lane costs more than the build it prepares for.
+      - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: docker buildx build --platform ${{ matrix.docker_platform }} --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} -f toolchains/hermes/Dockerfile.linux .
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ needs.plan.outputs.target_tag }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a#hermes-${{ matrix.defold_platform }}-libhermes.a" \
-            --repo "${{ github.repository }}" --clobber
+          bash scripts/ci/upload-release-asset.sh \
+            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a" "hermes-${{ matrix.defold_platform }}-libhermes.a"
 
   windows:
     needs: [plan, releases]
@@ -233,13 +234,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
+      # `upstream/` is not committed - it is bootstrapped reproducibly from
+      # upstream.lock. Only the Hermes tree is named, because cloning Defold on
+      # every build lane costs more than the build it prepares for.
+      - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ needs.plan.outputs.target_tag }}" \
-            "build/artifacts/x86_64-win32/hermes.lib#hermes-x86_64-win32-hermes.lib" \
-            --repo "${{ github.repository }}" --clobber
+          bash scripts/ci/upload-release-asset.sh \
+            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "build/artifacts/x86_64-win32/hermes.lib" "hermes-x86_64-win32-hermes.lib"
 
   android:
     needs: [plan, releases]
@@ -261,6 +266,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
+      # `upstream/` is not committed - it is bootstrapped reproducibly from
+      # upstream.lock. Only the Hermes tree is named, because cloning Defold on
+      # every build lane costs more than the build it prepares for.
+      - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: |
           docker buildx build \
             --platform linux/amd64 \
@@ -272,9 +281,9 @@ jobs:
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ needs.plan.outputs.target_tag }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a#hermes-${{ matrix.defold_platform }}-libhermes.a" \
-            --repo "${{ github.repository }}" --clobber
+          bash scripts/ci/upload-release-asset.sh \
+            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a" "hermes-${{ matrix.defold_platform }}-libhermes.a"
 
   # macOS x64, iOS and the iOS simulator need the Apple SDKs, so there is no
   # container path for them. One macOS runner builds all four Apple targets and
@@ -293,6 +302,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
+      # `upstream/` is not committed - it is bootstrapped reproducibly from
+      # upstream.lock. Only the Hermes tree is named, because cloning Defold on
+      # every build lane costs more than the build it prepares for.
+      - run: bash scripts/bootstrap-upstreams.sh hermes
       - run: brew install ninja cmake
       - run: |
           bash toolchains/hermes/build-apple.sh \
@@ -303,9 +316,9 @@ jobs:
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ needs.plan.outputs.target_tag }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a#hermes-${{ matrix.defold_platform }}-libhermes.a" \
-            --repo "${{ github.repository }}" --clobber
+          bash scripts/ci/upload-release-asset.sh \
+            "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
+            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a" "hermes-${{ matrix.defold_platform }}-libhermes.a"
 
   # ── Host compilers: hermesc and shermes, one pair per user host ─────────────
   #
@@ -338,6 +351,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
+      # `upstream/` is not committed - it is bootstrapped reproducibly from
+      # upstream.lock. Only the Hermes tree is named, because cloning Defold on
+      # every build lane costs more than the build it prepares for.
+      - run: bash scripts/bootstrap-upstreams.sh hermes
       - if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang cmake lld ninja-build python3
       - if: runner.os == 'macOS'
@@ -356,9 +373,9 @@ jobs:
         run: |
           set -euo pipefail
           for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
-            gh release upload "${{ needs.plan.outputs.host_tag }}" \
-              "$file#host-compilers-${{ matrix.host }}-$(basename "$file")" \
-              --repo "${{ github.repository }}" --clobber
+            bash scripts/ci/upload-release-asset.sh \
+              "${{ needs.plan.outputs.host_tag }}" "${{ github.repository }}" \
+              "$file" "host-compilers-${{ matrix.host }}-$(basename "$file")"
           done
 
   # A run that published nothing verifiable is a run that taught us nothing.

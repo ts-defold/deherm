@@ -1,0 +1,24 @@
+# The Hermes image builds use the repository root as their build context, so
+# everything here is uploaded to the daemon before the first instruction runs.
+# Only `upstream/hermes` and `toolchains/hermes` are ever COPYed, and the rest
+# is either large, machine-local, or irrelevant to a cross build.
+
+# Upstream checkouts other than Hermes. `upstream/defold` alone is far larger
+# than the Hermes tree the images actually consume.
+upstream/*
+!upstream/hermes
+
+# Git history of the Hermes checkout. It is a depth-1 detached checkout, so the
+# object store carries no useful history and the image never reads it.
+upstream/hermes/.git
+
+node_modules
+**/node_modules
+build
+dist
+.git
+.deherm
+defold/.internal
+defold/deherm
+.DS_Store
+.env
