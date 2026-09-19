@@ -31414,7 +31414,7 @@
         },
         {
           "name": "m_Value",
-          "type": "union (unnamed union at /Users/mini/Documents/defold-hermes/upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)",
+          "type": "union (unnamed union at upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)",
           "access": "public",
           "line": 1314
         }
@@ -54453,13 +54453,13 @@
       "members": [
         {
           "name": "m_Front",
-          "type": "struct (unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)",
+          "type": "struct (unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)",
           "access": "public",
           "line": 153
         },
         {
           "name": "m_Back",
-          "type": "struct (unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)",
+          "type": "struct (unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)",
           "access": "public",
           "line": 161
         },
@@ -65192,14 +65192,14 @@
   "unresolvedTypes": [],
   "opaqueTypes": [
     {
-      "name": "(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)",
+      "name": "(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)",
       "reason": "anonymous-native-record",
       "contexts": [
         "dmRender::StencilTestParams"
       ]
     },
     {
-      "name": "(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)",
+      "name": "(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)",
       "reason": "anonymous-native-record",
       "contexts": [
         "dmRender::StencilTestParams"
@@ -65419,7 +65419,7 @@
       ]
     },
     {
-      "name": "union (unnamed union at /Users/mini/Documents/defold-hermes/upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)",
+      "name": "union (unnamed union at upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)",
       "reason": "anonymous-native-record",
       "contexts": [
         "dmGameObject::SceneNodeProperty"

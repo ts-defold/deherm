@@ -4,12 +4,12 @@
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
   "generator": "sha256:71275f96197485f10c842dd917ff24d55f939decbc41d9c5cea2c7a8b14ad996",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "e68ad2c596a931e5004a55c772821b7db870bd4e6d9d495891ef48bb15cfa51d",
+  "policyRoot": "d73025df44fe76064400d890d364ee43e3e1885fc378d70dcc9ec6ac02da190b",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 55,
     "namespaces": 52,
-    "objectBytes": 6185652,
+    "objectBytes": 6185544,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -133,8 +133,8 @@
       "bytes": 73404
     },
     "gameobject": {
-      "hash": "7550fc1c4c9c3a8c8f7003496c3dbbaa5e44f8634eae5d3ba96b094298930429",
-      "bytes": 178609
+      "hash": "efdaacbb689f71a503e1d8f4eef17e6b48dc660ce1483c33d2b134e67f86e755",
+      "bytes": 178573
     },
     "gamesys": {
       "hash": "4736661610f731e5b257f239583e3ca17d23524877d948a9d8b3af1710089ac3",
@@ -217,8 +217,8 @@
       "bytes": 42696
     },
     "render": {
-      "hash": "d2562af49194a23a2c9b343832e2102f7dea5e1e667aaeee9e2887b8a8a9cd3c",
-      "bytes": 228337
+      "hash": "d77a195fdfd0626ba055b13c72f4da573c1ca07d5deeb63ff1835967e572d4a9",
+      "bytes": 228265
     },
     "resource": {
       "hash": "e555dd4a551581ebac85a6ee0edcbb00b5f36e3dab87634482d11d03438e87b4",

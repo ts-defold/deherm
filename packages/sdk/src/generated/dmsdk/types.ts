@@ -13150,7 +13150,7 @@ export interface DmSdkTypes {
   readonly "dmGameObject::Result": DmGameObjectResult;
   readonly "dmGameObject::SceneNode": Readonly<{ m_Node: bigint; m_Type: DmSdkTypes["dmGameObject::SceneNodeType"]; m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_ComponentType: DmPointer<"dmGameObject::ComponentType">; m_ComponentPrototype: DmPointer<"void">; m_ComponentWorld: DmPointer<"void">; m_Component: bigint }>;
   readonly "dmGameObject::SceneNodeIterator": Readonly<{ m_Node: DmSdkTypes["dmGameObject::SceneNode"]; m_Parent: DmSdkTypes["dmGameObject::SceneNode"]; m_NextChild: DmSdkTypes["dmGameObject::SceneNode"]; m_FnIterateNext: DmSdkTypes["dmGameObject::FIteratorNext"] }>;
-  readonly "dmGameObject::SceneNodeProperty": Readonly<{ m_NameHash: DmSdkTypes["dmhash_t"]; m_Type: DmSdkTypes["dmGameObject::SceneNodePropertyType"]; m_Value: DmNativeType<"union (unnamed union at /Users/mini/Documents/defold-hermes/upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)"> }>;
+  readonly "dmGameObject::SceneNodeProperty": Readonly<{ m_NameHash: DmSdkTypes["dmhash_t"]; m_Type: DmSdkTypes["dmGameObject::SceneNodePropertyType"]; m_Value: DmNativeType<"union (unnamed union at upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)"> }>;
   readonly "dmGameObject::SceneNodePropertyIterator": Readonly<{ m_Property: DmSdkTypes["dmGameObject::SceneNodeProperty"]; m_Node: DmPointer<"dmGameObject::SceneNode">; m_Next: bigint; m_FnIterateNext: DmSdkTypes["dmGameObject::FIteratorPropertiesNext"] }>;
   readonly "dmGameObject::SceneNodePropertyType": DmGameObjectSceneNodePropertyType;
   readonly "dmGameObject::SceneNodeType": DmGameObjectSceneNodeType;
@@ -13382,7 +13382,7 @@ export interface DmSdkTypes {
   readonly "dmRender::RenderOrder": DmRenderRenderOrder;
   readonly "dmRender::Result": DmRenderResult;
   readonly "dmRender::Sampler": DmNativeType<"dmRender::Sampler">;
-  readonly "dmRender::StencilTestParams": Readonly<{ m_Front: DmNativeType<"(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)">; m_Back: DmNativeType<"(unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)">; m_Ref: number; m_RefMask: number; m_BufferMask: number; m_ColorBufferMask: number; m_ClearBuffer: number; m_SeparateFaceStates: number }>;
+  readonly "dmRender::StencilTestParams": Readonly<{ m_Front: DmNativeType<"(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)">; m_Back: DmNativeType<"(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)">; m_Ref: number; m_RefMask: number; m_BufferMask: number; m_ColorBufferMask: number; m_ClearBuffer: number; m_SeparateFaceStates: number }>;
   readonly "dmRender::Visibility": DmRenderVisibility;
   readonly "dmResource::FDecryptResource": DmNativeCallback;
   readonly "dmResource::FReloadedCallback": DmSdkTypes["FResourceReloadedCallback"];

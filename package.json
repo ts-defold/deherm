@@ -274,7 +274,7 @@
     "test:headless-conformance:runtime": "pnpm configure:native && node scripts/check-headless-conformance.mjs",
     "test:native-defold:hot-reload": "node --test tests/native-hot-reload-fixture.test.mjs && node scripts/check-native-defold-hot-reload.mjs",
     "test:extension-retention": "node --test tests/dmsdk-scalar-extension-retention.test.mjs",
-    "test:cli": "node --test tests/cli.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs tests/toolchain-matrix.test.mjs tests/artifact-fingerprints.test.mjs",
+    "test:cli": "node --test tests/cli.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs tests/toolchain-matrix.test.mjs tests/artifact-fingerprints.test.mjs tests/artifact-archives.test.mjs",
     "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs tests/browser-target.test.mjs tests/typed-native-target.test.mjs tests/hash-literal.test.mjs tests/installed-dev-loop.test.mjs tests/runtime-bug-pool.test.mjs",
     "test:canonical-family-emission": "node --test tests/canonical-family-emission.test.mjs",
     "test:reachability": "node --test tests/release-reachability.test.mjs",

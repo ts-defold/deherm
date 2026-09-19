@@ -9,13 +9,44 @@
 # only discover at link time.
 #
 #   docker buildx build \
+#     --platform linux/amd64 \
 #     --build-arg ANDROID_ABI=arm64-v8a \
 #     --build-arg ANDROID_API=21 \
 #     --build-arg NDK_VERSION=25b \
 #     --output type=local,dest=build/artifacts/arm64-android \
 #     -f toolchains/hermes/Dockerfile.android .
+#
+# ── Why this lane builds its own ICU and its own fbjni ───────────────────────
+#
+# The reasoning is recorded in .agents/docs/decisions/android-icu-and-fbjni.md.
+# In short:
+#
+#   * include/hermes/Platform/Unicode/PlatformUnicode.h:21 picks the unicode
+#     backend from the PREPROCESSOR, defaulting to the JAVA backend whenever
+#     __ANDROID__ is defined. That backend needs fbjni initialised with the
+#     process's JavaVM and the class com/facebook/hermes/unicode/
+#     AndroidUnicodeUtils on the APK classpath; a Defold APK has neither.
+#     The macro is overridable, so this lane selects the ICU backend instead.
+#   * HERMES_UNICODE_LITE is not an option: PlatformUnicodeLite.cpp has empty
+#     convertToCase/normalize bodies, which silently breaks toUpperCase and
+#     toLowerCase for every non-ASCII string.
+#   * The NDK ships unicode headers at every API level but libicu.so only at
+#     API 31+, and Defold pins 19/21 - and a shared dependency is ruled out
+#     anyway. So ICU is built from source, static, per ABI, and merged into
+#     the archive.
+#   * HERMES_IS_ANDROID stays OFF, because it would drag the Java unicode
+#     backend (lib/Platform/Unicode/CMakeLists.txt:19), the Java Intl backend
+#     (lib/Platform/Intl/CMakeLists.txt:9) and find_package(fbjni REQUIRED)
+#     (CMakeLists.txt:776) back in. It also defaults HERMES_IS_MOBILE_BUILD
+#     (CMakeLists.txt:101), so that one is passed explicitly below - otherwise
+#     Android would silently get desktop tuning.
+#   * fbjni is still required, independently of the unicode backend:
+#     API/hermes/hermes.cpp:73 is `#ifdef __ANDROID__`, not
+#     `#ifdef HERMES_IS_ANDROID`, so <fbjni/fbjni.h> compiles unconditionally
+#     on Android and hermes.cpp wraps the finalizer worker thread in a
+#     facebook::jni::ThreadScope. It is built here, static, per ABI.
 
-FROM ubuntu:24.04
+FROM ubuntu:24.04 AS build
 
 ARG ANDROID_ABI
 ARG ANDROID_API
@@ -50,6 +81,30 @@ ARG NDK_SHA256=403ac3e3020dd0db63a848dcaba6ceb2603bf64de90949d5c4361f848e44b005
 ARG NDK_SHA1=e27dcb9c8bcaa77b78ff68c3f23abcf6867959eb
 ARG NDK_BYTES=530975885
 
+# ICU 73.2, the unicode backend this lane selects. Verified the same way the
+# NDK is: the vendor publishes SHA-512 only, in the signed-release
+# SHASUM512.txt asset alongside the tarball
+#
+#   https://github.com/unicode-org/icu/releases/download/release-73-2/SHASUM512.txt
+#     76dd782db6205833f289d7eb68b60860dddfa3f614f0ba03fe7ec13117077f82
+#     109f0dc1becabcdf4c8a9c628b94478ab0a46134bdb06f4302be55f74027ce62
+#       icu4c-73_2-src.tgz
+#
+# so both that digest and the size are checked here, and SHA-256 is recorded
+# as the digest this repository asserts over the same bytes.
+ARG ICU_VERSION=73_2
+ARG ICU_SHA512=76dd782db6205833f289d7eb68b60860dddfa3f614f0ba03fe7ec13117077f82109f0dc1becabcdf4c8a9c628b94478ab0a46134bdb06f4302be55f74027ce62
+ARG ICU_SHA256=818a80712ed3caacd9b652305e01afc7fa167e6f2e94996da44b90c2ab604ce1
+ARG ICU_BYTES=26519906
+
+# fbjni v0.7.0. Pinned by git commit rather than by a tarball digest: GitHub's
+# auto-generated source tarballs are not a vendor-published artifact and carry
+# no vendor checksum, whereas a git object name is a digest over the whole
+# tree and history, which is what `git checkout` verifies. This is the same
+# identity discipline upstream.lock uses for Hermes and Defold.
+ARG FBJNI_TAG=v0.7.0
+ARG FBJNI_REV=474795fa9ff0dda60b838871171be935432bae16
+
 RUN test -n "$ANDROID_ABI" && test -n "$ANDROID_API" && test -n "$NDK_VERSION"
 
 # The digests below are r25b's, and the NDK revision is derived from the pinned
@@ -63,7 +118,7 @@ RUN if [ "$NDK_VERSION" != "25b" ]; then \
     fi
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    ca-certificates clang cmake curl git libicu-dev lld ninja-build python3 unzip && \
+    ca-certificates clang cmake curl git libicu-dev lld make ninja-build pkg-config python3 unzip && \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSLo /tmp/ndk.zip "https://dl.google.com/android/repository/android-ndk-r${NDK_VERSION}-linux.zip" && \
@@ -75,11 +130,78 @@ RUN curl -fsSLo /tmp/ndk.zip "https://dl.google.com/android/repository/android-n
     echo "${NDK_SHA256}  /tmp/ndk.zip" | sha256sum -c - && \
     unzip -q /tmp/ndk.zip -d /opt && rm /tmp/ndk.zip
 ENV ANDROID_NDK_HOME=/opt/android-ndk-r${NDK_VERSION}
+ENV NDK_BIN=/opt/android-ndk-r${NDK_VERSION}/toolchains/llvm/prebuilt/linux-x86_64/bin
+
+WORKDIR /work
+
+# ── ICU ─────────────────────────────────────────────────────────────────────
+
+RUN curl -fsSLo /tmp/icu-src.tgz "https://github.com/unicode-org/icu/releases/download/release-$(echo ${ICU_VERSION} | tr _ -)/icu4c-${ICU_VERSION}-src.tgz" && \
+    actual_bytes="$(stat -c %s /tmp/icu-src.tgz)" && \
+    if [ "$actual_bytes" != "${ICU_BYTES}" ]; then \
+      echo "ICU source archive is ${actual_bytes} bytes, expected ${ICU_BYTES}" >&2; exit 1; \
+    fi && \
+    echo "${ICU_SHA512}  /tmp/icu-src.tgz" | sha512sum -c - && \
+    echo "${ICU_SHA256}  /tmp/icu-src.tgz" | sha256sum -c - && \
+    mkdir -p /src && tar xzf /tmp/icu-src.tgz -C /src && rm /tmp/icu-src.tgz
+
+# The data filter. ICU's full data package is ~30 MB, and almost none of it is
+# reachable from a Hermes built with HERMES_ENABLE_INTL=OFF: the only ICU entry
+# points lib/Platform/Unicode/PlatformUnicodeICU.cpp calls are ucol_open /
+# ucol_strcoll (String.prototype.localeCompare), udat_open / udat_format
+# (Date.prototype.toLocale*String), u_strToUpper / u_strToLower
+# (toUpperCase/toLowerCase) and unorm2_* (String.prototype.normalize).
+#
+# Character data survives the filter unconditionally: ICU compiles pnames.icu,
+# uprops.icu, ucase.icu, ubidi.icu and nfc.nrm into libicuuc itself rather than
+# into the data package (icu/source/data/BUILDRULES.py:294-300), so case
+# mapping and NFC/NFD keep working no matter what is filtered out. What the
+# filter keeps beyond that is the normalization package (NFKC/NFKD), the root
+# collation table, and the English + root subtree of the locale, collation and
+# timezone trees. What it drops is everything that only Intl, text
+# segmentation or charset conversion would reach.
+#
+# Two consequences are behavioural, not just smaller, and are recorded in the
+# decision:
+#   * localeCompare on a non-English locale falls back to root collation.
+#   * toLocaleDateString on a non-English locale falls back to root formats.
+# Intl, which is where per-locale formatting is actually specified, is OFF.
+RUN mkdir -p /work/icu && printf '%s\n' \
+'{' \
+'  "collationUCAData": "implicithan",' \
+'  "localeFilter": { "filterType": "language", "includelist": ["en"] },' \
+'  "featureFilters": {' \
+'    "brkitr_dictionaries": "exclude",' \
+'    "brkitr_rules": "exclude",' \
+'    "brkitr_tree": "exclude",' \
+'    "confusables": "exclude",' \
+'    "conversion_mappings": "exclude",' \
+'    "curr_tree": "exclude",' \
+'    "lang_tree": "exclude",' \
+'    "rbnf_tree": "exclude",' \
+'    "region_tree": "exclude",' \
+'    "stringprep": "exclude",' \
+'    "translit": "exclude",' \
+'    "unames": "exclude",' \
+'    "unit_tree": "exclude"' \
+'  }' \
+'}' > /work/icu/filters.json
+
+# ICU cross builds need a host ICU: the data package is produced by running
+# genrb, icupkg and pkgdata, which cannot be Android binaries. The host tree is
+# built unfiltered, because those tools load the host tree's own data.
+RUN mkdir -p /work/icu/host && cd /work/icu/host && \
+    CC=clang CXX=clang++ CFLAGS=-O1 CXXFLAGS=-O1 \
+    /src/icu/source/configure \
+      --disable-shared --enable-static \
+      --disable-tests --disable-samples --disable-extras --disable-layoutex && \
+    make -j"$(nproc)"
+
+# ── Hermes host compilers ───────────────────────────────────────────────────
 
 COPY upstream/hermes /src/hermes
 COPY toolchains/hermes/package-posix.sh /usr/local/bin/package-posix
 COPY toolchains/hermes/package-archive.sh /usr/local/bin/package-archive
-WORKDIR /work
 
 # Hermes cross builds need hermesc and shermes for the *host*, because the build
 # compiles its own internal JavaScript to bytecode. Build them first and import
@@ -94,50 +216,117 @@ RUN cmake -S /src/hermes -B /work/host -G Ninja \
       -DHERMES_ENABLE_INTL=OFF && \
     cmake --build /work/host --target hermesc shermes --parallel
 
-# ── The unresolved Android unicode blocker ──────────────────────────────────
+# The ICU configuration macros below are part of the ABI of the ICU headers, so
+# they are set once and applied to BOTH the ICU build and the Hermes build that
+# includes those headers. Dropping legacy charset conversion, transliteration
+# and the regex engine removes code no Hermes entry point can reach.
+ENV ICU_DEFINES="-DU_STATIC_IMPLEMENTATION=1 -DU_CHARSET_IS_UTF8=1 -DUCONFIG_NO_LEGACY_CONVERSION=1 -DUCONFIG_NO_TRANSLITERATION=1 -DUCONFIG_NO_REGULAR_EXPRESSIONS=1"
+ENV ICU_PREFIX=/opt/icu-android
+
+RUN set -eu; \
+    case "${ANDROID_ABI}" in \
+      armeabi-v7a) clang_triple=armv7a-linux-androideabi; host_triple=arm-linux-androideabi ;; \
+      arm64-v8a)   clang_triple=aarch64-linux-android;    host_triple=aarch64-linux-android ;; \
+      x86_64)      clang_triple=x86_64-linux-android;     host_triple=x86_64-linux-android ;; \
+      *) echo "Dockerfile.android does not know the toolchain triple for ANDROID_ABI=${ANDROID_ABI}" >&2; exit 1 ;; \
+    esac; \
+    mkdir -p /work/icu/target && cd /work/icu/target && \
+    ICU_DATA_FILTER_FILE=/work/icu/filters.json \
+    CC="${NDK_BIN}/${clang_triple}${ANDROID_API}-clang" \
+    CXX="${NDK_BIN}/${clang_triple}${ANDROID_API}-clang++" \
+    AR="${NDK_BIN}/llvm-ar" \
+    RANLIB="${NDK_BIN}/llvm-ranlib" \
+    CFLAGS="-Os -fPIC -ffunction-sections -fdata-sections ${ICU_DEFINES}" \
+    CXXFLAGS="-Os -fPIC -std=c++17 -ffunction-sections -fdata-sections ${ICU_DEFINES}" \
+    /src/icu/source/configure \
+      --host="${host_triple}" \
+      --with-cross-build=/work/icu/host \
+      --prefix="${ICU_PREFIX}" \
+      --with-data-packaging=static \
+      --disable-shared --enable-static \
+      --disable-tools --disable-tests --disable-samples --disable-extras --disable-layoutex && \
+    make -j"$(nproc)" && make install && \
+    echo "--- ICU static libraries for ${ANDROID_ABI} ---" && \
+    ls -l "${ICU_PREFIX}/lib"/libicu*.a
+
+# ── fbjni ───────────────────────────────────────────────────────────────────
 #
-# This lane does not build. HERMES_IS_ANDROID=ON was added to satisfy the ICU
-# requirement at the pinned tree's CMakeLists.txt:635, and it reaches
-# CMakeLists.txt:777 `find_package(fbjni REQUIRED CONFIG)`, which fails. That
-# flag is not the real problem, though - removing it only moves the failure:
+# Built by hand rather than through fbjni's own CMakeLists, for two reasons.
+# Its only library target is declared SHARED, which BUILD_SHARED_LIBS cannot
+# override; and one of its translation units must not reach an archive Extender
+# force-loads into the engine:
 #
-#   * `include/hermes/Platform/Unicode/PlatformUnicode.h` picks the unicode
-#     backend from the PREPROCESSOR, not from HERMES_IS_ANDROID. `__ANDROID__`
-#     is defined by the NDK toolchain, so PlatformUnicodeJava.cpp is the
-#     translation unit that compiles, and its first include is <fbjni/fbjni.h>.
-#   * fbjni is not in the NDK. Verified against the central directory of the
-#     pinned android-ndk-r25b-linux.zip: no entry matches "fbjni".
-#   * The Java backend also needs the class
-#     `com/facebook/hermes/unicode/AndroidUnicodeUtils` on the APK's classpath
-#     and fbjni initialised with the process's JavaVM. React Native ships both
-#     in its Hermes AAR; a Defold APK carries neither.
-#   * ICU is in the NDK, but only from API 31. Same verification: the sysroot
-#     carries `usr/include/unicode/*.h` for every level, and `libicu.so` ONLY
-#     under `.../31/`, `.../32/` and `.../33/`. The pinned engine builds Android
-#     at API 19 (armv7) and 21 (64-bit) - see the `sdk` block of
-#     packages/toolchains/defold-bundle-targets.json - so there is no libicu to
-#     link at Defold's floor, and even at 31 it would be a SHARED library the
-#     engine would then have to satisfy.
-#   * HERMES_UNICODE_LITE is forbidden and rightly so: PlatformUnicodeLite.cpp
-#     has empty `convertToCase` and `normalize` bodies and a `dateFormat` that
-#     returns the literal string "dateFormat not implemented". String.cpp:985
-#     has an ASCII fast path, so this is not a no-op - it silently breaks
-#     toUpperCase/toLowerCase for every non-ASCII string.
+#   cxx/fbjni/OnLoad.cpp   defines JNI_OnLoad, which the Defold engine already
+#                          defines. Linking both is a duplicate definition, and
+#                          winning that race would hijack the engine's own JNI
+#                          initialisation. Nothing reaches it from
+#                          facebook::jni::ThreadScope, the only fbjni symbol
+#                          hermes.cpp references.
 #
-# What is left is a statically linked ICU built for Android inside this image
-# and merged into the archive. That satisfies the no-shared-dependency
-# constraint, and it is a new pinned upstream with real size consequences (ICU
-# data), so it is a decision to record in .agents/docs/decisions/ rather than
-# something to slip into a CI fix. The flag stays as it is until that decision
-# is taken, so the failure remains the specific one described above rather than
-# a different one a week later.
+# Everything else is built, lyra included. cxx/lyra/cxa_throw.cpp looks like an
+# exception to that - it is fbjni's C++ ABI stack-trace hook - but at v0.7.0 it
+# defines no ABI symbol: it exposes facebook::lyra::cxa_throw behind a HookInfo
+# for an external installer to apply, and nothing here applies it. It also owns
+# the definition of lyra::detail::getExceptionTraceHolder, which
+# lyra_exceptions.cpp calls, so dropping it would leave the archive unresolved.
+# The assertion below is what keeps that reading honest: the archive must define
+# neither JNI_OnLoad nor __cxa_throw.
+RUN set -eu; \
+    case "${ANDROID_ABI}" in \
+      armeabi-v7a) clang_triple=armv7a-linux-androideabi ;; \
+      arm64-v8a)   clang_triple=aarch64-linux-android ;; \
+      x86_64)      clang_triple=x86_64-linux-android ;; \
+    esac; \
+    git init -q /src/fbjni && \
+    git -C /src/fbjni remote add origin https://github.com/facebookincubator/fbjni.git && \
+    git -C /src/fbjni fetch -q --depth=1 origin "${FBJNI_REV}" && \
+    git -C /src/fbjni checkout -q --detach "${FBJNI_REV}" && \
+    if [ "$(git -C /src/fbjni rev-parse HEAD)" != "${FBJNI_REV}" ]; then \
+      echo "fbjni checkout is not ${FBJNI_REV}" >&2; exit 1; \
+    fi && \
+    mkdir -p /work/fbjni /opt/fbjni/lib && cd /work/fbjni && \
+    for source in /src/fbjni/cxx/fbjni/*.cpp /src/fbjni/cxx/fbjni/detail/*.cpp \
+                  /src/fbjni/cxx/lyra/*.cpp; do \
+      case "$(basename "$source")" in OnLoad.cpp) continue ;; esac; \
+      "${NDK_BIN}/${clang_triple}${ANDROID_API}-clang++" \
+        -c "$source" -o "$(basename "$source" .cpp).o" \
+        -I/src/fbjni/cxx -std=c++17 -Os -fPIC -fexceptions -frtti \
+        -ffunction-sections -fdata-sections -fno-omit-frame-pointer \
+        -DNDEBUG -DBUILDING_FBJNI -Wall; \
+    done && \
+    "${NDK_BIN}/llvm-ar" rcsD /opt/fbjni/lib/libfbjni.a ./*.o && \
+    cp -r /src/fbjni/cxx /opt/fbjni/include && \
+    if "${NDK_BIN}/llvm-nm" --defined-only /opt/fbjni/lib/libfbjni.a | grep -qE ' T (JNI_OnLoad|__cxa_throw)$'; then \
+      echo "fbjni archive defines a process-wide entry point it must not own" >&2; exit 1; \
+    fi && \
+    ls -l /opt/fbjni/lib/libfbjni.a
+
+# ── Hermes, cross-compiled ──────────────────────────────────────────────────
+#
+# ICU is handed to Hermes as a result rather than as a search: the NDK sysroot
+# carries unicode headers of its own at every API level, and letting CMake's
+# FindICU run inside a sysrooted find-root would let those headers win over the
+# ones belonging to the static libraries actually being linked. Presetting
+# ICU_FOUND skips that search (CMakeLists.txt:640) and skips its
+# include_directories/add_definitions side effects, so both are supplied here
+# instead, through flags that also reach the ICU headers' own configuration
+# macros.
+ENV HERMES_ICU_FLAGS="-DHERMES_PLATFORM_UNICODE=3 ${ICU_DEFINES} -isystem ${ICU_PREFIX}/include -isystem /opt/fbjni/include"
+ENV HERMES_ICU_LIBRARIES="${ICU_PREFIX}/lib/libicui18n.a;${ICU_PREFIX}/lib/libicuuc.a;${ICU_PREFIX}/lib/libicudata.a"
+
 RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake \
       -DANDROID_ABI=${ANDROID_ABI} \
       -DANDROID_PLATFORM=android-${ANDROID_API} \
       -DANDROID_STL=c++_static \
-      -DHERMES_IS_ANDROID=ON \
+      -DCMAKE_C_FLAGS="${HERMES_ICU_FLAGS}" \
+      -DCMAKE_CXX_FLAGS="${HERMES_ICU_FLAGS}" \
+      -DHERMES_IS_ANDROID=OFF \
+      -DHERMES_IS_MOBILE_BUILD=ON \
+      -DICU_FOUND=1 \
+      -DICU_LIBRARIES="${HERMES_ICU_LIBRARIES}" \
+      -DHERMES_USE_STATIC_ICU=ON \
       -DIMPORT_HOST_COMPILERS=/work/host/ImportHostCompilers.cmake \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
       -DHERMES_ENABLE_TOOLS=OFF \
@@ -145,10 +334,7 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DHERMES_ENABLE_DEBUGGER=OFF \
       -DHERMES_ENABLE_INTL=OFF \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
-    cmake --build /work/build --target hermesvm_a jsi --parallel && \
-    AR=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar \
-    NM=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm \
-    package-posix /work/build /out/libhermes.a
+    cmake --build /work/build --target hermesvm_a jsi --parallel
 
 # The development library: a SECOND compilation with the debugger, which also
 # turns on HERMES_MEMORY_INSTRUMENTATION (chained at the pinned tree's
@@ -162,7 +348,13 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
       -DANDROID_ABI=${ANDROID_ABI} \
       -DANDROID_PLATFORM=android-${ANDROID_API} \
       -DANDROID_STL=c++_static \
-      -DHERMES_IS_ANDROID=ON \
+      -DCMAKE_C_FLAGS="${HERMES_ICU_FLAGS}" \
+      -DCMAKE_CXX_FLAGS="${HERMES_ICU_FLAGS}" \
+      -DHERMES_IS_ANDROID=OFF \
+      -DHERMES_IS_MOBILE_BUILD=ON \
+      -DICU_FOUND=1 \
+      -DICU_LIBRARIES="${HERMES_ICU_LIBRARIES}" \
+      -DHERMES_USE_STATIC_ICU=ON \
       -DIMPORT_HOST_COMPILERS=/work/host/ImportHostCompilers.cmake \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
       -DHERMES_ENABLE_TOOLS=OFF \
@@ -170,10 +362,78 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
       -DHERMES_ENABLE_DEBUGGER=ON \
       -DHERMES_ENABLE_INTL=OFF \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
-    cmake --build /work/build-debug --target hermesvm_a jsi --parallel && \
-    AR=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-ar \
-    NM=${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm \
-    package-posix /work/build-debug /out/libhermes.debug.a
+    cmake --build /work/build-debug --target hermesvm_a jsi --parallel
+
+# Merging ICU and fbjni in is what makes the archive self-contained. Extender
+# force-loads extension archives, so anything left undefined here becomes an
+# unresolved symbol in the engine's .so, and anything shared becomes a runtime
+# dependency a Defold APK does not carry. package-posix merges Hermes' own
+# archives; this adds the two new ones and then asserts, per variant, that the
+# archive selected the ICU backend and resolves both dependencies itself.
+RUN printf '%s\n' \
+'#!/usr/bin/env bash' \
+'set -euo pipefail' \
+'build_root="$1"' \
+'output="$2"' \
+'ar_tool="${NDK_BIN}/llvm-ar"' \
+'nm_tool="${NDK_BIN}/llvm-nm"' \
+'scratch="$(mktemp -d)"' \
+'core="$scratch/core.a"' \
+'' \
+'AR="$ar_tool" NM="$nm_tool" package-posix "$build_root" "$core"' \
+'' \
+'# Prove the preprocessor really selected the ICU backend before merging ICU' \
+'# in: with the default Android backend PlatformUnicodeICU.cpp compiles to' \
+'# nothing and this reference does not exist. Same for ThreadScope, which is' \
+'# what makes fbjni non-optional. (The symbol lists are written to files' \
+'# rather than piped, so that an early-exiting grep cannot SIGPIPE llvm-nm' \
+'# and turn a match into a pipefail.)' \
+'"$nm_tool" --undefined-only "$core" > "$scratch/core-undefined"' \
+'for symbol in ucol_open ThreadScope; do' \
+'  grep -q "$symbol" "$scratch/core-undefined" || {' \
+'    echo "merge-android-archive: $build_root has no undefined reference to $symbol" >&2' \
+'    exit 1' \
+'  }' \
+'done' \
+'' \
+'mkdir -p "$(dirname "$output")"' \
+'{' \
+'  echo "CREATE $output"' \
+'  echo "ADDLIB $core"' \
+'  echo "ADDLIB /opt/fbjni/lib/libfbjni.a"' \
+'  for lib in libicui18n libicuuc libicudata; do' \
+'    echo "ADDLIB ${ICU_PREFIX}/lib/${lib}.a"' \
+'  done' \
+'  echo "SAVE"' \
+'  echo "END"' \
+'} | "$ar_tool" -M' \
+'"$ar_tool" -D -s "$output" 2>/dev/null || "$ar_tool" -s "$output"' \
+'' \
+'# Every reference Hermes makes into ICU and fbjni must now be answered from' \
+'# inside this one archive. An archive does not resolve its members against' \
+'# each other, so the test is that the symbol is DEFINED somewhere in it -' \
+'# ICU renames its exports with a version suffix, hence the substring match.' \
+'"$nm_tool" --defined-only "$output" > "$scratch/defined"' \
+'for symbol in ucol_open udat_open u_strToUpper unorm2_getNFCInstance ThreadScope; do' \
+'  grep -q "$symbol" "$scratch/defined" || {' \
+'    echo "merge-android-archive: $output does not carry $symbol" >&2' \
+'    exit 1' \
+'  }' \
+'done' \
+'if grep -qE " T (JNI_OnLoad|__cxa_throw)$" "$scratch/defined"; then' \
+'  echo "merge-android-archive: $output defines a process-wide entry point it must not own" >&2' \
+'  exit 1' \
+'fi' \
+'' \
+'# Not a gate, a record: what the engine'"'"'s own link line still has to supply.' \
+'echo "--- $output: $(stat -c %s "$output") bytes ---"' \
+'"$nm_tool" --undefined-only "$output" | awk '"'"'{print $NF}'"'"' | sort -u \' \
+'  | grep -E '"'"'^(__android_log|AAsset|_Unwind|dl|ANativeWindow)'"'"' || true' \
+  > /usr/local/bin/merge-android-archive
+RUN chmod +x /usr/local/bin/merge-android-archive && \
+    merge-android-archive /work/build /out/libhermes.a && \
+    merge-android-archive /work/build-debug /out/libhermes.debug.a && \
+    ls -l /out
 
 # Named for the family, not the ABI: the workflow uploads this under
 # `hermes-<defold target>.tar.gz`, and renaming a file does not change its
@@ -181,4 +441,4 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
 RUN package-archive /out/hermes.tar.gz /out/libhermes.a /out/libhermes.debug.a
 
 FROM scratch
-COPY --from=0 /out/hermes.tar.gz /hermes.tar.gz
+COPY --from=build /out/hermes.tar.gz /hermes.tar.gz

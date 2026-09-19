@@ -28,143 +28,143 @@
   "diagnostics": [
     {
       "header": "upstream/defold/engine/extension/src/dmsdk/extension/extension_gen.hpp",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/extension/src/dmsdk/extension/extension_gen.hpp:40:\nIn file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/extension/src/dmsdk/extension/extension.h:574:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/extension/src/dmsdk/extension/extension.hpp:78:75: error: no type named 'Params' in namespace 'dmExtension'\n   78 |    DM_EXTENSION_DEPRECATED_CONTEXT_HELPER T GetContextAsType(dmExtension::Params* params, const char* name)\n      |                                                              ~~~~~~~~~~~~~^\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/extension/src/dmsdk/extension/extension.hpp:85:81: error: no type named 'Params' in namespace 'dmExtension'\n   85 |    DM_EXTENSION_DEPRECATED_CONTEXT_HELPER T GetContextAsTypeByHash(dmExtension::Params* params, dmhash_t name_hash)\n      |                                                                    ~~~~~~~~~~~~~^\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/extension/src/dmsdk/extension/extension.hpp:92:75: error: no type named 'Params' in namespace 'dmExtension'\n   92 |    DM_EXTENSION_DEPRECATED_CONTEXT_HELPER T GetContextAsType(dmExtension::Params* params, dmhash_t name_hash)\n      |                                                              ~~~~~~~~~~~~~^\n6 errors generated."
+      "diagnostics": "In file included from upstream/defold/engine/extension/src/dmsdk/extension/extension_gen.hpp:40:\nIn file included from upstream/defold/engine/extension/src/dmsdk/extension/extension.h:574:\nupstream/defold/engine/extension/src/dmsdk/extension/extension.hpp:78:75: error: no type named 'Params' in namespace 'dmExtension'\n   78 |    DM_EXTENSION_DEPRECATED_CONTEXT_HELPER T GetContextAsType(dmExtension::Params* params, const char* name)\n      |                                                              ~~~~~~~~~~~~~^\nupstream/defold/engine/extension/src/dmsdk/extension/extension.hpp:85:81: error: no type named 'Params' in namespace 'dmExtension'\n   85 |    DM_EXTENSION_DEPRECATED_CONTEXT_HELPER T GetContextAsTypeByHash(dmExtension::Params* params, dmhash_t name_hash)\n      |                                                                    ~~~~~~~~~~~~~^\nupstream/defold/engine/extension/src/dmsdk/extension/extension.hpp:92:75: error: no type named 'Params' in namespace 'dmExtension'\n   92 |    DM_EXTENSION_DEPRECATED_CONTEXT_HELPER T GetContextAsType(dmExtension::Params* params, dmhash_t name_hash)\n      |                                                              ~~~~~~~~~~~~~^\n6 errors generated."
     },
     {
       "header": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h:21:10: fatal error: 'gameobject/lua_ddf.h' file not found\n   21 | #include <gameobject/lua_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h:21:10: fatal error: 'gameobject/lua_ddf.h' file not found\n   21 | #include <gameobject/lua_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_model.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_model.h:20:\nIn file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/rig/src/dmsdk/rig/rig.h:26:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_model.h:20:\nIn file included from upstream/defold/engine/rig/src/dmsdk/rig/rig.h:26:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h:24:10: fatal error: 'gamesys/gui_ddf.h' file not found\n   24 | #include <gamesys/gui_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/gui.h:24:10: fatal error: 'gamesys/gui_ddf.h' file not found\n   24 | #include <gamesys/gui_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:21:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:19:10: fatal error: 'render/material_ddf.h' file not found\n   19 | #include <render/material_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:21:\nupstream/defold/engine/render/src/dmsdk/render/render.h:19:10: fatal error: 'render/material_ddf.h' file not found\n   19 | #include <render/material_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_animationset.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_animationset.h:18:10: fatal error: 'rig/rig_ddf.h' file not found\n   18 | #include <rig/rig_ddf.h>\n      |          ^~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_animationset.h:18:10: fatal error: 'rig/rig_ddf.h' file not found\n   18 | #include <rig/rig_ddf.h>\n      |          ^~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_buffer.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_buffer.h:22:10: fatal error: 'gamesys/buffer_ddf.h' file not found\n   22 | #include <gamesys/buffer_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_buffer.h:22:10: fatal error: 'gamesys/buffer_ddf.h' file not found\n   22 | #include <gamesys/buffer_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_camera.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_camera.h:18:10: fatal error: 'gamesys/camera_ddf.h' file not found\n   18 | #include <gamesys/camera_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_camera.h:18:10: fatal error: 'gamesys/camera_ddf.h' file not found\n   18 | #include <gamesys/camera_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_proxy.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_proxy.h:19:10: fatal error: 'gamesys/collectionproxy_ddf.h' file not found\n   19 | #include <gamesys/collectionproxy_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_proxy.h:19:10: fatal error: 'gamesys/collectionproxy_ddf.h' file not found\n   19 | #include <gamesys/collectionproxy_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collision_object.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collision_object.h:21:10: fatal error: 'gamesys/physics_ddf.h' file not found\n   21 | #include <gamesys/physics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collision_object.h:21:10: fatal error: 'gamesys/physics_ddf.h' file not found\n   21 | #include <gamesys/physics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h:17:10: fatal error: 'gamesys/data_ddf.h' file not found\n   17 | #include <gamesys/data_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h:17:10: fatal error: 'gamesys/data_ddf.h' file not found\n   17 | #include <gamesys/data_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:20:10: fatal error: 'gamesys/gamesys_ddf.h' file not found\n   20 | #include <gamesys/gamesys_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:20:10: fatal error: 'gamesys/gamesys_ddf.h' file not found\n   20 | #include <gamesys/gamesys_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:18:10: fatal error: 'render/font_ddf.h' file not found\n   18 | #include <render/font_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:18:10: fatal error: 'render/font_ddf.h' file not found\n   18 | #include <render/font_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_gui.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_gui.h:22:10: fatal error: 'gamesys/gui_ddf.h' file not found\n   22 | #include <gamesys/gui_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_gui.h:22:10: fatal error: 'gamesys/gui_ddf.h' file not found\n   22 | #include <gamesys/gui_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_label.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_label.h:18:10: fatal error: 'gamesys/label_ddf.h' file not found\n   18 | #include <gamesys/label_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_label.h:18:10: fatal error: 'gamesys/label_ddf.h' file not found\n   18 | #include <gamesys/label_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_light.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_light.h:17:10: fatal error: 'gamesys/data_ddf.h' file not found\n   17 | #include <gamesys/data_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_light.h:17:10: fatal error: 'gamesys/data_ddf.h' file not found\n   17 | #include <gamesys/data_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_material.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_material.h:18:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_material.h:18:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_mesh.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_mesh.h:19:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:19:10: fatal error: 'render/material_ddf.h' file not found\n   19 | #include <render/material_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_mesh.h:19:\nupstream/defold/engine/render/src/dmsdk/render/render.h:19:10: fatal error: 'render/material_ddf.h' file not found\n   19 | #include <render/material_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_meshset.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_meshset.h:18:10: fatal error: 'rig/rig_ddf.h' file not found\n   18 | #include <rig/rig_ddf.h>\n      |          ^~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_meshset.h:18:10: fatal error: 'rig/rig_ddf.h' file not found\n   18 | #include <rig/rig_ddf.h>\n      |          ^~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_model.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_model.h:22:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_model.h:22:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_rig_scene.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_rig_scene.h:21:\nIn file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/rig/src/dmsdk/rig/rig.h:26:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_rig_scene.h:21:\nIn file included from upstream/defold/engine/rig/src/dmsdk/rig/rig.h:26:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_skeleton.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_skeleton.h:21:10: fatal error: 'rig/rig_ddf.h' file not found\n   21 | #include <rig/rig_ddf.h>\n      |          ^~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_skeleton.h:21:10: fatal error: 'rig/rig_ddf.h' file not found\n   21 | #include <rig/rig_ddf.h>\n      |          ^~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_sprite.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_sprite.h:20:10: fatal error: 'gamesys/sprite_ddf.h' file not found\n   20 | #include <gamesys/sprite_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_sprite.h:20:10: fatal error: 'gamesys/sprite_ddf.h' file not found\n   20 | #include <gamesys/sprite_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_texture.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_texture.h:18:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_texture.h:18:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_textureset.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_textureset.h:22:\nIn file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_texture.h:18:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_textureset.h:22:\nIn file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_texture.h:18:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_tilegrid.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_tilegrid.h:20:10: fatal error: 'gamesys/tile_ddf.h' file not found\n   20 | #include <gamesys/tile_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_tilegrid.h:20:10: fatal error: 'gamesys/tile_ddf.h' file not found\n   20 | #include <gamesys/tile_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_ttf.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_ttf.h:18:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:18:10: fatal error: 'render/font_ddf.h' file not found\n   18 | #include <render/font_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_ttf.h:18:\nupstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:18:10: fatal error: 'render/font_ddf.h' file not found\n   18 | #include <render/font_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:18:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_opengl.h:18:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:18:10: fatal error: 'vulkan/vulkan_core.h' file not found\n   18 | #include <vulkan/vulkan_core.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:18:10: fatal error: 'vulkan/vulkan_core.h' file not found\n   18 | #include <vulkan/vulkan_core.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:18:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:18:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
-      "diagnostics": "/Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:19:10: fatal error: 'render/material_ddf.h' file not found\n   19 | #include <render/material_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "upstream/defold/engine/render/src/dmsdk/render/render.h:19:10: fatal error: 'render/material_ddf.h' file not found\n   19 | #include <render/material_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp",
-      "diagnostics": "  285 |    Result GetTypeFromExtension(HFactory factory, const char* extension, HResourceType* type);\n      |    ^\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:4: error: unknown type name 'Result'\n  295 |    Result GetTypeFromExtensionHash(HFactory factory, dmhash_t extension_hash, HResourceType* type);\n      |    ^\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:302:4: error: unknown type name 'Result'\n  302 |    Result SetupType(HResourceTypeContext ctx,\n      |    ^\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:4: error: unknown type name 'Result'\n  314 |    Result        ValidateResourceType(HResourceType type);\n      |    ^\n19 errors generated."
+      "diagnostics": "  285 |    Result GetTypeFromExtension(HFactory factory, const char* extension, HResourceType* type);\n      |    ^\nupstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:4: error: unknown type name 'Result'\n  295 |    Result GetTypeFromExtensionHash(HFactory factory, dmhash_t extension_hash, HResourceType* type);\n      |    ^\nupstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:302:4: error: unknown type name 'Result'\n  302 |    Result SetupType(HResourceTypeContext ctx,\n      |    ^\nupstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:4: error: unknown type name 'Result'\n  314 |    Result        ValidateResourceType(HResourceType type);\n      |    ^\n19 errors generated."
     },
     {
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/rig/src/dmsdk/rig/rig.h:26:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/rig/src/dmsdk/rig/rig.h:26:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     },
     {
       "header": "upstream/defold/engine/sdk/src/dmsdk/sdk.h",
-      "diagnostics": "In file included from /Users/mini/Documents/defold-hermes/upstream/defold/engine/sdk/src/dmsdk/sdk.h:38:\n/Users/mini/Documents/defold-hermes/upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
+      "diagnostics": "In file included from upstream/defold/engine/sdk/src/dmsdk/sdk.h:38:\nupstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:25:10: fatal error: 'graphics/graphics_ddf.h' file not found\n   25 | #include <graphics/graphics_ddf.h>\n      |          ^~~~~~~~~~~~~~~~~~~~~~~~~\n1 error generated."
     }
   ],
   "declarations": [
@@ -23257,7 +23257,7 @@
         },
         {
           "name": "m_Value",
-          "type": "union (unnamed union at /Users/mini/Documents/defold-hermes/upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)",
+          "type": "union (unnamed union at upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)",
           "access": "public",
           "line": 1314
         }
@@ -41327,13 +41327,13 @@
       "members": [
         {
           "name": "m_Front",
-          "type": "struct (unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)",
+          "type": "struct (unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)",
           "access": "public",
           "line": 153
         },
         {
           "name": "m_Back",
-          "type": "struct (unnamed struct at /Users/mini/Documents/defold-hermes/upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)",
+          "type": "struct (unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)",
           "access": "public",
           "line": 161
         },

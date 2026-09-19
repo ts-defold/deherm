@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "generator": "scripts/assemble-typed-native-extension.mjs",
+  "extension": "defold_hermes_typed_native",
+  "unit": "sh_export_deherm_typed_native",
+  "transport": "typed-native",
+  "requiresRuntime": "hermes",
+  "assembledForTarget": "arm64-macos",
+  "assembledForExtenderTarget": "arm64-osx",
+  "uploadGate": {
+    "mechanism": ".defignore",
+    "entry": "/defold_hermes_typed_native",
+    "appliedBy": "packages/cli/src/typed-native.mjs",
+    "note": "Bob filters extension discovery through .defignore, and an ext.manifest cannot exclude a platform."
+  },
+  "profile": false,
+  "laneSources": {
+    "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
+    "packages/static-hermes/src/generated/script-typed-native-bridge.ts": "71a5383a4fa616f7014358600d0c546fe2c6cb65038be836ae44cf3b2633cb3b"
+  },
+  "vendoredHeaders": {
+    "hermes/Support/sh_tryfast_fp_cvt.h": "765d5904d92d2fbfe1c0fbd7a7da1c1e50f3b66a467b21f4721538a444386d15",
+    "hermes/VM/SHRuntimeHermesValueFields.def": "14a74c4ba6b0fb792001f3fb7a10aab241726d5c184a9c0c9d1b06aec0ee5c8d",
+    "hermes/VM/sh_config.h": "eff5aea23fdcef84aea02c24c85cb52a1470b18664bafd154373b169c566e249",
+    "hermes/VM/sh_legacy_value.h": "b6bdafa31f0852d3b3aa739a8fcc3435595f0a2412ac83a71681f0a78527b1f3",
+    "hermes/VM/sh_mirror.h": "6bdeb232a7fcf3763bb5acb2ab00d8e88042910e3ec36a70c66346f14f20d7b9",
+    "hermes/VM/sh_runtime.h": "0a4d286b067f1d7a03e78257988999610a21149ee572af02b131828ddd44742a",
+    "hermes/VM/sh_segment_info.h": "6f8075cdb2f7bc87b4e3e99a4ca67be69c63a01a8348a3e944ad3cd9b7b8ca22",
+    "hermes/VM/sh_small_hermes_value.h": "443bc19b5a3d1e93b23f691e772e5efc111500238e302aa4a6886c37e4827cc3",
+    "hermes/VM/sh_stack_frame.h": "ace7acbab596673788050a518451fcc32ddb6a1cc7672445fea2e70a07085255",
+    "hermes/VM/static_h.h": "fafffcd691e05e1ca73ffc1f63ec7b748cd2b99fffabce98a037864a8327c9c8",
+    "hermes/VMLayouts/sh_stack_frame_layout.h": "3cc3bb34a4e69bb7b5a8da25f59d70d3b79e2c606a0e84a4bc36f767fd79f179",
+    "libhermesvm-config.h": "12b69de6e7090980d33bfa7cc4cabc5e32a98ef292249b8f4f49ec855041ec59"
+  },
+  "hermesArchiveModel": "rel",
+  "compiledWithAssertsOff": true,
+  "externCalleeCount": 37,
+  "externCallSiteCount": 67,
+  "emittedCSha256": "3ed34496f6af1d0897f9cc5e96e028740ca55bf4099e4e139073d13bc42aa4f2",
+  "emittedCBytes": 250408,
+  "adaptedSourceSha256": "48c9c272a76364452121557d69be845a433501b23253396896922163bf7afa7b",
+  "evidenceBoundary": {
+    "cEmission": "observed",
+    "compilation": "requires-extender",
+    "linkage": "requires-extender",
+    "runtime": "not-claimed"
+  }
+}

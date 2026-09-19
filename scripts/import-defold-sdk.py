@@ -152,6 +152,15 @@ def enum_members(node: dict[str, Any]) -> list[dict[str, Any]]:
 
 def normalize_type(type_name: str) -> str:
     value = re.sub(r"\b(const|volatile|restrict)\b", "", type_name)
+    # clang spells an anonymous record by where it was declared, e.g.
+    #   struct (unnamed struct at /abs/path/to/upstream/defold/.../render.h:147:9)
+    # With the absolute path left in, the derived API policy depends on WHERE the
+    # repository was cloned: the same Defold revision produced a different policy
+    # root on a laptop, in a temporary worktree and on a CI runner, which breaks
+    # the store's whole claim to be addressed by the engine revision. Rewriting
+    # the checkout prefix to a repository-relative path makes the IR - and every
+    # artifact derived from it - reproducible across machines.
+    value = value.replace(f"{ROOT}/", "")
     value = re.sub(r"\s+", " ", value).strip()
     return value
 
@@ -297,7 +306,11 @@ def parse_header(header: Path, includes: list[Path]) -> dict[str, Any]:
         )
     except subprocess.TimeoutExpired:
         return {"header": relative(header), "error": "clang timed out after 45 seconds"}
-    stderr = process.stderr.decode("utf-8", errors="replace")
+    # Clang prints absolute paths in diagnostics, and these are recorded as
+    # blocker evidence. Left as-is they put the checkout location into the
+    # committed inventory, which made the derived API policy depend on where the
+    # repository was cloned rather than on the engine revision it names.
+    stderr = process.stderr.decode("utf-8", errors="replace").replace(f"{ROOT}/", "")
     try:
         ast = json.loads(process.stdout)
     except json.JSONDecodeError as error:
@@ -467,9 +480,35 @@ support, or runtime compatibility.
 """
 
 
+def strip_checkout_path(text: str) -> str:
+    """Remove this checkout's location from a generated artifact.
+
+    Nothing generated here may carry an absolute path.  Clang spells anonymous
+    records and diagnostics by where it found them, and those strings flow into
+    the dmSDK IR and from there into the derived API policy - which made the
+    policy a function of WHERE the repository was cloned rather than of the
+    engine revision its address names.  The same Defold revision produced three
+    different policy roots on a laptop, in a temporary worktree, and on a CI
+    runner, and the published store carried a developer's home directory.
+
+    Individual call sites are normalized too, but this is the catch-all: it is
+    applied to the serialized bytes, so a new leak cannot reach disk by taking a
+    code path nobody remembered to normalize.
+    """
+    return text.replace(f"{ROOT}/", "")
+
+
 def serialized_outputs() -> tuple[str, str]:
     data = inventory()
-    return json.dumps(data, indent=2, sort_keys=False) + "\n", markdown(data)
+    inventory_text = strip_checkout_path(json.dumps(data, indent=2, sort_keys=False) + "\n")
+    report_text = strip_checkout_path(markdown(data))
+    # Fail closed rather than publish a path. A leak that survives the rewrite
+    # means the path was spelled some other way - a symlink, a relative prefix -
+    # and silently shipping it is what this whole change exists to stop.
+    for name, text in (("inventory", inventory_text), ("report", report_text)):
+        if str(ROOT) in text:
+            raise SystemExit(f"generated SDK {name} still contains the checkout path {ROOT}")
+    return inventory_text, report_text
 
 
 def main() -> int:
