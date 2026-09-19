@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "comment": "How much of the script generation chain refuses to derive a Defold revision other than the pinned one. Measured by scripts/check-cross-revision-derivation.mjs. This number only goes DOWN: a change that makes more steps refuse fails the check with the new refusals named. Nothing in `pnpm check` can find these, because `pnpm check` generates the one revision every pinned assumption was written against.",
+  "controlRevision": "574678c7d44be490d874fbed2d0ae6211feec4d9",
+  "controlVersion": "1.13.1",
+  "controlRationale": "A stable release that differs from the pinned dev revision along the axes that matter: no bullet3d backend at all, zero ---@alias declarations against the pinned revision's 98, callbacks annotated in the older `function(...)` spelling, and the editor and Lua standard-library surfaces the pinned revision omits.",
+  "totalSteps": 28,
+  "refusingSteps": 18,
+  "refusalsByCause": {
+    "absent-source": 3,
+    "pinned-census": 7,
+    "revision-stamp": 7,
+    "unclassified": 1
+  },
+  "steps": [
+    {
+      "step": "scripts/generate-borrowed-handle-classification.mjs",
+      "cause": "absent-source"
+    },
+    {
+      "step": "scripts/generate-script-api-accounting.mjs",
+      "cause": "revision-stamp"
+    },
+    {
+      "step": "scripts/generate-script-copied-value-record-blockers.mjs",
+      "cause": "revision-stamp"
+    },
+    {
+      "step": "scripts/generate-script-defold-value-tail.mjs",
+      "cause": "revision-stamp"
+    },
+    {
+      "step": "scripts/generate-script-dynamic-values.mjs",
+      "cause": "pinned-census"
+    },
+    {
+      "step": "scripts/generate-script-fixed-tuples.mjs",
+      "cause": "absent-source"
+    },
+    {
+      "step": "scripts/generate-script-opaque-record-blockers.mjs",
+      "cause": "pinned-census"
+    },
+    {
+      "step": "scripts/generate-script-overload-dispatch.mjs",
+      "cause": "revision-stamp"
+    },
+    {
+      "step": "scripts/generate-script-projection-ir.mjs",
+      "cause": "pinned-census"
+    },
+    {
+      "step": "scripts/generate-script-real-engine-matrix.mjs",
+      "cause": "revision-stamp"
+    },
+    {
+      "step": "scripts/generate-script-real-engine-probes.mjs",
+      "cause": "unclassified"
+    },
+    {
+      "step": "scripts/generate-script-route-availability-profiles.mjs",
+      "cause": "revision-stamp"
+    },
+    {
+      "step": "scripts/generate-script-table-record-bindings.mjs",
+      "cause": "absent-source"
+    },
+    {
+      "step": "scripts/generate-script-table-tuple-schemas.mjs",
+      "cause": "revision-stamp"
+    },
+    {
+      "step": "scripts/generate-script-universal-value-bindings.mjs",
+      "cause": "pinned-census"
+    },
+    {
+      "step": "scripts/generate-script-url-address-classification.mjs",
+      "cause": "pinned-census"
+    },
+    {
+      "step": "scripts/generate-script-value-bindings.mjs",
+      "cause": "pinned-census"
+    },
+    {
+      "step": "scripts/import-defold-script-api.py",
+      "cause": "pinned-census"
+    }
+  ]
+}
