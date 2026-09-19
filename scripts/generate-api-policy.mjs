@@ -43,6 +43,8 @@ import {
   serializeObject
 } from "../packages/compiler/src/api-policy.mjs";
 import { buildToolchainPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
+import { releaseAssetUrlTemplate } from "../packages/cli/src/release-assets.mjs";
+import { artifactFamilies, artifactFamilyNames, familyTag, publishedAssets } from "./lib/artifact-releases.mjs";
 import { apiPolicyGenerator } from "./lib/script-generator-pipeline.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -128,6 +130,47 @@ export function reconcileLocalPins({ lock, pins }) {
   return rows;
 }
 
+/**
+ * What a client on this Defold revision should download, named exactly.
+ *
+ * Two content-addressed systems used to have no way to meet: nothing in the
+ * policy store named an artifact tag, and nothing in the releases named a
+ * Defold revision. The index entry is the per-revision resolution point clients
+ * already fetch, so it is the natural place to answer "I am on Defold X, what
+ * do I download?".
+ *
+ * The host families are carried too, even though neither is a function of
+ * Defold. A user resolving a revision wants a working host, and one fetch that
+ * answers for both is worth more than the purity of omitting the two tags that
+ * happen not to move when the engine does.
+ *
+ * `indexedBy` is the distinction the whole toolchain rests on and the one a
+ * consumer gets wrong first: target archives are keyed by the Defold BUNDLE
+ * TARGET being built, host tools by the USER'S HOST, and neither implies the
+ * other.
+ */
+export async function buildArtifactReferences(options = {}) {
+  const sourceRoot = options.sourceRoot ?? root;
+  const families = {};
+  for (const name of artifactFamilyNames) {
+    const family = artifactFamilies[name];
+    const assets = {};
+    for (const row of await publishedAssets(name, { root: sourceRoot })) {
+      // Host rows carry a tool as well as a host, because one host publishes
+      // several binaries under one key; a target row is one archive.
+      if (row.tool) (assets[row.host] ??= {})[row.tool] = row.asset;
+      else assets[row.target] = row.asset;
+    }
+    families[name] = {
+      tag: await familyTag(name, { root: sourceRoot }),
+      indexedBy: family.tools ? "host" : "bundleTarget",
+      summary: family.summary,
+      assets
+    };
+  }
+  return families;
+}
+
 export async function derivePolicy(options = {}) {
   const sourceRoot = options.sourceRoot ?? root;
   const artifacts = options.artifacts ?? generatedDir;
@@ -186,7 +229,11 @@ export async function derivePolicy(options = {}) {
     repositoryRoot: sourceRoot
   });
   assertNoRevisionLeak({ rootBytes: policy.rootBytes, objects: policy.objects, revision: defoldRevision });
-  return { ...policy, defoldRevision, generator, toolchain, reconciliation };
+  // Derived after the leak check on purpose: the artifact references belong to
+  // the index entry, never to a content-addressed object, and this keeps them
+  // out of anything the check walks.
+  const artifactReferences = options.artifactReferences ?? await buildArtifactReferences({ sourceRoot });
+  return { ...policy, defoldRevision, generator, toolchain, reconciliation, artifacts: artifactReferences };
 }
 
 // ── The store ───────────────────────────────────────────────────────────────
@@ -265,19 +312,27 @@ function buildShippedIndex({ site, entries }) {
     kind: "deherm.policy.index",
     comment:
       "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision " +
-      "Defold has already published and is written once, never rewritten, because that " +
-      "revision's declaration inputs are fixed forever. Consumers FETCH the entry they need " +
+      "Defold has already published, and its policyRoot is written once and never rewritten, " +
+      "because that revision's declaration inputs are fixed forever. Consumers FETCH the entry they need " +
       "from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes " +
       "nightlies daily, so an index that had to be re-released to stay current would be a pin, " +
       "not an index. The policy an entry names is content-addressed and therefore " +
-      "self-verifying, so a substituted policy fails its own hash check.",
+      "self-verifying, so a substituted policy fails its own hash check. A fetched entry also " +
+      "carries the release tags and asset names of the Hermes archives and host tools that " +
+      "build for it; expand base.releaseAsset with a tag and an asset to get a download URL " +
+      "without hardcoding a forge.",
     base: {
       url: site.baseUrl,
       pathPrefix: site.pathPrefix,
       layoutVersion: site.layoutVersion,
       index: `${site.layoutVersion}/index/{defoldRevision}.json`,
       policy: `${site.layoutVersion}/policy/{policyRoot}.json`,
-      object: `${site.layoutVersion}/object/{subtreeHash}.json`
+      object: `${site.layoutVersion}/object/{subtreeHash}.json`,
+      // Absolute, unlike the three above: artifacts are large binaries served by
+      // a forge's release storage, not by the policy site, so they do not sit
+      // beneath this base. The template is the same expression
+      // packages/cli/src/release-assets.mjs builds its URLs from.
+      releaseAsset: releaseAssetUrlTemplate()
     },
     channels: site.channels,
     channelInfoUrl: site.channelInfoUrl,
@@ -323,7 +378,8 @@ export async function writeStore({ policy, site, check }) {
   const entry = buildIndexEntry({
     defoldRevision: policy.defoldRevision,
     policyRoot: policy.rootHash,
-    generator: policy.generator
+    generator: policy.generator,
+    artifacts: policy.artifacts
   });
   planned.set(indexPath(layout, policy.defoldRevision), `${serializeObject(entry)}\n`);
 

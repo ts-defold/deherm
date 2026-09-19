@@ -31,6 +31,19 @@ import path from "node:path";
 
 export const defaultReleaseRepository = "ts-defold/deherm";
 
+/**
+ * The URL shape itself, with `{tag}` and `{asset}` left unexpanded.
+ *
+ * The policy index carries this template so a consumer that resolved "I am on
+ * Defold X, what do I download?" can build the URL from index data alone rather
+ * than hardcoding github.com. It is derived from the same expression
+ * `releaseAssetUrl` uses, so the served template and the vendoring code cannot
+ * drift into two answers.
+ */
+export function releaseAssetUrlTemplate({ repository = defaultReleaseRepository } = {}) {
+  return `https://github.com/${repository}/releases/download/{tag}/{asset}`;
+}
+
 export function releaseAssetUrl({ repository = defaultReleaseRepository, tag, asset }) {
   if (!tag) throw new Error("releaseAssetUrl requires a tag");
   if (!asset) throw new Error("releaseAssetUrl requires an asset name");

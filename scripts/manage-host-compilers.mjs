@@ -21,24 +21,34 @@ import path from "node:path";
 import { downloadReleaseAssets } from "../packages/cli/src/release-assets.mjs";
 import { fileURLToPath } from "node:url";
 
+// What determines the bytes of a host tool is declared in one place for all
+// three artifact families - see ./lib/artifact-releases.mjs. The two host
+// families are kept apart there because they share no input at all: hermesc and
+// shermes come from the pinned Hermes tree, dehermc from its own Go sources and
+// the pinned ttsc version. One fingerprint over both meant a Go transform edit
+// republished ten unchanged LLVM compilers and a Hermes repin republished five
+// unchanged Go binaries.
+import {
+  artifactFamilies,
+  expectedAssetNames,
+  familyForHostTool,
+  familyTag,
+  fingerprintFamily,
+  hostArtifactFamilyNames
+} from "./lib/artifact-releases.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifestPath = path.join(root, "packages", "toolchains", "host-compilers.json");
 
-// What determines the bytes of a host tool. The Hermes compilers come from the
-// pinned Hermes revision through one build script; dehermc comes from its own
-// Go sources, its build script, and the ttsc module version pinned by the
-// lockfile. All of it is content, so a rebuild with unchanged inputs produces
-// the same fingerprint and CI can treat the release as already published.
-const inputs = [
-  "upstream.lock",
-  "toolchains/hermes/build-host-compilers.sh",
-  "toolchains/go/build-dehermc.sh",
-  "packages/compiler/go.mod",
-  "packages/compiler/ttsc/cmd/dehermc/main.go",
-  "packages/compiler/ttsc/hash-literal/hash_literal.go",
-  "packages/compiler/ttsc/hash-literal/resource_name.go",
-  "packages/compiler/ttsc/hash-literal/api_usage.go"
-];
+function requireHostFamily(name) {
+  if (!name) {
+    throw new Error(`Name the artifact family: one of ${hostArtifactFamilyNames.join(", ")}`);
+  }
+  if (!hostArtifactFamilyNames.includes(name)) {
+    throw new Error(`${name} is not a host artifact family; declared families are ${hostArtifactFamilyNames.join(", ")}`);
+  }
+  return name;
+}
 
 const missingStatuses = new Set(["required-missing", "blocked"]);
 const knownStatuses = new Set(["vendored", "required-missing", "blocked"]);
@@ -51,21 +61,6 @@ const MINIMUM_PLAUSIBLE_BYTES = 1_000_000;
 
 function digest(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
-}
-
-async function fingerprint() {
-  const hash = createHash("sha256");
-  for (const relative of inputs) {
-    const bytes = await readFile(path.join(root, relative));
-    hash.update(`${relative}\0${bytes.byteLength}\0`);
-    hash.update(bytes);
-  }
-  // The ttsc npm version decides which typescript-go dehermc is linked
-  // against, so it belongs in the fingerprint even though no file above
-  // contains it.
-  const manifest = await readManifest();
-  hash.update(`ttsc\0${manifest.ttscVersion ?? "unknown"}\0`);
-  return hash.digest("hex");
 }
 
 async function readManifest() {
@@ -167,6 +162,10 @@ async function report() {
       const entry = {
         host: key,
         tool,
+        // Which release holds this tool. The two host families are published
+        // under separate tags, so a user told a tool is missing needs to know
+        // which release to look in.
+        family: familyForHostTool(tool),
         status: toolRecord.status,
         builder: toolRecord.builder ?? null,
         file: toolRecord.file,
@@ -224,11 +223,12 @@ async function report() {
   }
   rows.sort((left, right) => left.host.localeCompare(right.host));
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     hermesRevision: manifest.hermesRevision,
     ttscVersion: manifest.ttscVersion ?? null,
     packageVersion: manifest.packageVersion,
     tools: Object.keys(manifest.tools ?? {}),
+    families: Object.fromEntries(hostArtifactFamilyNames.map((name) => [name, artifactFamilies[name].tools])),
     hosts: rows
   };
 }
@@ -268,28 +268,22 @@ function run(command, args) {
 }
 
 const [command, ...args] = process.argv.slice(2);
-// The asset names a complete host-tools release carries.
+// The asset names a complete release of ONE host family carries.
 //
 // A release EXISTING is not evidence that it is complete. The first run of the
 // native-artifacts workflow created this release and then most lanes failed,
 // leaving two assets of fifteen behind a tag the next run treated as done. The
-// skip has to be keyed on the assets themselves.
+// skip has to be keyed on the assets themselves - and now per family, because
+// the ten Hermes compilers and the five dehermc binaries are published under
+// separate tags and neither's completeness says anything about the other's.
 //
 // Blocked tools are excluded, matching `report`, so a tool that is deliberately
 // not published does not hold the release open forever.
-async function expectedAssets() {
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-  const names = [];
-  for (const [host, record] of Object.entries(manifest.hosts)) {
-    for (const toolRecord of Object.values(record.tools)) {
-      if (toolRecord.status === "blocked") continue;
-      names.push(`host-compilers-${host}-${path.basename(toolRecord.file)}`);
-    }
-  }
-  return names.sort();
+async function expectedAssets(family) {
+  return expectedAssetNames(requireHostFamily(family), { root });
 }
 
-if (command === "fingerprint") console.log(await fingerprint());
+if (command === "fingerprint") console.log(await fingerprintFamily(requireHostFamily(args[0]), { root }));
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
   const installed = await install(args[0]);
@@ -303,41 +297,56 @@ else if (command === "install") {
   await writeManifest(manifest);
   console.log(`recorded ${args[0]} ${Object.entries(recorded).map(([tool, value]) => `${tool}=${value.sha256}`).join(" ")}`);
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
-else if (command === "expected-assets") console.log((await expectedAssets()).join("\n"));
+else if (command === "expected-assets") console.log((await expectedAssets(args[0])).join("\n"));
 else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
 else if (command === "pull") {
   // Release assets, not workflow artifacts: a workflow artifact expires, is
   // run-scoped and needs auth, and none of that survives to a user six months
-  // later. The tag is the input fingerprint, so many déherm versions share one
-  // artifact release.
+  // later. The tag is the family's input fingerprint, so many déherm versions
+  // share one artifact release.
+  //
+  // Both host families are pulled by default, because a user wants a working
+  // host and does not care that the Hermes compilers and dehermc are built by
+  // different jobs on different schedules. `--tag` addresses one release, so it
+  // has to say which family that release holds.
   const tagIndex = args.indexOf("--tag");
-  const tag = tagIndex >= 0 ? args[tagIndex + 1] : `host-tools-${await fingerprint()}`;
-  const destination = path.join(root, "build", "host-compiler-downloads", tag);
-  await mkdir(destination, { recursive: true });
-  // By URL, not through `gh` - see packages/cli/src/release-assets.mjs. The
-  // asset names are the same listing CI checks the release against, so nothing
-  // is fetched to discover what to fetch.
-  const { missing } = await downloadReleaseAssets({
-    tag,
-    assets: await expectedAssets(),
-    destination,
-    optional: args.includes("--partial"),
-    onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
-  });
-  if (missing.length) console.log(`${missing.length} asset(s) not published for these inputs`);
-  // Release assets are flat files named host-compilers-<host>-<tool>[.exe];
-  // `install` matches on the directory segment, so unpack each into its own.
-  for (const file of await filesBelow(destination)) {
-    const base = path.basename(file);
-    const match = /^host-compilers-(?<host>[^-]+-[^-]+)-(?<tool>.+?)(?<extension>\.exe)?$/.exec(base);
-    if (!match) continue;
-    const target = path.join(destination, `host-compilers-${match.groups.host}`, `${match.groups.tool}${match.groups.extension ?? ""}`);
-    await mkdir(path.dirname(target), { recursive: true });
-    await cp(file, target);
+  const familyIndex = args.indexOf("--family");
+  if (tagIndex >= 0 && familyIndex < 0) {
+    throw new Error(`--tag names a single release, so it requires --family <${hostArtifactFamilyNames.join("|")}>`);
   }
-  const installed = await install(destination);
+  const families = familyIndex >= 0 ? [requireHostFamily(args[familyIndex + 1])] : hostArtifactFamilyNames;
+  const installed = [];
+  for (const family of families) {
+    const tag = tagIndex >= 0 ? args[tagIndex + 1] : await familyTag(family, { root });
+    const destination = path.join(root, "build", "host-compiler-downloads", tag);
+    await mkdir(destination, { recursive: true });
+    // By URL, not through `gh` - see packages/cli/src/release-assets.mjs. The
+    // asset names are the same listing CI checks the release against, so nothing
+    // is fetched to discover what to fetch.
+    const { missing } = await downloadReleaseAssets({
+      tag,
+      assets: await expectedAssets(family),
+      destination,
+      optional: args.includes("--partial"),
+      onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
+    });
+    if (missing.length) console.log(`${missing.length} ${family} asset(s) not published for these inputs`);
+    // Release assets are flat files named host-compilers-<host>-<tool>[.exe];
+    // `install` matches on the directory segment, so unpack each into its own.
+    for (const file of await filesBelow(destination)) {
+      const base = path.basename(file);
+      const match = /^host-compilers-(?<host>[^-]+-[^-]+)-(?<tool>.+?)(?<extension>\.exe)?$/.exec(base);
+      if (!match) continue;
+      const target = path.join(destination, `host-compilers-${match.groups.host}`, `${match.groups.tool}${match.groups.extension ?? ""}`);
+      await mkdir(path.dirname(target), { recursive: true });
+      await cp(file, target);
+    }
+    installed.push(...await install(destination));
+  }
   console.log(`installed ${installed.length} host tool(s): ${installed.join(", ") || "none"}`);
-  await verify(!args.includes("--partial"), false);
+  // A partial pull of one family still leaves the other's tools missing, so the
+  // complete check only makes sense when every family was asked for.
+  await verify(!args.includes("--partial") && familyIndex < 0, false);
 } else if (command === "stage") {
   // Copy this host's freshly built tools out of a local build, so the same
   // record/verify path works without a CI round trip.
@@ -374,5 +383,11 @@ else if (command === "pull") {
   await writeManifest(manifest);
   console.log(`staged ${key} ${staged.join(", ")}`);
 } else {
-  throw new Error("Usage: manage-host-compilers.mjs {fingerprint|expected-assets|report [--complete] [--json]|install <dir>|record <host> [tool]|stage <host> <build dir> [tool]|pull [--tag <tag>] [--partial]}");
+  throw new Error(
+    "Usage: manage-host-compilers.mjs {" +
+    `fingerprint <${hostArtifactFamilyNames.join("|")}>|` +
+    `expected-assets <${hostArtifactFamilyNames.join("|")}>|` +
+    "report|verify [--complete] [--json]|install <dir>|record <host> [tool]|" +
+    "stage <host> <build dir> [tool]|pull [--family <name>] [--tag <tag>] [--partial]}"
+  );
 }

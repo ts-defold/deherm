@@ -228,7 +228,7 @@ A static site - GitHub Pages is sufficient - where the path *is* the hash. Every
 object lives under a **single owned prefix**, never at the domain root:
 
 ```
-<base>/v1/index/<defold-sha>.json  -> { "policyRoot": "<hash>", "generator": "<rev>" }
+<base>/v1/index/<defold-sha>.json  -> { "policyRoot": "<hash>", "generator": "<rev>", "artifacts": { … } }
 <base>/v1/policy/<root-hash>.json  -> the policy root, naming its subtrees
 <base>/v1/object/<subtree-hash>.json -> one namespace's derived surface
 ```
@@ -270,12 +270,12 @@ The index is **not one mutable file**, and it is not shipped as an authority.
 It is one small immutable document per Defold revision:
 
 ```
-<base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "generator": "<rev>" }
+<base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "generator": "<rev>", "artifacts": { … } }
 ```
 
-Keyed by a sha Defold has already published, each entry is written once and
-never rewritten, because a given revision's declaration inputs are fixed
-forever. The caller resolves the sha it needs from
+Keyed by a sha Defold has already published, each entry's `policyRoot` is
+written once and never rewritten, because a given revision's declaration inputs
+are fixed forever. (`artifacts` is the exception; see below.) The caller resolves the sha it needs from
 `d.defold.com/<channel>/info.json` and fetches exactly that one document.
 
 This is the point on which an earlier draft of this decision was wrong. It said
@@ -290,7 +290,59 @@ So the index is fetched, and its trust comes from the same place the objects'
 does. An entry names a `policyRoot`, and the policy it names is content-addressed
 and therefore self-verifying: a substituted policy fails its own hash check. What
 an index entry can still do is point at the *wrong* valid policy for a revision,
-which is why entries are immutable and the nightly job never rewrites one.
+which is why the sha-to-root half of an entry is immutable and the nightly job
+never rewrites one.
+
+## The entry also answers "what do I download?"
+
+The policy store and the artifact releases were two content-addressed systems
+that never met. Nothing in the store named a release tag, and nothing in a
+release named a Defold revision, so a user who had just resolved "I am on Defold
+X" still had to be told out of band which `libhermes.a` and which `hermesc` go
+with it - by a constant in some client's code, which is exactly what keeping the
+base URL in data was supposed to prevent.
+
+The index entry is the per-revision resolution point a client already fetches,
+so it carries the answer:
+
+```
+"artifacts": {
+  "native-artifacts": { "tag": "native-artifacts-<fp>", "indexedBy": "bundleTarget",
+                        "assets": { "arm64-osx": "hermes-arm64-osx-libhermes.a", … } },
+  "hermes-host":      { "tag": "hermes-host-<fp>",      "indexedBy": "host",
+                        "assets": { "linux-x64": { "hermesc": …, "shermes": … }, … } },
+  "dehermc":          { "tag": "dehermc-<fp>",          "indexedBy": "host", "assets": { … } }
+}
+```
+
+and the served index gains one more template beside the three path templates:
+
+```
+"releaseAsset": "https://github.com/<repo>/releases/download/{tag}/{asset}"
+```
+
+That template is absolute where the other three are relative, because release
+storage is not the policy site. It is built from the same expression
+`packages/cli/src/release-assets.mjs` resolves its own downloads from, so a user
+who follows the index and a user who runs `pull` cannot reach two different
+URLs; `scripts/check-policy-site-resolution.mjs` asserts they agree, and that a
+target nobody built refuses rather than producing a plausible 404.
+
+`indexedBy` is in the data because it is the distinction the whole toolchain
+rests on and the one a consumer gets wrong first: target archives are keyed by
+the Defold **bundle target** being built and host tools by the user's **host**,
+and neither implies the other.
+
+**The honest caveat.** The artifact block is the one part of an entry that is
+not a function of the engine revision - it names what the build recipe publishes
+*now*. If the Hermes pin or a build recipe moves, the entry for the pinned
+revision is regenerated with new tags, while entries already published keep
+theirs and stay correct, because the release they name still holds those assets.
+So "written once, never rewritten" is a claim about the **sha-to-root half** of
+an entry, which is what the trust argument above actually rests on. The host
+families are carried even though neither is a function of Defold at all: a user
+resolving a revision wants a working host, and one fetch that answers for both
+is worth more than the purity of omitting two tags that happen not to move.
 
 ## What ships in the package
 

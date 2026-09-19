@@ -74,6 +74,16 @@ artifacts are content-addressed: many déherm versions share one release, and a
 rebuild whose inputs have not changed finds the release already present and does
 nothing.
 
+## What a fingerprint may hash, and what it may not
+
+See *Three families, three tags* below. The short version: a family hashes the
+`upstream.lock` **keys** it consumes and the **fields** of a generated manifest
+that decide its codegen, never a whole file. Hashing all of `upstream.lock` made
+`libhermes.a` a function of `DEFOLD_REV`; hashing all of
+`defold-bundle-targets.json` would put that coupling straight back, because that
+file carries `defoldRevision` and `sourceSha256` beside the `sdk` pins that
+actually matter.
+
 Every Defold bundle target must appear in `packages/toolchains/native-artifacts.json`
 with an explicit status. A target that is absent from the manifest is worse than
 one marked `required-missing`, because the user gets silence instead of a
@@ -128,7 +138,10 @@ failed install.
 `packages/toolchains/host-compilers.json` is the pinned record for all three
 host tools, managed by `scripts/manage-host-compilers.mjs` with the same
 `fingerprint`/`install`/`record`/`verify`/`stage`/`pull` verbs as the target
-archives. Resolution (`packages/cli/src/host-compilers.mjs`) checks the installed
+archives. `fingerprint` and `expected-assets` take a family name, because the
+three tools are published under two tags; `pull` fetches both unless `--family`
+names one, and `--tag` requires `--family` since a tag addresses exactly one
+release. Resolution (`packages/cli/src/host-compilers.mjs`) checks the installed
 package first and the in-tree staging directory second, verifies the SHA-256 of
 each binary against that record, and **fails closed**: a mismatch or a missing
 package raises an error naming the host, the tool, and the exact package to
@@ -321,11 +334,67 @@ Bob reads it. The same record shape covers generated extension C - the
 `generated-sources` kind - so the assembler that writes `shermes -emit-c` output
 into the extension inherits the freshness relation rather than inventing one.
 
+# Three families, three tags
+
+Every published artifact is addressed by a SHA-256 fingerprint of the inputs
+that determine its bytes, declared once in `scripts/lib/artifact-releases.mjs`.
+There are three families, and they used to be two.
+
+| Family | Tag | Consumes | Does **not** consume |
+| --- | --- | --- | --- |
+| Hermes host compilers | `hermes-host-<fp>` | `HERMES_URL`, `HERMES_REV`, `build-host-compilers.sh` | anything of Defold's, anything of Go's |
+| The transform compiler | `dehermc-<fp>` | `ttscVersion`, `packages/compiler/go.mod`, the ttsc Go sources, `build-dehermc.sh` | `upstream.lock` at all |
+| Target archives | `native-artifacts-<fp>` | `HERMES_URL`, `HERMES_REV`, the per-target build recipe, and the `sdk` and `targets` fields of `defold-bundle-targets.json` | `DEFOLD_REV`, `sourceSha256` |
+
+## Why the lock is hashed by key
+
+Both managers used to hash `upstream.lock` in its entirety, which made every
+artifact a function of every pin in it. That was measured, not theorised:
+changing **only** `DEFOLD_REV` rotated the host-tool tag from `7a3536af` to
+`35787eb7` and the target tag from `d37e4040` to `6fb21b2c`. `hermesc` and
+`shermes` link, read and embed nothing of Defold's, so the nightly repin in
+`.github/workflows/policy-revisions.yml` would have forced a rebuild and a
+republish of all 25 artifacts for zero byte change - and churned digests users
+had already pinned.
+
+A key a family declares and the lock does not carry is a **hard error**, never a
+silently skipped input: a stable tag computed over an incomplete input set is
+the one failure content addressing exists to prevent. A key declared twice is
+refused for the same reason - the whole-file hash could not tell two conflicting
+pins apart.
+
+The engine coupling that is real survives: the `sdk` pins move the target
+archives, because an archive built against a different NDK API level or
+deployment minimum than the engine links against is an ABI mismatch Extender
+only finds at link time. `tests/artifact-fingerprints.test.mjs` asserts both
+directions on a temporary checkout - a Defold repin moves nothing, a Hermes
+repin moves the two Hermes families and not `dehermc`, an `sdk` edit moves the
+target archives and a `defoldRevision` edit does not.
+
+## Why the host tools are two families and not one
+
+`hermesc`/`shermes` and `dehermc` are both indexed by the user's host, and that
+is the only thing they share. One `host-tools-<fp>` tag meant a Go transform
+edit republished ten unchanged LLVM compilers and a Hermes repin republished
+five unchanged Go binaries. The asset names are unchanged; only which release
+holds them moved.
+
+## What is still deliberately over-hashed
+
+Comments are hashed with everything else, so a prose-only edit to
+`Dockerfile.android` rotates a tag and republishes identical bytes. That is
+waste, and it is the **safe** direction: the opposite error serves different
+bytes under a tag users have already pinned. Stripping comments would mean
+parsing Dockerfile, shell, CMake, Go and JSON correctly enough to bet artifact
+identity on it, and a parser bug there is silent.
+
 # What builds what
 
-`.github/workflows/native-artifacts.yml` carries both matrices, kept apart in
-one file because conflating them has already cost review time. A `sdk` job reads
-the derived SDK pins once and feeds them to the cross builds.
+`.github/workflows/native-artifacts.yml` carries all three matrices, kept apart
+in one file because conflating them has already cost review time. A `sdk` job
+reads the derived SDK pins once and feeds them to the cross builds. The `plan`
+job computes all three tags and decides each family's skip independently, on the
+assets that release actually holds rather than on the tag's existence.
 
 | Lane | Runner | Produces |
 | --- | --- | --- |
@@ -333,8 +402,8 @@ the derived SDK pins once and feeds them to the cross builds.
 | `windows` | `ubuntu-24.04` | `x86_64-win32` via `Dockerfile.win32`, merged to one `hermes.lib` |
 | `android` | `ubuntu-24.04` | `armv7`, `arm64`, `x86_64` via `Dockerfile.android` and the engine's NDK pin |
 | `apple` | `macos-15` | `arm64-osx`, `x86_64-osx`, `arm64-ios`, `arm64_sim-ios` via `build-apple.sh` |
-| `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts |
-| `go-compiler` | one `ubuntu-24.04` | `dehermc` for all five hosts, `CGO_ENABLED=0` |
+| `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts, into `hermes-host-<fp>` |
+| `go-compiler` | one `ubuntu-24.04` | `dehermc` for all five hosts, `CGO_ENABLED=0`, into `dehermc-<fp>` |
 
 iOS and macOS x64 need the Apple SDKs, so they have no container path and run on
 a macOS runner. Android needs the NDK, pinned by digest inside the container
@@ -366,6 +435,12 @@ not declare. `--json` emits the same report as data.
 * The host matrix (5 compiler builds) and the target matrix (one archive per
   Defold platform, including mobile) are sized independently and neither implies
   the other.
+* A Defold repin rebuilds nothing. A Hermes repin rebuilds the Hermes families
+  and leaves `dehermc` alone. Each family's release is skipped on its own
+  assets.
+* A user who resolved a Defold revision through the policy index is told which
+  tags and which asset names go with it - see *The entry also answers "what do I
+  download?"* in the layered API policy cache decision.
 * Generated C is a build input to Bob, so it is subject to the same content
   addressing as everything else: it is derived from the policy Merkle root and
   the reachable surface, and changes only when those change.

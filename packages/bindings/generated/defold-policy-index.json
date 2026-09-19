@@ -1,14 +1,15 @@
 {
   "schemaVersion": 1,
   "kind": "deherm.policy.index",
-  "comment": "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision Defold has already published and is written once, never rewritten, because that revision's declaration inputs are fixed forever. Consumers FETCH the entry they need from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes nightlies daily, so an index that had to be re-released to stay current would be a pin, not an index. The policy an entry names is content-addressed and therefore self-verifying, so a substituted policy fails its own hash check.",
+  "comment": "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision Defold has already published, and its policyRoot is written once and never rewritten, because that revision's declaration inputs are fixed forever. Consumers FETCH the entry they need from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes nightlies daily, so an index that had to be re-released to stay current would be a pin, not an index. The policy an entry names is content-addressed and therefore self-verifying, so a substituted policy fails its own hash check. A fetched entry also carries the release tags and asset names of the Hermes archives and host tools that build for it; expand base.releaseAsset with a tag and an asset to get a download URL without hardcoding a forge.",
   "base": {
     "url": "https://ts-defold.dev/deherm",
     "pathPrefix": "",
     "layoutVersion": "v1",
     "index": "v1/index/{defoldRevision}.json",
     "policy": "v1/policy/{policyRoot}.json",
-    "object": "v1/object/{subtreeHash}.json"
+    "object": "v1/object/{subtreeHash}.json",
+    "releaseAsset": "https://github.com/ts-defold/deherm/releases/download/{tag}/{asset}"
   },
   "channels": [
     "stable",
@@ -19,8 +20,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "9ba8837e54a6c3d65615d9645649e38709550e3f7cb0fdfe08a831b9d0c9d2b9",
-      "generator": "sha256:664589c067634543ae34a8dc9efdb766de49f23ae57c7049bcf02ef166c092a3"
+      "policyRoot": "c3666e4cd4e4b65efb66f224b8c7d90ff770fc123e69c0c5139895f61b4df9c1",
+      "generator": "sha256:d533a1c6f66a4504836f17b508bda31ac558bbef2c56c8936b9accb6f5ef584f"
     }
   ]
 }

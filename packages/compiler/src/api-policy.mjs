@@ -460,13 +460,25 @@ export function assertNoRevisionLeak({ rootBytes, objects, revision }) {
 }
 
 /** The index entry for one revision: the only mutable, trust-requiring mapping. */
-export function buildIndexEntry({ defoldRevision, policyRoot, generator }) {
+/**
+ * One Defold revision's resolution point.
+ *
+ * `artifacts` is optional, and deliberately so: entries written before the
+ * policy store and the artifact releases were linked carry none, and rewriting
+ * them to add one would break the rule that an entry is written once. It is the
+ * only part of an entry that is not a function of the engine revision - it
+ * names the release tags and asset names the build recipe currently publishes -
+ * which is why it lives here, in the one document that is allowed to know the
+ * revision, and never inside a content-addressed policy object.
+ */
+export function buildIndexEntry({ defoldRevision, policyRoot, generator, artifacts = null }) {
   return {
     schemaVersion: POLICY_SCHEMA_VERSION,
     kind: "deherm.policy.index-entry",
     defoldRevision,
     policyRoot,
-    generator
+    generator,
+    ...(artifacts ? { artifacts } : {})
   };
 }
 

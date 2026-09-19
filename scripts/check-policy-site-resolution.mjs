@@ -12,8 +12,12 @@
 //      base and path templates, never a hard-coded URL;
 //   4. hash every fetched body and compare to the hash in its path;
 //   5. rebuild the revision-keyed runtime handshake from the policy alone, to
-//      show that stripping the revision out of the policy lost nothing; and
-//   6. serve a tampered object and confirm the verification actually fails,
+//      show that stripping the revision out of the policy lost nothing;
+//   6. resolve a DOWNLOAD URL for a Hermes archive and a host compiler out of
+//      the same entry, because "I am on Defold X, what do I download?" is the
+//      other half of the question the index exists to answer, and a client that
+//      had to hardcode a forge to answer it would not be resolving anything; and
+//   7. serve a tampered object and confirm the verification actually fails,
 //      because a check that never fails proves nothing.
 
 import { createServer } from "node:http";
@@ -24,6 +28,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { hashBytes } from "../packages/compiler/src/api-policy.mjs";
+import { releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
 import { buildPolicySite } from "./build-policy-site.mjs";
 import { readSiteConfig, shippedIndexPath } from "./generate-api-policy.mjs";
 
@@ -107,9 +112,31 @@ export async function resolvePolicy({ index, fetchImpl = fetch }) {
       subtrees[namespace] = JSON.parse(bytes);
     }
     trace.push(`verified ${Object.keys(subtrees).length} objects against their own paths`);
-    results.push({ revision: asserted.defoldRevision, policy, subtrees });
+    results.push({ revision: asserted.defoldRevision, entry, policy, subtrees });
   }
   return { trace, results };
+}
+
+/**
+ * Build one artifact download URL the way a consumer would: the tag and the
+ * asset name come from the index entry it just fetched, and the URL shape comes
+ * from the index's own `base.releaseAsset` template. Nothing here knows what a
+ * forge is called.
+ *
+ * A key the entry does not name is a refusal, not an invented URL. Guessing
+ * `hermes-<target>-libhermes.a` would produce a plausible URL for a target that
+ * was never built, and a 404 six months later is a worse diagnostic than a
+ * failure here.
+ */
+export function resolveArtifactUrl({ index, entry, family, key, tool = null }) {
+  const reference = entry.artifacts?.[family];
+  if (!reference) throw new Error(`${entry.defoldRevision}: the index entry names no ${family} artifacts`);
+  const named = reference.assets[key];
+  const asset = tool ? named?.[tool] : named;
+  if (typeof asset !== "string") {
+    throw new Error(`${family} publishes nothing for ${key}${tool ? ` ${tool}` : ""}`);
+  }
+  return { url: expand(index.base.releaseAsset, { tag: reference.tag, asset }), tag: reference.tag, asset };
 }
 
 /**
@@ -186,6 +213,34 @@ async function main() {
         `(catalogSha256 ${handshake.catalogSha256.slice(0, 12)})`);
     }
 
+    // The artifact half of the entry, resolved from index data alone. One
+    // bundle-target archive and one host compiler, because the two are indexed
+    // differently and a consumer that conflated them would download the wrong
+    // file for the right-looking reason.
+    for (const { revision, entry } of results) {
+      for (const [family, key, tool] of [["native-artifacts", "arm64-osx", null], ["hermes-host", "linux-x64", "hermesc"]]) {
+        const resolved = resolveArtifactUrl({ index, entry, family, key, tool });
+        // The vendoring path builds the same URL from the same tag and asset
+        // without ever reading the index. If these two disagree, a user who
+        // followed the index would download something `pull` would not.
+        const vendored = releaseAssetUrl({ tag: resolved.tag, asset: resolved.asset });
+        if (resolved.url !== vendored) {
+          throw new Error(`index template resolved ${resolved.url} but release-assets.mjs builds ${vendored}`);
+        }
+        lines.push(`  ${revision} ${family} ${key}${tool ? `/${tool}` : ""} -> ${resolved.url}`);
+      }
+      // Negative control for the same reason the tampered object exists below:
+      // a resolver that answers for a target nobody built is not resolving.
+      let refused = null;
+      try {
+        resolveArtifactUrl({ index, entry, family: "native-artifacts", key: "x86-osx" });
+      } catch (error) {
+        refused = error.message;
+      }
+      if (!refused) throw new Error("a retired bundle target resolved to a download URL");
+      lines.push(`  unbuilt target refused: ${refused}`);
+    }
+
     // Negative control: a mirror that serves different bytes at the same path
     // must be caught by the consumer, not trusted because the host answered.
     const victim = Object.values(results[0].policy.subtrees)[0];
@@ -204,7 +259,8 @@ async function main() {
     lines.push(`tampered object rejected: ${caught}`);
 
     console.log(lines.map((line) => `  ${line}`).join("\n"));
-    console.log(`ok policy site resolves end to end from ${host.origin}/deherm-relocated`);
+    console.log(`ok policy site resolves end to end from ${host.origin}/deherm-relocated, ` +
+      "including an artifact download URL built from the index's own template");
   } finally {
     await host.close();
   }

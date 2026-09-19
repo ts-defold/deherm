@@ -9,22 +9,17 @@ import { downloadReleaseAssets } from "../packages/cli/src/release-assets.mjs";
 import { fileURLToPath } from "node:url";
 
 import { allTargetNames, buildInputPath, deriveBundleTargets, readBundleTargets } from "./generate-defold-bundle-targets.mjs";
+// The input set that decides these bytes - and therefore the release tag - is
+// declared in one place for all three artifact families. It hashes the Hermes
+// pin and the per-target build recipe, and only the `sdk` and `targets` fields
+// of the derived bundle-target list, so a Defold repin that moves nothing but
+// `defoldRevision` no longer rebuilds and republishes ten unchanged archives.
+import { expectedAssetNames, familyTag, fingerprintFamily, targetLibraryName } from "./lib/artifact-releases.mjs";
+
+const FAMILY = "native-artifacts";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifestPath = path.join(root, "packages", "toolchains", "native-artifacts.json");
-const inputs = [
-  "upstream.lock",
-  "packages/toolchains/defold-bundle-targets.json",
-  "toolchains/hermes/Dockerfile.linux",
-  "toolchains/hermes/Dockerfile.win32",
-  "toolchains/hermes/Dockerfile.android",
-  "toolchains/hermes/build-apple.sh",
-  "toolchains/hermes/build-host-compilers.sh",
-  "toolchains/hermes/package-posix.sh",
-  "toolchains/hermes/package-msvc.sh",
-  "toolchains/hermes/windows-msvc.cmake",
-  "scripts/package-defold-extension.sh"
-];
 
 // A target whose artifact has to exist before a user can bundle for it. The
 // remaining statuses are not "not done yet": `vendored-source` targets link
@@ -35,16 +30,6 @@ const knownStatuses = new Set(["vendored", "vendored-source", "required-missing"
 
 function digest(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
-}
-
-async function fingerprint() {
-  const hash = createHash("sha256");
-  for (const relative of inputs) {
-    const bytes = await readFile(path.join(root, relative));
-    hash.update(`${relative}\0${bytes.byteLength}\0`);
-    hash.update(bytes);
-  }
-  return hash.digest("hex");
 }
 
 async function filesBelow(directory) {
@@ -60,10 +45,6 @@ async function filesBelow(directory) {
   return files;
 }
 
-function expectedFile(target, artifact) {
-  return target === "x86_64-win32" ? "hermes.lib" : path.basename(artifact.library);
-}
-
 function installable(artifact) {
   return artifact.status === "vendored" || artifact.status === "required-missing";
 }
@@ -76,17 +57,12 @@ function installable(artifact) {
 // treated as already built. The skip has to be keyed on the assets, not on the
 // tag.
 //
-// `installable` is the same predicate `install` uses, so a target that is
-// blocked or retired upstream is not expected here and does not hold a release
-// open forever.
+// The listing lives beside the fingerprint in ./lib/artifact-releases.mjs,
+// because the same names have to serve three consumers - this check, `pull`,
+// and the policy index entry that tells a user what to download - and three
+// copies of a naming rule is three chances to drift.
 async function expectedAssets() {
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-  const names = [];
-  for (const [target, artifact] of Object.entries(manifest.targets)) {
-    if (!installable(artifact)) continue;
-    names.push(`hermes-${target}-${expectedFile(target, artifact)}`);
-  }
-  return names.sort();
+  return expectedAssetNames(FAMILY, { root });
 }
 
 async function install(downloadRoot) {
@@ -95,7 +71,7 @@ async function install(downloadRoot) {
   const installed = [];
   for (const [target, artifact] of Object.entries(manifest.targets)) {
     if (!installable(artifact)) continue;
-    const name = expectedFile(target, artifact);
+    const name = targetLibraryName(target, artifact);
     const candidates = available.filter((file) => path.basename(file) === name && file.split(path.sep).includes(`hermes-${target}`));
     // A download that carries nothing for a target leaves that target alone, so
     // one platform's build failing in CI never silently unpins another's digest.
@@ -251,7 +227,7 @@ function run(command, args) {
 }
 
 const [command, ...args] = process.argv.slice(2);
-if (command === "fingerprint") console.log(await fingerprint());
+if (command === "fingerprint") console.log(await fingerprintFamily(FAMILY, { root }));
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
   const installed = await install(args[0]);
@@ -269,7 +245,7 @@ else if (command === "pull") {
   // this checkout's own input fingerprint, because the artifacts are
   // content-addressed: many déherm versions share one artifact release.
   const tagIndex = args.indexOf("--tag");
-  const tag = tagIndex >= 0 ? args[tagIndex + 1] : `native-artifacts-${await fingerprint()}`;
+  const tag = tagIndex >= 0 ? args[tagIndex + 1] : await familyTag(FAMILY, { root });
   const destination = path.join(root, "build", "native-artifact-downloads", tag);
   await mkdir(destination, { recursive: true });
   // By URL, not through `gh`: a user vendoring artifacts should not need a

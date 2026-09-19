@@ -1,20 +1,29 @@
 name: native-artifacts
 
 # Three independent matrices, deliberately kept apart in this file because
-# conflating them has already cost review time.
+# conflating them has already cost review time. They now publish under three
+# independent release tags for the same reason - see
+# `scripts/lib/artifact-releases.mjs` for the input set behind each.
 #
 #   * target libraries - one libhermes.a per Defold BUNDLE TARGET, because Bob
 #     uploads it to Extender for whatever platform is being bundled. A user on
 #     macOS bundling for Android needs the Android archive and none of their own.
+#     Tagged `native-artifacts-<fp>`.
 #   * host compilers - hermesc and shermes per USER HOST, because they run on
 #     the user's machine. Both are pure compilers, so shipping them imposes no
 #     native toolchain requirement on the user. Each pair must be built on a
 #     runner of its own architecture: they are LLVM, and a cross build would
-#     need a second toolchain per host.
+#     need a second toolchain per host. Tagged `hermes-host-<fp>`.
 #   * the transform compiler - dehermc, also per USER HOST, but pure Go with
 #     CGO_ENABLED=0, so ONE runner cross-compiles the whole matrix. It is the
 #     cheapest artifact déherm ships and the one whose absence used to make
 #     every user's first build run a `go build` of the typescript-go compiler.
+#     Tagged `dehermc-<fp>`.
+#
+# The two host families shared one `host-tools-<fp>` tag until the fingerprints
+# were split to their true input sets. They share no input: a Go transform edit
+# republished ten unchanged LLVM compilers, and a Hermes repin republished five
+# unchanged Go binaries.
 #
 # The target list is derived from the pinned Defold sources into
 # packages/toolchains/defold-bundle-targets.json, so a Defold release that adds
@@ -26,19 +35,22 @@ name: native-artifacts
 # A workflow artifact expires (90 days by default), is scoped to one run, and
 # needs an authenticated API call to fetch. None of that survives to a user six
 # months after a déherm release. These are published as GitHub RELEASE ASSETS
-# under a tag that is the SHA-256 fingerprint of the inputs that determine the
-# artifact - upstream.lock, the Dockerfiles, the build and packaging scripts,
-# the Go sources and the pinned ttsc version. The artifacts are therefore
-# content-addressed: many déherm versions share one artifact release, and a
-# rebuild whose inputs have not changed finds the release already present and
-# does nothing.
+# under a tag that is the SHA-256 fingerprint of the inputs that determine that
+# family's artifact - the lock KEYS it consumes, its build recipe, and for the
+# target archives the `sdk` and `targets` fields of the derived bundle-target
+# list. Keys and fields, never whole files: hashing all of `upstream.lock` made
+# hermesc a function of `DEFOLD_REV`, so a nightly Defold repin republished all
+# 25 artifacts for zero byte change. The artifacts are content-addressed: many
+# déherm versions share one artifact release, and a rebuild whose inputs have
+# not changed finds the release already present and does nothing.
 #
 # Vendor a completed run with:
 #   node scripts/manage-native-artifacts.mjs pull [--tag <tag>] --partial
-#   node scripts/manage-host-compilers.mjs   pull [--tag <tag>] --partial
+#   node scripts/manage-host-compilers.mjs   pull [--family <name>] [--tag <tag>] --partial
 #
-# Both default to the tag their own fingerprint names, so the usual invocation
-# takes no arguments at all.
+# Both default to the tags their own fingerprints name, so the usual invocation
+# takes no arguments at all; `manage-host-compilers.mjs pull` fetches both host
+# families unless `--family` names one.
 
 on:
   workflow_dispatch:
@@ -66,9 +78,11 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       target_tag: ${{ steps.compute.outputs.target_tag }}
-      host_tag: ${{ steps.compute.outputs.host_tag }}
+      hermes_host_tag: ${{ steps.compute.outputs.hermes_host_tag }}
+      dehermc_tag: ${{ steps.compute.outputs.dehermc_tag }}
       target_exists: ${{ steps.compute.outputs.target_exists }}
-      host_exists: ${{ steps.compute.outputs.host_exists }}
+      hermes_host_exists: ${{ steps.compute.outputs.hermes_host_exists }}
+      dehermc_exists: ${{ steps.compute.outputs.dehermc_exists }}
       android_ndk_version: ${{ steps.sdk.outputs.android_ndk_version }}
       android_ndk_api: ${{ steps.sdk.outputs.android_ndk_api }}
       android_64_ndk_api: ${{ steps.sdk.outputs.android_64_ndk_api }}
@@ -92,9 +106,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           target_tag="native-artifacts-$(node scripts/manage-native-artifacts.mjs fingerprint)"
-          host_tag="host-tools-$(node scripts/manage-host-compilers.mjs fingerprint)"
+          hermes_host_tag="hermes-host-$(node scripts/manage-host-compilers.mjs fingerprint hermes-host)"
+          dehermc_tag="dehermc-$(node scripts/manage-host-compilers.mjs fingerprint dehermc)"
           echo "target_tag=$target_tag" >> "$GITHUB_OUTPUT"
-          echo "host_tag=$host_tag" >> "$GITHUB_OUTPUT"
+          echo "hermes_host_tag=$hermes_host_tag" >> "$GITHUB_OUTPUT"
+          echo "dehermc_tag=$dehermc_tag" >> "$GITHUB_OUTPUT"
           # A COMPLETE release means these exact inputs have already been built,
           # and rebuilding would produce the same bytes at best while churning
           # the digests users pinned at worst.
@@ -126,10 +142,18 @@ jobs:
           else
             echo "target_exists=false" >> "$GITHUB_OUTPUT"
           fi
-          if complete "$host_tag" "$(node scripts/manage-host-compilers.mjs expected-assets)"; then
-            echo "host_exists=true" >> "$GITHUB_OUTPUT"
+          # Per family, not per host: the ten Hermes compilers and the five
+          # dehermc binaries live in different releases now, and one being
+          # complete says nothing about the other.
+          if complete "$hermes_host_tag" "$(node scripts/manage-host-compilers.mjs expected-assets hermes-host)"; then
+            echo "hermes_host_exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "host_exists=false" >> "$GITHUB_OUTPUT"
+            echo "hermes_host_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          if complete "$dehermc_tag" "$(node scripts/manage-host-compilers.mjs expected-assets dehermc)"; then
+            echo "dehermc_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dehermc_exists=false" >> "$GITHUB_OUTPUT"
           fi
       # The SDK levels every cross build has to match are the engine's own,
       # derived from upstream/defold/build_tools/sdk.py. Reading them here keeps
@@ -160,7 +184,7 @@ jobs:
 
   go-compiler:
     needs: plan
-    if: needs.plan.outputs.host_exists != 'true'
+    if: needs.plan.outputs.dehermc_exists != 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -191,7 +215,7 @@ jobs:
           set -euo pipefail
           for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
             bash scripts/ci/upload-release-asset.sh \
-              "${{ needs.plan.outputs.host_tag }}" "${{ github.repository }}" \
+              "${{ needs.plan.outputs.dehermc_tag }}" "${{ github.repository }}" \
               "$file" "host-compilers-${{ matrix.host }}-$(basename "$file")"
           done
 
@@ -374,7 +398,7 @@ jobs:
   # point.
   host-compilers:
     needs: plan
-    if: needs.plan.outputs.host_exists != 'true'
+    if: needs.plan.outputs.hermes_host_exists != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -421,7 +445,7 @@ jobs:
           set -euo pipefail
           for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
             bash scripts/ci/upload-release-asset.sh \
-              "${{ needs.plan.outputs.host_tag }}" "${{ github.repository }}" \
+              "${{ needs.plan.outputs.hermes_host_tag }}" "${{ github.repository }}" \
               "$file" "host-compilers-${{ matrix.host }}-$(basename "$file")"
           done
 
@@ -439,7 +463,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -uo pipefail
-          for tag in "${{ needs.plan.outputs.target_tag }}" "${{ needs.plan.outputs.host_tag }}"; do
+          for tag in "${{ needs.plan.outputs.target_tag }}" \
+                     "${{ needs.plan.outputs.hermes_host_tag }}" \
+                     "${{ needs.plan.outputs.dehermc_tag }}"; do
             {
               echo "### $tag"
               echo
