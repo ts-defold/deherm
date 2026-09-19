@@ -14,10 +14,11 @@ name: derivation
 # the measurement that decision rests on, and it is deliberately not a new kind
 # of evidence: every step below is a `--check` the repository already runs. A
 # `--check` regenerates the artifact and compares it byte for byte with the
-# committed one, so the committed artifacts ARE the fixture. Two hosts that both
-# report "current" have produced identical bytes, including the policy root; a
-# host that cannot reproduce them fails here, with the list of files that moved,
-# rather than quietly publishing a second root nobody compares.
+# committed one, so the committed artifacts ARE the fixture. Linux authors the
+# policy; macOS and Windows reporting "current" means both reproduced those
+# bytes, including the policy root. A host that cannot reproduce them fails
+# here, with the list of files that moved, rather than quietly publishing a
+# second root nobody compares.
 
 on:
   push:
@@ -55,32 +56,50 @@ concurrency:
 
 jobs:
   host-parity:
-    name: derive on ${{ matrix.os }}
+    name: ${{ matrix.role }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        # The two hosts that actually derive: `policy-revisions.yml` now runs on
-        # Linux, and a maintainer's machine is a Mac. They ship different clang
-        # major versions, which is the point - the parse must not depend on
-        # either. Add a host here rather than asserting in prose that it works.
-        os: [ubuntu-24.04, macos-15]
+        # Linux is the sole producer: policy-revisions.yml derives and publishes
+        # there. macOS and Windows are isolated parity witnesses. They reproduce
+        # the committed Linux artifacts byte for byte but never author or
+        # publish policy bytes, so their longer queues do not move authority to
+        # a scarce runner.
+        include:
+          - os: ubuntu-24.04
+            role: derive canonical policy
+            python: python3
+          - os: macos-15
+            role: validate Linux policy
+            python: python3
+          - os: windows-2025
+            role: validate Linux policy
+            python: python
+    defaults:
+      run:
+        # GitHub's Windows image ships Git Bash. The derivation commands and
+        # bootstrapper are intentionally the same on all three hosts; a separate
+        # PowerShell implementation would be a second pipeline, not parity.
+        shell: bash
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.13' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Record the compiler this host derives with
         run: |
           set -euo pipefail
           {
-            echo "### ${{ matrix.os }}"
+            echo "### ${{ matrix.role }} — ${{ matrix.os }}"
             echo
             echo '```'
             clang++ --version
-            python3 --version
+            ${{ matrix.python }} --version
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -96,13 +115,17 @@ jobs:
           key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
 
       - name: Fetch the pinned Defold sources
-        run: ./scripts/bootstrap-upstreams.sh defold ref-doc parse-sysroot
+        # This lane derives dmSDK only. The importer fetches and digest-checks
+        # its cached sysroot itself; avoiding bootstrap's python3 spelling and
+        # the unrelated ref-doc archive keeps the same path valid on Windows.
+        run: ./scripts/bootstrap-upstreams.sh defold
 
       # Parse, lower, resolve per target, assemble the policy. Each step refuses
-      # to differ from what is committed, so the last one passing on both hosts
-      # is the statement that both hosts computed the same policy root.
+      # to differ from what is committed, so the last one passing is the
+      # statement that all three hosts computed the same Linux-authored policy
+      # root.
       - name: The declaration inventory is host-independent
-        run: python3 scripts/import-defold-sdk.py --check
+        run: ${{ matrix.python }} scripts/import-defold-sdk.py --check
       - name: The dmSDK IR derived from it is host-independent
         run: node scripts/generate-dmsdk-sdk.mjs --check
       - name: The per-target conditional census is host-independent
@@ -122,4 +145,4 @@ jobs:
             const entry = require(`./packages/bindings/generated/policy/v1/index/${process.argv[1]}.json`);
             process.stdout.write(entry.policyRoot);
           ' "$revision")"
-          echo "${{ matrix.os }} derives Defold \`$revision\` to policy root \`$root\`." >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ matrix.role }} on ${{ matrix.os }} resolves Defold \`$revision\` to policy root \`$root\`." >> "$GITHUB_STEP_SUMMARY"

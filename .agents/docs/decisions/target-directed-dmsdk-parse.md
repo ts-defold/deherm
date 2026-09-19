@@ -135,9 +135,13 @@ versions produce the same 2141 declarations, the same per-target mangled names
 and the same diagnostics.
 
 CI runs that comparison as `host-parity` in `.github/workflows/derivation.yml`:
-the same `--check` on `ubuntu-24.04` and on `macos-15`. A host that cannot
-reproduce the committed inventory fails there, with the diff, rather than
-producing a second policy root nobody compares.
+Linux is the sole policy author; the same `--check` runs on `ubuntu-24.04`,
+`macos-15`, and `windows-2025`. A host that cannot reproduce the committed
+inventory fails there, with the diff, rather than producing a second policy
+root nobody compares. Linux/macOS byte identity is observed evidence from the
+run cited above. The Windows row is wired as an isolated parity witness and
+remains unverified until its first successful CI run; its queue can delay a
+verdict but can never author policy bytes.
 
 Two smaller reproducibility defects were fixed in the same pass, both of which
 had been putting machine-specific text into the committed inventory:
