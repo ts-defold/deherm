@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -23,6 +23,7 @@ import {
 } from "../packages/compiler/src/api-policy.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
+import { generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -187,6 +188,25 @@ test("canonical serialization depends on content, not key order", () => {
   assert.deepEqual(Object.keys(canonicalize({ z: 1, a: 2 })), ["a", "z"]);
   const sealed = sealObject({ a: 1 });
   assert.equal(sealed.hash, createHash("sha256").update(sealed.bytes, "utf8").digest("hex"));
+});
+
+test("generator identity is independent of checkout newline encoding", async (t) => {
+  const lf = await mkdtemp(path.join(tmpdir(), "deherm-generator-lf-"));
+  const crlf = await mkdtemp(path.join(tmpdir(), "deherm-generator-crlf-"));
+  t.after(async () => Promise.all([
+    rm(lf, { recursive: true, force: true }),
+    rm(crlf, { recursive: true, force: true })
+  ]));
+  const sources = ["one.mjs", "two.json"];
+  const texts = ["export const one = 1;\n", "{\n  \"two\": 2\n}\n"];
+  await Promise.all(sources.flatMap((source, index) => [
+    writeFile(path.join(lf, source), texts[index]),
+    writeFile(path.join(crlf, source), texts[index].replace(/\n/g, "\r\n"))
+  ]));
+  assert.equal(
+    await generatorRevision({ sourceRoot: lf, sources }),
+    await generatorRevision({ sourceRoot: crlf, sources })
+  );
 });
 
 test("namespace assignment follows the engine's own grouping", () => {

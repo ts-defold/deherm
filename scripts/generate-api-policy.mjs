@@ -85,10 +85,17 @@ export async function readSiteConfig(file = sitePath) {
  * detectably stale. It hashes the sources the ownership registry declares, in
  * the order the registry declares them.
  */
-export async function generatorRevision() {
+export async function generatorRevision(options = {}) {
+  const sourceRoot = options.sourceRoot ?? root;
+  const sources = options.sources ?? apiPolicyGenerator.sources;
   const digest = createHash("sha256");
-  for (const relative of apiPolicyGenerator.sources) {
-    digest.update(relative).update("\0").update(await readFile(path.join(root, relative))).update("\0");
+  for (const relative of sources) {
+    // Git may materialize the same tracked text with CRLF on Windows. The
+    // generator identity describes the program, not the checkout's newline
+    // encoding, so canonicalize text before hashing just as generated policy
+    // inputs do. Every declared generator source is textual JavaScript/JSON.
+    const source = await readFile(path.join(sourceRoot, relative), "utf8");
+    digest.update(relative).update("\0").update(source.replace(/\r\n?/g, "\n")).update("\0");
   }
   return `sha256:${digest.digest("hex")}`;
 }
