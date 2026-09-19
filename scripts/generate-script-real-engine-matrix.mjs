@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
-import { declaredDerivation } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectSameRevision } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -343,15 +343,19 @@ export async function generateScriptRealEngineMatrix(texts, options = {}) {
   assertNonEmpty(manifest.policy.defaultSetupId, "policy.defaultSetupId");
   if (JSON.stringify(manifest.policy.requiredEvidenceStages) !== JSON.stringify(stages)) throw new Error("requiredEvidenceStages must be compile, link, runtime");
   if (manifest.policy.runtimeRequiresExactScenarioMarker !== true) throw new Error("runtimeRequiresExactScenarioMarker must be true");
-  if (scalarRoutes.defoldRevision !== valueRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== tupleRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== urlRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== valueTailRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== overloadRoutes.defoldRevision ||
-      scalarRoutes.defoldRevision !== scalarProbes.defoldRevision ||
-      scalarRoutes.defoldRevision !== valueProbes.defoldRevision) {
-    throw new Error("All matrix inputs must use the same Defold revision");
-  }
+  expectSameRevision({
+    label: "script real-engine matrix",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-scalar-dispatch.json", revision: scalarRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-bindings.json", revision: valueRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-fixed-tuples.json", revision: tupleRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-url-address-classification.json", revision: urlRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-tail-bindings.json", revision: valueTailRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-overload-dispatch.json", revision: overloadRoutes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-real-engine-probes.json", revision: scalarProbes.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-real-engine-probes.json", revision: valueProbes.defoldRevision }
+    ]
+  });
   const setups = validateSetups(manifest);
   if (!setups.has(manifest.policy.defaultSetupId)) throw new Error(`Unknown default setup ${manifest.policy.defaultSetupId}`);
   const routes = routeRows(scalarRoutes, valueRoutes, tupleRoutes, urlRoutes, valueTailRoutes, overloadRoutes);

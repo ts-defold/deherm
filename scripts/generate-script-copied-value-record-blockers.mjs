@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { expectReviewedCount, observeReviewedSource, expectSameRevision } from "./lib/reviewed-revision.mjs";
 import { VOID } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -31,7 +31,14 @@ export function generate(inputs) {
   const ir = JSON.parse(inputs.irText), patterns = JSON.parse(inputs.patternsText), frontier = JSON.parse(inputs.frontierText), policy = JSON.parse(inputs.policyText);
   assert(policy.schemaVersion === 1 && Array.isArray(policy.sources) && Array.isArray(policy.routes), "copied-value blocker policy schema is unsupported");
   assert(ir.schemaVersion === 1 && patterns.schemaVersion === 1 && frontier.schemaVersion === 1, "copied-value blocker input schema is unsupported");
-  assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === frontier.defoldRevision, "copied-value blocker inputs use different Defold revisions");
+  expectSameRevision({
+    label: "copied-value record blockers",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-table-record-bindings.json", revision: frontier.defoldRevision }
+    ]
+  });
   assert(patterns.sourceSha256 === sha256(inputs.irText), "copied-value blocker patterns are stale against script IR");
   const sourceByKey = new Map();
   for (const source of policy.sources) { const text = inputs.sourceTexts.get(source.path); assert(!sourceByKey.has(source.key), `${source.key}: duplicate copied-value source`); if (observeReviewedSource({ input: "packages/bindings/overrides/script-copied-value-record-blockers.json", id: source.path, source: text ?? null, evidence: source }).status === VOID) continue; sourceByKey.set(source.key, { ...source, text }); }

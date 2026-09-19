@@ -6,7 +6,7 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision, expectReviewedCount } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, expectReviewedCount, expectSameRevision } from "./lib/reviewed-revision.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const defaultPolicy = "packages/bindings/overrides/script-route-availability-profiles.json";
@@ -150,8 +150,13 @@ async function generate(options) {
   // imported script API IR - and never from the reviewed policy, so a reviewed
   // file can no longer decide which revision the generated surface claims.
   const defoldRevision = scriptIr.defoldRevision;
-  assert(borrowed.defoldRevision === defoldRevision,
-    "Defold revision differs between the script API IR and the borrowed-handle classification");
+  expectSameRevision({
+    label: "script route availability",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: defoldRevision },
+      { path: "packages/bindings/generated/defold-script-borrowed-handle-classification.json", revision: borrowed.defoldRevision }
+    ]
+  });
   assert(Array.isArray(borrowed.rows), "borrowed-handle classification has no rows");
   // Reviewed evidence, compared against the revision being generated. The
   // reviewed feature and profile censuses below, and the SHA-256 of every cited

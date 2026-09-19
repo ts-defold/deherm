@@ -6,6 +6,8 @@ import { pathToFileURL } from "node:url";
 
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
 
+import { expectSameRevision } from "./lib/reviewed-revision.mjs";
+
 const root = new URL("../", import.meta.url);
 const urls = {
   ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root),
@@ -255,8 +257,14 @@ export function generateScriptTableTupleSchemas(texts) {
   const patterns = JSON.parse(texts.patterns);
   const accounting = JSON.parse(texts.accounting);
   const overrideDocument = JSON.parse(texts.overrides);
-  assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === accounting.defoldRevision,
-    "Script table/tuple inputs use different Defold revisions");
+  expectSameRevision({
+    label: "script table/tuple schemas",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-api-accounting.json", revision: accounting.defoldRevision }
+    ]
+  });
   const functions = new Map(ir.functions.map((fn) => [fn.id, fn]));
   const patternById = new Map(patterns.bindings.map((row) => [row.id, row]));
   const types = new Map(ir.types.map((type) => [type.name, type]));

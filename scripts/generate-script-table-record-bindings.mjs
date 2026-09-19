@@ -5,7 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { declaredDerivation, expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectReviewedCount, loadReviewedSources, expectSameRevision } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -192,7 +192,15 @@ export function generate(inputs) {
   const ir = JSON.parse(inputs.irText), patterns = JSON.parse(inputs.patternsText), accounting = JSON.parse(inputs.accountingText), schemas = JSON.parse(inputs.schemasText), policy = JSON.parse(inputs.policyText);
   assert(policy.schemaVersion === 1 && Array.isArray(policy.sources) && Array.isArray(policy.routes), "table-record policy schema is unsupported");
   assert(ir.schemaVersion === 1 && patterns.schemaVersion === 1 && accounting.schemaVersion === 1 && schemas.schemaVersion === 1, "table-record input schema is unsupported");
-  assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === accounting.defoldRevision && ir.defoldRevision === schemas.defoldRevision, "table-record inputs use different Defold revisions");
+  expectSameRevision({
+    label: "table-record bindings",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-api-accounting.json", revision: accounting.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-table-tuple-schemas.json", revision: schemas.defoldRevision }
+    ]
+  });
   assert(patterns.sourceSha256 === sha256(inputs.irText), "table-record binding patterns are stale against script IR");
   assert(accounting.inputEvidence?.scriptIrSha256 === sha256(inputs.irText) && accounting.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText), "table-record accounting provenance is stale");
   const withdrawnSources = inputs.withdrawnSources ?? new Set();

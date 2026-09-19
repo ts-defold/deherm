@@ -13,6 +13,8 @@ import {
   universalTargetSupport
 } from "./lib/script-universal-selection.mjs";
 
+import { expectSameRevision } from "./lib/reviewed-revision.mjs";
+
 const root = new URL("../", import.meta.url);
 const inputUrls = {
   inventory: new URL("packages/bindings/generated/defold-script-api-inventory.json", root),
@@ -266,8 +268,20 @@ export function generateScriptApiAccounting(inputs) {
   const overload = parse(inputs.overloadText, "overload-dispatch report");
   const universalPolicy = parse(inputs.universalPolicyText, "universal-value fallback policy");
 
-  const revisions = [inventory, patterns, descriptors, scalar, value, url, valueTail, overload].map((artifact) => artifact.defoldRevision);
-  assert(revisions.every((revision) => revision === ir.defoldRevision), "script generator Defold revisions differ");
+  expectSameRevision({
+    label: "script API accounting",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-api-inventory.json", revision: inventory.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-patterns.json", revision: patterns.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-binding-descriptors.json", revision: descriptors.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-scalar-dispatch.json", revision: scalar.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-bindings.json", revision: value.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-url-address-classification.json", revision: url.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-value-tail-bindings.json", revision: valueTail.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-overload-dispatch.json", revision: overload.defoldRevision }
+    ]
+  });
   assert(ir.counts?.functions === ir.functions.length, "script IR function count is stale");
   const functionById = uniqueMap(ir.functions, "script IR");
   const inventoryFunctions = inventory.declarations.filter(({ kind }) => kind === "function");

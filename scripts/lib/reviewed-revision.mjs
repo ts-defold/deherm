@@ -258,3 +258,52 @@ export function expectReviewedCount({ input, label, expected, observed, env = pr
   recordAudit({ input, id: label, status: MOVED, reason: "census", expected, observed, derived }, env);
   return { agreed: false, expected, observed };
 }
+
+/**
+ * Two derived artifacts, checked to describe the SAME Defold revision.
+ *
+ * ── Why this one stays fatal, inside a derivation as well as outside ───────
+ *
+ * Every other pinned assumption in this module is demoted when a derivation is
+ * declared, because it compares a REVIEW against a revision and a difference
+ * there is the measurement. This one is not that. It compares two artifacts
+ * this repository derived, and a difference says they describe different
+ * revisions of Defold. Joining them - accounting rows from one revision onto an
+ * IR from another - does not produce a degraded surface, it produces a wrong
+ * one, stamped with whichever revision the generator happened to read first.
+ *
+ * Inside a derivation such a mismatch is not a property of Defold at all. The
+ * chain runs in the order `scriptGenerationSteps` declares, which is a
+ * topological order: by the time a step runs, everything it consumes has
+ * already regenerated. So a stamp that still names the pinned revision means
+ * exactly one thing - the step that writes it REFUSED earlier in this same run -
+ * and that refusal is already reported by name. Continuing here would bury the
+ * real refusal under a pile of derived nonsense and put a corrupt surface in
+ * front of `--adopt`.
+ *
+ * What was wrong with it was the message. "inputs use different Defold
+ * revisions" tells a reader neither which input disagrees nor that the fix is
+ * somewhere else entirely. So this names each artifact and its stamp, and says
+ * where to look.
+ *
+ * @param {object} options
+ * @param {string} options.label    what the generator is producing, for the message
+ * @param {Array<{path: string, revision: string}>} options.inputs
+ *        every derived input, in the order the generator reads them. The first
+ *        is treated as the revision being generated.
+ */
+export function expectSameRevision({ label, inputs }) {
+  const [reference, ...rest] = inputs;
+  const disagreeing = rest.filter(({ revision }) => revision !== reference.revision);
+  if (!disagreeing.length) return reference.revision;
+  throw new Error(
+    `${label} inputs use different Defold revisions.\n` +
+    `  ${reference.path}: ${reference.revision}\n` +
+    disagreeing.map(({ path, revision }) => `  ${path}: ${revision}`).join("\n") + "\n" +
+    "These are artifacts this repository derives, not reviews: one describes a different " +
+    "Defold revision from the other, and emitting a surface from both would join rows " +
+    "across revisions. Inside a declared derivation the chain regenerates in dependency " +
+    "order, so a stamp naming the wrong revision means the step that writes it refused " +
+    "earlier in this run - fix that refusal rather than this comparison."
+  );
+}

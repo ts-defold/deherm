@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { expectReviewedCount, observeReviewedSource, expectSameRevision } from "./lib/reviewed-revision.mjs";
 import { VOID } from "./lib/revision-audit.mjs";
 const root = new URL("../", import.meta.url);
 const paths = { ir: new URL("packages/bindings/generated/defold-script-api-ir.json", root), frontier: new URL("packages/bindings/generated/defold-script-table-record-bindings.json", root), policy: new URL("packages/bindings/overrides/script-opaque-record-blockers.json", root), report: new URL("packages/bindings/generated/defold-script-opaque-record-blockers.json", root), target: new URL("packages/sdk/src/generated/script/opaque-record-blockers.ts", root) };
@@ -11,7 +11,14 @@ const assert = (value, message) => { if (!value) throw new Error(message); }; co
 export async function loadInputs() { const [irText, frontierText, policyText] = await Promise.all([paths.ir, paths.frontier, paths.policy].map((path) => readFile(path, "utf8"))); const policy = JSON.parse(policyText); const sourceTexts = new Map(await Promise.all(policy.sources.map(async ({ path }) => [path, await readFile(new URL(`upstream/defold/${path}`, root), "utf8")]))); return { irText, frontierText, policyText, sourceTexts }; }
 export function generate(inputs) {
   const ir = JSON.parse(inputs.irText), frontier = JSON.parse(inputs.frontierText), policy = JSON.parse(inputs.policyText);
-  assert(policy.schemaVersion === 1 && Array.isArray(policy.sources) && Array.isArray(policy.routes), "opaque-record blocker policy schema is unsupported"); assert(ir.schemaVersion === 1 && frontier.schemaVersion === 1 && ir.defoldRevision === frontier.defoldRevision, "opaque-record inputs drifted");
+  assert(policy.schemaVersion === 1 && Array.isArray(policy.sources) && Array.isArray(policy.routes), "opaque-record blocker policy schema is unsupported"); assert(ir.schemaVersion === 1 && frontier.schemaVersion === 1, "opaque-record inputs drifted");
+  expectSameRevision({
+    label: "opaque-record blockers",
+    inputs: [
+      { path: "packages/bindings/generated/defold-script-api-ir.json", revision: ir.defoldRevision },
+      { path: "packages/bindings/generated/defold-script-table-record-bindings.json", revision: frontier.defoldRevision }
+    ]
+  });
   const sources = new Map(); for (const source of policy.sources) { const text = inputs.sourceTexts.get(source.path); assert(!sources.has(source.key), `${source.key}: duplicate opaque-record source`); if (observeReviewedSource({ input: "packages/bindings/overrides/script-opaque-record-blockers.json", id: source.path, source: text ?? null, evidence: source }).status === VOID) continue; sources.set(source.key, { ...source, text }); }
   const frontierIds = new Set(frontier.blockedRoutes.filter(({ blocker }) => blocker === "opaque-or-nested-record").map(({ id }) => id)); expectReviewedCount({ input: "packages/bindings/overrides/script-opaque-record-blockers.json", label: "opaque-record frontier census", expected: policy.expectedRouteCount, observed: frontierIds.size }); const fnById = new Map(ir.functions.map((fn) => [fn.id, fn])); const seen = new Set();
   const routes = policy.routes.map((rule) => { assert(!seen.has(rule.id), `${rule.id}: duplicate opaque-record blocker`); seen.add(rule.id); assert(frontierIds.has(rule.id), `${rule.id}: route left opaque-record frontier`); const source = sources.get(rule.source), fn = fnById.get(rule.id); assert(source && fn && rule.anchors.every((anchor) => source.text.includes(anchor)), `${rule.id}: opaque-record source anchor drifted`); return { id: rule.id, stableId: stableBindingId(rule.id), parameters: fn.parameters.map(({ rawName, rawType, optional }) => ({ name: rawName, rawType, optional })), blocker: rule.blocker, source: `upstream/defold/${source.path}`, sourceSha256: source.sha256, anchors: rule.anchors }; }).sort((a, b) => a.stableId - b.stableId || compare(a.id, b.id));
