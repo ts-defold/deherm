@@ -21,6 +21,7 @@
 // directory, and `stop` releases the page, the browser, the server and the
 // profile.
 
+import { existsSync } from "node:fs";
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 
@@ -97,6 +98,24 @@ async function newestBundleDirectory(root, index) {
 }
 
 /**
+ * The repository a project sits inside, or null when it is standalone.
+ *
+ * Walked from the PROJECT rather than the working directory, so the answer is a
+ * property of the project's location and not of how the process was invoked.
+ */
+function findRepositoryRoot(from) {
+  let directory = from;
+  for (;;) {
+    for (const marker of [".git", "pnpm-workspace.yaml"]) {
+      if (existsSync(path.join(directory, marker))) return directory;
+    }
+    const parent = path.dirname(directory);
+    if (parent === directory) return null;
+    directory = parent;
+  }
+}
+
+/**
  * Find the packaged HTML5 bundle to serve.
  *
  * Bob writes a bundle under whichever `--bundle-output` it was given, so both
@@ -112,10 +131,22 @@ export async function resolveWebBundle(options) {
     await stat(path.join(directory, index));
     return { directory, index, source: "explicit" };
   }
+  // Three conventions, newest first. The repository root matters because a
+  // Defold project inside a monorepo - examples/<name>/defold here - gets its
+  // bundle written to the REPOSITORY's build/bundle, which is neither the
+  // project root nor necessarily the working directory. Searching only the
+  // first two made discovery depend on where the TUI happened to be launched
+  // from: it worked from the repository and failed from a home directory,
+  // reporting a bundle missing that was sitting on disk the whole time.
   const roots = [
     path.join(path.resolve(options.projectRoot), "build", "bundle"),
     path.join(path.resolve(options.cwd ?? process.cwd()), "build", "bundle")
   ];
+  const repositoryRoot = findRepositoryRoot(path.resolve(options.projectRoot));
+  if (repositoryRoot) {
+    const candidate = path.join(repositoryRoot, "build", "bundle");
+    if (!roots.includes(candidate)) roots.push(candidate);
+  }
   for (const root of roots) {
     const found = await newestBundleDirectory(root, index);
     if (found) return { directory: found.directory, index, source: root };
