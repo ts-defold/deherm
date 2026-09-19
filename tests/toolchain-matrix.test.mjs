@@ -219,6 +219,17 @@ test("the declared matrix verifies and the complete matrix names every gap", () 
   }
 });
 
+test("targeted artifact verification does not require unrelated bundle targets", () => {
+  const result = spawnSync(process.execPath, [
+    path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"),
+    "verify",
+    "--target", "wasm-web"
+  ], { cwd: repositoryRoot, encoding: "utf8" });
+  assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
+  assert.match(result.stdout, /ok wasm-web: vendored-source/u);
+  assert.doesNotMatch(result.stdout, /arm64-osx/u);
+});
+
 test("a targeted artifact pull rejects a target that has no published row before downloading", () => {
   const result = spawnSync(
     process.execPath,

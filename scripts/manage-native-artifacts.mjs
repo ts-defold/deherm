@@ -254,17 +254,26 @@ async function report() {
   };
 }
 
-async function verify(complete, json) {
+async function verify(complete, json, selected = new Set()) {
   const result = await report();
   if (json) console.log(JSON.stringify(result, null, 2));
   const problems = [];
-  for (const target of result.missingFromManifest) {
+  const inScope = (target) => selected.size === 0 || selected.has(target);
+  const known = new Set([
+    ...result.targets.map((row) => row.target),
+    ...result.missingFromManifest,
+    ...result.unknownInManifest
+  ]);
+  for (const target of selected) {
+    if (!known.has(target)) problems.push(`${target}: unknown Defold bundle target`);
+  }
+  for (const target of result.missingFromManifest.filter(inScope)) {
     problems.push(`${target}: declared by ${result.source} and absent from the native artifact manifest`);
   }
-  for (const target of result.unknownInManifest) {
+  for (const target of result.unknownInManifest.filter(inScope)) {
     problems.push(`${target}: declared by the native artifact manifest and unknown to ${result.source}`);
   }
-  for (const row of result.targets) {
+  for (const row of result.targets.filter((candidate) => inScope(candidate.target))) {
     if (row.invalid) problems.push(`${row.target}: ${row.detail}`);
     else if (complete && missingStatuses.has(row.status)) {
       problems.push(`${row.target}: ${row.status}${row.blocker ? ` (${row.blocker.code}: ${row.blocker.reason})` : ` (${row.detail})`}`);
@@ -274,9 +283,22 @@ async function verify(complete, json) {
     throw new Error(`Native artifact matrix (${complete ? "complete" : "declared"}) failed:\n${problems.map((problem) => `- ${problem}`).join("\n")}`);
   }
   if (!json) {
-    for (const row of result.targets) console.log(`${row.status === "vendored" || row.status === "vendored-source" ? "ok" : "--"} ${row.target}: ${row.status} ${row.detail}`);
-    console.log(`ok native artifact matrix (${complete ? "complete" : "declared"}): ${result.targets.length} target(s)`);
+    const rows = result.targets.filter((candidate) => inScope(candidate.target));
+    for (const row of rows) console.log(`${row.status === "vendored" || row.status === "vendored-source" ? "ok" : "--"} ${row.target}: ${row.status} ${row.detail}`);
+    console.log(`ok native artifact matrix (${complete ? "complete" : "declared"}): ${rows.length} target(s)`);
   }
+}
+
+function selectedTargets(args) {
+  const targets = new Set();
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] !== "--target") continue;
+    const target = args[index + 1];
+    if (!target || target.startsWith("--")) throw new Error("--target requires a Defold bundle target");
+    targets.add(target);
+    index += 1;
+  }
+  return targets;
 }
 
 function run(command, args) {
@@ -305,7 +327,9 @@ else if (command === "install") {
   console.log(`recorded ${args[0]} ${await record(args[0])}`);
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
 else if (command === "expected-assets") console.log((await expectedAssets()).join("\n"));
-else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
+else if (command === "verify") {
+  await verify(args.includes("--complete"), args.includes("--json"), selectedTargets(args));
+}
 else if (command === "pull") {
   // Release assets, not workflow artifacts. A workflow artifact expires, is
   // scoped to one run, and needs an authenticated API call to fetch; none of
@@ -320,14 +344,7 @@ else if (command === "pull") {
   // second CLI or an authenticated session. The asset names come from the same
   // listing the CI completeness check uses, so no release listing is fetched to
   // discover them - see packages/cli/src/release-assets.mjs.
-  const requestedTargets = [];
-  for (let index = 0; index < args.length; index += 1) {
-    if (args[index] !== "--target") continue;
-    const target = args[index + 1];
-    if (!target || target.startsWith("--")) throw new Error("--target requires a Defold bundle target");
-    requestedTargets.push(target);
-    index += 1;
-  }
+  const requestedTargets = [...selectedTargets(args)];
   const published = await publishedAssets(FAMILY, { root });
   const knownTargets = new Set(published.map((row) => row.target));
   const unknownTargets = [...new Set(requestedTargets)].filter((target) => !knownTargets.has(target));
@@ -369,11 +386,11 @@ else if (command === "pull") {
   // missingInstalls check above is its completeness gate; asking verify() for
   // global completeness here would make `--target x86_64-linux` fail because
   // an unrelated iOS row was intentionally not downloaded.
-  await verify(!args.includes("--partial") && selected.size === 0, false);
+  await verify(!args.includes("--partial") && selected.size === 0, false, selected);
 } else {
   throw new Error(
     "Usage: manage-native-artifacts.mjs {fingerprint|tag|release-metadata|expected-assets|report|" +
-    "verify [--complete] [--json]|install <dir>|record <target>|" +
+    "verify [--complete] [--json] [--target <bundle-target>]|install <dir>|record <target>|" +
     "pull [--tag <tag>] [--target <bundle-target>] [--partial]}"
   );
 }
