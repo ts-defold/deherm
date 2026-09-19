@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
 import { buildLedger, readLedger, stageNames } from "../scripts/check-end-to-end.mjs";
@@ -74,4 +75,10 @@ test("the declared stages are the ones the gate can run", async () => {
   assert.ok(stageNames.includes("policy"), "the gate must resolve a published policy");
   assert.ok(module.defaultBuildServer.startsWith("https://"),
     "the gate must default to a real build server, not this repository's localhost Extender");
+});
+
+test("Bob consumes the generated project's target artifact instead of rebuilding a host-native package", async () => {
+  const wrapper = await readFile(new URL("../scripts/bob.sh", import.meta.url), "utf8");
+  assert.match(wrapper, /check-project-native-artifact\.mjs" "\$project_root" "\$platform"/u);
+  assert.doesNotMatch(wrapper, /package:defold/u);
 });

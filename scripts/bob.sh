@@ -81,16 +81,15 @@ fi
 node "$repo_root/scripts/assemble-typed-native-extension.mjs" \
   --project "$project_root" --target "$platform" --reconcile
 
-case "$platform" in
-  *-web)
-    # HTML5 executes authored JavaScript in the browser. The extension's
-    # lib/web Emscripten libraries are source files and need no Hermes archive.
-    npm --prefix "$repo_root" run package:defold:web
-    ;;
-  *)
-    npm --prefix "$repo_root" run package:defold
-    ;;
-esac
+# The project generator has already installed the package's managed extension,
+# including the archive for this exact Defold bundle target (or the generated
+# browser-host library for web). Bob is a consumer of that tree. Rebuilding the
+# repository's host-native Hermes here is both redundant and wrong: a Linux CI
+# runner building Windows must upload the pinned Windows archive, not try to
+# manufacture an arm64-macOS package from local source after scaffolding.
+# The checker verifies only the project's copied bytes against the shipped
+# target manifest; Bob does not need a local Hermes compiler or source build.
+node "$repo_root/scripts/check-project-native-artifact.mjs" "$project_root" "$platform"
 
 # Bob archives whatever /deherm/app.dehermc is on disk as a custom_resources
 # entry, and nothing in Bob relates that file to the TypeScript beside it. The
