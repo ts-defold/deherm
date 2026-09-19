@@ -21,10 +21,29 @@ export function createBundleFingerprintPlaceholder() {
   return randomBytes(BUNDLE_FINGERPRINT_LENGTH / 2).toString("hex");
 }
 
+/**
+ * Every bundle is strict. Hermes evaluates a plain script in sloppy mode
+ * otherwise, and sloppy mode is not a milder dialect - it is different
+ * semantics: assigning an undeclared name creates a global instead of throwing,
+ * `this` in a plain call is the global object instead of undefined, and
+ * function declarations in blocks hoist differently. A bundle that silently got
+ * sloppy semantics would diverge from what the TypeScript sources mean, and
+ * from the ES modules they were authored as, which are always strict.
+ *
+ * This is emitted as part of the banner rather than through a separate
+ * mechanism because position is the whole contract: a directive only takes
+ * effect in the directive prologue, so `"use strict"` must precede every
+ * statement including the fingerprint assignment. Keeping them in one string is
+ * what guarantees nothing can be inserted between them. Strict mode at script
+ * level covers the IIFE esbuild wraps the program in, so one directive makes
+ * the entire bundle strict.
+ */
+export const BUNDLE_STRICT_DIRECTIVE = '"use strict";';
+
 /** The banner that publishes the placeholder into the evaluated bundle scope. */
 export function bundleFingerprintBanner(placeholder) {
   assertFingerprintShape(placeholder, "placeholder");
-  return `var ${BUNDLE_FINGERPRINT_GLOBAL} = "${placeholder}";`;
+  return `${BUNDLE_STRICT_DIRECTIVE}\nvar ${BUNDLE_FINGERPRINT_GLOBAL} = "${placeholder}";`;
 }
 
 function assertFingerprintShape(value, description) {
