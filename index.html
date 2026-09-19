@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>deherm policy store</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body { font: 15px/1.6 system-ui, sans-serif; max-width: 42rem; margin: 4rem auto; padding: 0 1.5rem; }
+  code { background: #f4f4f5; padding: .1em .35em; border-radius: 3px; }
+  pre { background: #f4f4f5; padding: 1rem; border-radius: 6px; overflow-x: auto; }
+</style>
+<h1>deherm policy store</h1>
+<p>
+  Content-addressed API policies derived from Defold engine sources. Every
+  object is immutable and self-verifying: hash the bytes, compare to the path.
+</p>
+<pre>/v1/index/&lt;defold-sha&gt;.json   -&gt; { policyRoot, generator }
+/v1/policy/&lt;root-hash&gt;.json   -&gt; the policy root, naming its subtrees
+/v1/object/&lt;subtree-hash&gt;.json -&gt; one namespace's derived surface</pre>
+<p>
+  This branch is generated. It is re-derivable from
+  <code>ts-defold/deherm</code> and carries no history worth preserving.
+</p>
