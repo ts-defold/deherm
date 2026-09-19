@@ -29,6 +29,16 @@ const generated = path.join(repositoryRoot, "packages", "bindings", "generated")
 
 const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
 
+test("policy host parity materializes every authoritative generator input", async () => {
+  const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
+  const parity = workflow.slice(
+    workflow.indexOf("  host-parity:"),
+    workflow.indexOf("  engine-conformance:")
+  );
+
+  assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
+});
+
 // A deliberately tiny stand-in for the generated state, so the structural
 // properties are tested against inputs a reader can hold in their head rather
 // than against six megabytes of real surface. The real surface is exercised by

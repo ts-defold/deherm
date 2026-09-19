@@ -252,7 +252,10 @@ jobs:
         with:
           path: upstream/dmsdk-parse-sysroot
           key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
-      - run: ./scripts/bootstrap-upstreams.sh defold
+      # Both inputs participate in dmSDK generation: headers come from the
+      # Defold checkout and documentation/type metadata comes from ref-doc.zip.
+      # A parity runner must materialize the same authoritative pair as derive.
+      - run: ./scripts/bootstrap-upstreams.sh defold ref-doc
       - run: ${{ matrix.python }} scripts/import-defold-sdk.py --check
       - run: node scripts/generate-dmsdk-sdk.mjs --check
       - run: node scripts/generate-dmsdk-target-conditionals.mjs --check
