@@ -54,6 +54,13 @@ for file in "$@"; do
   cp "$file" "$staging/$(basename "$file")"
 done
 
+# bsdtar has no creation-time equivalent of GNU tar's --mtime. Normalize the
+# staged entries themselves so both implementations serialize the same stable
+# timestamp instead of the time at which `cp` happened. 1980 is deliberately
+# used instead of the Unix epoch because it is representable on every host we
+# build on, including Windows filesystems used by the matrix.
+TZ=UTC touch -t 198001010000.00 -- "$staging"/*
+
 mkdir -p "$(dirname "$output")"
 
 # GNU tar and bsdtar spell the reproducibility flags differently. bsdtar (macOS,

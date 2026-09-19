@@ -72,12 +72,16 @@
         "hermesc": {
           "file": "bin/hermesc",
           "builder": "macos-native",
-          "status": "required-missing"
+          "status": "vendored",
+          "sha256": "7db2e6861dd05dd5115d198bd874b4ca26cfbcef20b820497e7507ea0aa4dfd4",
+          "bytes": 3446800
         },
         "shermes": {
           "file": "bin/shermes",
           "builder": "macos-native",
-          "status": "required-missing"
+          "status": "vendored",
+          "sha256": "a437ac98fb5c890075410ff0c51d29010f530adc751a0909d199a7214ef034ed",
+          "bytes": 2872336
         },
         "dehermc": {
           "file": "bin/dehermc",
@@ -155,12 +159,16 @@
         "hermesc": {
           "file": "bin/hermesc.exe",
           "builder": "windows-msvc-native",
-          "status": "required-missing"
+          "status": "vendored",
+          "sha256": "270ed353fd2e127cee817605561467c56bc7830920e806029cdb2b5d91d57b1e",
+          "bytes": 2884096
         },
         "shermes": {
           "file": "bin/shermes.exe",
           "builder": "windows-msvc-native",
-          "status": "required-missing"
+          "status": "vendored",
+          "sha256": "4064aeb0690c549823254283a539be750db2d6249516a80ee1cba2ba33dfbe99",
+          "bytes": 2445312
         },
         "dehermc": {
           "file": "bin/dehermc.exe",

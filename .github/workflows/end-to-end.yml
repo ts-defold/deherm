@@ -24,17 +24,22 @@ name: end-to-end
 # signal and the courtesy. The cheap half - the ledger, the policy resolution,
 # the scaffold, the generator - runs on every push, because that half costs
 # nobody anything and catches most of what breaks.
+#
+# A toolchain fingerprint change is deliberately absent from the push paths.
+# `native-artifacts.yml` dispatches this workflow only after every immutable row
+# for the new fingerprints is published; running concurrently would test a
+# release that cannot exist yet and turn the expected publication window into a
+# red end-to-end result.
 
 on:
   schedule:
-    # After `policy-revisions` has had its window, so a nightly repin is already
-    # in the tree when this builds against it.
+    # After the unified `policy` workflow's discovery window, so its accumulated
+    # website catalogue can be current before this consumer proof resolves it.
     - cron: '43 6 * * *'
   push:
     paths:
       - scripts/check-end-to-end.mjs
       - scripts/bob.sh
-      - packages/toolchains/**
       - .github/workflows/end-to-end.yml
   workflow_dispatch:
     inputs:

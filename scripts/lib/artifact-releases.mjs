@@ -10,7 +10,7 @@
 // host-tool tag from 7a3536af to 35787eb7 and the target tag from d37e4040 to
 // 6fb21b2c. `hermesc` and `shermes` do not link, read or embed anything of
 // Defold's, so a nightly Defold repin - which
-// `.github/workflows/policy-revisions.yml` does routinely - would have forced a
+// `.github/workflows/policy.yml` does routinely - would have forced a
 // rebuild and republish of all 25 artifacts for zero byte change.
 //
 // So each family names the lock KEYS it consumes, not the file. A key a family

@@ -88,7 +88,7 @@ test("the scratch checkout reproduces the real fingerprints before anything is e
 test("repinning Defold moves no artifact fingerprint", async (t) => {
   const before = await scratchCheckout();
   // A plausible nightly repin: the whole point of the split is that this is the
-  // routine event, not a rare one. policy-revisions.yml does it daily.
+  // routine event, not a rare one. policy.yml does it daily.
   const after = await scratchCheckout({
     lock: replaceLockValue("DEFOLD_REV", "0000000000000000000000000000000000000000")
   });
