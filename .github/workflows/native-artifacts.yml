@@ -131,9 +131,9 @@ jobs:
       # rather than both racing the same asset.
       registry_credential: ${{ steps.credential.outputs.available }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
       # The fingerprint reads Defold's build_input.yml, so it needs the `yaml`
       # dependency. Nothing else here runs project code.
@@ -242,16 +242,16 @@ jobs:
       matrix:
         host: [darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with: { node-version: '22' }
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       # The ttsc Go module - and the typescript-go checkout under its shim/ -
       # arrives with the npm package, pinned by pnpm-lock.yaml. It is not
       # vendored into this repository, so there is exactly one statement of the
       # compiler's provenance.
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v7
         with:
           go-version-file: packages/compiler/go.mod
           cache: false
@@ -294,7 +294,7 @@ jobs:
             defold_platform: arm64-linux
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
@@ -330,19 +330,19 @@ jobs:
     if: needs.plan.outputs.target_exists != 'true' && needs.plan.outputs.registry_credential == 'true'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
       - run: bash scripts/bootstrap-upstreams.sh hermes
-      - uses: google-github-actions/auth@v2
+      - uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.GCP_ARTIFACT_REGISTRY_KEY }}
       # The credential needs no role on Defold's project: the grant is to
       # authenticated identities, not to named principals. It only has to be a
       # real Google identity that can mint a token.
-      - uses: google-github-actions/setup-gcloud@v2
+      - uses: google-github-actions/setup-gcloud@v3
       - run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
       - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
       - env:
@@ -365,9 +365,26 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       - run: bash scripts/bootstrap-upstreams.sh hermes
+      # KNOWN STALE PIN. Every other action here now runs on Node 24; this one
+      # cannot. ilammy/msvc-dev-cmd's newest release, v1.13.0, still declares
+      # `using: node20`, the repository is unmaintained, and the request to
+      # publish a Node 24 build (ilammy/msvc-dev-cmd#94) is open with no
+      # release behind it. So the Node 20 deprecation warning on this lane is
+      # real and is not fixed by a version bump - there is no version to bump
+      # to. When GitHub finishes removing the Node 20 runtime this step stops
+      # resolving and this lane fails outright rather than warning.
+      #
+      # Replacing it is a behavioural change to how the MSVC environment is
+      # entered, so it is left for a deliberate decision rather than folded
+      # into a version sweep. The two candidates:
+      #   - egor-tensin/vs-shell: composite action, pure PowerShell, no Node
+      #     runtime at all, so it cannot deprecate this way again.
+      #   - TheMrMilchmann/setup-msvc-dev: maintained JS action, closest
+      #     drop-in for the inputs this action accepts.
+      # The same pin appears in the host-compilers lane below.
       - uses: ilammy/msvc-dev-cmd@v1
       - run: choco install ninja --no-progress -y
       - run: |
@@ -402,7 +419,7 @@ jobs:
             api_kind: android_64_ndk_api
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
@@ -440,7 +457,7 @@ jobs:
       DEFOLD_MACOSX_VERSION_MIN: ${{ needs.plan.outputs.macosx_version_min }}
       DEFOLD_IPHONEOS_VERSION_MIN: ${{ needs.plan.outputs.iphoneos_version_min }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
@@ -491,7 +508,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: { submodules: recursive }
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
@@ -501,6 +518,8 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang cmake lld ninja-build python3
       - if: runner.os == 'macOS'
         run: brew install ninja cmake
+      # KNOWN STALE PIN - see the windows-native lane above for why this one
+      # action is still on Node 20 and what would replace it.
       - if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
       - if: runner.os == 'Windows'
@@ -532,7 +551,7 @@ jobs:
     if: always()
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
