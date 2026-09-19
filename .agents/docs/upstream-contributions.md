@@ -49,6 +49,7 @@ Record candidates here before opening external state:
 | Candidate | Upstream | Reproducer | Status |
 | --- | --- | --- | --- |
 | Function-expression and arrow return annotations remain TS nodes after TS2Flow | Static Hermes | `test/AST/ts2flow/function-expression-return-types.ts` fails at pinned `4947871` and passes with commit `dcd175842` | [draft PR #2188](https://github.com/facebook/hermes/pull/2188); Meta CLA action required |
+| `PassManager.h` uses `std::vector` without including `<vector>` | Hermes | Android NDK r25b compile at pinned `dcd175842` fails in `PassManager.cpp`; `toolchains/hermes/patches/pass-manager-vector.patch` supplies the direct include | Reproduced in [CI run 35465650406](https://github.com/ts-defold/deherm/actions/runs/35465650406); local patch carried pending upstream submission |
 
 When a candidate appears, add its reduced fixture under the repository tests,
 record the pinned upstream revision, and verify that it fails without the patch

@@ -1,0 +1,12 @@
+diff --git a/include/hermes/Optimizer/PassManager/PassManager.h b/include/hermes/Optimizer/PassManager/PassManager.h
+index 9f83f798c..a1d083760 100644
+--- a/include/hermes/Optimizer/PassManager/PassManager.h
++++ b/include/hermes/Optimizer/PassManager/PassManager.h
+@@ -16,6 +16,7 @@
+ #include "llvh/ADT/StringRef.h"
+ 
+ #include <memory>
++#include <vector>
+ 
+ namespace hermes {
+ 

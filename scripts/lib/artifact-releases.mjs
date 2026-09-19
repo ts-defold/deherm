@@ -125,6 +125,7 @@ export const artifactFamilies = Object.freeze({
       "toolchains/hermes/Dockerfile.linux",
       "toolchains/hermes/Dockerfile.win32",
       "toolchains/hermes/Dockerfile.android",
+      "toolchains/hermes/patches/pass-manager-vector.patch",
       "toolchains/hermes/build-apple.sh",
       // The fallback Windows lane, which runs whenever no Defold registry
       // credential is configured. It was missing from the old input list, so a

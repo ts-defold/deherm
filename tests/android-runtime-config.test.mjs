@@ -24,3 +24,13 @@ test("Android native compilation has a bounded per-row worker count", async () =
   assert.doesNotMatch(instructions, /\$\(nproc\)/u);
   assert.equal((instructions.match(/\$\{BUILD_JOBS\}/gu) ?? []).length, 5);
 });
+
+test("Android applies the pinned Hermes missing-vector fix before compilation", async () => {
+  const dockerfile = await readFile("toolchains/hermes/Dockerfile.android", "utf8");
+  const patch = await readFile("toolchains/hermes/patches/pass-manager-vector.patch", "utf8");
+  const fingerprints = await readFile("scripts/lib/artifact-releases.mjs", "utf8");
+
+  assert.match(patch, /PassManager\.h[\s\S]*\+#include <vector>/u);
+  assert.match(dockerfile, /git -C \/src\/hermes apply --check \/tmp\/hermes-pass-manager-vector\.patch/u);
+  assert.match(fingerprints, /toolchains\/hermes\/patches\/pass-manager-vector\.patch/u);
+});

@@ -234,6 +234,12 @@ RUN curl -fsSLo /tmp/icu-data.zip "https://github.com/unicode-org/icu/releases/d
 # ── Hermes host compilers ───────────────────────────────────────────────────
 
 COPY upstream/hermes /src/hermes
+COPY toolchains/hermes/patches/pass-manager-vector.patch /tmp/hermes-pass-manager-vector.patch
+# Pinned Hermes uses std::vector in PassManager.h without including <vector>.
+# Host transitive includes mask it; the pinned NDK libc++ intentionally does
+# not. Keep the upstream-shaped patch explicit and fail if it no longer applies.
+RUN git -C /src/hermes apply --check /tmp/hermes-pass-manager-vector.patch && \
+    git -C /src/hermes apply /tmp/hermes-pass-manager-vector.patch
 COPY toolchains/hermes/package-posix.sh /usr/local/bin/package-posix
 COPY toolchains/hermes/package-archive.sh /usr/local/bin/package-archive
 
