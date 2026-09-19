@@ -37,6 +37,7 @@ test("policy host parity materializes every authoritative generator input", asyn
     workflow.indexOf("  host-parity:"),
     workflow.indexOf("  engine-conformance:")
   );
+  const publish = workflow.slice(workflow.indexOf("  publish-site:"));
 
   assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
   assert.match(bootstrap, /createHash\("sha256"\)/u);
@@ -44,6 +45,8 @@ test("policy host parity materializes every authoritative generator input", asyn
   for (const line of importer.split("\n").filter((candidate) => /\.(?:read|write)_text\(/u.test(candidate))) {
     assert.match(line, /encoding="utf-8"/u, `platform-default text codec in: ${line.trim()}`);
   }
+  assert.match(publish, /needs: \[derive, host-parity\]/u);
+  assert.match(publish, /needs\.host-parity\.result == 'success'/u);
 });
 
 // A deliberately tiny stand-in for the generated state, so the structural

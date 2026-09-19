@@ -336,9 +336,10 @@ jobs:
 
   publish-site:
     name: Publish policy website
-    needs: derive
+    needs: [derive, host-parity]
     if: >-
       needs.derive.result == 'success' &&
+      needs.host-parity.result == 'success' &&
       github.repository == 'ts-defold/deherm' &&
       github.ref == 'refs/heads/main' &&
       github.event_name != 'pull_request'
