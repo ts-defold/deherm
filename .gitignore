@@ -24,3 +24,6 @@ defold/.internal/
 
 # Upstream source checkouts are reproducibly bootstrapped from upstream.lock.
 upstream/
+
+# Python bytecode from the dmSDK importer.
+__pycache__/
