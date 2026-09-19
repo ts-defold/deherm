@@ -237,7 +237,9 @@ jobs:
       - name: Install the generated surface
         run: |
           rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
-          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+          archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+          if [ "$RUNNER_OS" = Windows ]; then archive="$(cygpath -u "$archive")"; fi
+          tar -xzf "$archive"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with: { node-version: '22', cache: 'pnpm' }
