@@ -29,7 +29,7 @@
 // non-Hermes target gets a named refusal instead of an undefined `_sh_*`
 // symbol at link time.
 
-import { access, readFile, rm, writeFile } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { extensionPlatform, readDefoldBundleTargets, readNativeArtifactManifest } from "./toolchains.mjs";
@@ -119,15 +119,12 @@ function parseIgnoreFile(text) {
  *
  * Idempotent in both directions, and it never deletes the materialised unit: a
  * web build hides it, and the next Hermes build reveals the same files again.
- * The exclusion is written only when there is something to exclude, and the
- * `.defignore` itself is removed when this entry was its only content, so a
- * project that never assembled a unit is left exactly as it was.
+ * The `.defignore` itself is removed when this entry was its only content, so
+ * the default state of a project is no file rather than an empty one.
  */
 export async function reconcileTypedNativeUpload(options) {
   const projectRoot = path.resolve(options.projectRoot);
   const disposition = await typedNativeDisposition(options.platform);
-  const materialised = await access(path.join(projectRoot, TYPED_NATIVE_EXTENSION))
-    .then(() => true, () => false);
   const defignore = path.join(projectRoot, ".defignore");
   let existing;
   try {
@@ -137,11 +134,10 @@ export async function reconcileTypedNativeUpload(options) {
   }
   const lines = existing === undefined ? [] : parseIgnoreFile(existing);
   const present = lines.some((line) => line.trim() === TYPED_NATIVE_IGNORE_ENTRY);
-  const wanted = !disposition.eligible && materialised;
+  const wanted = !disposition.eligible;
   const result = {
     ...disposition,
     defignore,
-    materialised,
     ignored: wanted,
     changed: present !== wanted,
     message: ""
@@ -149,9 +145,7 @@ export async function reconcileTypedNativeUpload(options) {
   if (present === wanted) {
     result.message = wanted
       ? `${TYPED_NATIVE_EXTENSION} stays excluded from the ${disposition.platform} upload (${disposition.code})`
-      : materialised
-        ? `${TYPED_NATIVE_EXTENSION} is uploadable for ${disposition.platform} (runtime ${disposition.runtimeId})`
-        : `no ${TYPED_NATIVE_EXTENSION} is materialised in this project`;
+      : `${TYPED_NATIVE_EXTENSION} is uploadable for ${disposition.platform} (runtime ${disposition.runtimeId})`;
     return result;
   }
   if (wanted) {

@@ -4,8 +4,8 @@
   "transport": "typed-native",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "inputHashes": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "356badf21c8a415d13b21dc368bc391e5f851fe29d80148d4ee6f127f4e7fcd3",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "bdd64114c6521fe278e3db4d649007cd5fa5f420dcae33ac9765ba27e5765df2"
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "812f8cd6ae3342f996aef64a45842a96b930f257cd6259a7acee73ef5be87235",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "3c95de321a340bed655f7671861c056d0c6ec1d085fefd9e23563994f32efd22"
   },
   "planTypedNativeEmit": 325,
   "claimedRouteCount": 320,
@@ -1641,7 +1641,7 @@
     }
   ],
   "generatedSha256": {
-    "typescript": "1ddbfc42f12008f141879f95a5eea7e1a97f6e41431ecf197d1e06654983abf8"
+    "typescript": "71a5383a4fa616f7014358600d0c546fe2c6cb65038be836ae44cf3b2633cb3b"
   },
   "evidenceBoundary": {
     "routeSelection": "derived-from-the-canonical-lowering-plan",
@@ -1650,5 +1650,5 @@
     "linkage": "not-claimed",
     "runtime": "not-claimed"
   },
-  "reportSha256": "71db8b5be4d2e436afafe218af2de6c8e02f916b380ade6800797e61d6ab6cf1"
+  "reportSha256": "61d90f5e8ed2305865a488a41f0aef445a97a65200f970f37587a3208f621b9a"
 }

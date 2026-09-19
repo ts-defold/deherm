@@ -7,13 +7,12 @@
 // Bob walks it.
 
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import {
-  TYPED_NATIVE_EXTENSION,
   TYPED_NATIVE_IGNORE_ENTRY,
   TYPED_NATIVE_REFUSAL_CODE,
   defoldTargetRuntime,
@@ -21,10 +20,8 @@ import {
   typedNativeDisposition
 } from "../packages/cli/src/typed-native.mjs";
 
-async function project({ materialised = true } = {}) {
-  const root = await mkdtemp(path.join(tmpdir(), "deherm-typed-native."));
-  if (materialised) await mkdir(path.join(root, TYPED_NATIVE_EXTENSION, "src"), { recursive: true });
-  return root;
+async function project() {
+  return mkdtemp(path.join(tmpdir(), "deherm-typed-native."));
 }
 
 test("every web bundle target runs the browser runtime and every other one runs Hermes", async () => {
@@ -72,21 +69,6 @@ test("a web build hides an already materialised unit and a Hermes build reveals 
     assert.equal(restored.changed, true);
     // The default state of a project is no file at all, not an empty one.
     await assert.rejects(() => readFile(defignore, "utf8"), { code: "ENOENT" });
-  } finally {
-    await rm(root, { recursive: true, force: true });
-  }
-});
-
-test("a project with no materialised unit is left exactly as it was", async () => {
-  // There is nothing to hide, so a web build must not invent a .defignore in a
-  // project that never assembled a unit.
-  const root = await project({ materialised: false });
-  try {
-    const result = await reconcileTypedNativeUpload({ projectRoot: root, platform: "wasm-web" });
-    assert.equal(result.materialised, false);
-    assert.equal(result.ignored, false);
-    assert.equal(result.changed, false);
-    await assert.rejects(() => readFile(path.join(root, ".defignore"), "utf8"), { code: "ENOENT" });
   } finally {
     await rm(root, { recursive: true, force: true });
   }
