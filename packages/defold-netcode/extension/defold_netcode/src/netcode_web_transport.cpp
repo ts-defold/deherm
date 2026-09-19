@@ -17,7 +17,10 @@
 
 extern "C" {
 
-// Implemented in lib/web/library_defold_netcode.js.
+// Implemented in lib/web/library_defold_netcode.js. The deherm_netcode_web_*
+// entry points these back are declared in defold_netcode.h under the same
+// DM_PLATFORM_HTML5 guard, so the definitions below are checked against their
+// declarations rather than silently diverging from them.
 extern int defoldNetcodeWebConnect(const char* url);
 extern int defoldNetcodeWebIsOpen(void);
 extern uint32_t defoldNetcodeWebMaxDatagramSize(void);

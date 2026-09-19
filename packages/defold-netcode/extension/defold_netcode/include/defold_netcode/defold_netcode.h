@@ -219,6 +219,47 @@ int32_t deherm_netcode_generate_connect_token(const char* server_address, uint64
                                               const uint8_t* user_data, int32_t user_data_bytes,
                                               uint8_t* out_token, int32_t out_token_bytes);
 
+// ---------------------------------------------------------------------------
+// HTML5: the WebTransport datagram channel
+// ---------------------------------------------------------------------------
+//
+// Declared only under DM_PLATFORM_HTML5 because that is the only target where
+// they are defined - netcode_web_transport.cpp is entirely behind the same
+// guard, since Extender compiles every src/ file for every target and an
+// ext.manifest cannot exclude a platform. A caller that reaches for these on a
+// native target gets a compile error naming the function, which is a better
+// failure than a link error naming a mangled symbol.
+
+#if defined(DM_PLATFORM_HTML5)
+
+// Opens a WebTransport session. Returns immediately - the handshake is
+// asynchronous in the browser and a Defold update cannot block on a promise -
+// so poll `deherm_netcode_web_is_open` before expecting datagrams to move.
+int32_t deherm_netcode_web_connect(const char* url);
+int32_t deherm_netcode_web_is_open(void);
+
+// The session's own datagram limit. Worth checking against
+// DEHERM_NETCODE_CONNECT_TOKEN_BYTES: netcode's payload packets fit a typical
+// QUIC datagram, but its connection request carries a 2048-byte connect token,
+// and a path that cannot carry that cannot complete a handshake. Surfacing the
+// number turns that from an unexplained timeout into a diagnosable condition.
+uint32_t deherm_netcode_web_max_datagram_size(void);
+
+void deherm_netcode_web_close(void);
+
+// One frame of the channel. Call AFTER deherm_netcode_client_update: that is
+// when netcode has finished writing what it wants sent. Returns the number of
+// datagrams moved, or a negative DEHERM_NETCODE_ERR_*.
+int32_t deherm_netcode_web_pump(uint32_t client);
+
+// Six int32 counters, in order: datagrams sent, received, dropped for being
+// larger than the path allows, dropped because the inbound queue was full,
+// write errors, and the current inbound queue depth. The caller supplies the
+// array; nothing is allocated.
+void deherm_netcode_web_stats(int32_t* out_six_counters);
+
+#endif  // DM_PLATFORM_HTML5
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
