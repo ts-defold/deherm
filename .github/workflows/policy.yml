@@ -293,7 +293,10 @@ jobs:
         continue-on-error: true
         run: |
           bash scripts/bootstrap-bob.sh
-          pnpm artifacts:pull
+          # This runner executes the x86_64 Linux driver. Pulling every bundle
+          # target made engine evidence depend on unrelated iOS/Android/Windows
+          # publication and downloaded hundreds of megabytes it could not use.
+          node scripts/manage-native-artifacts.mjs pull --target x86_64-linux
           pnpm configure:native
           node scripts/check-headless-conformance.mjs
       - name: Derive and report per-route verification
@@ -317,6 +320,36 @@ jobs:
             packages/bindings/generated/defold-route-verification.json
             packages/bindings/generated/defold-headless-conformance-report.json
           if-no-files-found: ignore
+      - name: Open or update per-route verification issues
+        if: >-
+          always() &&
+          github.repository == 'ts-defold/deherm' &&
+          github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          report=packages/bindings/generated/defold-route-verification.json
+          [ -f "$report" ] || exit 0
+          # Never materialize issues from a committed/stale report when this
+          # run could not derive the current evidence artifact.
+          node scripts/generate-route-verification.mjs --check || exit 0
+          existing="$RUNNER_TEMP/route-verification-issues.json"
+          gh issue list --state all --limit 1000 --search 'in:title "route verification:"' \
+            --json number,title,state,body,url > "$existing"
+          jq -c '.wantsIssue[]' "$report" | while IFS= read -r row; do
+            title="$(jq -r '.issue.title' <<< "$row")"
+            body="$(jq -r '.issue.body' <<< "$row")"
+            number="$(jq -r --arg title "$title" '.[] | select(.title == $title) | .number' "$existing" | head -n1)"
+            if [ -z "$number" ]; then
+              gh issue create --title "$title" --body "$body"
+              continue
+            fi
+            state="$(jq -r --argjson number "$number" '.[] | select(.number == $number) | .state' "$existing")"
+            current="$(jq -r --argjson number "$number" '.[] | select(.number == $number) | .body' "$existing")"
+            if [ "$state" = CLOSED ]; then gh issue reopen "$number"; fi
+            if [ "$current" != "$body" ]; then gh issue edit "$number" --body "$body"; fi
+          done
       - name: Open or update the real-engine evidence issue
         if: >-
           always() &&
@@ -389,3 +422,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" --silent
+
+  consumer-smoke:
+    name: Resolve published policy and generate a clean project
+    needs: [derive, publish-site]
+    if: needs.publish-site.result == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v5
+        with:
+          name: policy-surface
+          path: ${{ runner.temp }}/policy-surface
+      - name: Install the exact published surface
+        run: |
+          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Wait for Pages and resolve the public content-addressed store
+        run: node scripts/check-published-policy.mjs
+      - name: Scaffold, generate and typecheck as an npm consumer
+        run: node scripts/check-end-to-end.mjs --stage scaffold --stage generate

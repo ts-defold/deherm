@@ -22,6 +22,7 @@ import {
   serializeObject
 } from "../packages/compiler/src/api-policy.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
+import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -47,6 +48,25 @@ test("policy host parity materializes every authoritative generator input", asyn
   }
   assert.match(publish, /needs: \[derive, host-parity\]/u);
   assert.match(publish, /needs\.host-parity\.result == 'success'/u);
+  assert.match(workflow, /manage-native-artifacts\.mjs pull --target x86_64-linux/u);
+  assert.doesNotMatch(workflow, /pnpm artifacts:pull/u);
+  assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
+  assert.match(workflow, /check-published-policy\.mjs/u);
+});
+
+test("published smoke waits for the exact derived entries at the configured site", () => {
+  const expected = {
+    base: { url: "https://example.test/deherm/", pathPrefix: "policies", layoutVersion: "v1" },
+    entries: [{ defoldRevision: "a", policyRoot: "root-a", generator: "gen-a" }]
+  };
+  assert.equal(manifestUrl(expected), "https://example.test/deherm/policies/v1/index/manifest.json");
+  assert.deepEqual(missingPublishedEntries(expected, { entries: [] }), expected.entries);
+  assert.deepEqual(missingPublishedEntries(expected, {
+    entries: [{ defoldRevision: "a", policyRoot: "root-a", generator: "gen-a" }]
+  }), []);
+  assert.deepEqual(missingPublishedEntries(expected, {
+    entries: [{ defoldRevision: "a", policyRoot: "wrong", generator: "gen-a" }]
+  }), expected.entries);
 });
 
 // A deliberately tiny stand-in for the generated state, so the structural

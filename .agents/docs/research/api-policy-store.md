@@ -143,7 +143,10 @@ together with the index.
 # CI
 
 `.github/workflows/policy.yml` owns discovery, derivation, cross-host parity,
-real-engine evidence, and publication in one visible graph. It reads
+real-engine evidence, publication, and the post-publication consumer smoke in
+one visible graph. The smoke waits for the public Pages manifest to contain the
+exact derived roots, resolves and hashes the public objects, then scaffolds,
+generates, and typechecks a clean project. It reads
 `https://d.defold.com/<channel>/info.json` for the tracked channels each day. A
 channel whose sha is already indexed derives and publishes **nothing**. A new
 sha is pinned in a scratch workspace with the digests the immutable archive
@@ -153,17 +156,11 @@ pull requests; an authoritative Defold revision does not wait in a review queue.
 
 # Open boundaries
 
-* **The dmSDK IR is host-clang dependent.** `scripts/import-defold-sdk.py`
-  parses public headers with whatever `clang++` is on the host and labels its
-  output `arm64-macos` unconditionally. Two hosts can therefore derive two
-  different policies for one revision. The scheduled job runs on an arm64 macOS
-  runner to match the label, and its pull request says to compare the policy root
-  against a local derivation - but the real fix is for that generator to record
-  and pin its own toolchain, which is the same class of problem this policy
-  solves for Defold's pins.
-* **The dmSDK IR leaks the absolute checkout path** into anonymous-record names
-  (six occurrences). The policy normalizes them out, but the underlying artifact
-  is still a function of where the repository was cloned.
+* **The dmSDK declaration parse is target-neutral but still compiler-sensitive.**
+  Its target triple, sysroot, predefines, checkout-path normalization, and
+  cross-host byte parity are explicit and tested. Pinning the exact Clang binary
+  would further narrow the trust boundary; until then Linux, macOS, and Windows
+  must reproduce the canonical bytes before publication.
 * **Layers 1 and 2 are not built.** This is layer 0 only: one engine revision's
   surface. Extension policies keyed by archive content hash, and the Murmur2-64A
   cache keys that decide whether to reparse, remain future work.

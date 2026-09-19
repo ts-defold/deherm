@@ -57,10 +57,13 @@ derive each missing revision on Linux, accumulating one policy store
         v                             v
 reproduce canonical bytes       compile, link, and execute
 on Linux/macOS/Windows          generated routes in real Defold
-        |                             |
-        v                             +----> record evidence/issues
-publish every usable policy and its evidence
-to the deherm-policy-site branch; request Pages build
+        |                             +----> record evidence/issues
+        v
+publish every usable policy to deherm-policy-site; request Pages build
+        |
+        v
+resolve the public site, verify content hashes, scaffold a clean project,
+generate its SDK, and typecheck every TypeScript script context
 ```
 
 Publication waits for Linux, macOS, and Windows to reproduce the canonical
@@ -71,6 +74,16 @@ execution remains additive evidence: it runs in parallel, reports and opens or
 updates issues, but does not withhold a coherent policy. The workflow never
 waits for a review PR. Pull requests remain useful for generator code changes,
 not as a checkpoint for mechanically derived engine revisions.
+
+The consumer smoke is deliberately after publication and resolves
+`https://ts-defold.dev/deherm`; the local relocation/tamper test is not accepted
+as evidence that Pages deployed the new bytes. It waits for the public manifest
+to name the exact derived roots, verifies every fetched object against its
+content-addressed path, and then dogfoods the installed CLI's scaffold,
+generation, and typechecking flow. Full Bob builds remain downstream of the
+native-artifact workflow, because a policy is allowed to publish before a new
+platform archive fingerprint finishes building. The artifact workflow dispatches
+that all-target gate only after every immutable release row exists.
 
 # Per-revision algorithm
 
@@ -111,6 +124,14 @@ Status is additive evidence, not an allow-list:
 `suspect` and `unproven` entries remain usable. They carry generated
 documentation annotations and deterministic issue links. Repeated nightlies
 update the existing issue instead of opening duplicates.
+
+The deterministic link is a title-keyed repository issue lookup embedded in
+the route-verification artifact. The engine-evidence job materializes that
+contract: it lists the existing route-verification issues once, creates every
+missing `suspect` or `unproven` issue, reopens a matching closed issue if the
+finding recurs, and edits its generated body only when the evidence changed.
+Profile, context, destructive-effect and runtime-producer blockers remain
+harness notes and do not open route issues.
 
 # Failure policy
 
