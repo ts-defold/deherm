@@ -249,6 +249,7 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
   // Linux C++ headers, and Hermes' first `<atomic>` probe fails. These are the
   // environment-owned roots in Defold's Extender win32 `systemIncludes`.
   for (const suffix of [
+    "$ENV{CLANG_RESOURCE_DIR}/include",
     "$ENV{WINDOWS_MSVC_DIR}/include",
     "$ENV{WINDOWS_MSVC_DIR}/atlmfc/include",
     "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/ucrt",
@@ -258,6 +259,10 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
   ]) {
     assert.match(source, new RegExp(suffix.replace(/[{}$]/g, "\\$&")));
   }
+  assert.ok(
+    source.indexOf("$ENV{CLANG_RESOURCE_DIR}/include") < source.indexOf("$ENV{WINDOWS_MSVC_DIR}/include"),
+    "Clang's intrinsic headers must precede MSVC's, exactly as they do in Defold's win32 systemIncludes"
+  );
   assert.match(source, /-nostdinc\+\+/);
   assert.match(source, /"-D_WINDOWS -DDM_PLATFORM_WINDOWS/);
   assert.match(source, /if\(NOT IS_DIRECTORY "\$\{include_root\}"\)/);

@@ -13,13 +13,14 @@ set(CMAKE_ASM_COMPILER_TARGET x86_64-pc-win32-msvc)
 # that state while the first standard-library probe (`<atomic>`) silently falls
 # back to the Linux C++ headers and fails.  Keep this list in the same order as
 # Defold's authoritative win32 `systemIncludes` in extender/build.yml.
-foreach(required_environment WINDOWS_MSVC_DIR WINDOWS_SDK_DIR WINDOWS_SDK_VERSION)
+foreach(required_environment CLANG_RESOURCE_DIR WINDOWS_MSVC_DIR WINDOWS_SDK_DIR WINDOWS_SDK_VERSION)
   if("$ENV{${required_environment}}" STREQUAL "")
     message(FATAL_ERROR "The Defold Extender image must define ${required_environment}")
   endif()
 endforeach()
 
 set(DEHERM_WINDOWS_SYSTEM_INCLUDES
+  "$ENV{CLANG_RESOURCE_DIR}/include"
   "$ENV{WINDOWS_MSVC_DIR}/include"
   "$ENV{WINDOWS_MSVC_DIR}/atlmfc/include"
   "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/ucrt"
