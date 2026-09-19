@@ -18,11 +18,11 @@
       "sdkStackHelpers": 29,
       "bodyDerivedStackHelpers": 254,
       "namedUserTypes": 17,
-      "registrationEntryPoints": 41,
+      "registrationEntryPoints": 53,
       "registeredNamespaces": 51,
       "registeredRoutes": 924,
       "registeredRoutesInDeclaredNamespaces": 886,
-      "registeredConstants": 433,
+      "registeredConstants": 434,
       "commentedOutRegistrations": 2,
       "declaredRoutes": 926,
       "registeredAndDeclared": 867,
@@ -36,7 +36,7 @@
       "parameterSlotsCompared": 1508,
       "parameterSlotsDisagreeing": 206,
       "parameterSlotsUndecided": 543,
-      "blockers": 152,
+      "blockers": 171,
       "blockedRoutes": 110
     },
     "defold-engine-box2d-v2": {
@@ -45,11 +45,11 @@
       "sdkStackHelpers": 29,
       "bodyDerivedStackHelpers": 237,
       "namedUserTypes": 16,
-      "registrationEntryPoints": 41,
+      "registrationEntryPoints": 53,
       "registeredNamespaces": 51,
       "registeredRoutes": 836,
       "registeredRoutesInDeclaredNamespaces": 798,
-      "registeredConstants": 440,
+      "registeredConstants": 441,
       "commentedOutRegistrations": 4,
       "declaredRoutes": 926,
       "registeredAndDeclared": 793,
@@ -63,7 +63,7 @@
       "parameterSlotsCompared": 1409,
       "parameterSlotsDisagreeing": 203,
       "parameterSlotsUndecided": 491,
-      "blockers": 156,
+      "blockers": 175,
       "blockedRoutes": 116
     },
     "extension-defold-xmath": {
@@ -106,11 +106,11 @@
         "sdkStackHelpers": 29,
         "bodyDerivedStackHelpers": 254,
         "namedUserTypes": 17,
-        "registrationEntryPoints": 41,
+        "registrationEntryPoints": 53,
         "registeredNamespaces": 51,
         "registeredRoutes": 924,
         "registeredRoutesInDeclaredNamespaces": 886,
-        "registeredConstants": 433,
+        "registeredConstants": 434,
         "commentedOutRegistrations": 2,
         "declaredRoutes": 926,
         "registeredAndDeclared": 867,
@@ -124,12 +124,12 @@
         "parameterSlotsCompared": 1508,
         "parameterSlotsDisagreeing": 206,
         "parameterSlotsUndecided": 543,
-        "blockers": 152,
+        "blockers": 171,
         "blockedRoutes": 110
       },
       "blockerHistogram": {
-        "ambiguous-registration-callee": 4,
-        "anonymous-registration-without-table": 1,
+        "ambiguous-registration-callee": 9,
+        "anonymous-registration-without-table": 7,
         "argument-slot-without-stack-access": 23,
         "declared-module-never-registered": 21,
         "duplicate-registration": 3,
@@ -138,7 +138,7 @@
         "undecided-result-arity": 43,
         "unknown-registration-array": 1,
         "unresolved-helper-overload": 1,
-        "unresolved-module-name": 1,
+        "unresolved-module-name": 9,
         "unresolved-registration-argument": 1,
         "unresolved-registration-name": 7
       },
@@ -146,7 +146,7 @@
         "<globals>": {
           "declared": false,
           "registeredRoutes": 6,
-          "registeredConstants": 3,
+          "registeredConstants": 4,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 0
         },
@@ -664,6 +664,46 @@
           "name": "base_open"
         },
         {
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 648,
+          "name": "luaopen_base"
+        },
+        {
+          "path": "lua/src/lua/ldblib.c",
+          "line": 393,
+          "name": "luaopen_debug"
+        },
+        {
+          "path": "lua/src/lua/liolib.c",
+          "line": 538,
+          "name": "luaopen_io"
+        },
+        {
+          "path": "lua/src/lua/lmathlib.c",
+          "line": 251,
+          "name": "luaopen_math"
+        },
+        {
+          "path": "lua/src/lua/loadlib.c",
+          "line": 631,
+          "name": "luaopen_package"
+        },
+        {
+          "path": "lua/src/lua/loslib.c",
+          "line": 253,
+          "name": "luaopen_os"
+        },
+        {
+          "path": "lua/src/lua/lstrlib.c",
+          "line": 860,
+          "name": "luaopen_string"
+        },
+        {
+          "path": "lua/src/lua/ltablib.c",
+          "line": 283,
+          "name": "luaopen_table"
+        },
+        {
           "path": "profiler/src/profiler.cpp",
           "line": 952,
           "name": "InitializeProfiler"
@@ -684,14 +724,34 @@
           "name": "luaopen_bit"
         },
         {
+          "path": "script/src/luacjson/lua_cjson.c",
+          "line": 1834,
+          "name": "luaopen_cjson"
+        },
+        {
+          "path": "script/src/luacjson/lua_cjson.c",
+          "line": 1848,
+          "name": "luaopen_cjson_safe"
+        },
+        {
           "path": "script/src/luasocket/luasocket.c",
           "line": 92,
           "name": "base_open"
         },
         {
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 121,
+          "name": "luaopen_socket_core"
+        },
+        {
           "path": "script/src/luasocket/luasocket_html5.c",
           "line": 126,
           "name": "base_open"
+        },
+        {
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 150,
+          "name": "luaopen_socket_core"
         },
         {
           "path": "script/src/luasocket/mime.c",
@@ -732,6 +792,11 @@
       "stackBalancedCallees": [
         "lua/src/lua/lauxlib.c:112 luaL_newmetatable",
         "lua/src/lua/lbaselib.c:618 auxopen",
+        "lua/src/lua/liolib.c:511 createmeta",
+        "lua/src/lua/liolib.c:519 createstdfile",
+        "lua/src/lua/liolib.c:531 newfenv",
+        "lua/src/lua/loadlib.c:592 setpath",
+        "lua/src/lua/lstrlib.c:845 createmetatable",
         "script/src/script.cpp:782 RegisterUserType"
       ],
       "routes": [
@@ -83605,6 +83670,15 @@
           "line": 568
         },
         {
+          "name": "cjson",
+          "module": "",
+          "member": "cjson",
+          "valueKind": null,
+          "expression": "-1",
+          "path": "script/src/luacjson/lua_cjson.c",
+          "line": 1834
+        },
+        {
           "name": "collectionfactory.STATUS_LOADED",
           "module": "collectionfactory",
           "member": "STATUS_LOADED",
@@ -87224,6 +87298,41 @@
         },
         {
           "code": "ambiguous-registration-callee",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 648,
+          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 121,
+          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 121,
+          "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 150,
+          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 150,
+          "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
           "path": "script/src/script.cpp",
           "line": 198,
           "detail": "call to 'InitializeHtml5' resolves to 2 definitions: script/src/script_html5.cpp:23, script/src/script_html5_js.cpp:201",
@@ -87231,9 +87340,51 @@
         },
         {
           "code": "anonymous-registration-without-table",
-          "path": "script/src/script_hash.cpp",
-          "line": 415,
-          "detail": "luaL_openlib registers 'ScriptHash_methods' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "path": "lua/src/lua/loadlib.c",
+          "line": 620,
+          "detail": "luaL_register registers 'll_funcs' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/except.c",
+          "line": 22,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 85,
+          "detail": "luaL_openlib registers 'unsupported' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/select.c",
+          "line": 28,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/tcp.c",
+          "line": 92,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/timeout.c",
+          "line": 36,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/udp.c",
+          "line": 111,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
           "route": null
         },
         {
@@ -88204,6 +88355,62 @@
         },
         {
           "code": "unresolved-module-name",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 648,
+          "detail": "luaL_register module name 'LUA_COLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/ldblib.c",
+          "line": 393,
+          "detail": "luaL_register module name 'LUA_DBLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/liolib.c",
+          "line": 538,
+          "detail": "luaL_register module name 'LUA_IOLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/lmathlib.c",
+          "line": 251,
+          "detail": "luaL_register module name 'LUA_MATHLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/loadlib.c",
+          "line": 631,
+          "detail": "luaL_register module name 'LUA_LOADLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/loslib.c",
+          "line": 253,
+          "detail": "luaL_register module name 'LUA_OSLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/lstrlib.c",
+          "line": 860,
+          "detail": "luaL_register module name 'LUA_STRLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/ltablib.c",
+          "line": 283,
+          "detail": "luaL_register module name 'LUA_TABLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
           "path": "script/src/script.cpp",
           "line": 782,
           "detail": "luaL_register module name 'name' is neither a string literal nor a null pointer",
@@ -88299,11 +88506,11 @@
         "sdkStackHelpers": 29,
         "bodyDerivedStackHelpers": 237,
         "namedUserTypes": 16,
-        "registrationEntryPoints": 41,
+        "registrationEntryPoints": 53,
         "registeredNamespaces": 51,
         "registeredRoutes": 836,
         "registeredRoutesInDeclaredNamespaces": 798,
-        "registeredConstants": 440,
+        "registeredConstants": 441,
         "commentedOutRegistrations": 4,
         "declaredRoutes": 926,
         "registeredAndDeclared": 793,
@@ -88317,12 +88524,12 @@
         "parameterSlotsCompared": 1409,
         "parameterSlotsDisagreeing": 203,
         "parameterSlotsUndecided": 491,
-        "blockers": 156,
+        "blockers": 175,
         "blockedRoutes": 116
       },
       "blockerHistogram": {
-        "ambiguous-registration-callee": 4,
-        "anonymous-registration-without-table": 1,
+        "ambiguous-registration-callee": 9,
+        "anonymous-registration-without-table": 7,
         "argument-slot-without-stack-access": 23,
         "declared-module-never-registered": 40,
         "duplicate-registration": 3,
@@ -88331,7 +88538,7 @@
         "undecided-result-arity": 43,
         "unknown-registration-array": 1,
         "unresolved-helper-overload": 1,
-        "unresolved-module-name": 1,
+        "unresolved-module-name": 9,
         "unresolved-registration-argument": 1,
         "unresolved-registration-name": 7
       },
@@ -88339,7 +88546,7 @@
         "<globals>": {
           "declared": false,
           "registeredRoutes": 6,
-          "registeredConstants": 3,
+          "registeredConstants": 4,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 0
         },
@@ -88857,6 +89064,46 @@
           "name": "base_open"
         },
         {
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 648,
+          "name": "luaopen_base"
+        },
+        {
+          "path": "lua/src/lua/ldblib.c",
+          "line": 393,
+          "name": "luaopen_debug"
+        },
+        {
+          "path": "lua/src/lua/liolib.c",
+          "line": 538,
+          "name": "luaopen_io"
+        },
+        {
+          "path": "lua/src/lua/lmathlib.c",
+          "line": 251,
+          "name": "luaopen_math"
+        },
+        {
+          "path": "lua/src/lua/loadlib.c",
+          "line": 631,
+          "name": "luaopen_package"
+        },
+        {
+          "path": "lua/src/lua/loslib.c",
+          "line": 253,
+          "name": "luaopen_os"
+        },
+        {
+          "path": "lua/src/lua/lstrlib.c",
+          "line": 860,
+          "name": "luaopen_string"
+        },
+        {
+          "path": "lua/src/lua/ltablib.c",
+          "line": 283,
+          "name": "luaopen_table"
+        },
+        {
           "path": "profiler/src/profiler.cpp",
           "line": 952,
           "name": "InitializeProfiler"
@@ -88877,14 +89124,34 @@
           "name": "luaopen_bit"
         },
         {
+          "path": "script/src/luacjson/lua_cjson.c",
+          "line": 1834,
+          "name": "luaopen_cjson"
+        },
+        {
+          "path": "script/src/luacjson/lua_cjson.c",
+          "line": 1848,
+          "name": "luaopen_cjson_safe"
+        },
+        {
           "path": "script/src/luasocket/luasocket.c",
           "line": 92,
           "name": "base_open"
         },
         {
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 121,
+          "name": "luaopen_socket_core"
+        },
+        {
           "path": "script/src/luasocket/luasocket_html5.c",
           "line": 126,
           "name": "base_open"
+        },
+        {
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 150,
+          "name": "luaopen_socket_core"
         },
         {
           "path": "script/src/luasocket/mime.c",
@@ -88925,6 +89192,11 @@
       "stackBalancedCallees": [
         "lua/src/lua/lauxlib.c:112 luaL_newmetatable",
         "lua/src/lua/lbaselib.c:618 auxopen",
+        "lua/src/lua/liolib.c:511 createmeta",
+        "lua/src/lua/liolib.c:519 createstdfile",
+        "lua/src/lua/liolib.c:531 newfenv",
+        "lua/src/lua/loadlib.c:592 setpath",
+        "lua/src/lua/lstrlib.c:845 createmetatable",
         "script/src/script.cpp:782 RegisterUserType"
       ],
       "routes": [
@@ -166262,6 +166534,15 @@
           "line": 568
         },
         {
+          "name": "cjson",
+          "module": "",
+          "member": "cjson",
+          "valueKind": null,
+          "expression": "-1",
+          "path": "script/src/luacjson/lua_cjson.c",
+          "line": 1834
+        },
+        {
           "name": "collectionfactory.STATUS_LOADED",
           "module": "collectionfactory",
           "member": "STATUS_LOADED",
@@ -169901,6 +170182,41 @@
         },
         {
           "code": "ambiguous-registration-callee",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 648,
+          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 121,
+          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 121,
+          "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 150,
+          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 150,
+          "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
+          "route": null
+        },
+        {
+          "code": "ambiguous-registration-callee",
           "path": "script/src/script.cpp",
           "line": 198,
           "detail": "call to 'InitializeHtml5' resolves to 2 definitions: script/src/script_html5.cpp:23, script/src/script_html5_js.cpp:201",
@@ -169908,9 +170224,51 @@
         },
         {
           "code": "anonymous-registration-without-table",
-          "path": "script/src/script_hash.cpp",
-          "line": 415,
-          "detail": "luaL_openlib registers 'ScriptHash_methods' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "path": "lua/src/lua/loadlib.c",
+          "line": 620,
+          "detail": "luaL_register registers 'll_funcs' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/except.c",
+          "line": 22,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "line": 85,
+          "detail": "luaL_openlib registers 'unsupported' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/select.c",
+          "line": 28,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/tcp.c",
+          "line": 92,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/timeout.c",
+          "line": 36,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "route": null
+        },
+        {
+          "code": "anonymous-registration-without-table",
+          "path": "script/src/luasocket/udp.c",
+          "line": 111,
+          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
           "route": null
         },
         {
@@ -170906,6 +171264,62 @@
           "path": "script/src/script.cpp",
           "line": 617,
           "detail": "DoLuaPPrintTable(L, 1, &printer, printed_tables) matches no DoLuaPPrintTable overload taking 4 arguments"
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 648,
+          "detail": "luaL_register module name 'LUA_COLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/ldblib.c",
+          "line": 393,
+          "detail": "luaL_register module name 'LUA_DBLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/liolib.c",
+          "line": 538,
+          "detail": "luaL_register module name 'LUA_IOLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/lmathlib.c",
+          "line": 251,
+          "detail": "luaL_register module name 'LUA_MATHLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/loadlib.c",
+          "line": 631,
+          "detail": "luaL_register module name 'LUA_LOADLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/loslib.c",
+          "line": 253,
+          "detail": "luaL_register module name 'LUA_OSLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/lstrlib.c",
+          "line": 860,
+          "detail": "luaL_register module name 'LUA_STRLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
+        },
+        {
+          "code": "unresolved-module-name",
+          "path": "lua/src/lua/ltablib.c",
+          "line": 283,
+          "detail": "luaL_register module name 'LUA_TABLIBNAME' is neither a string literal nor a null pointer",
+          "route": null
         },
         {
           "code": "unresolved-module-name",

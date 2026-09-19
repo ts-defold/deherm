@@ -460,6 +460,11 @@ function parseRegistrationArrays(file) {
   return arrays;
 }
 
+// `mod[i].func(L)` - a call through a registration array element rather than a
+// named function. The index expression is whatever the loop uses; only the
+// array identifier and the `.func` member matter.
+const INDIRECT_DISPATCH = /\b([A-Za-z_]\w*)\s*\[[^\]]*\]\s*\.\s*func\s*\(/g;
+
 const FUNCTION_DEFINITION =
   /(^|[\s*&>])([A-Za-z_]\w*)\s*\(([^;{}()]*(?:\([^()]*\)[^;{}()]*)*)\)\s*(?:const\s*)?\{/g;
 
@@ -1102,6 +1107,7 @@ export function interpretRegistrations(project) {
     }
     const file = definition.file;
     const expanded = expandFunctionMacros(definition.code, file.macros);
+
     for (const call of callsIn(expanded)) {
       const args = splitArguments(call.argumentsText);
       const qualified = call.namespace ? `${call.namespace}::${call.name}` : call.name;
@@ -1297,7 +1303,10 @@ export function interpretRegistrations(project) {
       }
       const key = `${callee[0].path}#${callee[0].line}`;
       if (visited.has(key)) continue;
-      if (!/luaL_register|luaL_openlib|lua_register|lua_setfield|lua_setglobal|lua_newtable/.test(callee[0].code)) continue;
+      INDIRECT_DISPATCH.lastIndex = 0;
+      if (!/luaL_register|luaL_openlib|lua_register|lua_setfield|lua_setglobal|lua_newtable/.test(callee[0].code)
+          && !INDIRECT_DISPATCH.test(callee[0].code)) continue;
+      INDIRECT_DISPATCH.lastIndex = 0;
       visited.add(key);
       // Every Defold registration helper is stack balanced (DM_LUA_STACK_CHECK
       // or an explicit gettop assertion), so the callee gets its own view of
@@ -1307,9 +1316,58 @@ export function interpretRegistrations(project) {
       // parameters, can no longer desynchronise the namespaces above it.
       const inherited = [...stack];
       run(callee[0], inherited, visited, depth + 1);
-      if (inherited.length !== stack.length) balanceNotes.add(`${callee[0].path}:${callee[0].line} ${call.name}`);
+      if (inherited.length !== stack.length) {
+        balanceNotes.add(`${callee[0].path}:${callee[0].line} ${call.name}`);
+        // A callee that ends DEEPER than it started left something for its
+        // caller, and the C says so out loud: luasocket's `base_open` is
+        // commented "export functions (and leave namespace table on top of
+        // stack)" and its whole purpose is to hand the `socket` table up. The
+        // copy above exists so a generic helper cannot desynchronise the
+        // namespaces above it, which is right; but discarding a surplus makes
+        // every subsequent `luaL_openlib(L, NULL, ...)` in the caller's chain an
+        // anonymous registration with no table, which is how all sixteen
+        // socket.* routes went missing. Propagate what the callee actually
+        // left, and only the surplus.
+        for (const entry of inherited.slice(stack.length)) stack.push(entry);
+      }
       visited.delete(key);
     }
+    // Indirect dispatch through a registration array, AFTER the named calls.
+    //
+    // Order matters and is why this runs last: `luaopen_socket_core` calls
+    // `base_open(L)` - which creates the `socket` table and leaves it on the
+    // stack - and only then dispatches. Running the dispatch first reaches
+    // every opener with an empty stack, and each one's
+    // `luaL_openlib(L, NULL, ...)` becomes `anonymous-registration-without-table`.
+    //
+    // LuaSocket opens its sub-modules as
+    //   static const luaL_Reg mod[] = {{"tcp", tcp_open}, {"udp", udp_open}, ...};
+    //   for (i = 0; mod[i].name; i++) mod[i].func(L);
+    // so every socket.tcp / socket.udp / socket.select route is registered by a
+    // function this walk otherwise never reaches - the call site has no name of
+    // its own, so `callsIn` sees only `func(`.
+    //
+    // The array's NAMES are not route names here and must not be read as one:
+    // `{"auxiliar", auxiliar_open}` registers no Lua function at all, and
+    // `{"tcp", tcp_open}` registers three (tcp, tcp6, connect). What the array
+    // IS, is a list of callees, each registering into whatever table is on the
+    // stack through `luaL_openlib(L, NULL, ...)`. So follow each entry's
+    // function exactly as a named call is followed, inheriting this stack.
+    INDIRECT_DISPATCH.lastIndex = 0;
+    for (const dispatch of expanded.matchAll(INDIRECT_DISPATCH)) {
+      for (const record of project.arraysByName.get(dispatch[1]) ?? []) {
+        for (const entry of record.entries) {
+          const target = project.functionsByName.get(entry.cFunction);
+          if (!target || target.length !== 1) continue;
+          const targetKey = `${target[0].path}#${target[0].line}`;
+          if (visited.has(targetKey)) continue;
+          visited.add(targetKey);
+          run(target[0], [...stack], visited, depth + 1);
+          visited.delete(targetKey);
+        }
+      }
+    }
+
   }
 
   const candidates = [];
@@ -1317,7 +1375,19 @@ export function interpretRegistrations(project) {
   for (const file of project.files) {
     for (const definitions of file.functions.values()) {
       for (const definition of definitions) {
-        if (!/luaL_register|luaL_openlib|lua_register|lua_setglobal/.test(definition.code)) continue;
+        // `luaopen_<module>` is Lua's own convention for a module entry point -
+        // it is what `require` and `luaL_openlib` call - so a function with that
+        // name registers a module whether or not its own body contains a literal
+        // registration. LuaSocket's does not: `luaopen_socket_core` calls
+        // `base_open(L)` for the namespace table and then dispatches its
+        // sub-module openers through `mod[i].func(L)`, so under a
+        // literal-registration-only rule nothing here was ever an entry point
+        // and every socket.* route went missing.
+        const isLuaOpen = /^luaopen_\w+$/.test(definition.name ?? "");
+        if (!isLuaOpen &&
+            !/luaL_register|luaL_openlib|lua_register|lua_setglobal/.test(definition.code) &&
+            !INDIRECT_DISPATCH.test(definition.code)) continue;
+        INDIRECT_DISPATCH.lastIndex = 0;
         const expanded = expandFunctionMacros(definition.code, file.macros);
         registrationCapable.push({ definition, expanded });
         const hasLiteralRegistration = callsIn(expanded).some((call) => {
@@ -1325,7 +1395,7 @@ export function interpretRegistrations(project) {
           if (call.name !== "luaL_register" && call.name !== "luaL_openlib") return false;
           return resolveStringValue(splitArguments(call.argumentsText)[1], file.macros) !== null;
         });
-        if (hasLiteralRegistration) candidates.push(definition);
+        if (hasLiteralRegistration || isLuaOpen) candidates.push(definition);
       }
     }
   }

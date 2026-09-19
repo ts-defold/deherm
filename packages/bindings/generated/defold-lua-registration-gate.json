@@ -8,7 +8,7 @@
     "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
   },
   "sourceReport": "packages/bindings/generated/defold-lua-registration-surface.json",
-  "sourceReportSha256": "0f90a905d7f7ab05beecfdf6c3387246faf0cd9235ad797abb5c078844dc66a9",
+  "sourceReportSha256": "af4fca39a4a763ec15b513908c35e5627d48c03f43c0fdd44b63ad7f2a6e0e86",
   "engineTargets": [
     "defold-engine-box2d-v2",
     "defold-engine-box2d-v3"

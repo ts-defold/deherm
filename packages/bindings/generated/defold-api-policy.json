@@ -4,12 +4,12 @@
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
   "generator": "sha256:66103c6c25e6ee9592efcdb8df6002359932a484e84cac1428e0a1fd40a54c19",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "c5fce301f5f760568aaab5bee2a17c2b006542b8d7676b776eb2a774ecdfe348",
+  "policyRoot": "c3b6d6cf4580e0021238bce983d95782cab61d5e78b992b641eef8fe26cb9e1b",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 55,
     "namespaces": 52,
-    "objectBytes": 7427017,
+    "objectBytes": 7437147,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -57,8 +57,8 @@
       "bytes": 643793
     },
     "@shared": {
-      "hash": "53c1000ccf26266dcb98ffbb4d20d81275513076be90a4c96e4da42d46ec19c3",
-      "bytes": 145233
+      "hash": "b48734c5dad530ebeb89551ed033becf0382e46213fd226d667e0e4f2dca70ee",
+      "bytes": 155363
     },
     "@toolchain": {
       "hash": "8e4a825f66ee1ba9bcdd7de931f3463054637ccef636b038ad909a4234e4b484",
