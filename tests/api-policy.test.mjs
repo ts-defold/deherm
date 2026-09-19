@@ -33,7 +33,12 @@ const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
 test("policy host parity materializes every authoritative generator input", async () => {
   const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
   const bootstrap = await readFile(path.join(repositoryRoot, "scripts/bootstrap-upstreams.sh"), "utf8");
-  const importer = await readFile(path.join(repositoryRoot, "scripts/import-defold-sdk.py"), "utf8");
+  const bobBootstrap = await readFile(path.join(repositoryRoot, "scripts/bootstrap-bob.sh"), "utf8");
+  const checksumHelper = await readFile(path.join(repositoryRoot, "scripts/lib/sha256.sh"), "utf8");
+  const importers = await Promise.all([
+    "scripts/import-defold-sdk.py",
+    "scripts/import-defold-script-api.py"
+  ].map(async (relative) => [relative, await readFile(path.join(repositoryRoot, relative), "utf8")]));
   const parity = workflow.slice(
     workflow.indexOf("  host-parity:"),
     workflow.indexOf("  engine-conformance:")
@@ -47,10 +52,16 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
   assert.match(engine, /bootstrap-upstreams\.sh defold hermes extender ref-doc defold-sdk/u);
   assert.match(engine, /key: defold-sdk-\$\{\{ steps\.defold-sdk\.outputs\.digest \}\}/u);
-  assert.match(bootstrap, /createHash\("sha256"\)/u);
-  assert.doesNotMatch(bootstrap, /\bshasum\b/u);
-  for (const line of importer.split("\n").filter((candidate) => /\.(?:read|write)_text\(/u.test(candidate))) {
-    assert.match(line, /encoding="utf-8"/u, `platform-default text codec in: ${line.trim()}`);
+  assert.match(checksumHelper, /deherm_require_node[\s\S]*command -v node/u);
+  assert.match(checksumHelper, /createHash\("sha256"\)/u);
+  for (const script of [bootstrap, bobBootstrap]) {
+    assert.match(script, /source "\$repo_root\/scripts\/lib\/sha256\.sh"/u);
+    assert.doesNotMatch(script, /\bshasum\b|createHash\("sha256"\)/u);
+  }
+  for (const [relative, importer] of importers) {
+    for (const line of importer.split("\n").filter((candidate) => /\.(?:read|write)_text\(/u.test(candidate))) {
+      assert.match(line, /encoding="utf-8"/u, `${relative}: platform-default text codec in: ${line.trim()}`);
+    }
   }
   assert.match(publish, /needs: \[derive, host-parity\]/u);
   assert.match(publish, /needs\.host-parity\.result == 'success'/u);

@@ -21,7 +21,7 @@ ANNOTATION = re.compile(r"^---@(?P<kind>class|field|enum|alias|param|return)\s*(
 
 
 def revision() -> str:
-    lock = (ROOT / "upstream.lock").read_text()
+    lock = (ROOT / "upstream.lock").read_text(encoding="utf-8")
     match = re.search(r"^DEFOLD_REV=(\w+)$", lock, re.MULTILINE)
     return match.group(1) if match else "unknown"
 
@@ -163,7 +163,11 @@ def main() -> int:
         (REPORT, markdown(data)),
     )
     if args.check:
-        stale = [str(path.relative_to(ROOT)) for path, text in outputs if not path.exists() or path.read_text() != text]
+        stale = [
+            str(path.relative_to(ROOT))
+            for path, text in outputs
+            if not path.exists() or path.read_text(encoding="utf-8") != text
+        ]
         if stale:
             print("stale generated script API inventory: " + ", ".join(stale), file=sys.stderr)
             return 1
@@ -171,7 +175,7 @@ def main() -> int:
         return 0
     for path, text in outputs:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
+        path.write_text(text, encoding="utf-8")
     print(f"inventoried {data['declarationCount']} script declarations from {data['fileCount']} modules")
     return 0
 

@@ -4,6 +4,9 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=/dev/null
 source "$repo_root/upstream.lock"
+# shellcheck source=/dev/null
+source "$repo_root/scripts/lib/sha256.sh"
+deherm_require_node
 
 bob_dir="$repo_root/build/tooling"
 bob_jar="$bob_dir/bob.jar"
@@ -11,11 +14,7 @@ mkdir -p "$bob_dir"
 
 valid_bob=false
 if [[ -f "$bob_jar" ]]; then
-  actual_sha="$(node -e '
-    const { createHash } = require("node:crypto");
-    const { readFileSync } = require("node:fs");
-    process.stdout.write(createHash("sha256").update(readFileSync(process.argv[1])).digest("hex"));
-  ' "$bob_jar")"
+  actual_sha="$(deherm_sha256_file "$bob_jar")"
   if [[ "$actual_sha" == "$DEFOLD_BOB_SHA256" ]]; then
     valid_bob=true
   else
@@ -27,11 +26,7 @@ if [[ "$valid_bob" != true ]]; then
   temporary="$bob_jar.download"
   trap 'rm -f "$temporary"' EXIT
   curl -fL --retry 3 --retry-delay 2 "$DEFOLD_BOB_URL" -o "$temporary"
-  actual_sha="$(node -e '
-    const { createHash } = require("node:crypto");
-    const { readFileSync } = require("node:fs");
-    process.stdout.write(createHash("sha256").update(readFileSync(process.argv[1])).digest("hex"));
-  ' "$temporary")"
+  actual_sha="$(deherm_sha256_file "$temporary")"
   if [[ "$actual_sha" != "$DEFOLD_BOB_SHA256" ]]; then
     echo "Bob checksum mismatch: expected $DEFOLD_BOB_SHA256, got $actual_sha" >&2
     exit 1
