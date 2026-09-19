@@ -29,6 +29,10 @@ export const dmSdkGeneratorSources = Object.freeze([
 export const dmSdkPinnedInputs = Object.freeze([
   "upstream.lock",
   "packages/bindings/generated/defold-sdk-ir.json",
+  // Measured against the pinned engine/defoldsdk.zip, which is 533MB and is
+  // therefore not part of the clean room. The measurement travels as this
+  // committed artifact, exactly as the Clang-derived IR above does.
+  "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
   "packages/bindings/overrides/dmsdk-enum-value-bindings.json",
   "packages/bindings/overrides/dmsdk-named-scalar-policies.json",
   "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",

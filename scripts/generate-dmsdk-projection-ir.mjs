@@ -8,6 +8,22 @@ const repositoryRoot = resolve(scriptDirectory, "..");
 const defaultIrPath = resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json");
 const defaultClassificationPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json");
 const defaultOutputPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-projection-ir.json");
+const defaultSymbolEvidencePath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-symbol-evidence.json");
+
+/**
+ * The dmSDK headers that are the Lua transport itself rather than an API to
+ * project.
+ *
+ * `defold/defold_hermes/include/defold_hermes/lua_bridge.hpp` includes
+ * `<dmsdk/lua/lua.h>` and calls `lua_settop`, `lua_gettop`, `lua_rawgeti` and
+ * `luaL_ref` directly, from C++ that Extender compiles - that is how the bridge
+ * works today. Projecting the same raw stack manipulation into TypeScript would
+ * be meaningless and unsafe, so these declarations are accounted for as
+ * `separate-module` - the disposition the script surface already uses for an
+ * API a separate module owns - rather than sitting in the census as bindings
+ * nobody intends to emit.
+ */
+const TRANSPORT_INFRASTRUCTURE_HEADERS = /\/dmsdk\/lua\/(?:lua|lauxlib)\.h$/;
 const loweringEvidencePaths = Object.freeze({
   scalar: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
   enumValue: "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
@@ -84,6 +100,7 @@ function parseOptions(argv) {
   const options = {
     ir: defaultIrPath,
     classification: defaultClassificationPath,
+    symbolEvidence: defaultSymbolEvidencePath,
     output: defaultOutputPath,
     check: false,
   };
@@ -92,6 +109,7 @@ function parseOptions(argv) {
     if (argument === "--check") options.check = true;
     else if (argument === "--ir") options.ir = resolve(argv[++index]);
     else if (argument === "--classification") options.classification = resolve(argv[++index]);
+    else if (argument === "--symbol-evidence") options.symbolEvidence = resolve(argv[++index]);
     else if (argument === "--output") options.output = resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argument}`);
   }
@@ -338,8 +356,13 @@ function semanticTokens(declaration, binding, signature, effects) {
   if (nodes.some(({ kind }) => ["template", "template-record", "type-parameter"].includes(kind)) || declaration.kind === "function-template") tokens.add("template-specialization-set");
   if (nodes.some(({ kind }) => kind === "variadic")) tokens.add("typed-nonvariadic-facade");
   if (effects.spans.present) tokens.add("span-pairing-element-unit-copy");
-  if (effects.thread.call === "unspecified-requires-token") tokens.add("call-thread-affinity");
-  if (["profile-conditional", "unverified-all-targets"].includes(effects.availability.kind)) tokens.add("target-feature-symbol-matrix");
+  tokens.add("call-thread-affinity");
+  // Availability is a dimension every native declaration has, not a suspicion
+  // some of them attract. The token is therefore always accounted for, and
+  // `effects.availability` carries the measurement a policy resolves it with;
+  // emitting it only for the ones that looked doubtful is what let 1361 units
+  // share one unexamined answer.
+  tokens.add("target-feature-symbol-matrix");
   if (signature.parameters.some(({ direction }) => direction === "out" || direction === "inout")) tokens.add("out-storage-initialization-failure");
   if (effects.context.kind !== "global") tokens.add("receiver-provenance-lifetime");
   if (binding.families.includes("callback")) tokens.add("callback-registration-unregistration");
@@ -381,7 +404,7 @@ function countValues(values) {
   return Object.fromEntries([...counts].sort(([left], [right]) => left.localeCompare(right)));
 }
 
-function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvidence) {
+function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvidence, symbolEvidence) {
   const parameters = (declaration.parameters ?? []).map((parameter, position) => ({
     position,
     name: parameter.name || `arg${position}`,
@@ -440,9 +463,19 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
       pointerCandidates: pointerParameters,
       pairing: binding.families.includes("pointer-span") ? "unspecified-requires-token" : "not-applicable",
     },
+    // MEASURED, per bundle target and per build variant, against the archives
+    // the pinned engine SDK says Extender links - see
+    // `scripts/generate-dmsdk-symbol-evidence.mjs`. `unmeasured` is the honest
+    // answer for a class-template member, which denotes no symbol until it is
+    // instantiated; `partially-measured` is the honest answer when a
+    // cross-target parse could not reach that platform's system headers and so
+    // clang never named the symbol it would emit.
     availability: {
-      kind: binding.families.includes("platform-gated") ? "profile-conditional" : "unverified-all-targets",
-      profiles: binding.families.includes("platform-gated") ? "unspecified-requires-token" : "unverified",
+      kind: symbolEvidence?.availability ?? "unmeasured",
+      linkage: symbolEvidence?.linkage ?? "unmeasured",
+      platformGated: binding.families.includes("platform-gated"),
+      profiles: symbolEvidence ? "measured-engine-archive-linkage" : "unspecified-requires-token",
+      evidence: "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
     },
   };
   effects.ownership = ownershipEffect(declaration, signature);
@@ -472,6 +505,9 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
     id: declaration.id,
     projectionId,
     symbol: declaration.name,
+    accountingCategory: TRANSPORT_INFRASTRUCTURE_HEADERS.test(declaration.header ?? "")
+      ? "separate-module"
+      : "projected",
     provenance,
     projection: {
       state: "generated",
@@ -485,9 +521,14 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
   };
 }
 
-export async function build(irContent, classificationContent, loweringEvidenceContents = {}) {
+export async function build(irContent, classificationContent, loweringEvidenceContents = {}, symbolEvidenceContent = null) {
   const ir = JSON.parse(irContent);
   const classification = JSON.parse(classificationContent);
+  const symbolEvidence = symbolEvidenceContent ? JSON.parse(symbolEvidenceContent) : null;
+  if (symbolEvidence && symbolEvidence.defoldRevision !== ir.defoldRevision) {
+    throw new Error("dmSDK symbol evidence revision differs from dmSDK IR");
+  }
+  const symbolEvidenceById = new Map(Object.entries(symbolEvidence?.declarations ?? {}));
   const loweringReports = Object.fromEntries(Object.entries(loweringEvidenceContents).map(([name, content]) => [name, JSON.parse(content)]));
   for (const [name, report] of Object.entries(loweringReports)) {
     if (report.defoldRevision && report.defoldRevision !== ir.defoldRevision) {
@@ -508,7 +549,8 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
     seen.add(binding.id);
     const declaration = declarationsById.get(binding.id);
     if (!declaration) throw new Error(`Classified declaration does not exist in source IR: ${binding.id}`);
-    return buildRow(declaration, binding, typeIndex, ir.defoldRevision, loweringById.get(binding.id));
+    return buildRow(declaration, binding, typeIndex, ir.defoldRevision, loweringById.get(binding.id),
+      symbolEvidenceById.get(binding.id));
   }).sort((left, right) => left.id.localeCompare(right.id));
 
   const missingSemanticToken = [];
@@ -528,9 +570,12 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
     records: rows.filter(({ effects }) => effects.records.present).length,
     templates: rows.filter(({ effects }) => effects.templates.present).length,
     spans: rows.filter(({ effects }) => effects.spans.present).length,
-    profileConditional: rows.filter(({ effects }) => effects.availability.kind === "profile-conditional").length,
+    platformGated: rows.filter(({ effects }) => effects.availability.platformGated).length,
     receiverBound: rows.filter(({ effects }) => effects.context.kind !== "global").length,
   };
+  const availabilitySummary = countValues(rows.map(({ effects }) => effects.availability.kind));
+  const linkageSummary = countValues(rows.map(({ effects }) => effects.availability.linkage));
+  const accountingSummary = countValues(rows.map(({ accountingCategory }) => accountingCategory));
   const loweringSummary = countValues(rows.map(({ lowering }) => lowering.state));
   const headerHashes = {};
   for (const header of [...new Set(rows.map(({ provenance }) => provenance.header))].sort()) {
@@ -547,9 +592,11 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
     sources: {
       ir: "packages/bindings/generated/defold-sdk-ir.json",
       classification: "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
+      symbolEvidence: "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
       hashes: {
         ir: sha256(irContent),
         classification: sha256(classificationContent),
+        symbolEvidence: symbolEvidenceContent ? sha256(symbolEvidenceContent) : null,
         loweringEvidence: Object.fromEntries(Object.entries(loweringEvidenceContents).map(([name, content]) => [name, sha256(content)])),
         headers: headerHashes,
       },
@@ -569,6 +616,9 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
     },
     constructorSummary,
     effectSummary,
+    availabilitySummary,
+    linkageSummary,
+    accountingSummary,
     loweringStateSummary,
     loweringSummary,
     semanticTokenSummary,
@@ -584,7 +634,8 @@ export async function run(argv = process.argv.slice(2)) {
     name,
     await readFile(resolve(repositoryRoot, relative), "utf8")
   ])));
-  const report = await build(irContent, classificationContent, loweringEvidenceContents);
+  const symbolEvidenceContent = await readFile(options.symbolEvidence, "utf8");
+  const report = await build(irContent, classificationContent, loweringEvidenceContents, symbolEvidenceContent);
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (options.check) {
     if (await readFile(options.output, "utf8") !== serialized) throw new Error(`${options.output} is stale; regenerate dmSDK projection IR`);

@@ -8,8 +8,8 @@
     "policy": "packages/bindings/overrides/dmsdk-base64-span-bindings.json"
   },
   "sourceHashes": {
-    "ir": "0301718e88f902118f20f106b61b881d410a29cd728b3c5a09d2b0308ab38bf1",
-    "shapes": "cb58793920f2af154808e16fb505bc69b584736770701b243b92b197cc84e966",
+    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
+    "shapes": "34a7d990f6e545997a7dfc0854fcfe433c13b90c1b6f5db3e82eff7f09cc2e15",
     "policy": "1960a7ec2ff9bf619781db8f806703d982af1840f261b34253efa95a240227f1",
     "headers": {
       "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h": "ae6dce231e90fbde3642399b52ed2299b3c8488632492b811af7a2dd38eff560"

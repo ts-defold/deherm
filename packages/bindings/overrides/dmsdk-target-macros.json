@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 1,
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "The macro assignment each Defold bundle target compiles the dmSDK under, so that a declaration gated on a platform conditional can be resolved per target instead of per deriving host.",
+  "derivation": [
+    "platform defines are READ from Defold's own share/extender/build_input.yml, never restated here",
+    "a group's toolchain is read from the version symbol build_tools/sdk.py pins for that platform",
+    "a toolchain's predefines are a property of that compiler and are the only values declared here",
+    "an architecture's predefines are the ones dmSDK headers actually test: word size and byte order",
+    "a macro this file does not decide makes its conditional unresolved, never false"
+  ],
+  "sourceEvidence": [
+    {
+      "id": "extender-build-input",
+      "path": "share/extender/build_input.yml",
+      "sha256": "75e3402cd5e42f8492ad70408143cd01a6dbd9b554efb586e32372cae771446d",
+      "anchors": [
+        "DM_PLATFORM_OSX",
+        "DM_PLATFORM_IOS",
+        "DM_PLATFORM_ANDROID",
+        "DM_PLATFORM_HTML5",
+        "DM_PLATFORM_LINUX",
+        "DM_PLATFORM_WINDOWS"
+      ],
+      "reason": "Defold's own declaration of which platform defines each bundle target is compiled with. The per-target and per-group define lists are read from here; nothing in this file restates them."
+    },
+    {
+      "id": "defold-toolchain-pins",
+      "path": "build_tools/sdk.py",
+      "sha256": "30ed595a5b6e8bca6f2cd8531ffe8681ce3d4bd39bf840802eb279da334b1f63",
+      "anchors": [
+        "VERSION_XCODE_CLANG",
+        "VERSION_LINUX_CLANG",
+        "ANDROID_NDK_VERSION",
+        "VERSION_WINDOWS_MSVC",
+        "EMSCRIPTEN_VERSION_STR"
+      ],
+      "reason": "Which compiler each platform is built with, and therefore which predefined macros its dmSDK translation units see. Apple and Linux are clang, Android is the NDK's clang, Windows is MSVC, web is Emscripten's clang."
+    },
+    {
+      "id": "android-define",
+      "path": "build_tools/waf_dynamo.py",
+      "sha256": "d5c1eaed3e4b4d3c4a8274c171172df629d1dee33998d2acabd3f8fab87faa4d",
+      "anchors": [
+        "'-DANDROID', '-Wa,--noexecstack'"
+      ],
+      "reason": "`ANDROID` - the spelling dmsdk/dlib/android.h and dmsdk/graphics/graphics_native.h test - is not an NDK predefine. Defold's own build passes it, and this is where."
+    }
+  ],
+  "commonPredefines": {
+    "__cplusplus": "201703L",
+    "__STDC_HOSTED__": "1"
+  },
+  "toolchains": {
+    "clang": {
+      "evidence": "defold-toolchain-pins",
+      "predefines": {
+        "__clang__": "1",
+        "__GNUC__": "4",
+        "__llvm__": "1"
+      },
+      "queries": [
+        "__has_builtin",
+        "__has_attribute",
+        "__has_feature",
+        "__has_extension"
+      ]
+    },
+    "msvc": {
+      "evidence": "defold-toolchain-pins",
+      "predefines": {
+        "_MSC_VER": "1950",
+        "_MSC_EXTENSIONS": "1",
+        "_WIN32": "1",
+        "_WIN64": "1",
+        "WIN32": "1"
+      },
+      "queries": []
+    }
+  },
+  "groups": {
+    "osx": {
+      "toolchain": "clang",
+      "predefines": {
+        "__APPLE__": "1",
+        "__APPLE_CC__": "6000",
+        "__MACH__": "1"
+      }
+    },
+    "ios": {
+      "toolchain": "clang",
+      "predefines": {
+        "__APPLE__": "1",
+        "__APPLE_CC__": "6000",
+        "__MACH__": "1"
+      }
+    },
+    "linux": {
+      "toolchain": "clang",
+      "predefines": {
+        "__linux__": "1",
+        "__unix__": "1",
+        "__ELF__": "1"
+      }
+    },
+    "android": {
+      "toolchain": "clang",
+      "predefines": {
+        "__linux__": "1",
+        "__ANDROID__": "1",
+        "ANDROID": "1",
+        "__ELF__": "1"
+      }
+    },
+    "web": {
+      "toolchain": "clang",
+      "predefines": {
+        "__EMSCRIPTEN__": "1"
+      }
+    },
+    "win32": {
+      "toolchain": "msvc",
+      "predefines": {}
+    }
+  },
+  "architecturesComment": "`architectures` holds the GCC/clang spelling of a word size and byte order; `msvcArchitectures` holds MSVC's, because MSVC defines neither `__x86_64__` nor `__BYTE_ORDER__`. A target takes whichever matches its group's toolchain, so a Windows target is never told it has macros its compiler does not define.",
+  "architectures": {
+    "arm64": {
+      "predefines": {
+        "__aarch64__": "1",
+        "__LP64__": "1",
+        "__SIZEOF_POINTER__": "8",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    },
+    "arm64_sim": {
+      "predefines": {
+        "__aarch64__": "1",
+        "__LP64__": "1",
+        "__SIZEOF_POINTER__": "8",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    },
+    "armv7": {
+      "predefines": {
+        "__arm__": "1",
+        "__SIZEOF_POINTER__": "4",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    },
+    "x86_64": {
+      "predefines": {
+        "__x86_64__": "1",
+        "__LP64__": "1",
+        "__SIZEOF_POINTER__": "8",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    },
+    "x86": {
+      "predefines": {
+        "__i386__": "1",
+        "__SIZEOF_POINTER__": "4",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    },
+    "wasm": {
+      "predefines": {
+        "__wasm__": "1",
+        "__wasm32__": "1",
+        "__SIZEOF_POINTER__": "4",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    },
+    "wasm_pthread": {
+      "predefines": {
+        "__wasm__": "1",
+        "__wasm32__": "1",
+        "__SIZEOF_POINTER__": "4",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    }
+  },
+  "msvcArchitectures": {
+    "x86_64": {
+      "predefines": {
+        "_M_X64": "100",
+        "_M_AMD64": "100"
+      }
+    },
+    "arm64": {
+      "predefines": {
+        "_M_ARM64": "1"
+      }
+    },
+    "x86": {
+      "predefines": {
+        "_M_IX86": "600"
+      }
+    }
+  },
+  "triplesComment": "The clang target triple each bundle target is parsed under, so the MANGLED NAME of a declaration is asked of the compiler rather than inferred. Mangling is ABI-specific and not derivable: MSVC's scheme was never published, and an ILP32 target spells size_t and long differently from an LP64 one, so armv7 and wasm32 do not share arm64's symbols. Two targets may legitimately share a triple - the two web targets differ by threading, not by ABI.",
+  "triples": {
+    "arm64-osx": "arm64-apple-macos",
+    "x86_64-osx": "x86_64-apple-macos",
+    "x86-osx": "i386-apple-macos",
+    "arm64-ios": "arm64-apple-ios",
+    "arm64_sim-ios": "arm64-apple-ios-simulator",
+    "arm64-linux": "aarch64-unknown-linux-gnu",
+    "x86_64-linux": "x86_64-unknown-linux-gnu",
+    "arm64-android": "aarch64-linux-android",
+    "armv7-android": "armv7a-linux-androideabi",
+    "x86_64-android": "x86_64-linux-android",
+    "wasm-web": "wasm32-unknown-emscripten",
+    "wasm_pthread-web": "wasm32-unknown-emscripten",
+    "x86_64-win32": "x86_64-pc-windows-msvc"
+  }
+}

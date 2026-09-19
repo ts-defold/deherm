@@ -252,6 +252,27 @@ RUN cmake -S /src/hermes -B /work/host -G Ninja \
 ENV ICU_DEFINES="-DU_STATIC_IMPLEMENTATION=1 -DU_CHARSET_IS_UTF8=1 -DUCONFIG_NO_LEGACY_CONVERSION=1 -DUCONFIG_NO_TRANSLITERATION=1 -DUCONFIG_NO_REGULAR_EXPRESSIONS=1"
 ENV ICU_PREFIX=/opt/icu-android
 
+# Applying the filter is not enough: the data build has to be a data build.
+# icu/source/data/Makefile.in:143 sets ICUDATA_SOURCE_ARCHIVE from
+# `$(wildcard $(srcdir)/in/icudt73l.dat)`, and when that is non-empty,
+# `build-local` at :261 drops $(ICUDATA_ALL_OUTPUT_FILES) - the rules the filter
+# produced - and :272 builds the package list by unpacking the prebuilt archive
+# with `icupkg --list -x \*` instead. The filter runs, prints "Applying filters
+# from ...", and changes nothing.
+#
+# Measured before this line existed: a filtered arm64 configure produced a
+# 32,030,300-byte libicudata.a, byte-for-byte the whole package, with
+# `rules.mk: warning: ignoring old recipe for target out/tmp/icudata.lst` as the
+# only hint. Removing the one prebuilt archive is what makes the filtered rules
+# the build. Everything else under data/in - the .nrm normalization tables, the
+# character-property .icu files, coll/ucadata-*.icu - is INPUT to those rules
+# and must stay, so this names exactly one file and then asserts that no other
+# icudt73*.dat is left for the wildcard at :145 to find.
+RUN rm -f /src/icu/source/data/in/icudt73l.dat && \
+    if ls /src/icu/source/data/in/icudt73*.dat >/dev/null 2>&1; then \
+      echo "A prebuilt ICU data archive remains; the data filter would be bypassed." >&2; exit 1; \
+    fi
+
 RUN set -eu; \
     case "${ANDROID_ABI}" in \
       armeabi-v7a) clang_triple=armv7a-linux-androideabi; host_triple=arm-linux-androideabi ;; \

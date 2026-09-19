@@ -8,9 +8,9 @@
     "policy": "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json"
   },
   "sourceHashes": {
-    "ir": "0301718e88f902118f20f106b61b881d410a29cd728b3c5a09d2b0308ab38bf1",
-    "shapes": "cb58793920f2af154808e16fb505bc69b584736770701b243b92b197cc84e966",
-    "projection": "877964bf5ccc8a2ee8d71467cbc60a512e6065aba6a93df95303ac4057a5c2c0",
+    "ir": "144d5ae99e88bdc98601b94376c7808b127f9a69aef15ef4f951c199aac72a5c",
+    "shapes": "34a7d990f6e545997a7dfc0854fcfe433c13b90c1b6f5db3e82eff7f09cc2e15",
+    "projection": "8a21006ba46b28fdedcb2824bc73504cac9b28390a53920cfbfb70d90aadc82e",
     "policy": "43312983e8fbabd48c3f2355c462308a2d11c46c969050d837bd93ad038b20a9"
   },
   "selector": "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",

@@ -212,6 +212,20 @@ The filter (`ICU_DATA_FILTER_FILE`, written into the image) is therefore:
   the `curr`, `lang`, `region`, `rbnf` and `unit` trees - text segmentation,
   charset conversion tables, character names and everything only `Intl` reaches.
 
+Applying the filter is not the same as the filter taking effect, and the
+difference is silent. `icu/source/data/Makefile.in:143` sets
+`ICUDATA_SOURCE_ARCHIVE` from `$(wildcard $(srcdir)/in/icudt73l.dat)`; when that
+is non-empty, `build-local` at `:261` drops `$(ICUDATA_ALL_OUTPUT_FILES)` - the
+rules the filter produced - and `:272` builds the package list by unpacking the
+prebuilt archive with `icupkg --list -x \*` instead. Measured: a configure that
+printed *"Applying filters from /work/icu/filters.json"* produced a
+**32,030,300-byte** `libicudata.a`, the whole package, with
+`rules.mk: warning: ignoring old recipe for target out/tmp/icudata.lst` as the
+only clue. The lane therefore deletes exactly that one prebuilt archive before
+the cross configure, keeps everything else under `data/in` (those files are
+*input* to the filtered rules), and asserts that no other `icudt73*.dat` is left
+for the second wildcard at `:145` to find.
+
 The same reasoning trims ICU's *code*: the lane compiles ICU with `-Os` and with
 `UCONFIG_NO_LEGACY_CONVERSION`, `UCONFIG_NO_TRANSLITERATION`,
 `UCONFIG_NO_REGULAR_EXPRESSIONS` and `U_CHARSET_IS_UTF8`. Those macros are part

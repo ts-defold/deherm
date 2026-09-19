@@ -232,6 +232,11 @@ function dmsdkUnit(row, rowIndex) {
     sourceState: {
       loweringFamily: row.provenance.primaryFamily,
       loweringState: row.loweringState,
+      // The projector's own answer to whether this declaration is a route at
+      // all. `separate-module` names the Lua C API that the bridge's own C++
+      // calls directly - transport, not surface - and the script side has used
+      // the same word for the same reason since its accounting was written.
+      accountingCategory: row.accountingCategory ?? "projected",
       loweringEvidence: row.lowering
     }
   };
@@ -652,11 +657,19 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
 }
 
 function selectorMatches(unit, selector) {
-  const supported = new Set(["surface", "valueKindsAll", "valueKindsAny", "contexts", "semanticTokensAll", "semanticTokensAny"]);
+  const supported = new Set(["surface", "valueKindsAll", "valueKindsAny", "contexts", "semanticTokensAll",
+    "semanticTokensAny", "linkage", "availabilityKinds"]);
   for (const key of Object.keys(selector)) {
     if (!supported.has(key)) throw new Error(`Semantic policy uses unsupported or identity selector '${key}'`);
   }
   if (selector.surface && selector.surface !== unit.identity.surface) return false;
+  // Measured shapes, not identities. `linkage` and `availabilityKinds` are the
+  // answers scripts/generate-dmsdk-symbol-evidence.mjs read out of the engine
+  // archives the pinned SDK says Extender links, per bundle target and per
+  // build variant. A rule selecting on them names a category of evidence, and
+  // a unit the evidence does not cover matches nothing and stays blocked.
+  if (selector.linkage && !selector.linkage.includes(unit.availability?.linkage)) return false;
+  if (selector.availabilityKinds && !selector.availabilityKinds.includes(unit.availability?.kind)) return false;
   const kinds = new Set(unit.shapeKinds);
   if (selector.valueKindsAll && !selector.valueKindsAll.every((kind) => kinds.has(kind))) return false;
   if (selector.valueKindsAny && !selector.valueKindsAny.some((kind) => kinds.has(kind))) return false;
@@ -868,7 +881,10 @@ function compactUnits(units, implementationLanes) {
         }
       : {
           loweringFamily: unit.sourceState.loweringFamily,
-          loweringState: unit.sourceState.loweringState
+          loweringState: unit.sourceState.loweringState,
+          accountingCategory: unit.sourceState.accountingCategory,
+          linkage: unit.availability?.linkage ?? "unmeasured",
+          availability: unit.availability?.kind ?? "unmeasured"
         },
     implementationSet: implementationSets.intern(implementationLanes.get(unit.identity.id) ?? []),
     backends: Object.fromEntries(targetOrder.map((target) => {

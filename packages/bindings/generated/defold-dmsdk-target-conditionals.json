@@ -1,0 +1,6554 @@
+{
+  "schemaVersion": 1,
+  "generator": "scripts/generate-dmsdk-target-conditionals.mjs",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "Every public dmSDK declaration whose presence, or whose type, depends on the Defold bundle target being built. A declaration absent from this census is target-invariant: no platform conditional decides whether it exists and none decides any name its type mentions.",
+  "derivation": [
+    "a target's macro assignment is Defold's own build_input.yml defines over the declared toolchain and architecture predefines",
+    "a branch is target-varying when the targets do not agree about taking it",
+    "a declaration inside a target-varying branch is present only for the targets that take it",
+    "a declaration outside every such branch is target-conditional when its type names something a branch introduces",
+    "a macro the assignment does not decide leaves its branch unresolved for that target, never absent"
+  ],
+  "inputEvidence": {
+    "macros": "packages/bindings/overrides/dmsdk-target-macros.json",
+    "macrosSha256": "cbf030bcedd5cbe08c0db3c26be128ce4cfded045178e3d54ccb3378a8050d24",
+    "buildInput": "upstream/defold/share/extender/build_input.yml",
+    "buildInputSha256": "75e3402cd5e42f8492ad70408143cd01a6dbd9b554efb586e32372cae771446d",
+    "variantManifests": {
+      "debug": {
+        "path": "upstream/defold/share/extender/variants/debug_input.appmanifest",
+        "sha256": "e96c3341981120b66815acaa6e8b226682d75a5b36b0b5567ec2c44bbdfb15c3"
+      },
+      "release": {
+        "path": "upstream/defold/share/extender/variants/release_input.appmanifest",
+        "sha256": "cbe85c7de4eca76af495ea97beadff8d60fe2d5cecd1d03e059cfa1f9a4cd9f0"
+      },
+      "headless": {
+        "path": "upstream/defold/share/extender/variants/headless_input.appmanifest",
+        "sha256": "9adf700a3c9a83eba7e0ebe56549e01d361ed5039a2b2a6f33c87e206ad9477b"
+      }
+    },
+    "bundleTargets": "packages/toolchains/defold-bundle-targets.json",
+    "bundleTargetsSha256": "65a25d0043db47b09903d8b07b1708f59de16f425700203888e63dd35204db44",
+    "inventory": "packages/bindings/generated/defold-sdk-inventory.json",
+    "inventorySha256": "07e4b3fa1ec073430b01a4bafb454ac46b5c2d47209195fab31f9026b74cfdbd"
+  },
+  "buildVariants": {
+    "note": "Every target is resolved once per build variant and the three are required to agree; a header conditional that disagreed would fail this pass rather than be averaged away. `NDEBUG` and `DM_PROFILE_NULL` - the two macros dmsdk/dlib/profile.h gates its entire API on - are defined by no variant, so an extension is compiled against the full profiler API in all three. The debug/release difference is which archive is linked, and that is measured in the symbol evidence.",
+    "defines": {
+      "debug": [
+        "DM_DEBUG"
+      ],
+      "release": [
+        "DM_RELEASE"
+      ],
+      "headless": [
+        "DM_HEADLESS"
+      ]
+    },
+    "macrosDefinedBySomeVariant": [],
+    "varyingBranches": 0
+  },
+  "targets": [
+    {
+      "target": "arm64-android",
+      "group": "android",
+      "architecture": "arm64",
+      "defineCount": 20,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_OPENGL_COMPUTE_SUPPORT",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_ANDROID",
+        "__aarch64__"
+      ]
+    },
+    {
+      "target": "arm64-ios",
+      "group": "ios",
+      "architecture": "arm64",
+      "defineCount": 18,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_IOS"
+      ]
+    },
+    {
+      "target": "arm64-linux",
+      "group": "linux",
+      "architecture": "arm64",
+      "defineCount": 20,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_OPENGL_COMPUTE_SUPPORT",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_LINUX",
+        "__STDC_LIMIT_MACROS"
+      ]
+    },
+    {
+      "target": "arm64-osx",
+      "group": "osx",
+      "architecture": "arm64",
+      "defineCount": 20,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_MACOS",
+        "DM_PLATFORM_OSX",
+        "GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED"
+      ]
+    },
+    {
+      "target": "arm64_sim-ios",
+      "group": "ios",
+      "architecture": "arm64_sim",
+      "defineCount": 18,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_PLATFORM_IOS",
+        "IOS_SIMULATOR"
+      ]
+    },
+    {
+      "target": "armv7-android",
+      "group": "android",
+      "architecture": "armv7",
+      "defineCount": 24,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_OPENGL_COMPUTE_SUPPORT",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_ANDROID",
+        "LUA_BYTECODE_ENABLE_32",
+        "__ARM_ARCH_5E__",
+        "__ARM_ARCH_5TE__",
+        "__ARM_ARCH_5T__",
+        "__ARM_ARCH_5__"
+      ]
+    },
+    {
+      "target": "wasm-web",
+      "group": "web",
+      "architecture": "wasm",
+      "defineCount": 16,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_LUA_USE_LUA51",
+        "DM_PLATFORM_HTML5"
+      ]
+    },
+    {
+      "target": "wasm_pthread-web",
+      "group": "web",
+      "architecture": "wasm_pthread",
+      "defineCount": 16,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_LUA_USE_LUA51",
+        "DM_PLATFORM_HTML5"
+      ]
+    },
+    {
+      "target": "x86_64-android",
+      "group": "android",
+      "architecture": "x86_64",
+      "defineCount": 20,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_OPENGL_COMPUTE_SUPPORT",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_ANDROID"
+      ]
+    },
+    {
+      "target": "x86_64-linux",
+      "group": "linux",
+      "architecture": "x86_64",
+      "defineCount": 20,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_OPENGL_COMPUTE_SUPPORT",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_LINUX",
+        "__STDC_LIMIT_MACROS"
+      ]
+    },
+    {
+      "target": "x86_64-osx",
+      "group": "osx",
+      "architecture": "x86_64",
+      "defineCount": 20,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_MACOS",
+        "DM_PLATFORM_OSX",
+        "GL_DO_NOT_WARN_IF_MULTI_GL_VERSION_HEADERS_INCLUDED"
+      ]
+    },
+    {
+      "target": "x86_64-win32",
+      "group": "win32",
+      "architecture": "x86_64",
+      "defineCount": 20,
+      "defoldDeclaredDefines": [
+        "DDF_EXPOSE_DESCRIPTORS",
+        "DM_DEBUG",
+        "DM_HAVE_OPENGL_COMPUTE_SUPPORT",
+        "DM_HAVE_PLATFORM_COMPUTE_SUPPORT",
+        "DM_PLATFORM_WINDOWS",
+        "NOMINMAX",
+        "WIN32",
+        "WINVER",
+        "_CRT_SECURE_NO_WARNINGS",
+        "_CRT_USE_BUILTIN_OFFSETOF",
+        "_WINSOCK_DEPRECATED_NO_WARNINGS",
+        "__STDC_LIMIT_MACROS"
+      ]
+    }
+  ],
+  "counts": {
+    "headers": 121,
+    "targetInvariantHeaders": 103,
+    "targetVaryingHeaders": 18,
+    "declarations": 2140,
+    "targetConditionalDeclarations": 43,
+    "declarationsAbsentSomewhere": 0,
+    "declarationsRespelledSomewhere": 4,
+    "declarationsPlatformSuppliedSomewhere": 17,
+    "targetInvariantDeclarations": 2097,
+    "unresolvedDeclarations": 0,
+    "gatedTypeNames": 60
+  },
+  "gatedTypeNames": [
+    {
+      "name": "DMSDK_SAFE_WINDOWS_H",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+          "kind": "define",
+          "line": 18,
+          "condition": "defined(_MSC_VER)"
+        }
+      ]
+    },
+    {
+      "name": "DM_ALIGNED",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/align.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/align.h",
+          "kind": "define",
+          "line": 66,
+          "condition": "defined(__GNUC__)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/align.h",
+          "kind": "define",
+          "line": 68,
+          "condition": "defined(_MSC_VER)"
+        }
+      ]
+    },
+    {
+      "name": "DM_DLLEXPORT",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/shared_library.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/shared_library.h",
+          "kind": "define",
+          "line": 42,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/shared_library.h",
+          "kind": "define",
+          "line": 44,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "DM_ENDIAN",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "kind": "define",
+          "line": 46,
+          "condition": "defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "kind": "define",
+          "line": 48,
+          "condition": "defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "kind": "define",
+          "line": 53,
+          "condition": "defined(_WIN32) || defined(_GAMING_XBOX) || defined(__NX__) || defined(__SCE__) || \\"
+        }
+      ]
+    },
+    {
+      "name": "DM_ENDIAN_HAS_BUILTIN",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "kind": "define",
+          "line": 25,
+          "condition": "defined(__has_builtin)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "kind": "define",
+          "line": 27,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "DM_EXTENSION_DEPRECATED_CONTEXT_HELPER",
+      "header": "upstream/defold/engine/extension/src/dmsdk/extension/extension.hpp",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/extension/src/dmsdk/extension/extension.hpp",
+          "kind": "define",
+          "line": 26,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/extension/src/dmsdk/extension/extension.hpp",
+          "kind": "define",
+          "line": 28,
+          "condition": "defined(__GNUC__) || defined(__clang__)"
+        }
+      ]
+    },
+    {
+      "name": "EGLContext",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 31,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "EGLSurface",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 32,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "GLXContext",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 49,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "HGLRC",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 42,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "HWND",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 41,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "JavaVM",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 33,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_BITSINT",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 394,
+          "condition": "INT_MAX-20 < 32760"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 397,
+          "condition": "INT_MAX > 2147483640L"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_DATA",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 190,
+          "condition": "defined(__GNUC__) && ((__GNUC__*100 + __GNUC_MINOR__) >= 302) && \\"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 194,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_FUNC",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 189,
+          "condition": "defined(__GNUC__) && ((__GNUC__*100 + __GNUC_MINOR__) >= 302) && \\"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 193,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_INT32",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 417,
+          "condition": "LUAI_BITSINT >= 32"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 424,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_MAXINT32",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 418,
+          "condition": "LUAI_BITSINT >= 32"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 425,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_MEM",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 420,
+          "condition": "LUAI_BITSINT >= 32"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 427,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_UINT32",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 416,
+          "condition": "LUAI_BITSINT >= 32"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 423,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUAI_UMEM",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 419,
+          "condition": "LUAI_BITSINT >= 32"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 426,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_CDIR",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 89,
+          "condition": "defined(_WIN32)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 99,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_CPATH_DEFAULT",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 93,
+          "condition": "defined(_WIN32)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 103,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_DIRSEP",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 114,
+          "condition": "defined(_WIN32)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 116,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_LDIR",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 88,
+          "condition": "defined(_WIN32)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 98,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_PATH_DEFAULT",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 90,
+          "condition": "defined(_WIN32)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 100,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_ROOT",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 97,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_TMPNAMBUFSIZE",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 653,
+          "condition": "defined(__APPLE__)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 690,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "LUA_WIN",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 33,
+          "condition": "!defined(LUA_ANSI) && defined(_WIN32)"
+        }
+      ]
+    },
+    {
+      "name": "NOMINMAX",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+          "kind": "define",
+          "line": 22,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+          "kind": "define",
+          "line": 22,
+          "condition": "!defined(NOMINMAX)"
+        }
+      ]
+    },
+    {
+      "name": "WGPUAdapter",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 29,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WGPUCommandEncoder",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 34,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WGPUDevice",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 31,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WGPUInstance",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 28,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WGPUQueue",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 30,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WGPURenderPassEncoder",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 35,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WGPUTexture",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 32,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WGPUTextureView",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+          "kind": "typedef",
+          "line": 33,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "WIN32_LEAN_AND_MEAN",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+          "kind": "define",
+          "line": 20,
+          "condition": "defined(_MSC_VER)"
+        }
+      ]
+    },
+    {
+      "name": "Window",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 48,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "_USE_MATH_DEFINES",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
+          "kind": "define",
+          "line": 22,
+          "condition": "defined(_MSC_VER)"
+        }
+      ]
+    },
+    {
+      "name": "alloca",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dalloca.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dalloca.h",
+          "kind": "define",
+          "line": 32,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dalloca.h",
+          "kind": "define",
+          "line": 36,
+          "condition": "defined(__GNUC__) || defined(__clang__)"
+        }
+      ]
+    },
+    {
+      "name": "android_app",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 35,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogDebug",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 175,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 182,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogError",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 179,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 186,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogFatal",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 180,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 187,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogInfo",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 177,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 184,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogOnceDebug",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 204,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 220,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogOnceError",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 208,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 224,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogOnceFatal",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 209,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 225,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogOnceInfo",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 206,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 222,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogOnceInternal",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 195,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 211,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogOnceUserDebug",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 205,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 221,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogOnceWarning",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 207,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 223,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogUserDebug",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 176,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 183,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "dmLogWarning",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 178,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "kind": "define",
+          "line": 185,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "id",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 22,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "jobject",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+          "kind": "typedef",
+          "line": 34,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "lua_number2int",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 565,
+          "condition": "defined(LUA_NUMBER_DOUBLE) && !defined(LUA_ANSI) && !defined(__SSE2__) && \\"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 573,
+          "condition": "defined(LUA_NUMBER_DOUBLE) && !defined(LUA_ANSI) && !defined(__SSE2__) && \\"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 565,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 573,
+          "condition": "(no preceding arm)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 582,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "lua_number2integer",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 566,
+          "condition": "defined(LUA_NUMBER_DOUBLE) && !defined(LUA_ANSI) && !defined(__SSE2__) && \\"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 575,
+          "condition": "defined(LUA_NUMBER_DOUBLE) && !defined(LUA_ANSI) && !defined(__SSE2__) && \\"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 566,
+          "condition": "defined(_MSC_VER)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 575,
+          "condition": "(no preceding arm)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 583,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    },
+    {
+      "name": "lua_tmpnam",
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "sites": [
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 678,
+          "condition": "defined(__APPLE__)"
+        },
+        {
+          "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+          "kind": "define",
+          "line": 691,
+          "condition": "(no preceding arm)"
+        }
+      ]
+    }
+  ],
+  "headers": [
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/align.h",
+      "branchCount": 4,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            65,
+            66
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_ALIGNED",
+              "kind": "define",
+              "line": 66
+            }
+          ]
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "elif",
+          "lines": [
+            67,
+            68
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_ALIGNED",
+              "kind": "define",
+              "line": 68
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/android.h",
+      "branchCount": 2,
+      "targetVaryingBranches": 1,
+      "branches": [
+        {
+          "condition": "defined(ANDROID)",
+          "kind": "if",
+          "lines": [
+            18,
+            226
+          ],
+          "liveIn": [
+            "arm64-android",
+            "armv7-android",
+            "x86_64-android"
+          ],
+          "absentIn": [
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "jni.h",
+              "kind": "include",
+              "line": 20
+            },
+            {
+              "name": "android_native_app_glue.h",
+              "kind": "include",
+              "line": 21
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h",
+      "branchCount": 14,
+      "targetVaryingBranches": 13,
+      "branches": [
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            31,
+            32
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "dmsdk/dlib/safe_windows.h",
+              "kind": "include",
+              "line": 32
+            }
+          ]
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            49,
+            50
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            51,
+            52
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            64,
+            65
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            66,
+            67
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            81,
+            82
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            83,
+            84
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            97,
+            98
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            99,
+            100
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            113,
+            114
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            115,
+            116
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            130,
+            131
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            132,
+            133
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dalloca.h",
+      "branchCount": 6,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            29,
+            33
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "malloc.h",
+              "kind": "include",
+              "line": 30
+            },
+            {
+              "name": "alloca",
+              "kind": "define",
+              "line": 32
+            }
+          ]
+        },
+        {
+          "condition": "defined(__GNUC__) || defined(__clang__)",
+          "kind": "elif",
+          "lines": [
+            34,
+            37
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "alloca",
+              "kind": "define",
+              "line": 36
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+      "branchCount": 3,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            48,
+            49
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            50,
+            51
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+      "branchCount": 24,
+      "targetVaryingBranches": 22,
+      "branches": [
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            20,
+            21
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "stdlib.h",
+              "kind": "include",
+              "line": 21
+            }
+          ]
+        },
+        {
+          "condition": "defined(__has_builtin)",
+          "kind": "if",
+          "lines": [
+            24,
+            25
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_ENDIAN_HAS_BUILTIN",
+              "kind": "define",
+              "line": 25
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            26,
+            27
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_ENDIAN_HAS_BUILTIN",
+              "kind": "define",
+              "line": 27
+            }
+          ]
+        },
+        {
+          "condition": "defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)",
+          "kind": "if",
+          "lines": [
+            45,
+            46
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "x86_64-win32",
+              "reason": "__BYTE_ORDER__ is not decided by this macro assignment"
+            }
+          ],
+          "introduces": [
+            {
+              "name": "DM_ENDIAN",
+              "kind": "define",
+              "line": 46
+            }
+          ]
+        },
+        {
+          "condition": "defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)",
+          "kind": "elif",
+          "lines": [
+            47,
+            48
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "x86_64-win32",
+              "reason": "__BYTE_ORDER__ is not decided by this macro assignment"
+            }
+          ],
+          "introduces": [
+            {
+              "name": "DM_ENDIAN",
+              "kind": "define",
+              "line": 48
+            }
+          ]
+        },
+        {
+          "condition": "defined(_WIN32) || defined(_GAMING_XBOX) || defined(__NX__) || defined(__SCE__) || \\",
+          "kind": "elif",
+          "lines": [
+            49,
+            53
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "x86_64-win32",
+              "reason": "unsupported token \"\\\""
+            }
+          ],
+          "introduces": [
+            {
+              "name": "DM_ENDIAN",
+              "kind": "define",
+              "line": 53
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            56,
+            57
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: __BYTE_ORDER__ is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            67,
+            68
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "DM_ENDIAN_HAS_BUILTIN(__builtin_bswap16) || defined(__GNUC__) || defined(__clang__)",
+          "kind": "elif",
+          "lines": [
+            69,
+            70
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            71,
+            72
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            83,
+            84
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "DM_ENDIAN_HAS_BUILTIN(__builtin_bswap32) || defined(__GNUC__) || defined(__clang__)",
+          "kind": "elif",
+          "lines": [
+            85,
+            86
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            87,
+            91
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            102,
+            103
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "DM_ENDIAN_HAS_BUILTIN(__builtin_bswap64) || defined(__GNUC__) || defined(__clang__)",
+          "kind": "elif",
+          "lines": [
+            104,
+            105
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            106,
+            114
+          ],
+          "liveIn": [],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN_HAS_BUILTIN() is not a query this macro assignment decides"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "DM_ENDIAN == DM_ENDIAN_LITTLE",
+          "kind": "if",
+          "lines": [
+            127,
+            128
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            129,
+            130
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "DM_ENDIAN == DM_ENDIAN_LITTLE",
+          "kind": "if",
+          "lines": [
+            155,
+            156
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            157,
+            158
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "DM_ENDIAN == DM_ENDIAN_LITTLE",
+          "kind": "if",
+          "lines": [
+            183,
+            184
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "DM_ENDIAN is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            185,
+            186
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: DM_ENDIAN is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "branchCount": 14,
+      "targetVaryingBranches": 7,
+      "branches": [
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            162,
+            163
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            167,
+            169
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            170,
+            171
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            174,
+            180
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "dmLogDebug",
+              "kind": "define",
+              "line": 175
+            },
+            {
+              "name": "dmLogUserDebug",
+              "kind": "define",
+              "line": 176
+            },
+            {
+              "name": "dmLogInfo",
+              "kind": "define",
+              "line": 177
+            },
+            {
+              "name": "dmLogWarning",
+              "kind": "define",
+              "line": 178
+            },
+            {
+              "name": "dmLogError",
+              "kind": "define",
+              "line": 179
+            },
+            {
+              "name": "dmLogFatal",
+              "kind": "define",
+              "line": 180
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            181,
+            187
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "dmLogDebug",
+              "kind": "define",
+              "line": 182
+            },
+            {
+              "name": "dmLogUserDebug",
+              "kind": "define",
+              "line": 183
+            },
+            {
+              "name": "dmLogInfo",
+              "kind": "define",
+              "line": 184
+            },
+            {
+              "name": "dmLogWarning",
+              "kind": "define",
+              "line": 185
+            },
+            {
+              "name": "dmLogError",
+              "kind": "define",
+              "line": 186
+            },
+            {
+              "name": "dmLogFatal",
+              "kind": "define",
+              "line": 187
+            }
+          ]
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            194,
+            209
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "dmLogOnceInternal",
+              "kind": "define",
+              "line": 195
+            },
+            {
+              "name": "dmLogOnceDebug",
+              "kind": "define",
+              "line": 204
+            },
+            {
+              "name": "dmLogOnceUserDebug",
+              "kind": "define",
+              "line": 205
+            },
+            {
+              "name": "dmLogOnceInfo",
+              "kind": "define",
+              "line": 206
+            },
+            {
+              "name": "dmLogOnceWarning",
+              "kind": "define",
+              "line": 207
+            },
+            {
+              "name": "dmLogOnceError",
+              "kind": "define",
+              "line": 208
+            },
+            {
+              "name": "dmLogOnceFatal",
+              "kind": "define",
+              "line": 209
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            210,
+            225
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "dmLogOnceInternal",
+              "kind": "define",
+              "line": 211
+            },
+            {
+              "name": "dmLogOnceDebug",
+              "kind": "define",
+              "line": 220
+            },
+            {
+              "name": "dmLogOnceUserDebug",
+              "kind": "define",
+              "line": 221
+            },
+            {
+              "name": "dmLogOnceInfo",
+              "kind": "define",
+              "line": 222
+            },
+            {
+              "name": "dmLogOnceWarning",
+              "kind": "define",
+              "line": 223
+            },
+            {
+              "name": "dmLogOnceError",
+              "kind": "define",
+              "line": 224
+            },
+            {
+              "name": "dmLogOnceFatal",
+              "kind": "define",
+              "line": 225
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+      "branchCount": 5,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            391,
+            392
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            393,
+            394
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/safe_windows.h",
+      "branchCount": 8,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            15,
+            49
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DMSDK_SAFE_WINDOWS_H",
+              "kind": "define",
+              "line": 18
+            },
+            {
+              "name": "WIN32_LEAN_AND_MEAN",
+              "kind": "define",
+              "line": 20
+            },
+            {
+              "name": "NOMINMAX",
+              "kind": "define",
+              "line": 22
+            },
+            {
+              "name": "Windows.h",
+              "kind": "include",
+              "line": 24
+            }
+          ]
+        },
+        {
+          "condition": "!defined(NOMINMAX)",
+          "kind": "if",
+          "lines": [
+            21,
+            22
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "NOMINMAX",
+              "kind": "define",
+              "line": 22
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/shared_library.h",
+      "branchCount": 3,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            41,
+            42
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_DLLEXPORT",
+              "kind": "define",
+              "line": 42
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            43,
+            44
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_DLLEXPORT",
+              "kind": "define",
+              "line": 44
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
+      "branchCount": 3,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            21,
+            22
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "_USE_MATH_DEFINES",
+              "kind": "define",
+              "line": 22
+            }
+          ]
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            25,
+            26
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/extension/src/dmsdk/extension/extension.hpp",
+      "branchCount": 5,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            25,
+            26
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_EXTENSION_DEPRECATED_CONTEXT_HELPER",
+              "kind": "define",
+              "line": 26
+            }
+          ]
+        },
+        {
+          "condition": "defined(__GNUC__) || defined(__clang__)",
+          "kind": "elif",
+          "lines": [
+            27,
+            28
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "DM_EXTENSION_DEPRECATED_CONTEXT_HELPER",
+              "kind": "define",
+              "line": 28
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "branchCount": 10,
+      "targetVaryingBranches": 9,
+      "branches": [
+        {
+          "condition": "defined(__APPLE_CC__)",
+          "kind": "if",
+          "lines": [
+            19,
+            20
+          ],
+          "liveIn": [
+            "arm64-ios",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-linux",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "objc/objc.h",
+              "kind": "include",
+              "line": 20
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            21,
+            22
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-linux",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-ios",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "id",
+              "kind": "typedef",
+              "line": 22
+            }
+          ]
+        },
+        {
+          "condition": "defined(ANDROID)",
+          "kind": "if",
+          "lines": [
+            25,
+            29
+          ],
+          "liveIn": [
+            "arm64-android",
+            "armv7-android",
+            "x86_64-android"
+          ],
+          "absentIn": [
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "EGL/egl.h",
+              "kind": "include",
+              "line": 26
+            },
+            {
+              "name": "GLES/gl.h",
+              "kind": "include",
+              "line": 27
+            },
+            {
+              "name": "android/native_window.h",
+              "kind": "include",
+              "line": 28
+            },
+            {
+              "name": "android_native_app_glue.h",
+              "kind": "include",
+              "line": 29
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            30,
+            35
+          ],
+          "liveIn": [
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "armv7-android",
+            "x86_64-android"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "EGLContext",
+              "kind": "typedef",
+              "line": 31
+            },
+            {
+              "name": "EGLSurface",
+              "kind": "typedef",
+              "line": 32
+            },
+            {
+              "name": "JavaVM",
+              "kind": "typedef",
+              "line": 33
+            },
+            {
+              "name": "jobject",
+              "kind": "typedef",
+              "line": 34
+            },
+            {
+              "name": "android_app",
+              "kind": "typedef",
+              "line": 35
+            }
+          ]
+        },
+        {
+          "condition": "defined(_WIN32)",
+          "kind": "if",
+          "lines": [
+            38,
+            39
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "Windows.h",
+              "kind": "include",
+              "line": 39
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            40,
+            42
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "HWND",
+              "kind": "typedef",
+              "line": 41
+            },
+            {
+              "name": "HGLRC",
+              "kind": "typedef",
+              "line": 42
+            }
+          ]
+        },
+        {
+          "condition": "defined(__linux__) && !defined(ANDROID)",
+          "kind": "if",
+          "lines": [
+            45,
+            46
+          ],
+          "liveIn": [
+            "arm64-linux",
+            "x86_64-linux"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "GL/glx.h",
+              "kind": "include",
+              "line": 46
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            47,
+            49
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-linux",
+            "x86_64-linux"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "Window",
+              "kind": "typedef",
+              "line": 48
+            },
+            {
+              "name": "GLXContext",
+              "kind": "typedef",
+              "line": 49
+            }
+          ]
+        },
+        {
+          "condition": "defined(__EMSCRIPTEN__)",
+          "kind": "if",
+          "lines": [
+            52,
+            53
+          ],
+          "liveIn": [
+            "wasm-web",
+            "wasm_pthread-web"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "branchCount": 5,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(__EMSCRIPTEN__)",
+          "kind": "if",
+          "lines": [
+            20,
+            26
+          ],
+          "liveIn": [
+            "wasm-web",
+            "wasm_pthread-web"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "webgpu/webgpu_wagyu.h",
+              "kind": "include",
+              "line": 22
+            },
+            {
+              "name": "webgpu/webgpu.h",
+              "kind": "include",
+              "line": 24
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            27,
+            35
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "wasm-web",
+            "wasm_pthread-web"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "WGPUInstance",
+              "kind": "typedef",
+              "line": 28
+            },
+            {
+              "name": "WGPUAdapter",
+              "kind": "typedef",
+              "line": 29
+            },
+            {
+              "name": "WGPUQueue",
+              "kind": "typedef",
+              "line": 30
+            },
+            {
+              "name": "WGPUDevice",
+              "kind": "typedef",
+              "line": 31
+            },
+            {
+              "name": "WGPUTexture",
+              "kind": "typedef",
+              "line": 32
+            },
+            {
+              "name": "WGPUTextureView",
+              "kind": "typedef",
+              "line": 33
+            },
+            {
+              "name": "WGPUCommandEncoder",
+              "kind": "typedef",
+              "line": 34
+            },
+            {
+              "name": "WGPURenderPassEncoder",
+              "kind": "typedef",
+              "line": 35
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h",
+      "branchCount": 10,
+      "targetVaryingBranches": 4,
+      "branches": [
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            71,
+            72
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            73,
+            74
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            78,
+            79
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            80,
+            81
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/lua.h",
+      "branchCount": 6,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            169,
+            170
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            171,
+            172
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/lua/src/dmsdk/lua/luaconf.h",
+      "branchCount": 50,
+      "targetVaryingBranches": 18,
+      "branches": [
+        {
+          "condition": "!defined(LUA_ANSI) && defined(_WIN32)",
+          "kind": "if",
+          "lines": [
+            32,
+            33
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "LUA_WIN",
+              "kind": "define",
+              "line": 33
+            }
+          ]
+        },
+        {
+          "condition": "defined(_WIN32)",
+          "kind": "if",
+          "lines": [
+            83,
+            95
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "LUA_LDIR",
+              "kind": "define",
+              "line": 88
+            },
+            {
+              "name": "LUA_CDIR",
+              "kind": "define",
+              "line": 89
+            },
+            {
+              "name": "LUA_PATH_DEFAULT",
+              "kind": "define",
+              "line": 90
+            },
+            {
+              "name": "LUA_CPATH_DEFAULT",
+              "kind": "define",
+              "line": 93
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            96,
+            104
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "LUA_ROOT",
+              "kind": "define",
+              "line": 97
+            },
+            {
+              "name": "LUA_LDIR",
+              "kind": "define",
+              "line": 98
+            },
+            {
+              "name": "LUA_CDIR",
+              "kind": "define",
+              "line": 99
+            },
+            {
+              "name": "LUA_PATH_DEFAULT",
+              "kind": "define",
+              "line": 100
+            },
+            {
+              "name": "LUA_CPATH_DEFAULT",
+              "kind": "define",
+              "line": 103
+            }
+          ]
+        },
+        {
+          "condition": "defined(_WIN32)",
+          "kind": "if",
+          "lines": [
+            113,
+            114
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "LUA_DIRSEP",
+              "kind": "define",
+              "line": 114
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            115,
+            116
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "LUA_DIRSEP",
+              "kind": "define",
+              "line": 116
+            }
+          ]
+        },
+        {
+          "condition": "defined(__GNUC__) && ((__GNUC__*100 + __GNUC_MINOR__) >= 302) && \\",
+          "kind": "elif",
+          "lines": [
+            187,
+            191
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "armv7-android",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "wasm-web",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "unsupported token \"\\\""
+            }
+          ],
+          "introduces": [
+            {
+              "name": "LUAI_FUNC",
+              "kind": "define",
+              "line": 189
+            },
+            {
+              "name": "LUAI_DATA",
+              "kind": "define",
+              "line": 190
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            192,
+            194
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            }
+          ],
+          "introduces": [
+            {
+              "name": "LUAI_FUNC",
+              "kind": "define",
+              "line": 193
+            },
+            {
+              "name": "LUAI_DATA",
+              "kind": "define",
+              "line": 194
+            }
+          ]
+        },
+        {
+          "condition": "INT_MAX-20 < 32760",
+          "kind": "if",
+          "lines": [
+            393,
+            394
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            }
+          ],
+          "introduces": [
+            {
+              "name": "LUAI_BITSINT",
+              "kind": "define",
+              "line": 394
+            }
+          ]
+        },
+        {
+          "condition": "INT_MAX > 2147483640L",
+          "kind": "elif",
+          "lines": [
+            395,
+            397
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "INT_MAX is not decided by this macro assignment"
+            }
+          ],
+          "introduces": [
+            {
+              "name": "LUAI_BITSINT",
+              "kind": "define",
+              "line": 397
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            398,
+            399
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: INT_MAX is not decided by this macro assignment"
+            }
+          ],
+          "introduces": []
+        },
+        {
+          "condition": "LUAI_BITSINT >= 32",
+          "kind": "if",
+          "lines": [
+            415,
+            420
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "LUAI_BITSINT is not decided by this macro assignment"
+            }
+          ],
+          "introduces": [
+            {
+              "name": "LUAI_UINT32",
+              "kind": "define",
+              "line": 416
+            },
+            {
+              "name": "LUAI_INT32",
+              "kind": "define",
+              "line": 417
+            },
+            {
+              "name": "LUAI_MAXINT32",
+              "kind": "define",
+              "line": 418
+            },
+            {
+              "name": "LUAI_UMEM",
+              "kind": "define",
+              "line": 419
+            },
+            {
+              "name": "LUAI_MEM",
+              "kind": "define",
+              "line": 420
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            421,
+            427
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: LUAI_BITSINT is not decided by this macro assignment"
+            }
+          ],
+          "introduces": [
+            {
+              "name": "LUAI_UINT32",
+              "kind": "define",
+              "line": 423
+            },
+            {
+              "name": "LUAI_INT32",
+              "kind": "define",
+              "line": 424
+            },
+            {
+              "name": "LUAI_MAXINT32",
+              "kind": "define",
+              "line": 425
+            },
+            {
+              "name": "LUAI_UMEM",
+              "kind": "define",
+              "line": 426
+            },
+            {
+              "name": "LUAI_MEM",
+              "kind": "define",
+              "line": 427
+            }
+          ]
+        },
+        {
+          "condition": "defined(LUA_NUMBER_DOUBLE) && !defined(LUA_ANSI) && !defined(__SSE2__) && \\",
+          "kind": "if",
+          "lines": [
+            559,
+            580
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "armv7-android",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "wasm-web",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "unsupported token \"\\\""
+            }
+          ],
+          "introduces": [
+            {
+              "name": "lua_number2int",
+              "kind": "define",
+              "line": 565
+            },
+            {
+              "name": "lua_number2integer",
+              "kind": "define",
+              "line": 566
+            },
+            {
+              "name": "lua_number2int",
+              "kind": "define",
+              "line": 573
+            },
+            {
+              "name": "lua_number2integer",
+              "kind": "define",
+              "line": 575
+            }
+          ]
+        },
+        {
+          "condition": "defined(_MSC_VER)",
+          "kind": "if",
+          "lines": [
+            563,
+            569
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "lua_number2int",
+              "kind": "define",
+              "line": 565
+            },
+            {
+              "name": "lua_number2integer",
+              "kind": "define",
+              "line": 566
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            570,
+            576
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "lua_number2int",
+              "kind": "define",
+              "line": 573
+            },
+            {
+              "name": "lua_number2integer",
+              "kind": "define",
+              "line": 575
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            581,
+            584
+          ],
+          "liveIn": [],
+          "absentIn": [],
+          "unresolvedIn": [
+            {
+              "target": "arm64-android",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-ios",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-linux",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64-osx",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "arm64_sim-ios",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "armv7-android",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "wasm-web",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "wasm_pthread-web",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-android",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-linux",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-osx",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            },
+            {
+              "target": "x86_64-win32",
+              "reason": "an earlier arm of this group is unresolved: unsupported token \"\\\""
+            }
+          ],
+          "introduces": [
+            {
+              "name": "lua_number2int",
+              "kind": "define",
+              "line": 582
+            },
+            {
+              "name": "lua_number2integer",
+              "kind": "define",
+              "line": 583
+            }
+          ]
+        },
+        {
+          "condition": "defined(__APPLE__)",
+          "kind": "if",
+          "lines": [
+            648,
+            679
+          ],
+          "liveIn": [
+            "arm64-ios",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-linux",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "stdio.h",
+              "kind": "include",
+              "line": 649
+            },
+            {
+              "name": "stdlib.h",
+              "kind": "include",
+              "line": 650
+            },
+            {
+              "name": "string.h",
+              "kind": "include",
+              "line": 651
+            },
+            {
+              "name": "unistd.h",
+              "kind": "include",
+              "line": 652
+            },
+            {
+              "name": "LUA_TMPNAMBUFSIZE",
+              "kind": "define",
+              "line": 653
+            },
+            {
+              "name": "lua_tmpnam",
+              "kind": "define",
+              "line": 678
+            }
+          ]
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            689,
+            691
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-linux",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-ios",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": [
+            {
+              "name": "LUA_TMPNAMBUFSIZE",
+              "kind": "define",
+              "line": 690
+            },
+            {
+              "name": "lua_tmpnam",
+              "kind": "define",
+              "line": 691
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
+      "branchCount": 3,
+      "targetVaryingBranches": 2,
+      "branches": [
+        {
+          "condition": "defined(__GNUC__)",
+          "kind": "if",
+          "lines": [
+            77,
+            78
+          ],
+          "liveIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "absentIn": [
+            "x86_64-win32"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        },
+        {
+          "condition": "(no preceding arm)",
+          "kind": "else",
+          "lines": [
+            79,
+            80
+          ],
+          "liveIn": [
+            "x86_64-win32"
+          ],
+          "absentIn": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx"
+          ],
+          "unresolvedIn": [],
+          "introduces": []
+        }
+      ]
+    }
+  ],
+  "declarations": [
+    {
+      "name": "dmSnPrintf",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+      "line": 49,
+      "basis": "gated-region",
+      "absentDisposition": "respelled",
+      "respelledAs": {
+        "disposition": "respelled",
+        "arm": "else",
+        "condition": "(no preceding arm)",
+        "line": 51
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx"
+      ],
+      "absentIn": [
+        "x86_64-win32"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "LogInternal",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+      "line": 168,
+      "basis": "gated-region",
+      "absentDisposition": "respelled",
+      "respelledAs": {
+        "disposition": "respelled",
+        "arm": "else",
+        "condition": "(no preceding arm)",
+        "line": 171
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx"
+      ],
+      "absentIn": [
+        "x86_64-win32"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "ProfileLogText",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+      "line": 392,
+      "basis": "gated-region",
+      "absentDisposition": "respelled",
+      "respelledAs": {
+        "disposition": "respelled",
+        "arm": "else",
+        "condition": "(no preceding arm)",
+        "line": 394
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx"
+      ],
+      "absentIn": [
+        "x86_64-win32"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "EGLContext",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 31,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(ANDROID)",
+        "include": "EGL/egl.h",
+        "line": 26
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-android",
+        "armv7-android",
+        "x86_64-android"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "EGLSurface",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 32,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(ANDROID)",
+        "include": "EGL/egl.h",
+        "line": 26
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-android",
+        "armv7-android",
+        "x86_64-android"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "JavaVM",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 33,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(ANDROID)",
+        "include": "EGL/egl.h",
+        "line": 26
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-android",
+        "armv7-android",
+        "x86_64-android"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "jobject",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 34,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(ANDROID)",
+        "include": "EGL/egl.h",
+        "line": 26
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-android",
+        "armv7-android",
+        "x86_64-android"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "android_app",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 35,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(ANDROID)",
+        "include": "EGL/egl.h",
+        "line": 26
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-android",
+        "armv7-android",
+        "x86_64-android"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "HWND",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 41,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(_WIN32)",
+        "include": "Windows.h",
+        "line": 39
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx"
+      ],
+      "absentIn": [
+        "x86_64-win32"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "HGLRC",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 42,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(_WIN32)",
+        "include": "Windows.h",
+        "line": 39
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx"
+      ],
+      "absentIn": [
+        "x86_64-win32"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "Window",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 48,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__linux__) && !defined(ANDROID)",
+        "include": "GL/glx.h",
+        "line": 46
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-linux",
+        "x86_64-linux"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "GLXContext",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 49,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__linux__) && !defined(ANDROID)",
+        "include": "GL/glx.h",
+        "line": 46
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "arm64-linux",
+        "x86_64-linux"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeiOSUIWindow",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 76,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "id"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeiOSUIView",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 85,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "id"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeiOSEAGLContext",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 94,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "id"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeOSXNSWindow",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 103,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "id"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeOSXNSView",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 112,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "id"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeOSXNSOpenGLContext",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 121,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "id"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeWindowsHWND",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 130,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "HWND"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeWindowsHGLRC",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 139,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "HGLRC"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeAndroidEGLContext",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 148,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "EGLContext"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeAndroidEGLSurface",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 157,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "EGLSurface"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeAndroidJavaVM",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 166,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "JavaVM"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeAndroidActivity",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 175,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "jobject"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeAndroidApp",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 184,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "android_app"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeX11Window",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 193,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "Window"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::GetNativeX11GLXContext",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_native.h",
+      "line": 202,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "GLXContext"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPUInstance",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 28,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPUAdapter",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 29,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPUQueue",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 30,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPUDevice",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 31,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPUTexture",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 32,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPUTextureView",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 33,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPUCommandEncoder",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 34,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "WGPURenderPassEncoder",
+      "kind": "type-alias",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 35,
+      "basis": "gated-region",
+      "absentDisposition": "platform-supplied",
+      "respelledAs": {
+        "disposition": "platform-supplied",
+        "arm": "if",
+        "condition": "defined(__EMSCRIPTEN__)",
+        "include": "webgpu/webgpu_wagyu.h",
+        "line": 22
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [
+        "wasm-web",
+        "wasm_pthread-web"
+      ],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::WebGPUGetInstance",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 50,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "WGPUInstance"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::WebGPUGetAdapter",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 51,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "WGPUAdapter"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::WebGPUGetDevice",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 52,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "WGPUDevice"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::WebGPUGetQueue",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 53,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "WGPUQueue"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::WebGPUGetTextureView",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 54,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "WGPUTextureView"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::WebGPUGetTexture",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 55,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "WGPUTexture"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmGraphics::WebGPUGetActiveCommandEncoder",
+      "kind": "function",
+      "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h",
+      "line": 57,
+      "basis": "gated-type",
+      "absentDisposition": null,
+      "respelledAs": null,
+      "gatedTypeNames": [
+        "WGPUCommandEncoder"
+      ],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx",
+        "x86_64-win32"
+      ],
+      "absentIn": [],
+      "unresolvedIn": []
+    },
+    {
+      "name": "dmScript::LuaStackCheck::Error",
+      "kind": "method",
+      "header": "upstream/defold/engine/script/src/dmsdk/script/script.h",
+      "line": 78,
+      "basis": "gated-region",
+      "absentDisposition": "respelled",
+      "respelledAs": {
+        "disposition": "respelled",
+        "arm": "else",
+        "condition": "(no preceding arm)",
+        "line": 80
+      },
+      "gatedTypeNames": [],
+      "liveIn": [
+        "arm64-android",
+        "arm64-ios",
+        "arm64-linux",
+        "arm64-osx",
+        "arm64_sim-ios",
+        "armv7-android",
+        "wasm-web",
+        "wasm_pthread-web",
+        "x86_64-android",
+        "x86_64-linux",
+        "x86_64-osx"
+      ],
+      "absentIn": [
+        "x86_64-win32"
+      ],
+      "unresolvedIn": []
+    }
+  ]
+}

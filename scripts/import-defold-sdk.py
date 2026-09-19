@@ -207,6 +207,26 @@ def symbol_from_node(
         "status": status,
         "access": node.get("access", access),
     }
+    # How this declaration is reached, which is not the same question as
+    # whether it exists.
+    #
+    # dmSDK is a HEADER sdk: an extension includes it and compiles against it.
+    # A `static inline` function - dmEndian::ByteSwap is one - is compiled into
+    # the caller's translation unit and deliberately emits no external symbol.
+    # Our generated bindings are themselves C++ that Extender compiles, so such
+    # a function is reached by the thunk we already emit; finding it absent from
+    # every engine archive is the CORRECT result, not a missing symbol. Without
+    # recording this, a linkage check cannot tell "header-only by design" from
+    # "declared but not shipped" and would block both alike.
+    #
+    # `mangledName` is the compiler's own answer to which symbol a declaration
+    # denotes. Recording it lets a symbol-evidence pass match mangled-to-mangled
+    # instead of reconstructing names from demangler output, which differs
+    # between the Itanium and MSVC ABIs and cannot separate overloads without
+    # resolving typedefs.
+    for field, key in (("inline", "inline"), ("storageClass", "storageClass"), ("mangledName", "mangledName")):
+        if node.get(field):
+            symbol[key] = node[field]
     type_name = node.get("type", {}).get("qualType")
     if type_name:
         symbol["type"] = type_name
@@ -280,7 +300,67 @@ def include_roots() -> list[Path]:
     return sorted(roots)
 
 
-def parse_header(header: Path, includes: list[Path]) -> dict[str, Any]:
+# The clang target triple each bundle target is parsed under, read from the
+# override that already models targets rather than restated here.
+#
+# Mangling is ABI-specific and NOT derivable. MSVC's scheme was never published,
+# and even among Itanium targets an ILP32 architecture spells a 64-bit integer
+# differently from an LP64 one - dmEndian::ByteSwap ends `Ey` on armv7 and wasm
+# but `Em` on aarch64-linux. Inferring one platform's symbols from another's
+# therefore reports absences that are really spelling differences.
+#
+# Only the MANGLING is taken from these passes; the declarations themselves come
+# from the primary parse, so a target whose parse fails costs mangled names
+# rather than declarations.
+def target_triples() -> dict[str, str]:
+    overrides = json.loads((ROOT / "packages/bindings/overrides/dmsdk-target-macros.json").read_text())
+    triples = overrides.get("triples") or {}
+    if not triples:
+        raise SystemExit("dmsdk-target-macros.json declares no target triples")
+    return triples
+
+
+def declaration_key(declaration: dict[str, Any]) -> tuple:
+    """What identifies a declaration within one header across two parses.
+
+    Name alone is not enough - overloads share it - and the mangled name cannot
+    be used because it is the thing being joined. Line plus signature separates
+    every overload in practice.
+    """
+    return (declaration.get("name"), declaration.get("line"), declaration.get("type"))
+
+
+def merge_target_mangling(
+    primary: list[dict[str, Any]],
+    triples: dict[str, str],
+    per_triple: dict[str, list[dict[str, Any]]],
+) -> None:
+    """Record, per BUNDLE TARGET, the symbol clang says that target would emit."""
+    indexed: dict[str, dict[str, dict[tuple, str]]] = {}
+    for triple, entries in per_triple.items():
+        by_header: dict[str, dict[tuple, str]] = {}
+        for entry in entries:
+            by_header[entry.get("header")] = {
+                declaration_key(d): d["mangledName"]
+                for d in entry.get("declarations", [])
+                if d.get("mangledName")
+            }
+        indexed[triple] = by_header
+
+    for entry in primary:
+        header = entry.get("header")
+        for declaration in entry.get("declarations", []):
+            key = declaration_key(declaration)
+            names = {}
+            for target, triple in triples.items():
+                mangled = indexed.get(triple, {}).get(header, {}).get(key)
+                if mangled:
+                    names[target] = mangled
+            if names:
+                declaration["mangledNames"] = names
+
+
+def parse_header(header: Path, includes: list[Path], target: str | None = None) -> dict[str, Any]:
     command = [
         "clang++",
         "-x",
@@ -290,6 +370,7 @@ def parse_header(header: Path, includes: list[Path]) -> dict[str, Any]:
         "-Wno-everything",
         "-Xclang",
         "-ast-dump=json",
+        *(("-target", target) if target else ()),
         "-DLUA_API=",
         "-DDM_PLATFORM_OSX=1",
         *(f"-I{path}" for path in includes),
@@ -348,6 +429,14 @@ def inventory() -> dict[str, Any]:
             includes.append(temp / "include")
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
             results = list(executor.map(lambda header: parse_header(header, includes), headers))
+            # One pass per DISTINCT triple; two bundle targets that share an
+            # ABI share a parse.
+            triples = target_triples()
+            per_triple: dict[str, list[dict[str, Any]]] = {}
+            for triple in sorted(set(triples.values())):
+                per_triple[triple] = list(executor.map(
+                    lambda header, t=triple: parse_header(header, includes, t), headers))
+        merge_target_mangling(results, triples, per_triple)
 
     parsed = [item for item in results if "error" not in item]
     failures = [

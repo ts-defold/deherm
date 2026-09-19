@@ -2,9 +2,83 @@
   "schemaVersion": 1,
   "scope": "Algebraic semantic-token resolutions shared by all lowering backends. Rules select value/effect/context shapes; route IDs are forbidden.",
   "selectorLanguage": {
-    "fields": ["surface", "valueKindsAll", "valueKindsAny", "contexts", "semanticTokensAll", "semanticTokensAny"],
+    "fields": ["surface", "valueKindsAll", "valueKindsAny", "contexts", "semanticTokensAll", "semanticTokensAny", "linkage", "availabilityKinds"],
     "identitySelectors": "forbidden",
-    "overlap": "Two matching rules may not resolve the same token for one unit"
+    "overlap": "Two matching rules may not resolve the same token for one unit",
+    "measuredFields": {
+      "note": "`linkage` and `availabilityKinds` are categories of MEASUREMENT, not names. They are the answers scripts/generate-dmsdk-symbol-evidence.mjs read out of the engine archives the pinned engine/defoldsdk.zip says Extender links, per bundle target and per build variant. Selecting on them states which evidence a rule needs, and a declaration the evidence does not cover matches no rule and stays blocked.",
+      "linkage": {
+        "external": "an externally visible definition exists in a linked engine archive",
+        "header-only": "inline or static, so no external symbol exists by design",
+        "absent": "the archives were asked for every target and none defines it",
+        "unmeasured": "clang named no symbol for it, so the archives were never asked"
+      },
+      "availabilityKinds": {
+        "all-targets-all-variants": "defined for every bundle target under every build variant",
+        "header-only": "no symbol is needed for any target or variant",
+        "target-subset": "defined for some bundle targets and measurably not for others",
+        "variant-conditional": "the debug, release and headless link lines do not agree",
+        "partially-measured": "at least one bundle target could not be asked",
+        "unmeasured": "no bundle target could be asked",
+        "unlinked": "asked everywhere, defined nowhere"
+      }
+    }
   },
-  "rules": []
+  "rules": [
+    {
+      "id": "dmsdk-linked-engine-archive-symbol",
+      "scope": "Linkage is answered when a linked engine archive defines the symbol the declaration denotes.",
+      "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+      "rationale": "The token was added to every dmSDK unit before any declaration was examined, so it recorded our not having looked rather than anything about the API. llvm-nm over defoldsdk/lib/<dir> - restricted to the engineLibs the SDK's own extender/build.yml names for that platform, edited by the SDK's own variant appmanifest - answers it declaration by declaration, matching the compiler's own mangled name for each target's ABI.",
+      "selector": {
+        "surface": "dmsdk",
+        "semanticTokensAll": ["native-symbol-linkage"],
+        "linkage": ["external"]
+      },
+      "resolves": {
+        "native-symbol-linkage": "linked-engine-archive-symbol"
+      }
+    },
+    {
+      "id": "dmsdk-header-only-by-design",
+      "scope": "Linkage is answered when the declaration is inline or static and therefore emits no external symbol.",
+      "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+      "rationale": "An inline or static declaration is absent from every archive BY DESIGN, and our bindings are C++ that Extender compiles, so it is reached through the thunk already emitted rather than by linking. Treating that absence as a missing symbol would block the one case where there is nothing to miss.",
+      "selector": {
+        "surface": "dmsdk",
+        "semanticTokensAll": ["native-symbol-linkage"],
+        "linkage": ["header-only"]
+      },
+      "resolves": {
+        "native-symbol-linkage": "header-only-compiled-into-extension-translation-unit"
+      }
+    },
+    {
+      "id": "dmsdk-available-on-every-target-and-variant",
+      "scope": "The target/variant availability matrix is answered when the measurement agrees across all of them.",
+      "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+      "rationale": "The token stood at 'unverified-all-targets' for every unit, which is a statement about the census rather than the API. It is now measured over all 12 bundle targets and all 3 build variants Defold ships an appmanifest for. This rule resolves only the uniform answers: a declaration that is target-conditional, variant-conditional, unlinked, or that some target could not be asked about, matches no rule and stays blocked, because those are real findings rather than missing work.",
+      "selector": {
+        "surface": "dmsdk",
+        "semanticTokensAll": ["target-feature-symbol-matrix"],
+        "availabilityKinds": ["all-targets-all-variants", "header-only"]
+      },
+      "resolves": {
+        "target-feature-symbol-matrix": "defined-for-every-bundle-target-and-build-variant"
+      }
+    },
+    {
+      "id": "dmsdk-main-thread-call-context",
+      "scope": "Call-thread affinity is a property of OUR calling context, and our calling context has one thread.",
+      "evidence": "defold/defold_hermes/src/extension.cpp",
+      "rationale": "The token was read as a question about each native API's thread-safety, which no census can answer from a header. The answerable question is which thread we call FROM. The extension spawns no threads - there is no std::thread, no pthread_create and no dmThread::New anywhere in defold/defold_hermes/src - and every binding call enters through UpdateLuaInstance (a Lua callback), through UpdateExtension, or through the Initialize/Finalize and AppInitialize/AppFinalize extension lifecycle, all of which Defold runs on the main thread. The callback_lifecycle_registry already enforces this, rejecting any operation that arrives on a thread other than its owner's. This resolution says nothing about a native callback being INVOKED on another thread; that is callback-thread-reentrancy-lifetime, which stays unresolved.",
+      "selector": {
+        "surface": "dmsdk",
+        "semanticTokensAll": ["call-thread-affinity"]
+      },
+      "resolves": {
+        "call-thread-affinity": "main-thread-only-single-threaded-extension-runtime"
+      }
+    }
+  ]
 }
