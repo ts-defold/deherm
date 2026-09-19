@@ -4,7 +4,7 @@ title: Take release reachability from ttsc, and lower reachable code to native
 description: The checker resolves which API symbols a project actually calls; release builds emit only those, and the reachable surface is progressively lowered from bytecode to extern_c native code.
 tags: [decision, reachability, tree-shaking, ttsc, static-hermes, release, performance]
 status: accepted
-generated: { by: claude/opus-5, at: 2026-09-19T00:10:00-04:00 }
+generated: { by: claude/opus-5, at: 2026-09-18T22:40:00-04:00 }
 sources:
   - id: build-seam
     resource: ./toolchain-distribution-and-build-seam.md
@@ -170,6 +170,16 @@ first-class artifact rather than a filtered copy of another. The completion
 matrix is already per-target for this reason. A route proven on `jsi` is not
 thereby proven on `direct-memory`, and one retained in a development link is not
 thereby present in a release one.
+
+That is enforced rather than merely stated for the first product example to
+live in more than one projection at once. `examples/war-battles-online/integration/projections.mjs`
+declares the three War Battles runtime projections by exactly the four
+parameters above, with what each one's evidence observed and what it explicitly
+does not claim; each evidence document embeds its declaration verbatim, and
+`pnpm check:war-battles-projections` fails by name when a declared projection
+has no evidence. Declaring the set separately from the files is the point: a
+projection nobody ran leaves no artifact at all, so without a declaration its
+absence is indistinguishable from never having been expected.
 
 ## Where the hazard actually lives
 

@@ -123,6 +123,9 @@ test("Defold attachment consumes generated proxy evidence and the independent en
   );
   const bySource = new Map(exampleManifest.components.map((component) => [component.source, component]));
   assert.deepEqual([...bySource.keys()].sort(), [
+    // The camera is a component like any other: the scrolling world reads its
+    // orthographic zoom back off the render camera rather than assuming one.
+    "main/camera.script.ts",
     "main/player.script.ts",
     "main/rocket.script.ts",
     "main/ui.gui.ts",

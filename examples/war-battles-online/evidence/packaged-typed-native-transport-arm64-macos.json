@@ -1,8 +1,29 @@
 {
-  "schemaVersion": 1,
-  "title": "War Battles packaged arm64-macOS transport evidence",
-  "stage": "packaged-engine-runtime",
-  "evidenceBoundary": "Observed transport selection in a packaged Defold engine, with the span durations the telemetry ring recorded. It is not conformance evidence, not allocation evidence, and not a benchmark: the two runs executed different amounts of gameplay and both engines are Extender debug-variant builds.",
+  "schemaVersion": 2,
+  "projection": {
+    "id": "native-arm64-macos-typed-native-transport",
+    "title": "Per-route transport selection observed inside a packaged arm64-macOS engine",
+    "runtime": "hermes",
+    "transport": [
+      "typed-native",
+      "jsi"
+    ],
+    "reachableSet": "complete",
+    "profile": "DEHERM_PROFILE",
+    "stage": "packaged-engine-runtime",
+    "observed": [
+      "An engine assembled with transport telemetry on reported, per route, which transport each binding crossing actually took, with the span durations its producer ring recorded.",
+      "The AOT `extern_c` unit and the bytecode bundle evaluated into one Hermes runtime, and the unit installed itself over the script bridge.",
+      "A control engine, produced by the same command with the assembled extension removed, registered no static unit and put every route on `jsi`, so the split is the assembly rather than the instrument."
+    ],
+    "excluded": [
+      "the shipped build: this engine is the instrumented one, and the shipped default is telemetry off",
+      "conformance: a route crossing on a transport is not a route behaving correctly on it",
+      "allocation and benchmark claims: the two runs executed different amounts of gameplay and both engines are Extender debug-variant builds",
+      "visual correctness",
+      "the gameplay markers themselves, which the `native-arm64-macos` projection owns"
+    ]
+  },
   "target": "arm64-macos",
   "engineRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "buildServer": "http://localhost:9010 (pinned local Extender)",
@@ -10,19 +31,11 @@
   "telemetry": {
     "switch": "DEHERM_PROFILE",
     "materialisedBy": "node scripts/assemble-typed-native-extension.mjs --project <dir> --profile",
+    "recordedBy": "node examples/war-battles-online/integration/check-typed-native-transport.mjs --run <with-typed-native|control>",
     "spanSites": {
       "typed-native": "defold/defold_hermes/src/generated_script_universal_value_capi.cpp: deherm_script_universal_dispatch, reachable in this binary only from the extern_c static frame",
       "jsi": "defold/defold_hermes/src/script_jsi_bridge.cpp: the JSI host function the generated SDK's callScriptApi calls"
     }
-  },
-  "assembledExtension": {
-    "name": "defold_hermes_typed_native",
-    "unit": "sh_export_deherm_typed_native",
-    "emittedCSha256": "cd9cdec20a31a8a308a2f9bde72e294610310952c68fc4d61822d78fcbf811c5",
-    "adaptedSourceSha256": "e551fd0b83f075d9db4dd6a2ac018fa48112e17ee09eae1d439f152121d8400d",
-    "externCalleeCount": 37,
-    "externCallSiteCount": 67,
-    "hermesArchiveModel": "rel"
   },
   "typedNativeBridge": {
     "claimedRouteCount": 320,
@@ -56,181 +69,184 @@
     ],
     "planTypedNativeEmit": 325
   },
-  "artifacts": {
-    "examples/war-battles-online/defold/build/arm64-osx/dmengine": "552507cff88b92f21ca201b9f1eac883ccd37620a38662c667a500b43daaa54b",
-    "examples/war-battles-online/defold/defold_hermes_typed_native/src/deherm_typed_native_unit.cpp": "e551fd0b83f075d9db4dd6a2ac018fa48112e17ee09eae1d439f152121d8400d",
-    "examples/war-battles-online/defold/build/default/deherm/app.dehermc": "87ad8a36ad9632132410b715e829741ec766f994d0508dd58e2c443bb05214fd"
-  },
   "runs": {
     "withAssembledTypedNativeExtension": {
-      "reason": "periodic",
-      "routeCount": 15,
-      "spansProduced": 104033,
+      "reason": "finalize",
+      "routeCount": 16,
+      "spansProduced": 8187,
       "spansDropped": 0,
       "censusOverflow": 0,
       "typedNativeUnitRegistered": true,
       "staticUnitsEvaluated": 1,
       "transportCounts": {
         "jsi": 2,
-        "typed-native": 13
+        "typed-native": 14
       },
       "rows": [
         {
           "routeId": "script:gui.get_node",
-          "stableId": 509983822,
           "transport": "jsi",
-          "claimedByTypedNativeBridge": false,
+          "stableId": 509983822,
           "calls": 1,
-          "totalNanoseconds": 24208,
-          "meanNanoseconds": 24208,
-          "failedCrossings": 0
+          "totalNanoseconds": 10083,
+          "meanNanoseconds": 10083,
+          "failures": 0
         },
         {
           "routeId": "script:gui.set_text",
-          "stableId": 1480837389,
           "transport": "jsi",
-          "claimedByTypedNativeBridge": false,
-          "calls": 1,
-          "totalNanoseconds": 6958,
-          "meanNanoseconds": 6958,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:vmath.vector3",
-          "stableId": 3491633886,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 19359,
-          "totalNanoseconds": 14246661,
-          "meanNanoseconds": 735,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:go.get_position",
-          "stableId": 3918772974,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 19356,
-          "totalNanoseconds": 6285240,
-          "meanNanoseconds": 324,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:go.set_position",
-          "stableId": 608141138,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 19353,
-          "totalNanoseconds": 7144918,
-          "meanNanoseconds": 369,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:msg.post",
-          "stableId": 1111726479,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 9757,
-          "totalNanoseconds": 93703747,
-          "meanNanoseconds": 9603,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:vmath.length",
-          "stableId": 2370510694,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 9756,
-          "totalNanoseconds": 2937221,
-          "meanNanoseconds": 301,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:vmath.quat_rotation_z",
-          "stableId": 653417741,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 8815,
-          "totalNanoseconds": 2438346,
-          "meanNanoseconds": 276,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:go.set_rotation",
-          "stableId": 2093413559,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 8815,
-          "totalNanoseconds": 1612603,
-          "meanNanoseconds": 182,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:vmath.normalize",
-          "stableId": 3582341977,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
-          "calls": 8814,
-          "totalNanoseconds": 20478587,
-          "meanNanoseconds": 2323,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:sys.get_config_number",
-          "stableId": 1601401386,
-          "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 1480837389,
           "calls": 2,
-          "totalNanoseconds": 13375,
-          "meanNanoseconds": 6687,
-          "failedCrossings": 0
+          "totalNanoseconds": 15666,
+          "meanNanoseconds": 7833,
+          "failures": 0
         },
         {
           "routeId": "script:camera.get_cameras",
-          "stableId": 1001666066,
           "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 1001666066,
           "calls": 1,
-          "totalNanoseconds": 55000,
-          "meanNanoseconds": 55000,
-          "failedCrossings": 0
+          "totalNanoseconds": 19667,
+          "meanNanoseconds": 19667,
+          "failures": 0
         },
         {
           "routeId": "script:camera.get_orthographic_zoom",
-          "stableId": 1514123934,
           "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 1514123934,
           "calls": 1,
-          "totalNanoseconds": 6167,
-          "meanNanoseconds": 6167,
-          "failedCrossings": 0
+          "totalNanoseconds": 2292,
+          "meanNanoseconds": 2292,
+          "failures": 0
         },
         {
           "routeId": "script:factory.create",
-          "stableId": 96184340,
           "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 96184340,
           "calls": 1,
-          "totalNanoseconds": 417166,
-          "meanNanoseconds": 417166,
-          "failedCrossings": 0
+          "totalNanoseconds": 444042,
+          "meanNanoseconds": 444042,
+          "failures": 0
         },
         {
           "routeId": "script:go.delete",
-          "stableId": 2920192283,
           "transport": "typed-native",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 2920192283,
+          "calls": 2,
+          "totalNanoseconds": 27167,
+          "meanNanoseconds": 13583,
+          "failures": 0
+        },
+        {
+          "routeId": "script:go.get_position",
+          "transport": "typed-native",
+          "stableId": 3918772974,
+          "calls": 1520,
+          "totalNanoseconds": 815096,
+          "meanNanoseconds": 536,
+          "failures": 0
+        },
+        {
+          "routeId": "script:go.set_position",
+          "transport": "typed-native",
+          "stableId": 608141138,
+          "calls": 1517,
+          "totalNanoseconds": 1397994,
+          "meanNanoseconds": 921,
+          "failures": 0
+        },
+        {
+          "routeId": "script:go.set_rotation",
+          "transport": "typed-native",
+          "stableId": 2093413559,
+          "calls": 661,
+          "totalNanoseconds": 128075,
+          "meanNanoseconds": 193,
+          "failures": 0
+        },
+        {
+          "routeId": "script:msg.post",
+          "transport": "typed-native",
+          "stableId": 1111726479,
+          "calls": 820,
+          "totalNanoseconds": 11370673,
+          "meanNanoseconds": 13866,
+          "failures": 0
+        },
+        {
+          "routeId": "script:sys.get_config_number",
+          "transport": "typed-native",
+          "stableId": 1601401386,
+          "calls": 2,
+          "totalNanoseconds": 5041,
+          "meanNanoseconds": 2520,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.length",
+          "transport": "typed-native",
+          "stableId": 2370510694,
+          "calls": 816,
+          "totalNanoseconds": 542142,
+          "meanNanoseconds": 664,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.normalize",
+          "transport": "typed-native",
+          "stableId": 3582341977,
+          "calls": 659,
+          "totalNanoseconds": 2066996,
+          "meanNanoseconds": 3136,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.quat",
+          "transport": "typed-native",
+          "stableId": 2756728049,
           "calls": 1,
-          "totalNanoseconds": 3084,
-          "meanNanoseconds": 3084,
-          "failedCrossings": 0
+          "totalNanoseconds": 1042,
+          "meanNanoseconds": 1042,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.quat_rotation_z",
+          "transport": "typed-native",
+          "stableId": 653417741,
+          "calls": 660,
+          "totalNanoseconds": 379294,
+          "meanNanoseconds": 574,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.vector3",
+          "transport": "typed-native",
+          "stableId": 3491633886,
+          "calls": 1523,
+          "totalNanoseconds": 2592317,
+          "meanNanoseconds": 1702,
+          "failures": 0
         }
-      ]
+      ],
+      "artifacts": {
+        "examples/war-battles-online/defold/build/arm64-osx/dmengine": "54c063ce745402536534b2c1667a9fd4ea708d1417639a336d1c43f946aa46f2",
+        "examples/war-battles-online/defold/build/default/deherm/app.dehermc": "d273437192190b7e458bff398a35e0662d07045440360bf094e154b9d740f276"
+      },
+      "assembledExtension": {
+        "name": "defold_hermes_typed_native",
+        "unit": "sh_export_deherm_typed_native",
+        "profile": true,
+        "emittedCSha256": "3ed34496f6af1d0897f9cc5e96e028740ca55bf4099e4e139073d13bc42aa4f2",
+        "adaptedSourceSha256": "48c9c272a76364452121557d69be845a433501b23253396896922163bf7afa7b",
+        "externCalleeCount": 37,
+        "externCallSiteCount": 67,
+        "hermesArchiveModel": "rel"
+      }
     },
     "controlWithoutAssembledExtension": {
-      "reason": "periodic",
+      "reason": "finalize",
       "routeCount": 16,
-      "spansProduced": 917376,
+      "spansProduced": 8192,
       "spansDropped": 0,
       "censusOverflow": 0,
       "typedNativeUnitRegistered": false,
@@ -240,167 +256,179 @@
       },
       "rows": [
         {
-          "routeId": "script:vmath.vector3",
-          "stableId": 3491633886,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 180804,
-          "totalNanoseconds": 905236941,
-          "meanNanoseconds": 5006,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:go.get_position",
-          "stableId": 3918772974,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 180801,
-          "totalNanoseconds": 203130654,
-          "meanNanoseconds": 1123,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:go.set_position",
-          "stableId": 608141138,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 180798,
-          "totalNanoseconds": 362852496,
-          "meanNanoseconds": 2006,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:msg.post",
-          "stableId": 1111726479,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 163412,
-          "totalNanoseconds": 1788397583,
-          "meanNanoseconds": 10944,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:vmath.length",
-          "stableId": 2370510694,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 163409,
-          "totalNanoseconds": 211198001,
-          "meanNanoseconds": 1292,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:go.set_rotation",
-          "stableId": 2093413559,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 16048,
-          "totalNanoseconds": 12116825,
-          "meanNanoseconds": 755,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:vmath.quat_rotation_z",
-          "stableId": 653417741,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 16047,
-          "totalNanoseconds": 15594798,
-          "meanNanoseconds": 971,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:vmath.normalize",
-          "stableId": 3582341977,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 16046,
-          "totalNanoseconds": 18195879,
-          "meanNanoseconds": 1133,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:sys.get_config_number",
-          "stableId": 1601401386,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 2,
-          "totalNanoseconds": 6207,
-          "meanNanoseconds": 3103,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:gui.set_text",
-          "stableId": 1480837389,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": false,
-          "calls": 2,
-          "totalNanoseconds": 16209,
-          "meanNanoseconds": 8104,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:go.delete",
-          "stableId": 2920192283,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
-          "calls": 2,
-          "totalNanoseconds": 19874,
-          "meanNanoseconds": 9937,
-          "failedCrossings": 0
-        },
-        {
           "routeId": "script:camera.get_cameras",
-          "stableId": 1001666066,
           "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 1001666066,
           "calls": 1,
-          "totalNanoseconds": 39625,
-          "meanNanoseconds": 39625,
-          "failedCrossings": 0
+          "totalNanoseconds": 98125,
+          "meanNanoseconds": 98125,
+          "failures": 0
         },
         {
           "routeId": "script:camera.get_orthographic_zoom",
+          "transport": "jsi",
           "stableId": 1514123934,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
           "calls": 1,
-          "totalNanoseconds": 4917,
-          "meanNanoseconds": 4917,
-          "failedCrossings": 0
-        },
-        {
-          "routeId": "script:gui.get_node",
-          "stableId": 509983822,
-          "transport": "jsi",
-          "claimedByTypedNativeBridge": false,
-          "calls": 1,
-          "totalNanoseconds": 13958,
-          "meanNanoseconds": 13958,
-          "failedCrossings": 0
+          "totalNanoseconds": 4958,
+          "meanNanoseconds": 4958,
+          "failures": 0
         },
         {
           "routeId": "script:factory.create",
-          "stableId": 96184340,
           "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 96184340,
           "calls": 1,
-          "totalNanoseconds": 178583,
-          "meanNanoseconds": 178583,
-          "failedCrossings": 0
+          "totalNanoseconds": 321291,
+          "meanNanoseconds": 321291,
+          "failures": 0
+        },
+        {
+          "routeId": "script:go.delete",
+          "transport": "jsi",
+          "stableId": 2920192283,
+          "calls": 2,
+          "totalNanoseconds": 6792,
+          "meanNanoseconds": 3396,
+          "failures": 0
+        },
+        {
+          "routeId": "script:go.get_position",
+          "transport": "jsi",
+          "stableId": 3918772974,
+          "calls": 1521,
+          "totalNanoseconds": 2163661,
+          "meanNanoseconds": 1422,
+          "failures": 0
+        },
+        {
+          "routeId": "script:go.set_position",
+          "transport": "jsi",
+          "stableId": 608141138,
+          "calls": 1518,
+          "totalNanoseconds": 3552405,
+          "meanNanoseconds": 2340,
+          "failures": 0
+        },
+        {
+          "routeId": "script:go.set_rotation",
+          "transport": "jsi",
+          "stableId": 2093413559,
+          "calls": 661,
+          "totalNanoseconds": 1316542,
+          "meanNanoseconds": 1991,
+          "failures": 0
+        },
+        {
+          "routeId": "script:gui.get_node",
+          "transport": "jsi",
+          "stableId": 509983822,
+          "calls": 1,
+          "totalNanoseconds": 7291,
+          "meanNanoseconds": 7291,
+          "failures": 0
+        },
+        {
+          "routeId": "script:gui.set_text",
+          "transport": "jsi",
+          "stableId": 1480837389,
+          "calls": 2,
+          "totalNanoseconds": 12959,
+          "meanNanoseconds": 6479,
+          "failures": 0
+        },
+        {
+          "routeId": "script:msg.post",
+          "transport": "jsi",
+          "stableId": 1111726479,
+          "calls": 821,
+          "totalNanoseconds": 12797129,
+          "meanNanoseconds": 15587,
+          "failures": 0
+        },
+        {
+          "routeId": "script:sys.get_config_number",
+          "transport": "jsi",
+          "stableId": 1601401386,
+          "calls": 2,
+          "totalNanoseconds": 33958,
+          "meanNanoseconds": 16979,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.length",
+          "transport": "jsi",
+          "stableId": 2370510694,
+          "calls": 817,
+          "totalNanoseconds": 1758039,
+          "meanNanoseconds": 2151,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.normalize",
+          "transport": "jsi",
+          "stableId": 3582341977,
+          "calls": 659,
+          "totalNanoseconds": 1432301,
+          "meanNanoseconds": 2173,
+          "failures": 0
         },
         {
           "routeId": "script:vmath.quat",
-          "stableId": 2756728049,
           "transport": "jsi",
-          "claimedByTypedNativeBridge": true,
+          "stableId": 2756728049,
           "calls": 1,
-          "totalNanoseconds": 2000,
-          "meanNanoseconds": 2000,
-          "failedCrossings": 0
+          "totalNanoseconds": 1292,
+          "meanNanoseconds": 1292,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.quat_rotation_z",
+          "transport": "jsi",
+          "stableId": 653417741,
+          "calls": 660,
+          "totalNanoseconds": 1222610,
+          "meanNanoseconds": 1852,
+          "failures": 0
+        },
+        {
+          "routeId": "script:vmath.vector3",
+          "transport": "jsi",
+          "stableId": 3491633886,
+          "calls": 1524,
+          "totalNanoseconds": 8449081,
+          "meanNanoseconds": 5544,
+          "failures": 0
         }
-      ]
+      ],
+      "artifacts": {
+        "examples/war-battles-online/defold/build/arm64-osx/dmengine": "8c9629e80c9f742e8093438b38bbe9c3bba2d7c5fce389def868e29316ef4488",
+        "examples/war-battles-online/defold/build/default/deherm/app.dehermc": "d273437192190b7e458bff398a35e0662d07045440360bf094e154b9d740f276"
+      },
+      "assembledExtension": null
     }
   },
-  "controlNote": "The control engine was produced by the same command with <project>/defold_hermes_typed_native removed; defold_hermes itself is byte-identical between the two builds, so the only difference is whether an AOT unit was present to claim routes."
+  "split": {
+    "typedNativeRoutes": [
+      "script:camera.get_cameras",
+      "script:camera.get_orthographic_zoom",
+      "script:factory.create",
+      "script:go.delete",
+      "script:go.get_position",
+      "script:go.set_position",
+      "script:go.set_rotation",
+      "script:msg.post",
+      "script:sys.get_config_number",
+      "script:vmath.length",
+      "script:vmath.normalize",
+      "script:vmath.quat",
+      "script:vmath.quat_rotation_z",
+      "script:vmath.vector3"
+    ],
+    "jsiRoutesWithExtension": [
+      "script:gui.get_node",
+      "script:gui.set_text"
+    ],
+    "controlIsAllJsi": true
+  },
+  "recordSha256": "e11a387cd5aca36426bad255e9e26f347ff4dd892b687ccf676253837bd32a2b"
 }

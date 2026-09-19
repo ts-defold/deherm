@@ -8,12 +8,23 @@ import { join, relative, resolve } from "node:path";
 // all classify engine output the same way.
 import { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic } from "@ts-defold/deherm/dev/runtime-diagnostics";
 
+import { DYNAMIC_SERVICE_PORT_ENV, requestGracefulShutdown } from "./graceful-shutdown.mjs";
+import { projectionEnvelope } from "./projections.mjs";
+
+/** The projection this harness observes. */
+export const PROJECTION_ID = "native-arm64-macos";
+
 export { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic };
 
+// The same tutorial loop the browser gate requires, spelled in engine-log form.
+// Keeping the two lists the same behaviour is what makes the native and browser
+// projections comparable instead of merely adjacent.
 export const REQUIRED_MARKERS = Object.freeze([
   "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
   "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
   "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
+  "INFO:DEFOLD_HERMES: war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
+  "INFO:DEFOLD_HERMES: war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
   "INFO:DEFOLD_HERMES: war-battles:ui-init",
   "INFO:DEFOLD_HERMES: war-battles:player-init:560.0:360.0",
   "INFO:DEFOLD_HERMES: war-battles:player-fire:560.0:360.0:1.00:0.00",
@@ -21,7 +32,16 @@ export const REQUIRED_MARKERS = Object.freeze([
   "INFO:DEFOLD_HERMES: war-battles:rocket-hit",
   "INFO:DEFOLD_HERMES: war-battles:score:100",
   "INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done",
+  "INFO:DEFOLD_HERMES: war-battles:player-moved:1592.0:1072.0",
   "INFO:DEFOLD_HERMES: Extension update entered (application initialized: false)",
+]);
+
+// Markers that only a graceful shutdown can produce. A component `final()` runs
+// when the engine tears its collections down, which a signal never does, so
+// this line is observable evidence that teardown ran and that a structured Lua
+// call from `final` still found its captured script instance.
+export const REQUIRED_SHUTDOWN_MARKERS = Object.freeze([
+  "INFO:DEFOLD_HERMES: war-battles:player-final",
 ]);
 
 export function observedRequiredMarkers(transcript, requiredMarkers = REQUIRED_MARKERS) {
@@ -42,20 +62,39 @@ async function waitForExitAfterSignal(child, method, graceMs) {
   });
 }
 
-async function terminate(child, graceMs) {
+/**
+ * Ask the engine to shut down the way a game does, so every component `final()`
+ * runs. The addressing and the collision census live in `graceful-shutdown.mjs`
+ * and both fail loudly; a failure here is never quietly downgraded to a signal,
+ * because a signal would produce a transcript that looks like a clean run while
+ * proving nothing about teardown. The process is still reaped so the gate does
+ * not leak an engine.
+ */
+async function terminateGracefully(child, transcript, graceMs) {
   if (child.exitCode !== null || child.signalCode !== null) {
     return { method: "already-exited", exitCode: child.exitCode, signal: child.signalCode };
   }
-  if (!child.kill("SIGTERM")) throw new Error("Packaged runtime could not be sent SIGTERM");
-  const graceful = await waitForExitAfterSignal(child, "sigterm", graceMs);
-  if (graceful) return graceful;
-  if (child.exitCode !== null || child.signalCode !== null) {
-    return { method: "sigterm", exitCode: child.exitCode, signal: child.signalCode };
+  let addressed;
+  try {
+    addressed = await requestGracefulShutdown({ transcript: transcript(), pid: child.pid });
+  } catch (error) {
+    await forceKill(child, graceMs);
+    throw error;
   }
-  if (!child.kill("SIGKILL")) throw new Error("Packaged runtime ignored SIGTERM and could not be sent SIGKILL");
-  const forced = await waitForExitAfterSignal(child, "sigkill-after-timeout", graceMs);
-  if (!forced) throw new Error("Packaged runtime did not report exit after SIGKILL");
-  return forced;
+  const exited = await waitForExitAfterSignal(child, "system-exit", graceMs);
+  if (!exited) {
+    await forceKill(child, graceMs);
+    throw new Error(
+      `Packaged runtime did not exit within ${graceMs}ms of a graceful @system/exit posted to ` +
+      `port ${addressed.port} (pid ${addressed.pid})`);
+  }
+  return { ...exited, port: addressed.port };
+}
+
+async function forceKill(child, graceMs) {
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  if (!child.kill("SIGKILL")) throw new Error("Packaged runtime could not be sent SIGKILL");
+  await waitForExitAfterSignal(child, "sigkill", graceMs);
 }
 
 export async function runPackagedRuntimeEvidence({
@@ -64,9 +103,10 @@ export async function runPackagedRuntimeEvidence({
   cwd,
   env = process.env,
   requiredMarkers = REQUIRED_MARKERS,
-  timeoutMs = 15_000,
+  shutdownMarkers = REQUIRED_SHUTDOWN_MARKERS,
+  timeoutMs = 30_000,
   settleMs = 1_500,
-  terminationGraceMs = 2_000,
+  terminationGraceMs = 8_000,
 }) {
   for (const [name, value] of Object.entries({ timeoutMs, settleMs, terminationGraceMs })) {
     if (!Number.isSafeInteger(value) || value <= 0) throw new Error(`${name} must be a positive integer`);
@@ -75,8 +115,18 @@ export async function runPackagedRuntimeEvidence({
   if (!Array.isArray(requiredMarkers) || requiredMarkers.length === 0 || new Set(requiredMarkers).size !== requiredMarkers.length) {
     throw new Error("requiredMarkers must be a non-empty list of unique strings");
   }
+  if (!Array.isArray(shutdownMarkers) || new Set(shutdownMarkers).size !== shutdownMarkers.length) {
+    throw new Error("shutdownMarkers must be a list of unique strings");
+  }
 
-  const child = spawn(command, args, { cwd, env, stdio: ["ignore", "pipe", "pipe"] });
+  // The engine service port is what a graceful shutdown is addressed to, and a
+  // default port is shared between engines by SO_REUSEPORT. Asking the kernel
+  // for one per engine is the half of the fix that no census can substitute.
+  const child = spawn(command, args, {
+    cwd,
+    env: { ...env, ...DYNAMIC_SERVICE_PORT_ENV },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
   let transcript = "";
   let markerObservedAt = null;
   let settled = false;
@@ -124,7 +174,7 @@ export async function runPackagedRuntimeEvidence({
     observationFailure = error;
   }
   try {
-    termination = await terminate(child, terminationGraceMs);
+    termination = await terminateGracefully(child, () => transcript, terminationGraceMs);
   } catch (cleanupError) {
     if (observationFailure) {
       observationFailure.cleanupFailure = cleanupError;
@@ -138,16 +188,25 @@ export async function runPackagedRuntimeEvidence({
   if (diagnostic) {
     throw new Error(`Packaged runtime emitted rejected diagnostic '${diagnostic.id}' during shutdown: ${diagnostic.text}\n${transcript}`);
   }
-  const terminatedBySignal = termination.method === "sigterm" && termination.exitCode === null && termination.signal === "SIGTERM";
-  const handledSigtermCleanly = termination.method === "sigterm" && termination.exitCode === 0 && termination.signal === null;
-  if (!terminatedBySignal && !handledSigtermCleanly) {
+  // A graceful shutdown is the claim; a non-zero code or a signal means the
+  // engine did not shut down the way a game does, whatever else the transcript
+  // shows.
+  if (termination.method !== "system-exit" || termination.exitCode !== 0 || termination.signal !== null) {
     throw new Error(
-      `Packaged runtime did not terminate from SIGTERM (method=${termination.method}, code=${termination.exitCode}, signal=${termination.signal}):\n${transcript}`,
+      `Packaged runtime did not exit cleanly from @system/exit (method=${termination.method}, code=${termination.exitCode}, signal=${termination.signal}):\n${transcript}`,
+    );
+  }
+  const observedShutdown = observedRequiredMarkers(transcript, shutdownMarkers);
+  if (!observedShutdown.every(Boolean)) {
+    const missing = shutdownMarkers.filter((_, index) => !observedShutdown[index]);
+    throw new Error(
+      `Packaged runtime shut down without running component teardown; missing markers: ${missing.join(" | ")}\n${transcript}`,
     );
   }
 
   return {
     markers: observedRequiredMarkers(transcript, requiredMarkers),
+    shutdownMarkers: observedShutdown,
     transcript,
     settleMs,
     termination,
@@ -229,7 +288,15 @@ export function digestEvidenceInputs(entries) {
     .digest("hex");
 }
 
-export function buildEvidenceDocument({ artifacts, sourceInputs, markers, settleMs, termination, transcript }) {
+export function buildEvidenceDocument({
+  artifacts,
+  sourceInputs,
+  markers,
+  shutdownMarkers,
+  settleMs,
+  termination,
+  transcript,
+}) {
   const artifactKey = digestEvidenceInputs(artifacts);
   const sourceKey = digestEvidenceInputs(sourceInputs);
   const transcriptRecord = transcript;
@@ -237,26 +304,26 @@ export function buildEvidenceDocument({ artifacts, sourceInputs, markers, settle
       !/^[0-9a-f]{64}$/.test(transcriptRecord.canonicalSha256)) {
     throw new Error("Transcript evidence must contain a positive canonical line count and SHA-256 digest");
   }
-  const terminationIsSignal = termination?.method === "sigterm" && termination.exitCode === null && termination.signal === "SIGTERM";
-  const terminationIsCleanExit = termination?.method === "sigterm" && termination.exitCode === 0 && termination.signal === null;
-  if (!terminationIsSignal && !terminationIsCleanExit) throw new Error("Transcript evidence must record the observed SIGTERM exit result");
+  // Only a graceful shutdown runs component `final()`, so only a graceful
+  // shutdown can be recorded here. A signal-terminated run is a different
+  // observation and must not be written into this document's shape.
+  const terminationIsGraceful = termination?.method === "system-exit" &&
+    termination.exitCode === 0 && termination.signal === null &&
+    Number.isSafeInteger(termination.port) && termination.port > 0;
+  if (!terminationIsGraceful) {
+    throw new Error("Transcript evidence must record a clean @system/exit shutdown with the engine service port it was addressed to");
+  }
+  if (!Array.isArray(shutdownMarkers) || shutdownMarkers.length === 0 || shutdownMarkers.some((marker) => typeof marker !== "string")) {
+    throw new Error("Transcript evidence must record the observed component-teardown markers");
+  }
   const evidenceKey = createHash("sha256")
     .update(JSON.stringify({ artifactKey, sourceKey, transcript: transcriptRecord }))
     .digest("hex");
   return {
-    schemaVersion: 2,
-    scope: "war-battles-packaged-gui-typescript-dynamic-hermes",
+    schemaVersion: 3,
+    projection: projectionEnvelope(PROJECTION_ID),
     target: "arm64-macos",
-    runtime: "dynamic-hermes",
     status: "observed-clean",
-    claim: "The packaged War Battles GUI proxy attached its generated TypeScript component, loaded the bundle in Dynamic Hermes, completed its TypeScript GUI initialization, first render, and first update render through real Defold APIs, and remained free of rejected diagnostics for the bounded settling window.",
-    exclusions: [
-      "Static Hermes execution",
-      "HTML5 browser-host execution",
-      "all Defold component contexts or lifecycle combinations",
-      "the complete generated script or dmSDK surface",
-      "multiplayer transport execution",
-    ],
     artifactKey,
     sourceKey,
     evidenceKey,
@@ -264,6 +331,7 @@ export function buildEvidenceDocument({ artifacts, sourceInputs, markers, settle
     sourceInputs,
     observation: {
       requiredMarkers: markers,
+      shutdownMarkers,
       settleMs,
       rejectedDiagnosticIds: REJECTED_DIAGNOSTICS.map(({ id }) => id),
       termination,

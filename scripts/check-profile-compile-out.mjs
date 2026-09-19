@@ -15,6 +15,8 @@ import { readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { renderBuildConfig } from "./assemble-typed-native-extension.mjs";
+
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 export const repositoryRoot = resolve(scriptDirectory, "..");
 
@@ -47,6 +49,61 @@ export const instrumentedGeneratedSources = Object.freeze([
   "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp",
   "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"
 ]);
+
+/// The build-time switch that travels with a packaged extension. Bob and
+/// Extender have no equivalent of a CMake option, so the assembler materialises
+/// it as this header; a profiling run therefore leaves an instrumented header
+/// behind in the working tree, and nothing about the header's *shape* says
+/// which of the two it is.
+export const shippedBuildConfigPath =
+  "defold/defold_hermes/include/defold_hermes/generated_build_config.h";
+
+/// Assembled extension manifests that must agree the shipped build is not the
+/// instrumented one. The header is the authority; these are the second opinion
+/// that names which project was assembled with telemetry on.
+export const assembledManifestGlobRoots = Object.freeze([
+  "defold",
+  "examples/war-battles-online/defold"
+]);
+
+/**
+ * The shipped default is telemetry OFF, and it is checked against the
+ * assembler's own renderer rather than against a copy of the text, so the two
+ * cannot drift. Fails loudly, naming the command that restores the skeleton.
+ */
+export async function checkShippedProfileDefault() {
+  const absolute = resolve(repositoryRoot, shippedBuildConfigPath);
+  const committed = await readFile(absolute, "utf8");
+  const skeleton = renderBuildConfig(false);
+  if (committed !== skeleton) {
+    const instrumented = committed === renderBuildConfig(true);
+    throw new Error(
+      `${shippedBuildConfigPath} is not the shipped skeleton` +
+      (instrumented ? " - it is the instrumented header a --profile assembly leaves behind" : "") +
+      ". Restore it with:\n" +
+      "  node scripts/assemble-typed-native-extension.mjs --project <project> \n" +
+      "(without --profile), or delete the file and re-run that command.");
+  }
+  const manifests = [];
+  for (const root of assembledManifestGlobRoots) {
+    const manifestPath = `${root}/defold_hermes_typed_native/manifest.json`;
+    let text;
+    try {
+      text = await readFile(resolve(repositoryRoot, manifestPath), "utf8");
+    } catch (error) {
+      if (error.code === "ENOENT") continue;
+      throw error;
+    }
+    const manifest = JSON.parse(text);
+    if (manifest.profile !== false) {
+      throw new Error(
+        `${manifestPath} records profile=${JSON.stringify(manifest.profile)}; ` +
+        "re-assemble that project without --profile before committing");
+    }
+    manifests.push(manifestPath);
+  }
+  return { header: shippedBuildConfigPath, manifests };
+}
 
 function run(command, argv, options = {}) {
   return execFileSync(command, argv, {
@@ -157,6 +214,13 @@ export async function checkProfileCompileOut({
 }
 
 export async function run_(argv = process.argv.slice(2)) {
+  if (argv.includes("--shipped-default")) {
+    const shipped = await checkShippedProfileDefault();
+    process.stdout.write(
+      `shipped DEHERM_PROFILE default verified: ${shipped.header} is the skeleton; ` +
+      `${shipped.manifests.length} assembled manifest(s) agree.\n`);
+    return shipped;
+  }
   const offDirectory = argv.includes("--reuse") ? "build/native" : "build/profile-off";
   const onDirectory = argv.includes("--reuse") ? "build/profile" : "build/profile-on";
   const offBinary = configureAndBuild(offDirectory, { profile: false });
