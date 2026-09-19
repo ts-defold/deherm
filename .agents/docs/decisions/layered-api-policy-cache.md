@@ -163,6 +163,48 @@ will.
 * **Unchanged inputs publish nothing.** Re-deriving a revision whose inputs did
   not move yields the same hash and no new object.
 
+# Toolchain pins are Defold's, and belong in the policy
+
+Defold - not this project - defines every platform SDK and NDK version its
+engine is built against. `build_tools/sdk.py` at a given revision is the
+authoritative declaration, and it pins more than the target matrix currently
+derives:
+
+| Concern | Symbols in `build_tools/sdk.py` |
+| --- | --- |
+| Apple | `VERSION_XCODE`, `VERSION_XCODE_CLANG`, `VERSION_MACOSX`, `VERSION_IPHONEOS`, `VERSION_IPHONESIMULATOR`, `PACKAGES_*_SDK`, `PACKAGES_XCODE_TOOLCHAIN` |
+| Deployment minimums | `VERSION_IPHONEOS_MIN`, `VERSION_MACOSX_MIN` |
+| Android | `ANDROID_NDK_VERSION`, `ANDROID_NDK_API_VERSION`, `ANDROID_TARGET_API_LEVEL`, `ANDROID_BUILD_TOOLS_VERSION` |
+| Linux | `VERSION_LINUX_CLANG` |
+| Windows | `VERSION_WINDOWS_SDK`, `VERSION_WINDOWS_MSVC`, `VISUAL_STUDIO_VERSION` |
+| Web | `EMSCRIPTEN_VERSION_STR` |
+
+`share/extender/build_input.yml` is the companion authority for which platform
+keys exist at all.
+
+**Never restate one of these as our own constant.** A cross build against a
+different SDK, NDK API level or deployment minimum than the engine's own is an
+ABI mismatch that Extender finds at link time, or worse does not find. Two
+instances already existed: `EMSCRIPTEN_VERSION=4.0.6` is written into
+`upstream.lock` as our pin of their number, and the Android NDK digest was a
+recalled constant until it was attested against Google's published SHA-1 and a
+signed transparency log.
+
+## They belong in the policy, not in a source read
+
+`sdk.py` lives in the engine source tree, and the whole point of the policy
+layers is that a user needs no engine checkout. So a revision's toolchain pins
+are **derived once alongside its API surface and carried in the same policy**.
+
+A policy that records what the engine's API surface is, but not which NDK and
+Emscripten that revision requires, is incomplete: the native artifact matrix
+depends on those pins exactly as much as the bindings depend on the surface.
+Both move with the engine revision, and both must therefore be keyed by it.
+
+The consequence for the artifact matrix is that a `libhermes.a` is valid for a
+*range* of Defold revisions - those sharing its toolchain pins - rather than for
+one. The policy is what lets that range be computed instead of assumed.
+
 # Distribution: a content-addressed static site, plus one policy in the package
 
 Policies and native artifacts want opposite distribution, and conflating them is

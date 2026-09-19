@@ -105,7 +105,7 @@
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
-      "sha256": "3ac16b222c9a81b8c968fdd3e291f5e5939697e5375aabb39155ec8175f5fbbb"
+      "sha256": "bfe017f0f7610c87ee541346add7152f5db583c870e19fe3a8481a6a4f7520cf"
     },
     "luaProvider": {
       "path": "defold/defold_hermes/include/defold_hermes/component_proxy_lua_gate.hpp",
@@ -121,11 +121,11 @@
     },
     "browserProvider": {
       "path": "defold/defold_hermes/lib/web/component_bridge.js",
-      "sha256": "1ed1e040e1b67fbdc0e26440168b99512d25327a610deb0147005b7ffda32e1d"
+      "sha256": "0ab58d09139f0cfd5ea7851541b52c63c4140bea6dc39cf96580cfd3ddb92962"
     },
     "adapterSource": {
       "path": "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",
-      "sha256": "d0211a11939e901b06fd25e08c3c551310f1d3e9ac038596e4928a85fecee0b9"
+      "sha256": "19d2ca700a901de179d301cf639d06600b788baabb4f197f0960c512a15007cf"
     },
     "componentSdk": {
       "path": "packages/sdk/src/component.ts",

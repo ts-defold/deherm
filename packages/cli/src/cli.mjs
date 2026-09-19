@@ -34,7 +34,8 @@ Options:
   --name <name>       Project title used by create
   --project <path>   Defold project directory or game.project
   --out-dir <path>   Generated directory relative to the project (default: .deherm)
-  --defold-sdk <sha> Exact Defold engine SHA expected by generated API inputs
+  --defold-sdk <sha> Exact Defold engine SHA to generate for. Always wins over detection.
+  --bob <path>       Bob jar interrogated for the project's engine SHA when nothing else names it
   --output <path>    Conformance harness output directory
   --usage <path>     dmSDK usage document for materialize-dmsdk
   --header <path>    Public C header for generate-extension-api
@@ -113,6 +114,7 @@ export function parseArguments(argv) {
     else if (value === "--name") options.name = args.shift();
     else if (value === "--out-dir") options.outDir = args.shift();
     else if (value === "--defold-sdk") options.defoldSdk = args.shift();
+    else if (value === "--bob") options.bob = args.shift();
     else if (value === "--output") options.output = args.shift();
     else if (value === "--usage") options.usage = args.shift();
     else if (value === "--header") options.header = args.shift();
@@ -228,7 +230,16 @@ async function runDoctor(options) {
   const selected = artifacts.targets.filter((row) => !requested || requested.includes(row.target));
   const currentHost = hosts.hosts.find((host) => host.current);
   const failures = [];
-  if (!currentHost?.ok) failures.push(`host compilers: ${currentHost?.detail ?? `no record for ${hosts.currentHost}`}`);
+  // Every host tool is reported by name. A rolled-up "host compilers" failure
+  // would say this host cannot build without saying which of the three is
+  // missing, and the three come from different builders: hermesc and shermes
+  // are LLVM built per architecture, deherm-tsc is pure Go cross-compiled for
+  // every host at once. Which one is absent decides what the user does next.
+  for (const tool of Object.values(currentHost?.tools ?? {})) {
+    if (!tool.ok) failures.push(`${tool.tool} (${hosts.currentHost}): ${tool.detail}`);
+  }
+  if (!currentHost) failures.push(`host tools: no record for ${hosts.currentHost}`);
+  else if (!Object.keys(currentHost.tools ?? {}).length) failures.push(`host tools: ${currentHost.detail}`);
   for (const target of unknownTargets) {
     failures.push(`--target ${target} is not a Defold bundle target declared by ${artifacts.source}`);
   }
@@ -252,10 +263,20 @@ async function runDoctor(options) {
     return failures.length || projectErrors.length || projectError ? 1 : 0;
   }
 
-  console.log(`${currentHost?.ok ? "ok" : "!!"} host compilers ${hosts.currentHost} (this host): ${currentHost?.status ?? "unknown-host"} ${currentHost?.detail ?? ""}`.trimEnd());
+  // This host's three tools, each on its own line with its own reason. The
+  // other hosts are information, not the question the user asked, so they stay
+  // one line each - but that line still names the tools that are missing.
+  if (!currentHost || !Object.keys(currentHost.tools ?? {}).length) {
+    console.log(`!! host tools ${hosts.currentHost} (this host): ${currentHost?.status ?? "unknown-host"} ${currentHost?.detail ?? ""}`.trimEnd());
+  } else {
+    for (const tool of Object.values(currentHost.tools)) {
+      console.log(`${tool.ok ? "ok" : "!!"} ${tool.tool} ${hosts.currentHost} (this host): ${tool.status} ${tool.detail}`);
+    }
+  }
   for (const host of hosts.hosts) {
     if (host.current) continue;
-    console.log(`${host.ok ? "ok" : "--"} host compilers ${host.host}: ${host.status} ${host.detail}`);
+    const missing = host.missing ?? [];
+    console.log(`${host.ok ? "ok" : "--"} host tools ${host.host}: ${host.status}${missing.length ? ` missing ${missing.join(", ")}` : ` ${host.detail}`}`);
   }
   for (const row of selected) {
     // Without an explicit --target, a target the user is not shipping is
@@ -423,7 +444,7 @@ export async function run(argv = process.argv.slice(2)) {
     if (errors.length) {
       throw new Error(`Defold project configuration is not ready for déherm dev:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
     }
-    await writeGeneratedProject(inventory, options.outDir);
+    await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk, bob: options.bob });
     await installNativeExtension(inventory.projectRoot);
     await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot });
     const snapshot = await runDevSession(options);
@@ -504,7 +525,7 @@ export async function run(argv = process.argv.slice(2)) {
     if (errors.length) {
       throw new Error(`Defold project configuration is not ready for déherm:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
     }
-    const output = await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk, force: options.force });
+    const output = await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk, bob: options.bob, force: options.force });
     const nativeExtension = await installNativeExtension(inventory.projectRoot, { force: options.force });
     const components = await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot });
     const componentCount = components.manifest.components.length;
@@ -524,7 +545,10 @@ export async function run(argv = process.argv.slice(2)) {
       }
       console.log(`Indexed ${resourceSymbols.table.resourceCount} Defold resource(s) for compile-time name resolution`);
       console.log(`Indexed ${routeSymbols.index.routeCount} Defold route(s) for compile-time reachability`);
-      console.log(`Pinned Defold API: ${output.defoldRevision}`);
+      for (const diagnostic of output.revisionDiagnostics ?? []) {
+        console.log(`-- Defold revision: ${diagnostic.message}`);
+      }
+      console.log(`Defold API: ${output.defoldRevision} (resolved from ${output.defoldResolution?.source ?? "unknown"}; surface layer ${output.defoldSurfaceLayer ?? "unknown"})`);
       if (output.created.tsconfig) console.log("Created tsconfig.json referencing all generated TypeScript context projects");
       else if (output.migrated.tsconfig) console.log("Migrated the legacy generated tsconfig.json to TypeScript project references");
       else console.log("Kept existing tsconfig.json; run 'deherm typecheck' to check every generated context project");
@@ -540,7 +564,7 @@ export async function run(argv = process.argv.slice(2)) {
       console.log(`ok generated project: ${result.checkedFiles} verified IR and generated-output sentinel(s)`);
       console.log(`ok component proxies: ${componentCount} generated resource(s)`);
       console.log(`ok lowering plan: ${result.planSha256}`);
-      console.log(`ok Defold API: ${result.defoldRevision}`);
+      console.log(`ok Defold API: ${result.defoldRevision} (resolved from ${result.defoldResolution?.source ?? "unknown"})`);
       const { formatBuildArtifactReport } = await import("./build-artifacts.mjs");
       for (const line of formatBuildArtifactReport(result.buildArtifacts)) console.log(line);
       if (!result.buildArtifacts.ok) {
