@@ -4,8 +4,8 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "artifacts": {
     "hermes-host": {
-      "tag": "hermes-ac8f704fb529",
-      "fingerprint": "ac8f704fb529a245f3be7afdfe4321b34878ebae637dfa0540591f5687912313",
+      "tag": "hermes-7d678790fcd9",
+      "fingerprint": "7d678790fcd918420ac4a79e956d3bfc1c3423d3b8dd5c872c91c935d84dd583",
       "indexedBy": "host",
       "summary": "hermesc and shermes, per user host",
       "assets": {
@@ -39,8 +39,8 @@
       }
     },
     "dehermc": {
-      "tag": "tools-a2e89ca9eb60",
-      "fingerprint": "a2e89ca9eb6034f57abeace2ffb1953923dd78d4dbcfcea73b17f7120d96b1c0",
+      "tag": "tools-42cb0a61b431",
+      "fingerprint": "42cb0a61b4318fa9ae03d808527a56c950e193a3bb40a808b3737a430c5c85d0",
       "indexedBy": "host",
       "summary": "dehermc, déherm's TypeScript transform compiler, per user host",
       "assets": {
@@ -69,8 +69,8 @@
       }
     },
     "native-artifacts": {
-      "tag": "libs-44f6dc29e5c1",
-      "fingerprint": "44f6dc29e5c142d98e41090330f04b616095e515e86caafb274e01646c288a8e",
+      "tag": "libs-a60d2a6fc91f",
+      "fingerprint": "a60d2a6fc91f08ee97f64ddddd7060dc07e325781186030134122e5887488c6c",
       "indexedBy": "bundleTarget",
       "summary": "libhermes.a / hermes.lib, per Defold bundle target",
       "assets": {
