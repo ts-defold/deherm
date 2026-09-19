@@ -777,6 +777,7 @@ export function buildHeadlessConformancePlan(documents, {
         const optional = [];
         const blockerCounts = new Map();
         const blockerExamples = new Map();
+        const blockerRoutes = new Map();
         for (const unit of units) {
           const decision = classifyRoute({
             unit,
@@ -800,14 +801,19 @@ export function buildHeadlessConformancePlan(documents, {
           }
           blockerCounts.set(decision.reason, (blockerCounts.get(decision.reason) ?? 0) + 1);
           if (!blockerExamples.has(decision.reason)) blockerExamples.set(decision.reason, unit.identity.id);
+          // The route ids, not only how many. A count plus one example cannot
+          // answer "why is THIS route untested", which is the question a user
+          // holding the API actually asks, and the one a per-route verification
+          // status has to answer for all 926 of them.
+          blockerRoutes.set(decision.reason, [...(blockerRoutes.get(decision.reason) ?? []), unit.identity.id]);
         }
-        return { eligible, optional, blockerCounts, blockerExamples };
+        return { eligible, optional, blockerCounts, blockerExamples, blockerRoutes };
       };
 
       // A contract with no safe route is retried admitting destructive ones,
       // and then exercises exactly one: the engine instance is disposable, but
       // a destroyed engine object must not be seen by a sibling exercise.
-      let { eligible, optional, blockerCounts, blockerExamples } = classify(false);
+      let { eligible, optional, blockerCounts, blockerExamples, blockerRoutes } = classify(false);
       if (eligible.length === 0) {
         const retried = classify(true);
         if (retried.eligible.length > 0) {
@@ -815,6 +821,7 @@ export function buildHeadlessConformancePlan(documents, {
           optional = [];
           blockerCounts = retried.blockerCounts;
           blockerExamples = retried.blockerExamples;
+          blockerRoutes = retried.blockerRoutes;
         }
       }
       // A profile that admits more of the contract's handle algebra wins even
@@ -828,7 +835,7 @@ export function buildHeadlessConformancePlan(documents, {
       const grounded = eligible.filter((exercise) =>
         (exercise.returnHandleKind !== null && kindAdmissible(profile, algebra, exercise.returnHandleKind)) ||
         exercise.arguments.some((argument) => argument.kind === "handle")).length;
-      const candidate = { profile, eligible, optional, blockerCounts, blockerExamples, providers, mismatched, grounded };
+      const candidate = { profile, eligible, optional, blockerCounts, blockerExamples, blockerRoutes, providers, mismatched, grounded };
       const better = chosen === null ||
         eligible.length > chosen.eligible.length ||
         (eligible.length === chosen.eligible.length && grounded > chosen.grounded) ||
@@ -838,7 +845,12 @@ export function buildHeadlessConformancePlan(documents, {
 
     const blockers = [...chosen.blockerCounts.entries()]
       .sort((left, right) => right[1] - left[1] || (left[0] < right[0] ? -1 : 1))
-      .map(([reason, routeCount]) => ({ reason, routeCount, exampleRouteId: chosen.blockerExamples.get(reason) }));
+      .map(([reason, routeCount]) => ({
+        reason,
+        routeCount,
+        exampleRouteId: chosen.blockerExamples.get(reason),
+        routeIds: [...(chosen.blockerRoutes.get(reason) ?? [])].sort()
+      }));
 
     const properties = propertiesForContract(contractRecord);
     const slug = contractSlug(index);

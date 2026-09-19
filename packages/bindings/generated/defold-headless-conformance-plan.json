@@ -596,15 +596,15 @@
     "physics-3d"
   ],
   "inputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "3450e7b1cca5ff1898c0ccb8aa131db014a4e389d14fb922eac91d82834cbeb5",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "22fd16f548bab1af288ff122530c118fefcc0b3c22389bf510d730ffa9268826",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "ffdc662711897b646b97eba185323bef9d31701b9f7b62a13a980eda9354f325",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "0743694ea58297d11782b7b95e44ad1538168c7e5bea6d0480892f8581a315eb",
     "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "d21931dbcd4587137084a0372d750e1487d26d64ee0d3fbffa50b441c2276d12",
-    "packages/bindings/generated/defold-script-route-availability-profiles.json": "c0e3a3928cea05d3ddab734917d11914b5ee2b80640eb06433303a90cc135b66",
-    "packages/bindings/generated/defold-script-handle-lowering.json": "8935a4f13609c99ada06019dd252aaae3666f64ce1ed8fbc1d9ffc9538914aa9",
+    "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "0cd7365088e2c06d07586b7b4aa410377ec301489beaeed34ce75971dffe878d",
+    "packages/bindings/generated/defold-script-route-availability-profiles.json": "fa1ea62ab616113e8fb723db0d7fb7677ec58eb640861d7f57446b0d66ea9be9",
+    "packages/bindings/generated/defold-script-handle-lowering.json": "830c7d6a1b86cc263ad7b30a2cbbd192a5e6a21f16ce9798beac95b6d49ef05f",
     "packages/bindings/generated/defold-value-layouts.json": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
-    "packages/bindings/generated/defold-script-projection-ir.json": "a3370e1a8e88b4c4cfdf4b9a9464b3a3d189ea7e597f884ceae516281910cf57"
+    "packages/bindings/generated/defold-script-projection-ir.json": "fc000bce9020f24d82c46e8520f87950107a214343c6676cdae2fedddb83b67c"
   },
   "contractCount": 85,
   "reachableContractCount": 40,
@@ -680,27 +680,56 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 14,
-          "exampleRouteId": "script:b2d.body.apply_linear_impulse_to_center"
+          "exampleRouteId": "script:b2d.body.apply_linear_impulse_to_center",
+          "routeIds": [
+            "script:b2d.body.apply_linear_impulse_to_center",
+            "script:b2d.body.enable_contact_events",
+            "script:b2d.body.enable_hit_events",
+            "script:b2d.body.enable_sleep",
+            "script:b2d.body.get_local_center_of_mass",
+            "script:b2d.body.get_name",
+            "script:b2d.body.get_rotational_inertia",
+            "script:b2d.body.get_sleep_threshold",
+            "script:b2d.body.get_world_center_of_mass",
+            "script:b2d.body.is_sleeping_enabled",
+            "script:b2d.body.is_valid",
+            "script:b2d.body.set_name",
+            "script:b2d.body.set_sleep_threshold",
+            "script:b2d.body.set_target_transform"
+          ]
         },
         {
           "reason": "lua-stack-omit-profile",
           "routeCount": 2,
-          "exampleRouteId": "script:b2d.body.get_user_data"
+          "exampleRouteId": "script:b2d.body.get_user_data",
+          "routeIds": [
+            "script:b2d.body.get_user_data",
+            "script:b2d.body.set_user_data"
+          ]
         },
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.reset_mass_data"
+          "exampleRouteId": "script:b2d.body.reset_mass_data",
+          "routeIds": [
+            "script:b2d.body.reset_mass_data"
+          ]
         },
         {
           "reason": "harness-effect-guard:dump",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.dump"
+          "exampleRouteId": "script:b2d.body.dump",
+          "routeIds": [
+            "script:b2d.body.dump"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:b2d.body.B2",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.set_type"
+          "exampleRouteId": "script:b2d.body.set_type",
+          "routeIds": [
+            "script:b2d.body.set_type"
+          ]
         }
       ],
       "profile": "physics-2d",
@@ -1223,47 +1252,109 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 18,
-          "exampleRouteId": "script:b2d.body.compute_aabb"
+          "exampleRouteId": "script:b2d.body.compute_aabb",
+          "routeIds": [
+            "script:b2d.body.compute_aabb",
+            "script:b2d.body.create_chain",
+            "script:b2d.body.create_shape",
+            "script:b2d.body.get_contact_data",
+            "script:b2d.body.get_shapes",
+            "script:b2d.chain.get_geometry",
+            "script:b2d.chain.get_segments",
+            "script:b2d.shape.get_contact_data",
+            "script:b2d.shape.get_mass_data",
+            "script:b2d.shape.get_sensor_overlaps",
+            "script:b2d.shape.get_shape",
+            "script:b2d.shape.ray_cast",
+            "script:b2d.shape.set_shape",
+            "script:b2d.world.cast_mover",
+            "script:b2d.world.collide_mover",
+            "script:b2d.world.explode",
+            "script:b2d.world.get_counters",
+            "script:b2d.world.get_profile"
+          ]
         },
         {
           "reason": "handle-kind-outside-fixture-profile:btDiscreteDynamicsWorld",
           "routeCount": 10,
-          "exampleRouteId": "script:bullet3d.world.cast_ray"
+          "exampleRouteId": "script:bullet3d.world.cast_ray",
+          "routeIds": [
+            "script:bullet3d.world.cast_ray",
+            "script:bullet3d.world.cast_ray_closest",
+            "script:bullet3d.world.cast_shape",
+            "script:bullet3d.world.cast_shape_closest",
+            "script:bullet3d.world.contact_pair_test",
+            "script:bullet3d.world.contact_test",
+            "script:bullet3d.world.get_collision_objects",
+            "script:bullet3d.world.overlap_aabb",
+            "script:bullet3d.world.overlap_point",
+            "script:bullet3d.world.overlap_shape"
+          ]
         },
         {
           "reason": "context-fixture-missing:network",
           "routeCount": 6,
-          "exampleRouteId": "script:socket.connect"
+          "exampleRouteId": "script:socket.connect",
+          "routeIds": [
+            "script:socket.connect",
+            "script:socket.select",
+            "script:socket.tcp",
+            "script:socket.tcp6",
+            "script:socket.udp",
+            "script:socket.udp6"
+          ]
         },
         {
           "reason": "multi-result-shape-unmodelled",
           "routeCount": 4,
-          "exampleRouteId": "script:b2d.world.cast_ray"
+          "exampleRouteId": "script:b2d.world.cast_ray",
+          "routeIds": [
+            "script:b2d.world.cast_ray",
+            "script:b2d.world.cast_shape",
+            "script:b2d.world.overlap_aabb",
+            "script:b2d.world.overlap_shape"
+          ]
         },
         {
           "reason": "handle-kind-outside-fixture-profile:btCollisionShape",
           "routeCount": 2,
-          "exampleRouteId": "script:bullet3d.shape.get_shape"
+          "exampleRouteId": "script:bullet3d.shape.get_shape",
+          "routeIds": [
+            "script:bullet3d.shape.get_shape",
+            "script:bullet3d.shape.set_shape"
+          ]
         },
         {
           "reason": "handle-kind-outside-fixture-profile:btCollisionObject",
           "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.collision_object.get_shapes"
+          "exampleRouteId": "script:bullet3d.collision_object.get_shapes",
+          "routeIds": [
+            "script:bullet3d.collision_object.get_shapes"
+          ]
         },
         {
           "reason": "handle-kind-outside-fixture-profile:btRigidBody",
           "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.rigid_body.compute_aabb"
+          "exampleRouteId": "script:bullet3d.rigid_body.compute_aabb",
+          "routeIds": [
+            "script:bullet3d.rigid_body.compute_aabb"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:b2d.shape.definition",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.fixture.set_shape"
+          "exampleRouteId": "script:b2d.fixture.set_shape",
+          "routeIds": [
+            "script:b2d.fixture.set_shape"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:b2d.shape.definition@b2d.fixture_definition.shape",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.create_fixture"
+          "exampleRouteId": "script:b2d.body.create_fixture",
+          "routeIds": [
+            "script:b2d.body.create_fixture"
+          ]
         }
       ],
       "profile": "physics-2d",
@@ -1845,7 +1936,10 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.destroy_shape"
+          "exampleRouteId": "script:b2d.body.destroy_shape",
+          "routeIds": [
+            "script:b2d.body.destroy_shape"
+          ]
         }
       ],
       "profile": "physics-2d",
@@ -2045,7 +2139,10 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.chain.destroy"
+          "exampleRouteId": "script:b2d.chain.destroy",
+          "routeIds": [
+            "script:b2d.chain.destroy"
+          ]
         }
       ]
     },
@@ -2074,7 +2171,10 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.chain.from_shape"
+          "exampleRouteId": "script:b2d.chain.from_shape",
+          "routeIds": [
+            "script:b2d.chain.from_shape"
+          ]
         }
       ]
     },
@@ -2103,7 +2203,17 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 8,
-          "exampleRouteId": "script:b2d.chain.get_friction"
+          "exampleRouteId": "script:b2d.chain.get_friction",
+          "routeIds": [
+            "script:b2d.chain.get_friction",
+            "script:b2d.chain.get_material",
+            "script:b2d.chain.get_restitution",
+            "script:b2d.chain.get_segment_count",
+            "script:b2d.chain.is_valid",
+            "script:b2d.chain.set_friction",
+            "script:b2d.chain.set_material",
+            "script:b2d.chain.set_restitution"
+          ]
         }
       ]
     },
@@ -2132,7 +2242,10 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.chain.get_world"
+          "exampleRouteId": "script:b2d.chain.get_world",
+          "routeIds": [
+            "script:b2d.chain.get_world"
+          ]
         }
       ]
     },
@@ -2357,7 +2470,11 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 2,
-          "exampleRouteId": "script:b2d.joint.create_filter"
+          "exampleRouteId": "script:b2d.joint.create_filter",
+          "routeIds": [
+            "script:b2d.joint.create_filter",
+            "script:b2d.joint.create_motor"
+          ]
         }
       ],
       "profile": "physics-2d",
@@ -3161,7 +3278,35 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 26,
-          "exampleRouteId": "script:b2d.joint.enable_spring"
+          "exampleRouteId": "script:b2d.joint.enable_spring",
+          "routeIds": [
+            "script:b2d.joint.enable_spring",
+            "script:b2d.joint.get_angular_damping_ratio",
+            "script:b2d.joint.get_angular_hertz",
+            "script:b2d.joint.get_angular_offset",
+            "script:b2d.joint.get_correction_factor",
+            "script:b2d.joint.get_current_length",
+            "script:b2d.joint.get_linear_damping_ratio",
+            "script:b2d.joint.get_linear_hertz",
+            "script:b2d.joint.get_linear_offset",
+            "script:b2d.joint.get_min_length",
+            "script:b2d.joint.get_spring_hertz",
+            "script:b2d.joint.is_spring_enabled",
+            "script:b2d.joint.is_valid",
+            "script:b2d.joint.set_angular_damping_ratio",
+            "script:b2d.joint.set_angular_hertz",
+            "script:b2d.joint.set_angular_offset",
+            "script:b2d.joint.set_collide_connected",
+            "script:b2d.joint.set_correction_factor",
+            "script:b2d.joint.set_length_range",
+            "script:b2d.joint.set_linear_damping_ratio",
+            "script:b2d.joint.set_linear_hertz",
+            "script:b2d.joint.set_linear_offset",
+            "script:b2d.joint.set_min_length",
+            "script:b2d.joint.set_reference_angle",
+            "script:b2d.joint.set_spring_hertz",
+            "script:b2d.joint.wake_bodies"
+          ]
         }
       ],
       "profile": "physics-2d",
@@ -3727,7 +3872,10 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.joint.get_world"
+          "exampleRouteId": "script:b2d.joint.get_world",
+          "routeIds": [
+            "script:b2d.joint.get_world"
+          ]
         }
       ]
     },
@@ -3756,7 +3904,23 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 14,
-          "exampleRouteId": "script:b2d.shape.are_contact_events_enabled"
+          "exampleRouteId": "script:b2d.shape.are_contact_events_enabled",
+          "routeIds": [
+            "script:b2d.shape.are_contact_events_enabled",
+            "script:b2d.shape.are_hit_events_enabled",
+            "script:b2d.shape.are_pre_solve_events_enabled",
+            "script:b2d.shape.are_sensor_events_enabled",
+            "script:b2d.shape.enable_contact_events",
+            "script:b2d.shape.enable_hit_events",
+            "script:b2d.shape.enable_pre_solve_events",
+            "script:b2d.shape.enable_sensor_events",
+            "script:b2d.shape.get_closest_point",
+            "script:b2d.shape.get_contact_capacity",
+            "script:b2d.shape.get_material",
+            "script:b2d.shape.get_sensor_capacity",
+            "script:b2d.shape.is_valid",
+            "script:b2d.shape.set_material"
+          ]
         }
       ]
     },
@@ -3785,7 +3949,10 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.shape.get_body"
+          "exampleRouteId": "script:b2d.shape.get_body",
+          "routeIds": [
+            "script:b2d.shape.get_body"
+          ]
         }
       ]
     },
@@ -3814,7 +3981,10 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
-          "exampleRouteId": "script:b2d.shape.get_world"
+          "exampleRouteId": "script:b2d.shape.get_world",
+          "routeIds": [
+            "script:b2d.shape.get_world"
+          ]
         }
       ]
     },
@@ -3843,7 +4013,30 @@
         {
           "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 21,
-          "exampleRouteId": "script:b2d.world.enable_continuous"
+          "exampleRouteId": "script:b2d.world.enable_continuous",
+          "routeIds": [
+            "script:b2d.world.enable_continuous",
+            "script:b2d.world.enable_sleeping",
+            "script:b2d.world.enable_speculative",
+            "script:b2d.world.enable_warm_starting",
+            "script:b2d.world.get_awake_body_count",
+            "script:b2d.world.get_gravity",
+            "script:b2d.world.get_hit_event_threshold",
+            "script:b2d.world.get_maximum_linear_speed",
+            "script:b2d.world.get_restitution_threshold",
+            "script:b2d.world.is_continuous_enabled",
+            "script:b2d.world.is_locked",
+            "script:b2d.world.is_sleeping_enabled",
+            "script:b2d.world.is_valid",
+            "script:b2d.world.is_warm_starting_enabled",
+            "script:b2d.world.rebuild_static_tree",
+            "script:b2d.world.set_contact_tuning",
+            "script:b2d.world.set_gravity",
+            "script:b2d.world.set_hit_event_threshold",
+            "script:b2d.world.set_joint_tuning",
+            "script:b2d.world.set_maximum_linear_speed",
+            "script:b2d.world.set_restitution_threshold"
+          ]
         }
       ]
     },
@@ -3872,162 +4065,360 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 42,
-          "exampleRouteId": "script:compute.get_constants"
+          "exampleRouteId": "script:compute.get_constants",
+          "routeIds": [
+            "script:compute.get_constants",
+            "script:compute.get_samplers",
+            "script:compute.get_textures",
+            "script:compute.set_constants",
+            "script:compute.set_samplers",
+            "script:compute.set_textures",
+            "script:font.get_info",
+            "script:graphics.get_adapter_info",
+            "script:graphics.get_engine_adapters",
+            "script:material.get_constants",
+            "script:material.get_samplers",
+            "script:material.get_textures",
+            "script:material.get_vertex_attributes",
+            "script:material.set_constants",
+            "script:material.set_samplers",
+            "script:material.set_textures",
+            "script:material.set_vertex_attributes",
+            "script:render.disable_material",
+            "script:render.disable_state",
+            "script:render.dispatch_compute",
+            "script:render.draw",
+            "script:render.draw_debug3d",
+            "script:render.enable_state",
+            "script:render.get_height",
+            "script:render.get_width",
+            "script:render.get_window_height",
+            "script:render.get_window_width",
+            "script:render.predicate",
+            "script:render.set_blend_equation_separate",
+            "script:render.set_blend_func",
+            "script:render.set_blend_func_separate",
+            "script:render.set_camera",
+            "script:render.set_color_mask",
+            "script:render.set_cull_face",
+            "script:render.set_depth_func",
+            "script:render.set_depth_mask",
+            "script:render.set_polygon_offset",
+            "script:render.set_render_target",
+            "script:render.set_stencil_func",
+            "script:render.set_stencil_mask",
+            "script:render.set_stencil_op",
+            "script:render.set_viewport"
+          ]
         },
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 11,
-          "exampleRouteId": "script:gui.clone_tree"
+          "exampleRouteId": "script:gui.clone_tree",
+          "routeIds": [
+            "script:gui.clone_tree",
+            "script:gui.get",
+            "script:gui.get_height",
+            "script:gui.get_layout_objects",
+            "script:gui.get_layouts",
+            "script:gui.get_tree",
+            "script:gui.get_width",
+            "script:gui.set",
+            "script:gui.set_render_order",
+            "script:gui.set_safe_area_mode",
+            "script:gui.stop_particlefx"
+          ]
         },
         {
           "reason": "execution-policy-destructive",
           "routeCount": 11,
-          "exampleRouteId": "script:crash.release"
+          "exampleRouteId": "script:crash.release",
+          "routeIds": [
+            "script:crash.release",
+            "script:gui.reset_keyboard",
+            "script:gui.reset_nodes",
+            "script:model.reset_constant",
+            "script:particlefx.reset_constant",
+            "script:physics.destroy_joint",
+            "script:render.clear",
+            "script:sprite.reset_constant",
+            "script:sys.exit",
+            "script:sys.reboot",
+            "script:tilemap.reset_constant"
+          ]
         },
         {
           "reason": "context-fixture-missing:network",
           "routeCount": 8,
-          "exampleRouteId": "script:socket.dns.getaddrinfo"
+          "exampleRouteId": "script:socket.dns.getaddrinfo",
+          "routeIds": [
+            "script:socket.dns.getaddrinfo",
+            "script:socket.dns.gethostname",
+            "script:socket.dns.getnameinfo",
+            "script:socket.dns.tohostname",
+            "script:socket.dns.toip",
+            "script:socket.gettime",
+            "script:socket.skip",
+            "script:socket.sleep"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:any",
           "routeCount": 8,
-          "exampleRouteId": "script:json.encode"
+          "exampleRouteId": "script:json.encode",
+          "routeIds": [
+            "script:json.encode",
+            "script:types.is_hash",
+            "script:types.is_matrix4",
+            "script:types.is_quat",
+            "script:types.is_url",
+            "script:types.is_vector",
+            "script:types.is_vector3",
+            "script:types.is_vector4"
+          ]
         },
         {
           "reason": "context-fixture-missing:window",
           "routeCount": 7,
-          "exampleRouteId": "script:window.get_dim_mode"
+          "exampleRouteId": "script:window.get_dim_mode",
+          "routeIds": [
+            "script:window.get_dim_mode",
+            "script:window.get_display_scale",
+            "script:window.get_safe_area",
+            "script:window.set_dim_mode",
+            "script:window.set_position",
+            "script:window.set_size",
+            "script:window.set_title"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:T",
           "routeCount": 6,
-          "exampleRouteId": "script:vmath.clamp"
+          "exampleRouteId": "script:vmath.clamp",
+          "routeIds": [
+            "script:vmath.clamp",
+            "script:vmath.dot",
+            "script:vmath.lerp",
+            "script:vmath.mul_per_elem",
+            "script:vmath.normalize",
+            "script:vmath.slerp"
+          ]
         },
         {
           "reason": "execution-policy-interactive",
           "routeCount": 5,
-          "exampleRouteId": "script:gui.hide_keyboard"
+          "exampleRouteId": "script:gui.hide_keyboard",
+          "routeIds": [
+            "script:gui.hide_keyboard",
+            "script:gui.show_keyboard",
+            "script:sys.open_url",
+            "script:window.get_mouse_lock",
+            "script:window.set_mouse_lock"
+          ]
         },
         {
           "reason": "variadic-argument-shape-unmodelled",
           "routeCount": 4,
-          "exampleRouteId": "script:bit.band"
+          "exampleRouteId": "script:bit.band",
+          "routeIds": [
+            "script:bit.band",
+            "script:bit.bor",
+            "script:bit.bxor",
+            "script:pprint"
+          ]
         },
         {
           "reason": "multi-result-shape-unmodelled",
           "routeCount": 2,
-          "exampleRouteId": "script:buffer.get_metadata"
+          "exampleRouteId": "script:buffer.get_metadata",
+          "routeIds": [
+            "script:buffer.get_metadata",
+            "script:sys.load_resource"
+          ]
         },
         {
           "reason": "no-generated-universal-adapter",
           "routeCount": 2,
-          "exampleRouteId": "script:timer.cancel"
+          "exampleRouteId": "script:timer.cancel",
+          "routeIds": [
+            "script:timer.cancel",
+            "script:timer.trigger"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:crash.USERFIELD",
           "routeCount": 2,
-          "exampleRouteId": "script:crash.get_user_field"
+          "exampleRouteId": "script:crash.get_user_field",
+          "routeIds": [
+            "script:crash.get_user_field",
+            "script:crash.set_user_field"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:hash[]",
           "routeCount": 2,
-          "exampleRouteId": "script:physics.raycast"
+          "exampleRouteId": "script:physics.raycast",
+          "routeIds": [
+            "script:physics.raycast",
+            "script:physics.raycast_async"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:number[]",
           "routeCount": 2,
-          "exampleRouteId": "script:buffer.set_metadata"
+          "exampleRouteId": "script:buffer.set_metadata",
+          "routeIds": [
+            "script:buffer.set_metadata",
+            "script:vmath.vector"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:resource.animation[]@resource.atlas.animations",
           "routeCount": 2,
-          "exampleRouteId": "script:resource.create_atlas"
+          "exampleRouteId": "script:resource.create_atlas",
+          "routeIds": [
+            "script:resource.create_atlas",
+            "script:resource.set_atlas"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:table<any, any>",
           "routeCount": 2,
-          "exampleRouteId": "script:sys.save"
+          "exampleRouteId": "script:sys.save",
+          "routeIds": [
+            "script:sys.save",
+            "script:sys.serialize"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:vector3|vector4",
           "routeCount": 2,
-          "exampleRouteId": "script:vmath.matrix4_compose"
+          "exampleRouteId": "script:vmath.matrix4_compose",
+          "routeIds": [
+            "script:vmath.matrix4_compose",
+            "script:vmath.matrix4_translation"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:vector3|vector4|quaternion",
           "routeCount": 2,
-          "exampleRouteId": "script:vmath.length"
+          "exampleRouteId": "script:vmath.length",
+          "routeIds": [
+            "script:vmath.length",
+            "script:vmath.length_sqr"
+          ]
         },
         {
           "reason": "execution-policy-context-blocked",
           "routeCount": 1,
-          "exampleRouteId": "script:html5.run"
+          "exampleRouteId": "script:html5.run",
+          "routeIds": [
+            "script:html5.run"
+          ]
         },
         {
           "reason": "harness-effect-guard:dump_frame",
           "routeCount": 1,
-          "exampleRouteId": "script:profiler.dump_frame"
+          "exampleRouteId": "script:profiler.dump_frame",
+          "routeIds": [
+            "script:profiler.dump_frame"
+          ]
         },
         {
           "reason": "harness-effect-guard:write_dump",
           "routeCount": 1,
-          "exampleRouteId": "script:crash.write_dump"
+          "exampleRouteId": "script:crash.write_dump",
+          "routeIds": [
+            "script:crash.write_dump"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:camera.ORTHO_MODE",
           "routeCount": 1,
-          "exampleRouteId": "script:camera.set_orthographic_mode"
+          "exampleRouteId": "script:camera.set_orthographic_mode",
+          "routeIds": [
+            "script:camera.set_orthographic_mode"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:crash.SYSFIELD",
           "routeCount": 1,
-          "exampleRouteId": "script:crash.get_sys_field"
+          "exampleRouteId": "script:crash.get_sys_field",
+          "routeIds": [
+            "script:crash.get_sys_field"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:graphics.TEXTURE_TYPE@resource.texture_creation_params.type",
           "routeCount": 1,
-          "exampleRouteId": "script:resource.create_texture"
+          "exampleRouteId": "script:resource.create_texture",
+          "routeIds": [
+            "script:resource.create_texture"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:graphics.TEXTURE_TYPE@resource.texture_update_params.type",
           "routeCount": 1,
-          "exampleRouteId": "script:resource.set_texture"
+          "exampleRouteId": "script:resource.set_texture",
+          "routeIds": [
+            "script:resource.set_texture"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:number[]|nil",
           "routeCount": 1,
-          "exampleRouteId": "script:model.set_blend_weights"
+          "exampleRouteId": "script:model.set_blend_weights",
+          "routeIds": [
+            "script:model.set_blend_weights"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:physics.JOINT_TYPE",
           "routeCount": 1,
-          "exampleRouteId": "script:physics.create_joint"
+          "exampleRouteId": "script:physics.create_joint",
+          "routeIds": [
+            "script:physics.create_joint"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:physics.SHAPE_TYPE@physics.shape_data.type",
           "routeCount": 1,
-          "exampleRouteId": "script:physics.set_shape"
+          "exampleRouteId": "script:physics.set_shape",
+          "routeIds": [
+            "script:physics.set_shape"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:profiler.MODE",
           "routeCount": 1,
-          "exampleRouteId": "script:profiler.set_ui_mode"
+          "exampleRouteId": "script:profiler.set_ui_mode",
+          "routeIds": [
+            "script:profiler.set_ui_mode"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:profiler.VIEW_MODE",
           "routeCount": 1,
-          "exampleRouteId": "script:profiler.set_ui_view_mode"
+          "exampleRouteId": "script:profiler.set_ui_view_mode",
+          "routeIds": [
+            "script:profiler.set_ui_view_mode"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:timer_handle",
           "routeCount": 1,
-          "exampleRouteId": "script:timer.get_info"
+          "exampleRouteId": "script:timer.get_info",
+          "routeIds": [
+            "script:timer.get_info"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:{ distance:integer }|{ frame:integer }",
           "routeCount": 1,
-          "exampleRouteId": "script:profiler.view_recorded_frame"
+          "exampleRouteId": "script:profiler.view_recorded_frame",
+          "routeIds": [
+            "script:profiler.view_recorded_frame"
+          ]
         }
       ],
       "profile": "engine",
@@ -4679,7 +5070,10 @@
         {
           "reason": "unsynthesizable-parameter-type:({ name:hash|string, type:buffer.VALUE_TYPE, count:number })[]",
           "routeCount": 1,
-          "exampleRouteId": "script:buffer.create"
+          "exampleRouteId": "script:buffer.create",
+          "routeIds": [
+            "script:buffer.create"
+          ]
         }
       ],
       "profile": "engine",
@@ -4850,12 +5244,19 @@
         {
           "reason": "unsynthesizable-parameter-type:bullet3d.collision_object.ACTIVATION_STATE",
           "routeCount": 2,
-          "exampleRouteId": "script:bullet3d.collision_object.force_activation_state"
+          "exampleRouteId": "script:bullet3d.collision_object.force_activation_state",
+          "routeIds": [
+            "script:bullet3d.collision_object.force_activation_state",
+            "script:bullet3d.collision_object.set_activation_state"
+          ]
         },
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.rigid_body.clear_forces"
+          "exampleRouteId": "script:bullet3d.rigid_body.clear_forces",
+          "routeIds": [
+            "script:bullet3d.rigid_body.clear_forces"
+          ]
         }
       ],
       "profile": "physics-3d",
@@ -5385,7 +5786,25 @@
         {
           "reason": "multi-result-shape-unmodelled",
           "routeCount": 16,
-          "exampleRouteId": "script:bullet3d.collision_object.get_world_transform"
+          "exampleRouteId": "script:bullet3d.collision_object.get_world_transform",
+          "routeIds": [
+            "script:bullet3d.collision_object.get_world_transform",
+            "script:bullet3d.constraint.get_6dof_motor",
+            "script:bullet3d.constraint.get_anchors",
+            "script:bullet3d.constraint.get_angles",
+            "script:bullet3d.constraint.get_axes",
+            "script:bullet3d.constraint.get_cone_twist_limits",
+            "script:bullet3d.constraint.get_frame_a",
+            "script:bullet3d.constraint.get_frame_b",
+            "script:bullet3d.constraint.get_hinge_limits",
+            "script:bullet3d.constraint.get_hinge_motor",
+            "script:bullet3d.constraint.get_limit",
+            "script:bullet3d.constraint.get_pivots",
+            "script:bullet3d.constraint.get_slider_limits",
+            "script:bullet3d.constraint.get_slider_motor",
+            "script:bullet3d.rigid_body.get_damping",
+            "script:bullet3d.shape.get_local_transform"
+          ]
         }
       ]
     },
@@ -7374,12 +7793,18 @@
         {
           "reason": "unsynthesizable-parameter-type:bullet3d.shape.definition",
           "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.world.cast_shape_async"
+          "exampleRouteId": "script:bullet3d.world.cast_shape_async",
+          "routeIds": [
+            "script:bullet3d.world.cast_shape_async"
+          ]
         },
         {
           "reason": "unsynthesizable-parameter-type:fun(self:script_instance, hits:bullet3d.world.cast_result[])",
           "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.world.cast_ray_async"
+          "exampleRouteId": "script:bullet3d.world.cast_ray_async",
+          "routeIds": [
+            "script:bullet3d.world.cast_ray_async"
+          ]
         }
       ]
     },
@@ -7557,12 +7982,21 @@
         {
           "reason": "execution-policy-destructive",
           "routeCount": 3,
-          "exampleRouteId": "script:font.remove_font"
+          "exampleRouteId": "script:font.remove_font",
+          "routeIds": [
+            "script:font.remove_font",
+            "script:liveupdate.remove_mount",
+            "script:resource.release"
+          ]
         },
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 2,
-          "exampleRouteId": "script:font.add_font"
+          "exampleRouteId": "script:font.add_font",
+          "routeIds": [
+            "script:font.add_font",
+            "script:font.set_style"
+          ]
         }
       ],
       "profile": "engine",
@@ -7992,7 +8426,10 @@
         {
           "reason": "unsynthesizable-parameter-type:fun(self:script_instance, message_id:hash, message:collectionproxy.load_data, sender:url)",
           "routeCount": 1,
-          "exampleRouteId": "script:collectionproxy.load"
+          "exampleRouteId": "script:collectionproxy.load",
+          "routeIds": [
+            "script:collectionproxy.load"
+          ]
         }
       ]
     },
@@ -8021,7 +8458,13 @@
         {
           "reason": "multi-result-shape-unmodelled",
           "routeCount": 4,
-          "exampleRouteId": "script:collectionproxy.set_collection"
+          "exampleRouteId": "script:collectionproxy.set_collection",
+          "routeIds": [
+            "script:collectionproxy.set_collection",
+            "script:sound.get_peak",
+            "script:sound.get_rms",
+            "script:tilemap.get_bounds"
+          ]
         }
       ]
     },
@@ -8050,7 +8493,10 @@
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
-          "exampleRouteId": "script:go.delete"
+          "exampleRouteId": "script:go.delete",
+          "routeIds": [
+            "script:go.delete"
+          ]
         }
       ],
       "profile": "engine",
@@ -8202,7 +8648,10 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 1,
-          "exampleRouteId": "script:font.prewarm_text"
+          "exampleRouteId": "script:font.prewarm_text",
+          "routeIds": [
+            "script:font.prewarm_text"
+          ]
         }
       ]
     },
@@ -8231,7 +8680,10 @@
         {
           "reason": "unsynthesizable-parameter-type:go.PLAYBACK",
           "routeCount": 1,
-          "exampleRouteId": "script:go.animate"
+          "exampleRouteId": "script:go.animate",
+          "routeIds": [
+            "script:go.animate"
+          ]
         }
       ]
     },
@@ -8260,7 +8712,10 @@
         {
           "reason": "no-generated-universal-adapter",
           "routeCount": 1,
-          "exampleRouteId": "script:go.property"
+          "exampleRouteId": "script:go.property",
+          "routeIds": [
+            "script:go.property"
+          ]
         }
       ]
     },
@@ -8289,7 +8744,10 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 1,
-          "exampleRouteId": "script:gui.animate"
+          "exampleRouteId": "script:gui.animate",
+          "routeIds": [
+            "script:gui.animate"
+          ]
         }
       ]
     },
@@ -8318,12 +8776,64 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 47,
-          "exampleRouteId": "script:gui.cancel_animations"
+          "exampleRouteId": "script:gui.cancel_animations",
+          "routeIds": [
+            "script:gui.cancel_animations",
+            "script:gui.cancel_flipbook",
+            "script:gui.get_adjust_mode",
+            "script:gui.get_alpha",
+            "script:gui.get_blend_mode",
+            "script:gui.get_clipping_inverted",
+            "script:gui.get_clipping_mode",
+            "script:gui.get_clipping_visible",
+            "script:gui.get_color",
+            "script:gui.get_euler",
+            "script:gui.get_fill_angle",
+            "script:gui.get_flipbook",
+            "script:gui.get_flipbook_cursor",
+            "script:gui.get_flipbook_playback_rate",
+            "script:gui.get_font",
+            "script:gui.get_id",
+            "script:gui.get_index",
+            "script:gui.get_inherit_alpha",
+            "script:gui.get_inner_radius",
+            "script:gui.get_layer",
+            "script:gui.get_leading",
+            "script:gui.get_line_break",
+            "script:gui.get_material",
+            "script:gui.get_outer_bounds",
+            "script:gui.get_outline",
+            "script:gui.get_particlefx",
+            "script:gui.get_perimeter_vertices",
+            "script:gui.get_pivot",
+            "script:gui.get_position",
+            "script:gui.get_rotation",
+            "script:gui.get_scale",
+            "script:gui.get_screen_position",
+            "script:gui.get_shadow",
+            "script:gui.get_size",
+            "script:gui.get_size_mode",
+            "script:gui.get_slice9",
+            "script:gui.get_text",
+            "script:gui.get_texture",
+            "script:gui.get_tracking",
+            "script:gui.get_visible",
+            "script:gui.get_xanchor",
+            "script:gui.get_yanchor",
+            "script:gui.is_enabled",
+            "script:gui.move_above",
+            "script:gui.move_below",
+            "script:gui.pick_node",
+            "script:gui.screen_to_local"
+          ]
         },
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
-          "exampleRouteId": "script:gui.reset_material"
+          "exampleRouteId": "script:gui.reset_material",
+          "routeIds": [
+            "script:gui.reset_material"
+          ]
         }
       ]
     },
@@ -8352,7 +8862,11 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 2,
-          "exampleRouteId": "script:gui.clone"
+          "exampleRouteId": "script:gui.clone",
+          "routeIds": [
+            "script:gui.clone",
+            "script:gui.get_parent"
+          ]
         }
       ]
     },
@@ -8381,7 +8895,10 @@
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
-          "exampleRouteId": "script:gui.delete_node"
+          "exampleRouteId": "script:gui.delete_node",
+          "routeIds": [
+            "script:gui.delete_node"
+          ]
         }
       ]
     },
@@ -8410,12 +8927,21 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 4,
-          "exampleRouteId": "script:gui.get_font_resource"
+          "exampleRouteId": "script:gui.get_font_resource",
+          "routeIds": [
+            "script:gui.get_font_resource",
+            "script:gui.get_layout",
+            "script:gui.set_layout",
+            "script:gui.set_texture_data"
+          ]
         },
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
-          "exampleRouteId": "script:gui.delete_texture"
+          "exampleRouteId": "script:gui.delete_texture",
+          "routeIds": [
+            "script:gui.delete_texture"
+          ]
         }
       ]
     },
@@ -8444,7 +8970,50 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 41,
-          "exampleRouteId": "script:gui.get_node"
+          "exampleRouteId": "script:gui.get_node",
+          "routeIds": [
+            "script:gui.get_node",
+            "script:gui.set_adjust_mode",
+            "script:gui.set_alpha",
+            "script:gui.set_blend_mode",
+            "script:gui.set_clipping_inverted",
+            "script:gui.set_clipping_mode",
+            "script:gui.set_clipping_visible",
+            "script:gui.set_color",
+            "script:gui.set_enabled",
+            "script:gui.set_euler",
+            "script:gui.set_fill_angle",
+            "script:gui.set_flipbook_cursor",
+            "script:gui.set_flipbook_playback_rate",
+            "script:gui.set_font",
+            "script:gui.set_id",
+            "script:gui.set_inherit_alpha",
+            "script:gui.set_inner_radius",
+            "script:gui.set_layer",
+            "script:gui.set_leading",
+            "script:gui.set_line_break",
+            "script:gui.set_material",
+            "script:gui.set_outer_bounds",
+            "script:gui.set_outline",
+            "script:gui.set_parent",
+            "script:gui.set_particlefx",
+            "script:gui.set_perimeter_vertices",
+            "script:gui.set_pivot",
+            "script:gui.set_position",
+            "script:gui.set_rotation",
+            "script:gui.set_scale",
+            "script:gui.set_screen_position",
+            "script:gui.set_shadow",
+            "script:gui.set_size",
+            "script:gui.set_size_mode",
+            "script:gui.set_slice9",
+            "script:gui.set_text",
+            "script:gui.set_texture",
+            "script:gui.set_tracking",
+            "script:gui.set_visible",
+            "script:gui.set_xanchor",
+            "script:gui.set_yanchor"
+          ]
         }
       ]
     },
@@ -8473,7 +9042,11 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 2,
-          "exampleRouteId": "script:gui.get_type"
+          "exampleRouteId": "script:gui.get_type",
+          "routeIds": [
+            "script:gui.get_type",
+            "script:gui.new_texture"
+          ]
         }
       ]
     },
@@ -8502,7 +9075,13 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 4,
-          "exampleRouteId": "script:gui.new_box_node"
+          "exampleRouteId": "script:gui.new_box_node",
+          "routeIds": [
+            "script:gui.new_box_node",
+            "script:gui.new_particlefx_node",
+            "script:gui.new_pie_node",
+            "script:gui.new_text_node"
+          ]
         }
       ]
     },
@@ -8531,7 +9110,10 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 1,
-          "exampleRouteId": "script:gui.play_flipbook"
+          "exampleRouteId": "script:gui.play_flipbook",
+          "routeIds": [
+            "script:gui.play_flipbook"
+          ]
         }
       ]
     },
@@ -8560,7 +9142,10 @@
         {
           "reason": "context-fixture-missing:gui-scene",
           "routeCount": 1,
-          "exampleRouteId": "script:gui.play_particlefx"
+          "exampleRouteId": "script:gui.play_particlefx",
+          "routeIds": [
+            "script:gui.play_particlefx"
+          ]
         }
       ]
     },
@@ -8589,7 +9174,10 @@
         {
           "reason": "execution-policy-context-blocked",
           "routeCount": 1,
-          "exampleRouteId": "script:html5.set_interaction_listener"
+          "exampleRouteId": "script:html5.set_interaction_listener",
+          "routeIds": [
+            "script:html5.set_interaction_listener"
+          ]
         }
       ]
     },
@@ -8618,7 +9206,10 @@
         {
           "reason": "context-fixture-missing:network",
           "routeCount": 1,
-          "exampleRouteId": "script:http.request"
+          "exampleRouteId": "script:http.request",
+          "routeIds": [
+            "script:http.request"
+          ]
         }
       ]
     },
@@ -8647,7 +9238,10 @@
         {
           "reason": "unsynthesizable-parameter-type:fun(self:script_instance, name:hash, uri:string, result:liveupdate.LIVEUPDATE)",
           "routeCount": 1,
-          "exampleRouteId": "script:liveupdate.add_mount"
+          "exampleRouteId": "script:liveupdate.add_mount",
+          "routeIds": [
+            "script:liveupdate.add_mount"
+          ]
         }
       ]
     },
@@ -8676,7 +9270,10 @@
         {
           "reason": "unsynthesizable-parameter-type:go.PLAYBACK",
           "routeCount": 1,
-          "exampleRouteId": "script:model.play_anim"
+          "exampleRouteId": "script:model.play_anim",
+          "routeIds": [
+            "script:model.play_anim"
+          ]
         }
       ]
     },
@@ -8863,7 +9460,10 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 1,
-          "exampleRouteId": "script:render.constant_buffer"
+          "exampleRouteId": "script:render.constant_buffer",
+          "routeIds": [
+            "script:render.constant_buffer"
+          ]
         }
       ]
     },
@@ -8892,7 +9492,10 @@
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
-          "exampleRouteId": "script:render.delete_render_target"
+          "exampleRouteId": "script:render.delete_render_target",
+          "routeIds": [
+            "script:render.delete_render_target"
+          ]
         }
       ]
     },
@@ -8921,7 +9524,11 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 2,
-          "exampleRouteId": "script:render.disable_texture"
+          "exampleRouteId": "script:render.disable_texture",
+          "routeIds": [
+            "script:render.disable_texture",
+            "script:render.enable_texture"
+          ]
         }
       ]
     },
@@ -8950,7 +9557,13 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 4,
-          "exampleRouteId": "script:render.enable_material"
+          "exampleRouteId": "script:render.enable_material",
+          "routeIds": [
+            "script:render.enable_material",
+            "script:render.set_compute",
+            "script:render.set_projection",
+            "script:render.set_view"
+          ]
         }
       ]
     },
@@ -8979,7 +9592,12 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 3,
-          "exampleRouteId": "script:render.get_render_target_height"
+          "exampleRouteId": "script:render.get_render_target_height",
+          "routeIds": [
+            "script:render.get_render_target_height",
+            "script:render.get_render_target_width",
+            "script:render.set_render_target_size"
+          ]
         }
       ]
     },
@@ -9008,7 +9626,10 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 1,
-          "exampleRouteId": "script:render.render_target"
+          "exampleRouteId": "script:render.render_target",
+          "routeIds": [
+            "script:render.render_target"
+          ]
         }
       ]
     },
@@ -9037,7 +9658,10 @@
         {
           "reason": "context-fixture-missing:render-script",
           "routeCount": 1,
-          "exampleRouteId": "script:render.set_listener"
+          "exampleRouteId": "script:render.set_listener",
+          "routeIds": [
+            "script:render.set_listener"
+          ]
         }
       ]
     },
@@ -9066,7 +9690,16 @@
         {
           "reason": "no-generated-universal-adapter",
           "routeCount": 7,
-          "exampleRouteId": "script:resource.atlas"
+          "exampleRouteId": "script:resource.atlas",
+          "routeIds": [
+            "script:resource.atlas",
+            "script:resource.buffer",
+            "script:resource.font",
+            "script:resource.material",
+            "script:resource.render_target",
+            "script:resource.texture",
+            "script:resource.tile_source"
+          ]
         }
       ]
     },
@@ -9095,7 +9728,10 @@
         {
           "reason": "multi-result-shape-unmodelled",
           "routeCount": 1,
-          "exampleRouteId": "script:resource.create_texture_async"
+          "exampleRouteId": "script:resource.create_texture_async",
+          "routeIds": [
+            "script:resource.create_texture_async"
+          ]
         }
       ]
     },
@@ -9124,7 +9760,11 @@
         {
           "reason": "lua-stack-blocked-capability",
           "routeCount": 2,
-          "exampleRouteId": "script:socket.newtry"
+          "exampleRouteId": "script:socket.newtry",
+          "routeIds": [
+            "script:socket.newtry",
+            "script:socket.protect"
+          ]
         }
       ]
     },
@@ -9292,7 +9932,10 @@
         {
           "reason": "unsynthesizable-parameter-type:fun(self:script_instance, request_id:integer, result:sys.load_buffer_result)",
           "routeCount": 1,
-          "exampleRouteId": "script:sys.load_buffer_async"
+          "exampleRouteId": "script:sys.load_buffer_async",
+          "routeIds": [
+            "script:sys.load_buffer_async"
+          ]
         }
       ]
     },
@@ -9321,7 +9964,10 @@
         {
           "reason": "unsynthesizable-parameter-type:fun(source:string, message:string, traceback:string)",
           "routeCount": 1,
-          "exampleRouteId": "script:sys.set_error_handler"
+          "exampleRouteId": "script:sys.set_error_handler",
+          "routeIds": [
+            "script:sys.set_error_handler"
+          ]
         }
       ]
     },
@@ -9350,7 +9996,10 @@
         {
           "reason": "no-generated-universal-adapter",
           "routeCount": 1,
-          "exampleRouteId": "script:timer.delay"
+          "exampleRouteId": "script:timer.delay",
+          "routeIds": [
+            "script:timer.delay"
+          ]
         }
       ]
     },
@@ -9379,12 +10028,18 @@
         {
           "reason": "context-fixture-missing:window",
           "routeCount": 1,
-          "exampleRouteId": "script:window.get_size"
+          "exampleRouteId": "script:window.get_size",
+          "routeIds": [
+            "script:window.get_size"
+          ]
         },
         {
           "reason": "multi-result-shape-unmodelled",
           "routeCount": 1,
-          "exampleRouteId": "script:vmath.quat_to_euler"
+          "exampleRouteId": "script:vmath.quat_to_euler",
+          "routeIds": [
+            "script:vmath.quat_to_euler"
+          ]
         }
       ]
     },
@@ -9413,7 +10068,10 @@
         {
           "reason": "context-fixture-missing:window",
           "routeCount": 1,
-          "exampleRouteId": "script:window.set_listener"
+          "exampleRouteId": "script:window.set_listener",
+          "routeIds": [
+            "script:window.set_listener"
+          ]
         }
       ]
     }
