@@ -454,3 +454,39 @@ The current leaves digest each `.script_api`'s parsed declarations and name
 headers and sources by path. Content-hashing every header and source file is
 the next step and is what a layer-1 or layer-2 policy key will need; the shape
 of the tree does not change when it lands.
+
+# What exists today
+
+Layer 0's policy artifact and its distribution are implemented. See
+[the API policy store](../research/api-policy-store.md) for the derived shape,
+the emitted tree and the evidence.
+
+| Piece | Where |
+| --- | --- |
+| The derivation and the store's `--check` closure | `scripts/generate-api-policy.mjs` |
+| Subtree attribution, canonical sealing, the revision-leak guard | `packages/compiler/src/api-policy.mjs` |
+| Defold's toolchain pins, read under Defold's own symbol names | `packages/compiler/src/defold-toolchain-pins.mjs` |
+| The published base, as configuration rather than a constant | `packages/bindings/policy-site.json` |
+| The emitted `v1` tree | `scripts/build-policy-site.mjs` |
+| The end-to-end consumer proof, including a tampered-object control | `scripts/check-policy-site-resolution.mjs` |
+| Channel tracking and revision repinning | `scripts/track-defold-channels.mjs` |
+| Publish and watch | `.github/workflows/policy-site.yml`, `.github/workflows/policy-revisions.yml` |
+
+Three details the implementation had to settle that this document left open:
+
+* **Nothing in a policy object may carry the revision** - not even transitively,
+  through a digest computed over bytes that themselves carry it. The route
+  profiles' runtime handshake carried both, so its `defoldRevision` and
+  `catalogSha256` are stripped and reconstituted at resolution time from the
+  revision the consumer already resolved. Without that rule every revision would
+  produce a distinct root and the storage argument would stop holding silently.
+* **`<globals>` is not a namespace.** It is the registration parser's marker for
+  a Lua name registered outside any module, and is not a legal Lua identifier.
+  Its rows go to the shared subtree; `_G` stays a namespace, because the global
+  table is a real scope.
+* **Reserved subtrees use an `@` prefix**, which no Lua module name can contain,
+  so cross-cutting content (`@shared`, `@profiles`, `@toolchain`) cannot collide
+  with a namespace.
+
+Layers 1 to 3 - extension policies keyed by archive content hash, and the
+Murmur2-64A keys that decide whether to reparse - remain future work.

@@ -277,3 +277,51 @@ export const resourceNamespaceGenerator = Object.freeze({
     "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline"
   ])
 });
+
+// The layered API policy lane. It assembles one Defold revision's derived
+// surface - the script API IR, the dmSDK IR, the route availability profiles,
+// the source-derived Lua registration surface and the resource declaration
+// schema - into content-addressed per-namespace subtrees, and carries that
+// revision's toolchain pins alongside them.
+//
+// Like `luaRegistrationSurfaceGenerator` and `resourceNamespaceGenerator` it
+// owns its artifacts here rather than joining `scriptGenerationSteps`, and for
+// the same two reasons in combination:
+//
+//   * its evidence is a source tree - Defold's `build_tools/sdk.py` and
+//     `share/extender/build_input.yml` declare the toolchain pins, and the
+//     clean room copies an enumerated evidence subset it cannot express; and
+//   * its outputs are CONTENT-ADDRESSED, so their filenames are hashes that are
+//     not knowable before the derivation runs. `storeRoot` names the directory
+//     they live under; `artifacts` lists only the two files whose paths are
+//     fixed. `--check` verifies the store as a closure instead: every object an
+//     index entry reaches must exist and hash to its own path, and nothing
+//     unreferenced may sit in the store.
+export const apiPolicyGenerator = Object.freeze({
+  sources: Object.freeze([
+    "scripts/generate-api-policy.mjs",
+    "packages/compiler/src/api-policy.mjs",
+    "packages/compiler/src/defold-toolchain-pins.mjs"
+  ]),
+  pinnedInputs: Object.freeze([
+    "upstream.lock",
+    "packages/bindings/policy-site.json",
+    "packages/bindings/generated/defold-script-api-ir.json",
+    "packages/bindings/generated/defold-sdk-ir.json",
+    "packages/bindings/generated/defold-lua-registration-surface.json",
+    "packages/bindings/generated/defold-script-route-availability-profiles.json",
+    "packages/bindings/generated/defold-resource-declaration-schema.json"
+  ]),
+  artifacts: Object.freeze([
+    "packages/bindings/generated/defold-api-policy.json",
+    "packages/bindings/generated/defold-policy-index.json"
+  ]),
+  storeRoot: "packages/bindings/generated/policy",
+  steps: Object.freeze([
+    Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs" })
+  ]),
+  sourceTreeEvidence: Object.freeze([
+    "upstream/defold/build_tools/sdk.py",
+    "upstream/defold/share/extender/build_input.yml"
+  ])
+});

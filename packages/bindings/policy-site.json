@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "comment": [
+    "Where the policy store is published. This file is CONFIGURATION, not generated state:",
+    "the base URL is carried in the shipped index so relocating the site is an edit here and a",
+    "republish, never a code change and never a release. A GitHub project page is served under",
+    "its repository name, so the default already sits beneath one owned segment; publishing from",
+    "an organisation-site repository would remove that segment, which is what `pathPrefix` is for.",
+    "Nothing may be published at a root-level segment: a top-level /index/ or /policy/ would",
+    "collide with whatever the organisation site routes now or later. `layoutVersion` is in the",
+    "path so a v2 layout can be published alongside v1 during a migration."
+  ],
+  "baseUrl": "https://ts-defold.github.io/deherm",
+  "pathPrefix": "",
+  "layoutVersion": "v1",
+  "channels": ["stable", "beta", "alpha"],
+  "channelInfoUrl": "https://d.defold.com/{channel}/info.json"
+}

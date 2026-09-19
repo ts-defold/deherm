@@ -1,0 +1,121 @@
+name: policy-site
+
+# Publish the content-addressed API policy store as a static site.
+#
+# See `.agents/docs/decisions/layered-api-policy-cache.md`. The site serves one
+# owned prefix and nothing at a root-level segment:
+#
+#   <base>/v1/index/<defold-sha>.json    -> { policyRoot, generator }
+#   <base>/v1/policy/<root-hash>.json    -> names its subtrees
+#   <base>/v1/object/<subtree-hash>.json -> one namespace's surface
+#
+# ── What this job does and does not rebuild ─────────────────────────────────
+#
+# It derives NOTHING. The policy store is committed under
+# packages/bindings/generated/policy, so this job reads bytes that were reviewed
+# in the pull request that produced them and emits the tree around them. That is
+# what makes "the site builds from a clean checkout" true: no Defold checkout, no
+# clang, no network.
+#
+# Re-running is therefore free and idempotent in the sense that matters: an
+# object's URL never changes its bytes, and an object already published is
+# emitted byte-identically rather than re-derived. `build-policy-site.mjs`
+# reports how many files it actually had to write; in the steady state that is
+# zero. Pages itself replaces the whole site artifact on each deploy - it has no
+# incremental upload - so the guarantee is immutability of each object, not a
+# partial upload.
+#
+# ── Trust ───────────────────────────────────────────────────────────────────
+#
+# Objects are self-verifying: a consumer hashes the body and compares it to the
+# hash in the path, so a hostile or corrupted mirror cannot substitute content.
+# Only the index is a mutable mapping, which is why it also ships inside the npm
+# package and why the release's copy wins over a fetched one.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/bindings/generated/policy/**
+      - packages/bindings/generated/defold-policy-index.json
+      - packages/bindings/generated/defold-api-policy.json
+      - packages/bindings/policy-site.json
+      - scripts/build-policy-site.mjs
+      - scripts/generate-api-policy.mjs
+      - scripts/check-policy-site-resolution.mjs
+      - packages/compiler/src/api-policy.mjs
+      - .github/workflows/policy-site.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Pages allows one in-flight deployment. Queueing rather than cancelling means a
+# push that lands during a deploy still publishes, which matters because the
+# thing being published is additive.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # The store must be internally consistent before any of it is served: every
+      # object an index entry reaches has to exist and hash to its own path, and
+      # nothing unreferenced may sit in the store. A `--check` failure here means
+      # the committed store and the committed index disagree, which is exactly
+      # the state that must never be published.
+      - name: Verify the committed policy store
+        run: node scripts/generate-api-policy.mjs --check
+
+      - name: Emit the site
+        run: node scripts/build-policy-site.mjs --out build/policy-site
+
+      # Resolve sha -> index -> policy -> objects over HTTP against a served copy
+      # of what is about to be deployed, including the negative control that a
+      # tampered object is rejected. A deploy that has not been resolved end to
+      # end is a deploy nobody has checked.
+      - name: Resolve the emitted tree end to end
+        run: node scripts/check-policy-site-resolution.mjs
+
+      - name: Report what is being published
+        run: |
+          {
+            echo "### Policy site"
+            echo
+            echo '```'
+            node -e '
+              const index = require("./packages/bindings/generated/defold-policy-index.json");
+              const manifest = require("./packages/bindings/generated/defold-api-policy.json");
+              console.log(`base        ${index.base.url}${index.base.pathPrefix ? "/" + index.base.pathPrefix : ""}`);
+              console.log(`layout      ${index.base.layoutVersion}`);
+              console.log(`revisions   ${index.entries.length}`);
+              console.log(`generator   ${manifest.generator}`);
+              for (const entry of index.entries) console.log(`  ${entry.defoldRevision} -> ${entry.policyRoot}`);
+            '
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/policy-site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

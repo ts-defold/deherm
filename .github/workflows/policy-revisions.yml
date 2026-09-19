@@ -1,0 +1,214 @@
+name: policy-revisions
+
+# Watch Defold's release channels and derive a policy for any revision the index
+# does not already cover.
+#
+# See `.agents/docs/decisions/layered-api-policy-cache.md` ("The nightly job")
+# and `.agents/docs/decisions/api-source-resolution.md` ("A channel is a moving
+# pointer, never a pin").
+#
+# ── The property that makes this cheap ──────────────────────────────────────
+#
+# Because objects are content-addressed, a revision whose declaration inputs did
+# not change publishes NOTHING: the subtree hashes already exist and the index
+# simply gains one more pointer at them. The steady-state cost of a Defold
+# release is one index line. `plan` exits without a matrix when every tracked
+# channel already resolves to an indexed revision, and even when a revision IS
+# new, `generate-api-policy.mjs` reports how many objects were actually added -
+# often zero.
+#
+# ── Why this opens a pull request instead of pushing ────────────────────────
+#
+# Deriving a revision changes what this repository treats as ground truth:
+# `upstream.lock` is repinned to that revision with the digests the immutable
+# archive actually served. That is a reviewed decision, not an automated one,
+# and a policy is reviewable on purpose - a diff showing a parameter change from
+# required to optional is meant to be a visible event. The branch carries the
+# repinned lock, the regenerated surface, the new policy objects and the index
+# entry together, so the review sees the whole derivation.
+#
+# ── Why macOS, and the determinism caveat this job cannot fix ───────────────
+#
+# The dmSDK IR is produced by parsing public headers with the HOST clang, and
+# `scripts/import-defold-sdk.py` labels its output `arm64-macos` unconditionally.
+# Deriving it on a Linux runner would therefore produce an IR labelled for a
+# platform it was not parsed for, and a different clang can legitimately produce
+# a different AST. Until that generator records and pins its own toolchain, this
+# job runs on an arm64 macOS runner to match the label, and the resulting policy
+# root is compared against a local derivation during review rather than trusted
+# because CI produced it.
+
+on:
+  schedule:
+    # Daily. Defold publishes to `stable`, `beta` and `alpha` independently, and
+    # a channel can move at any time; nothing downstream keys on the channel, so
+    # polling frequency only changes how quickly a new sha gets an index entry.
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: Derive this Defold revision instead of reading the channels
+        required: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: policy-revisions
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      derive: ${{ steps.plan.outputs.derive }}
+      any: ${{ steps.plan.outputs.any }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - id: plan
+        run: |
+          set -euo pipefail
+          if [ -n "${{ inputs.revision }}" ]; then
+            derive='[{"channel":"manual","sha1":"${{ inputs.revision }}","version":null}]'
+          else
+            # Fails closed: an unreachable channel or a malformed info.json is an
+            # error, never an empty plan. "Nothing to do" and "could not find
+            # out" must not look the same.
+            derive="$(node scripts/track-defold-channels.mjs plan --json | node -e 'process.stdin.once("data", (d) => process.stdout.write(JSON.stringify(JSON.parse(d).derive)))')"
+          fi
+          echo "derive=$derive" >> "$GITHUB_OUTPUT"
+          if [ "$derive" = "[]" ]; then
+            echo "any=false" >> "$GITHUB_OUTPUT"
+            echo "Every tracked channel already resolves to an indexed revision; nothing to derive or publish." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "any=true" >> "$GITHUB_OUTPUT"
+          fi
+      - run: node scripts/track-defold-channels.mjs plan >> "$GITHUB_STEP_SUMMARY"
+        if: always()
+
+  derive:
+    needs: plan
+    if: needs.plan.outputs.any == 'true'
+    # arm64 macOS, to match the platform label the dmSDK inventory writes. See
+    # the determinism caveat in this file's header.
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        revision: ${{ fromJSON(needs.plan.outputs.derive) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+
+      # Repin ground truth to the observed revision, recording the SHA-256 of
+      # what the immutable archive actually served rather than a recalled
+      # constant.
+      - name: Pin Defold ${{ matrix.revision.sha1 }}
+        run: node scripts/track-defold-channels.mjs pin "${{ matrix.revision.sha1 }}" --write
+
+      # The smallest deterministic slice of the engine the generators read.
+      # A full checkout is 1.4 GB; these paths are roughly 115 MB.
+      - name: Fetch the engine slice
+        run: |
+          set -euo pipefail
+          source ./upstream.lock
+          mkdir -p upstream/defold
+          git -C upstream/defold init -q
+          git -C upstream/defold remote add origin "$DEFOLD_URL"
+          git -C upstream/defold config core.sparseCheckout true
+          git -C upstream/defold sparse-checkout set \
+            engine \
+            build_tools/sdk.py \
+            share/extender/build_input.yml \
+            com.dynamo.cr/com.dynamo.cr.bob/src \
+            editor/test/resources/test_project/app_manifest
+          git -C upstream/defold fetch --depth=1 --filter=blob:none origin "$DEFOLD_REV"
+          git -C upstream/defold checkout --detach "$DEFOLD_REV"
+          curl -fL "$DEFOLD_REF_DOC_URL" -o upstream/ref-doc.zip
+          shasum -a 256 -c <<< "$DEFOLD_REF_DOC_SHA256  upstream/ref-doc.zip"
+
+      # Derive the surface this revision declares, then the policy over it. The
+      # order is the one the ownership registries imply: the declared surface
+      # first, the source-derived registration ground truth over it, then the
+      # generators that consume the registration gate, then the policy.
+      - name: Derive the surface
+        run: |
+          set -euo pipefail
+          python3 scripts/import-defold-sdk.py
+          python3 scripts/import-defold-script-api.py
+          node scripts/generate-script-sdk.mjs
+          node scripts/generate-lua-registration-surface.mjs
+          node scripts/generate-defold-resource-schema.mjs
+          node scripts/generate-script-resource-namespace-classification.mjs
+          node scripts/generate-dmsdk-sdk.mjs
+          node scripts/generate-script-runtime.mjs
+
+      # `--prune` removes objects no index entry reaches any more. It cannot
+      # remove an object a previously published revision still points at, because
+      # that revision's index entry is still in the store.
+      - name: Derive the policy
+        id: policy
+        run: |
+          set -euo pipefail
+          node scripts/generate-api-policy.mjs --prune | tee /tmp/policy.txt
+          node scripts/generate-api-policy.mjs --check
+          node scripts/build-policy-site.mjs --out build/policy-site
+          node scripts/check-policy-site-resolution.mjs
+
+      - name: Report
+        run: |
+          {
+            echo "### ${{ matrix.revision.channel }} ${{ matrix.revision.version }} (${{ matrix.revision.sha1 }})"
+            echo
+            echo '```'
+            cat /tmp/policy.txt
+            echo '```'
+            echo
+            echo "Objects added by this revision (empty means its declared surface did not move):"
+            echo '```'
+            git status --porcelain packages/bindings/generated/policy | sed -n '1,40p'
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      # A pull request, never a push: repinning upstream.lock and moving a
+      # derived surface are reviewed decisions. Deploying happens from main, by
+      # the policy-site workflow, after that review.
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: policy/defold-${{ matrix.revision.sha1 }}
+          base: main
+          title: "policy: derive Defold ${{ matrix.revision.version || matrix.revision.sha1 }}"
+          commit-message: |
+            policy: derive Defold ${{ matrix.revision.sha1 }}
+
+            Observed on the ${{ matrix.revision.channel }} channel. upstream.lock is
+            repinned with the digests the immutable archive served. Content-addressed
+            subtrees that did not move are unchanged, so this diff shows exactly what
+            the engine's declared surface changed.
+          body: |
+            Derived from the `${{ matrix.revision.channel }}` channel, which resolved to
+            `${{ matrix.revision.sha1 }}` (${{ matrix.revision.version }}).
+
+            Review notes:
+
+            * Subtree hashes that did not change are not in this diff; the policy root and
+              the index entry always are.
+            * The dmSDK IR is parsed with the runner's clang. Compare the policy root
+              against a local derivation before merging.
+            * `upstream.lock` digests were computed from what `d.defold.com/archive`
+              served during this run.
+          add-paths: |
+            upstream.lock
+            packages/bindings/generated
+            packages/sdk/src/generated
+            .agents/docs/research/sdk-coverage.md
+            .agents/docs/research/script-api-coverage.md
