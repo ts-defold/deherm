@@ -39,7 +39,7 @@
     "browserWasmHost": "packages/bindings/targets/browser-wasm-host.json"
   },
   "inputHashes": {
-    "scriptProjection": "f1b658001ef9f796d292a0a57c90d37d01e3a602561ca26b6ec5011b82335cc7",
+    "scriptProjection": "e29275aba314e5462a63a9888f267b4877b8bf8f60481d4233c74669378dbc7d",
     "scriptScalarDispatch": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
     "scriptValueBindings": "fb76b3c56345d38463c65d1644fcdfc47c70fd779152897eae7cb5502345c021",
     "scriptFixedTuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
@@ -51,8 +51,8 @@
     "scriptCopiedValueBlockers": "e566aacdeef63899975d2c90f04e0009edce83e166f2a358b978180ac57bb98c",
     "scriptOpaqueRecordBlockers": "3e943b8df5a247ad63d303eaef5ffb73f676ee70eaae0546aada88ab1d5e4239",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "d0e21abdcca565ed2f9aa7bb0553ba9899f279d901bda1c7b5a1a1a9b6b4a6c3",
-    "scriptUniversalValue": "7473ca02067589618d1e080f9a9519a42a7e2a4ab58e75b1e4662eb9b402ddc0",
+    "scriptHandleLowering": "f32347ae73567a16f17d5477a4882bf19822d5552d810301607a34d5678b72e4",
+    "scriptUniversalValue": "1a61f303faee8737af5e14747dce3be4181117c713a51c577e97024b3326c5ba",
     "defoldValueLayouts": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
     "dmsdkProjection": "492fc0a14d65270fb510caad4050bdf77ff48b9fa17c00f74e88e11d17dc3dd0",
     "dmsdkUniversal": "7da597ce8d428c30e57e1e1713cfae11824347bef10af1f9d039693c936f9ed0",
@@ -74,9 +74,9 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "391ef23dcb1c681cdff0a0ca9ed1fa7658bfe05f5c3b56e4298b8c5219865428",
+  "cacheKey": "9d42794244c2c37a4df3effe88f6bbfbfa4d5e9d1a532dce1250f0678519d8e5",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
   "outputBytes": 16076740,
-  "outputSha256": "8495dbfe47506ac8e338eacb206c972f547c8e0015b3b564d0fb6d66edb50b03",
-  "planSha256": "b681310b61823196afacfad3e59b49785f16a3b9852f09ae9d55a2ef6887e3ed"
+  "outputSha256": "133079c928d4ec0257c2e64fc5f64aa4d493a59f3f081b48aa1945d581424b9a",
+  "planSha256": "e53581335a808045fc4271ea8d52dfdefbff755068aebd21cce77d2f060dce88"
 }

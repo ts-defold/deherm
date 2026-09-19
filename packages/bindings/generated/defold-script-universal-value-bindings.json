@@ -1007,7 +1007,7 @@
     }
   },
   "inputHashes": {
-    "projection": "f1b658001ef9f796d292a0a57c90d37d01e3a602561ca26b6ec5011b82335cc7",
+    "projection": "e29275aba314e5462a63a9888f267b4877b8bf8f60481d4233c74669378dbc7d",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
     "classification": "0cd7365088e2c06d07586b7b4aa410377ec301489beaeed34ce75971dffe878d",
     "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
@@ -1027,12 +1027,12 @@
   ],
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp": "12f6c0b24ac8e1734077d47ba814329d8a1c36f3535dd1e24d839648901b2be4",
-    "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": "a3fb849280806e9c38850a0be1d6f2ababb64f2846a25f6655c02a7ece13daf8",
+    "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": "5fb340b6c0511c4f7fca2ac0baffbbb475cc2baa3fbecd55e98b645808929b88",
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": "4e6b3204a8cc7bb76ade0e451c6e39555432ff199ac3756bf5f87d1df98585d1",
-    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "2036d22ebfcd6565893c26123d5a8cc4662fee1e016f6e8972a91c6c66906c68",
+    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "de591ccdc1a82639dcc11f87f286211cd1eb538c67156cf1fe355abb8d019fed",
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": "ab423b90ed7c9166abb5a9ef238ac0d37a1e951fc03d2dc7d17836406b86cb0e",
     "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "d0f6c13c8dcda6e800db098369b4e47b576f2d30ec7298f134e3206c3d14bc9c",
-    "packages/sdk/src/generated/script/universal-value-bindings.ts": "0289fd7164c28e0ba533bb4dc165786325add7154c41fbd6346ee2172740a5e0",
+    "packages/sdk/src/generated/script/universal-value-bindings.ts": "94cab22b44f35d49a4e8e6e203cfd771db5b3be50ea62f5513d6be818eded4a7",
     "packages/sdk/src/generated/script/browser-target-support.ts": "4de2ba390aef3354cbdd498617ce92820975a99077d26ce116a43fed4532e9c8",
     "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
     "defold/defold_hermes/lib/web/generated_script_universal_value.js": "6e0bba955d31d3073907a9c1a941f3d7bdc63a0065702bb2da56eb8f896f8730"
@@ -8686,7 +8686,7 @@
       ],
       "member": "connect",
       "loweringFamily": "multi-result",
-      "minimumArgumentCount": 2,
+      "minimumArgumentCount": 3,
       "maximumArgumentCount": 5,
       "minimumResultCount": 0,
       "maximumResultCount": 2,

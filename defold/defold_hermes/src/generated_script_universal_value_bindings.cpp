@@ -222,7 +222,7 @@ constexpr Operation kOperations[] = {
   {0x3e2d0909u, "script:bullet3d.collision_object.is_awake", "bullet3d.collision_object", "is_awake", 1, 1, 1, 1, 1, 0, 0, 0, 0, 0},
   {0x3e992374u, "script:window.set_mouse_lock", "window", "set_mouse_lock", 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
   {0x3ed17a96u, "script:socket.gettime", "socket", "gettime", 0, 0, 1, 1, 1, 0, 0, 0, 0, 0},
-  {0x3ed92129u, "script:socket.connect", "socket", "connect", 2, 5, 0, 2, 2, 0, 0, 0, 0, 0},
+  {0x3ed92129u, "script:socket.connect", "socket", "connect", 3, 5, 0, 2, 2, 0, 0, 0, 0, 0},
   {0x3eee7ea1u, "script:go.get_world_scale_uniform", "go", "get_world_scale_uniform", 0, 1, 1, 1, 1, 0, 0, 0, 0, 1},
   {0x3f140628u, "script:vmath.matrix4_perspective", "vmath", "matrix4_perspective", 4, 4, 1, 1, 1, 0, 0, 0, 1, 0},
   {0x3f93a0cdu, "script:gui.hide_keyboard", "gui", "hide_keyboard", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},

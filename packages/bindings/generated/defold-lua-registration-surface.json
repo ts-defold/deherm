@@ -9,62 +9,62 @@
   },
   "inputEvidence": {
     "policy": "packages/bindings/overrides/lua-registration-surface-targets.json",
-    "policySha256": "5a6619742e83c9871949807652bf9baa0eb1ff3bcd58fc01a2db77268c76ebde"
+    "policySha256": "7db54b8b8d587ed3db44ad9133fa95609de14f1b8230d0a3f60c809d66f7ccf0"
   },
   "totals": {
     "defold-engine-box2d-v3": {
-      "sourceFiles": 905,
+      "sourceFiles": 904,
       "headerFiles": 825,
       "sdkStackHelpers": 29,
       "bodyDerivedStackHelpers": 254,
       "namedUserTypes": 17,
-      "registrationEntryPoints": 53,
+      "registrationEntryPoints": 51,
       "registeredNamespaces": 51,
-      "registeredRoutes": 924,
-      "registeredRoutesInDeclaredNamespaces": 886,
-      "registeredConstants": 434,
+      "registeredRoutes": 959,
+      "registeredRoutesInDeclaredNamespaces": 896,
+      "registeredConstants": 436,
       "commentedOutRegistrations": 2,
       "declaredRoutes": 926,
-      "registeredAndDeclared": 867,
-      "agreeing": 316,
-      "partiallyUndecided": 377,
-      "disagreeing": 174,
-      "undecided": 0,
-      "declaredButUnregistered": 61,
-      "registeredButUndeclared": 57,
+      "registeredAndDeclared": 877,
+      "agreeing": 317,
+      "partiallyUndecided": 381,
+      "disagreeing": 178,
+      "undecided": 1,
+      "declaredButUnregistered": 51,
+      "registeredButUndeclared": 82,
       "registeredButUndeclaredInDeclaredNamespaces": 22,
-      "parameterSlotsCompared": 1508,
-      "parameterSlotsDisagreeing": 206,
-      "parameterSlotsUndecided": 543,
-      "blockers": 171,
-      "blockedRoutes": 110
+      "parameterSlotsCompared": 1519,
+      "parameterSlotsDisagreeing": 211,
+      "parameterSlotsUndecided": 546,
+      "blockers": 204,
+      "blockedRoutes": 134
     },
     "defold-engine-box2d-v2": {
-      "sourceFiles": 905,
+      "sourceFiles": 904,
       "headerFiles": 825,
       "sdkStackHelpers": 29,
       "bodyDerivedStackHelpers": 237,
       "namedUserTypes": 16,
-      "registrationEntryPoints": 53,
+      "registrationEntryPoints": 51,
       "registeredNamespaces": 51,
-      "registeredRoutes": 836,
-      "registeredRoutesInDeclaredNamespaces": 798,
-      "registeredConstants": 441,
+      "registeredRoutes": 871,
+      "registeredRoutesInDeclaredNamespaces": 808,
+      "registeredConstants": 443,
       "commentedOutRegistrations": 4,
       "declaredRoutes": 926,
-      "registeredAndDeclared": 793,
-      "agreeing": 284,
-      "partiallyUndecided": 338,
-      "disagreeing": 171,
-      "undecided": 0,
-      "declaredButUnregistered": 135,
-      "registeredButUndeclared": 43,
+      "registeredAndDeclared": 803,
+      "agreeing": 285,
+      "partiallyUndecided": 342,
+      "disagreeing": 175,
+      "undecided": 1,
+      "declaredButUnregistered": 125,
+      "registeredButUndeclared": 68,
       "registeredButUndeclaredInDeclaredNamespaces": 8,
-      "parameterSlotsCompared": 1409,
-      "parameterSlotsDisagreeing": 203,
-      "parameterSlotsUndecided": 491,
-      "blockers": 175,
-      "blockedRoutes": 116
+      "parameterSlotsCompared": 1420,
+      "parameterSlotsDisagreeing": 208,
+      "parameterSlotsUndecided": 494,
+      "blockers": 208,
+      "blockedRoutes": 140
     },
     "extension-defold-xmath": {
       "sourceFiles": 0,
@@ -92,50 +92,55 @@
         "archiveSha256": null,
         "archiveEntries": null,
         "declaredSurface": "packages/bindings/generated/defold-script-api-ir.json",
-        "sourceSha256": "5dc0dac5d8aa8928a3690133cbdd3ee10c1e7762ac91a2cfae322622cb2b3504",
+        "sourceSha256": "550f5635e871d27080c7d9eef2fc9ecac17b5d5685f080869f8bd238a39a3dd8",
         "variantExclusions": [
           {
             "path": "scripts/box2d/v2/",
             "reason": "box2d v2 and v3 define the same registration symbols (ScriptBox2DInitializeBody and friends) and are selected against each other at link time by the app manifest. Linking both into one parse would make every b2d callee ambiguous, so each variant is its own target."
+          },
+          {
+            "path": "script/src/luasocket/luasocket_html5.c",
+            "reason": "luasocket_html5.c and luasocket.c define the same symbols - luaopen_socket_core and base_open - and are selected against each other per platform, exactly as the box2d v2/v3 pair is selected by the app manifest. Parsing both makes every luasocket entry point ambiguous, so the walk skips it and every socket.* route disappears. The html5 build is also semantically different rather than merely duplicate: its `unsupported[]` table registers connect, tcp, udp and select to a function that raises, because HTML5 has no sockets. These targets describe the native engine, so the native variant is the one parsed."
           }
         ]
       },
       "summary": {
-        "sourceFiles": 905,
+        "sourceFiles": 904,
         "headerFiles": 825,
         "sdkStackHelpers": 29,
         "bodyDerivedStackHelpers": 254,
         "namedUserTypes": 17,
-        "registrationEntryPoints": 53,
+        "registrationEntryPoints": 51,
         "registeredNamespaces": 51,
-        "registeredRoutes": 924,
-        "registeredRoutesInDeclaredNamespaces": 886,
-        "registeredConstants": 434,
+        "registeredRoutes": 959,
+        "registeredRoutesInDeclaredNamespaces": 896,
+        "registeredConstants": 436,
         "commentedOutRegistrations": 2,
         "declaredRoutes": 926,
-        "registeredAndDeclared": 867,
-        "agreeing": 316,
-        "partiallyUndecided": 377,
-        "disagreeing": 174,
-        "undecided": 0,
-        "declaredButUnregistered": 61,
-        "registeredButUndeclared": 57,
+        "registeredAndDeclared": 877,
+        "agreeing": 317,
+        "partiallyUndecided": 381,
+        "disagreeing": 178,
+        "undecided": 1,
+        "declaredButUnregistered": 51,
+        "registeredButUndeclared": 82,
         "registeredButUndeclaredInDeclaredNamespaces": 22,
-        "parameterSlotsCompared": 1508,
-        "parameterSlotsDisagreeing": 206,
-        "parameterSlotsUndecided": 543,
-        "blockers": 171,
-        "blockedRoutes": 110
+        "parameterSlotsCompared": 1519,
+        "parameterSlotsDisagreeing": 211,
+        "parameterSlotsUndecided": 546,
+        "blockers": 204,
+        "blockedRoutes": 134
       },
       "blockerHistogram": {
-        "ambiguous-registration-callee": 9,
-        "anonymous-registration-without-table": 7,
-        "argument-slot-without-stack-access": 23,
+        "ambiguous-c-function": 1,
+        "ambiguous-registration-callee": 2,
+        "anonymous-registration-below-top": 6,
+        "argument-slot-without-stack-access": 24,
         "declared-module-never-registered": 21,
-        "duplicate-registration": 3,
-        "dynamic-stack-index": 45,
+        "duplicate-registration": 28,
+        "dynamic-stack-index": 49,
         "relative-stack-index": 1,
-        "undecided-result-arity": 43,
+        "undecided-result-arity": 53,
         "unknown-registration-array": 1,
         "unresolved-helper-overload": 1,
         "unresolved-module-name": 9,
@@ -145,14 +150,14 @@
       "namespaces": {
         "<globals>": {
           "declared": false,
-          "registeredRoutes": 6,
-          "registeredConstants": 4,
+          "registeredRoutes": 7,
+          "registeredConstants": 6,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 0
         },
         "_G": {
           "declared": false,
-          "registeredRoutes": 24,
+          "registeredRoutes": 48,
           "registeredConstants": 0,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 0
@@ -432,7 +437,7 @@
         },
         "socket": {
           "declared": true,
-          "registeredRoutes": 6,
+          "registeredRoutes": 16,
           "registeredConstants": 0,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 11
@@ -744,16 +749,6 @@
           "name": "luaopen_socket_core"
         },
         {
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 126,
-          "name": "base_open"
-        },
-        {
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 150,
-          "name": "luaopen_socket_core"
-        },
-        {
           "path": "script/src/luasocket/mime.c",
           "line": 82,
           "name": "luaopen_mime_core"
@@ -792,11 +787,13 @@
       "stackBalancedCallees": [
         "lua/src/lua/lauxlib.c:112 luaL_newmetatable",
         "lua/src/lua/lbaselib.c:618 auxopen",
+        "lua/src/lua/lbaselib.c:626 base_open",
         "lua/src/lua/liolib.c:511 createmeta",
         "lua/src/lua/liolib.c:519 createstdfile",
         "lua/src/lua/liolib.c:531 newfenv",
         "lua/src/lua/loadlib.c:592 setpath",
         "lua/src/lua/lstrlib.c:845 createmetatable",
+        "script/src/luasocket/luasocket.c:92 base_open",
         "script/src/script.cpp:782 RegisterUserType"
       ],
       "routes": [
@@ -70742,6 +70739,494 @@
           "undecided": 1
         },
         {
+          "name": "socket.connect",
+          "module": "socket",
+          "cFunction": "global_connect",
+          "registration": {
+            "path": "script/src/luasocket/tcp.c",
+            "line": 95,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:59",
+            "parameters": 5,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "address",
+                "optional": false,
+                "type": "string",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_checkstring"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "agree"
+            },
+            {
+              "index": 2,
+              "declared": {
+                "name": "port",
+                "optional": false,
+                "type": "number",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_checkstring"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "disagree",
+                "reason": "declared=number derived=string"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "disagree"
+            },
+            {
+              "index": 3,
+              "declared": {
+                "name": "locaddr",
+                "optional": true,
+                "type": "string",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_optstring"
+                ],
+                "evidence": "defaulted"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "agree"
+            },
+            {
+              "index": 4,
+              "declared": {
+                "name": "locport",
+                "optional": true,
+                "type": "number",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_optstring"
+                ],
+                "evidence": "defaulted"
+              },
+              "type": {
+                "verdict": "disagree",
+                "reason": "declared=number derived=string"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "disagree"
+            },
+            {
+              "index": 5,
+              "declared": {
+                "name": "family",
+                "optional": true,
+                "type": "string",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "inet_optfamily"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "disagree",
+                "reason": "declared optional, derived required from checked accessor inet_optfamily",
+                "classification": "documentation-permits-refused-call",
+                "defect": "declaration",
+                "severity": "blocking",
+                "correction": "require-slot"
+              },
+              "verdict": "disagree"
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 5,
+              "max": 5,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 2,
+            "declaredMaximum": 5,
+            "verdict": "disagree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 2
+            },
+            "declared": 2,
+            "verdict": "disagree"
+          },
+          "verdict": "disagree",
+          "disagreements": 3,
+          "undecided": 0
+        },
+        {
+          "name": "socket.gettime",
+          "module": "socket",
+          "cFunction": "timeout_lua_gettime",
+          "registration": {
+            "path": "script/src/luasocket/timeout.c",
+            "line": 37,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:130",
+            "parameters": 0,
+            "returns": 1,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 1
+            },
+            "declared": 1,
+            "verdict": "agree"
+          },
+          "verdict": "agree",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.newtry",
+          "module": "socket",
+          "cFunction": "global_newtry",
+          "registration": {
+            "path": "script/src/luasocket/except.c",
+            "line": 23,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:153",
+            "parameters": 1,
+            "returns": 1,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "finalizer",
+                "optional": false,
+                "type": "fun()",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "nil"
+                ],
+                "accessors": [
+                  "lua_isnil"
+                ],
+                "evidence": "probed"
+              },
+              "type": {
+                "verdict": "undecided",
+                "reason": "no-derived-type"
+              },
+              "optionality": {
+                "verdict": "disagree",
+                "reason": "declared required, derived optional from probed accessor lua_isnil",
+                "classification": "engine-tolerates-omission",
+                "defect": "neither",
+                "severity": "advisory",
+                "correction": "none"
+              },
+              "verdict": "disagree"
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 1,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 1,
+            "declaredMaximum": 1,
+            "verdict": "disagree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 1
+            },
+            "declared": 1,
+            "verdict": "agree"
+          },
+          "verdict": "disagree",
+          "disagreements": 1,
+          "undecided": 0
+        },
+        {
+          "name": "socket.protect",
+          "module": "socket",
+          "cFunction": "global_protect",
+          "registration": {
+            "path": "script/src/luasocket/except.c",
+            "line": 24,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:177",
+            "parameters": 1,
+            "returns": 1,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "func",
+                "optional": false,
+                "type": "fun(...:any):any"
+              },
+              "derived": null,
+              "verdict": "declared-only",
+              "reason": null
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 1,
+            "declaredMaximum": 1,
+            "verdict": "disagree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 1
+            },
+            "declared": 1,
+            "verdict": "agree"
+          },
+          "verdict": "disagree",
+          "disagreements": 1,
+          "undecided": 0
+        },
+        {
+          "name": "socket.select",
+          "module": "socket",
+          "cFunction": "global_select",
+          "registration": {
+            "path": "script/src/luasocket/select.c",
+            "line": 29,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:202",
+            "parameters": 3,
+            "returns": 3,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "recvt",
+                "optional": false,
+                "type": "socket_selectable[]",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "nil",
+                  "table"
+                ],
+                "accessors": [
+                  "check_dirty",
+                  "collect_fd"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "undecided",
+                "reason": "unmapped-declared-type:socket_selectable"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "undecided"
+            },
+            {
+              "index": 2,
+              "declared": {
+                "name": "sendt",
+                "optional": false,
+                "type": "socket_selectable[]",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "nil",
+                  "table"
+                ],
+                "accessors": [
+                  "collect_fd"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "undecided",
+                "reason": "unmapped-declared-type:socket_selectable"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "undecided"
+            },
+            {
+              "index": 3,
+              "declared": {
+                "name": "timeout",
+                "optional": true,
+                "type": "number",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "number"
+                ],
+                "accessors": [
+                  "luaL_optnumber"
+                ],
+                "evidence": "defaulted"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "agree"
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 2,
+              "max": 3,
+              "variadic": true,
+              "branchDependent": false
+            },
+            "declaredMinimum": 2,
+            "declaredMaximum": 3,
+            "verdict": "undecided",
+            "reason": "undecided-stack-index"
+          },
+          "results": {
+            "derived": {
+              "min": 2,
+              "max": 3
+            },
+            "declared": 3,
+            "verdict": "disagree"
+          },
+          "verdict": "disagree",
+          "disagreements": 0,
+          "undecided": 2
+        },
+        {
           "name": "socket.skip",
           "module": "socket",
           "cFunction": "global_skip",
@@ -70825,8 +71310,8 @@
           "module": "socket",
           "cFunction": "global_skip",
           "registration": {
-            "path": "script/src/luasocket/luasocket_html5.c",
-            "line": 50,
+            "path": "script/src/luasocket/luasocket.c",
+            "line": 58,
             "array": "func",
             "guard": null
           },
@@ -70897,6 +71382,208 @@
           },
           "verdict": "disagree",
           "disagreements": 1,
+          "undecided": 0
+        },
+        {
+          "name": "socket.sleep",
+          "module": "socket",
+          "cFunction": "timeout_lua_sleep",
+          "registration": {
+            "path": "script/src/luasocket/timeout.c",
+            "line": 38,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:235",
+            "parameters": 1,
+            "returns": 0,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "time",
+                "optional": false,
+                "type": "number"
+              },
+              "derived": null,
+              "verdict": "undecided",
+              "reason": "no-body-analysis"
+            }
+          ],
+          "arity": {
+            "derived": null,
+            "declaredMinimum": 1,
+            "declaredMaximum": 1,
+            "verdict": "undecided",
+            "reason": "no-body-analysis"
+          },
+          "results": {
+            "derived": null,
+            "declared": 0,
+            "verdict": "undecided"
+          },
+          "verdict": "undecided",
+          "disagreements": 0,
+          "undecided": 1
+        },
+        {
+          "name": "socket.tcp",
+          "module": "socket",
+          "cFunction": "global_create",
+          "registration": {
+            "path": "script/src/luasocket/tcp.c",
+            "line": 93,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:242",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.tcp6",
+          "module": "socket",
+          "cFunction": "global_create6",
+          "registration": {
+            "path": "script/src/luasocket/tcp.c",
+            "line": 94,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:251",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.udp",
+          "module": "socket",
+          "cFunction": "global_create",
+          "registration": {
+            "path": "script/src/luasocket/udp.c",
+            "line": 112,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:258",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.udp6",
+          "module": "socket",
+          "cFunction": "global_create6",
+          "registration": {
+            "path": "script/src/luasocket/udp.c",
+            "line": 113,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:267",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
           "undecided": 0
         },
         {
@@ -82143,13 +82830,6 @@
           "commentedOutRegistration": null
         },
         {
-          "name": "socket.connect",
-          "module": "socket",
-          "source": "doc/socket.lua:59",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
           "name": "socket.dns.getaddrinfo",
           "module": "socket.dns",
           "source": "doc/socket.lua:70",
@@ -82185,69 +82865,6 @@
           "commentedOutRegistration": null
         },
         {
-          "name": "socket.gettime",
-          "module": "socket",
-          "source": "doc/socket.lua:130",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.newtry",
-          "module": "socket",
-          "source": "doc/socket.lua:153",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.protect",
-          "module": "socket",
-          "source": "doc/socket.lua:177",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.select",
-          "module": "socket",
-          "source": "doc/socket.lua:202",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.sleep",
-          "module": "socket",
-          "source": "doc/socket.lua:235",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.tcp",
-          "module": "socket",
-          "source": "doc/socket.lua:242",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.tcp6",
-          "module": "socket",
-          "source": "doc/socket.lua:251",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.udp",
-          "module": "socket",
-          "source": "doc/socket.lua:258",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.udp6",
-          "module": "socket",
-          "source": "doc/socket.lua:267",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
           "name": "sys.set_render_enable",
           "module": "sys",
           "source": "doc/sys.lua:722",
@@ -82272,6 +82889,44 @@
             "min": 1,
             "max": 2,
             "variadic": true,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.assert",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_assert",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 448,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": true,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.collectgarbage",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_collectgarbage",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 449,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
             "branchDependent": false
           }
         },
@@ -82314,6 +82969,44 @@
           }
         },
         {
+          "name": "_G.dofile",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_dofile",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 450,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 1,
+            "variadic": true,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.error",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_error",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 451,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.error",
           "module": "_G",
           "inDeclaredModule": false,
@@ -82340,6 +83033,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 452,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 0,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.gcinfo",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_gcinfo",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 452,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 0,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.getfenv",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_getfenv",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 453,
             "array": "base_funcs",
             "guard": null
           },
@@ -82390,6 +83121,25 @@
           }
         },
         {
+          "name": "_G.getmetatable",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_getmetatable",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 454,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.load",
           "module": "_G",
           "inDeclaredModule": false,
@@ -82404,6 +83154,44 @@
           "derivedArity": {
             "min": 1,
             "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.load",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_load",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 456,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.loadfile",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_loadfile",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 455,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 1,
             "variadic": false,
             "branchDependent": false
           }
@@ -82447,6 +83235,25 @@
           }
         },
         {
+          "name": "_G.loadstring",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_loadstring",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 457,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.next",
           "module": "_G",
           "inDeclaredModule": false,
@@ -82454,6 +83261,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 458,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.next",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_next",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 458,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.pcall",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_pcall",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 459,
             "array": "base_funcs",
             "guard": null
           },
@@ -82504,6 +83349,25 @@
           }
         },
         {
+          "name": "_G.print",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_print",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 460,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 0,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.rawequal",
           "module": "_G",
           "inDeclaredModule": false,
@@ -82511,6 +83375,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 461,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.rawequal",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_rawequal",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 461,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.rawget",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_rawget",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 462,
             "array": "base_funcs",
             "guard": null
           },
@@ -82561,6 +83463,44 @@
           }
         },
         {
+          "name": "_G.rawset",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_rawset",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 463,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 3,
+            "max": 3,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.select",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_select",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 464,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.select",
           "module": "_G",
           "inDeclaredModule": false,
@@ -82599,6 +83539,25 @@
           }
         },
         {
+          "name": "_G.setfenv",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_setfenv",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 465,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.setmetatable",
           "module": "_G",
           "inDeclaredModule": false,
@@ -82606,6 +83565,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 466,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.setmetatable",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_setmetatable",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 466,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.tonumber",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_tonumber",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 467,
             "array": "base_funcs",
             "guard": null
           },
@@ -82656,6 +83653,44 @@
           }
         },
         {
+          "name": "_G.tostring",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_tostring",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 468,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.type",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_type",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 469,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.type",
           "module": "_G",
           "inDeclaredModule": false,
@@ -82688,6 +83723,44 @@
           "documentedName": null,
           "derivedArity": {
             "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.unpack",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_unpack",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 470,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.xpcall",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_xpcall",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 471,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
             "max": 2,
             "variadic": false,
             "branchDependent": false
@@ -83169,6 +84242,25 @@
           }
         },
         {
+          "name": "newproxy",
+          "module": "",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_newproxy",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 626,
+            "array": null,
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "print",
           "module": "",
           "inDeclaredModule": false,
@@ -83231,8 +84323,8 @@
           "inDeclaredModule": true,
           "cFunction": "global_unload",
           "registration": {
-            "path": "script/src/luasocket/luasocket_html5.c",
-            "line": 51,
+            "path": "script/src/luasocket/luasocket.c",
+            "line": 59,
             "array": "func",
             "guard": null
           },
@@ -83351,6 +84443,24 @@
           "member": "_G",
           "valueKind": null,
           "expression": "LUA_GLOBALSINDEX",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 626
+        },
+        {
+          "name": "_G",
+          "module": "",
+          "member": "_G",
+          "valueKind": null,
+          "expression": "LUA_GLOBALSINDEX",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 626
+        },
+        {
+          "name": "_VERSION",
+          "module": "",
+          "member": "_VERSION",
+          "valueKind": "string",
+          "expression": "LUA_VERSION",
           "path": "lua/src/lua/lbaselib.c",
           "line": 626
         },
@@ -87276,58 +88386,16 @@
       ],
       "blockers": [
         {
-          "code": "ambiguous-registration-callee",
-          "path": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
-          "line": 636,
-          "detail": "call to 'SetIntegerConstant' resolves to 3 definitions: gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp:630, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp:1948, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp:641",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
-          "line": 1954,
-          "detail": "call to 'SetIntegerConstant' resolves to 3 definitions: gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp:630, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp:1948, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp:641",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
-          "line": 647,
-          "detail": "call to 'SetIntegerConstant' resolves to 3 definitions: gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp:630, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp:1948, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp:641",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "lua/src/lua/lbaselib.c",
-          "line": 648,
-          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
-          "route": null
+          "code": "ambiguous-c-function",
+          "route": "socket.sleep",
+          "path": "script/src/luasocket/timeout.c",
+          "line": 38,
+          "detail": "'timeout_lua_sleep' has 2 definitions: script/src/luasocket/timeout.c:195, script/src/luasocket/timeout.c:205"
         },
         {
           "code": "ambiguous-registration-callee",
           "path": "script/src/luasocket/luasocket.c",
           "line": 121,
-          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "script/src/luasocket/luasocket.c",
-          "line": 121,
-          "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 150,
-          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 150,
           "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
           "route": null
         },
@@ -87339,53 +88407,53 @@
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "lua/src/lua/loadlib.c",
           "line": 620,
-          "detail": "luaL_register registers 'll_funcs' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_register registers 'll_funcs' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/except.c",
           "line": 22,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 85,
-          "detail": "luaL_openlib registers 'unsupported' into the value on top of the stack, which the interpreter could not resolve to a table",
-          "route": null
-        },
-        {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/select.c",
           "line": 28,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/tcp.c",
           "line": 92,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/timeout.c",
           "line": 36,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/udp.c",
           "line": 111,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
+        },
+        {
+          "code": "argument-slot-without-stack-access",
+          "route": "_G.xpcall",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 384,
+          "detail": "argument 1 is inside the derived arity but no recognised stack accessor reads it"
         },
         {
           "code": "argument-slot-without-stack-access",
@@ -87697,6 +88765,174 @@
         },
         {
           "code": "duplicate-registration",
+          "route": "_G.assert",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 448,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.collectgarbage",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 449,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.dofile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 450,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.error",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 451,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.gcinfo",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 452,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.getfenv",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 453,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.getmetatable",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 454,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.load",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 456,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.loadfile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 455,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.loadstring",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 457,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.next",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 458,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.pcall",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 459,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.print",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 460,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.rawequal",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 461,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.rawget",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 462,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.rawset",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 463,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.select",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 464,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.setfenv",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 465,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.setmetatable",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 466,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.tonumber",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 467,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.tostring",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 468,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.type",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 469,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.unpack",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 470,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.xpcall",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 471,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
           "route": "http.request",
           "path": "gamesys/src/gamesys/scripts/script_http_js.cpp",
           "line": 250,
@@ -87704,16 +88940,23 @@
         },
         {
           "code": "duplicate-registration",
+          "route": "newproxy",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 626,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
           "route": "socket.__unload",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 51,
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 59,
           "detail": "the same fully-qualified name is registered more than once"
         },
         {
           "code": "duplicate-registration",
           "route": "socket.skip",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 50,
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 58,
           "detail": "the same fully-qualified name is registered more than once"
         },
         {
@@ -88026,6 +89269,34 @@
         },
         {
           "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "make_assoc(L, rtab)"
+        },
+        {
+          "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "make_assoc(L, wtab)"
+        },
+        {
+          "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "return_fd(L, &rset, max_fd+1, itab, rtab, ndirty)"
+        },
+        {
+          "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "return_fd(L, &wset, max_fd+1, itab, wtab, 0)"
+        },
+        {
+          "code": "dynamic-stack-index",
           "route": "sys.set_debugger_lightweight_hook",
           "path": "script/src/script_sys.cpp",
           "line": 1476,
@@ -88047,9 +89318,30 @@
         },
         {
           "code": "undecided-result-arity",
+          "route": "_G.dofile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 325,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
           "route": "_G.load",
           "path": "lua/src/lua/lbaselib.c",
           "line": 315,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.load",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 315,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.loadfile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 285,
           "detail": "non-literal-return-expression"
         },
         {
@@ -88068,9 +89360,30 @@
         },
         {
           "code": "undecided-result-arity",
+          "route": "_G.loadstring",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 277,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
           "route": "_G.select",
           "path": "lua/src/lua/lbaselib.c",
           "line": 358,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.select",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 358,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.unpack",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 342,
           "detail": "non-literal-return-expression"
         },
         {
@@ -88321,8 +89634,36 @@
         {
           "code": "undecided-result-arity",
           "route": "socket.skip",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 58,
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 66,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.tcp",
+          "path": "script/src/luasocket/tcp.c",
+          "line": 393,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.tcp6",
+          "path": "script/src/luasocket/tcp.c",
+          "line": 397,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.udp",
+          "path": "script/src/luasocket/udp.c",
+          "line": 445,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.udp6",
+          "path": "script/src/luasocket/udp.c",
+          "line": 449,
           "detail": "non-literal-return-expression"
         },
         {
@@ -88492,50 +89833,55 @@
         "archiveSha256": null,
         "archiveEntries": null,
         "declaredSurface": "packages/bindings/generated/defold-script-api-ir.json",
-        "sourceSha256": "806426b75a413cfacb7c958864d3e1a63f927534a120e26749e9b16f609517e2",
+        "sourceSha256": "c5518dc00377aec2430edfa8da8eb9cbe8e82fd22fa06dd425bac6774b5312f1",
         "variantExclusions": [
           {
             "path": "scripts/box2d/v3/",
             "reason": "The mirror of the v3 target: the legacy Box2D v2 backend."
+          },
+          {
+            "path": "script/src/luasocket/luasocket_html5.c",
+            "reason": "luasocket_html5.c and luasocket.c define the same symbols - luaopen_socket_core and base_open - and are selected against each other per platform, exactly as the box2d v2/v3 pair is selected by the app manifest. Parsing both makes every luasocket entry point ambiguous, so the walk skips it and every socket.* route disappears. The html5 build is also semantically different rather than merely duplicate: its `unsupported[]` table registers connect, tcp, udp and select to a function that raises, because HTML5 has no sockets. These targets describe the native engine, so the native variant is the one parsed."
           }
         ]
       },
       "summary": {
-        "sourceFiles": 905,
+        "sourceFiles": 904,
         "headerFiles": 825,
         "sdkStackHelpers": 29,
         "bodyDerivedStackHelpers": 237,
         "namedUserTypes": 16,
-        "registrationEntryPoints": 53,
+        "registrationEntryPoints": 51,
         "registeredNamespaces": 51,
-        "registeredRoutes": 836,
-        "registeredRoutesInDeclaredNamespaces": 798,
-        "registeredConstants": 441,
+        "registeredRoutes": 871,
+        "registeredRoutesInDeclaredNamespaces": 808,
+        "registeredConstants": 443,
         "commentedOutRegistrations": 4,
         "declaredRoutes": 926,
-        "registeredAndDeclared": 793,
-        "agreeing": 284,
-        "partiallyUndecided": 338,
-        "disagreeing": 171,
-        "undecided": 0,
-        "declaredButUnregistered": 135,
-        "registeredButUndeclared": 43,
+        "registeredAndDeclared": 803,
+        "agreeing": 285,
+        "partiallyUndecided": 342,
+        "disagreeing": 175,
+        "undecided": 1,
+        "declaredButUnregistered": 125,
+        "registeredButUndeclared": 68,
         "registeredButUndeclaredInDeclaredNamespaces": 8,
-        "parameterSlotsCompared": 1409,
-        "parameterSlotsDisagreeing": 203,
-        "parameterSlotsUndecided": 491,
-        "blockers": 175,
-        "blockedRoutes": 116
+        "parameterSlotsCompared": 1420,
+        "parameterSlotsDisagreeing": 208,
+        "parameterSlotsUndecided": 494,
+        "blockers": 208,
+        "blockedRoutes": 140
       },
       "blockerHistogram": {
-        "ambiguous-registration-callee": 9,
-        "anonymous-registration-without-table": 7,
-        "argument-slot-without-stack-access": 23,
+        "ambiguous-c-function": 1,
+        "ambiguous-registration-callee": 2,
+        "anonymous-registration-below-top": 6,
+        "argument-slot-without-stack-access": 24,
         "declared-module-never-registered": 40,
-        "duplicate-registration": 3,
-        "dynamic-stack-index": 30,
+        "duplicate-registration": 28,
+        "dynamic-stack-index": 34,
         "relative-stack-index": 1,
-        "undecided-result-arity": 43,
+        "undecided-result-arity": 53,
         "unknown-registration-array": 1,
         "unresolved-helper-overload": 1,
         "unresolved-module-name": 9,
@@ -88545,14 +89891,14 @@
       "namespaces": {
         "<globals>": {
           "declared": false,
-          "registeredRoutes": 6,
-          "registeredConstants": 4,
+          "registeredRoutes": 7,
+          "registeredConstants": 6,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 0
         },
         "_G": {
           "declared": false,
-          "registeredRoutes": 24,
+          "registeredRoutes": 48,
           "registeredConstants": 0,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 0
@@ -88832,7 +90178,7 @@
         },
         "socket": {
           "declared": true,
-          "registeredRoutes": 6,
+          "registeredRoutes": 16,
           "registeredConstants": 0,
           "commentedOutRegistrations": 0,
           "declaredRoutes": 11
@@ -89144,16 +90490,6 @@
           "name": "luaopen_socket_core"
         },
         {
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 126,
-          "name": "base_open"
-        },
-        {
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 150,
-          "name": "luaopen_socket_core"
-        },
-        {
           "path": "script/src/luasocket/mime.c",
           "line": 82,
           "name": "luaopen_mime_core"
@@ -89192,11 +90528,13 @@
       "stackBalancedCallees": [
         "lua/src/lua/lauxlib.c:112 luaL_newmetatable",
         "lua/src/lua/lbaselib.c:618 auxopen",
+        "lua/src/lua/lbaselib.c:626 base_open",
         "lua/src/lua/liolib.c:511 createmeta",
         "lua/src/lua/liolib.c:519 createstdfile",
         "lua/src/lua/liolib.c:531 newfenv",
         "lua/src/lua/loadlib.c:592 setpath",
         "lua/src/lua/lstrlib.c:845 createmetatable",
+        "script/src/luasocket/luasocket.c:92 base_open",
         "script/src/script.cpp:782 RegisterUserType"
       ],
       "routes": [
@@ -153309,6 +154647,494 @@
           "undecided": 1
         },
         {
+          "name": "socket.connect",
+          "module": "socket",
+          "cFunction": "global_connect",
+          "registration": {
+            "path": "script/src/luasocket/tcp.c",
+            "line": 95,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:59",
+            "parameters": 5,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "address",
+                "optional": false,
+                "type": "string",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_checkstring"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "agree"
+            },
+            {
+              "index": 2,
+              "declared": {
+                "name": "port",
+                "optional": false,
+                "type": "number",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_checkstring"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "disagree",
+                "reason": "declared=number derived=string"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "disagree"
+            },
+            {
+              "index": 3,
+              "declared": {
+                "name": "locaddr",
+                "optional": true,
+                "type": "string",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_optstring"
+                ],
+                "evidence": "defaulted"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "agree"
+            },
+            {
+              "index": 4,
+              "declared": {
+                "name": "locport",
+                "optional": true,
+                "type": "number",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "luaL_optstring"
+                ],
+                "evidence": "defaulted"
+              },
+              "type": {
+                "verdict": "disagree",
+                "reason": "declared=number derived=string"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "disagree"
+            },
+            {
+              "index": 5,
+              "declared": {
+                "name": "family",
+                "optional": true,
+                "type": "string",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "string"
+                ],
+                "accessors": [
+                  "inet_optfamily"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "disagree",
+                "reason": "declared optional, derived required from checked accessor inet_optfamily",
+                "classification": "documentation-permits-refused-call",
+                "defect": "declaration",
+                "severity": "blocking",
+                "correction": "require-slot"
+              },
+              "verdict": "disagree"
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 5,
+              "max": 5,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 2,
+            "declaredMaximum": 5,
+            "verdict": "disagree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 2
+            },
+            "declared": 2,
+            "verdict": "disagree"
+          },
+          "verdict": "disagree",
+          "disagreements": 3,
+          "undecided": 0
+        },
+        {
+          "name": "socket.gettime",
+          "module": "socket",
+          "cFunction": "timeout_lua_gettime",
+          "registration": {
+            "path": "script/src/luasocket/timeout.c",
+            "line": 37,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:130",
+            "parameters": 0,
+            "returns": 1,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 1
+            },
+            "declared": 1,
+            "verdict": "agree"
+          },
+          "verdict": "agree",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.newtry",
+          "module": "socket",
+          "cFunction": "global_newtry",
+          "registration": {
+            "path": "script/src/luasocket/except.c",
+            "line": 23,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:153",
+            "parameters": 1,
+            "returns": 1,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "finalizer",
+                "optional": false,
+                "type": "fun()",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "nil"
+                ],
+                "accessors": [
+                  "lua_isnil"
+                ],
+                "evidence": "probed"
+              },
+              "type": {
+                "verdict": "undecided",
+                "reason": "no-derived-type"
+              },
+              "optionality": {
+                "verdict": "disagree",
+                "reason": "declared required, derived optional from probed accessor lua_isnil",
+                "classification": "engine-tolerates-omission",
+                "defect": "neither",
+                "severity": "advisory",
+                "correction": "none"
+              },
+              "verdict": "disagree"
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 1,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 1,
+            "declaredMaximum": 1,
+            "verdict": "disagree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 1
+            },
+            "declared": 1,
+            "verdict": "agree"
+          },
+          "verdict": "disagree",
+          "disagreements": 1,
+          "undecided": 0
+        },
+        {
+          "name": "socket.protect",
+          "module": "socket",
+          "cFunction": "global_protect",
+          "registration": {
+            "path": "script/src/luasocket/except.c",
+            "line": 24,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:177",
+            "parameters": 1,
+            "returns": 1,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "func",
+                "optional": false,
+                "type": "fun(...:any):any"
+              },
+              "derived": null,
+              "verdict": "declared-only",
+              "reason": null
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 1,
+            "declaredMaximum": 1,
+            "verdict": "disagree",
+            "reason": null
+          },
+          "results": {
+            "derived": {
+              "min": 1,
+              "max": 1
+            },
+            "declared": 1,
+            "verdict": "agree"
+          },
+          "verdict": "disagree",
+          "disagreements": 1,
+          "undecided": 0
+        },
+        {
+          "name": "socket.select",
+          "module": "socket",
+          "cFunction": "global_select",
+          "registration": {
+            "path": "script/src/luasocket/select.c",
+            "line": 29,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:202",
+            "parameters": 3,
+            "returns": 3,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "recvt",
+                "optional": false,
+                "type": "socket_selectable[]",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "nil",
+                  "table"
+                ],
+                "accessors": [
+                  "check_dirty",
+                  "collect_fd"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "undecided",
+                "reason": "unmapped-declared-type:socket_selectable"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "undecided"
+            },
+            {
+              "index": 2,
+              "declared": {
+                "name": "sendt",
+                "optional": false,
+                "type": "socket_selectable[]",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": false,
+                "types": [
+                  "nil",
+                  "table"
+                ],
+                "accessors": [
+                  "collect_fd"
+                ],
+                "evidence": "checked"
+              },
+              "type": {
+                "verdict": "undecided",
+                "reason": "unmapped-declared-type:socket_selectable"
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "undecided"
+            },
+            {
+              "index": 3,
+              "declared": {
+                "name": "timeout",
+                "optional": true,
+                "type": "number",
+                "optionalitySpelling": null
+              },
+              "derived": {
+                "optional": true,
+                "types": [
+                  "number"
+                ],
+                "accessors": [
+                  "luaL_optnumber"
+                ],
+                "evidence": "defaulted"
+              },
+              "type": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "optionality": {
+                "verdict": "agree",
+                "reason": null
+              },
+              "verdict": "agree"
+            }
+          ],
+          "arity": {
+            "derived": {
+              "min": 2,
+              "max": 3,
+              "variadic": true,
+              "branchDependent": false
+            },
+            "declaredMinimum": 2,
+            "declaredMaximum": 3,
+            "verdict": "undecided",
+            "reason": "undecided-stack-index"
+          },
+          "results": {
+            "derived": {
+              "min": 2,
+              "max": 3
+            },
+            "declared": 3,
+            "verdict": "disagree"
+          },
+          "verdict": "disagree",
+          "disagreements": 0,
+          "undecided": 2
+        },
+        {
           "name": "socket.skip",
           "module": "socket",
           "cFunction": "global_skip",
@@ -153392,8 +155218,8 @@
           "module": "socket",
           "cFunction": "global_skip",
           "registration": {
-            "path": "script/src/luasocket/luasocket_html5.c",
-            "line": 50,
+            "path": "script/src/luasocket/luasocket.c",
+            "line": 58,
             "array": "func",
             "guard": null
           },
@@ -153464,6 +155290,208 @@
           },
           "verdict": "disagree",
           "disagreements": 1,
+          "undecided": 0
+        },
+        {
+          "name": "socket.sleep",
+          "module": "socket",
+          "cFunction": "timeout_lua_sleep",
+          "registration": {
+            "path": "script/src/luasocket/timeout.c",
+            "line": 38,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:235",
+            "parameters": 1,
+            "returns": 0,
+            "missingFunctionType": false
+          },
+          "parameters": [
+            {
+              "index": 1,
+              "declared": {
+                "name": "time",
+                "optional": false,
+                "type": "number"
+              },
+              "derived": null,
+              "verdict": "undecided",
+              "reason": "no-body-analysis"
+            }
+          ],
+          "arity": {
+            "derived": null,
+            "declaredMinimum": 1,
+            "declaredMaximum": 1,
+            "verdict": "undecided",
+            "reason": "no-body-analysis"
+          },
+          "results": {
+            "derived": null,
+            "declared": 0,
+            "verdict": "undecided"
+          },
+          "verdict": "undecided",
+          "disagreements": 0,
+          "undecided": 1
+        },
+        {
+          "name": "socket.tcp",
+          "module": "socket",
+          "cFunction": "global_create",
+          "registration": {
+            "path": "script/src/luasocket/tcp.c",
+            "line": 93,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:242",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.tcp6",
+          "module": "socket",
+          "cFunction": "global_create6",
+          "registration": {
+            "path": "script/src/luasocket/tcp.c",
+            "line": 94,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:251",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.udp",
+          "module": "socket",
+          "cFunction": "global_create",
+          "registration": {
+            "path": "script/src/luasocket/udp.c",
+            "line": 112,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:258",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
+          "undecided": 0
+        },
+        {
+          "name": "socket.udp6",
+          "module": "socket",
+          "cFunction": "global_create6",
+          "registration": {
+            "path": "script/src/luasocket/udp.c",
+            "line": 113,
+            "array": "func",
+            "guard": null
+          },
+          "documentedName": null,
+          "declaration": {
+            "source": "doc/socket.lua:267",
+            "parameters": 0,
+            "returns": 2,
+            "missingFunctionType": false
+          },
+          "parameters": [],
+          "arity": {
+            "derived": {
+              "min": 0,
+              "max": 0,
+              "variadic": false,
+              "branchDependent": false
+            },
+            "declaredMinimum": 0,
+            "declaredMaximum": 0,
+            "verdict": "agree",
+            "reason": null
+          },
+          "results": {
+            "derived": null,
+            "declared": 2,
+            "verdict": "undecided"
+          },
+          "verdict": "partially-undecided",
+          "disagreements": 0,
           "undecided": 0
         },
         {
@@ -165210,13 +167238,6 @@
           "commentedOutRegistration": null
         },
         {
-          "name": "socket.connect",
-          "module": "socket",
-          "source": "doc/socket.lua:59",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
           "name": "socket.dns.getaddrinfo",
           "module": "socket.dns",
           "source": "doc/socket.lua:70",
@@ -165252,69 +167273,6 @@
           "commentedOutRegistration": null
         },
         {
-          "name": "socket.gettime",
-          "module": "socket",
-          "source": "doc/socket.lua:130",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.newtry",
-          "module": "socket",
-          "source": "doc/socket.lua:153",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.protect",
-          "module": "socket",
-          "source": "doc/socket.lua:177",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.select",
-          "module": "socket",
-          "source": "doc/socket.lua:202",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.sleep",
-          "module": "socket",
-          "source": "doc/socket.lua:235",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.tcp",
-          "module": "socket",
-          "source": "doc/socket.lua:242",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.tcp6",
-          "module": "socket",
-          "source": "doc/socket.lua:251",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.udp",
-          "module": "socket",
-          "source": "doc/socket.lua:258",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
-          "name": "socket.udp6",
-          "module": "socket",
-          "source": "doc/socket.lua:267",
-          "moduleIsRegistered": true,
-          "commentedOutRegistration": null
-        },
-        {
           "name": "sys.set_render_enable",
           "module": "sys",
           "source": "doc/sys.lua:722",
@@ -165339,6 +167297,44 @@
             "min": 1,
             "max": 2,
             "variadic": true,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.assert",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_assert",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 448,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": true,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.collectgarbage",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_collectgarbage",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 449,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
             "branchDependent": false
           }
         },
@@ -165381,6 +167377,44 @@
           }
         },
         {
+          "name": "_G.dofile",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_dofile",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 450,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 1,
+            "variadic": true,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.error",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_error",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 451,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.error",
           "module": "_G",
           "inDeclaredModule": false,
@@ -165407,6 +167441,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 452,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 0,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.gcinfo",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_gcinfo",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 452,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 0,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.getfenv",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_getfenv",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 453,
             "array": "base_funcs",
             "guard": null
           },
@@ -165457,6 +167529,25 @@
           }
         },
         {
+          "name": "_G.getmetatable",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_getmetatable",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 454,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.load",
           "module": "_G",
           "inDeclaredModule": false,
@@ -165471,6 +167562,44 @@
           "derivedArity": {
             "min": 1,
             "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.load",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_load",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 456,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.loadfile",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_loadfile",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 455,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 1,
             "variadic": false,
             "branchDependent": false
           }
@@ -165514,6 +167643,25 @@
           }
         },
         {
+          "name": "_G.loadstring",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_loadstring",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 457,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.next",
           "module": "_G",
           "inDeclaredModule": false,
@@ -165521,6 +167669,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 458,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.next",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_next",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 458,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.pcall",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_pcall",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 459,
             "array": "base_funcs",
             "guard": null
           },
@@ -165571,6 +167757,25 @@
           }
         },
         {
+          "name": "_G.print",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_print",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 460,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 0,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.rawequal",
           "module": "_G",
           "inDeclaredModule": false,
@@ -165578,6 +167783,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 461,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.rawequal",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_rawequal",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 461,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.rawget",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_rawget",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 462,
             "array": "base_funcs",
             "guard": null
           },
@@ -165628,6 +167871,44 @@
           }
         },
         {
+          "name": "_G.rawset",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_rawset",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 463,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 3,
+            "max": 3,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.select",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_select",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 464,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.select",
           "module": "_G",
           "inDeclaredModule": false,
@@ -165666,6 +167947,25 @@
           }
         },
         {
+          "name": "_G.setfenv",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_setfenv",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 465,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.setmetatable",
           "module": "_G",
           "inDeclaredModule": false,
@@ -165673,6 +167973,44 @@
           "registration": {
             "path": "lua/src/lua/lbaselib.c",
             "line": 466,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.setmetatable",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_setmetatable",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 466,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.tonumber",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_tonumber",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 467,
             "array": "base_funcs",
             "guard": null
           },
@@ -165723,6 +168061,44 @@
           }
         },
         {
+          "name": "_G.tostring",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_tostring",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 468,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.type",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_type",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 469,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "_G.type",
           "module": "_G",
           "inDeclaredModule": false,
@@ -165755,6 +168131,44 @@
           "documentedName": null,
           "derivedArity": {
             "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.unpack",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_unpack",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 470,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 1,
+            "max": 2,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
+          "name": "_G.xpcall",
+          "module": "_G",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_xpcall",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 471,
+            "array": "base_funcs",
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 2,
             "max": 2,
             "variadic": false,
             "branchDependent": false
@@ -165970,6 +168384,25 @@
           }
         },
         {
+          "name": "newproxy",
+          "module": "",
+          "inDeclaredModule": false,
+          "cFunction": "luaB_newproxy",
+          "registration": {
+            "path": "lua/src/lua/lbaselib.c",
+            "line": 626,
+            "array": null,
+            "guard": null
+          },
+          "documentedName": null,
+          "derivedArity": {
+            "min": 0,
+            "max": 1,
+            "variadic": false,
+            "branchDependent": false
+          }
+        },
+        {
           "name": "print",
           "module": "",
           "inDeclaredModule": false,
@@ -166032,8 +168465,8 @@
           "inDeclaredModule": true,
           "cFunction": "global_unload",
           "registration": {
-            "path": "script/src/luasocket/luasocket_html5.c",
-            "line": 51,
+            "path": "script/src/luasocket/luasocket.c",
+            "line": 59,
             "array": "func",
             "guard": null
           },
@@ -166152,6 +168585,24 @@
           "member": "_G",
           "valueKind": null,
           "expression": "LUA_GLOBALSINDEX",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 626
+        },
+        {
+          "name": "_G",
+          "module": "",
+          "member": "_G",
+          "valueKind": null,
+          "expression": "LUA_GLOBALSINDEX",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 626
+        },
+        {
+          "name": "_VERSION",
+          "module": "",
+          "member": "_VERSION",
+          "valueKind": "string",
+          "expression": "LUA_VERSION",
           "path": "lua/src/lua/lbaselib.c",
           "line": 626
         },
@@ -170160,58 +172611,16 @@
       ],
       "blockers": [
         {
-          "code": "ambiguous-registration-callee",
-          "path": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp",
-          "line": 636,
-          "detail": "call to 'SetIntegerConstant' resolves to 3 definitions: gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp:630, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp:1948, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp:641",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp",
-          "line": 1954,
-          "detail": "call to 'SetIntegerConstant' resolves to 3 definitions: gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp:630, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp:1948, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp:641",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp",
-          "line": 647,
-          "detail": "call to 'SetIntegerConstant' resolves to 3 definitions: gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_collision_object.cpp:630, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp:1948, gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_shape.cpp:641",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "lua/src/lua/lbaselib.c",
-          "line": 648,
-          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
-          "route": null
+          "code": "ambiguous-c-function",
+          "route": "socket.sleep",
+          "path": "script/src/luasocket/timeout.c",
+          "line": 38,
+          "detail": "'timeout_lua_sleep' has 2 definitions: script/src/luasocket/timeout.c:195, script/src/luasocket/timeout.c:205"
         },
         {
           "code": "ambiguous-registration-callee",
           "path": "script/src/luasocket/luasocket.c",
           "line": 121,
-          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "script/src/luasocket/luasocket.c",
-          "line": 121,
-          "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 150,
-          "detail": "call to 'base_open' resolves to 3 definitions: lua/src/lua/lbaselib.c:626, script/src/luasocket/luasocket.c:92, script/src/luasocket/luasocket_html5.c:126",
-          "route": null
-        },
-        {
-          "code": "ambiguous-registration-callee",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 150,
           "detail": "call to 'func' resolves to 2 definitions: script/src/bitop/bitop.c:98, script/src/bitop/bitop.c:110",
           "route": null
         },
@@ -170223,53 +172632,53 @@
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "lua/src/lua/loadlib.c",
           "line": 620,
-          "detail": "luaL_register registers 'll_funcs' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_register registers 'll_funcs' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/except.c",
           "line": 22,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 85,
-          "detail": "luaL_openlib registers 'unsupported' into the value on top of the stack, which the interpreter could not resolve to a table",
-          "route": null
-        },
-        {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/select.c",
           "line": 28,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/tcp.c",
           "line": 92,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/timeout.c",
           "line": 36,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
         },
         {
-          "code": "anonymous-registration-without-table",
+          "code": "anonymous-registration-below-top",
           "path": "script/src/luasocket/udp.c",
           "line": 111,
-          "detail": "luaL_openlib registers 'func' into the value on top of the stack, which the interpreter could not resolve to a table",
+          "detail": "luaL_openlib registers 'func' into the nearest table 1 slot(s) below the modelled top; untracked pushes left non-table values above it",
           "route": null
+        },
+        {
+          "code": "argument-slot-without-stack-access",
+          "route": "_G.xpcall",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 384,
+          "detail": "argument 1 is inside the derived arity but no recognised stack accessor reads it"
         },
         {
           "code": "argument-slot-without-stack-access",
@@ -170714,6 +173123,174 @@
         },
         {
           "code": "duplicate-registration",
+          "route": "_G.assert",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 448,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.collectgarbage",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 449,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.dofile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 450,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.error",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 451,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.gcinfo",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 452,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.getfenv",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 453,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.getmetatable",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 454,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.load",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 456,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.loadfile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 455,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.loadstring",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 457,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.next",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 458,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.pcall",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 459,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.print",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 460,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.rawequal",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 461,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.rawget",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 462,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.rawset",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 463,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.select",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 464,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.setfenv",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 465,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.setmetatable",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 466,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.tonumber",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 467,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.tostring",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 468,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.type",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 469,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.unpack",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 470,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
+          "route": "_G.xpcall",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 471,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
           "route": "http.request",
           "path": "gamesys/src/gamesys/scripts/script_http_js.cpp",
           "line": 250,
@@ -170721,16 +173298,23 @@
         },
         {
           "code": "duplicate-registration",
+          "route": "newproxy",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 626,
+          "detail": "the same fully-qualified name is registered more than once"
+        },
+        {
+          "code": "duplicate-registration",
           "route": "socket.__unload",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 51,
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 59,
           "detail": "the same fully-qualified name is registered more than once"
         },
         {
           "code": "duplicate-registration",
           "route": "socket.skip",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 50,
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 58,
           "detail": "the same fully-qualified name is registered more than once"
         },
         {
@@ -170938,6 +173522,34 @@
         },
         {
           "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "make_assoc(L, rtab)"
+        },
+        {
+          "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "make_assoc(L, wtab)"
+        },
+        {
+          "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "return_fd(L, &rset, max_fd+1, itab, rtab, ndirty)"
+        },
+        {
+          "code": "dynamic-stack-index",
+          "route": "socket.select",
+          "path": "script/src/luasocket/select.c",
+          "line": 57,
+          "detail": "return_fd(L, &wset, max_fd+1, itab, wtab, 0)"
+        },
+        {
+          "code": "dynamic-stack-index",
           "route": "sys.set_debugger_lightweight_hook",
           "path": "script/src/script_sys.cpp",
           "line": 1476,
@@ -170959,9 +173571,30 @@
         },
         {
           "code": "undecided-result-arity",
+          "route": "_G.dofile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 325,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
           "route": "_G.load",
           "path": "lua/src/lua/lbaselib.c",
           "line": 315,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.load",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 315,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.loadfile",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 285,
           "detail": "non-literal-return-expression"
         },
         {
@@ -170980,9 +173613,30 @@
         },
         {
           "code": "undecided-result-arity",
+          "route": "_G.loadstring",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 277,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
           "route": "_G.select",
           "path": "lua/src/lua/lbaselib.c",
           "line": 358,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.select",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 358,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "_G.unpack",
+          "path": "lua/src/lua/lbaselib.c",
+          "line": 342,
           "detail": "non-literal-return-expression"
         },
         {
@@ -171233,8 +173887,36 @@
         {
           "code": "undecided-result-arity",
           "route": "socket.skip",
-          "path": "script/src/luasocket/luasocket_html5.c",
-          "line": 58,
+          "path": "script/src/luasocket/luasocket.c",
+          "line": 66,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.tcp",
+          "path": "script/src/luasocket/tcp.c",
+          "line": 393,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.tcp6",
+          "path": "script/src/luasocket/tcp.c",
+          "line": 397,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.udp",
+          "path": "script/src/luasocket/udp.c",
+          "line": 445,
+          "detail": "non-literal-return-expression"
+        },
+        {
+          "code": "undecided-result-arity",
+          "route": "socket.udp6",
+          "path": "script/src/luasocket/udp.c",
+          "line": 449,
           "detail": "non-literal-return-expression"
         },
         {

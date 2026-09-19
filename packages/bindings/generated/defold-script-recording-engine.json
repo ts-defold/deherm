@@ -3,12 +3,12 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "b681310b61823196afacfad3e59b49785f16a3b9852f09ae9d55a2ef6887e3ed",
+  "planSha256": "e53581335a808045fc4271ea8d52dfdefbff755068aebd21cce77d2f060dce88",
   "inputHashes": {
-    "projection": "f1b658001ef9f796d292a0a57c90d37d01e3a602561ca26b6ec5011b82335cc7",
-    "universal": "7473ca02067589618d1e080f9a9519a42a7e2a4ab58e75b1e4662eb9b402ddc0",
-    "handleLowering": "d0e21abdcca565ed2f9aa7bb0553ba9899f279d901bda1c7b5a1a1a9b6b4a6c3",
-    "loweringPlan": "8495dbfe47506ac8e338eacb206c972f547c8e0015b3b564d0fb6d66edb50b03"
+    "projection": "e29275aba314e5462a63a9888f267b4877b8bf8f60481d4233c74669378dbc7d",
+    "universal": "1a61f303faee8737af5e14747dce3be4181117c713a51c577e97024b3326c5ba",
+    "handleLowering": "f32347ae73567a16f17d5477a4882bf19822d5552d810301607a34d5678b72e4",
+    "loweringPlan": "133079c928d4ec0257c2e64fc5f64aa4d493a59f3f081b48aa1945d581424b9a"
   },
   "planInputDrift": [],
   "transports": {
@@ -49103,7 +49103,7 @@
       },
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 3,
         "maximum": 5,
         "driven": 5
       },
@@ -56545,11 +56545,11 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "07b2f1dc958f87340a592bd910b799bed90ce0a4098d4ee6a50f48323d515a21",
+    "header": "492f3ba2d4a4e9fb7d6a0fa1947709a1e06c4c5bee7a69904188261f388f684b",
     "tables": "df47c2547e5f4a3fa3822861b0aea9b4989641b8f00d1bfb2c46949656dd8775",
     "provider": "576c3fb87089a0b968abe465b809de407d0027a286dd165c783325f853c63171",
     "driver": "04230cea34fba2a1418c110364ee6f101525b393106b6a42f26e7ff2644c86e2",
     "driverJs": "5dc503db68fb631b0db31a39c7db5796a8c44491c655522194158426a2f48744",
-    "expectedTrace": "9be66e9105f868ed093e54228781b40bff0091bedb6345ddc1e65caa488968cb"
+    "expectedTrace": "c13c71419e95fd2eb42433990b2c2482dbe2944f7e473619d0c9f6b93e485ab2"
   }
 }

@@ -460,6 +460,27 @@ function parseRegistrationArrays(file) {
   return arrays;
 }
 
+/**
+ * Resolve a called function, honouring C's file scope.
+ *
+ * `functionsByName` is global, so a `static` function defined in two files
+ * looks ambiguous even though C gives each file its own. `base_open` is defined
+ * `static` in both Lua's own lbaselib.c and in luasocket.c, which made every
+ * call to it ambiguous - and since luaopen_socket_core's call to base_open is
+ * what puts the `socket` table on the stack, skipping it lost every socket.*
+ * route in the engine.
+ *
+ * A call inside a file therefore resolves to that file's own definition when it
+ * has one. Only a genuinely cross-file call with several candidates is
+ * ambiguous.
+ */
+function resolveCallee(project, name, fromPath) {
+  const all = project.functionsByName.get(name);
+  if (!all || all.length <= 1) return all;
+  const local = all.filter((item) => item.path === fromPath);
+  return local.length === 1 ? local : all;
+}
+
 // `mod[i].func(L)` - a call through a registration array element rather than a
 // named function. The index expression is whatever the loop uses; only the
 // array identifier and the `.func` member matter.
@@ -1143,17 +1164,39 @@ export function interpretRegistrations(project) {
           continue;
         }
         if (isNullExpression(nameArgument)) {
-          const top = stack[stack.length - 1];
-          if (!top || top.kind !== "table") {
+          // `luaL_openlib(L, NULL, ...)` registers into the table on top of the
+          // stack. When the model's top is not a table it is almost always our
+          // drift rather than the engine's: luasocket's `base_open` leaves the
+          // `socket` table and then does several pushliteral/rawset pairs whose
+          // pushes this interpreter does not model, so the table ends up buried
+          // under leftovers that do not exist at runtime.
+          //
+          // Emulating every push exactly is a much larger job than the question
+          // deserves, and failing closed here loses every route in the module.
+          // So: take the nearest table below the top, and record that we had to
+          // look past something, so the imprecision is reported rather than
+          // hidden.
+          let index = stack.length - 1;
+          while (index >= 0 && stack[index]?.kind !== "table") index -= 1;
+          const target = index >= 0 ? stack[index] : null;
+          if (!target) {
             blockers.push({
               code: "anonymous-registration-without-table",
               path: record.path,
               line: record.line,
-              detail: `${qualified} registers '${record.array}' into the value on top of the stack, which the interpreter could not resolve to a table`
+              detail: `${qualified} registers '${record.array}' into the value on top of the stack, and no table was on the stack at all`
             });
             continue;
           }
-          attach(top, record, null);
+          if (index !== stack.length - 1) {
+            blockers.push({
+              code: "anonymous-registration-below-top",
+              path: record.path,
+              line: record.line,
+              detail: `${qualified} registers '${record.array}' into the nearest table ${stack.length - 1 - index} slot(s) below the modelled top; untracked pushes left non-table values above it`
+            });
+          }
+          attach(target, record, null);
           continue;
         }
         blockers.push({
@@ -1290,7 +1333,7 @@ export function interpretRegistrations(project) {
       }
       // A plain call whose first argument is the Lua state may itself register
       // into the table currently on the stack, so follow it.
-      const callee = project.functionsByName.get(call.name);
+      const callee = resolveCallee(project, call.name, definition.path);
       if (!callee || !/\bL\b|m_L|lua_State/.test(args[0] ?? "")) continue;
       if (callee.length > 1) {
         blockers.push({

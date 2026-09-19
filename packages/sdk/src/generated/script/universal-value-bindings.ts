@@ -3164,7 +3164,7 @@ export const scriptUniversalValueBindings = [
     ],
     "member": "connect",
     "loweringFamily": "multi-result",
-    "minimumArgumentCount": 2,
+    "minimumArgumentCount": 3,
     "maximumArgumentCount": 5,
     "minimumResultCount": 0,
     "maximumResultCount": 2,

@@ -17,6 +17,10 @@
         {
           "path": "scripts/box2d/v2/",
           "reason": "box2d v2 and v3 define the same registration symbols (ScriptBox2DInitializeBody and friends) and are selected against each other at link time by the app manifest. Linking both into one parse would make every b2d callee ambiguous, so each variant is its own target."
+        },
+        {
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "reason": "luasocket_html5.c and luasocket.c define the same symbols - luaopen_socket_core and base_open - and are selected against each other per platform, exactly as the box2d v2/v3 pair is selected by the app manifest. Parsing both makes every luasocket entry point ambiguous, so the walk skips it and every socket.* route disappears. The html5 build is also semantically different rather than merely duplicate: its `unsupported[]` table registers connect, tcp, udp and select to a function that raises, because HTML5 has no sockets. These targets describe the native engine, so the native variant is the one parsed."
         }
       ],
       "declared": {
@@ -39,6 +43,10 @@
         {
           "path": "scripts/box2d/v3/",
           "reason": "The mirror of the v3 target: the legacy Box2D v2 backend."
+        },
+        {
+          "path": "script/src/luasocket/luasocket_html5.c",
+          "reason": "luasocket_html5.c and luasocket.c define the same symbols - luaopen_socket_core and base_open - and are selected against each other per platform, exactly as the box2d v2/v3 pair is selected by the app manifest. Parsing both makes every luasocket entry point ambiguous, so the walk skips it and every socket.* route disappears. The html5 build is also semantically different rather than merely duplicate: its `unsupported[]` table registers connect, tcp, udp and select to a function that raises, because HTML5 has no sockets. These targets describe the native engine, so the native variant is the one parsed."
         }
       ],
       "declared": {

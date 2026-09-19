@@ -8,22 +8,22 @@
     "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
   },
   "sourceReport": "packages/bindings/generated/defold-lua-registration-surface.json",
-  "sourceReportSha256": "af4fca39a4a763ec15b513908c35e5627d48c03f43c0fdd44b63ad7f2a6e0e86",
+  "sourceReportSha256": "1ddd6ac89786e97257ba3635a40304d727b2df882d3a4b43d8895fa05104c468",
   "engineTargets": [
     "defold-engine-box2d-v2",
     "defold-engine-box2d-v3"
   ],
   "counts": {
-    "findings": 38,
+    "findings": 39,
     "routesBlocked": 1,
-    "parametersCorrected": 37,
+    "parametersCorrected": 38,
     "byKind": {
-      "documented-optional-slot-required-by-c": 37,
+      "documented-optional-slot-required-by-c": 38,
       "registered-under-a-different-name": 1
     },
     "byAction": {
       "block-emission": 1,
-      "require-parameter": 37
+      "require-parameter": 38
     }
   },
   "findings": [
@@ -1031,6 +1031,35 @@
           "registeredAt": "gamesys/src/gamesys/scripts/script_resource.cpp:3452",
           "accessors": [
             "dmScript::CreateCallback"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "socket.connect",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 5,
+        "name": "family"
+      },
+      "reason": "declared optional, derived required from checked accessor inet_optfamily",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/socket.lua:59",
+          "registeredAt": "script/src/luasocket/tcp.c:95",
+          "accessors": [
+            "inet_optfamily"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/socket.lua:59",
+          "registeredAt": "script/src/luasocket/tcp.c:95",
+          "accessors": [
+            "inet_optfamily"
           ]
         }
       ]
