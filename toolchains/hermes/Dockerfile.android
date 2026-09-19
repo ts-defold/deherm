@@ -197,6 +197,35 @@ RUN mkdir -p /work/icu/host && cd /work/icu/host && \
       --disable-tests --disable-samples --disable-extras --disable-layoutex && \
     make -j"$(nproc)"
 
+# The CLDR data sources, published as a separate asset in the same ICU release
+# and listed in the same SHASUM512.txt.
+ARG ICU_DATA_SHA512=7f25816de4062fe79eaf350cb5230747643b9bb08c60443b4e1b2d79eb1ce3192ae9a767107171b85bda4cfc1969035ce09cebc81add0590eb4d61ca33aa0730
+ARG ICU_DATA_SHA256=ca1ee076163b438461e484421a7679fc33a64cd0a54f9d4b401893fa1eb42701
+ARG ICU_DATA_BYTES=19990179
+
+# The data filter needs the CLDR **sources**, which icu4c-73_2-src.tgz does not
+# ship - it carries only the prebuilt data/in/icudt73l.dat. That matters because
+# configure fails open rather than loudly: source/configure:9302 runs the
+# filtering data builder only `if test -f "$srcdir/data/locales/root.txt"`, and
+# otherwise prints "Not rebuilding data/rules.mk, assuming prebuilt data in
+# data/in" and packages the whole 32 MB .dat. Verified by running the builder
+# against the src tarball alone: it dies on a missing
+# data/locales/LOCALE_DEPS.json. So the data asset is fetched too, unpacked over
+# source/data, and the filter then has something to filter.
+#
+# It is fetched AFTER the host build on purpose: the host tools only need the
+# prebuilt .dat, and downloading 20 MB of CLDR text before them would put it in
+# a layer every target rebuild has to carry.
+RUN curl -fsSLo /tmp/icu-data.zip "https://github.com/unicode-org/icu/releases/download/release-$(echo ${ICU_VERSION} | tr _ -)/icu4c-${ICU_VERSION}-data.zip" && \
+    actual_bytes="$(stat -c %s /tmp/icu-data.zip)" && \
+    if [ "$actual_bytes" != "${ICU_DATA_BYTES}" ]; then \
+      echo "ICU data archive is ${actual_bytes} bytes, expected ${ICU_DATA_BYTES}" >&2; exit 1; \
+    fi && \
+    echo "${ICU_DATA_SHA512}  /tmp/icu-data.zip" | sha512sum -c - && \
+    echo "${ICU_DATA_SHA256}  /tmp/icu-data.zip" | sha256sum -c - && \
+    unzip -q -o /tmp/icu-data.zip -d /src/icu/source && rm /tmp/icu-data.zip && \
+    test -f /src/icu/source/data/locales/root.txt
+
 # ── Hermes host compilers ───────────────────────────────────────────────────
 
 COPY upstream/hermes /src/hermes

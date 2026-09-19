@@ -237,8 +237,21 @@ every target, so neither changes a behaviour this project claims to provide.
 
 | Upstream | Identity | Verification |
 | --- | --- | --- |
-| ICU4C 73.2 | `icu4c-73_2-src.tgz`, 26,519,906 bytes | vendor SHA-512 `76dd782d…27ce62` from the release's `SHASUM512.txt`, plus SHA-256 `818a8071…04ce1` recorded here, plus the byte length |
+| ICU4C 73.2 source | `icu4c-73_2-src.tgz`, 26,519,906 bytes | vendor SHA-512 `76dd782d…27ce62` from the release's `SHASUM512.txt`, plus SHA-256 `818a8071…04ce1` recorded here, plus the byte length |
+| ICU4C 73.2 CLDR data | `icu4c-73_2-data.zip`, 19,990,179 bytes | vendor SHA-512 `7f25816d…a0730` from the same `SHASUM512.txt`, plus SHA-256 `ca1ee076…42701`, plus the byte length |
 | fbjni v0.7.0 | commit `474795fa9ff0dda60b838871171be935432bae16` | `git checkout` of the exact object name, asserted after fetch |
+
+The data asset is not optional, and finding that out is worth recording because
+the failure is silent. `icu4c-73_2-src.tgz` ships **no CLDR sources** - only the
+prebuilt 32 MB `data/in/icudt73l.dat` - and `source/configure:9302` runs the
+filtering data builder only `if test -f "$srcdir/data/locales/root.txt"`.
+Without the data asset, configure prints *"Not rebuilding data/rules.mk,
+assuming prebuilt data in data/in"*, `ICU_DATA_FILTER_FILE` is never consulted,
+and the full package is linked in. Checked directly: running
+`icutools.databuilder` against the source tarball alone fails on a missing
+`data/locales/LOCALE_DEPS.json`, and against source + data it emits rules for
+the filtered set. The lane therefore asserts `data/locales/root.txt` exists
+after unpacking, so a future release that reorganises the assets fails loudly.
 
 fbjni is pinned by git commit rather than by a tarball digest on purpose:
 GitHub's auto-generated source tarballs are not a vendor-published artifact and

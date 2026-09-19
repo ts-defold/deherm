@@ -2,14 +2,14 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "052a5bb57b3c247abc5e0810321ed19b1cddb886b6ecc2d4348b96f44bf5e1bf",
-    "sdkIr": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
+    "projection": "877964bf5ccc8a2ee8d71467cbc60a512e6065aba6a93df95303ac4057a5c2c0",
+    "sdkIr": "0301718e88f902118f20f106b61b881d410a29cd728b3c5a09d2b0308ab38bf1",
     "specialized": {
-      "borrowedHandle": "8a57760db790ca430ec40329b2874a3b008b324a0724660bf95404fe95d5fc95",
-      "scratchScalarOut": "8ab118df450c4062b17c183b59974de0c3b8e683b59e9c8df7fb26793f0f2824",
-      "cstringValue": "60e03716f6e074c8cb30acbdfcfe635315e2f41da04ea7d9451c124f3a52a78c"
+      "borrowedHandle": "aafc429eef77faaddb88cf73ec35885a2ddcba6b6c7fb58db1df04209da1a681",
+      "scratchScalarOut": "eef75a2ed154ea4876c88a8cc05b1b07290f33f58b832a25c70c28d62c7146e4",
+      "cstringValue": "58f2707c190d9386fa4271bdeac9981bfaebdba9ae4be016e3419d877cb3bf60"
     },
-    "aggregate": "a9d80bd82a521bd76d54ad21503f018535c7d5630f0ab8612f2ee478dcd83b0c",
+    "aggregate": "49b732c4ae47a2934080d5d38cf49fb6a31a7d79f769e96298712f380d1e7305",
     "catalog": "fe9bb1eb459215f9537e55ae5bdc3e52938435a08970958e98ac59188a89d6ef"
   },
   "coverage": {

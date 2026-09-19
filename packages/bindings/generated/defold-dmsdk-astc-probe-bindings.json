@@ -8,8 +8,8 @@
     "policy": "packages/bindings/overrides/dmsdk-astc-probe-bindings.json"
   },
   "sourceHashes": {
-    "ir": "98201e5b5f2766364f08574a8343fc8a216c59d2fd57d2b9d492b9a0ce1966f1",
-    "shapes": "0277bf19d42b2c3185917adb3dbc58af4b1ff29311d2ed5d37aab162cbe5cec9",
+    "ir": "0301718e88f902118f20f106b61b881d410a29cd728b3c5a09d2b0308ab38bf1",
+    "shapes": "cb58793920f2af154808e16fb505bc69b584736770701b243b92b197cc84e966",
     "policy": "0b9ad9f3d7a22709254de8f9f6d603f1e9506e12c94e1e7db2cc0f4b5faca0cd",
     "headers": {
       "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h": "cd1d701fd48d98dab9c5794ed0b96d278ba3dfb79ceb295ba0aa017d74728419",
