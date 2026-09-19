@@ -287,7 +287,13 @@ jobs:
         with: { distribution: temurin, java-version: '25' }
       - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld
       - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: bash scripts/bootstrap-upstreams.sh defold hermes extender ref-doc
+      - id: defold-sdk
+        run: sed -n 's/^DEFOLD_SDK_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: upstream/defoldsdk.zip
+          key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
+      - run: bash scripts/bootstrap-upstreams.sh defold hermes extender ref-doc defold-sdk
       - id: engine
         name: Materialize the runtime and exercise every generated route
         continue-on-error: true

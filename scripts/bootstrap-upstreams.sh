@@ -35,7 +35,7 @@ checkout_revision() {
 if [[ $# -gt 0 ]]; then
   requested=("$@")
 else
-  requested=(defold hermes extender ref-doc parse-sysroot)
+  requested=(defold hermes extender ref-doc defold-sdk parse-sysroot)
 fi
 
 wants() {
@@ -49,10 +49,10 @@ wants() {
 
 for candidate in "${requested[@]}"; do
   case "$candidate" in
-    defold | hermes | extender | ref-doc | parse-sysroot) ;;
+    defold | hermes | extender | ref-doc | defold-sdk | parse-sysroot) ;;
     *)
       echo "Unknown upstream component: $candidate" >&2
-      echo "Expected one or more of: defold hermes extender ref-doc parse-sysroot" >&2
+      echo "Expected one or more of: defold hermes extender ref-doc defold-sdk parse-sysroot" >&2
       exit 2
       ;;
   esac
@@ -75,6 +75,51 @@ if wants ref-doc; then
     echo "ref-doc.zip checksum mismatch: expected $DEFOLD_REF_DOC_SHA256, got $actual_sha" >&2
     exit 1
   fi
+fi
+
+# Defold's published SDK is the authoritative set of headers and prebuilt
+# engine archives that Extender links. The headless conformance driver needs
+# the actual libraries, not only the engine source checkout. Keep the archive
+# cacheable independently from its extracted revision directory and verify it
+# before trusting either.
+if wants defold-sdk; then
+  sdk_archive="$repo_root/upstream/defoldsdk.zip"
+  sdk_parent="$repo_root/upstream/extender/server/app/sdk/$DEFOLD_REV"
+  sdk_root="$sdk_parent/defoldsdk"
+  sdk_sentinel="$sdk_root/.deherm-sdk-sha256"
+  valid_sdk_archive=false
+  if [[ -f "$sdk_archive" ]]; then
+    actual_sha="$(node -e '
+      const { createHash } = require("node:crypto");
+      const { readFileSync } = require("node:fs");
+      process.stdout.write(createHash("sha256").update(readFileSync(process.argv[1])).digest("hex"));
+    ' "$sdk_archive")"
+    [[ "$actual_sha" == "$DEFOLD_SDK_SHA256" ]] && valid_sdk_archive=true
+  fi
+  if [[ "$valid_sdk_archive" != true ]]; then
+    temporary="$sdk_archive.download"
+    trap 'rm -f "$temporary"' EXIT
+    curl -fL --retry 3 --retry-delay 2 "$DEFOLD_SDK_URL" -o "$temporary"
+    actual_sha="$(node -e '
+      const { createHash } = require("node:crypto");
+      const { readFileSync } = require("node:fs");
+      process.stdout.write(createHash("sha256").update(readFileSync(process.argv[1])).digest("hex"));
+    ' "$temporary")"
+    if [[ "$actual_sha" != "$DEFOLD_SDK_SHA256" ]]; then
+      echo "defoldsdk.zip checksum mismatch: expected $DEFOLD_SDK_SHA256, got $actual_sha" >&2
+      exit 1
+    fi
+    mv "$temporary" "$sdk_archive"
+    trap - EXIT
+  fi
+  if [[ ! -f "$sdk_sentinel" ]] || [[ "$(cat "$sdk_sentinel")" != "$DEFOLD_SDK_SHA256" ]] ||
+     [[ ! -f "$sdk_root/lib/x86_64-linux/libengine.a" ]]; then
+    rm -rf "$sdk_root"
+    mkdir -p "$sdk_parent"
+    unzip -q "$sdk_archive" -d "$sdk_parent"
+    printf '%s\n' "$DEFOLD_SDK_SHA256" > "$sdk_sentinel"
+  fi
+  printf 'defold-sdk %s\n' "$DEFOLD_SDK_SHA256"
 fi
 
 # The pinned C library headers the dmSDK declaration parse resolves against.

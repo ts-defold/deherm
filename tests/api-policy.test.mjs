@@ -45,7 +45,8 @@ test("policy host parity materializes every authoritative generator input", asyn
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
 
   assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
-  assert.match(engine, /bootstrap-upstreams\.sh defold hermes extender ref-doc/u);
+  assert.match(engine, /bootstrap-upstreams\.sh defold hermes extender ref-doc defold-sdk/u);
+  assert.match(engine, /key: defold-sdk-\$\{\{ steps\.defold-sdk\.outputs\.digest \}\}/u);
   assert.match(bootstrap, /createHash\("sha256"\)/u);
   assert.doesNotMatch(bootstrap, /\bshasum\b/u);
   for (const line of importer.split("\n").filter((candidate) => /\.(?:read|write)_text\(/u.test(candidate))) {

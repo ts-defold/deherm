@@ -595,8 +595,11 @@ target_link_libraries(defold-hermes-component-runtime-e2e PRIVATE
 # pinned Defold SDK payload and the packaged Hermes archive, both of which are
 # produced by the local toolchain rather than checked in.
 # ---------------------------------------------------------------------------
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/upstream.lock" DEHERM_DEFOLD_REV_LINE
+  REGEX "^DEFOLD_REV=[0-9a-f]+$")
+string(REPLACE "DEFOLD_REV=" "" DEHERM_DEFOLD_REV "${DEHERM_DEFOLD_REV_LINE}")
 set(DEHERM_DEFOLD_SDK_DIR
-  "${CMAKE_CURRENT_SOURCE_DIR}/upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk"
+  "${CMAKE_CURRENT_SOURCE_DIR}/upstream/extender/server/app/sdk/${DEHERM_DEFOLD_REV}/defoldsdk"
   CACHE PATH "Pinned Defold SDK payload used by the headless conformance driver")
 
 # The Defold SDK's platform directory, and the directory our own Hermes archive
@@ -650,12 +653,17 @@ if(DEHERM_DEFOLD_SDK_PLATFORM
   # generated content emits.
   target_compile_options(defold-hermes-headless-conformance-driver PRIVATE
     -fexceptions -UNDEBUG)
+  set(DEHERM_HEADLESS_PLATFORM_DEFINITIONS "")
+  if(APPLE)
+    list(APPEND DEHERM_HEADLESS_PLATFORM_DEFINITIONS DM_PLATFORM_MACOS DM_PLATFORM_OSX)
+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    list(APPEND DEHERM_HEADLESS_PLATFORM_DEFINITIONS DM_PLATFORM_LINUX __STDC_LIMIT_MACROS)
+  endif()
   target_compile_definitions(defold-hermes-headless-conformance-driver PRIVATE
     DLIB_LOG_DOMAIN="DEFOLD_HERMES"
-    DM_PLATFORM_MACOS
-    DM_PLATFORM_OSX
     DM_HEADLESS
     DDF_EXPOSE_DESCRIPTORS
+    ${DEHERM_HEADLESS_PLATFORM_DEFINITIONS}
   )
   target_include_directories(defold-hermes-headless-conformance-driver PRIVATE
     defold/defold_hermes/include
@@ -687,6 +695,11 @@ if(DEHERM_DEFOLD_SDK_PLATFORM
     sound_null
     liveupdate decoder_wav decoder_ogg
   )
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Linux's own Extender build declares this archive; Apple obtains the same
+    # TLS facilities from its platform frameworks and does not link it.
+    list(INSERT DEHERM_HEADLESS_ENGINE_LIBS 2 dmbedtls)
+  endif()
   set(DEHERM_HEADLESS_LINK_LIBS "")
   foreach(library IN LISTS DEHERM_HEADLESS_ENGINE_LIBS)
     if(EXISTS "${DEHERM_HEADLESS_SDK_LIB_DIR}/lib${library}.a")
@@ -698,14 +711,25 @@ if(DEHERM_DEFOLD_SDK_PLATFORM
     endif()
   endforeach()
 
-  target_link_libraries(defold-hermes-headless-conformance-driver PRIVATE
-    "${DEHERM_PACKAGED_HERMES_ARCHIVE}"
-    ${DEHERM_HEADLESS_LINK_LIBS}
-    "-framework Foundation" "-framework AppKit" "-framework Cocoa"
-    "-framework IOKit" "-framework Carbon" "-framework CoreVideo"
-    "-framework QuartzCore" "-framework AVFoundation" "-framework CFNetwork"
-    "-framework Security" "-framework GameController" "-framework IOSurface"
-  )
+  if(APPLE)
+    target_link_libraries(defold-hermes-headless-conformance-driver PRIVATE
+      "${DEHERM_PACKAGED_HERMES_ARCHIVE}"
+      ${DEHERM_HEADLESS_LINK_LIBS}
+      "-framework Foundation" "-framework AppKit" "-framework Cocoa"
+      "-framework IOKit" "-framework Carbon" "-framework CoreVideo"
+      "-framework QuartzCore" "-framework AVFoundation" "-framework CFNetwork"
+      "-framework Security" "-framework GameController" "-framework IOSurface"
+    )
+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # Defold's Linux link recipe groups its static engine archives to resolve
+    # their intentional circular references, then returns to dynamic system
+    # libraries. Mirror that ordering exactly for the in-process driver.
+    target_link_libraries(defold-hermes-headless-conformance-driver PRIVATE
+      "${DEHERM_PACKAGED_HERMES_ARCHIVE}"
+      "-Wl,--start-group" ${DEHERM_HEADLESS_LINK_LIBS} "-Wl,--end-group"
+      pthread m dl
+    )
+  endif()
 else()
   message(STATUS
     "Headless Defold conformance driver is unavailable: the pinned Defold SDK "
