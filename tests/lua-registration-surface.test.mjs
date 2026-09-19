@@ -21,6 +21,9 @@ import { materializeIngestionProject } from "./fixtures/defold-extension-ingesti
 const execFileAsync = promisify(execFile);
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = path.join(repositoryRoot, luaRegistrationSurfaceGenerator.artifacts[0]);
+const pinnedDefoldRevision = (await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"))
+  .match(/^DEFOLD_REV=(.+)$/m)?.[1];
+assert.match(pinnedDefoldRevision, /^[0-9a-f]{40}$/);
 
 async function readReport() {
   return JSON.parse(await readFile(reportPath, "utf8"));
@@ -190,7 +193,7 @@ test("a `.script_api` member without `type: function` and a trailing [optional] 
     const policy = path.join(workspace, "policy.json");
     await writeFile(policy, JSON.stringify({
       schemaVersion: 1,
-      defoldRevision: "test",
+      defoldRevision: pinnedDefoldRevision,
       targets: [{ id: "demo", kind: "extension-root", root, declared: { kind: "script-api" } }]
     }));
     await execFileAsync("node", [
@@ -232,7 +235,7 @@ test("a dependency archive is read without unpacking, and a declaration with no 
     const policy = path.join(workspace, "policy.json");
     await writeFile(policy, JSON.stringify({
       schemaVersion: 1,
-      defoldRevision: "test",
+      defoldRevision: pinnedDefoldRevision,
       targets: names.map((name, index) => ({
         id: `archive-${index}`,
         kind: "dependency-archive",
@@ -270,6 +273,17 @@ test("the committed engine report is fail-closed and complete", async () => {
   assert.equal(engine.status, "verified");
   assert.equal(engine.summary.declaredRoutes, 926);
   assert.ok(engine.summary.registeredRoutes > 800);
+
+  // ResolveURL's stack-index overload defaults an absent slot to the current
+  // URL. Its same-arity string overload must not hide that body-derived
+  // contract and turn documented optional URLs into required parameters.
+  for (const targetId of ["defold-engine-box2d-v2", "defold-engine-box2d-v3"]) {
+    const setParent = report.targets[targetId].routes.find((route) => route.name === "go.set_parent");
+    assert.ok(setParent, `${targetId} must register go.set_parent`);
+    assert.equal(setParent.arity.derived.min, 0);
+    assert.equal(setParent.parameters[0].derived.optional, true);
+    assert.equal(setParent.parameters[0].derived.evidence, "presence-guarded");
+  }
 
   // Nothing is silently passed: every undecided route carries a blocker, and
   // every blocker names a code, a location, and a reason.
@@ -404,6 +418,46 @@ test("a presence test on a slot outranks a check below it", () => {
   assert.deepEqual(query.undecided, []);
 });
 
+test("a same-arity non-slot overload does not hide a public helper's body contract", () => {
+  const sources = [
+    {
+      path: "src/url.cpp",
+      text: `
+        int ResolveURL(lua_State* L, const char* url, URL* out, URL* defaults) {
+          return 0;
+        }
+        int ResolveURL(lua_State* L, int index, URL* out, URL* defaults) {
+          if (lua_gettop(L) < index || lua_isnil(L, index)) {
+            return 0;
+          }
+          luaL_argerror(L, index, "url expected");
+          return 0;
+        }
+      `
+    },
+    {
+      path: "src/caller.cpp",
+      text: `
+        static int demo_resolve(lua_State* L) {
+          ResolveURL(L, 1, 0, 0);
+          return 0;
+        }
+      `
+    }
+  ];
+  const headers = [{
+    path: "include/url.h",
+    text: "int ResolveURL(lua_State* L, int index, URL* out, URL* defaults);"
+  }];
+  const { project, helpers } = analyze(sources, headers);
+  const route = analyzeFunctionBody(project.functionsByName.get("demo_resolve")[0], helpers, project);
+
+  assert.deepEqual(route.arity, { min: 0, max: 1, variadic: false, branchDependent: false });
+  assert.equal(route.parameters[0].optional, true);
+  assert.equal(route.parameters[0].evidence, "presence-guarded");
+  assert.deepEqual(route.parameters[0].accessors, ["ResolveURL"]);
+});
+
 test("the gate carries only findings with positive source evidence in every engine variant", async () => {
   const report = await readReport();
   const gate = JSON.parse(await readFile(
@@ -412,6 +466,8 @@ test("the gate carries only findings with positive source evidence in every engi
   assert.equal(gate.sourceReport, luaRegistrationSurfaceGenerator.artifacts[0]);
   assert.deepEqual(gate.engineTargets, ["defold-engine-box2d-v2", "defold-engine-box2d-v3"]);
   assert.ok(gate.findings.length > 0);
+  assert.equal(gate.findings.some((finding) => finding.route === "go.set_parent"), false,
+    "go.set_parent must not be narrowed after real-engine zero-argument evidence");
 
   const gatedKinds = new Set([
     "registered-under-a-different-name",

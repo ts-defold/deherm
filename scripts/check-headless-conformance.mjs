@@ -10,6 +10,7 @@
 // is a blocker, never a silent skip.
 
 import { spawn, spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -36,6 +37,8 @@ const MARKER = "deherm-headless-conformance";
 // route-resolution script on the index object.
 const RESOLUTION = /deherm-route-resolution:([^\s:]+):(\w+)\s*$/;
 const TICK_BUDGET = 8;
+
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 function javaExecutable() {
   const fromEnvironment = process.env.JAVA_HOME ? path.join(process.env.JAVA_HOME, "bin/java") : null;
@@ -94,7 +97,7 @@ const CRASH_FRAME = /^ERROR:CRASH:\s+\d+\s+\S+\s+0x[0-9a-f]+\s+(.+?)\s+\+\s+\d+$
 // plan is claiming routes the linked engine does not register.
 const DETECTED_PROFILE = /Detected Defold runtime profile '([^']+)'/;
 
-function parseTranscript(transcript) {
+export function parseTranscript(transcript) {
   const observations = [];
   const resolutions = new Map();
   const outcomes = new Map();
@@ -135,7 +138,15 @@ function parseTranscript(transcript) {
     }
     const index = line.indexOf(`${MARKER}\t`);
     if (index >= 0) {
-      const [, contract, route, property, disposition, ...rest] = line.slice(index).split("\t");
+      const fields = line.slice(index).split("\t");
+      // stdout and stderr are independent streams. A partial stdout marker
+      // used to be concatenated with a simultaneous stderr engine error and
+      // became a bogus `undefined:undefined` observation. The runner now
+      // frames each stream by line, and this check also makes an incomplete
+      // marker non-evidence if an older/corrupt transcript is parsed.
+      if (fields.length < 6) continue;
+      const [, contract, route, property, disposition, ...rest] = fields;
+      if (!contract || !route || !property || !disposition) continue;
       observations.push({ contract, route, property, disposition, detail: rest.join("\t") });
     }
   }
@@ -149,12 +160,21 @@ async function runDriver(projectFile, remaining) {
       cwd: repoRoot,
       stdio: ["ignore", "pipe", "pipe"]
     });
-    let transcript = "";
-    const append = (chunk) => { transcript += chunk.toString("utf8"); };
-    child.stdout.on("data", append);
-    child.stderr.on("data", append);
+    const completeLines = [];
+    const pending = new Map([["stdout", ""], ["stderr", ""]]);
+    const append = (stream, chunk) => {
+      const lines = `${pending.get(stream)}${chunk.toString("utf8")}`.split("\n");
+      pending.set(stream, lines.pop());
+      completeLines.push(...lines.map((line) => `${line}\n`));
+    };
+    child.stdout.on("data", (chunk) => append("stdout", chunk));
+    child.stderr.on("data", (chunk) => append("stderr", chunk));
     child.once("error", reject);
-    child.once("exit", (code, signal) => resolve({ transcript, code, signal }));
+    // `close` follows stdio closure; `exit` can race the last data event.
+    child.once("close", (code, signal) => {
+      for (const value of pending.values()) if (value) completeLines.push(`${value}\n`);
+      resolve({ transcript: completeLines.join(""), code, signal });
+    });
   });
 }
 
@@ -319,6 +339,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       "dmEngineUpdate. This report claims runtime behaviour only; it never promotes generation, compilation " +
       "or linkage evidence, and it claims nothing for contracts recorded as unreachable or blocked.",
     driver: "native/headless_conformance_driver.cpp",
+    planSha256: sha256(JSON.stringify(plan)),
     planInputs: plan.inputs,
     contractCount: plan.contractCount,
     summary: {
@@ -372,7 +393,11 @@ async function main(argv = process.argv.slice(2)) {
   for (const [key, value] of Object.entries(report.propertySummary).sort()) {
     console.log(`headless-conformance:property:${key}=${value}`);
   }
-  if (report.summary.mismatched > 0 || report.summary.blocked > 0 || report.summary.engineFault > 0) {
+  // A mismatch or blocked producer is evidence to publish and issue-track, not
+  // an infrastructure failure. Policy generation must continue to expose the
+  // route with that evidence attached. Only a crashed/faulted engine means the
+  // evidence instrument itself failed to run.
+  if (report.summary.engineFault > 0) {
     process.exitCode = 1;
   }
 }

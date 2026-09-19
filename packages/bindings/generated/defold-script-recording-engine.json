@@ -3,13 +3,13 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "1d43d7d842b40510860b3e03cde74c2b8a223ba04b9cc38ca446a55818f79c9b",
+  "planSha256": "f0a53c5b0041144bf540b3ae0680d229c929d6e6fb2bd11c7365dc635bf257f2",
   "planFallback": null,
   "inputHashes": {
-    "projection": "e29275aba314e5462a63a9888f267b4877b8bf8f60481d4233c74669378dbc7d",
-    "universal": "4009a87553f414393052183e65622a08cd3935a26dc0ec20a46275f300841d1a",
-    "handleLowering": "46873b8992b356d389917037a1486d463f3b025f9e0e77eb023cb9faeb20077b",
-    "loweringPlan": "196a8b1692a485de57e36c1bab7fc9431a0ae3b45f0942e495a3d4301ce288f9"
+    "projection": "7ab843d19f8099f3781777ebfbf55a7fa6332314ccf935a01dd83433cecf81bd",
+    "universal": "c127645fcc2d0b5e148b9ae890c89863b461c4c402657525afa79ad8cd0457f1",
+    "handleLowering": "79932ffd5e3149ed2a7618d410cf29078db762d8b459dbb65d1f3f9d0c50928a",
+    "loweringPlan": "5e06a2693ab6b8761e56c3e4e79123c59a9f1a1201fe5e32be18131dc6a7c7ca"
   },
   "planInputDrift": [],
   "transports": {
@@ -30485,7 +30485,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -30543,7 +30543,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -30657,7 +30657,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -30715,7 +30715,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -30773,7 +30773,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -30831,7 +30831,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -30889,7 +30889,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -30947,7 +30947,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -31005,7 +31005,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -31063,7 +31063,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "script-instance",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -31121,7 +31121,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "script-instance",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -31298,7 +31298,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 2,
         "driven": 2
       },
@@ -31355,7 +31355,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 2,
         "driven": 2
       },
@@ -31412,7 +31412,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 2,
         "driven": 2
       },
@@ -31469,7 +31469,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 2,
         "driven": 2
       },
@@ -31526,7 +31526,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 2,
         "driven": 2
       },
@@ -31583,7 +31583,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 2,
         "driven": 2
       },
@@ -31640,7 +31640,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 2,
+        "minimum": 1,
         "maximum": 2,
         "driven": 2
       },
@@ -31818,7 +31818,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -31876,7 +31876,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "captured-script-instance",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 2,
         "driven": 2
       },
@@ -31933,7 +31933,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 2,
         "driven": 2
       },
@@ -31990,7 +31990,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -32162,7 +32162,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "script-instance",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 2,
         "driven": 2
       },
@@ -33258,7 +33258,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -33316,7 +33316,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "captured-script-instance",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 2,
         "driven": 2
       },
@@ -33373,7 +33373,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 2,
         "driven": 2
       },
@@ -33430,7 +33430,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 1,
         "driven": 1
       },
@@ -34768,7 +34768,7 @@
       "loweringPlanEvidence": "canonical-plan",
       "context": "context-policy-unresolved",
       "arity": {
-        "minimum": 1,
+        "minimum": 0,
         "maximum": 3,
         "driven": 3
       },
@@ -57461,11 +57461,11 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "877fe3a191d5041e93377f849de63ed52a8c926718cac4da9eec93d142a55ddd",
+    "header": "79bddf4b43fdd0428d6b252d09bf0713144fb219f9b973f5816b549d2be6f10b",
     "tables": "df47c2547e5f4a3fa3822861b0aea9b4989641b8f00d1bfb2c46949656dd8775",
     "provider": "576c3fb87089a0b968abe465b809de407d0027a286dd165c783325f853c63171",
     "driver": "04230cea34fba2a1418c110364ee6f101525b393106b6a42f26e7ff2644c86e2",
     "driverJs": "5dc503db68fb631b0db31a39c7db5796a8c44491c655522194158426a2f48744",
-    "expectedTrace": "648b37c295fdfbabc5f6c0a75beff6e9d75eb776a552d1bde5dee5f3088a9139"
+    "expectedTrace": "c1164c7bf9219c6b519dc361e3819f1402f62466c383821d2b8d8b7b2e4ed966"
   }
 }

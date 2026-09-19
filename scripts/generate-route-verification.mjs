@@ -47,15 +47,22 @@
 //
 //   suspect     Our own evidence CONTRADICTS the documentation: the engine
 //               registers no such name, or we exercised it and a property did
-//               not hold. This is the only status that earns a mark and an
-//               issue, and there are a few dozen of them rather than hundreds.
+//               not hold.
 //
-// Where we did not execute a route, the reason is recorded as a note about our
+//   unproven    The ordinary generated exercise cannot be emitted because its
+//               parameter/result/variadic/capability shape is not modelled.
+//               This marks a missing generator/test capability, not an engine
+//               failure. Suspect and unproven routes both carry a deterministic
+//               annotation and issue lookup.
+//
+// Other reasons we did not execute a route are recorded as notes about our
 // harness - a missing fixture context, a route belonging to a runtime profile
-// this run did not exercise. That is a to-do list for us. It is not a caveat
-// on the route and it is not published as one.
+// this run did not exercise, or a runtime producer the fixture could not root.
+// Those are a to-do list for us. They are not caveats on the route and are not
+// published as one.
 
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { componentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
@@ -64,8 +71,10 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const generated = path.join(root, "packages", "bindings", "generated");
 const outputPath = path.join(generated, "defold-route-verification.json");
+const issueRepository = "ts-defold/deherm";
 
 const read = async (name) => JSON.parse(await readFile(path.join(generated, name), "utf8"));
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 /**
  * A route's runtime verdict across every property observed for it.
@@ -83,6 +92,54 @@ function routeVerdict(dispositions) {
   return dispositions[0] ?? null;
 }
 
+// A plan blocker is an `unproven` route only when it names a missing generator
+// or ordinary derived-test capability. Target/profile selection, destructive or
+// interactive effects, and a fixture this one harness does not own are evidence
+// gaps in the harness, not caveats on Defold's API.
+function isGeneratorVerificationGap(reason) {
+  const family = String(reason ?? "").split(":")[0];
+  return family === "unsynthesizable-parameter-type"
+    || family === "multi-result-shape-unmodelled"
+    || family === "variadic-argument-shape-unmodelled"
+    || family === "lua-stack-blocked-capability";
+}
+
+function issueMetadata(row, defoldRevision) {
+  // Keep the title stable across Defold revisions. The body carries the exact
+  // revision and is updated in place by the nightly; putting the revision in
+  // the identity would open a fresh copy of every unresolved route each time a
+  // channel advanced.
+  const title = `route verification: ${row.luaName} is ${row.status}`;
+  const query = new URLSearchParams({ q: `is:issue in:title \"${title}\"` });
+  const evidence = row.status === "suspect"
+    ? row.mismatch ?? row.registration
+    : row.notExecutedHere;
+  return {
+    key: `${row.id}:${row.status}`,
+    title,
+    url: `https://github.com/${issueRepository}/issues?${query}`,
+    body: [
+      `Automated route verification marks \`${row.luaName}\` as **${row.status}** for Defold \`${defoldRevision}\`.`,
+      "",
+      `Evidence: \`${evidence}\``,
+      "",
+      `Route: \`${row.id}\``,
+      `Registration: \`${row.registration}\``,
+      "",
+      "This issue is generated from `packages/bindings/generated/defold-route-verification.json`. " +
+        "Repeated policy runs update this issue instead of opening a duplicate."
+    ].join("\n")
+  };
+}
+
+export function runtimeEvidenceMatchesPlan(report, plan, defoldRevision) {
+  return report.defoldRevision === defoldRevision
+    && report.target === plan.target
+    && report.runtimeProfile === plan.runtimeProfile
+    && report.planSha256 === sha256(JSON.stringify(plan))
+    && JSON.stringify(report.planInputs ?? null) === JSON.stringify(plan.inputs ?? null);
+}
+
 async function main() {
   const check = process.argv.includes("--check");
   const [ir, report, plan, registration] = await Promise.all([
@@ -91,19 +148,36 @@ async function main() {
     read("defold-headless-conformance-plan.json"),
     read("defold-lua-registration-surface.json")
   ]);
+  const runtimeEvidenceCurrent = runtimeEvidenceMatchesPlan(report, plan, ir.defoldRevision);
+  // Never promote a runtime observation across the plan/input boundary that
+  // produced it. A generator correction may invalidate only the exercise
+  // contract while leaving the old report on disk; treating that report as
+  // current is how the former go.set_parent false positive survived its own
+  // zero-argument runtime observation.
+  const runtimeContracts = runtimeEvidenceCurrent ? report.contracts ?? [] : [];
 
   // Runtime evidence: what the engine actually did, per route.
   const observedByRoute = new Map();
-  for (const contract of report.contracts ?? []) {
+  for (const contract of runtimeContracts) {
     for (const property of contract.properties ?? []) {
       const id = String(property.route).split("#")[0];
       observedByRoute.set(id, [...(observedByRoute.get(id) ?? []), property.disposition]);
     }
   }
   const runtime = new Map([...observedByRoute].map(([id, list]) => [id, routeVerdict(list)]));
+  const runtimeBlocker = new Map();
+  for (const contract of runtimeContracts) {
+    for (const property of contract.properties ?? []) {
+      if (!String(property.disposition).startsWith("blocked")) continue;
+      const id = String(property.route).split("#")[0];
+      if (!runtimeBlocker.has(id)) {
+        runtimeBlocker.set(id, `runtime-${property.disposition}:${property.detail ?? "no detail"}`);
+      }
+    }
+  }
   // What a mismatched route actually disagreed about, so the issue says so.
   const mismatchDetail = new Map();
-  for (const contract of report.contracts ?? []) {
+  for (const contract of runtimeContracts) {
     for (const property of contract.properties ?? []) {
       if (!String(property.disposition).includes("mismatch")) continue;
       const id = String(property.route).split("#")[0];
@@ -123,7 +197,8 @@ async function main() {
 
   // Arity evidence. The registration parse compares each route's documented
   // parameter list against what its C implementation actually reads, and
-  // records a verdict. 304 of 1660 route rows disagree, and nothing read it.
+  // records a verdict. Hundreds of target-specific route rows disagree, and
+  // before this report nothing consumed that evidence.
   // This is a REPORT, not a verdict on the route: the parser infers a minimum
   // from `luaL_check*` accessors and is conservative where the engine treats an
   // absent argument as a default - `go.set_parent()` with no arguments is valid
@@ -234,15 +309,19 @@ async function main() {
       || registered === "commented-out-upstream"
       || registered === "documented-name-mismatch"
       || disposition === "mismatched";
-    const status = contradicted ? "suspect" : disposition === "observed" ? "executed" : "supported";
-    return {
+    const notExecutedHere = runtimeBlocker.get(fn.id) ?? untestedReason.get(fn.id) ?? "not-in-conformance-plan";
+    const status = contradicted ? "suspect"
+      : disposition === "observed" ? "executed"
+      : isGeneratorVerificationGap(notExecutedHere) ? "unproven"
+      : "supported";
+    const row = {
       id: fn.id,
       luaName,
       status,
       ...(disposition ? { disposition } : {}),
       // A note about OUR harness, for our own queue - never published as a
       // caveat on the route.
-      ...(status === "supported" ? { notExecutedHere: untestedReason.get(fn.id) ?? "not-in-conformance-plan" } : {}),
+      ...(status === "supported" || status === "unproven" ? { notExecutedHere } : {}),
       ...(mismatchDetail.has(fn.id) ? { mismatch: mismatchDetail.get(fn.id) } : {}),
       ...(arityDisagreement.has(luaName) ? { arityDisagreement: arityDisagreement.get(luaName) } : {}),
       registration: registered,
@@ -255,6 +334,13 @@ async function main() {
       ...(registeredUnder.has(luaName) ? { registeredAs: registeredUnder.get(luaName) } : {}),
       source: fn.source
     };
+    if (status === "suspect" || status === "unproven") {
+      row.annotation = status === "suspect"
+        ? `@suspect ${row.mismatch ?? row.registration}`
+        : `@unverified ${row.notExecutedHere}`;
+      row.issue = issueMetadata(row, ir.defoldRevision);
+    }
+    return row;
   }).sort((left, right) => left.id < right.id ? -1 : 1);
 
   const tally = (select) => {
@@ -263,10 +349,9 @@ async function main() {
     return Object.fromEntries(Object.entries(counts).sort(([a], [b]) => a < b ? -1 : 1));
   };
 
-  // What wants an issue: exactly the suspects. A route we simply have not run
-  // here is not a defect and an issue saying so would be noise in someone
-  // else's tracker.
-  const wantsIssue = rows.filter((row) => row.status === "suspect");
+  // Actual contradictions and generator/test-shape gaps want issues. Ordinary
+  // fixture/profile gaps remain harness notes and deliberately do not.
+  const wantsIssue = rows.filter((row) => row.status === "suspect" || row.status === "unproven");
 
   const artifact = {
     schemaVersion: 1,
@@ -274,6 +359,8 @@ async function main() {
     defoldRevision: ir.defoldRevision,
     evidence: {
       runtime: report.evidenceBoundary ?? null,
+      runtimeCurrent: runtimeEvidenceCurrent,
+      ...(!runtimeEvidenceCurrent ? { runtimeNotApplied: "report revision/plan digest/inputs/target/profile do not match the current generated plan" } : {}),
       runtimeTarget: report.target ?? null,
       runtimeProfile: report.runtimeProfile ?? null,
       registrationTargets: Object.values(registration.targets ?? {}).map((target) => target.id)
@@ -292,9 +379,10 @@ async function main() {
       return Object.fromEntries(Object.entries(counts).sort(([, a], [, b]) => b - a));
     })(),
     arityDisagreementCount: rows.filter(({ arityDisagreement: value }) => value).length,
-    wantsIssue: wantsIssue.map(({ id, luaName, status, disposition, mismatch, registration, declaredAt }) =>
+    wantsIssue: wantsIssue.map(({ id, luaName, status, disposition, mismatch, notExecutedHere, registration, declaredAt, annotation, issue }) =>
       ({ id, luaName, status, ...(disposition ? { disposition } : {}), ...(mismatch ? { mismatch } : {}),
-         registration, ...(declaredAt ? { declaredAt } : {}) })),
+         ...(notExecutedHere ? { notExecutedHere } : {}), registration, ...(declaredAt ? { declaredAt } : {}),
+         annotation, issue })),
     routes: rows
   };
 
@@ -318,7 +406,7 @@ async function main() {
   }
   console.log(`  ${artifact.arityDisagreementCount} route(s) where the documented arity and the parsed C implementation disagree (reported, not a verdict)`);
   if (wantsIssue.length) {
-    console.log(`  ${wantsIssue.length} suspect - our evidence contradicts the documentation, and these want an issue:`);
+    console.log(`  ${wantsIssue.length} suspect/unproven route(s) want an issue:`);
     for (const row of wantsIssue.slice(0, 25)) {
       console.log(`    ${row.luaName} - ${row.status}${row.disposition ? ` (${row.disposition})` : ""}, ${row.registration}${row.declaredAt ? ` at ${row.declaredAt}` : ""}`);
     }
@@ -326,4 +414,4 @@ async function main() {
   }
 }
 
-await main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) await main();

@@ -6,7 +6,7 @@ import test from "node:test";
 import {
   FIXTURE_PROFILES,
   HEADLESS_RUNTIME_PROFILE,
-  MAX_EXERCISES_PER_CONTRACT,
+  MAX_OPTIONAL_EXERCISES_PER_CONTRACT,
   SUPPLIED_CONTEXTS,
   UNSUPPLIED_CONTEXTS,
   buildHandleAlgebra,
@@ -51,7 +51,13 @@ test("a contract without a fixture fails closed with machine-readable blockers",
       continue;
     }
     assert.ok(contract.exercises.length > 0, contract.id);
-    assert.ok(contract.exercises.length <= MAX_EXERCISES_PER_CONTRACT, contract.id);
+    const requiredRouteIds = new Set(contract.exercises
+      .filter((exercise) => exercise.arity === "required")
+      .map((exercise) => exercise.routeId));
+    const optionalExerciseCount = contract.exercises
+      .filter((exercise) => exercise.arity !== "required" && requiredRouteIds.has(exercise.routeId))
+      .length;
+    assert.ok(optionalExerciseCount <= MAX_OPTIONAL_EXERCISES_PER_CONTRACT, contract.id);
     assert.ok(FIXTURE_PROFILES.some((profile) => profile.id === contract.profile), contract.id);
     // A destructive route is admitted only as a last resort, and then alone.
     if (contract.exercises.some((exercise) => exercise.destructive)) {
@@ -213,6 +219,30 @@ test("route classification rejects an unsupplied context and an unsynthesizable 
   });
   assert.equal(destructive.eligible, false);
   assert.equal(destructive.reason, "execution-policy-destructive");
+});
+
+test("dedicated and compile-time bindings are not reported as missing adapters", () => {
+  const irFunction = { modulePath: ["test"], jsName: "route", member: "route", parameters: [] };
+  const conformanceCase = { execution: { policy: "safe" }, requiredContexts: ["engine"] };
+  const baseUnit = {
+    identity: { surface: "script", id: "script:test.route", stableId: 1 },
+    abi: { state: "planned" },
+    backends: { luaStack: { selection: "separate-module" } }
+  };
+  assert.equal(classifyRoute({
+    unit: baseUnit,
+    irFunction,
+    universalBinding: null,
+    scalarBinding: null,
+    conformanceCase
+  }).reason, "separate-module-adapter");
+  assert.equal(classifyRoute({
+    unit: { ...baseUnit, abi: { state: "compile-time-intrinsic" } },
+    irFunction,
+    universalBinding: null,
+    scalarBinding: null,
+    conformanceCase
+  }).reason, "compile-time-intrinsic");
 });
 
 test("the generated harness emits one collection, game object and script per reachable contract", () => {

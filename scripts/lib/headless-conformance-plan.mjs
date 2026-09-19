@@ -457,7 +457,20 @@ export function classifyRoute({
   admitDestructive = false
 }) {
   if (!irFunction) return { eligible: false, reason: "absent-from-script-projection" };
-  if (!universalBinding) return { eligible: false, reason: "no-generated-universal-adapter" };
+  if (!universalBinding) {
+    // These routes deliberately do not belong to the universal runtime table.
+    // Component properties are compiler intrinsics, while the timer family has
+    // a dedicated callback-aware bridge on every backend. Calling either case
+    // "no generated adapter" made a successfully generated implementation
+    // look like a product hole in the policy summary.
+    if (unit.abi?.state === "compile-time-intrinsic") {
+      return { eligible: false, reason: "compile-time-intrinsic" };
+    }
+    if (unit.backends.luaStack.selection === "separate-module") {
+      return { eligible: false, reason: "separate-module-adapter" };
+    }
+    return { eligible: false, reason: "no-generated-universal-adapter" };
+  }
   if (unit.backends.luaStack.selection !== "emit") {
     return { eligible: false, reason: `lua-stack-${unit.backends.luaStack.selection}` };
   }

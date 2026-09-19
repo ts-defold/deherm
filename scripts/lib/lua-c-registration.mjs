@@ -920,8 +920,20 @@ export function collectBodyDerivedHelpers(project, declared, userTypes) {
       // macro invocation is local to the file that wrote the invocation, and
       // its offsets do not index the file text, so its storage class cannot be
       // read from around it either.
+      // C++ may overload a public helper at the same arity with a non-stack
+      // parameter in the same position. `dmScript::ResolveURL` is the concrete
+      // engine example: `(lua_State*, int index, ...)` accepts an absent slot,
+      // while `(lua_State*, const char* url, ...)` has the same total arity but
+      // addresses no Lua argument. Counting the latter as another stack helper
+      // incorrectly made the body-derived `presence` contract file-local, so a
+      // caller in another translation unit fell back to the declaration-name
+      // heuristic (`Resolve*` => required). Count only overloads that can
+      // actually describe a stack slot when deciding that equal spellings need
+      // file scope.
       const sameArity = definitions.filter((item) =>
-        splitArguments(item.signature).length === arity).length;
+        splitArguments(item.signature).length === arity &&
+        /^\s*(?:const\s+)?(?:struct\s+)?lua_State\s*\*/.test(item.signature) &&
+        integerParameters(item.signature).length > 0).length;
       candidates.push({
         name,
         definition,

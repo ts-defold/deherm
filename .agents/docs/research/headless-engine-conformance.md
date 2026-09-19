@@ -255,10 +255,17 @@ Defold `7f0f554`, arm64 macOS, headless, runtime profile
 | blocked | 3 |
 | unreachable | 45 |
 
-171 routes were exercised across 40 fixtures in 189 exercises, producing 123
-`result-arity:observed`, 59 `result-arity:observed-as-target-exception`, 179
-`scratch-reuse:observed`, 168 `error-model:observed` and 157
-`handle-provenance:observed`. A refused synthesized argument is recorded as
+476 routes were selected across 40 reachable contracts in 522 exercises,
+producing 310 `result-arity:observed`, 203
+`result-arity:observed-as-target-exception`, 510 `scratch-reuse:observed`, 436
+`error-model:observed` and 314 `handle-provenance:observed`. A prior raw-stream
+merge had also produced one bogus `undefined:undefined` summary row by joining
+a partial stdout evidence marker to a simultaneous stderr engine error; the
+runner now frames each stream by complete line and the parser rejects incomplete
+markers. The per-route
+verification report promotes 467 unique routes to `executed`; eight routes
+remain supported with an explicit runtime producer blocker, and the three
+source-backed registration contradictions stay `suspect`. A refused synthesized argument is recorded as
 `observed-as-target-exception`, not as a mismatch: it is evidence the declared
 error model holds, not evidence about the route's semantics.
 
@@ -268,7 +275,9 @@ exercised, 82 `result-arity:observed` and 90 `handle-provenance:observed`.
 The three blocked contracts are honest runtime blockers, not skips: `buffer-data`
 has no producer the harness can feed a real resource path to
 (`resource.get_buffer` needs a compiled `.bufferc`), and `buffer-stream` depends
-on it.
+on it. Their per-route records retain the concrete
+`runtime-blocked-producer-*` disposition instead of falling back to the false
+`not-in-conformance-plan` label.
 
 # Findings only a real engine produced
 

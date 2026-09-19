@@ -10,36 +10,36 @@
   "evidenceStage": "runtime",
   "evidenceBoundary": "Observed contracts executed inside a real headless Defold engine driven one tick at a time through dmEngineUpdate. This report claims runtime behaviour only; it never promotes generation, compilation or linkage evidence, and it claims nothing for contracts recorded as unreachable or blocked.",
   "driver": "native/headless_conformance_driver.cpp",
+  "planSha256": "8936db41af5e2ed7ef17ec6afca1bb1e2bd309dadb6900f7be9c9997aaed95cf",
   "planInputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "22fd16f548bab1af288ff122530c118fefcc0b3c22389bf510d730ffa9268826",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "5e06a2693ab6b8761e56c3e4e79123c59a9f1a1201fe5e32be18131dc6a7c7ca",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "0743694ea58297d11782b7b95e44ad1538168c7e5bea6d0480892f8581a315eb",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "c127645fcc2d0b5e148b9ae890c89863b461c4c402657525afa79ad8cd0457f1",
     "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
     "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "0cd7365088e2c06d07586b7b4aa410377ec301489beaeed34ce75971dffe878d",
     "packages/bindings/generated/defold-script-route-availability-profiles.json": "fa1ea62ab616113e8fb723db0d7fb7677ec58eb640861d7f57446b0d66ea9be9",
-    "packages/bindings/generated/defold-script-handle-lowering.json": "830c7d6a1b86cc263ad7b30a2cbbd192a5e6a21f16ce9798beac95b6d49ef05f",
-    "packages/bindings/generated/defold-value-layouts.json": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
-    "packages/bindings/generated/defold-script-projection-ir.json": "fc000bce9020f24d82c46e8520f87950107a214343c6676cdae2fedddb83b67c"
+    "packages/bindings/generated/defold-script-handle-lowering.json": "79932ffd5e3149ed2a7618d410cf29078db762d8b459dbb65d1f3f9d0c50928a",
+    "packages/bindings/generated/defold-value-layouts.json": "1af3bd85aafa17ba19e3faf53b63f846510aec26e4432d556e791aa94e4afde3",
+    "packages/bindings/generated/defold-script-projection-ir.json": "7ab843d19f8099f3781777ebfbf55a7fa6332314ccf935a01dd83433cecf81bd"
   },
   "contractCount": 85,
   "summary": {
-    "observed": 36,
-    "mismatched": 1,
+    "observed": 37,
+    "mismatched": 0,
     "engineFault": 0,
     "blocked": 3,
     "unreachable": 45
   },
   "propertySummary": {
     "handle-provenance:observed": 314,
-    "result-arity:observed": 309,
-    "scratch-reuse:observed": 506,
-    "error-model:observed": 456,
-    "result-arity:observed-as-target-exception": 200,
+    "result-arity:observed": 310,
+    "scratch-reuse:observed": 510,
+    "error-model:observed": 436,
+    "result-arity:observed-as-target-exception": 203,
     "handle-provenance:blocked-producer-raised": 8,
     "scratch-reuse:not-applicable": 3,
     "error-model:observed-raise-only": 3,
-    "error-model:not-applicable": 48,
-    "error-model:mismatched": 1,
+    "error-model:not-applicable": 74,
     "handle-provenance:blocked-producer-absent": 1
   },
   "routeResolution": {},
@@ -4702,16 +4702,16 @@
       "contractIndex": 161,
       "routeCount": 308,
       "exercisedRouteCount": 190,
-      "outcome": "mismatched",
+      "outcome": "observed",
       "engine": {
         "disposition": "exited",
-        "exitCode": 1,
+        "exitCode": 0,
         "ticks": 3
       },
       "profile": "engine",
-      "observedPropertyCount": 563,
+      "observedPropertyCount": 564,
       "blockedPropertyCount": 2,
-      "mismatchedPropertyCount": 1,
+      "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0161",
@@ -4907,7 +4907,7 @@
           "route": "script:camera.get_aspect_ratio#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -4920,15 +4920,15 @@
           "contract": "contract_0161",
           "route": "script:camera.get_aspect_ratio#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:camera.get_auto_aspect_ratio#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -4941,8 +4941,8 @@
           "contract": "contract_0161",
           "route": "script:camera.get_auto_aspect_ratio#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
@@ -4970,7 +4970,7 @@
           "route": "script:camera.get_enabled#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -4983,15 +4983,15 @@
           "contract": "contract_0161",
           "route": "script:camera.get_enabled#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:camera.get_far_z#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5004,15 +5004,15 @@
           "contract": "contract_0161",
           "route": "script:camera.get_far_z#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:camera.get_fov#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5025,15 +5025,15 @@
           "contract": "contract_0161",
           "route": "script:camera.get_fov#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:camera.get_near_z#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5046,15 +5046,15 @@
           "contract": "contract_0161",
           "route": "script:camera.get_near_z#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:camera.get_orthographic_auto_zoom#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5067,15 +5067,15 @@
           "contract": "contract_0161",
           "route": "script:camera.get_orthographic_auto_zoom#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:camera.get_orthographic_mode#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5088,15 +5088,15 @@
           "contract": "contract_0161",
           "route": "script:camera.get_orthographic_mode#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:camera.get_orthographic_zoom#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5109,8 +5109,8 @@
           "contract": "contract_0161",
           "route": "script:camera.get_orthographic_zoom#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
@@ -5159,7 +5159,7 @@
           "route": "script:camera.set_aspect_ratio#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5180,7 +5180,7 @@
           "route": "script:camera.set_auto_aspect_ratio#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5201,7 +5201,7 @@
           "route": "script:camera.set_far_z#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5222,7 +5222,7 @@
           "route": "script:camera.set_fov#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5243,7 +5243,7 @@
           "route": "script:camera.set_near_z#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5264,7 +5264,7 @@
           "route": "script:camera.set_orthographic_zoom#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0161:/probe#deherm' not found."
         },
         {
           "contract": "contract_0161",
@@ -5327,7 +5327,7 @@
           "route": "script:collectionfactory.get_status#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Component expected to be of type 'collectionfactoryc' but was 'scriptc'"
         },
         {
           "contract": "contract_0161",
@@ -5340,15 +5340,15 @@
           "contract": "contract_0161",
           "route": "script:collectionfactory.get_status#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:collectionfactory.set_prototype#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Component expected to be of type 'collectionfactoryc' but was 'scriptc'"
         },
         {
           "contract": "contract_0161",
@@ -5361,15 +5361,15 @@
           "contract": "contract_0161",
           "route": "script:collectionfactory.set_prototype#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:collectionfactory.unload#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Component expected to be of type 'collectionfactoryc' but was 'scriptc'"
         },
         {
           "contract": "contract_0161",
@@ -5382,8 +5382,8 @@
           "contract": "contract_0161",
           "route": "script:collectionfactory.unload#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
@@ -5537,7 +5537,7 @@
           "route": "script:factory.get_status#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Component expected to be of type 'factoryc' but was 'scriptc'"
         },
         {
           "contract": "contract_0161",
@@ -5550,15 +5550,15 @@
           "contract": "contract_0161",
           "route": "script:factory.get_status#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:factory.set_prototype#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Component expected to be of type 'factoryc' but was 'scriptc'"
         },
         {
           "contract": "contract_0161",
@@ -5571,15 +5571,15 @@
           "contract": "contract_0161",
           "route": "script:factory.set_prototype#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
           "route": "script:factory.unload#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Component expected to be of type 'factoryc' but was 'scriptc'"
         },
         {
           "contract": "contract_0161",
@@ -5592,8 +5592,8 @@
           "contract": "contract_0161",
           "route": "script:factory.unload#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
@@ -5858,8 +5858,8 @@
           "contract": "contract_0161",
           "route": "script:go.set_parent#required",
           "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Could not find any instance with id '<unknown:1283857951929530042>'."
+          "disposition": "observed",
+          "detail": "undefined"
         },
         {
           "contract": "contract_0161",
@@ -5872,8 +5872,8 @@
           "contract": "contract_0161",
           "route": "script:go.set_parent#required",
           "property": "error-model",
-          "disposition": "mismatched",
-          "detail": "under-supplied call did not raise"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0161",
@@ -7494,6 +7494,13 @@
         },
         {
           "contract": "contract_0161",
+          "route": "script:sys.load#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0161",
           "route": "script:sys.set_connectivity_host#required",
           "property": "result-arity",
           "disposition": "observed",
@@ -8355,6 +8362,195 @@
         },
         {
           "contract": "contract_0161",
+          "route": "script:camera.get_aspect_ratio#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_aspect_ratio#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_aspect_ratio#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_auto_aspect_ratio#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_auto_aspect_ratio#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_auto_aspect_ratio#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_enabled#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_enabled#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_enabled#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_far_z#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_far_z#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_far_z#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_fov#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_fov#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_fov#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_near_z#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_near_z#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_near_z#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_auto_zoom#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_auto_zoom#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_auto_zoom#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_mode#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_mode#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_mode#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_zoom#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_zoom#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:camera.get_orthographic_zoom#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0161",
           "route": "script:camera.screen_to_world#required-and-optional",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
@@ -8397,276 +8593,87 @@
         },
         {
           "contract": "contract_0161",
-          "route": "script:camera.world_to_screen#required-and-optional",
+          "route": "script:camera.set_aspect_ratio#required-and-optional",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "Invalid handle."
         },
         {
           "contract": "contract_0161",
-          "route": "script:camera.world_to_screen#required-and-optional",
+          "route": "script:camera.set_aspect_ratio#required-and-optional",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0161",
-          "route": "script:camera.world_to_screen#required-and-optional",
+          "route": "script:camera.set_aspect_ratio#required-and-optional",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0161",
-          "route": "script:collectionfactory.create#required-and-optional",
+          "route": "script:camera.set_auto_aspect_ratio#required-and-optional",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Invalid handle."
         },
         {
           "contract": "contract_0161",
-          "route": "script:collectionfactory.create#required-and-optional",
+          "route": "script:camera.set_auto_aspect_ratio#required-and-optional",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0161",
-          "route": "script:collectionfactory.create#required-and-optional",
+          "route": "script:camera.set_auto_aspect_ratio#required-and-optional",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0161",
-          "route": "script:collectionfactory.set_prototype#required-and-optional",
+          "route": "script:camera.set_far_z#required-and-optional",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Invalid handle."
         },
         {
           "contract": "contract_0161",
-          "route": "script:collectionfactory.set_prototype#required-and-optional",
+          "route": "script:camera.set_far_z#required-and-optional",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0161",
-          "route": "script:collectionfactory.set_prototype#required-and-optional",
+          "route": "script:camera.set_far_z#required-and-optional",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0161",
-          "route": "script:factory.set_prototype#required-and-optional",
+          "route": "script:camera.set_fov#required-and-optional",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "detail": "Invalid handle."
         },
         {
           "contract": "contract_0161",
-          "route": "script:factory.set_prototype#required-and-optional",
+          "route": "script:camera.set_fov#required-and-optional",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0161",
-          "route": "script:factory.set_prototype#required-and-optional",
+          "route": "script:camera.set_fov#required-and-optional",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.cancel_animations#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Could not find any instance with id '<unknown:1283857951929530042>'."
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.cancel_animations#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.cancel_animations#required-and-optional",
-          "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Could not find any instance with id '<unknown:1283857951929530042>'."
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get#required-and-optional",
-          "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_parent#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_parent#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_parent#required-and-optional",
-          "property": "error-model",
-          "disposition": "not-applicable",
-          "detail": "route has no required argument to withhold"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_position#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_position#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_position#required-and-optional",
-          "property": "error-model",
-          "disposition": "not-applicable",
-          "detail": "route has no required argument to withhold"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_rotation#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_rotation#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_rotation#required-and-optional",
-          "property": "error-model",
-          "disposition": "not-applicable",
-          "detail": "route has no required argument to withhold"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_scale#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_scale#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_scale#required-and-optional",
-          "property": "error-model",
-          "disposition": "not-applicable",
-          "detail": "route has no required argument to withhold"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_scale_uniform#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_scale_uniform#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_scale_uniform#required-and-optional",
-          "property": "error-model",
-          "disposition": "not-applicable",
-          "detail": "route has no required argument to withhold"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_world_position#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_world_position#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_world_position#required-and-optional",
-          "property": "error-model",
-          "disposition": "not-applicable",
-          "detail": "route has no required argument to withhold"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_world_rotation#required-and-optional",
-          "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_world_rotation#required-and-optional",
-          "property": "scratch-reuse",
-          "disposition": "observed",
-          "detail": "64 repetitions"
-        },
-        {
-          "contract": "contract_0161",
-          "route": "script:go.get_world_rotation#required-and-optional",
-          "property": "error-model",
-          "disposition": "not-applicable",
-          "detail": "route has no required argument to withhold"
         }
       ]
     },
@@ -13302,7 +13309,7 @@
       "id": "contract_0181",
       "contractIndex": 181,
       "routeCount": 17,
-      "exercisedRouteCount": 14,
+      "exercisedRouteCount": 16,
       "outcome": "observed",
       "engine": {
         "disposition": "exited",
@@ -13310,7 +13317,7 @@
         "ticks": 3
       },
       "profile": "engine",
-      "observedPropertyCount": 42,
+      "observedPropertyCount": 48,
       "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
@@ -13319,7 +13326,7 @@
           "route": "script:camera.get_projection#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0181:/probe#deherm' not found."
         },
         {
           "contract": "contract_0181",
@@ -13332,15 +13339,15 @@
           "contract": "contract_0181",
           "route": "script:camera.get_projection#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0181",
           "route": "script:camera.get_view#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Invalid handle."
+          "detail": "Camera 'contract_0181:/probe#deherm' not found."
         },
         {
           "contract": "contract_0181",
@@ -13353,8 +13360,8 @@
           "contract": "contract_0181",
           "route": "script:camera.get_view#required",
           "property": "error-model",
-          "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0181",
@@ -13568,6 +13575,48 @@
         },
         {
           "contract": "contract_0181",
+          "route": "script:camera.get_projection#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0181",
+          "route": "script:camera.get_projection#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0181",
+          "route": "script:camera.get_projection#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0181",
+          "route": "script:camera.get_view#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0181",
+          "route": "script:camera.get_view#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0181",
+          "route": "script:camera.get_view#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0181",
           "route": "script:go.get_id#required-and-optional",
           "property": "result-arity",
           "disposition": "observed",
@@ -13614,7 +13663,7 @@
       "id": "contract_0182",
       "contractIndex": 182,
       "routeCount": 1,
-      "exercisedRouteCount": 1,
+      "exercisedRouteCount": 2,
       "outcome": "observed",
       "engine": {
         "disposition": "exited",
@@ -13622,7 +13671,7 @@
         "ticks": 3
       },
       "profile": "engine",
-      "observedPropertyCount": 3,
+      "observedPropertyCount": 6,
       "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
@@ -13644,8 +13693,29 @@
           "contract": "contract_0182",
           "route": "script:collectionfactory.load#required",
           "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0182",
+          "route": "script:collectionfactory.load#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Argument #2 is expected to be completion function."
+        },
+        {
+          "contract": "contract_0182",
+          "route": "script:collectionfactory.load#required-and-optional",
+          "property": "scratch-reuse",
           "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0182",
+          "route": "script:collectionfactory.load#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         }
       ]
     },
@@ -13748,7 +13818,7 @@
       "id": "contract_0186",
       "contractIndex": 186,
       "routeCount": 1,
-      "exercisedRouteCount": 1,
+      "exercisedRouteCount": 2,
       "outcome": "observed",
       "engine": {
         "disposition": "exited",
@@ -13756,7 +13826,7 @@
         "ticks": 3
       },
       "profile": "engine",
-      "observedPropertyCount": 3,
+      "observedPropertyCount": 6,
       "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
@@ -13778,8 +13848,29 @@
           "contract": "contract_0186",
           "route": "script:factory.load#required",
           "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0186",
+          "route": "script:factory.load#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Argument #2 is expected to be completion function."
+        },
+        {
+          "contract": "contract_0186",
+          "route": "script:factory.load#required-and-optional",
+          "property": "scratch-reuse",
           "disposition": "observed",
-          "detail": "raised and boundary remained usable"
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0186",
+          "route": "script:factory.load#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         }
       ]
     },
@@ -13822,7 +13913,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "no-generated-universal-adapter",
+          "reason": "compile-time-intrinsic",
           "routeCount": 1,
           "exampleRouteId": "script:go.property",
           "routeIds": [
@@ -14407,7 +14498,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "no-generated-universal-adapter",
+          "reason": "compile-time-intrinsic",
           "routeCount": 7,
           "exampleRouteId": "script:resource.atlas",
           "routeIds": [
@@ -14593,7 +14684,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "no-generated-universal-adapter",
+          "reason": "separate-module-adapter",
           "routeCount": 1,
           "exampleRouteId": "script:timer.delay",
           "routeIds": [

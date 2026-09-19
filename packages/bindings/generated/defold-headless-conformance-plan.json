@@ -596,21 +596,21 @@
     "physics-3d"
   ],
   "inputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "22fd16f548bab1af288ff122530c118fefcc0b3c22389bf510d730ffa9268826",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "5e06a2693ab6b8761e56c3e4e79123c59a9f1a1201fe5e32be18131dc6a7c7ca",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "0743694ea58297d11782b7b95e44ad1538168c7e5bea6d0480892f8581a315eb",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "c127645fcc2d0b5e148b9ae890c89863b461c4c402657525afa79ad8cd0457f1",
     "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
     "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "0cd7365088e2c06d07586b7b4aa410377ec301489beaeed34ce75971dffe878d",
     "packages/bindings/generated/defold-script-route-availability-profiles.json": "fa1ea62ab616113e8fb723db0d7fb7677ec58eb640861d7f57446b0d66ea9be9",
-    "packages/bindings/generated/defold-script-handle-lowering.json": "830c7d6a1b86cc263ad7b30a2cbbd192a5e6a21f16ce9798beac95b6d49ef05f",
-    "packages/bindings/generated/defold-value-layouts.json": "061dcf38f5756f5fdf4ae2677d404d63c3470afbbce06f0ddc7c5b4b5a410d14",
-    "packages/bindings/generated/defold-script-projection-ir.json": "fc000bce9020f24d82c46e8520f87950107a214343c6676cdae2fedddb83b67c"
+    "packages/bindings/generated/defold-script-handle-lowering.json": "79932ffd5e3149ed2a7618d410cf29078db762d8b459dbb65d1f3f9d0c50928a",
+    "packages/bindings/generated/defold-value-layouts.json": "1af3bd85aafa17ba19e3faf53b63f846510aec26e4432d556e791aa94e4afde3",
+    "packages/bindings/generated/defold-script-projection-ir.json": "7ab843d19f8099f3781777ebfbf55a7fa6332314ccf935a01dd83433cecf81bd"
   },
   "contractCount": 85,
   "reachableContractCount": 40,
   "unreachableContractCount": 45,
   "exercisedRouteCount": 476,
-  "exerciseCount": 518,
+  "exerciseCount": 522,
   "eligibleRouteCount": 476,
   "documentedRouteNames": [
     "b2d.body.apply_angular_impulse",
@@ -1567,9 +1567,9 @@
       "routeCount": 22
     },
     {
-      "family": "no-generated-universal-adapter",
-      "contractCount": 3,
-      "routeCount": 9
+      "family": "compile-time-intrinsic",
+      "contractCount": 2,
+      "routeCount": 8
     },
     {
       "family": "execution-policy-context-blocked",
@@ -1580,6 +1580,11 @@
       "family": "lua-stack-blocked-capability",
       "contractCount": 1,
       "routeCount": 2
+    },
+    {
+      "family": "separate-module-adapter",
+      "contractCount": 1,
+      "routeCount": 1
     }
   ],
   "contracts": [
@@ -7259,7 +7264,7 @@
           ]
         },
         {
-          "reason": "no-generated-universal-adapter",
+          "reason": "separate-module-adapter",
           "routeCount": 2,
           "exampleRouteId": "script:timer.cancel",
           "routeIds": [
@@ -7690,7 +7695,7 @@
             "camera",
             "getAspectRatio"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7700,12 +7705,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_auto_aspect_ratio",
@@ -7714,7 +7714,7 @@
             "camera",
             "getAutoAspectRatio"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7724,12 +7724,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_cameras",
@@ -7757,7 +7752,7 @@
             "camera",
             "getEnabled"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7767,12 +7762,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_far_z",
@@ -7781,7 +7771,7 @@
             "camera",
             "getFarZ"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7791,12 +7781,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_fov",
@@ -7805,7 +7790,7 @@
             "camera",
             "getFov"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7815,12 +7800,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_near_z",
@@ -7829,7 +7809,7 @@
             "camera",
             "getNearZ"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7839,12 +7819,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_orthographic_auto_zoom",
@@ -7853,7 +7828,7 @@
             "camera",
             "getOrthographicAutoZoom"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7863,12 +7838,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_orthographic_mode",
@@ -7877,7 +7847,7 @@
             "camera",
             "getOrthographicMode"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7887,12 +7857,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_orthographic_zoom",
@@ -7901,7 +7866,7 @@
             "camera",
             "getOrthographicZoom"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -7911,12 +7876,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.screen_to_world",
@@ -7981,7 +7941,7 @@
             "camera",
             "setAspectRatio"
           ],
-          "minimumArgumentCount": 2,
+          "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -7994,7 +7954,7 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": 0
+              "value": null
             },
             {
               "kind": "literal",
@@ -8009,7 +7969,7 @@
             "camera",
             "setAutoAspectRatio"
           ],
-          "minimumArgumentCount": 2,
+          "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8022,7 +7982,7 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": 0
+              "value": null
             },
             {
               "kind": "literal",
@@ -8037,7 +7997,7 @@
             "camera",
             "setFarZ"
           ],
-          "minimumArgumentCount": 2,
+          "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8050,7 +8010,7 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": 0
+              "value": null
             },
             {
               "kind": "literal",
@@ -8065,7 +8025,7 @@
             "camera",
             "setFov"
           ],
-          "minimumArgumentCount": 2,
+          "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8078,7 +8038,7 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": 0
+              "value": null
             },
             {
               "kind": "literal",
@@ -8093,7 +8053,7 @@
             "camera",
             "setNearZ"
           ],
-          "minimumArgumentCount": 2,
+          "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8106,7 +8066,7 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": 0
+              "value": null
             },
             {
               "kind": "literal",
@@ -8121,7 +8081,7 @@
             "camera",
             "setOrthographicZoom"
           ],
-          "minimumArgumentCount": 2,
+          "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8134,7 +8094,7 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": 0
+              "value": null
             },
             {
               "kind": "literal",
@@ -8201,7 +8161,7 @@
             "collectionfactory",
             "getStatus"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -8211,12 +8171,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:collectionfactory.set_prototype",
@@ -8225,7 +8180,7 @@
             "collectionfactory",
             "setPrototype"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8235,12 +8190,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:collectionfactory.unload",
@@ -8249,7 +8199,7 @@
             "collectionfactory",
             "unload"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8259,12 +8209,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:collectionproxy.get_resources",
@@ -8440,7 +8385,7 @@
             "factory",
             "getStatus"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -8450,12 +8395,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:factory.set_prototype",
@@ -8464,7 +8404,7 @@
             "factory",
             "setPrototype"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8474,12 +8414,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:factory.unload",
@@ -8488,7 +8423,7 @@
             "factory",
             "unload"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8498,12 +8433,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:go.cancel_animations",
@@ -8792,7 +8722,7 @@
             "go",
             "setParent"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 3,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -8802,12 +8732,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:go.set_position",
@@ -11964,6 +11889,222 @@
           ]
         },
         {
+          "routeId": "script:camera.get_aspect_ratio",
+          "stableId": 4150761990,
+          "accessor": [
+            "camera",
+            "getAspectRatio"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_auto_aspect_ratio",
+          "stableId": 815384074,
+          "accessor": [
+            "camera",
+            "getAutoAspectRatio"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_enabled",
+          "stableId": 3707335843,
+          "accessor": [
+            "camera",
+            "getEnabled"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_far_z",
+          "stableId": 4055682442,
+          "accessor": [
+            "camera",
+            "getFarZ"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_fov",
+          "stableId": 1655100321,
+          "accessor": [
+            "camera",
+            "getFov"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_near_z",
+          "stableId": 94225445,
+          "accessor": [
+            "camera",
+            "getNearZ"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_orthographic_auto_zoom",
+          "stableId": 333496520,
+          "accessor": [
+            "camera",
+            "getOrthographicAutoZoom"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_orthographic_mode",
+          "stableId": 780726310,
+          "accessor": [
+            "camera",
+            "getOrthographicMode"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_orthographic_zoom",
+          "stableId": 1514123934,
+          "accessor": [
+            "camera",
+            "getOrthographicZoom"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
           "routeId": "script:camera.screen_to_world",
           "stableId": 4212113566,
           "accessor": [
@@ -12028,16 +12169,16 @@
           ]
         },
         {
-          "routeId": "script:camera.world_to_screen",
-          "stableId": 3205603148,
+          "routeId": "script:camera.set_aspect_ratio",
+          "stableId": 2940707570,
           "accessor": [
             "camera",
-            "worldToScreen"
+            "setAspectRatio"
           ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
           "loweringFamily": "defold-value",
           "resultCodec": null,
           "resultNullable": null,
@@ -12046,12 +12187,8 @@
           "arity": "required-and-optional",
           "arguments": [
             {
-              "kind": "value",
-              "valueType": "vector3",
-              "accessor": [
-                "vmath",
-                "vector3"
-              ]
+              "kind": "literal",
+              "value": 0
             },
             {
               "kind": "literal",
@@ -12060,51 +12197,11 @@
           ]
         },
         {
-          "routeId": "script:collectionfactory.create",
-          "stableId": 3514780936,
+          "routeId": "script:camera.set_auto_aspect_ratio",
+          "stableId": 3812610558,
           "accessor": [
-            "collectionfactory",
-            "create"
-          ],
-          "minimumArgumentCount": 1,
-          "maximumArgumentCount": 5,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "lua-table",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            },
-            {
-              "kind": "value",
-              "valueType": "vector3",
-              "accessor": [
-                "vmath",
-                "vector3"
-              ]
-            },
-            {
-              "kind": "value",
-              "valueType": "quaternion",
-              "accessor": [
-                "vmath",
-                "quat"
-              ]
-            }
-          ]
-        },
-        {
-          "routeId": "script:collectionfactory.set_prototype",
-          "stableId": 3724333493,
-          "accessor": [
-            "collectionfactory",
-            "setPrototype"
+            "camera",
+            "setAutoAspectRatio"
           ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
@@ -12119,20 +12216,20 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": "deherm_conformance"
+              "value": 0
             },
             {
               "kind": "literal",
-              "value": "deherm_conformance"
+              "value": false
             }
           ]
         },
         {
-          "routeId": "script:factory.set_prototype",
-          "stableId": 3506659009,
+          "routeId": "script:camera.set_far_z",
+          "stableId": 2081791798,
           "accessor": [
-            "factory",
-            "setPrototype"
+            "camera",
+            "setFarZ"
           ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
@@ -12147,20 +12244,20 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": "deherm_conformance"
+              "value": 0
             },
             {
               "kind": "literal",
-              "value": "deherm_conformance"
+              "value": 0
             }
           ]
         },
         {
-          "routeId": "script:go.cancel_animations",
-          "stableId": 1183026732,
+          "routeId": "script:camera.set_fov",
+          "stableId": 2734551893,
           "accessor": [
-            "go",
-            "cancelAnimations"
+            "camera",
+            "setFov"
           ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
@@ -12175,212 +12272,11 @@
           "arguments": [
             {
               "kind": "literal",
-              "value": "deherm_conformance"
+              "value": 0
             },
             {
               "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get",
-          "stableId": 2488072860,
-          "accessor": [
-            "go",
-            "get"
-          ],
-          "minimumArgumentCount": 2,
-          "maximumArgumentCount": 3,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "lua-table",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            },
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            },
-            {
-              "kind": "record",
-              "recordType": "go.property_options",
-              "fields": []
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get_parent",
-          "stableId": 3138865481,
-          "accessor": [
-            "go",
-            "getParent"
-          ],
-          "minimumArgumentCount": 0,
-          "maximumArgumentCount": 1,
-          "minimumResultCount": 0,
-          "maximumResultCount": 1,
-          "loweringFamily": "defold-value",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get_position",
-          "stableId": 3918772974,
-          "accessor": [
-            "go",
-            "getPosition"
-          ],
-          "minimumArgumentCount": 0,
-          "maximumArgumentCount": 1,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "defold-value",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get_rotation",
-          "stableId": 384109339,
-          "accessor": [
-            "go",
-            "getRotation"
-          ],
-          "minimumArgumentCount": 0,
-          "maximumArgumentCount": 1,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "defold-value",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get_scale",
-          "stableId": 2771038861,
-          "accessor": [
-            "go",
-            "getScale"
-          ],
-          "minimumArgumentCount": 0,
-          "maximumArgumentCount": 1,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "defold-value",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get_scale_uniform",
-          "stableId": 3159049394,
-          "accessor": [
-            "go",
-            "getScaleUniform"
-          ],
-          "minimumArgumentCount": 0,
-          "maximumArgumentCount": 1,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "defold-value",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get_world_position",
-          "stableId": 2533378019,
-          "accessor": [
-            "go",
-            "getWorldPosition"
-          ],
-          "minimumArgumentCount": 0,
-          "maximumArgumentCount": 1,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "defold-value",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
-            }
-          ]
-        },
-        {
-          "routeId": "script:go.get_world_rotation",
-          "stableId": 2823544550,
-          "accessor": [
-            "go",
-            "getWorldRotation"
-          ],
-          "minimumArgumentCount": 0,
-          "maximumArgumentCount": 1,
-          "minimumResultCount": 1,
-          "maximumResultCount": 1,
-          "loweringFamily": "defold-value",
-          "resultCodec": null,
-          "resultNullable": null,
-          "destructive": false,
-          "returnHandleKind": null,
-          "arity": "required-and-optional",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": "deherm_conformance"
+              "value": 0
             }
           ]
         }
@@ -18301,7 +18197,7 @@
             "camera",
             "getProjection"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -18311,12 +18207,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_view",
@@ -18325,7 +18216,7 @@
             "camera",
             "getView"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
@@ -18335,12 +18226,7 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
-          "arguments": [
-            {
-              "kind": "literal",
-              "value": 0
-            }
-          ]
+          "arguments": []
         },
         {
           "routeId": "script:go.get_id",
@@ -18589,6 +18475,54 @@
           ]
         },
         {
+          "routeId": "script:camera.get_projection",
+          "stableId": 2326768707,
+          "accessor": [
+            "camera",
+            "getProjection"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_view",
+          "stableId": 986113063,
+          "accessor": [
+            "camera",
+            "getView"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
           "routeId": "script:go.get_id",
           "stableId": 1477563324,
           "accessor": [
@@ -18672,7 +18606,7 @@
             "collectionfactory",
             "load"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -18682,6 +18616,25 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:collectionfactory.load",
+          "stableId": 4139911040,
+          "accessor": [
+            "collectionfactory",
+            "load"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
           "arguments": [
             {
               "kind": "literal",
@@ -18894,7 +18847,7 @@
             "factory",
             "load"
           ],
-          "minimumArgumentCount": 1,
+          "minimumArgumentCount": 0,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
@@ -18904,6 +18857,25 @@
           "destructive": false,
           "returnHandleKind": null,
           "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:factory.load",
+          "stableId": 1808015212,
+          "accessor": [
+            "factory",
+            "load"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
           "arguments": [
             {
               "kind": "literal",
@@ -19001,7 +18973,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "no-generated-universal-adapter",
+          "reason": "compile-time-intrinsic",
           "routeCount": 1,
           "exampleRouteId": "script:go.property",
           "routeIds": [
@@ -19979,7 +19951,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "no-generated-universal-adapter",
+          "reason": "compile-time-intrinsic",
           "routeCount": 7,
           "exampleRouteId": "script:resource.atlas",
           "routeIds": [
@@ -20285,7 +20257,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "no-generated-universal-adapter",
+          "reason": "separate-module-adapter",
           "routeCount": 1,
           "exampleRouteId": "script:timer.delay",
           "routeIds": [

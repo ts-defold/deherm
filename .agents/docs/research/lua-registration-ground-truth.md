@@ -230,33 +230,35 @@ registration symbols and are selected against each other at link time.
 
 | | box2d-v3 | box2d-v2 |
 | --- | ---: | ---: |
-| C/C++ sources parsed | 905 | 905 |
-| Registration entry points | 41 | 41 |
+| C/C++ sources parsed | 904 | 904 |
+| Registration entry points | 51 | 51 |
 | Registered namespaces | 51 | 51 |
-| **Registered routes** | **924** | **836** |
-| Registered constants | 433 | 440 |
+| **Registered routes** | **959** | **871** |
+| Registered constants | 436 | 443 |
 | Documented routes (pinned script API IR) | 926 | 926 |
-| Registered **and** documented | 867 | 793 |
-| **Documented but unregistered** | **61** | **135** |
-| **Registered but undocumented** | **57** | **43** |
+| Registered **and** documented | 877 | 803 |
+| **Documented but unregistered** | **51** | **125** |
+| **Registered but undocumented** | **82** | **68** |
 | Commented-out registrations found | 2 | 4 |
-| Per-route verdict: agree | 316 | 284 |
-| Per-route verdict: partially undecided | 377 | 338 |
-| Per-route verdict: disagree | 174 | 171 |
-| Per-route verdict: undecided | 0 | 0 |
-| Parameter slots compared | 1,508 | 1,409 |
-| Parameter slots disagreeing | 206 | 203 |
-| Parameter slots undecided | 543 | 491 |
-| **Blockers (unparseable)** | **152 over 110 routes** | **156 over 116 routes** |
+| Per-route verdict: agree | 305 | 273 |
+| Per-route verdict: partially undecided | 373 | 334 |
+| Per-route verdict: disagree | 198 | 195 |
+| Per-route verdict: undecided | 1 | 1 |
+| Parameter slots compared | 1,519 | 1,420 |
+| Parameter slots disagreeing | 237 | 234 |
+| Parameter slots undecided | 547 | 495 |
+| **Blockers (unparseable)** | **204 over 134 routes** | **208 over 140 routes** |
 
-The documented surface is 926 routes. On the v3 build 867 of them are actually
-registered; 61 are not. Coverage counted against documentation is therefore not
-coverage: 57 registered routes have no documentation at all, and only 316 of the
-867 matched routes agree on every parameter, arity and result.
+The documented surface is 926 routes. On the v3 build 877 of them are actually
+registered and matched; 51 are not registered under their documented name.
+Coverage counted against documentation is therefore not coverage: 82 registered
+routes have no matching documentation at all, and only 305 of the 877 matched
+routes agree on every
+parameter, arity and result.
 
 ### What the blocker queue looked like, and what it is now
 
-The first run of this verifier left 391 blockers over 302 of the 867 matched
+The first run of this verifier left 391 blockers over 302 of the then-867 matched
 routes, and 259 routes fully agreeing. Working that queue down meant adding
 general parsing rules, never per-route knowledge. Five rules account for the
 whole move:
@@ -269,23 +271,32 @@ whole move:
 | Additive arithmetic over integer literals in an index expression is folded, because macro expansion produces `luaL_checknumber(L, 1 + 2)` | 8 |
 | A helper addresses *every* integer parameter its body shows stack evidence for, not just the first: `CheckJointDefBodies(L, 1, 2, &a, &b, &world)` reads two argument positions in one call | 30 |
 
+One later correction is equally important: only overloads that themselves have
+an integer stack-index parameter participate in the file-scope ambiguity test.
+`dmScript::ResolveURL(lua_State*, int index, ...)` and
+`ResolveURL(lua_State*, const char* url, ...)` have the same total arity, but the
+second does not address the Lua stack. Treating it as a competing stack helper
+hid the first overload's body-derived absent-slot default from every other
+translation unit. That false requirement narrowed 28 generated optional slots,
+including `go.set_parent`; the real engine accepts `go.set_parent()`.
+
 | | before | after |
 | --- | ---: | ---: |
-| Blockers | 391 | **152** |
-| Routes carrying a blocker | 302 | **110** |
-| Routes fully agreeing | 259 | **316** |
-| Routes with no decidable verdict at all | 48 | **0** |
-| Parameter slots disagreeing | 348 | **206** |
+| Blockers | 391 | **204** |
+| Routes carrying a blocker | 302 | **134** |
+| Routes fully agreeing | 259 | **305** |
+| Routes with no decidable verdict at all | 48 | **1** |
+| Parameter slots disagreeing | 348 | **237** |
 
-The `undecided` bucket is empty because it was entirely
-`unresolved-c-function`: 48 routes whose registered symbol existed only as a
-macro expansion. What remains is genuinely undecidable by a structural reading:
-45 stack indices computed at runtime (`barg(L, i)` in a loop,
-`lua_rawgeti(L, shape_def.m_VerticesIndex, i)`, `GetShapeValueIndex(L, 1)`), 43
-non-literal return expressions (`_G.unpack` and `_G.select` really are variadic
-in their result count), 23 argument positions inside the derived window that no
-recognised accessor reads, and 21 documented modules with no registration array
-anywhere in the target.
+The former `unresolved-c-function` bucket is gone: all 48 routes whose
+registered symbol existed only as a macro expansion are now parsed. The one
+fully undecided route is `socket.sleep`, whose registered external function has
+no body available to this source slice. What remains is reported structurally:
+53 non-literal result expressions, 49 stack indices computed at runtime, 28
+duplicate registrations, 24 argument positions inside the derived window that
+no recognised accessor reads, and 21 documented modules with no registration
+array anywhere in the target, plus the smaller registration-tracing families
+enumerated in the artifact.
 
 ## What the disagreements are
 
@@ -302,8 +313,8 @@ fourteen `b2d.shape.*` routes the route-availability generator already found, pl
 `sys.set_debugger_lightweight_hook`, `sys.set_render_enabled`, and the luasocket
 `socket.serial` / `socket.unix` / `socket.__unload` entries.
 
-**Documented but unregistered (61 on v3).** The breakdown is
-`b2d.fixture` 16, `b2d.joint` 15, `socket` 10, `b2d.body` 7, `resource` 7,
+**Documented but unregistered (51 on v3).** The breakdown is
+`b2d.fixture` 16, `b2d.joint` 15, `b2d.body` 7, `resource` 7,
 `socket.dns` 5, `sys` 1. The Box2D rows are the v2-only surface, correctly absent
 from a v3 build - the mirror target shows the complement, with 135 documented
 routes absent from a v2 build. Two of the `b2d.body` rows,
@@ -326,10 +337,10 @@ it (v3 counts):
 
 | classification | what the source says | defect | correction |
 | --- | --- | --- | ---: |
-| `documentation-permits-refused-call` (37) | declared optional; the body refuses the omission at its own statement level | the declaration | **require the slot** |
-| `engine-tolerates-omission` (88) | declared required; the body reads the slot with a non-raising accessor, so omitting it substitutes that accessor's zero value rather than raising | neither | none |
-| `branch-dependent-requirement` (67) | declared optional; the body's `luaL_check*` for that slot sits inside a branch, so it proves nothing about the fall-through | undecided | none |
-| `engine-guards-omission` (3) | declared required; the body tests the slot's presence explicitly | neither | none |
+| `documentation-permits-refused-call` (10) | declared optional; the body refuses the omission at its own statement level | the declaration | **require the slot** |
+| `engine-tolerates-omission` (90) | declared required; the body reads the slot with a non-raising accessor, so omitting it substitutes that accessor's zero value rather than raising | neither | none |
+| `branch-dependent-requirement` (65) | declared optional; the body's `luaL_check*` for that slot sits inside a branch, so it proves nothing about the fall-through | undecided | none |
+| `engine-guards-omission` (56) | declared required; the body tests the slot's presence explicitly | neither | none |
 
 Only the first is a defect a generator must act on. `sound.set_gain` documents
 `@param [gain]` and its body runs `luaL_checknumber(L, 2)` unconditionally:
@@ -379,13 +390,13 @@ builds do not both witness: a route present in one variant and absent in the
 other is a variant fact, not a defect. Each finding therefore carries one
 evidence row per engine target, and the lane's test asserts that.
 
-On the pinned engine the gate carries 38 findings. In the projection IR they
+On the pinned engine the gate carries 11 findings. In the projection IR they
 become:
 
 | | routes |
 | --- | ---: |
-| `registration-verified` | 888 |
-| `registration-corrected` (a parameter's declared optionality overridden by the C body) | 37 |
+| `registration-verified` | 915 |
+| `registration-corrected` (a parameter's declared optionality overridden by the C body) | 10 |
 | `registration-blocked` (semantic hole `registration:registered-under-a-different-name`) | 1 |
 
 A corrected parameter carries `optionalityCorrectedBy: "lua-registration-gate"`
@@ -463,7 +474,7 @@ This is **generation and static-analysis evidence only**. Nothing here was
 compiled, linked, or executed. The verifier reads C source; it does not prove
 that a registered route behaves as its body suggests at runtime, and a
 disagreement it reports is a disagreement between two static descriptions, not a
-runtime failure. The 152 blockers on the v3 engine target are exactly the places
+runtime failure. The 204 blockers on the v3 engine target are exactly the places
 where the static reading stopped, and they are reported rather than assumed away.
 
 The gate inherits that boundary. `require-parameter` says the C body refuses a

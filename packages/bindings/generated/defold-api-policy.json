@@ -4,12 +4,12 @@
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
   "generator": "sha256:66103c6c25e6ee9592efcdb8df6002359932a484e84cac1428e0a1fd40a54c19",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "e4899766350122a9148274d573218d5e35def001ec7544eacbd103c8a3ccd265",
+  "policyRoot": "23df73f7833d7cefc71bc911c7cdc0cc79e200aa06b8b9866e371fd368827e1b",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 55,
     "namespaces": 52,
-    "objectBytes": 7475965,
+    "objectBytes": 7484441,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -57,7 +57,7 @@
       "bytes": 643793
     },
     "@shared": {
-      "hash": "88865590bf49e11b54fa1626223ceee63cfe9ecc066eb8b6104736697c4b67e0",
+      "hash": "bcd2fb6c1b94b287f62fb692b0a0687a9b8729372621cac071e808e71783f396",
       "bytes": 164629
     },
     "@toolchain": {
@@ -69,8 +69,8 @@
       "bytes": 27340
     },
     "b2d": {
-      "hash": "8f2f2595ca5e284686de90278d20a86f22ca294ada4de08c9729c3644d0828bd",
-      "bytes": 828556
+      "hash": "043be05137ea4fe4b85aa5463487d8bfca757d19d30c45707ee9ecbce076ebbc",
+      "bytes": 828872
     },
     "bit": {
       "hash": "7840cb4dfffcc281c648549d85beb0a7917e431ee5cafab63eb2a23643b2246e",
@@ -89,16 +89,16 @@
       "bytes": 757669
     },
     "camera": {
-      "hash": "2514de6ea954c8e050759806a0e06e8e6f9a05613043ebab346ae28a6295e380",
-      "bytes": 86480
+      "hash": "4cc5d50a5770ce6094d5765639951882779566a53be74030a0cfc434f4c71505",
+      "bytes": 82994
     },
     "collectionfactory": {
-      "hash": "7b20882f451e958ea77d28b9e2923f550ed13a1a08147813fed66df548cdf9fb",
-      "bytes": 31711
+      "hash": "95174e966aa602e12bfcd34004187298f82e893cc2215febf9375353b4d38598",
+      "bytes": 30527
     },
     "collectionproxy": {
-      "hash": "30624d1e9eec152be7dd99f4b5f8b21870a112d8efa5e2c6cb4b9d0767f69117",
-      "bytes": 30665
+      "hash": "6236e4626b63de81908f2de1d37879df4460ecd05133da2f6bc0b79b17b48cd8",
+      "bytes": 30607
     },
     "compute": {
       "hash": "94ecd4e64585ec7dcd59099175bf3a4c312d923361b9884bdbce5733cc86783c",
@@ -125,8 +125,8 @@
       "bytes": 74137
     },
     "factory": {
-      "hash": "efdbdff5b44750ebaff28d78957693ffd06457ffd2ddb4f25bbbb5c018a3999d",
-      "bytes": 28725
+      "hash": "4417bd9424c4f115ea145a30d8d414f18ef4d6a0678381b99aa13e7121bcbc33",
+      "bytes": 27541
     },
     "font": {
       "hash": "fc243f5ada0e98a495eb2a04b7d15fb3b3283c41221ac83124137d3a58607af4",
@@ -141,16 +141,16 @@
       "bytes": 283605
     },
     "go": {
-      "hash": "29810a0a2c513a2214807b3fbed6c57edaae40baa0a02754d37bc8dc3df78f44",
-      "bytes": 154788
+      "hash": "7527903aa19411e70fe62a0b877b86a3d1cda16f764d0ceb31ff6af1bd14922b",
+      "bytes": 153782
     },
     "graphics": {
       "hash": "4496447a3ce40478c82ca664b7b613a373c5c86cf53ab98ab35678731022fa92",
       "bytes": 460327
     },
     "gui": {
-      "hash": "a27835e3b91cd113087759fae5ddf7ab0d685c0b2511226152297c95e8b48a6a",
-      "bytes": 531094
+      "hash": "228626db8e7314fc32d459a47eb9c86839ae249cd8ffd36df0869d5229611b83",
+      "bytes": 531578
     },
     "hid": {
       "hash": "505fd74823fb85dc954075be7c073edce22c447d7908192682812dc17aca06a2",
@@ -173,8 +173,8 @@
       "bytes": 9853
     },
     "label": {
-      "hash": "d3a0096b4525b4556c621498426eb2da5dc9b8929f93ea9820cc205b4741f93d",
-      "bytes": 15301
+      "hash": "4ab0c86435c1f88412cef9175f457684fd9958c1448535d757821397d7b283a5",
+      "bytes": 16513
     },
     "liveupdate": {
       "hash": "566413a63ada1709f3ddee16767cf44638a1293a73a112c34c78ca3da5fdc189",
@@ -193,20 +193,20 @@
       "bytes": 5136
     },
     "model": {
-      "hash": "177de72c556166f34cdd149f29a57caaa58e048f72b7b33dfe4fed1acba32901",
-      "bytes": 48156
+      "hash": "a09b057ad317ac11634b6ca9f01e2d48b000663ac9cdaa0b41ce548fca83fb11",
+      "bytes": 51168
     },
     "msg": {
       "hash": "f2adc26fd53c3f9f2f025ede053a3c6e5ff78c8d560c614e7b73056cc017c93e",
       "bytes": 11111
     },
     "particlefx": {
-      "hash": "b916aeab2f4e8d0557b65e1530f7251ee2044893ba6733a981da2d1bedd1c6fd",
-      "bytes": 25997
+      "hash": "0ed5806e97bb3986fd11d5b8609b511ea02f34f705275000f82d8cd1ec15752f",
+      "bytes": 27331
     },
     "physics": {
-      "hash": "daee25c5cd8e238e211a28b4e61af375290a8a93605a01f72e485e6db1eef923",
-      "bytes": 126631
+      "hash": "c7b9b45e105ce5ec7018cc977b9f21a95097460f53277c1d14dd19250e448897",
+      "bytes": 131191
     },
     "platform": {
       "hash": "0d8f97ea4ab0ae5d41772711c38e39664a1ddbebd63e61fa59ea30794fbb4b18",
@@ -217,8 +217,8 @@
       "bytes": 42696
     },
     "render": {
-      "hash": "61599957504a4ed13eed7bec49a2e6217d47d20c8602a29b53cb7e86ebef832c",
-      "bytes": 281618
+      "hash": "744ff27b418f784cf582014fa40b903facb6d422af0fb57c1f2c9642ea61e264",
+      "bytes": 281396
     },
     "resource": {
       "hash": "7d0906a7977bdfac6260e088b35eec933f4a77d0a1aacbea749234705e2c02f1",
@@ -237,20 +237,20 @@
       "bytes": 48011
     },
     "sound": {
-      "hash": "fbe5c06a98b3c8655df5e3b3f203f3172e8074e191fb3a205fda055752c44d8c",
-      "bytes": 60359
+      "hash": "ce4df7669a453082f8f7f0df09c30976659abaacad1493748b6de0187bd08ceb",
+      "bytes": 62015
     },
     "sprite": {
-      "hash": "e82c7bb7066da4a606c3da97d41bcf49026060036efdd13cef4c1baa2ec526ce",
-      "bytes": 25045
+      "hash": "10cb953ed07c0ef5f7846f500f971ebae46ed1547eaf55d2a25e352ad7b83d51",
+      "bytes": 26389
     },
     "sys": {
       "hash": "a35cd080c4fee51206ce41b6bd457d12372de479a4d3bfff67bf86ec8c6ce167",
       "bytes": 123593
     },
     "tilemap": {
-      "hash": "cb60f19e529e59e489bda5fbec3f0af3b486dbd1b059f652f4908b2cc3537788",
-      "bytes": 37684
+      "hash": "12b6dc7c5c3d6a99aa59895b663950b4e48e06e9382b7342c3d5414f92b664a2",
+      "bytes": 39382
     },
     "timer": {
       "hash": "4b11d93c985eb1348960c61f8b7374bcf512d28db35767e4eb1118018067bbb7",
