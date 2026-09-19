@@ -1,0 +1,8 @@
+# Materialised by scripts/assemble-typed-native-extension.mjs. Do not edit.
+#
+# This extension exists to carry `shermes -emit-c` output for one project. It
+# declares no context of its own: Extender merges every extension's
+# `ext.manifest` context into one per-build setting, so the C++ standard and
+# exception flags `defold_hermes` already asks for are the ones this unit is
+# compiled under, and a flag added here would land on `defold_hermes` too.
+name: "defold_hermes_typed_native"

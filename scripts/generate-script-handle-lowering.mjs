@@ -832,7 +832,14 @@ bool CapturedLuaRouter::read(int index, const ValueCodec& codec, ScriptValue* ou
   *output = {};
   if (lua_isnil(state_, index) && (codec.mask & kNil)) { output->tag = ScriptValueTag::kNull; return true; }
   if (codec.semanticKind != SemanticHandleKind::kNone) {
-    if (!lua_isuserdata(state_, index) || !captureHandleUnsafe(index, codec.semanticKind, output)) { fail(error, capacity, "semantic handle result capture failed or registry is exhausted"); return false; }
+    // lua_isuserdata is true for a light userdata, which carries no
+    // metatable and therefore no rooted identity the semantic-handle registry
+    // can generation-check. Refuse it by name so the failure is attributable
+    // instead of being reported as an exhausted registry.
+    const int handleType = lua_type(state_, index);
+    if (handleType == LUA_TLIGHTUSERDATA) { fail(error, capacity, "semantic handle result is a light userdata with no rooted identity"); return false; }
+    if (handleType != LUA_TUSERDATA) { fail(error, capacity, "semantic handle result is not a userdata"); return false; }
+    if (!captureHandleUnsafe(index, codec.semanticKind, output)) { fail(error, capacity, "semantic handle registry is exhausted"); return false; }
     return true;
   }
   const int type = lua_type(state_, index);

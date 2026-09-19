@@ -26,6 +26,13 @@
 
 #include <stdint.h>
 
+// A packaged build materialises this header; the shipped skeleton defines
+// nothing. It is included before the `DEHERM_PROFILE` test below so a packaged
+// extension can be assembled with telemetry on without an `ext.manifest` edit.
+// The CMake `DEHERM_PROFILE` option still works unchanged: it arrives as a
+// compile definition, which is already defined by the time this is read.
+#include <defold_hermes/generated_build_config.h>
+
 // ---------------------------------------------------------------------------
 // Stable numeric ids. These are plain preprocessor constants: they emit no
 // storage and no symbols in either build, so they are declared unconditionally

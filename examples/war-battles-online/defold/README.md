@@ -136,6 +136,8 @@ node bin/deherm.mjs dev \
   --entry examples/war-battles-online/defold/main/player.script.ts \
   --watch examples/war-battles-online/defold \
   --once --headless --no-launch
+node scripts/assemble-typed-native-extension.mjs \
+  --project examples/war-battles-online/defold
 /opt/homebrew/opt/openjdk@25/bin/java -jar build/tooling/bob.jar \
   --root examples/war-battles-online/defold \
   --output build/default \
@@ -144,6 +146,26 @@ node bin/deherm.mjs dev \
   --build-server http://localhost:9010 \
   resolve build
 ```
+
+## The typed-native transport
+
+The assemble step above materialises `defold_hermes_typed_native/`, a
+project-local extension carrying one `shermes -typed -strict -O -emit-c` unit.
+Bob uploads it, Extender compiles and links it, and `defold_hermes` evaluates it
+into the same Hermes runtime as the bytecode bundle. The unit installs itself
+over the script bridge, so the routes it claims cross into the engine through
+`extern_c` and every other route keeps crossing over JSI in the same binary.
+
+Add `--profile` to the assemble step to build with transport telemetry on. The
+running game then prints a `DEHERM_EVENT transport-span` census every two
+seconds, naming the transport, route, call count and mean nanoseconds of every
+binding crossing. A recorded run is in
+[`../evidence/packaged-typed-native-transport-arm64-macos.json`](../evidence/packaged-typed-native-transport-arm64-macos.json):
+13 routes on `typed-native`, and `gui.get_node`/`gui.set_text` - the two routes
+whose value type is a retained `node` handle - on `jsi`.
+
+The directory is generated. Delete it and rebuild and the game still runs, with
+every route back on JSI; that is the control run in the same evidence file.
 
 The project exposes the repository extension through its example-local
 `defold_hermes` dependency link, so a full native build requires the pinned

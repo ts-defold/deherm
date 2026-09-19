@@ -79,6 +79,14 @@ class Runtime {
   Runtime& operator=(const Runtime&) = delete;
 
   void load(const std::string& source, const std::string& sourceUrl);
+  /**
+   * Evaluate AOT (`shermes -emit-c`) units into this runtime without claiming
+   * the application entrypoints, so a later `load()` of ordinary bytecode runs
+   * beside them in the same runtime. Must be called before `load()`.
+   */
+  void evaluateStaticUnits(
+      const StaticUnitCreator* unitCreators,
+      size_t unitCount);
   /** Evaluate AOT units and capture the application registered by the final unit. */
   void loadStatic(
       const StaticUnitCreator* unitCreators,

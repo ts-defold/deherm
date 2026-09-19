@@ -56,8 +56,11 @@ async function bundleHarness(entryPoint) {
     format: "iife",
     platform: "neutral",
     target: "es2020",
-    plugins: [ttsc()],
-    tsconfig: path.join(repoRoot, "tsconfig.json"),
+    // The conformance bundle is type-checked as its own program so this
+    // runtime-evidence lane depends only on the generated SDK surface it
+    // exercises.
+    plugins: [ttsc({ project: path.join(repoRoot, "tsconfig.headless-conformance.json") })],
+    tsconfig: path.join(repoRoot, "tsconfig.headless-conformance.json"),
     absWorkingDir: repoRoot,
     sourcemap: false,
     legalComments: "none",
@@ -76,17 +79,23 @@ function compileContent() {
 }
 
 async function writeManifest(fixtures) {
-  const lines = fixtures.map((fixture) => `${fixture.id}\t${fixture.collection}\t${TICK_BUDGET}`);
+  const lines = fixtures.map((fixture) =>
+    `${fixture.id}\t${fixture.collection}\t${TICK_BUDGET}\t${(fixture.engineConfig ?? []).join(" ")}`);
   await mkdir(path.dirname(manifestPath), { recursive: true });
   await writeFile(manifestPath, `${lines.join("\n")}\n`);
 }
 
 const CRASH_FRAME = /^ERROR:CRASH:\s+\d+\s+\S+\s+0x[0-9a-f]+\s+(.+?)\s+\+\s+\d+$/;
+// déherm reports the runtime profile it detected from the registered Lua
+// symbols. The plan is built against one profile, so a disagreement means the
+// plan is claiming routes the linked engine does not register.
+const DETECTED_PROFILE = /Detected Defold runtime profile '([^']+)'/;
 
 function parseTranscript(transcript) {
   const observations = [];
   const outcomes = new Map();
   const crashFrames = [];
+  const detectedProfiles = new Set();
   let inFlight = null;
   for (const raw of transcript.split("\n")) {
     const line = raw.replace(/\r/g, "");
@@ -95,6 +104,8 @@ function parseTranscript(transcript) {
       crashFrames.length = 0;
       continue;
     }
+    const detected = DETECTED_PROFILE.exec(line);
+    if (detected) detectedProfiles.add(detected[1]);
     const frame = CRASH_FRAME.exec(line);
     if (frame) {
       crashFrames.push(frame[1]);
@@ -112,7 +123,7 @@ function parseTranscript(transcript) {
       observations.push({ contract, route, property, disposition, detail: rest.join("\t") });
     }
   }
-  return { observations, outcomes, inFlight, crashFrames };
+  return { observations, outcomes, inFlight, crashFrames, detectedProfiles };
 }
 
 async function runDriver(projectFile, remaining) {
@@ -162,6 +173,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
   const observations = [];
   const outcomes = new Map();
   const transcripts = [];
+  const detectedProfiles = new Set();
   let remaining = fixtures;
   // A contract that faults the process takes the driver down with it. Record
   // that contract as an engine fault and resume with the rest rather than
@@ -171,6 +183,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
     transcripts.push(result.transcript);
     const parsed = parseTranscript(result.transcript);
     observations.push(...parsed.observations);
+    for (const profile of parsed.detectedProfiles) detectedProfiles.add(profile);
     for (const [id, outcome] of parsed.outcomes) outcomes.set(id, outcome);
     const unfinished = remaining.filter((fixture) => !outcomes.has(fixture.id));
     if (unfinished.length === 0) break;
@@ -188,6 +201,31 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
     });
     remaining = unfinished.filter((fixture) => fixture.id !== faulted);
   }
+
+  // Fail closed rather than record evidence planned against the wrong engine.
+  const unexpectedProfiles = [...detectedProfiles].filter((profile) => profile !== plan.runtimeProfile);
+  if (unexpectedProfiles.length > 0) {
+    throw new Error(
+      `The linked engine reported Defold runtime profile ${unexpectedProfiles.join(", ")}, ` +
+      `but the plan was built for ${plan.runtimeProfile}`
+    );
+  }
+
+  // A blocked contract explains itself with the dispositions the run actually
+  // produced, so an unreached route never disappears into a generic label.
+  const blockersFor = (contract, engine, properties, conclusive) => {
+    if (conclusive.length === 0 && properties.length > 0) {
+      const counts = new Map();
+      for (const item of properties) {
+        const reason = `runtime-${item.disposition}:${item.detail.split(":")[0]}`;
+        counts.set(reason, (counts.get(reason) ?? 0) + 1);
+      }
+      return [...counts.entries()]
+        .sort((left, right) => right[1] - left[1] || (left[0] < right[0] ? -1 : 1))
+        .map(([reason, routeCount]) => ({ reason, routeCount }));
+    }
+    return [{ reason: `engine-disposition:${engine.disposition}`, routeCount: contract.exercises.length }];
+  };
 
   const byContract = new Map();
   for (const observation of observations) {
@@ -208,6 +246,10 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
     const engine = outcomes.get(contract.id) ?? { disposition: "not-executed", exitCode: -1, ticks: 0 };
     const properties = byContract.get(contract.id) ?? [];
     const mismatched = properties.filter((item) => item.disposition === "mismatched");
+    // A `blocked-` disposition is an explicit failure to reach the route, not
+    // evidence about it. A contract whose every property is blocked stays
+    // blocked and never counts as observed.
+    const conclusive = properties.filter((item) => !item.disposition.startsWith("blocked-"));
     const decisive = engine.disposition === "exited";
     let outcome;
     if (engine.disposition === "engine-fault") {
@@ -216,7 +258,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       outcome = "blocked";
     } else if (engine.exitCode !== 0 || mismatched.length > 0) {
       outcome = "mismatched";
-    } else if (properties.length === 0) {
+    } else if (conclusive.length === 0) {
       outcome = "blocked";
     } else {
       outcome = "observed";
@@ -228,11 +270,13 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       exercisedRouteCount: contract.exercises.length,
       outcome,
       engine,
-      observedPropertyCount: properties.length,
+      profile: contract.profile,
+      observedPropertyCount: conclusive.length,
+      blockedPropertyCount: properties.length - conclusive.length,
       mismatchedPropertyCount: mismatched.length,
       properties,
       ...(outcome === "blocked" || outcome === "engine-fault"
-        ? { blockers: [{ reason: `engine-disposition:${engine.disposition}`, routeCount: contract.exercises.length }] }
+        ? { blockers: blockersFor(contract, engine, properties, conclusive) }
         : {})
     };
   });
@@ -247,6 +291,8 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
     defoldRevision: plan.defoldRevision,
     target: plan.target,
     variant: plan.variant,
+    runtimeProfile: plan.runtimeProfile,
+    detectedRuntimeProfiles: [...detectedProfiles].sort(),
     evidenceStage: "runtime",
     evidenceBoundary:
       "Observed contracts executed inside a real headless Defold engine driven one tick at a time through " +

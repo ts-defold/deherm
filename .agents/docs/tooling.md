@@ -50,6 +50,8 @@ ordinary edit loop.
 | Generate reachable-only release bindings | `pnpm build:release-plan` | Filtered artifacts under `build/profiles/release` |
 | Gate symbol-level reachability | `pnpm test:reachability` | Fixture project; checker/module-graph cross-check; dead-symbol retention through the emitted C |
 | Check Static Hermes declarations/export unit | `pnpm check:static-hermes` | Parses `extern_c` and proves a library-shaped exported unit without `main` |
+| Generate the typed-native JS bridge | `pnpm generate:typed-native-bridge` | Sound-typed unit that replaces `__defoldScriptBridgeV1` with the AOT lane, claiming the plan's `staticHermesCAbi` routes |
+| Assemble `shermes -emit-c` into a project | `pnpm assemble:typed-native --project <dir> [--profile]` | Materialises `<dir>/defold_hermes_typed_native/` for Bob and Extender |
 | Exercise the cached Lua bridge | `pnpm test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
 | Stage the native extension | `pnpm package:defold` | Defold package directory/archive inputs |
 | Prepare pinned local Extender | `pnpm extender:prepare` | Builds the pinned jars and maps the installed Xcode SDK |
@@ -57,7 +59,7 @@ ordinary edit loop.
 | Compile the real Defold project | `pnpm bob:local:build` | Starts a temporary pinned Extender when needed, then builds with Bob |
 | Produce a desktop app bundle | `pnpm bob:local:bundle` | Writes `build/bundle/Defold Hermes Spike.app` |
 | Prove the bundled native runtime | `pnpm test:native-defold:runtime` | Rejects stale archives, launches the app, and checks real Hermes, Lua-API, and update-lifecycle markers |
-| Run headless contract conformance | `pnpm test:headless-conformance:runtime` | Generates per-contract fixtures, compiles content with Bob, links the in-process headless engine driver, and records contract -> observed/mismatched/unreachable |
+| Run headless contract conformance | `pnpm test:headless-conformance:runtime` | Generates per-contract fixtures from their fixture profile, compiles content with Bob, links the in-process headless engine driver, asserts the engine's detected runtime profile matches the plan, and records contract -> observed/mismatched/blocked/unreachable |
 | Build/bundle the HTML5 game | `pnpm bob:web:build`; `pnpm bob:web:bundle` | Uses pinned emsdk 4.0.6 through local Extender |
 | Verify a running HTML5 bundle | `pnpm test:html5:runtime` | Reload-synchronized CDP lifecycle and binding proof |
 | Reuse a running local Extender | `pnpm bob:build`; `pnpm bob:bundle` | Local port 9010 is the default |
@@ -210,8 +212,49 @@ no network and never rebuilds on its own.
 
 The `generated-sources` artifact kind records the same relation for files
 assembled into the extension before Bob uploads it - `shermes -emit-c` output
-and per-extension FFI glue. The emission lane is separate work; the freshness
-relation it will need is already recorded and checked here.
+and per-extension FFI glue.
+
+## Assembling the emitted C
+
+`scripts/assemble-typed-native-extension.mjs` is the consumer of that kind. It
+concatenates the universal-value lane with the generated typed-native bridge,
+runs `shermes -typed -strict -O -emit-c` over the pair, and materialises the
+result as a project-local extension, `<project>/defold_hermes_typed_native/`,
+which Bob uploads and Extender compiles like any other extension source. The
+user still compiles nothing natively.
+
+It is a sibling extension rather than files inside `defold_hermes/` because the
+shared extension is per-release while the emitted unit is per-project. Nothing
+in `defold_hermes/` changes per project: the assembled extension declares its
+own Defold extension symbol and hands its unit to the runtime through
+`defold_hermes/static_unit_registry.h` from `AppInitialize`, and `runtime.cpp`
+evaluates whatever the registry holds into the Hermes runtime before the
+bytecode bundle is loaded. With nothing registered the behaviour is exactly the
+bytecode-over-JSI behaviour that preceded the seam.
+
+Three things are adapted, because Extender merges every `ext.manifest` context
+into one per-build setting and drives all sources through `clang++`, so the C++
+standard `defold_hermes` asks for lands on the emitted unit too:
+
+* a tentative array definition (`static T name[];`) has no C++ spelling, so the
+  real definition is hoisted over the forward declaration;
+* `void*` converts implicitly only in C, so a generated prelude gives each
+  `extern_c` callee a `void*` overload that casts back, derived from the same
+  pinned declarations `extern_c` pointed at;
+* `calloc`/`malloc` results are cast explicitly.
+
+Each transform asserts it applied, so an upstream emitter change fails in the
+assembler rather than inside Extender. The unit also compiles with `NDEBUG`
+matching the packaged `libhermes.a`, which the assembler reads out of the
+archive's own symbol table - Hermes enforces the agreement with a link-time
+model symbol.
+
+`--profile` additionally materialises
+`defold_hermes/include/defold_hermes/generated_build_config.h` with
+`DEHERM_PROFILE`, because Extender has no configure step. The shipped skeleton
+defines nothing, and this checkout's CMake build is unaffected either way: it
+always defines `DEHERM_PROFILE_BUILD_SYSTEM`, which the generated header defers
+to.
 
 # Published npm CLI
 

@@ -1,0 +1,1654 @@
+{
+  "schemaVersion": 1,
+  "generator": "scripts/generate-typed-native-bridge.mjs",
+  "transport": "typed-native",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "inputHashes": {
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "356badf21c8a415d13b21dc368bc391e5f851fe29d80148d4ee6f127f4e7fcd3",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "bdd64114c6521fe278e3db4d649007cd5fa5f420dcae33ac9765ba27e5765df2"
+  },
+  "planTypedNativeEmit": 325,
+  "claimedRouteCount": 320,
+  "declinedRouteCount": 5,
+  "maximumArgumentCount": 7,
+  "claimedRoutes": [
+    {
+      "id": "script:physics.destroy_joint",
+      "stableId": 350770,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:physics.raycast",
+      "stableId": 2636616,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:physics.wakeup",
+      "stableId": 10300768,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_blend_func",
+      "stableId": 12859057,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:go.update_world_transform",
+      "stableId": 16978861,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.get_near_z",
+      "stableId": 94225445,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:factory.create",
+      "stableId": 96184340,
+      "maximumArgumentCount": 5
+    },
+    {
+      "id": "script:resource.create_sound_data",
+      "stableId": 109392419,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sys.set_connectivity_host",
+      "stableId": 161653622,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:image.load",
+      "stableId": 172398549,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.disable_state",
+      "stableId": 182835960,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:profiler.dump_frame",
+      "stableId": 206098425,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:sys.get_config_boolean",
+      "stableId": 236701305,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:model.reset_constant",
+      "stableId": 250460089,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.get_height",
+      "stableId": 286597108,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:camera.set_orthographic_zoom",
+      "stableId": 294035082,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sys.reboot",
+      "stableId": 309934808,
+      "maximumArgumentCount": 6
+    },
+    {
+      "id": "script:zlib.deflate",
+      "stableId": 314843756,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.get_orthographic_auto_zoom",
+      "stableId": 333496520,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:resource.release",
+      "stableId": 366027815,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.get_rotation",
+      "stableId": 384109339,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.exit",
+      "stableId": 389692837,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.get_world_scale",
+      "stableId": 457161058,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.serialize",
+      "stableId": 466939425,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:html5.run",
+      "stableId": 475687915,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.set_group_gain",
+      "stableId": 497116905,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:profiler.scope_begin",
+      "stableId": 507784421,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:tilemap.set_tile",
+      "stableId": 530608877,
+      "maximumArgumentCount": 6
+    },
+    {
+      "id": "script:types.is_hash",
+      "stableId": 543852986,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:bit.lshift",
+      "stableId": 553650099,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:bit.tobit",
+      "stableId": 578552117,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.clear",
+      "stableId": 583164307,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.set_parent",
+      "stableId": 593473189,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:vmath.quat_rotation_y",
+      "stableId": 603084884,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.set_render_enable",
+      "stableId": 606958618,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.set_position",
+      "stableId": 608141138,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sys.get_connectivity",
+      "stableId": 610646079,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:vmath.quat_rotation_x",
+      "stableId": 619862503,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:model.get_aabb",
+      "stableId": 621943862,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:font.add_font",
+      "stableId": 638454056,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.quat_rotation_z",
+      "stableId": 653417741,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.set_pan",
+      "stableId": 665323993,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:resource.create_buffer",
+      "stableId": 684194101,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.set_blend_equation_separate",
+      "stableId": 721632055,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:hash_to_hex",
+      "stableId": 754452606,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.get_orthographic_mode",
+      "stableId": 780726310,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.save",
+      "stableId": 798578280,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:collectionproxy.set_collection",
+      "stableId": 803274747,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:msg.url",
+      "stableId": 806414134,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:camera.get_auto_aspect_ratio",
+      "stableId": 815384074,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.get_window_height",
+      "stableId": 821977639,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:factory.unload",
+      "stableId": 826508291,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:profiler.enable_ui",
+      "stableId": 844414261,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_polygon_offset",
+      "stableId": 851073219,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sound.stop",
+      "stableId": 851439019,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.matrix4_translation",
+      "stableId": 889923285,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.sleep",
+      "stableId": 902564824,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:b2d.get_version",
+      "stableId": 984377853,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:camera.get_view",
+      "stableId": 986113063,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.get_cameras",
+      "stableId": 1001666066,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:sound.is_phone_call_active",
+      "stableId": 1027591192,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:material.set_constants",
+      "stableId": 1039973353,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:window.set_mouse_lock",
+      "stableId": 1050223476,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.gettime",
+      "stableId": 1053915798,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:go.get_world_scale_uniform",
+      "stableId": 1055817377,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.matrix4_perspective",
+      "stableId": 1058276904,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:gui.hide_keyboard",
+      "stableId": 1066639565,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:material.get_vertex_attributes",
+      "stableId": 1070053126,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_compute",
+      "stableId": 1089182856,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:msg.post",
+      "stableId": 1111726479,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:physics.get_joint_reaction_force",
+      "stableId": 1120188142,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:window.get_dim_mode",
+      "stableId": 1130709659,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:bit.bswap",
+      "stableId": 1151793552,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.get_ifaddrs",
+      "stableId": 1174885233,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:go.cancel_animations",
+      "stableId": 1183026732,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:crash.set_user_field",
+      "stableId": 1193509462,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:physics.get_shape",
+      "stableId": 1220373797,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.matrix4",
+      "stableId": 1238853489,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.get_gravity",
+      "stableId": 1242286766,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:crash.get_modules",
+      "stableId": 1244117951,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:model.get_go",
+      "stableId": 1244796042,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:bit.arshift",
+      "stableId": 1244951420,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sys.load",
+      "stableId": 1260100361,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:crash.get_signum",
+      "stableId": 1269208753,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.set_gravity",
+      "stableId": 1277170138,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.get_config_int",
+      "stableId": 1282948964,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.ortho_inv",
+      "stableId": 1292408212,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.get_application_info",
+      "stableId": 1294659359,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.dns.tohostname",
+      "stableId": 1298827590,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.exists",
+      "stableId": 1311027776,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.euler_to_quat",
+      "stableId": 1329930197,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:compute.get_samplers",
+      "stableId": 1345946881,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.dns.gethostname",
+      "stableId": 1367399751,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:render.set_color_mask",
+      "stableId": 1380158343,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:window.get_safe_area",
+      "stableId": 1389820634,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:sys.exists",
+      "stableId": 1421868765,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.get_joint_reaction_torque",
+      "stableId": 1431636929,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:image.load_buffer",
+      "stableId": 1439789256,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:profiler.get_memory_usage",
+      "stableId": 1450101103,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:vmath.quat_from_to",
+      "stableId": 1458980654,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:go.get_id",
+      "stableId": 1477563324,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_stencil_op",
+      "stableId": 1483760217,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:bit.rshift",
+      "stableId": 1486569517,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:go.get_world_transform",
+      "stableId": 1495634860,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.pause",
+      "stableId": 1502096075,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:camera.get_orthographic_zoom",
+      "stableId": 1514123934,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:json.decode",
+      "stableId": 1547570734,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:label.get_text",
+      "stableId": 1547809370,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.set_vsync_swap_interval",
+      "stableId": 1577053319,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.get_config_number",
+      "stableId": 1601401386,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:collectionfactory.unload",
+      "stableId": 1613326455,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.get_fov",
+      "stableId": 1655100321,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_stencil_func",
+      "stableId": 1699887816,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:sprite.set_hflip",
+      "stableId": 1703142815,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sys.get_sys_info",
+      "stableId": 1715761682,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.matrix4_axis_angle",
+      "stableId": 1732915491,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:profiler.view_recorded_frame",
+      "stableId": 1794446851,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.dispatch_compute",
+      "stableId": 1831038998,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:render.set_depth_func",
+      "stableId": 1832879575,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.mul_per_elem",
+      "stableId": 1848085754,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:font.get_info",
+      "stableId": 1863401472,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.get_maskbit",
+      "stableId": 1870095059,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:window.set_size",
+      "stableId": 1882390770,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:label.set_text",
+      "stableId": 1888249062,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:material.get_samplers",
+      "stableId": 1893279761,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.set_safe_area_mode",
+      "stableId": 1932609869,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:graphics.get_engine_adapters",
+      "stableId": 1938117379,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:resource.create_atlas",
+      "stableId": 1985681678,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.get_height",
+      "stableId": 1986171713,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:render.set_view",
+      "stableId": 1992852954,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:graphics.get_adapter_info",
+      "stableId": 1995008024,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:sound.is_music_playing",
+      "stableId": 2034901354,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.get_width",
+      "stableId": 2048321486,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:sys.open_url",
+      "stableId": 2064699563,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:camera.set_far_z",
+      "stableId": 2081791798,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:go.set_rotation",
+      "stableId": 2093413559,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.set_projection",
+      "stableId": 2094481018,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.reset_nodes",
+      "stableId": 2107179008,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:vmath.matrix4_scale",
+      "stableId": 2116175008,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:crash.load_previous",
+      "stableId": 2128448069,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:crash.write_dump",
+      "stableId": 2139022713,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:vmath.matrix4_look_at",
+      "stableId": 2149531511,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:window.get_display_scale",
+      "stableId": 2150954578,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:render.get_window_width",
+      "stableId": 2157256624,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:tilemap.get_bounds",
+      "stableId": 2158702312,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_viewport",
+      "stableId": 2171506453,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:go.set_scale",
+      "stableId": 2172419017,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:material.get_constants",
+      "stableId": 2177588733,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:liveupdate.get_mounts",
+      "stableId": 2185826800,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:profiler.set_ui_mode",
+      "stableId": 2218436408,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.dns.getnameinfo",
+      "stableId": 2254437809,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.world_to_local_transform",
+      "stableId": 2265777619,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:font.set_style",
+      "stableId": 2283853637,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:sys.load_resource",
+      "stableId": 2308150026,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sprite.set_vflip",
+      "stableId": 2316635445,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:crash.get_sys_field",
+      "stableId": 2320525628,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:material.get_textures",
+      "stableId": 2324364704,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.get_projection",
+      "stableId": 2326768707,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:tilemap.get_tiles",
+      "stableId": 2340730158,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:profiler.recorded_frame_count",
+      "stableId": 2347140851,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:font.remove_font",
+      "stableId": 2369627843,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.length",
+      "stableId": 2370510694,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.get_joint_properties",
+      "stableId": 2390276224,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:crash.set_file_path",
+      "stableId": 2406941902,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:model.get_mesh_enabled",
+      "stableId": 2409536311,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:resource.get_text_metrics",
+      "stableId": 2409976854,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:render.disable_material",
+      "stableId": 2431147342,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:render.set_depth_mask",
+      "stableId": 2443358201,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.get_groups",
+      "stableId": 2474752686,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:window.set_dim_mode",
+      "stableId": 2490982863,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:bit.tohex",
+      "stableId": 2491340691,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:model.set_mesh_enabled",
+      "stableId": 2492040859,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:go.world_to_local_position",
+      "stableId": 2492984466,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.matrix4_compose",
+      "stableId": 2501238546,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_y",
+      "stableId": 2509648852,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.get_group_name",
+      "stableId": 2520029065,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_x",
+      "stableId": 2526426471,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.clamp",
+      "stableId": 2532589649,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:go.get_world_position",
+      "stableId": 2533378019,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.draw_debug3d",
+      "stableId": 2546261723,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.matrix4_rotation_z",
+      "stableId": 2559981709,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:types.is_matrix4",
+      "stableId": 2597142853,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.show_keyboard",
+      "stableId": 2609195142,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:liveupdate.is_built_with_excluded_files",
+      "stableId": 2617193436,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:camera.set_near_z",
+      "stableId": 2620899633,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sound.get_rms",
+      "stableId": 2635085856,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.quat_to_euler",
+      "stableId": 2641296689,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.raycast_async",
+      "stableId": 2653555167,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:window.set_position",
+      "stableId": 2677153760,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.project",
+      "stableId": 2686972787,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.delete_texture",
+      "stableId": 2687333512,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.dot",
+      "stableId": 2708084985,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:compute.get_constants",
+      "stableId": 2714229261,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_stencil_mask",
+      "stableId": 2717264638,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.get_peak",
+      "stableId": 2722214421,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:camera.set_fov",
+      "stableId": 2734551893,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sys.get_config_string",
+      "stableId": 2745305294,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.quat",
+      "stableId": 2756728049,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:go.get_scale",
+      "stableId": 2771038861,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.create_joint",
+      "stableId": 2781780682,
+      "maximumArgumentCount": 7
+    },
+    {
+      "id": "script:vmath.matrix4_orthographic",
+      "stableId": 2797369728,
+      "maximumArgumentCount": 6
+    },
+    {
+      "id": "script:tilemap.get_tile",
+      "stableId": 2810309289,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:go.get_world_rotation",
+      "stableId": 2823544550,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.new_texture",
+      "stableId": 2832050683,
+      "maximumArgumentCount": 6
+    },
+    {
+      "id": "script:hash",
+      "stableId": 2845099200,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.set_engine_throttle",
+      "stableId": 2847174763,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:camera.set_orthographic_mode",
+      "stableId": 2873442090,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:physics.set_hflip",
+      "stableId": 2879664679,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:go.delete",
+      "stableId": 2920192283,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:physics.set_shape",
+      "stableId": 2940108129,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:camera.set_aspect_ratio",
+      "stableId": 2940707570,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.quat_basis",
+      "stableId": 2962238768,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:sys.get_host_path",
+      "stableId": 2971433320,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.length_sqr",
+      "stableId": 2981849211,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:json.encode",
+      "stableId": 2983061638,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.get_width",
+      "stableId": 3019471645,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:compute.get_textures",
+      "stableId": 3022270032,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.cross",
+      "stableId": 3022880242,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.get_layout",
+      "stableId": 3027276460,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:physics.set_group",
+      "stableId": 3028485791,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.slerp",
+      "stableId": 3033910890,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:profiler.enable",
+      "stableId": 3042163066,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:particlefx.stop",
+      "stableId": 3044283654,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:particlefx.set_constant",
+      "stableId": 3047358751,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:sys.set_update_frequency",
+      "stableId": 3058596528,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.matrix4_quat",
+      "stableId": 3063853257,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:profiler.set_ui_vsync_wait_visible",
+      "stableId": 3083074845,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:compute.set_samplers",
+      "stableId": 3114313573,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:material.set_textures",
+      "stableId": 3114410068,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:go.get_parent",
+      "stableId": 3138865481,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.get_scale_uniform",
+      "stableId": 3159049394,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.set_maskbit",
+      "stableId": 3160984935,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:render.enable_state",
+      "stableId": 3190141495,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:profiler.scope_end",
+      "stableId": 3195307493,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:tilemap.set_visible",
+      "stableId": 3195961805,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:camera.world_to_screen",
+      "stableId": 3205603148,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.set_blend_func_separate",
+      "stableId": 3206577455,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:crash.get_extra_data",
+      "stableId": 3280962645,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.get_group_gain",
+      "stableId": 3299788677,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.quat_matrix4",
+      "stableId": 3312627817,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:types.is_quat",
+      "stableId": 3338215221,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:crash.get_user_field",
+      "stableId": 3344562290,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:profiler.set_ui_view_mode",
+      "stableId": 3352616584,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:resource.set_sound",
+      "stableId": 3353499114,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:types.is_vector",
+      "stableId": 3360255165,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.set_joint_properties",
+      "stableId": 3377735404,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:liveupdate.remove_mount",
+      "stableId": 3486747409,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.vector3",
+      "stableId": 3491633886,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:go.set_scale_xy",
+      "stableId": 3492879989,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.inv",
+      "stableId": 3499206161,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:zlib.inflate",
+      "stableId": 3500234696,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:material.set_vertex_attributes",
+      "stableId": 3500426026,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:factory.get_status",
+      "stableId": 3501057803,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:factory.set_prototype",
+      "stableId": 3506659009,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sys.get_save_file",
+      "stableId": 3514141112,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:collectionfactory.create",
+      "stableId": 3514780936,
+      "maximumArgumentCount": 5
+    },
+    {
+      "id": "script:vmath.vector4",
+      "stableId": 3541966743,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:compute.set_textures",
+      "stableId": 3559237732,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:types.is_vector4",
+      "stableId": 3566590891,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:particlefx.reset_constant",
+      "stableId": 3569310218,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:vmath.normalize",
+      "stableId": 3582341977,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:bit.ror",
+      "stableId": 3586131806,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:model.get_blend_weights",
+      "stableId": 3593377177,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:crash.get_backtrace",
+      "stableId": 3602643930,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.get_engine_info",
+      "stableId": 3618995147,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:tilemap.reset_constant",
+      "stableId": 3635172296,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:types.is_vector3",
+      "stableId": 3650478986,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:model.cancel",
+      "stableId": 3654418919,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:window.set_title",
+      "stableId": 3682979203,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.rotate",
+      "stableId": 3691011585,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:compute.set_constants",
+      "stableId": 3697623257,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:camera.get_enabled",
+      "stableId": 3707335843,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:collectionfactory.set_prototype",
+      "stableId": 3724333493,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_render_order",
+      "stableId": 3733202233,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:bit.rol",
+      "stableId": 3753907996,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.enable_material",
+      "stableId": 3764411239,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:bit.bnot",
+      "stableId": 3772371256,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_cull_face",
+      "stableId": 3782563365,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:resource.get_atlas",
+      "stableId": 3804314878,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.set_auto_aspect_ratio",
+      "stableId": 3812610558,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.reset_keyboard",
+      "stableId": 3823880698,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:tilemap.get_tile_info",
+      "stableId": 3858575418,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:crash.release",
+      "stableId": 3860576604,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:go.get_position",
+      "stableId": 3918772974,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:physics.update_mass",
+      "stableId": 3925799645,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:image.get_astc_header",
+      "stableId": 3935561203,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:profiler.log_text",
+      "stableId": 3938384805,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:profiler.get_cpu_usage",
+      "stableId": 3944657330,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:window.get_size",
+      "stableId": 3950716894,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.get_layouts",
+      "stableId": 3963041037,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:physics.get_group",
+      "stableId": 3971564819,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sys.get_application_path",
+      "stableId": 3996665900,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:sys.deserialize",
+      "stableId": 4006243984,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.dns.getaddrinfo",
+      "stableId": 4017512905,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.lerp",
+      "stableId": 4026227879,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:window.get_mouse_lock",
+      "stableId": 4036039488,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:material.set_samplers",
+      "stableId": 4042791701,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.get_font_resource",
+      "stableId": 4047461608,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:collectionproxy.get_resources",
+      "stableId": 4052177648,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.dns.toip",
+      "stableId": 4052701394,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.get_far_z",
+      "stableId": 4055682442,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:render.set_camera",
+      "stableId": 4056267072,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:physics.set_vflip",
+      "stableId": 4109527981,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.quat_axis_angle",
+      "stableId": 4121318819,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:camera.screen_xy_to_world",
+      "stableId": 4124133706,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:gui.set_texture_data",
+      "stableId": 4140093370,
+      "maximumArgumentCount": 6
+    },
+    {
+      "id": "script:resource.set_atlas",
+      "stableId": 4144449218,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:model.set_blend_weights",
+      "stableId": 4149119709,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:camera.get_aspect_ratio",
+      "stableId": 4150761990,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sprite.reset_constant",
+      "stableId": 4156456045,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:bullet3d.get_version",
+      "stableId": 4161320994,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:label.get_layout_objects",
+      "stableId": 4187510320,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:types.is_url",
+      "stableId": 4210288007,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:camera.screen_to_world",
+      "stableId": 4212113566,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:sound.set_gain",
+      "stableId": 4220725117,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:vmath.conj",
+      "stableId": 4233115420,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.set_layout",
+      "stableId": 4235294552,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:collectionfactory.get_status",
+      "stableId": 4238240607,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:vmath.matrix4_frustum",
+      "stableId": 4245225016,
+      "maximumArgumentCount": 6
+    },
+    {
+      "id": "script:model.get_mesh_aabb",
+      "stableId": 4275324396,
+      "maximumArgumentCount": 1
+    }
+  ],
+  "declinedRoutes": [
+    {
+      "id": "script:bit.bor",
+      "stableId": 143800718,
+      "reason": "variadic-argument-window"
+    },
+    {
+      "id": "script:bit.band",
+      "stableId": 2020799616,
+      "reason": "variadic-argument-window"
+    },
+    {
+      "id": "script:bit.bxor",
+      "stableId": 2492420236,
+      "reason": "variadic-argument-window"
+    },
+    {
+      "id": "script:socket.skip",
+      "stableId": 2601339186,
+      "reason": "variadic-argument-window"
+    },
+    {
+      "id": "script:pprint",
+      "stableId": 2977240615,
+      "reason": "variadic-argument-window"
+    }
+  ],
+  "generatedSha256": {
+    "typescript": "1ddbfc42f12008f141879f95a5eea7e1a97f6e41431ecf197d1e06654983abf8"
+  },
+  "evidenceBoundary": {
+    "routeSelection": "derived-from-the-canonical-lowering-plan",
+    "cEmission": "requires-shermes-emit-c-consumer",
+    "compilation": "not-claimed",
+    "linkage": "not-claimed",
+    "runtime": "not-claimed"
+  },
+  "reportSha256": "71db8b5be4d2e436afafe218af2de6c8e02f916b380ade6800797e61d6ab6cf1"
+}

@@ -4,26 +4,39 @@ import { defineDefoldApp, sys } from "@deherm/sdk";
 import { contracts } from "./registry";
 
 const MARKER = "deherm-headless-conformance";
+const RUN_TICK = 2;
 const readCase = sys.getConfigString as unknown as (key: string) => unknown;
 
-defineDefoldApp((host) => ({
-  init() {
-    const report = (line: string): void => host.log("info", line);
-    report(`${MARKER}:harness:${82}:${16}`);
-    const selected = String(readCase("deherm_conformance.case") ?? "");
-    if (selected === "" || selected === "none") {
-      report(`${MARKER}:case-unselected`);
-      throw new Error("no headless conformance case was selected");
+defineDefoldApp((host) => {
+  const report = (line: string): void => host.log("info", line);
+  let selected = "";
+  let run: ((report: (line: string) => void) => boolean) | undefined;
+  let tick = 0;
+
+  return {
+    init() {
+      report(`${MARKER}:harness:${82}:${34}`);
+      selected = String(readCase("deherm_conformance.case") ?? "");
+      if (selected === "" || selected === "none") {
+        report(`${MARKER}:case-unselected`);
+        throw new Error("no headless conformance case was selected");
+      }
+      run = contracts[selected];
+      if (run === undefined) {
+        report(`${MARKER}:case-unknown:${selected}`);
+        throw new Error(`unknown headless conformance case: ${selected}`);
+      }
+    },
+    // The contract runs from update, not init, so every route is exercised
+    // against an engine frame that has already stepped its component worlds.
+    update() {
+      tick += 1;
+      if (tick !== RUN_TICK || run === undefined) return;
+      const ok = run(report);
+      report(`${MARKER}:case-result:${selected}:${ok ? "observed" : "mismatched"}`);
+      if (!ok) {
+        throw new Error(`headless conformance contract ${selected} mismatched`);
+      }
     }
-    const run = contracts[selected];
-    if (run === undefined) {
-      report(`${MARKER}:case-unknown:${selected}`);
-      throw new Error(`unknown headless conformance case: ${selected}`);
-    }
-    const ok = run(report);
-    report(`${MARKER}:case-result:${selected}:${ok ? "observed" : "mismatched"}`);
-    if (!ok) {
-      throw new Error(`headless conformance contract ${selected} mismatched`);
-    }
-  }
-}));
+  };
+});

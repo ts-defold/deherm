@@ -3,6 +3,7 @@
 #if !defined(DM_PLATFORM_HTML5)
 
 #include <defold_hermes/script_bridge_capi.hpp>
+#include <defold_hermes/deherm_profile.hpp>
 #include <defold_hermes/generated_script_handle_kinds.hpp>
 #include <defold_hermes/generated_script_universal_value_bindings.hpp>
 #include <defold_hermes/script_matrix4_arena.hpp>
@@ -921,6 +922,13 @@ std::shared_ptr<ScriptJsiBridgeLifetime> installScriptJsiBridge(jsi::Runtime& ru
         ScratchSlot* slot = scratchFrame.get();
         if (!slot) throw jsi::JSError(runtime, "Reentrant Defold script call depth exceeds the fixed scratch stack");
         const uint32_t id = stableId(runtime, args[0]);
+        // The JSI crossing is the baseline transport every route falls back to.
+        // Naming it here is what lets a drained ring say which transport a call
+        // actually took rather than inferring it from a missing typed-native
+        // span. The contract-shape dimension is zero: the JSI encoder is one
+        // generic value-graph walker rather than a per-contract frame.
+        DEHERM_PROFILE_TRANSPORT_SCOPE(DEHERM_PROFILE_TRANSPORT_JSI, id, 0u,
+            "deherm.jsi.call");
 #if defined(DEHERM_CANONICAL_RELEASE)
         if (!dehermCanonicalReleaseRouteEnabled(id)) {
           throw jsi::JSError(runtime, "Defold script route was removed from this release build");
@@ -954,7 +962,10 @@ std::shared_ptr<ScriptJsiBridgeLifetime> installScriptJsiBridge(jsi::Runtime& ru
         frame.tableScratchCapacity = static_cast<uint32_t>(slot->outputTableEntries.size());
         frame.matrix4Arena = &slot->matrix4Arena;
         frame.urlArena = &slot->urlArena;
-        if (!dispatchScriptCall(&frame)) throw jsi::JSError(runtime, scriptBridgeLastError());
+        if (!dispatchScriptCall(&frame)) {
+          DEHERM_PROFILE_SCOPE_FAILED();
+          throw jsi::JSError(runtime, scriptBridgeLastError());
+        }
         const auto* universalOperation = universal_value::find(id);
         if (universalOperation && universalOperation->maximumResultCount > 1) {
           jsi::Array results(runtime, universalOperation->maximumResultCount);

@@ -48,6 +48,13 @@ endif()
 # so it cannot answer "what does this transport cost in a release build";
 # DEHERM_PROFILE can be enabled in a Release configuration for exactly that.
 # ---------------------------------------------------------------------------
+# The packaged extension carries its own materialised switch in
+# `generated_build_config.h`, because Extender has no configure step. This
+# definition tells that header a real build system is in charge here, so this
+# checkout's DEHERM_PROFILE option stays the only authority for CMake targets
+# whether it is ON or OFF.
+add_compile_definitions(DEHERM_PROFILE_BUILD_SYSTEM=1)
+
 option(DEHERM_PROFILE "Emit deherm binding-transport telemetry spans" OFF)
 set(DEHERM_PROFILE_RING_CAPACITY "8192" CACHE STRING
   "Producer ring capacity in 32-byte telemetry records (power of two)")

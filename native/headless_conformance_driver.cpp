@@ -28,6 +28,10 @@ struct Case {
   std::string id;
   std::string collection;
   int max_ticks = 0;
+  // Per-case engine configuration, exactly as Defold's own engine harness
+  // selects a backend with `--config=physics.type=3D`. The driver never
+  // interprets these: they are opaque `key=value` tokens from the manifest.
+  std::vector<std::string> config;
 };
 
 struct Outcome {
@@ -43,11 +47,16 @@ Outcome RunCase(const std::string& project_file, const Case& item, int argc_extr
   std::string boot = "--config=bootstrap.main_collection=" + item.collection;
   std::string selected = "--config=deherm_conformance.case=" + item.id;
 
+  std::vector<std::string> overrides;
+  overrides.reserve(item.config.size());
+  for (size_t i = 0; i < item.config.size(); ++i) overrides.push_back("--config=" + item.config[i]);
+
   std::vector<const char*> argv;
   argv.push_back("deherm-headless-conformance");
   argv.push_back(boot.c_str());
   argv.push_back(selected.c_str());
   argv.push_back("--config=dmengine.unload_builtins=0");
+  for (size_t i = 0; i < overrides.size(); ++i) argv.push_back(overrides[i].c_str());
   for (int i = 0; i < argc_extra; ++i) argv.push_back(argv_extra[i]);
   argv.push_back(project_file.c_str());
 
@@ -94,11 +103,24 @@ bool ReadManifest(const char* path, std::vector<Case>* cases) {
     char* second = strchr(first + 1, '\t');
     if (second == 0) { fclose(file); return false; }
     *second = '\0';
+    // An optional fourth field carries space-separated engine configuration.
+    char* third = strchr(second + 1, '\t');
+    if (third != 0) *third = '\0';
     Case item;
     item.id = line;
     item.collection = first + 1;
     item.max_ticks = atoi(second + 1);
     if (item.max_ticks <= 0) { fclose(file); return false; }
+    if (third != 0) {
+      const char* cursor = third + 1;
+      while (*cursor != '\0') {
+        const char* space = strchr(cursor, ' ');
+        const size_t length = space != 0 ? static_cast<size_t>(space - cursor) : strlen(cursor);
+        if (length > 0) item.config.push_back(std::string(cursor, length));
+        if (space == 0) break;
+        cursor = space + 1;
+      }
+    }
     cases->push_back(item);
   }
   fclose(file);

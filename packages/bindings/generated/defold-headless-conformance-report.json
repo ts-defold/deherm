@@ -3,56 +3,506 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos",
   "variant": "headless",
+  "runtimeProfile": "default-legacy-bullet",
+  "detectedRuntimeProfiles": [
+    "default-legacy-bullet"
+  ],
   "evidenceStage": "runtime",
   "evidenceBoundary": "Observed contracts executed inside a real headless Defold engine driven one tick at a time through dmEngineUpdate. This report claims runtime behaviour only; it never promotes generation, compilation or linkage evidence, and it claims nothing for contracts recorded as unreachable or blocked.",
   "driver": "native/headless_conformance_driver.cpp",
   "planInputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "ca355c81ca01d5a2515937df150d74dde1fd40813886fbfb0d021e6acdce4739",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "356badf21c8a415d13b21dc368bc391e5f851fe29d80148d4ee6f127f4e7fcd3",
     "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "8d16dca1aa186e974a8a43eec0b38c6ef92fc42326e4c377718a2bd1846dbe00",
-    "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "bdd64114c6521fe278e3db4d649007cd5fa5f420dcae33ac9765ba27e5765df2",
+    "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
+    "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "8884e9042789b27655162577651feb63a79ce9c0611938817f439826cc44b3b9",
+    "packages/bindings/generated/defold-script-route-availability-profiles.json": "a15b5fae86aa4f91ec093c27098a03f0d6ac8f830615e9eff4922a049db8a216",
+    "packages/bindings/generated/defold-script-handle-lowering.json": "5a1bb08aca326f703e5f65f43db38ed7f2fd8d491a0c5d356f234b1cc9b63afa"
   },
   "contractCount": 82,
   "summary": {
-    "observed": 15,
+    "observed": 31,
     "mismatched": 0,
-    "engineFault": 1,
-    "blocked": 0,
-    "unreachable": 66
+    "engineFault": 0,
+    "blocked": 3,
+    "unreachable": 48
   },
   "propertySummary": {
-    "result-arity:observed-as-target-exception": 13,
-    "scratch-reuse:observed": 26,
-    "error-model:observed": 16,
-    "result-arity:observed": 13,
-    "error-model:not-applicable": 10
+    "handle-provenance:observed": 90,
+    "result-arity:observed": 82,
+    "scratch-reuse:observed": 129,
+    "error-model:observed": 104,
+    "result-arity:observed-as-target-exception": 49,
+    "scratch-reuse:not-applicable": 2,
+    "error-model:observed-raise-only": 2,
+    "error-model:not-applicable": 25,
+    "handle-provenance:blocked-producer-raised": 3,
+    "handle-provenance:blocked-producer-absent": 1
   },
   "contracts": [
     {
       "id": "contract_0139",
       "contractIndex": 139,
       "routeCount": 70,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 16,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 64,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 66,
-          "exampleRouteId": "script:b2d.body.apply_angular_impulse"
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_angular_impulse#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
         },
         {
-          "reason": "lua-stack-omit-profile",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.body.get_user_data"
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_angular_impulse#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "undefined"
         },
         {
-          "reason": "execution-policy-destructive",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.reset_mass_data"
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_angular_impulse#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
         },
         {
-          "reason": "harness-effect-guard:dump",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.dump"
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_angular_impulse#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_torque#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_torque#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "undefined"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_torque#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.apply_torque#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angle#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angle#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angle#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angle#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_damping#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_damping#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_damping#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_damping#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_velocity#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_velocity#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_velocity#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_angular_velocity#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_force#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_force#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_force#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_force#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_gravity_scale#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_gravity_scale#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_gravity_scale#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_gravity_scale#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_inertia#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_inertia#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_inertia#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_inertia#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_damping#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_damping#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_damping#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_damping#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_velocity#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_velocity#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_velocity#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_linear_velocity#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_local_center#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_local_center#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_local_center#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_local_center#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_mass#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_mass#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_mass#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_mass#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_position#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_position#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_position#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_position#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_type#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_type#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_type#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_type#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_world_center#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_world_center#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_world_center#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.get_world_center#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.is_active#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.is_active#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "boolean"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.is_active#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0139",
+          "route": "script:b2d.body.is_active#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -60,62 +510,528 @@
       "id": "contract_0140",
       "contractIndex": 140,
       "routeCount": 78,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 16,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 73,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 26,
-          "exampleRouteId": "script:b2d.body.compute_aabb"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_fixtures#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
-          "routeCount": 10,
-          "exampleRouteId": "script:bullet3d.world.cast_ray"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_fixtures#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btRigidBody",
-          "routeCount": 9,
-          "exampleRouteId": "script:bullet3d.constraint.create_cone_twist"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_fixtures#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
         },
         {
-          "reason": "context-fixture-missing:network",
-          "routeCount": 6,
-          "exampleRouteId": "script:socket.connect"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_fixtures#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         },
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
-          "routeCount": 6,
-          "exampleRouteId": "script:b2d.shape.get_contact_data"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_joints#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
         },
         {
-          "reason": "unsynthesizable-parameter-type:b2World",
-          "routeCount": 6,
-          "exampleRouteId": "script:b2d.world.cast_mover"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_joints#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
         },
         {
-          "reason": "multi-result-shape-unmodelled",
-          "routeCount": 5,
-          "exampleRouteId": "script:b2d.body.create_chain"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_joints#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
         },
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 5,
-          "exampleRouteId": "script:b2d.joint.create_gear"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_joints#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         },
         {
-          "reason": "unsynthesizable-parameter-type:b2Chain",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.chain.get_geometry"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_mass_data#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionShape",
-          "routeCount": 2,
-          "exampleRouteId": "script:bullet3d.shape.get_shape"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_mass_data#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionObject",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.collision_object.get_shapes"
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_mass_data#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_mass_data#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_transform#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_transform#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_transform#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.body.get_transform#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_aabb#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_aabb#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_aabb#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_aabb#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_filter_data#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_filter_data#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_filter_data#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_filter_data#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_shape#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_shape#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_shape#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.fixture.get_shape#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_distance#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_distance#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_distance#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_distance#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_distance#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_friction#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_friction#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_friction#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_friction#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_friction#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_gear#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_gear#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_gear#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "gear joints can only connect revolute and prismatic joints."
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_gear#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_gear#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_mouse#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_mouse#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_mouse#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_mouse#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_mouse#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_prismatic#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_prismatic#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_prismatic#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_prismatic#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_prismatic#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_pulley#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_pulley#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_pulley#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_pulley#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_pulley#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_revolute#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_revolute#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_revolute#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_revolute#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_revolute#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_rope#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_rope#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_rope#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_rope#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_rope#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_weld#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_weld#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#1"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_weld#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_weld#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0140",
+          "route": "script:b2d.joint.create_weld#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -123,12 +1039,45 @@
       "id": "contract_0141",
       "contractIndex": 141,
       "routeCount": 2,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 4,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "execution-policy-destructive",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.body.destroy_fixture"
+          "contract": "contract_0141",
+          "route": "script:b2d.body.destroy_fixture#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0141",
+          "route": "script:b2d.body.destroy_fixture#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "undefined"
+        },
+        {
+          "contract": "contract_0141",
+          "route": "script:b2d.body.destroy_fixture#required",
+          "property": "scratch-reuse",
+          "disposition": "not-applicable",
+          "detail": "route destroys its engine object, so repetition would not address the same object"
+        },
+        {
+          "contract": "contract_0141",
+          "route": "script:b2d.body.destroy_fixture#required",
+          "property": "error-model",
+          "disposition": "observed-raise-only",
+          "detail": "raised; boundary re-invocation withheld for a destructive route"
         }
       ]
     },
@@ -136,12 +1085,45 @@
       "id": "contract_0142",
       "contractIndex": 142,
       "routeCount": 1,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 4,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.get_next"
+          "contract": "contract_0142",
+          "route": "script:b2d.body.get_next#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0142",
+          "route": "script:b2d.body.get_next#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0142",
+          "route": "script:b2d.body.get_next#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0142",
+          "route": "script:b2d.body.get_next#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -149,12 +1131,45 @@
       "id": "contract_0143",
       "contractIndex": 143,
       "routeCount": 1,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 4,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.get_world"
+          "contract": "contract_0143",
+          "route": "script:b2d.body.get_world#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-body#0"
+        },
+        {
+          "contract": "contract_0143",
+          "route": "script:b2d.body.get_world#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "semantic handle result is a light userdata with no rooted identity"
+        },
+        {
+          "contract": "contract_0143",
+          "route": "script:b2d.body.get_world#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0143",
+          "route": "script:b2d.body.get_world#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -165,7 +1180,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "execution-policy-destructive",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.chain.destroy"
         }
@@ -178,7 +1193,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.chain.from_shape"
         }
@@ -191,7 +1206,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 8,
           "exampleRouteId": "script:b2d.chain.get_friction"
         }
@@ -204,7 +1219,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.chain.get_world"
         }
@@ -219,28 +1234,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "physics-2d",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0148",
-          "route": "script:b2d.get_body",
+          "route": "script:b2d.get_body#required",
           "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "disposition": "observed",
+          "detail": "object"
         },
         {
           "contract": "contract_0148",
-          "route": "script:b2d.get_body",
+          "route": "script:b2d.get_body#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0148",
-          "route": "script:b2d.get_body",
+          "route": "script:b2d.get_body#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -256,70 +1273,72 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 9,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0149",
-          "route": "script:b2d.get_version",
+          "route": "script:b2d.get_version#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "object"
         },
         {
           "contract": "contract_0149",
-          "route": "script:b2d.get_version",
+          "route": "script:b2d.get_version#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0149",
-          "route": "script:b2d.get_version",
+          "route": "script:b2d.get_version#required",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0149",
-          "route": "script:bullet3d.get_version",
+          "route": "script:bullet3d.get_version#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "object"
         },
         {
           "contract": "contract_0149",
-          "route": "script:bullet3d.get_version",
+          "route": "script:bullet3d.get_version#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0149",
-          "route": "script:bullet3d.get_version",
+          "route": "script:bullet3d.get_version#required",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0149",
-          "route": "script:image.get_astc_header",
+          "route": "script:image.get_astc_header#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "Data is not a valid .astc file"
         },
         {
           "contract": "contract_0149",
-          "route": "script:image.get_astc_header",
+          "route": "script:image.get_astc_header#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0149",
-          "route": "script:image.get_astc_header",
+          "route": "script:image.get_astc_header#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -331,30 +1350,37 @@
       "contractIndex": 150,
       "routeCount": 1,
       "exercisedRouteCount": 1,
-      "outcome": "engine-fault",
+      "outcome": "observed",
       "engine": {
-        "disposition": "engine-fault",
-        "exitCode": -1,
-        "ticks": 0,
-        "signal": "SIGSEGV",
-        "crashFrames": [
-          "_ZN12dmGameSystemL12B2D_GetWorldEP9lua_State",
-          "lj_BC_FUNCC",
-          "_ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter14dispatchUnsafeERNS1_15DispatchContextE",
-          "_ZN13defold_hermes22script_handle_lowering17CapturedLuaRouter17ProtectedDispatchEP9lua_State",
-          "lj_BC_FUNCC",
-          "dm_lua_cpcall",
-          "_ZN13defold_hermes18dispatchScriptCallEPNS_15ScriptCallFrameE",
-          "_ZNSt3__110__function6__funcIZN13defold_hermes22installScriptJsiBridgeERN8facebook3jsi7RuntimeEE3$_0FNS4_5ValueES6_RKS8_PS9_mEEclES6_SA_OSB_Om"
-        ]
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
       },
-      "observedPropertyCount": 0,
+      "profile": "physics-2d",
+      "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
-      "properties": [],
-      "blockers": [
+      "properties": [
         {
-          "reason": "engine-disposition:engine-fault",
-          "routeCount": 1
+          "contract": "contract_0150",
+          "route": "script:b2d.get_world#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "semantic handle result is a light userdata with no rooted identity"
+        },
+        {
+          "contract": "contract_0150",
+          "route": "script:b2d.get_world#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0150",
+          "route": "script:b2d.get_world#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         }
       ]
     },
@@ -362,12 +1388,45 @@
       "id": "contract_0151",
       "contractIndex": 151,
       "routeCount": 1,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 4,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "execution-policy-destructive",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.joint.destroy"
+          "contract": "contract_0151",
+          "route": "script:b2d.joint.destroy#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0151",
+          "route": "script:b2d.joint.destroy#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0151",
+          "route": "script:b2d.joint.destroy#required",
+          "property": "scratch-reuse",
+          "disposition": "not-applicable",
+          "detail": "route destroys its engine object, so repetition would not address the same object"
+        },
+        {
+          "contract": "contract_0151",
+          "route": "script:b2d.joint.destroy#required",
+          "property": "error-model",
+          "disposition": "observed-raise-only",
+          "detail": "raised; boundary re-invocation withheld for a destructive route"
         }
       ]
     },
@@ -375,12 +1434,465 @@
       "id": "contract_0152",
       "contractIndex": 152,
       "routeCount": 76,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 16,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 64,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 76,
-          "exampleRouteId": "script:b2d.joint.enable_limit"
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_limit#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_limit#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_limit#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_limit#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_motor#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_motor#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_motor#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.enable_motor#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_a#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_a#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_a#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_a#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_b#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_b#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_b#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_anchor_b#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_collide_connected#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_collide_connected#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_collide_connected#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_collide_connected#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_damping_ratio#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_damping_ratio#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_damping_ratio#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_damping_ratio#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_frequency#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_frequency#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_frequency#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_frequency#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_a#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_a#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_a#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_a#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_b#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_b#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_b#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_ground_anchor_b#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_hertz#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_hertz#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_hertz#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_hertz#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_angle#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_angle#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_angle#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_angle#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_speed#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_speed#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_speed#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_speed#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_translation#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_translation#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_translation#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_joint_translation#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_a#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_a#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_a#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_a#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_b#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_b#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_b#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0152",
+          "route": "script:b2d.joint.get_length_b#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -388,12 +1900,73 @@
       "id": "contract_0153",
       "contractIndex": 153,
       "routeCount": 2,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 2,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 8,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.joint.get_body_a"
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_a#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_a#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_a#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_a#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_b#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_b#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_b#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0153",
+          "route": "script:b2d.joint.get_body_b#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -401,12 +1974,73 @@
       "id": "contract_0154",
       "contractIndex": 154,
       "routeCount": 2,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 2,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-2d",
+      "observedPropertyCount": 8,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.joint.get_joint1"
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint1#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint1#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint1#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint1#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint2#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "box2d-joint#0"
+        },
+        {
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint2#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument codec mismatch"
+        },
+        {
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint2#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0154",
+          "route": "script:b2d.joint.get_joint2#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -417,7 +2051,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.joint.get_world"
         }
@@ -430,7 +2064,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 14,
           "exampleRouteId": "script:b2d.shape.are_contact_events_enabled"
         }
@@ -443,7 +2077,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.shape.get_body"
         }
@@ -456,7 +2090,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.shape.get_world"
         }
@@ -469,7 +2103,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2World",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 21,
           "exampleRouteId": "script:b2d.world.enable_continuous"
         }
@@ -479,99 +2113,353 @@
       "id": "contract_0160",
       "contractIndex": 160,
       "routeCount": 310,
-      "exercisedRouteCount": 4,
+      "exercisedRouteCount": 16,
       "outcome": "observed",
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
-      "observedPropertyCount": 12,
+      "profile": "physics-2d",
+      "observedPropertyCount": 48,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0160",
-          "route": "script:bit.arshift",
+          "route": "script:bit.arshift#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "number"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.arshift",
+          "route": "script:bit.arshift#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.arshift",
+          "route": "script:bit.arshift#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.bnot",
+          "route": "script:bit.bnot#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "number"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.bnot",
+          "route": "script:bit.bnot#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.bnot",
+          "route": "script:bit.bnot#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.bswap",
+          "route": "script:bit.bswap#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "number"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.bswap",
+          "route": "script:bit.bswap#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.bswap",
+          "route": "script:bit.bswap#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.lshift",
+          "route": "script:bit.lshift#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "number"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.lshift",
+          "route": "script:bit.lshift#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0160",
-          "route": "script:bit.lshift",
+          "route": "script:bit.lshift#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.rol#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.rol#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.rol#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.ror#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.ror#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.ror#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.rshift#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.rshift#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.rshift#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.tobit#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.tobit#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.tobit#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.tohex#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "string"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.tohex#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:bit.tohex#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_aspect_ratio#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0160:/probe#deherm' not found."
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_aspect_ratio#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_aspect_ratio#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_auto_aspect_ratio#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0160:/probe#deherm' not found."
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_auto_aspect_ratio#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_auto_aspect_ratio#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_cameras#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_cameras#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_cameras#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_enabled#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0160:/probe#deherm' not found."
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_enabled#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_enabled#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_far_z#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0160:/probe#deherm' not found."
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_far_z#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_far_z#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_fov#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0160:/probe#deherm' not found."
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_fov#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_fov#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_near_z#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Camera 'contract_0160:/probe#deherm' not found."
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_near_z#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0160",
+          "route": "script:camera.get_near_z#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
         }
       ]
     },
@@ -579,12 +2467,37 @@
       "id": "contract_0161",
       "contractIndex": 161,
       "routeCount": 3,
-      "outcome": "unreachable",
+      "exercisedRouteCount": 2,
+      "outcome": "blocked",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "engine",
+      "observedPropertyCount": 0,
+      "blockedPropertyCount": 2,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0161",
+          "route": "script:buffer.copy_buffer#required",
+          "property": "handle-provenance",
+          "disposition": "blocked-producer-raised",
+          "detail": "buffer-data: Could not get bufferc type resource: deherm_conformance"
+        },
+        {
+          "contract": "contract_0161",
+          "route": "script:resource.set#required",
+          "property": "handle-provenance",
+          "disposition": "blocked-producer-raised",
+          "detail": "buffer-data: Could not get bufferc type resource: deherm_conformance"
+        }
+      ],
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:buffer_data",
-          "routeCount": 3,
-          "exampleRouteId": "script:buffer.copy_buffer"
+          "reason": "runtime-blocked-producer-raised:buffer-data",
+          "routeCount": 2
         }
       ]
     },
@@ -592,12 +2505,30 @@
       "id": "contract_0162",
       "contractIndex": 162,
       "routeCount": 1,
-      "outcome": "unreachable",
+      "exercisedRouteCount": 1,
+      "outcome": "blocked",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "engine",
+      "observedPropertyCount": 0,
+      "blockedPropertyCount": 1,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0162",
+          "route": "script:buffer.copy_stream#required",
+          "property": "handle-provenance",
+          "disposition": "blocked-producer-absent",
+          "detail": "buffer-stream"
+        }
+      ],
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:buffer_stream",
-          "routeCount": 1,
-          "exampleRouteId": "script:buffer.copy_stream"
+          "reason": "runtime-blocked-producer-absent:buffer-stream",
+          "routeCount": 1
         }
       ]
     },
@@ -605,12 +2536,30 @@
       "id": "contract_0163",
       "contractIndex": 163,
       "routeCount": 1,
-      "outcome": "unreachable",
+      "exercisedRouteCount": 1,
+      "outcome": "blocked",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "engine",
+      "observedPropertyCount": 0,
+      "blockedPropertyCount": 1,
+      "mismatchedPropertyCount": 0,
+      "properties": [
+        {
+          "contract": "contract_0163",
+          "route": "script:buffer.get_stream#required",
+          "property": "handle-provenance",
+          "disposition": "blocked-producer-raised",
+          "detail": "buffer-data: Could not get bufferc type resource: deherm_conformance"
+        }
+      ],
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:buffer_data",
-          "routeCount": 1,
-          "exampleRouteId": "script:buffer.get_stream"
+          "reason": "runtime-blocked-producer-raised:buffer-data",
+          "routeCount": 1
         }
       ]
     },
@@ -618,22 +2567,465 @@
       "id": "contract_0164",
       "contractIndex": 164,
       "routeCount": 79,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 16,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-3d",
+      "observedPropertyCount": 64,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:btRigidBody",
-          "routeCount": 41,
-          "exampleRouteId": "script:bullet3d.rigid_body.apply_central_force"
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.activate#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionObject",
-          "routeCount": 37,
-          "exampleRouteId": "script:bullet3d.collision_object.activate"
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.activate#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "handle argument count mismatch"
         },
         {
-          "reason": "execution-policy-destructive",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.rigid_body.clear_forces"
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.activate#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.activate#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_activation_state#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_activation_state#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_activation_state#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_activation_state#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_motion_threshold#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_motion_threshold#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_motion_threshold#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_motion_threshold#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_swept_sphere_radius#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_swept_sphere_radius#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_swept_sphere_radius#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_ccd_swept_sphere_radius#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_group#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_group#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_group#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_group#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_mask#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_mask#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_mask#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_filter_mask#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_flags#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_flags#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_flags#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_collision_flags#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_contact_processing_threshold#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_contact_processing_threshold#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_contact_processing_threshold#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_contact_processing_threshold#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_deactivation_time#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_deactivation_time#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_deactivation_time#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_deactivation_time#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_friction#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_friction#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_friction#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_friction#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_internal_type#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_internal_type#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_internal_type#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_internal_type#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_position#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_position#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_position#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_position#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_restitution#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_restitution#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_restitution#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_restitution#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_rotation#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_rotation#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_rotation#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_rotation#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_shape_count#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_shape_count#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_shape_count#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.get_shape_count#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.has_collision_flag#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.has_collision_flag#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "boolean"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.has_collision_flag#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0164",
+          "route": "script:bullet3d.collision_object.has_collision_flag#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -641,12 +3033,45 @@
       "id": "contract_0165",
       "contractIndex": 165,
       "routeCount": 1,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-3d",
+      "observedPropertyCount": 4,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionObject",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.collision_object.get_shape"
+          "contract": "contract_0165",
+          "route": "script:bullet3d.collision_object.get_shape#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0165",
+          "route": "script:bullet3d.collision_object.get_shape#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0165",
+          "route": "script:bullet3d.collision_object.get_shape#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0165",
+          "route": "script:bullet3d.collision_object.get_shape#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -683,7 +3108,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "reason": "no-handle-producer-chain:btTypedConstraint",
           "routeCount": 34,
           "exampleRouteId": "script:bullet3d.constraint.enable_cone_twist_motor"
         }
@@ -696,7 +3121,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "reason": "no-handle-producer-chain:btTypedConstraint",
           "routeCount": 2,
           "exampleRouteId": "script:bullet3d.constraint.get_body_a"
         }
@@ -709,7 +3134,7 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "reason": "no-handle-producer-chain:btTypedConstraint",
           "routeCount": 1,
           "exampleRouteId": "script:bullet3d.constraint.get_world"
         }
@@ -724,49 +3149,51 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "physics-3d",
       "observedPropertyCount": 6,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0171",
-          "route": "script:bullet3d.get_collision_object",
+          "route": "script:bullet3d.get_collision_object#required",
           "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "disposition": "observed",
+          "detail": "object"
         },
         {
           "contract": "contract_0171",
-          "route": "script:bullet3d.get_collision_object",
+          "route": "script:bullet3d.get_collision_object#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0171",
-          "route": "script:bullet3d.get_collision_object",
+          "route": "script:bullet3d.get_collision_object#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0171",
-          "route": "script:bullet3d.get_rigid_body",
+          "route": "script:bullet3d.get_rigid_body#required",
           "property": "result-arity",
-          "disposition": "observed-as-target-exception",
-          "detail": "Instance deherm_conformance not found"
+          "disposition": "observed",
+          "detail": "object"
         },
         {
           "contract": "contract_0171",
-          "route": "script:bullet3d.get_rigid_body",
+          "route": "script:bullet3d.get_rigid_body#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0171",
-          "route": "script:bullet3d.get_rigid_body",
+          "route": "script:bullet3d.get_rigid_body#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -782,28 +3209,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "physics-3d",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0172",
-          "route": "script:bullet3d.get_world",
+          "route": "script:bullet3d.get_world#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "object"
         },
         {
           "contract": "contract_0172",
-          "route": "script:bullet3d.get_world",
+          "route": "script:bullet3d.get_world#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0172",
-          "route": "script:bullet3d.get_world",
+          "route": "script:bullet3d.get_world#required",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
@@ -814,12 +3243,45 @@
       "id": "contract_0173",
       "contractIndex": 173,
       "routeCount": 1,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-3d",
+      "observedPropertyCount": 4,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:btRigidBody",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.rigid_body.get_world"
+          "contract": "contract_0173",
+          "route": "script:bullet3d.rigid_body.get_world#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-object#0"
+        },
+        {
+          "contract": "contract_0173",
+          "route": "script:bullet3d.rigid_body.get_world#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0173",
+          "route": "script:bullet3d.rigid_body.get_world#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0173",
+          "route": "script:bullet3d.rigid_body.get_world#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -827,12 +3289,45 @@
       "id": "contract_0174",
       "contractIndex": 174,
       "routeCount": 1,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 1,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-3d",
+      "observedPropertyCount": 4,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionShape",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.shape.get_collision_object"
+          "contract": "contract_0174",
+          "route": "script:bullet3d.shape.get_collision_object#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-shape#0"
+        },
+        {
+          "contract": "contract_0174",
+          "route": "script:bullet3d.shape.get_collision_object#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0174",
+          "route": "script:bullet3d.shape.get_collision_object#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0174",
+          "route": "script:bullet3d.shape.get_collision_object#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -840,12 +3335,101 @@
       "id": "contract_0175",
       "contractIndex": 175,
       "routeCount": 4,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 3,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-3d",
+      "observedPropertyCount": 12,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionShape",
-          "routeCount": 4,
-          "exampleRouteId": "script:bullet3d.shape.get_index"
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_index#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-shape#0"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_index#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_index#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_index#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_type#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-shape#0"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_type#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_type#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.get_type#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.is_valid#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-shape#0"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.is_valid#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "boolean"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.is_valid#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0175",
+          "route": "script:bullet3d.shape.is_valid#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -856,8 +3440,13 @@
       "outcome": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
-          "routeCount": 2,
+          "reason": "unsynthesizable-parameter-type:bullet3d.shape.definition",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.world.cast_shape_async"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 1,
           "exampleRouteId": "script:bullet3d.world.cast_ray_async"
         }
       ]
@@ -866,12 +3455,101 @@
       "id": "contract_0177",
       "contractIndex": 177,
       "routeCount": 4,
-      "outcome": "unreachable",
-      "blockers": [
+      "exercisedRouteCount": 3,
+      "outcome": "observed",
+      "engine": {
+        "disposition": "exited",
+        "exitCode": 0,
+        "ticks": 3
+      },
+      "profile": "physics-3d",
+      "observedPropertyCount": 12,
+      "blockedPropertyCount": 0,
+      "mismatchedPropertyCount": 0,
+      "properties": [
         {
-          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
-          "routeCount": 4,
-          "exampleRouteId": "script:bullet3d.world.get_collision_object_count"
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_collision_object_count#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-world#0"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_collision_object_count#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_collision_object_count#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_collision_object_count#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_gravity#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-world#0"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_gravity#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "object"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_gravity#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.get_gravity#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.is_valid#required",
+          "property": "handle-provenance",
+          "disposition": "observed",
+          "detail": "bullet-world#0"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.is_valid#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "boolean"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.is_valid#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0177",
+          "route": "script:bullet3d.world.is_valid#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
         }
       ]
     },
@@ -879,96 +3557,287 @@
       "id": "contract_0178",
       "contractIndex": 178,
       "routeCount": 17,
-      "exercisedRouteCount": 4,
+      "exercisedRouteCount": 13,
       "outcome": "observed",
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
-      "observedPropertyCount": 12,
+      "profile": "engine",
+      "observedPropertyCount": 39,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0178",
-          "route": "script:camera.get_projection",
+          "route": "script:camera.get_projection#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Camera 'contract_0178:/contract_0178#contract_0178' not found."
+          "detail": "Camera 'contract_0178:/probe#deherm' not found."
         },
         {
           "contract": "contract_0178",
-          "route": "script:camera.get_projection",
+          "route": "script:camera.get_projection#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0178",
-          "route": "script:camera.get_projection",
+          "route": "script:camera.get_projection#required",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0178",
-          "route": "script:camera.get_view",
+          "route": "script:camera.get_view#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
-          "detail": "Camera 'contract_0178:/contract_0178#contract_0178' not found."
+          "detail": "Camera 'contract_0178:/probe#deherm' not found."
         },
         {
           "contract": "contract_0178",
-          "route": "script:camera.get_view",
+          "route": "script:camera.get_view#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0178",
-          "route": "script:camera.get_view",
+          "route": "script:camera.get_view#required",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0178",
-          "route": "script:go.get_id",
+          "route": "script:go.get_id#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "bigint"
         },
         {
           "contract": "contract_0178",
-          "route": "script:go.get_id",
+          "route": "script:go.get_id#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0178",
-          "route": "script:go.get_id",
+          "route": "script:go.get_id#required",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
         },
         {
           "contract": "contract_0178",
-          "route": "script:go.get_world_transform",
+          "route": "script:go.get_world_transform#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "object"
         },
         {
           "contract": "contract_0178",
-          "route": "script:go.get_world_transform",
+          "route": "script:go.get_world_transform#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0178",
-          "route": "script:go.get_world_transform",
+          "route": "script:go.get_world_transform#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:physics.get_gravity#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Physics world doesn't exist. Make sure you have at least one physics component in collection."
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:physics.get_gravity#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:physics.get_gravity#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:resource.set_sound#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "The resource was not found (-3): 8dacd79ab962b4f0, deherm_conformance"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:resource.set_sound#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:resource.set_sound#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.get_group_gain#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "number"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.get_group_gain#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.get_group_gain#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.get_group_name#required",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "bad argument #1 to '?' (hash expected, got string)"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.get_group_name#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.get_group_name#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.set_group_gain#required",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "undefined"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.set_group_gain#required",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:sound.set_group_gain#required",
+          "property": "error-model",
+          "disposition": "observed",
+          "detail": "raised and boundary remained usable"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_projection#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_projection#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_projection#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_view#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Invalid handle."
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_view#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:camera.get_view#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_id#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed",
+          "detail": "bigint"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_id#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_id#required-and-optional",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_world_transform#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Instance deherm_conformance not found"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_world_transform#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0178",
+          "route": "script:go.get_world_transform#required-and-optional",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
@@ -979,33 +3848,56 @@
       "id": "contract_0179",
       "contractIndex": 179,
       "routeCount": 1,
-      "exercisedRouteCount": 1,
+      "exercisedRouteCount": 2,
       "outcome": "observed",
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
-      "observedPropertyCount": 3,
+      "profile": "engine",
+      "observedPropertyCount": 6,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0179",
-          "route": "script:collectionfactory.load",
+          "route": "script:collectionfactory.load#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "Argument #2 is expected to be completion function."
         },
         {
           "contract": "contract_0179",
-          "route": "script:collectionfactory.load",
+          "route": "script:collectionfactory.load#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0179",
-          "route": "script:collectionfactory.load",
+          "route": "script:collectionfactory.load#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0179",
+          "route": "script:collectionfactory.load#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Argument #2 is expected to be completion function."
+        },
+        {
+          "contract": "contract_0179",
+          "route": "script:collectionfactory.load#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0179",
+          "route": "script:collectionfactory.load#required-and-optional",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
@@ -1047,28 +3939,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0182",
-          "route": "script:factory.create",
+          "route": "script:factory.create#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "Instance deherm_conformance not found"
         },
         {
           "contract": "contract_0182",
-          "route": "script:factory.create",
+          "route": "script:factory.create#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0182",
-          "route": "script:factory.create",
+          "route": "script:factory.create#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -1079,33 +3973,56 @@
       "id": "contract_0183",
       "contractIndex": 183,
       "routeCount": 1,
-      "exercisedRouteCount": 1,
+      "exercisedRouteCount": 2,
       "outcome": "observed",
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
-      "observedPropertyCount": 3,
+      "profile": "engine",
+      "observedPropertyCount": 6,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0183",
-          "route": "script:factory.load",
+          "route": "script:factory.load#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "Argument #2 is expected to be completion function."
         },
         {
           "contract": "contract_0183",
-          "route": "script:factory.load",
+          "route": "script:factory.load#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0183",
-          "route": "script:factory.load",
+          "route": "script:factory.load#required",
+          "property": "error-model",
+          "disposition": "not-applicable",
+          "detail": "route has no required argument to withhold"
+        },
+        {
+          "contract": "contract_0183",
+          "route": "script:factory.load#required-and-optional",
+          "property": "result-arity",
+          "disposition": "observed-as-target-exception",
+          "detail": "Argument #2 is expected to be completion function."
+        },
+        {
+          "contract": "contract_0183",
+          "route": "script:factory.load#required-and-optional",
+          "property": "scratch-reuse",
+          "disposition": "observed",
+          "detail": "64 repetitions"
+        },
+        {
+          "contract": "contract_0183",
+          "route": "script:factory.load#required-and-optional",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
@@ -1352,28 +4269,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0201",
-          "route": "script:msg.post",
+          "route": "script:msg.post#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "undefined"
         },
         {
           "contract": "contract_0201",
-          "route": "script:msg.post",
+          "route": "script:msg.post#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0201",
-          "route": "script:msg.post",
+          "route": "script:msg.post#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -1389,28 +4308,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0202",
-          "route": "script:particlefx.play",
+          "route": "script:particlefx.play#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "undefined"
         },
         {
           "contract": "contract_0202",
-          "route": "script:particlefx.play",
+          "route": "script:particlefx.play#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0202",
-          "route": "script:particlefx.play",
+          "route": "script:particlefx.play#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -1426,28 +4347,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0203",
-          "route": "script:physics.set_event_listener",
+          "route": "script:physics.set_event_listener#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "Physics world doesn't exist. Make sure you have at least one physics component in collection."
         },
         {
           "contract": "contract_0203",
-          "route": "script:physics.set_event_listener",
+          "route": "script:physics.set_event_listener#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0203",
-          "route": "script:physics.set_event_listener",
+          "route": "script:physics.set_event_listener#required",
           "property": "error-model",
           "disposition": "not-applicable",
           "detail": "route has no required argument to withhold"
@@ -1567,70 +4490,72 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 9,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0212",
-          "route": "script:resource.get_buffer",
+          "route": "script:resource.get_buffer#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "Could not get bufferc type resource: deherm_conformance"
         },
         {
           "contract": "contract_0212",
-          "route": "script:resource.get_buffer",
+          "route": "script:resource.get_buffer#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0212",
-          "route": "script:resource.get_buffer",
+          "route": "script:resource.get_buffer#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0212",
-          "route": "script:resource.load",
+          "route": "script:resource.load#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "The resource was not found (-3): 8dacd79ab962b4f0, deherm_conformance"
         },
         {
           "contract": "contract_0212",
-          "route": "script:resource.load",
+          "route": "script:resource.load#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0212",
-          "route": "script:resource.load",
+          "route": "script:resource.load#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
         },
         {
           "contract": "contract_0212",
-          "route": "script:sys.load_buffer",
+          "route": "script:sys.load_buffer#required",
           "property": "result-arity",
           "disposition": "observed-as-target-exception",
           "detail": "sys.load_buffer failed to load the resource (code=-3)"
         },
         {
           "contract": "contract_0212",
-          "route": "script:sys.load_buffer",
+          "route": "script:sys.load_buffer#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0212",
-          "route": "script:sys.load_buffer",
+          "route": "script:sys.load_buffer#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -1659,28 +4584,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0214",
-          "route": "script:sound.play",
+          "route": "script:sound.play#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "number"
         },
         {
           "contract": "contract_0214",
-          "route": "script:sound.play",
+          "route": "script:sound.play#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0214",
-          "route": "script:sound.play",
+          "route": "script:sound.play#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"
@@ -1696,28 +4623,30 @@
       "engine": {
         "disposition": "exited",
         "exitCode": 0,
-        "ticks": 2
+        "ticks": 3
       },
+      "profile": "engine",
       "observedPropertyCount": 3,
+      "blockedPropertyCount": 0,
       "mismatchedPropertyCount": 0,
       "properties": [
         {
           "contract": "contract_0215",
-          "route": "script:sprite.play_flipbook",
+          "route": "script:sprite.play_flipbook#required",
           "property": "result-arity",
           "disposition": "observed",
           "detail": "undefined"
         },
         {
           "contract": "contract_0215",
-          "route": "script:sprite.play_flipbook",
+          "route": "script:sprite.play_flipbook#required",
           "property": "scratch-reuse",
           "disposition": "observed",
           "detail": "64 repetitions"
         },
         {
           "contract": "contract_0215",
-          "route": "script:sprite.play_flipbook",
+          "route": "script:sprite.play_flipbook#required",
           "property": "error-model",
           "disposition": "observed",
           "detail": "raised and boundary remained usable"

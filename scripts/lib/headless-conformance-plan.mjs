@@ -10,6 +10,18 @@
 // when every predicate below holds structurally, and a contract with no
 // eligible route is recorded as an explicit machine-readable blocker rather
 // than being skipped.
+//
+// Two structural mechanisms widen what a fixture can reach:
+//
+//   * fixture profiles - a profile declares the components its generated
+//     collection carries, the engine configuration the driver passes for it,
+//     and the script contexts it therefore supplies. A contract is assigned
+//     the profile that makes the most of its routes eligible.
+//   * handle provenance - the generated borrowed-handle classification
+//     partitions every handle route into producers and consumers. A parameter
+//     whose type names a borrowed handle kind is satisfied by calling that
+//     kind's producer chain against the same live engine, so a consumer route
+//     becomes reachable without any hand-authored scenario.
 
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
@@ -17,10 +29,7 @@ import { readFile } from "node:fs/promises";
 import { buildConformancePlan, loadConformanceInputs } from "../../packages/cli/src/conformance.mjs";
 import { publicScriptRootName } from "../../packages/compiler/src/script-public-api-policy.mjs";
 
-export const HEADLESS_CONFORMANCE_SCHEMA_VERSION = 1;
-
-/** Contexts this harness can supply from a headless engine with a game-object script instance. */
-export const SUPPLIED_CONTEXTS = Object.freeze(["engine", "game-object"]);
+export const HEADLESS_CONFORMANCE_SCHEMA_VERSION = 2;
 
 /** Deterministic inhabitants for the parameter types the harness can synthesize. */
 const SCALAR_INHABITANTS = Object.freeze({
@@ -30,11 +39,27 @@ const SCALAR_INHABITANTS = Object.freeze({
   string: "deherm_conformance"
 });
 
+/** Raw parameter types that name a component address rather than a plain string. */
+const ADDRESS_MEMBERS = Object.freeze(["url"]);
+
+/** Type member that means "this result may be absent"; it never selects a handle kind. */
+const ABSENT_MEMBER = "nil";
+
+/**
+ * Parameter names that address an element of a Lua-side collection. Lua is
+ * one-based, so zero is never an inhabitant of such a parameter and the scalar
+ * inhabitant would be refused by every engine range check.
+ */
+const ONE_BASED_INDEX_PARAMETER = /(^|_)index$/;
+
 /** Most routes carrying one contract are redundant evidence; exercise a bounded sample. */
-export const MAX_EXERCISES_PER_CONTRACT = 4;
+export const MAX_EXERCISES_PER_CONTRACT = 16;
 
 /** Repetitions used by the bounded-scratch property. */
 export const SCRATCH_REUSE_REPETITIONS = 64;
+
+/** How many producer hops a handle provider chain may take before it fails closed. */
+export const PROVIDER_CHAIN_DEPTH_LIMIT = 6;
 
 const SCRATCH_CONTRACT_TOKEN = "caller-owned-bounded-reentrant-scratch";
 const ERROR_MODEL_CONTRACT_TOKEN = "status-return-and-target-exception";
@@ -44,57 +69,320 @@ const ERROR_MODEL_CONTRACT_TOKEN = "status-return-and-target-exception";
 // runs in, because the driver reuses one process for every case.
 const EXTERNAL_WRITE_LEAF = /^(write|dump)/;
 
+/**
+ * Fixture profiles.
+ *
+ * A profile is a shape of generated collection, not a scenario: it declares
+ * what components the single generated game object carries, what engine
+ * configuration the driver passes for that case, which script contexts the
+ * resulting instance therefore supplies, and which borrowed-handle contexts
+ * can be rooted from it. Nothing here names a route or a contract.
+ *
+ * `physicsBackendPath` is the pinned Defold source directory whose script
+ * bindings this profile's physics backend implements. A borrowed handle kind
+ * is admissible in a profile only when every source the classification cites
+ * for that kind lies under the profile's backend directory, so 2D and 3D
+ * handle algebra can never be mixed into one engine instance.
+ */
+export const FIXTURE_PROFILES = Object.freeze([
+  Object.freeze({
+    id: "engine",
+    summary: "One game object carrying only the generated déherm script component.",
+    suppliedContexts: Object.freeze(["engine", "game-object"]),
+    handleContexts: Object.freeze(["runtime-global"]),
+    physicsBackendPath: null,
+    components: Object.freeze([]),
+    componentAddresses: Object.freeze([]),
+    engineConfig: Object.freeze([])
+  }),
+  Object.freeze({
+    id: "physics-2d",
+    summary: "One game object carrying the déherm script and a dynamic box collision object, with the Box2D backend selected.",
+    suppliedContexts: Object.freeze(["engine", "game-object"]),
+    handleContexts: Object.freeze(["runtime-global", "game-object-instance", "explicit-physics-handle"]),
+    physicsBackendPath: "/gamesys/scripts/box2d/",
+    components: Object.freeze(["collisionobject"]),
+    componentAddresses: Object.freeze(["#physics", "/probe_b#physics"]),
+    engineConfig: Object.freeze(["physics.type=2D"])
+  }),
+  Object.freeze({
+    id: "physics-3d",
+    summary: "One game object carrying the déherm script and a dynamic box collision object, with the Bullet backend selected.",
+    suppliedContexts: Object.freeze(["engine", "game-object"]),
+    handleContexts: Object.freeze(["runtime-global", "game-object-instance", "explicit-physics-handle"]),
+    physicsBackendPath: "/gamesys/scripts/bullet3d/",
+    components: Object.freeze(["collisionobject"]),
+    componentAddresses: Object.freeze(["#physics", "/probe_b#physics"]),
+    engineConfig: Object.freeze(["physics.type=3D"])
+  })
+]);
+
+export const DEFAULT_FIXTURE_PROFILE = FIXTURE_PROFILES[0];
+
+/** Contexts this harness can supply, across every profile. */
+export const SUPPLIED_CONTEXTS = Object.freeze(
+  [...new Set(FIXTURE_PROFILES.flatMap((profile) => profile.suppliedContexts))].sort()
+);
+
+/**
+ * Contexts no generated fixture can supply, and the exact obstacle for each.
+ *
+ * These are recorded so `context-fixture-missing` never reads as "somebody
+ * should write a fixture": for two of them no fixture is sufficient, because
+ * déherm's bootstrap attachment itself only accepts a game-object instance.
+ */
+export const UNSUPPLIED_CONTEXTS = Object.freeze([
+  Object.freeze({
+    context: "gui-scene",
+    obstacle: "bootstrap-attachment-requires-game-object-instance",
+    evidence: "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, " +
+      "so a .gui_script instance cannot attach the déherm runtime",
+    unblockedBy: "component-proxy gui-script attachment (.gui.ts transport)"
+  }),
+  Object.freeze({
+    context: "render-script",
+    obstacle: "bootstrap-attachment-requires-game-object-instance",
+    evidence: "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, " +
+      "so a .render_script instance cannot attach the déherm runtime",
+    unblockedBy: "a render-script attachment lane"
+  }),
+  Object.freeze({
+    context: "window",
+    obstacle: "headless-variant-selects-the-null-window-backend",
+    evidence: "engine/platform/src/platform_window_null.cpp is what the headless appmanifest links",
+    unblockedBy: "a windowed packaged-engine lane, which is not this instrument"
+  }),
+  Object.freeze({
+    context: "network",
+    obstacle: "hermetic-run-has-no-live-socket",
+    evidence: "the driver runs offline and must stay deterministic",
+    unblockedBy: "a loopback server fixture owned by the driver"
+  }),
+  Object.freeze({
+    context: "browser",
+    obstacle: "target-is-arm64-macos-not-js-web",
+    evidence: "html5 script routes require target js-web",
+    unblockedBy: "the browser/wasm conformance lane"
+  })
+]);
+
 const INPUT_PATHS = Object.freeze({
   loweringPlan: "packages/bindings/generated/defold-binding-lowering-plan.json",
   scriptIr: "packages/bindings/generated/defold-script-api-ir.json",
   universalValueBindings: "packages/bindings/generated/defold-script-universal-value-bindings.json",
-  scalarDispatch: "packages/bindings/generated/defold-script-scalar-dispatch.json"
+  scalarDispatch: "packages/bindings/generated/defold-script-scalar-dispatch.json",
+  borrowedHandles: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
+  routeAvailability: "packages/bindings/generated/defold-script-route-availability-profiles.json",
+  handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json"
 });
+
+/**
+ * The Defold runtime profile the headless driver's engine actually presents.
+ *
+ * The driver links the pinned SDK archives the `headless` appmanifest selects,
+ * which carry Box2D v2 and Bullet. déherm detects the profile at runtime from
+ * the registered Lua symbols; `scripts/check-headless-conformance.mjs` asserts
+ * that the detected profile equals this one, so a plan can never claim a route
+ * the linked engine does not register.
+ */
+export const HEADLESS_RUNTIME_PROFILE = "default-legacy-bullet";
 
 function sha256(text) {
   return createHash("sha256").update(text).digest("hex");
 }
 
-function synthesizeArgument(rawType) {
+function typeMembers(rawType) {
+  return String(rawType).split("|").map((member) => member.trim()).filter((member) => member.length > 0);
+}
+
+/**
+ * Route availability under one runtime profile.
+ *
+ * `catalog` is every route any profile documents. A route inside the catalog
+ * but outside the active profile's available set does not exist in the engine
+ * the driver links, so exercising it would record an exception that says
+ * nothing about the route's contract.
+ */
+export function buildRouteAvailability(document, runtimeProfile) {
+  const profiles = document?.profiles ?? {};
+  const active = profiles[runtimeProfile];
+  if (!active) {
+    throw new Error(`Unknown Defold runtime profile ${runtimeProfile}; known: ${Object.keys(profiles).join(", ")}`);
+  }
+  const catalog = new Set();
+  for (const profile of Object.values(profiles)) {
+    for (const route of profile.documentedRoutes ?? []) catalog.add(route.id ?? route);
+  }
+  const available = new Set((active.availableRoutes ?? []).map((route) => route.id ?? route));
+  return { runtimeProfile, features: [...(active.features ?? [])], catalog, available };
+}
+
+const EMPTY_AVAILABILITY = Object.freeze({
+  runtimeProfile: null,
+  features: [],
+  catalog: new Set(),
+  available: new Set()
+});
+
+/**
+ * The handle algebra a profile can root, derived from the generated
+ * borrowed-handle classification rather than from any name list here.
+ */
+export function buildHandleAlgebra(classification) {
+  const sourcePathById = new Map((classification?.inputEvidence?.defoldSources ?? []).map((item) => [item.id, item.path]));
+  const backendByKind = new Map();
+  const kindByRawType = new Map();
+  for (const kind of classification?.handleKinds ?? []) {
+    for (const rawType of kind.rawTypes ?? []) kindByRawType.set(rawType, kind.id);
+    const paths = (kind.sourceEvidence ?? []).map((id) => sourcePathById.get(id) ?? "");
+    const backends = new Set();
+    for (const profile of FIXTURE_PROFILES) {
+      if (profile.physicsBackendPath === null) continue;
+      if (paths.length > 0 && paths.every((path) => path.includes(profile.physicsBackendPath))) {
+        backends.add(profile.physicsBackendPath);
+      }
+    }
+    backendByKind.set(kind.id, backends.size === 1 ? [...backends][0] : null);
+  }
+  const rowsById = new Map((classification?.rows ?? []).map((row) => [row.id, row]));
+  return { backendByKind, kindByRawType, rowsById };
+}
+
+function kindAdmissible(profile, algebra, kindId) {
+  const backend = algebra.backendByKind.get(kindId) ?? null;
+  if (backend === null) return true;
+  return profile.physicsBackendPath === backend;
+}
+
+/**
+ * Synthesize one argument for one parameter.
+ *
+ * Order matters and is structural: a parameter naming a borrowed handle kind
+ * with a live producer chain is satisfied by that chain, a parameter naming a
+ * component address is satisfied by the profile's published address, and
+ * anything else falls back to the scalar inhabitants.
+ */
+function synthesizeArgument(parameter, context) {
+  const rawType = parameter?.rawType;
   if (typeof rawType !== "string" || rawType.length === 0) return { ok: false, reason: "untyped-parameter" };
-  if (Object.hasOwn(SCALAR_INHABITANTS, rawType)) return { ok: true, value: SCALAR_INHABITANTS[rawType] };
+  const { profile, providers, algebra, ordinals } = context;
+  const members = typeMembers(rawType);
+
+  for (const member of members) {
+    const kindId = algebra.kindByRawType.get(member);
+    if (kindId !== undefined && providers.has(kindId)) {
+      // Each occurrence of one handle kind in one call gets its own ordinal so
+      // a route needing two distinct engine objects is given two, not the same
+      // object twice.
+      const ordinal = ordinals.handles.get(kindId) ?? 0;
+      ordinals.handles.set(kindId, ordinal + 1);
+      return { ok: true, spec: { kind: "handle", handleKind: kindId, ordinal } };
+    }
+  }
+
+  // A parameter that names a component address takes one of the profile's
+  // published addresses instead of an arbitrary string, so the engine resolves
+  // it for real rather than refusing it.
+  if (profile.componentAddresses.length > 0 &&
+      members.some((member) => ADDRESS_MEMBERS.includes(member))) {
+    const ordinal = ordinals.addresses;
+    ordinals.addresses += 1;
+    return { ok: true, spec: { kind: "address", ordinal } };
+  }
+
+  if (rawType === "integer" && ONE_BASED_INDEX_PARAMETER.test(String(parameter.rawName ?? ""))) {
+    return { ok: true, spec: { kind: "literal", value: 1 } };
+  }
+
+  if (Object.hasOwn(SCALAR_INHABITANTS, rawType)) {
+    return { ok: true, spec: { kind: "literal", value: SCALAR_INHABITANTS[rawType] } };
+  }
   // A union whose inhabitants include a synthesizable scalar is satisfied by
   // that inhabitant. This is a shape rule, not a symbol allowlist.
-  const members = rawType.split("|").map((member) => member.trim());
   if (members.length > 1) {
     for (const key of Object.keys(SCALAR_INHABITANTS)) {
-      if (members.includes(key)) return { ok: true, value: SCALAR_INHABITANTS[key] };
+      if (members.includes(key)) return { ok: true, spec: { kind: "literal", value: SCALAR_INHABITANTS[key] } };
+    }
+  }
+
+  for (const member of members) {
+    const kindId = algebra.kindByRawType.get(member);
+    if (kindId !== undefined) {
+      return {
+        ok: false,
+        reason: kindAdmissible(profile, algebra, kindId)
+          ? `no-handle-producer-chain:${member}`
+          : `handle-kind-outside-fixture-profile:${member}`
+      };
     }
   }
   return { ok: false, reason: `unsynthesizable-parameter-type:${rawType}` };
 }
 
+// The generated TypeScript surface spells nested module segments in camel
+// case, exactly as the shared conformance plan's type access does.
+function camelSegment(value) {
+  if (/^[A-Z][A-Z0-9_]*$/.test(value)) return value;
+  return String(value).replace(/_([a-zA-Z0-9])/g, (_match, character) => character.toUpperCase());
+}
+
 function accessorPath(irFunction) {
   const [root, ...nested] = irFunction.modulePath;
-  return [publicScriptRootName(root), ...nested, irFunction.jsName];
+  return [publicScriptRootName(root), ...nested.map(camelSegment), irFunction.jsName];
 }
 
 function contractSlug(index) {
   return `contract_${String(index).padStart(4, "0")}`;
 }
 
+const EMPTY_ALGEBRA = Object.freeze({
+  backendByKind: new Map(),
+  kindByRawType: new Map(),
+  rowsById: new Map()
+});
+
 /**
- * Decide whether one route can act as a real-engine fixture for its contract.
- * Returns either `{ eligible: true, exercise }` or `{ eligible: false, reason }`
- * where `reason` is a stable machine-readable token.
+ * Decide whether one route can act as a real-engine fixture for its contract
+ * under one fixture profile. Returns either `{ eligible: true, exercise }` or
+ * `{ eligible: false, reason }` where `reason` is a stable machine-readable
+ * token.
  */
-export function classifyRoute({ unit, irFunction, universalBinding, scalarBinding, conformanceCase }) {
+export function classifyRoute({
+  unit,
+  irFunction,
+  universalBinding,
+  scalarBinding,
+  conformanceCase,
+  profile = DEFAULT_FIXTURE_PROFILE,
+  providers = new Map(),
+  algebra = EMPTY_ALGEBRA,
+  availability = EMPTY_AVAILABILITY,
+  admitDestructive = false
+}) {
   if (!irFunction) return { eligible: false, reason: "absent-from-script-projection" };
   if (!universalBinding) return { eligible: false, reason: "no-generated-universal-adapter" };
   if (unit.backends.luaStack.selection !== "emit") {
     return { eligible: false, reason: `lua-stack-${unit.backends.luaStack.selection}` };
   }
   if (!conformanceCase) return { eligible: false, reason: "absent-from-conformance-plan" };
-  if (conformanceCase.execution.policy !== "safe") {
+  // A route the catalog documents but the linked engine does not register is
+  // not reachable at all; exercising it would only observe déherm's own
+  // profile refusal, which is evidence about availability, not about the
+  // route's contract.
+  if (availability.catalog.has(unit.identity.id) && !availability.available.has(unit.identity.id)) {
+    return { eligible: false, reason: `route-unavailable-in-runtime-profile:${availability.runtimeProfile}` };
+  }
+  // The driver creates and destroys one engine instance per contract, so a
+  // destructive operation cannot reach any other contract's evidence. It is
+  // still admitted only as a last resort - see `admitDestructive` at the call
+  // site - because within one contract it would invalidate the engine objects
+  // its sibling exercises depend on.
+  const destructive = conformanceCase.execution.policy === "destructive";
+  if (conformanceCase.execution.policy !== "safe" && !(destructive && admitDestructive)) {
     return { eligible: false, reason: `execution-policy-${conformanceCase.execution.policy}` };
   }
   const contexts = conformanceCase.requiredContexts ?? [];
-  if (!contexts.some((context) => SUPPLIED_CONTEXTS.includes(context))) {
+  if (!contexts.some((context) => profile.suppliedContexts.includes(context))) {
     return { eligible: false, reason: `context-fixture-missing:${contexts.join("|") || "unknown"}` };
   }
   const leaf = String(irFunction.member ?? "");
@@ -107,32 +395,146 @@ export function classifyRoute({ unit, irFunction, universalBinding, scalarBindin
   if (universalBinding.maximumResultCount > 1) {
     return { eligible: false, reason: "multi-result-shape-unmodelled" };
   }
-  const args = [];
+  const classificationRow = algebra.rowsById.get(unit.identity.id) ?? null;
+  const context = { profile, providers, algebra, ordinals: { handles: new Map(), addresses: 0 } };
+  const required = [];
+  const optional = [];
+  let sawRequiredAfterOptional = false;
   for (const parameter of irFunction.parameters ?? []) {
-    if (parameter.optional) continue;
-    const synthesized = synthesizeArgument(parameter.rawType);
+    const synthesized = synthesizeArgument(parameter, context);
+    if (parameter.optional) {
+      // Lua positional arguments cannot skip a hole: stop extending the
+      // optional tail at the first inhabitant this harness cannot synthesize.
+      if (synthesized.ok && !sawRequiredAfterOptional) optional.push(synthesized.spec);
+      else sawRequiredAfterOptional = true;
+      continue;
+    }
     if (!synthesized.ok) return { eligible: false, reason: synthesized.reason };
-    args.push(synthesized.value);
+    required.push(synthesized.spec);
   }
-  if (args.length < universalBinding.minimumArgumentCount) {
+  if (required.length < universalBinding.minimumArgumentCount) {
     return { eligible: false, reason: "argument-arity-disagrees-with-projection" };
   }
+  const base = {
+    routeId: unit.identity.id,
+    stableId: unit.identity.stableId,
+    accessor: accessorPath(irFunction),
+    minimumArgumentCount: universalBinding.minimumArgumentCount,
+    maximumArgumentCount: universalBinding.maximumArgumentCount,
+    minimumResultCount: universalBinding.minimumResultCount,
+    maximumResultCount: universalBinding.maximumResultCount,
+    loweringFamily: universalBinding.loweringFamily,
+    resultCodec: scalarBinding ? scalarBinding.result.codec : null,
+    resultNullable: scalarBinding ? Boolean(scalarBinding.result.nullable) : null,
+    destructive,
+    returnHandleKind: classificationRow?.returnHandleKinds?.length === 1
+      ? classificationRow.returnHandleKinds[0]
+      : null
+  };
   return {
     eligible: true,
-    exercise: {
-      routeId: unit.identity.id,
-      stableId: unit.identity.stableId,
-      accessor: accessorPath(irFunction),
-      arguments: args,
-      minimumArgumentCount: universalBinding.minimumArgumentCount,
-      maximumArgumentCount: universalBinding.maximumArgumentCount,
-      minimumResultCount: universalBinding.minimumResultCount,
-      maximumResultCount: universalBinding.maximumResultCount,
-      loweringFamily: universalBinding.loweringFamily,
-      resultCodec: scalarBinding ? scalarBinding.result.codec : null,
-      resultNullable: scalarBinding ? Boolean(scalarBinding.result.nullable) : null
-    }
+    exercise: { ...base, arity: "required", arguments: required },
+    // An optional tail the harness can inhabit is a second, additive
+    // observation of the same route at a wider arity. It never replaces the
+    // required-only observation.
+    optionalExercise: optional.length > 0 && !destructive
+      ? { ...base, arity: "required-and-optional", arguments: [...required, ...optional] }
+      : null
   };
+}
+
+/**
+ * Build the handle provider chains one fixture profile can root.
+ *
+ * A producer is a classified route returning exactly one borrowed handle
+ * kind. It becomes a provider when the profile can supply its context and
+ * every one of its own parameters, which may itself be a handle produced by
+ * an already-resolved provider. The fixpoint is bounded so a cyclic handle
+ * algebra fails closed instead of looping.
+ */
+export function handleProducers(irFunctions, algebra) {
+  const producers = [];
+  for (const irFunction of irFunctions) {
+    const returns = irFunction.returns ?? [];
+    if (returns.length !== 1) continue;
+    const kinds = new Set(typeMembers(returns[0])
+      .filter((member) => member !== ABSENT_MEMBER)
+      .map((member) => algebra.kindByRawType.get(member))
+      .filter((kindId) => kindId !== undefined));
+    if (kinds.size !== 1) continue;
+    producers.push({ id: irFunction.id, handleKind: [...kinds][0] });
+  }
+  return producers.sort((left, right) => (left.id < right.id ? -1 : left.id > right.id ? 1 : 0));
+}
+
+export function buildHandleProviders({ profile, algebra, availability, lookup }) {
+  const providers = new Map();
+  const producers = handleProducers([...lookup.irById.values()], algebra);
+
+  for (let depth = 0; depth < PROVIDER_CHAIN_DEPTH_LIMIT; depth += 1) {
+    let added = false;
+    for (const producer of producers) {
+      const kindId = producer.handleKind;
+      if (providers.has(kindId)) continue;
+      if (!kindAdmissible(profile, algebra, kindId)) continue;
+      const row = algebra.rowsById.get(producer.id);
+      if (row?.requiredContext && !profile.handleContexts.includes(row.requiredContext)) continue;
+      const unit = lookup.unitById.get(producer.id);
+      if (!unit) continue;
+      const decision = classifyRoute({
+        unit,
+        irFunction: lookup.irById.get(producer.id),
+        universalBinding: lookup.universalById.get(producer.id),
+        scalarBinding: lookup.scalarById.get(producer.id),
+        conformanceCase: lookup.conformanceById.get(producer.id),
+        profile,
+        providers,
+        algebra,
+        availability
+      });
+      if (!decision.eligible) continue;
+      providers.set(kindId, {
+        handleKind: kindId,
+        routeId: producer.id,
+        accessor: decision.exercise.accessor,
+        arguments: decision.exercise.arguments,
+        depth: depth + 1
+      });
+      added = true;
+    }
+    if (!added) break;
+  }
+  return providers;
+}
+
+/**
+ * Cross-transport agreement for each handle kind a fixture profile can root.
+ *
+ * A borrowed handle crosses the boundary as a semantic handle only on routes
+ * the handle-lowering table covers. When a kind's producer is outside that
+ * table while its consumers are inside it, the producer's value is not the
+ * representation the consumers accept, and every consumer refuses a handle
+ * that a live engine really did produce. That disagreement is recorded here
+ * rather than left to be rediscovered from a runtime transcript.
+ */
+export function handleTransportAgreement(providers, loweredRouteIds, consumersByKind) {
+  return [...providers.values()]
+    .sort((left, right) => (left.handleKind < right.handleKind ? -1 : 1))
+    .map((provider) => {
+      const consumers = consumersByKind.get(provider.handleKind) ?? [];
+      const loweredConsumers = consumers.filter((id) => loweredRouteIds.has(id));
+      const producerLowered = loweredRouteIds.has(provider.routeId);
+      return {
+        handleKind: provider.handleKind,
+        producerRouteId: provider.routeId,
+        producerHandleLowered: producerLowered,
+        consumerCount: consumers.length,
+        handleLoweredConsumerCount: loweredConsumers.length,
+        agreement: producerLowered || loweredConsumers.length === 0
+          ? "agreed"
+          : "producer-outside-handle-lowering"
+      };
+    });
 }
 
 function propertiesForContract(contractRecord) {
@@ -152,16 +554,44 @@ export async function loadHeadlessConformanceInputs(root) {
   return documents;
 }
 
-export function buildHeadlessConformancePlan(documents, { target = "arm64-macos" } = {}) {
+export function buildHeadlessConformancePlan(documents, {
+  target = "arm64-macos",
+  runtimeProfile = HEADLESS_RUNTIME_PROFILE
+} = {}) {
   const loweringPlan = documents.loweringPlan.value;
   if (loweringPlan.schemaVersion !== 2) {
     throw new Error(`Headless conformance requires canonical lowering-plan schema v2, got ${loweringPlan.schemaVersion}`);
   }
   const conformancePlan = buildConformancePlan(documents.conformance, { target, contexts: ["*"], shard: "0/1" });
-  const conformanceById = new Map(conformancePlan.cases.map((item) => [item.id, item]));
-  const irById = new Map(documents.scriptIr.value.functions.map((item) => [item.id, item]));
-  const universalById = new Map(documents.universalValueBindings.value.bindings.map((item) => [item.id, item]));
-  const scalarById = new Map(documents.scalarDispatch.value.bindings.map((item) => [item.id, item]));
+  const classification = documents.borrowedHandles?.value ?? null;
+  const algebra = buildHandleAlgebra(classification);
+  const availability = buildRouteAvailability(documents.routeAvailability?.value ?? null, runtimeProfile);
+
+  const lookup = {
+    conformanceById: new Map(conformancePlan.cases.map((item) => [item.id, item])),
+    irById: new Map(documents.scriptIr.value.functions.map((item) => [item.id, item])),
+    universalById: new Map(documents.universalValueBindings.value.bindings.map((item) => [item.id, item])),
+    scalarById: new Map(documents.scalarDispatch.value.bindings.map((item) => [item.id, item])),
+    unitById: new Map(loweringPlan.units.map((unit) => [unit.identity.id, unit]))
+  };
+
+  const loweredRouteIds = new Set((documents.handleLowering?.value?.routes ?? []).map((route) => route.id));
+  const consumersByKind = new Map();
+  for (const irFunction of lookup.irById.values()) {
+    for (const parameter of irFunction.parameters ?? []) {
+      for (const member of typeMembers(parameter.rawType ?? "")) {
+        const kindId = algebra.kindByRawType.get(member);
+        if (kindId === undefined) continue;
+        if (!consumersByKind.has(kindId)) consumersByKind.set(kindId, []);
+        consumersByKind.get(kindId).push(irFunction.id);
+      }
+    }
+  }
+
+  const profileProviders = new Map(FIXTURE_PROFILES.map((profile) => [
+    profile.id,
+    buildHandleProviders({ profile, algebra, availability, lookup })
+  ]));
 
   const byContract = new Map();
   for (const unit of loweringPlan.units) {
@@ -176,28 +606,76 @@ export function buildHeadlessConformancePlan(documents, { target = "arm64-macos"
     const units = byContract.get(index).slice().sort((left, right) =>
       left.identity.id < right.identity.id ? -1 : left.identity.id > right.identity.id ? 1 : 0);
     const contractRecord = loweringPlan.tables.contracts[index];
-    const eligible = [];
-    const blockerCounts = new Map();
-    const blockerExamples = new Map();
-    for (const unit of units) {
-      const decision = classifyRoute({
-        unit,
-        irFunction: irById.get(unit.identity.id),
-        universalBinding: universalById.get(unit.identity.id),
-        scalarBinding: scalarById.get(unit.identity.id),
-        conformanceCase: conformanceById.get(unit.identity.id)
-      });
-      if (decision.eligible) {
-        eligible.push(decision.exercise);
-        continue;
+
+    // Every profile is tried; the contract takes the one that makes the most
+    // of its routes eligible, with the cheapest profile winning a tie.
+    let chosen = null;
+    for (const profile of FIXTURE_PROFILES) {
+      const providers = profileProviders.get(profile.id);
+      const classify = (admitDestructive) => {
+        const eligible = [];
+        const optional = [];
+        const blockerCounts = new Map();
+        const blockerExamples = new Map();
+        for (const unit of units) {
+          const decision = classifyRoute({
+            unit,
+            irFunction: lookup.irById.get(unit.identity.id),
+            universalBinding: lookup.universalById.get(unit.identity.id),
+            scalarBinding: lookup.scalarById.get(unit.identity.id),
+            conformanceCase: lookup.conformanceById.get(unit.identity.id),
+            profile,
+            providers,
+            algebra,
+            availability,
+            admitDestructive
+          });
+          if (decision.eligible) {
+            eligible.push(decision.exercise);
+            if (decision.optionalExercise) optional.push(decision.optionalExercise);
+            continue;
+          }
+          blockerCounts.set(decision.reason, (blockerCounts.get(decision.reason) ?? 0) + 1);
+          if (!blockerExamples.has(decision.reason)) blockerExamples.set(decision.reason, unit.identity.id);
+        }
+        return { eligible, optional, blockerCounts, blockerExamples };
+      };
+
+      // A contract with no safe route is retried admitting destructive ones,
+      // and then exercises exactly one: the engine instance is disposable, but
+      // a destroyed engine object must not be seen by a sibling exercise.
+      let { eligible, optional, blockerCounts, blockerExamples } = classify(false);
+      if (eligible.length === 0) {
+        const retried = classify(true);
+        if (retried.eligible.length > 0) {
+          eligible = retried.eligible.slice(0, 1);
+          optional = [];
+          blockerCounts = retried.blockerCounts;
+          blockerExamples = retried.blockerExamples;
+        }
       }
-      blockerCounts.set(decision.reason, (blockerCounts.get(decision.reason) ?? 0) + 1);
-      if (!blockerExamples.has(decision.reason)) blockerExamples.set(decision.reason, unit.identity.id);
+      // A profile that admits more of the contract's handle algebra wins even
+      // when neither profile can reach the contract, so the recorded blocker
+      // names the real obstacle rather than the profile mismatch, and a route
+      // that merely returns a handle still lands in a fixture that owns the
+      // engine world that handle belongs to.
+      const mismatched = [...blockerCounts.entries()]
+        .filter(([reason]) => reason.startsWith("handle-kind-outside-fixture-profile"))
+        .reduce((total, [, count]) => total + count, 0);
+      const grounded = eligible.filter((exercise) =>
+        (exercise.returnHandleKind !== null && kindAdmissible(profile, algebra, exercise.returnHandleKind)) ||
+        exercise.arguments.some((argument) => argument.kind === "handle")).length;
+      const candidate = { profile, eligible, optional, blockerCounts, blockerExamples, providers, mismatched, grounded };
+      const better = chosen === null ||
+        eligible.length > chosen.eligible.length ||
+        (eligible.length === chosen.eligible.length && grounded > chosen.grounded) ||
+        (eligible.length === chosen.eligible.length && grounded === chosen.grounded && mismatched < chosen.mismatched);
+      if (better) chosen = candidate;
     }
 
-    const blockers = [...blockerCounts.entries()]
+    const blockers = [...chosen.blockerCounts.entries()]
       .sort((left, right) => right[1] - left[1] || (left[0] < right[0] ? -1 : 1))
-      .map(([reason, routeCount]) => ({ reason, routeCount, exampleRouteId: blockerExamples.get(reason) }));
+      .map(([reason, routeCount]) => ({ reason, routeCount, exampleRouteId: chosen.blockerExamples.get(reason) }));
 
     const properties = propertiesForContract(contractRecord);
     const slug = contractSlug(index);
@@ -205,7 +683,7 @@ export function buildHeadlessConformancePlan(documents, { target = "arm64-macos"
       contractIndex: index,
       id: slug,
       routeCount: units.length,
-      eligibleRouteCount: eligible.length,
+      eligibleRouteCount: chosen.eligible.length,
       contract: {
         context: contractRecord.context?.kind ?? null,
         ownershipResult: contractRecord.ownership?.result ?? null,
@@ -217,29 +695,80 @@ export function buildHeadlessConformancePlan(documents, { target = "arm64-macos"
         scratch: contractRecord.scratch?.token ?? null
       },
       properties,
-      disposition: eligible.length > 0 ? "fixture" : "unreachable",
+      disposition: chosen.eligible.length > 0 ? "fixture" : "unreachable",
       blockers
     };
-    if (eligible.length > 0) {
+    if (chosen.eligible.length > 0) {
+      const destructive = chosen.eligible.some((exercise) => exercise.destructive);
+      const exercises = chosen.eligible.slice(0, destructive ? 1 : MAX_EXERCISES_PER_CONTRACT);
+      // The optional-arity variants ride in the remaining budget so a wider
+      // arity is never bought by dropping a route from the sample.
+      const budget = Math.max(0, MAX_EXERCISES_PER_CONTRACT - exercises.length);
+      const exercisedRoutes = new Set(exercises.map((exercise) => exercise.routeId));
+      const extras = chosen.optional
+        .filter((exercise) => exercisedRoutes.has(exercise.routeId))
+        .slice(0, budget);
+      record.profile = chosen.profile.id;
+      if (destructive) record.executionPolicy = "destructive-last-resort";
       record.collection = `/conformance/${slug}.collectionc`;
-      record.exercises = eligible.slice(0, MAX_EXERCISES_PER_CONTRACT);
+      record.engineConfig = [...chosen.profile.engineConfig];
+      record.exercises = [...exercises, ...extras];
+      // Transitive closure: a consumed handle kind drags in every producer its
+      // own chain depends on, so the recorded provenance is complete.
+      const usedKinds = new Set();
+      const visit = (kindId) => {
+        if (usedKinds.has(kindId)) return;
+        usedKinds.add(kindId);
+        for (const argument of chosen.providers.get(kindId)?.arguments ?? []) {
+          if (argument.kind === "handle") visit(argument.handleKind);
+        }
+      };
+      for (const exercise of record.exercises) {
+        for (const argument of exercise.arguments) {
+          if (argument.kind === "handle") visit(argument.handleKind);
+        }
+      }
+      record.handleProviders = [...usedKinds].sort().map((kindId) => {
+        const provider = chosen.providers.get(kindId);
+        return { handleKind: kindId, routeId: provider.routeId, depth: provider.depth };
+      });
     }
     contracts.push(record);
   }
 
   const reachable = contracts.filter((item) => item.disposition === "fixture");
+  const usedProfiles = [...new Set(reachable.map((item) => item.profile))].sort();
   return {
     schemaVersion: HEADLESS_CONFORMANCE_SCHEMA_VERSION,
     defoldRevision: loweringPlan.defoldRevision,
     target,
     variant: "headless",
+    runtimeProfile: availability.runtimeProfile,
+    runtimeProfileFeatures: availability.features,
     evidenceBoundary:
       "Runtime evidence only. A fixture disposition states that the harness can reach the contract " +
       "from a headless engine instance; it never promotes generation, compilation or linkage evidence, " +
       "and it makes no claim for a contract this plan records as unreachable.",
     suppliedContexts: [...SUPPLIED_CONTEXTS],
+    unsuppliedContexts: UNSUPPLIED_CONTEXTS.map((entry) => ({ ...entry })),
     scratchReuseRepetitions: SCRATCH_REUSE_REPETITIONS,
     maxExercisesPerContract: MAX_EXERCISES_PER_CONTRACT,
+    providerChainDepthLimit: PROVIDER_CHAIN_DEPTH_LIMIT,
+    fixtureProfiles: FIXTURE_PROFILES.map((profile) => ({
+      id: profile.id,
+      summary: profile.summary,
+      suppliedContexts: [...profile.suppliedContexts],
+      handleContexts: [...profile.handleContexts],
+      components: [...profile.components],
+      componentAddresses: [...profile.componentAddresses],
+      engineConfig: [...profile.engineConfig],
+      contractCount: reachable.filter((item) => item.profile === profile.id).length,
+      handleProviders: [...profileProviders.get(profile.id).values()]
+        .sort((left, right) => (left.handleKind < right.handleKind ? -1 : 1)),
+      handleTransportAgreement: handleTransportAgreement(
+        profileProviders.get(profile.id), loweredRouteIds, consumersByKind)
+    })),
+    usedProfiles,
     inputs: Object.fromEntries(Object.entries(INPUT_PATHS).map(([name, relative]) => [
       relative,
       documents[name].sha256
@@ -247,7 +776,9 @@ export function buildHeadlessConformancePlan(documents, { target = "arm64-macos"
     contractCount: contracts.length,
     reachableContractCount: reachable.length,
     unreachableContractCount: contracts.length - reachable.length,
-    exercisedRouteCount: reachable.reduce((total, item) => total + item.exercises.length, 0),
+    exercisedRouteCount: reachable.reduce(
+      (total, item) => total + new Set(item.exercises.map((exercise) => exercise.routeId)).size, 0),
+    exerciseCount: reachable.reduce((total, item) => total + item.exercises.length, 0),
     eligibleRouteCount: contracts.reduce((total, item) => total + item.eligibleRouteCount, 0),
     blockerSummary: summarizeBlockers(contracts),
     contracts

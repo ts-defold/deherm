@@ -1,0 +1,8 @@
+{
+  "//": "Type-check scope for the headless conformance bundle. The harness is bundled with its own program so this runtime-evidence lane depends only on the generated SDK surface it actually exercises, and is never blocked by unrelated packages.",
+  "extends": "./tsconfig.json",
+  "include": [
+    "packages/bindings/generated/headless-conformance/**/*.ts",
+    "packages/sdk/src/**/*.ts"
+  ]
+}

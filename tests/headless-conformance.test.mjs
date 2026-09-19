@@ -4,9 +4,14 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import {
+  FIXTURE_PROFILES,
+  HEADLESS_RUNTIME_PROFILE,
   MAX_EXERCISES_PER_CONTRACT,
   SUPPLIED_CONTEXTS,
+  UNSUPPLIED_CONTEXTS,
+  buildHandleAlgebra,
   buildHeadlessConformancePlan,
+  buildRouteAvailability,
   classifyRoute,
   loadHeadlessConformanceInputs
 } from "../scripts/lib/headless-conformance-plan.mjs";
@@ -47,6 +52,12 @@ test("a contract without a fixture fails closed with machine-readable blockers",
     }
     assert.ok(contract.exercises.length > 0, contract.id);
     assert.ok(contract.exercises.length <= MAX_EXERCISES_PER_CONTRACT, contract.id);
+    assert.ok(FIXTURE_PROFILES.some((profile) => profile.id === contract.profile), contract.id);
+    // A destructive route is admitted only as a last resort, and then alone.
+    if (contract.exercises.some((exercise) => exercise.destructive)) {
+      assert.equal(contract.exercises.length, 1, contract.id);
+      assert.equal(contract.executionPolicy, "destructive-last-resort", contract.id);
+    }
     assert.equal(contract.collection, `/conformance/${contract.id}.collectionc`);
     assert.equal(
       contract.eligibleRouteCount + contract.blockers.reduce((total, item) => total + item.routeCount, 0),
@@ -79,19 +90,72 @@ test("properties are selected by the contract record, never by route identity", 
 });
 
 test("a fixture only ever calls a route from a context the harness supplies", () => {
-  const eligible = plan.contracts
-    .filter((contract) => contract.disposition === "fixture")
-    .flatMap((contract) => contract.exercises);
+  const fixtures = plan.contracts.filter((contract) => contract.disposition === "fixture");
+  const eligible = fixtures.flatMap((contract) => contract.exercises);
   assert.ok(eligible.length > 0);
   for (const exercise of eligible) {
     assert.ok(exercise.accessor.length >= 2, exercise.routeId);
     assert.ok(exercise.arguments.length >= exercise.minimumArgumentCount, exercise.routeId);
     assert.ok(exercise.maximumResultCount <= 1, exercise.routeId);
     for (const argument of exercise.arguments) {
-      assert.ok(["number", "boolean", "string"].includes(typeof argument), exercise.routeId);
+      assert.ok(["literal", "address", "handle"].includes(argument.kind), exercise.routeId);
+      if (argument.kind === "literal") {
+        assert.ok(["number", "boolean", "string"].includes(typeof argument.value), exercise.routeId);
+      } else {
+        assert.ok(Number.isInteger(argument.ordinal) && argument.ordinal >= 0, exercise.routeId);
+      }
     }
   }
   assert.deepEqual(plan.suppliedContexts, [...SUPPLIED_CONTEXTS]);
+  assert.deepEqual(plan.unsuppliedContexts.map((entry) => entry.context), UNSUPPLIED_CONTEXTS.map((entry) => entry.context));
+});
+
+test("every handle argument names a provider the contract's profile can root", () => {
+  const profileById = new Map(plan.fixtureProfiles.map((profile) => [profile.id, profile]));
+  for (const contract of plan.contracts) {
+    if (contract.disposition !== "fixture") continue;
+    const rooted = new Set(profileById.get(contract.profile).handleProviders.map((provider) => provider.handleKind));
+    const recorded = new Set(contract.handleProviders.map((provider) => provider.handleKind));
+    for (const exercise of contract.exercises) {
+      for (const argument of exercise.arguments) {
+        if (argument.kind !== "handle") continue;
+        assert.ok(rooted.has(argument.handleKind), `${contract.id}: ${argument.handleKind}`);
+        assert.ok(recorded.has(argument.handleKind), `${contract.id}: ${argument.handleKind} is unrecorded`);
+      }
+    }
+    // The recorded provenance is transitively closed.
+    for (const provider of contract.handleProviders) {
+      const chain = profileById.get(contract.profile).handleProviders
+        .find((item) => item.handleKind === provider.handleKind);
+      for (const argument of chain.arguments) {
+        if (argument.kind === "handle") assert.ok(recorded.has(argument.handleKind), `${contract.id}: ${argument.handleKind}`);
+      }
+    }
+  }
+});
+
+test("the plan never exercises a route the linked engine does not register", () => {
+  const availability = buildRouteAvailability(documents.routeAvailability.value, HEADLESS_RUNTIME_PROFILE);
+  assert.equal(plan.runtimeProfile, HEADLESS_RUNTIME_PROFILE);
+  for (const contract of plan.contracts) {
+    for (const exercise of contract.exercises ?? []) {
+      if (!availability.catalog.has(exercise.routeId)) continue;
+      assert.ok(availability.available.has(exercise.routeId), exercise.routeId);
+    }
+  }
+});
+
+test("a handle kind is rooted only by a profile whose physics backend owns it", () => {
+  const algebra = buildHandleAlgebra(documents.borrowedHandles.value);
+  const profileById = new Map(FIXTURE_PROFILES.map((profile) => [profile.id, profile]));
+  for (const declared of plan.fixtureProfiles) {
+    const profile = profileById.get(declared.id);
+    for (const provider of declared.handleProviders) {
+      const backend = algebra.backendByKind.get(provider.handleKind) ?? null;
+      if (backend === null) continue;
+      assert.equal(backend, profile.physicsBackendPath, `${declared.id}: ${provider.handleKind}`);
+    }
+  }
 });
 
 test("route classification rejects an unsupplied context and an unsynthesizable parameter", () => {

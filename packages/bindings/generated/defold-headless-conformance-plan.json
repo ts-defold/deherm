@@ -1,46 +1,551 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos",
   "variant": "headless",
+  "runtimeProfile": "default-legacy-bullet",
+  "runtimeProfileFeatures": [
+    "core",
+    "box2d-v2",
+    "bullet3d"
+  ],
   "evidenceBoundary": "Runtime evidence only. A fixture disposition states that the harness can reach the contract from a headless engine instance; it never promotes generation, compilation or linkage evidence, and it makes no claim for a contract this plan records as unreachable.",
   "suppliedContexts": [
     "engine",
     "game-object"
   ],
-  "scratchReuseRepetitions": 64,
-  "maxExercisesPerContract": 4,
-  "inputs": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "4e25823968f903d41d1450ea2666e1978897dbadcfa491ec02316f41ece8176c",
-    "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "43e45305ee983316adf1fc6bf1089bda189896cbdeaeb9770490e5385fc3120f",
-    "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
-  },
-  "contractCount": 82,
-  "reachableContractCount": 16,
-  "unreachableContractCount": 66,
-  "exercisedRouteCount": 27,
-  "eligibleRouteCount": 178,
-  "blockerSummary": [
+  "unsuppliedContexts": [
     {
-      "family": "unsynthesizable-parameter-type",
-      "contractCount": 34,
-      "routeCount": 402
+      "context": "gui-scene",
+      "obstacle": "bootstrap-attachment-requires-game-object-instance",
+      "evidence": "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, so a .gui_script instance cannot attach the déherm runtime",
+      "unblockedBy": "component-proxy gui-script attachment (.gui.ts transport)"
     },
     {
+      "context": "render-script",
+      "obstacle": "bootstrap-attachment-requires-game-object-instance",
+      "evidence": "defold/defold_hermes/src/extension.cpp AttachLuaInstance calls dmScript::CheckGOInstance, so a .render_script instance cannot attach the déherm runtime",
+      "unblockedBy": "a render-script attachment lane"
+    },
+    {
+      "context": "window",
+      "obstacle": "headless-variant-selects-the-null-window-backend",
+      "evidence": "engine/platform/src/platform_window_null.cpp is what the headless appmanifest links",
+      "unblockedBy": "a windowed packaged-engine lane, which is not this instrument"
+    },
+    {
+      "context": "network",
+      "obstacle": "hermetic-run-has-no-live-socket",
+      "evidence": "the driver runs offline and must stay deterministic",
+      "unblockedBy": "a loopback server fixture owned by the driver"
+    },
+    {
+      "context": "browser",
+      "obstacle": "target-is-arm64-macos-not-js-web",
+      "evidence": "html5 script routes require target js-web",
+      "unblockedBy": "the browser/wasm conformance lane"
+    }
+  ],
+  "scratchReuseRepetitions": 64,
+  "maxExercisesPerContract": 16,
+  "providerChainDepthLimit": 6,
+  "fixtureProfiles": [
+    {
+      "id": "engine",
+      "summary": "One game object carrying only the generated déherm script component.",
+      "suppliedContexts": [
+        "engine",
+        "game-object"
+      ],
+      "handleContexts": [
+        "runtime-global"
+      ],
+      "components": [],
+      "componentAddresses": [],
+      "engineConfig": [],
+      "contractCount": 14,
+      "handleProviders": [
+        {
+          "handleKind": "buffer-data",
+          "routeId": "script:resource.get_buffer",
+          "accessor": [
+            "resource",
+            "getBuffer"
+          ],
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 1
+        },
+        {
+          "handleKind": "buffer-stream",
+          "routeId": "script:buffer.get_stream",
+          "accessor": [
+            "buffer",
+            "getStream"
+          ],
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "buffer-data",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 2
+        },
+        {
+          "handleKind": "resource-declaration",
+          "routeId": "script:go.get",
+          "accessor": [
+            "go",
+            "get"
+          ],
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 1
+        }
+      ],
+      "handleTransportAgreement": [
+        {
+          "handleKind": "buffer-data",
+          "producerRouteId": "script:resource.get_buffer",
+          "producerHandleLowered": true,
+          "consumerCount": 11,
+          "handleLoweredConsumerCount": 5,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "buffer-stream",
+          "producerRouteId": "script:buffer.get_stream",
+          "producerHandleLowered": true,
+          "consumerCount": 2,
+          "handleLoweredConsumerCount": 2,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "resource-declaration",
+          "producerRouteId": "script:go.get",
+          "producerHandleLowered": false,
+          "consumerCount": 2,
+          "handleLoweredConsumerCount": 0,
+          "agreement": "agreed"
+        }
+      ]
+    },
+    {
+      "id": "physics-2d",
+      "summary": "One game object carrying the déherm script and a dynamic box collision object, with the Box2D backend selected.",
+      "suppliedContexts": [
+        "engine",
+        "game-object"
+      ],
+      "handleContexts": [
+        "runtime-global",
+        "game-object-instance",
+        "explicit-physics-handle"
+      ],
+      "components": [
+        "collisionobject"
+      ],
+      "componentAddresses": [
+        "#physics",
+        "/probe_b#physics"
+      ],
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "contractCount": 12,
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "accessor": [
+            "b2d",
+            "getBody"
+          ],
+          "arguments": [
+            {
+              "kind": "address",
+              "ordinal": 0
+            }
+          ],
+          "depth": 1
+        },
+        {
+          "handleKind": "box2d-joint",
+          "routeId": "script:b2d.joint.create_distance",
+          "accessor": [
+            "b2d",
+            "joint",
+            "createDistance"
+          ],
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ],
+          "depth": 1
+        },
+        {
+          "handleKind": "box2d-world",
+          "routeId": "script:b2d.get_world",
+          "accessor": [
+            "b2d",
+            "getWorld"
+          ],
+          "arguments": [],
+          "depth": 1
+        },
+        {
+          "handleKind": "buffer-data",
+          "routeId": "script:resource.get_buffer",
+          "accessor": [
+            "resource",
+            "getBuffer"
+          ],
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 1
+        },
+        {
+          "handleKind": "buffer-stream",
+          "routeId": "script:buffer.get_stream",
+          "accessor": [
+            "buffer",
+            "getStream"
+          ],
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "buffer-data",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 2
+        },
+        {
+          "handleKind": "resource-declaration",
+          "routeId": "script:go.get",
+          "accessor": [
+            "go",
+            "get"
+          ],
+          "arguments": [
+            {
+              "kind": "address",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 1
+        }
+      ],
+      "handleTransportAgreement": [
+        {
+          "handleKind": "box2d-body",
+          "producerRouteId": "script:b2d.get_body",
+          "producerHandleLowered": true,
+          "consumerCount": 112,
+          "handleLoweredConsumerCount": 74,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "box2d-joint",
+          "producerRouteId": "script:b2d.joint.create_distance",
+          "producerHandleLowered": false,
+          "consumerCount": 88,
+          "handleLoweredConsumerCount": 82,
+          "agreement": "producer-outside-handle-lowering"
+        },
+        {
+          "handleKind": "box2d-world",
+          "producerRouteId": "script:b2d.get_world",
+          "producerHandleLowered": true,
+          "consumerCount": 31,
+          "handleLoweredConsumerCount": 21,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "buffer-data",
+          "producerRouteId": "script:resource.get_buffer",
+          "producerHandleLowered": true,
+          "consumerCount": 11,
+          "handleLoweredConsumerCount": 5,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "buffer-stream",
+          "producerRouteId": "script:buffer.get_stream",
+          "producerHandleLowered": true,
+          "consumerCount": 2,
+          "handleLoweredConsumerCount": 2,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "resource-declaration",
+          "producerRouteId": "script:go.get",
+          "producerHandleLowered": false,
+          "consumerCount": 2,
+          "handleLoweredConsumerCount": 0,
+          "agreement": "agreed"
+        }
+      ]
+    },
+    {
+      "id": "physics-3d",
+      "summary": "One game object carrying the déherm script and a dynamic box collision object, with the Bullet backend selected.",
+      "suppliedContexts": [
+        "engine",
+        "game-object"
+      ],
+      "handleContexts": [
+        "runtime-global",
+        "game-object-instance",
+        "explicit-physics-handle"
+      ],
+      "components": [
+        "collisionobject"
+      ],
+      "componentAddresses": [
+        "#physics",
+        "/probe_b#physics"
+      ],
+      "engineConfig": [
+        "physics.type=3D"
+      ],
+      "contractCount": 8,
+      "handleProviders": [
+        {
+          "handleKind": "buffer-data",
+          "routeId": "script:resource.get_buffer",
+          "accessor": [
+            "resource",
+            "getBuffer"
+          ],
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 1
+        },
+        {
+          "handleKind": "buffer-stream",
+          "routeId": "script:buffer.get_stream",
+          "accessor": [
+            "buffer",
+            "getStream"
+          ],
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "buffer-data",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 2
+        },
+        {
+          "handleKind": "bullet-object",
+          "routeId": "script:bullet3d.get_collision_object",
+          "accessor": [
+            "bullet3d",
+            "getCollisionObject"
+          ],
+          "arguments": [
+            {
+              "kind": "address",
+              "ordinal": 0
+            }
+          ],
+          "depth": 1
+        },
+        {
+          "handleKind": "bullet-shape",
+          "routeId": "script:bullet3d.collision_object.get_shape",
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getShape"
+          ],
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            }
+          ],
+          "depth": 2
+        },
+        {
+          "handleKind": "bullet-world",
+          "routeId": "script:bullet3d.get_world",
+          "accessor": [
+            "bullet3d",
+            "getWorld"
+          ],
+          "arguments": [],
+          "depth": 1
+        },
+        {
+          "handleKind": "resource-declaration",
+          "routeId": "script:go.get",
+          "accessor": [
+            "go",
+            "get"
+          ],
+          "arguments": [
+            {
+              "kind": "address",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ],
+          "depth": 1
+        }
+      ],
+      "handleTransportAgreement": [
+        {
+          "handleKind": "buffer-data",
+          "producerRouteId": "script:resource.get_buffer",
+          "producerHandleLowered": true,
+          "consumerCount": 11,
+          "handleLoweredConsumerCount": 5,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "buffer-stream",
+          "producerRouteId": "script:buffer.get_stream",
+          "producerHandleLowered": true,
+          "consumerCount": 2,
+          "handleLoweredConsumerCount": 2,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "bullet-object",
+          "producerRouteId": "script:bullet3d.get_collision_object",
+          "producerHandleLowered": true,
+          "consumerCount": 104,
+          "handleLoweredConsumerCount": 81,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "bullet-shape",
+          "producerRouteId": "script:bullet3d.collision_object.get_shape",
+          "producerHandleLowered": true,
+          "consumerCount": 8,
+          "handleLoweredConsumerCount": 5,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "bullet-world",
+          "producerRouteId": "script:bullet3d.get_world",
+          "producerHandleLowered": true,
+          "consumerCount": 16,
+          "handleLoweredConsumerCount": 4,
+          "agreement": "agreed"
+        },
+        {
+          "handleKind": "resource-declaration",
+          "producerRouteId": "script:go.get",
+          "producerHandleLowered": false,
+          "consumerCount": 2,
+          "handleLoweredConsumerCount": 0,
+          "agreement": "agreed"
+        }
+      ]
+    }
+  ],
+  "usedProfiles": [
+    "engine",
+    "physics-2d",
+    "physics-3d"
+  ],
+  "inputs": {
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "356badf21c8a415d13b21dc368bc391e5f851fe29d80148d4ee6f127f4e7fcd3",
+    "packages/bindings/generated/defold-script-api-ir.json": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "bdd64114c6521fe278e3db4d649007cd5fa5f420dcae33ac9765ba27e5765df2",
+    "packages/bindings/generated/defold-script-scalar-dispatch.json": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
+    "packages/bindings/generated/defold-script-borrowed-handle-classification.json": "8884e9042789b27655162577651feb63a79ce9c0611938817f439826cc44b3b9",
+    "packages/bindings/generated/defold-script-route-availability-profiles.json": "a15b5fae86aa4f91ec093c27098a03f0d6ac8f830615e9eff4922a049db8a216",
+    "packages/bindings/generated/defold-script-handle-lowering.json": "5a1bb08aca326f703e5f65f43db38ed7f2fd8d491a0c5d356f234b1cc9b63afa"
+  },
+  "contractCount": 82,
+  "reachableContractCount": 34,
+  "unreachableContractCount": 48,
+  "exercisedRouteCount": 129,
+  "exerciseCount": 135,
+  "eligibleRouteCount": 366,
+  "blockerSummary": [
+    {
       "family": "context-fixture-missing",
-      "contractCount": 19,
-      "routeCount": 124
+      "contractCount": 18,
+      "routeCount": 118
+    },
+    {
+      "family": "route-unavailable-in-runtime-profile",
+      "contractCount": 9,
+      "routeCount": 49
+    },
+    {
+      "family": "unsynthesizable-parameter-type",
+      "contractCount": 7,
+      "routeCount": 8
     },
     {
       "family": "execution-policy-destructive",
-      "contractCount": 10,
-      "routeCount": 11
+      "contractCount": 5,
+      "routeCount": 5
     },
     {
       "family": "multi-result-shape-unmodelled",
-      "contractCount": 5,
-      "routeCount": 27
+      "contractCount": 4,
+      "routeCount": 22
     },
     {
       "family": "no-generated-universal-adapter",
@@ -48,22 +553,17 @@
       "routeCount": 9
     },
     {
+      "family": "no-handle-producer-chain",
+      "contractCount": 3,
+      "routeCount": 37
+    },
+    {
       "family": "execution-policy-context-blocked",
       "contractCount": 1,
       "routeCount": 1
     },
     {
-      "family": "harness-effect-guard",
-      "contractCount": 1,
-      "routeCount": 1
-    },
-    {
       "family": "lua-stack-blocked-capability",
-      "contractCount": 1,
-      "routeCount": 2
-    },
-    {
-      "family": "lua-stack-omit-profile",
       "contractCount": 1,
       "routeCount": 2
     }
@@ -73,7 +573,7 @@
       "contractIndex": 139,
       "id": "contract_0139",
       "routeCount": 70,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 39,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -89,12 +589,17 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 66,
-          "exampleRouteId": "script:b2d.body.apply_angular_impulse"
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+          "routeCount": 14,
+          "exampleRouteId": "script:b2d.body.apply_linear_impulse_to_center"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 12,
+          "exampleRouteId": "script:b2d.body.apply_force"
         },
         {
           "reason": "lua-stack-omit-profile",
@@ -110,6 +615,449 @@
           "reason": "harness-effect-guard:dump",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.body.dump"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2d.body.B2",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.set_type"
+        }
+      ],
+      "profile": "physics-2d",
+      "collection": "/conformance/contract_0139.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
+        {
+          "routeId": "script:b2d.body.apply_angular_impulse",
+          "stableId": 726881113,
+          "accessor": [
+            "b2d",
+            "body",
+            "applyAngularImpulse"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.apply_torque",
+          "stableId": 761672151,
+          "accessor": [
+            "b2d",
+            "body",
+            "applyTorque"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_angle",
+          "stableId": 165698188,
+          "accessor": [
+            "b2d",
+            "body",
+            "getAngle"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_angular_damping",
+          "stableId": 3599094944,
+          "accessor": [
+            "b2d",
+            "body",
+            "getAngularDamping"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_angular_velocity",
+          "stableId": 3833370693,
+          "accessor": [
+            "b2d",
+            "body",
+            "getAngularVelocity"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_force",
+          "stableId": 1437207392,
+          "accessor": [
+            "b2d",
+            "body",
+            "getForce"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_gravity_scale",
+          "stableId": 1493593008,
+          "accessor": [
+            "b2d",
+            "body",
+            "getGravityScale"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_inertia",
+          "stableId": 2158714333,
+          "accessor": [
+            "b2d",
+            "body",
+            "getInertia"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_linear_damping",
+          "stableId": 4027002921,
+          "accessor": [
+            "b2d",
+            "body",
+            "getLinearDamping"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_linear_velocity",
+          "stableId": 2588459910,
+          "accessor": [
+            "b2d",
+            "body",
+            "getLinearVelocity"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_local_center",
+          "stableId": 829974432,
+          "accessor": [
+            "b2d",
+            "body",
+            "getLocalCenter"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_mass",
+          "stableId": 275202805,
+          "accessor": [
+            "b2d",
+            "body",
+            "getMass"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_position",
+          "stableId": 1505246598,
+          "accessor": [
+            "b2d",
+            "body",
+            "getPosition"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_type",
+          "stableId": 4261927433,
+          "accessor": [
+            "b2d",
+            "body",
+            "getType"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_world_center",
+          "stableId": 209676193,
+          "accessor": [
+            "b2d",
+            "body",
+            "getWorldCenter"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.is_active",
+          "stableId": 3359264919,
+          "accessor": [
+            "b2d",
+            "body",
+            "isActive"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
         }
       ]
     },
@@ -117,7 +1065,7 @@
       "contractIndex": 140,
       "id": "contract_0140",
       "routeCount": 78,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 21,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -133,20 +1081,20 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 26,
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+          "routeCount": 20,
           "exampleRouteId": "script:b2d.body.compute_aabb"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
+          "reason": "handle-kind-outside-fixture-profile:btDiscreteDynamicsWorld",
           "routeCount": 10,
           "exampleRouteId": "script:bullet3d.world.cast_ray"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btRigidBody",
+          "reason": "handle-kind-outside-fixture-profile:btRigidBody",
           "routeCount": 9,
           "exampleRouteId": "script:bullet3d.constraint.create_cone_twist"
         },
@@ -156,39 +1104,544 @@
           "exampleRouteId": "script:socket.connect"
         },
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
-          "routeCount": 6,
-          "exampleRouteId": "script:b2d.shape.get_contact_data"
-        },
-        {
-          "reason": "unsynthesizable-parameter-type:b2World",
-          "routeCount": 6,
-          "exampleRouteId": "script:b2d.world.cast_mover"
-        },
-        {
           "reason": "multi-result-shape-unmodelled",
-          "routeCount": 5,
-          "exampleRouteId": "script:b2d.body.create_chain"
+          "routeCount": 4,
+          "exampleRouteId": "script:b2d.world.cast_ray"
         },
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 5,
-          "exampleRouteId": "script:b2d.joint.create_gear"
-        },
-        {
-          "reason": "unsynthesizable-parameter-type:b2Chain",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.chain.get_geometry"
-        },
-        {
-          "reason": "unsynthesizable-parameter-type:btCollisionShape",
+          "reason": "handle-kind-outside-fixture-profile:btCollisionShape",
           "routeCount": 2,
           "exampleRouteId": "script:bullet3d.shape.get_shape"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionObject",
+          "reason": "handle-kind-outside-fixture-profile:btCollisionObject",
           "routeCount": 1,
           "exampleRouteId": "script:bullet3d.collision_object.get_shapes"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2d.filter",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.fixture.set_filter_data"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2d.fixture_definition",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.create_fixture"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2d.mass_data",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.set_mass_data"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:b2d.shape.definition",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.fixture.set_shape"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.world.cast_ray_closest"
+        }
+      ],
+      "profile": "physics-2d",
+      "collection": "/conformance/contract_0140.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
+        {
+          "routeId": "script:b2d.body.get_fixtures",
+          "stableId": 2698008815,
+          "accessor": [
+            "b2d",
+            "body",
+            "getFixtures"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_joints",
+          "stableId": 2537079216,
+          "accessor": [
+            "b2d",
+            "body",
+            "getJoints"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_mass_data",
+          "stableId": 662219582,
+          "accessor": [
+            "b2d",
+            "body",
+            "getMassData"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.body.get_transform",
+          "stableId": 842021223,
+          "accessor": [
+            "b2d",
+            "body",
+            "getTransform"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.fixture.get_aabb",
+          "stableId": 941873080,
+          "accessor": [
+            "b2d",
+            "fixture",
+            "getAabb"
+          ],
+          "minimumArgumentCount": 3,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.fixture.get_filter_data",
+          "stableId": 3062165453,
+          "accessor": [
+            "b2d",
+            "fixture",
+            "getFilterData"
+          ],
+          "minimumArgumentCount": 3,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.fixture.get_shape",
+          "stableId": 1143938691,
+          "accessor": [
+            "b2d",
+            "fixture",
+            "getShape"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createDistance"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_friction",
+          "stableId": 517998087,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createFriction"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_gear",
+          "stableId": 3014196138,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createGear"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createMouse"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createPrismatic"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_pulley",
+          "stableId": 105428164,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createPulley"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createRevolute"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_rope",
+          "stableId": 2656060889,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createRope"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "accessor": [
+            "b2d",
+            "joint",
+            "createWeld"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 3,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 1
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
+        },
+        {
+          "handleKind": "box2d-joint",
+          "routeId": "script:b2d.joint.create_distance",
+          "depth": 1
         }
       ]
     },
@@ -196,7 +1649,7 @@
       "contractIndex": 141,
       "id": "contract_0141",
       "routeCount": 2,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -212,12 +1665,57 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "execution-policy-destructive",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.body.destroy_fixture"
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.body.destroy_shape"
+        }
+      ],
+      "profile": "physics-2d",
+      "executionPolicy": "destructive-last-resort",
+      "collection": "/conformance/contract_0141.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
+        {
+          "routeId": "script:b2d.body.destroy_fixture",
+          "stableId": 203543744,
+          "accessor": [
+            "b2d",
+            "body",
+            "destroyFixture"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": true,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
         }
       ]
     },
@@ -225,7 +1723,7 @@
       "contractIndex": 142,
       "id": "contract_0142",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -241,12 +1739,46 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-2d",
+      "collection": "/conformance/contract_0142.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.get_next"
+          "routeId": "script:b2d.body.get_next",
+          "stableId": 1887140972,
+          "accessor": [
+            "b2d",
+            "body",
+            "getNext"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-body",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
         }
       ]
     },
@@ -254,7 +1786,7 @@
       "contractIndex": 143,
       "id": "contract_0143",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -270,12 +1802,46 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-2d",
+      "collection": "/conformance/contract_0143.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Body",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.body.get_world"
+          "routeId": "script:b2d.body.get_world",
+          "stableId": 3271172727,
+          "accessor": [
+            "b2d",
+            "body",
+            "getWorld"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-world",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-body",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
         }
       ]
     },
@@ -302,7 +1868,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "execution-policy-destructive",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.chain.destroy"
         }
@@ -331,7 +1897,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.chain.from_shape"
         }
@@ -360,7 +1926,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 8,
           "exampleRouteId": "script:b2d.chain.get_friction"
         }
@@ -389,7 +1955,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Chain",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.chain.get_world"
         }
@@ -417,7 +1983,11 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "physics-2d",
       "collection": "/conformance/contract_0148.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
       "exercises": [
         {
           "routeId": "script:b2d.get_body",
@@ -426,18 +1996,25 @@
             "b2d",
             "getBody"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 0,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-body",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "address",
+              "ordinal": 0
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 149,
@@ -461,7 +2038,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0149.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:b2d.get_version",
@@ -470,14 +2049,17 @@
             "b2d",
             "getVersion"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 0,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "lua-table",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
         },
         {
           "routeId": "script:bullet3d.get_version",
@@ -486,14 +2068,17 @@
             "bullet3d",
             "getVersion"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 0,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "lua-table",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
         },
         {
           "routeId": "script:image.get_astc_header",
@@ -502,18 +2087,25 @@
             "image",
             "getAstcHeader"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 0,
           "maximumResultCount": 1,
           "loweringFamily": "lua-table",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 150,
@@ -537,7 +2129,11 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "physics-2d",
       "collection": "/conformance/contract_0150.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
       "exercises": [
         {
           "routeId": "script:b2d.get_world",
@@ -546,22 +2142,26 @@
             "b2d",
             "getWorld"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 0,
           "minimumResultCount": 0,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-world",
+          "arity": "required",
+          "arguments": []
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 151,
       "id": "contract_0151",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -577,12 +2177,52 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-2d",
+      "executionPolicy": "destructive-last-resort",
+      "collection": "/conformance/contract_0151.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
         {
-          "reason": "execution-policy-destructive",
-          "routeCount": 1,
-          "exampleRouteId": "script:b2d.joint.destroy"
+          "routeId": "script:b2d.joint.destroy",
+          "stableId": 4156305370,
+          "accessor": [
+            "b2d",
+            "joint",
+            "destroy"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": true,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
+        },
+        {
+          "handleKind": "box2d-joint",
+          "routeId": "script:b2d.joint.create_distance",
+          "depth": 1
         }
       ]
     },
@@ -590,7 +2230,7 @@
       "contractIndex": 152,
       "id": "contract_0152",
       "routeCount": 76,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 49,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -606,12 +2246,460 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 76,
-          "exampleRouteId": "script:b2d.joint.enable_limit"
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+          "routeCount": 26,
+          "exampleRouteId": "script:b2d.joint.enable_spring"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 1,
+          "exampleRouteId": "script:b2d.joint.set_mouse_target"
+        }
+      ],
+      "profile": "physics-2d",
+      "collection": "/conformance/contract_0152.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
+        {
+          "routeId": "script:b2d.joint.enable_limit",
+          "stableId": 1468180163,
+          "accessor": [
+            "b2d",
+            "joint",
+            "enableLimit"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": false
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.enable_motor",
+          "stableId": 501836777,
+          "accessor": [
+            "b2d",
+            "joint",
+            "enableMotor"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": false
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_anchor_a",
+          "stableId": 428788652,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getAnchorA"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_anchor_b",
+          "stableId": 479121509,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getAnchorB"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_collide_connected",
+          "stableId": 2700128697,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getCollideConnected"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_damping_ratio",
+          "stableId": 3755540409,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getDampingRatio"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_frequency",
+          "stableId": 1394715861,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getFrequency"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_ground_anchor_a",
+          "stableId": 2831073086,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getGroundAnchorA"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_ground_anchor_b",
+          "stableId": 2814295467,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getGroundAnchorB"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_hertz",
+          "stableId": 251838610,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getHertz"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_joint_angle",
+          "stableId": 830127879,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getJointAngle"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_joint_speed",
+          "stableId": 3189910327,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getJointSpeed"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_joint_translation",
+          "stableId": 767596551,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getJointTranslation"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_length",
+          "stableId": 3398271393,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getLength"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_length_a",
+          "stableId": 486091873,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getLengthA"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_length_b",
+          "stableId": 435759016,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getLengthB"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
+        },
+        {
+          "handleKind": "box2d-joint",
+          "routeId": "script:b2d.joint.create_distance",
+          "depth": 1
         }
       ]
     },
@@ -619,7 +2707,7 @@
       "contractIndex": 153,
       "id": "contract_0153",
       "routeCount": 2,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 2,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -635,12 +2723,77 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-2d",
+      "collection": "/conformance/contract_0153.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.joint.get_body_a"
+          "routeId": "script:b2d.joint.get_body_a",
+          "stableId": 76897113,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getBodyA"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-body",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_body_b",
+          "stableId": 26564256,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getBodyB"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-body",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
+        },
+        {
+          "handleKind": "box2d-joint",
+          "routeId": "script:b2d.joint.create_distance",
+          "depth": 1
         }
       ]
     },
@@ -648,7 +2801,7 @@
       "contractIndex": 154,
       "id": "contract_0154",
       "routeCount": 2,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 2,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -664,12 +2817,77 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-2d",
+      "collection": "/conformance/contract_0154.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
-          "routeCount": 2,
-          "exampleRouteId": "script:b2d.joint.get_joint1"
+          "routeId": "script:b2d.joint.get_joint1",
+          "stableId": 1578643662,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getJoint1"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-joint",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:b2d.joint.get_joint2",
+          "stableId": 1561866043,
+          "accessor": [
+            "b2d",
+            "joint",
+            "getJoint2"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "box2d-joint",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "box2d-joint",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "box2d-body",
+          "routeId": "script:b2d.get_body",
+          "depth": 1
+        },
+        {
+          "handleKind": "box2d-joint",
+          "routeId": "script:b2d.joint.create_distance",
+          "depth": 1
         }
       ]
     },
@@ -696,7 +2914,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Joint",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.joint.get_world"
         }
@@ -725,7 +2943,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 14,
           "exampleRouteId": "script:b2d.shape.are_contact_events_enabled"
         }
@@ -754,7 +2972,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.shape.get_body"
         }
@@ -783,7 +3001,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2Shape",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 1,
           "exampleRouteId": "script:b2d.shape.get_world"
         }
@@ -812,7 +3030,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:b2World",
+          "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
           "routeCount": 21,
           "exampleRouteId": "script:b2d.world.enable_continuous"
         }
@@ -822,7 +3040,7 @@
       "contractIndex": 160,
       "id": "contract_0160",
       "routeCount": 310,
-      "eligibleRouteCount": 150,
+      "eligibleRouteCount": 152,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -911,14 +3129,14 @@
           "exampleRouteId": "script:timer.cancel"
         },
         {
-          "reason": "unsynthesizable-parameter-type:buffer_data",
-          "routeCount": 2,
-          "exampleRouteId": "script:buffer.set_metadata"
-        },
-        {
           "reason": "unsynthesizable-parameter-type:crash.USERFIELD",
           "routeCount": 2,
           "exampleRouteId": "script:crash.get_user_field"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:number[]",
+          "routeCount": 2,
+          "exampleRouteId": "script:buffer.set_metadata"
         },
         {
           "reason": "unsynthesizable-parameter-type:resource.atlas",
@@ -976,11 +3194,6 @@
           "exampleRouteId": "script:resource.get_text_metrics"
         },
         {
-          "reason": "unsynthesizable-parameter-type:number[]",
-          "routeCount": 1,
-          "exampleRouteId": "script:vmath.vector"
-        },
-        {
           "reason": "unsynthesizable-parameter-type:physics.JOINT_TYPE",
           "routeCount": 1,
           "exampleRouteId": "script:physics.create_joint"
@@ -1026,11 +3239,6 @@
           "exampleRouteId": "script:timer.get_info"
         },
         {
-          "reason": "unsynthesizable-parameter-type:url",
-          "routeCount": 1,
-          "exampleRouteId": "script:collectionproxy.get_resources"
-        },
-        {
           "reason": "unsynthesizable-parameter-type:vector4",
           "routeCount": 1,
           "exampleRouteId": "script:particlefx.set_constant"
@@ -1041,7 +3249,11 @@
           "exampleRouteId": "script:profiler.view_recorded_frame"
         }
       ],
+      "profile": "physics-2d",
       "collection": "/conformance/contract_0160.collectionc",
+      "engineConfig": [
+        "physics.type=2D"
+      ],
       "exercises": [
         {
           "routeId": "script:bit.arshift",
@@ -1050,17 +3262,26 @@
             "bit",
             "arshift"
           ],
-          "arguments": [
-            0,
-            0
-          ],
           "minimumArgumentCount": 2,
           "maximumArgumentCount": 2,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "scalar",
           "resultCodec": "Number",
-          "resultNullable": false
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
         },
         {
           "routeId": "script:bit.bnot",
@@ -1069,16 +3290,22 @@
             "bit",
             "bnot"
           ],
-          "arguments": [
-            0
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "scalar",
           "resultCodec": "Number",
-          "resultNullable": false
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
         },
         {
           "routeId": "script:bit.bswap",
@@ -1087,16 +3314,22 @@
             "bit",
             "bswap"
           ],
-          "arguments": [
-            0
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "scalar",
           "resultCodec": "Number",
-          "resultNullable": false
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
         },
         {
           "routeId": "script:bit.lshift",
@@ -1105,9 +3338,33 @@
             "bit",
             "lshift"
           ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
           "arguments": [
-            0,
-            0
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bit.rol",
+          "stableId": 3753907996,
+          "accessor": [
+            "bit",
+            "rol"
           ],
           "minimumArgumentCount": 2,
           "maximumArgumentCount": 2,
@@ -1115,15 +3372,266 @@
           "maximumResultCount": 1,
           "loweringFamily": "scalar",
           "resultCodec": "Number",
-          "resultNullable": false
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bit.ror",
+          "stableId": 3586131806,
+          "accessor": [
+            "bit",
+            "ror"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bit.rshift",
+          "stableId": 1486569517,
+          "accessor": [
+            "bit",
+            "rshift"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bit.tobit",
+          "stableId": 578552117,
+          "accessor": [
+            "bit",
+            "tobit"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "Number",
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bit.tohex",
+          "stableId": 2491340691,
+          "accessor": [
+            "bit",
+            "tohex"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "scalar",
+          "resultCodec": "String",
+          "resultNullable": false,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_aspect_ratio",
+          "stableId": 4150761990,
+          "accessor": [
+            "camera",
+            "getAspectRatio"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:camera.get_auto_aspect_ratio",
+          "stableId": 815384074,
+          "accessor": [
+            "camera",
+            "getAutoAspectRatio"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:camera.get_cameras",
+          "stableId": 1001666066,
+          "accessor": [
+            "camera",
+            "getCameras"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 0,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "lua-table",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:camera.get_enabled",
+          "stableId": 3707335843,
+          "accessor": [
+            "camera",
+            "getEnabled"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:camera.get_far_z",
+          "stableId": 4055682442,
+          "accessor": [
+            "camera",
+            "getFarZ"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:camera.get_fov",
+          "stableId": 1655100321,
+          "accessor": [
+            "camera",
+            "getFov"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:camera.get_near_z",
+          "stableId": 94225445,
+          "accessor": [
+            "camera",
+            "getNearZ"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 161,
       "id": "contract_0161",
       "routeCount": 3,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 2,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1139,12 +3647,95 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:buffer_data",
-          "routeCount": 3,
-          "exampleRouteId": "script:buffer.copy_buffer"
+          "reason": "unsynthesizable-parameter-type:hash",
+          "routeCount": 1,
+          "exampleRouteId": "script:buffer.get_bytes"
+        }
+      ],
+      "profile": "engine",
+      "collection": "/conformance/contract_0161.collectionc",
+      "engineConfig": [],
+      "exercises": [
+        {
+          "routeId": "script:buffer.copy_buffer",
+          "stableId": 248365108,
+          "accessor": [
+            "buffer",
+            "copyBuffer"
+          ],
+          "minimumArgumentCount": 5,
+          "maximumArgumentCount": 5,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "buffer-data",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "buffer-data",
+              "ordinal": 1
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:resource.set",
+          "stableId": 1254740582,
+          "accessor": [
+            "resource",
+            "set"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            },
+            {
+              "kind": "handle",
+              "handleKind": "buffer-data",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "buffer-data",
+          "routeId": "script:resource.get_buffer",
+          "depth": 1
         }
       ]
     },
@@ -1152,7 +3743,7 @@
       "contractIndex": 162,
       "id": "contract_0162",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1168,12 +3759,65 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "engine",
+      "collection": "/conformance/contract_0162.collectionc",
+      "engineConfig": [],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:buffer_stream",
-          "routeCount": 1,
-          "exampleRouteId": "script:buffer.copy_stream"
+          "routeId": "script:buffer.copy_stream",
+          "stableId": 2241911666,
+          "accessor": [
+            "buffer",
+            "copyStream"
+          ],
+          "minimumArgumentCount": 5,
+          "maximumArgumentCount": 5,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "buffer-stream",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "handle",
+              "handleKind": "buffer-stream",
+              "ordinal": 1
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "buffer-data",
+          "routeId": "script:resource.get_buffer",
+          "depth": 1
+        },
+        {
+          "handleKind": "buffer-stream",
+          "routeId": "script:buffer.get_stream",
+          "depth": 2
         }
       ]
     },
@@ -1181,7 +3825,7 @@
       "contractIndex": 163,
       "id": "contract_0163",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1197,12 +3841,47 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "engine",
+      "collection": "/conformance/contract_0163.collectionc",
+      "engineConfig": [],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:buffer_data",
-          "routeCount": 1,
-          "exampleRouteId": "script:buffer.get_stream"
+          "routeId": "script:buffer.get_stream",
+          "stableId": 3111756709,
+          "accessor": [
+            "buffer",
+            "getStream"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "buffer-stream",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "buffer-data",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "buffer-data",
+          "routeId": "script:resource.get_buffer",
+          "depth": 1
         }
       ]
     },
@@ -1210,7 +3889,7 @@
       "contractIndex": 164,
       "id": "contract_0164",
       "routeCount": 79,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 56,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1226,22 +3905,461 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btRigidBody",
-          "routeCount": 41,
-          "exampleRouteId": "script:bullet3d.rigid_body.apply_central_force"
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 19,
+          "exampleRouteId": "script:bullet3d.collision_object.set_position"
         },
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionObject",
-          "routeCount": 37,
-          "exampleRouteId": "script:bullet3d.collision_object.activate"
+          "reason": "unsynthesizable-parameter-type:bullet3d.collision_object.ACTIVATION_STATE",
+          "routeCount": 2,
+          "exampleRouteId": "script:bullet3d.collision_object.force_activation_state"
         },
         {
           "reason": "execution-policy-destructive",
           "routeCount": 1,
           "exampleRouteId": "script:bullet3d.rigid_body.clear_forces"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:quaternion",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.collision_object.set_rotation"
+        }
+      ],
+      "profile": "physics-3d",
+      "collection": "/conformance/contract_0164.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
+      "exercises": [
+        {
+          "routeId": "script:bullet3d.collision_object.activate",
+          "stableId": 3024397388,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "activate"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_activation_state",
+          "stableId": 3989547642,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getActivationState"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_ccd_motion_threshold",
+          "stableId": 1113126993,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getCcdMotionThreshold"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_ccd_swept_sphere_radius",
+          "stableId": 551560955,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getCcdSweptSphereRadius"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_collision_filter_group",
+          "stableId": 84341599,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getCollisionFilterGroup"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_collision_filter_mask",
+          "stableId": 3319614396,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getCollisionFilterMask"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_collision_flags",
+          "stableId": 2203492448,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getCollisionFlags"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_contact_processing_threshold",
+          "stableId": 2518924678,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getContactProcessingThreshold"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_deactivation_time",
+          "stableId": 1557579929,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getDeactivationTime"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_friction",
+          "stableId": 1617568870,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getFriction"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_internal_type",
+          "stableId": 1290785334,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getInternalType"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_position",
+          "stableId": 3615172423,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getPosition"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_restitution",
+          "stableId": 4095848016,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getRestitution"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_rotation",
+          "stableId": 3522006770,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getRotation"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.get_shape_count",
+          "stableId": 3936603817,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getShapeCount"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.collision_object.has_collision_flag",
+          "stableId": 2534203119,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "hasCollisionFlag"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "bullet-object",
+          "routeId": "script:bullet3d.get_collision_object",
+          "depth": 1
         }
       ]
     },
@@ -1249,7 +4367,7 @@
       "contractIndex": 165,
       "id": "contract_0165",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1265,12 +4383,50 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-3d",
+      "collection": "/conformance/contract_0165.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionObject",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.collision_object.get_shape"
+          "routeId": "script:bullet3d.collision_object.get_shape",
+          "stableId": 463523689,
+          "accessor": [
+            "bullet3d",
+            "collisionObject",
+            "getShape"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "bullet-shape",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            },
+            {
+              "kind": "literal",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "bullet-object",
+          "routeId": "script:bullet3d.get_collision_object",
+          "depth": 1
         }
       ]
     },
@@ -1355,7 +4511,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "reason": "no-handle-producer-chain:btTypedConstraint",
           "routeCount": 34,
           "exampleRouteId": "script:bullet3d.constraint.enable_cone_twist_motor"
         }
@@ -1384,7 +4540,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "reason": "no-handle-producer-chain:btTypedConstraint",
           "routeCount": 2,
           "exampleRouteId": "script:bullet3d.constraint.get_body_a"
         }
@@ -1413,7 +4569,7 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btTypedConstraint",
+          "reason": "no-handle-producer-chain:btTypedConstraint",
           "routeCount": 1,
           "exampleRouteId": "script:bullet3d.constraint.get_world"
         }
@@ -1441,7 +4597,11 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "physics-3d",
       "collection": "/conformance/contract_0171.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
       "exercises": [
         {
           "routeId": "script:bullet3d.get_collision_object",
@@ -1450,16 +4610,22 @@
             "bullet3d",
             "getCollisionObject"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 0,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "bullet-object",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "address",
+              "ordinal": 0
+            }
+          ]
         },
         {
           "routeId": "script:bullet3d.get_rigid_body",
@@ -1468,18 +4634,25 @@
             "bullet3d",
             "getRigidBody"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 0,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "bullet-object",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "address",
+              "ordinal": 0
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 172,
@@ -1503,7 +4676,11 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "physics-3d",
       "collection": "/conformance/contract_0172.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
       "exercises": [
         {
           "routeId": "script:bullet3d.get_world",
@@ -1512,22 +4689,26 @@
             "bullet3d",
             "getWorld"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 0,
           "minimumResultCount": 0,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "bullet-world",
+          "arity": "required",
+          "arguments": []
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 173,
       "id": "contract_0173",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1543,12 +4724,46 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-3d",
+      "collection": "/conformance/contract_0173.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:btRigidBody",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.rigid_body.get_world"
+          "routeId": "script:bullet3d.rigid_body.get_world",
+          "stableId": 3815014814,
+          "accessor": [
+            "bullet3d",
+            "rigidBody",
+            "getWorld"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "bullet-world",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-object",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "bullet-object",
+          "routeId": "script:bullet3d.get_collision_object",
+          "depth": 1
         }
       ]
     },
@@ -1556,7 +4771,7 @@
       "contractIndex": 174,
       "id": "contract_0174",
       "routeCount": 1,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 1,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1572,12 +4787,51 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
-      "blockers": [
+      "disposition": "fixture",
+      "blockers": [],
+      "profile": "physics-3d",
+      "collection": "/conformance/contract_0174.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
+      "exercises": [
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionShape",
-          "routeCount": 1,
-          "exampleRouteId": "script:bullet3d.shape.get_collision_object"
+          "routeId": "script:bullet3d.shape.get_collision_object",
+          "stableId": 3986175953,
+          "accessor": [
+            "bullet3d",
+            "shape",
+            "getCollisionObject"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "bullet-object",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-shape",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "bullet-object",
+          "routeId": "script:bullet3d.get_collision_object",
+          "depth": 1
+        },
+        {
+          "handleKind": "bullet-shape",
+          "routeId": "script:bullet3d.collision_object.get_shape",
+          "depth": 2
         }
       ]
     },
@@ -1585,7 +4839,7 @@
       "contractIndex": 175,
       "id": "contract_0175",
       "routeCount": 4,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 3,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1601,12 +4855,109 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btCollisionShape",
-          "routeCount": 4,
-          "exampleRouteId": "script:bullet3d.shape.get_index"
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.shape.set_local_transform"
+        }
+      ],
+      "profile": "physics-3d",
+      "collection": "/conformance/contract_0175.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
+      "exercises": [
+        {
+          "routeId": "script:bullet3d.shape.get_index",
+          "stableId": 2512948821,
+          "accessor": [
+            "bullet3d",
+            "shape",
+            "getIndex"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-shape",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.shape.get_type",
+          "stableId": 3481559031,
+          "accessor": [
+            "bullet3d",
+            "shape",
+            "getType"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-shape",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.shape.is_valid",
+          "stableId": 1810895539,
+          "accessor": [
+            "bullet3d",
+            "shape",
+            "isValid"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-shape",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "bullet-object",
+          "routeId": "script:bullet3d.get_collision_object",
+          "depth": 1
+        },
+        {
+          "handleKind": "bullet-shape",
+          "routeId": "script:bullet3d.collision_object.get_shape",
+          "depth": 2
         }
       ]
     },
@@ -1633,8 +4984,13 @@
       "disposition": "unreachable",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
-          "routeCount": 2,
+          "reason": "unsynthesizable-parameter-type:bullet3d.shape.definition",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.world.cast_shape_async"
+        },
+        {
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 1,
           "exampleRouteId": "script:bullet3d.world.cast_ray_async"
         }
       ]
@@ -1643,7 +4999,7 @@
       "contractIndex": 177,
       "id": "contract_0177",
       "routeCount": 4,
-      "eligibleRouteCount": 0,
+      "eligibleRouteCount": 3,
       "contract": {
         "context": null,
         "ownershipResult": null,
@@ -1659,12 +5015,104 @@
         "scratch-reuse",
         "error-model"
       ],
-      "disposition": "unreachable",
+      "disposition": "fixture",
       "blockers": [
         {
-          "reason": "unsynthesizable-parameter-type:btDiscreteDynamicsWorld",
-          "routeCount": 4,
-          "exampleRouteId": "script:bullet3d.world.get_collision_object_count"
+          "reason": "unsynthesizable-parameter-type:vector3",
+          "routeCount": 1,
+          "exampleRouteId": "script:bullet3d.world.set_gravity"
+        }
+      ],
+      "profile": "physics-3d",
+      "collection": "/conformance/contract_0177.collectionc",
+      "engineConfig": [
+        "physics.type=3D"
+      ],
+      "exercises": [
+        {
+          "routeId": "script:bullet3d.world.get_collision_object_count",
+          "stableId": 3056503702,
+          "accessor": [
+            "bullet3d",
+            "world",
+            "getCollisionObjectCount"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-world",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.world.get_gravity",
+          "stableId": 2585594286,
+          "accessor": [
+            "bullet3d",
+            "world",
+            "getGravity"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-world",
+              "ordinal": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:bullet3d.world.is_valid",
+          "stableId": 696282104,
+          "accessor": [
+            "bullet3d",
+            "world",
+            "isValid"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "borrowed-handle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "handle",
+              "handleKind": "bullet-world",
+              "ordinal": 0
+            }
+          ]
+        }
+      ],
+      "handleProviders": [
+        {
+          "handleKind": "bullet-world",
+          "routeId": "script:bullet3d.get_world",
+          "depth": 1
         }
       ]
     },
@@ -1716,7 +5164,9 @@
           "exampleRouteId": "script:physics.set_gravity"
         }
       ],
+      "profile": "engine",
       "collection": "/conformance/contract_0178.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:camera.get_projection",
@@ -1725,14 +5175,17 @@
             "camera",
             "getProjection"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "defold-value",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
         },
         {
           "routeId": "script:camera.get_view",
@@ -1741,14 +5194,17 @@
             "camera",
             "getView"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "defold-value",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
         },
         {
           "routeId": "script:go.get_id",
@@ -1757,14 +5213,17 @@
             "go",
             "getId"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "defold-value",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
         },
         {
           "routeId": "script:go.get_world_transform",
@@ -1773,16 +5232,239 @@
             "go",
             "getWorldTransform"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "defold-value",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:physics.get_gravity",
+          "stableId": 1242286766,
+          "accessor": [
+            "physics",
+            "getGravity"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 0,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:resource.set_sound",
+          "stableId": 3353499114,
+          "accessor": [
+            "resource",
+            "setSound"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
+        },
+        {
+          "routeId": "script:sound.get_group_gain",
+          "stableId": 3299788677,
+          "accessor": [
+            "sound",
+            "getGroupGain"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
+        },
+        {
+          "routeId": "script:sound.get_group_name",
+          "stableId": 2520029065,
+          "accessor": [
+            "sound",
+            "getGroupName"
+          ],
+          "minimumArgumentCount": 1,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
+        },
+        {
+          "routeId": "script:sound.set_group_gain",
+          "stableId": 497116905,
+          "accessor": [
+            "sound",
+            "setGroupGain"
+          ],
+          "minimumArgumentCount": 2,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            },
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_projection",
+          "stableId": 2326768707,
+          "accessor": [
+            "camera",
+            "getProjection"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:camera.get_view",
+          "stableId": 986113063,
+          "accessor": [
+            "camera",
+            "getView"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "routeId": "script:go.get_id",
+          "stableId": 1477563324,
+          "accessor": [
+            "go",
+            "getId"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
+        },
+        {
+          "routeId": "script:go.get_world_transform",
+          "stableId": 1495634860,
+          "accessor": [
+            "go",
+            "getWorldTransform"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 1,
+          "minimumResultCount": 1,
+          "maximumResultCount": 1,
+          "loweringFamily": "defold-value",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 179,
@@ -1806,7 +5488,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0179.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:collectionfactory.load",
@@ -1815,16 +5499,44 @@
             "collectionfactory",
             "load"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
           "loweringFamily": "callback-lifecycle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:collectionfactory.load",
+          "stableId": 4139911040,
+          "accessor": [
+            "collectionfactory",
+            "load"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 180,
@@ -1912,7 +5624,9 @@
           "exampleRouteId": "script:go.delete"
         }
       ],
+      "profile": "engine",
       "collection": "/conformance/contract_0182.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:factory.create",
@@ -1921,18 +5635,25 @@
             "factory",
             "create"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 5,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "lua-table",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 183,
@@ -1956,7 +5677,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0183.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:factory.load",
@@ -1965,16 +5688,44 @@
             "factory",
             "load"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
           "loweringFamily": "callback-lifecycle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
+        },
+        {
+          "routeId": "script:factory.load",
+          "stableId": 1808015212,
+          "accessor": [
+            "factory",
+            "load"
+          ],
+          "minimumArgumentCount": 0,
+          "maximumArgumentCount": 2,
+          "minimumResultCount": 0,
+          "maximumResultCount": 0,
+          "loweringFamily": "callback-lifecycle",
+          "resultCodec": null,
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required-and-optional",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 184,
@@ -2501,7 +6252,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0201.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:msg.post",
@@ -2510,19 +6263,29 @@
             "msg",
             "post"
           ],
-          "arguments": [
-            "deherm_conformance",
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 2,
           "maximumArgumentCount": 3,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
           "loweringFamily": "lua-table",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 202,
@@ -2546,7 +6309,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0202.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:particlefx.play",
@@ -2555,18 +6320,25 @@
             "particlefx",
             "play"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 2,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
           "loweringFamily": "callback-lifecycle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 203,
@@ -2590,7 +6362,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0203.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:physics.set_event_listener",
@@ -2599,16 +6373,20 @@
             "physics",
             "setEventListener"
           ],
-          "arguments": [],
           "minimumArgumentCount": 0,
           "maximumArgumentCount": 1,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
           "loweringFamily": "callback-lifecycle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": []
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 204,
@@ -2864,7 +6642,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0212.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:resource.get_buffer",
@@ -2873,16 +6653,22 @@
             "resource",
             "getBuffer"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "buffer-data",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         },
         {
           "routeId": "script:resource.load",
@@ -2891,16 +6677,22 @@
             "resource",
             "load"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "buffer-data",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         },
         {
           "routeId": "script:sys.load_buffer",
@@ -2909,18 +6701,25 @@
             "sys",
             "loadBuffer"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 1,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "borrowed-handle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": "buffer-data",
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 213,
@@ -2973,7 +6772,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0214.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:sound.play",
@@ -2982,18 +6783,25 @@
             "sound",
             "play"
           ],
-          "arguments": [
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 1,
           "maximumArgumentCount": 3,
           "minimumResultCount": 1,
           "maximumResultCount": 1,
           "loweringFamily": "callback-lifecycle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 215,
@@ -3017,7 +6825,9 @@
       ],
       "disposition": "fixture",
       "blockers": [],
+      "profile": "engine",
       "collection": "/conformance/contract_0215.collectionc",
+      "engineConfig": [],
       "exercises": [
         {
           "routeId": "script:sprite.play_flipbook",
@@ -3026,19 +6836,29 @@
             "sprite",
             "playFlipbook"
           ],
-          "arguments": [
-            "deherm_conformance",
-            "deherm_conformance"
-          ],
           "minimumArgumentCount": 2,
           "maximumArgumentCount": 4,
           "minimumResultCount": 0,
           "maximumResultCount": 0,
           "loweringFamily": "callback-lifecycle",
           "resultCodec": null,
-          "resultNullable": null
+          "resultNullable": null,
+          "destructive": false,
+          "returnHandleKind": null,
+          "arity": "required",
+          "arguments": [
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            },
+            {
+              "kind": "literal",
+              "value": "deherm_conformance"
+            }
+          ]
         }
-      ]
+      ],
+      "handleProviders": []
     },
     {
       "contractIndex": 216,

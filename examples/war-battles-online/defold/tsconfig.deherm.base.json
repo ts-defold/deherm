@@ -18,6 +18,8 @@
         "enabled": true,
         "inventory": "./.deherm/extensions.json",
         "resourceSymbols": "./.deherm/generated/resource-symbols.json",
+        "routeSymbols": "./.deherm/generated/script-route-symbol-index.json",
+        "apiUsage": "./.deherm/generated/defold-api-usage.json",
         "profile": "development"
       }
     ]

@@ -6,16 +6,37 @@
 
 export type Report = (line: string) => void;
 
+/** A provider produces one live borrowed handle from the running engine. */
+export type Provider = (ordinal: number) => unknown;
+
+/**
+ * How one argument is obtained. A literal is a synthesized inhabitant; a
+ * handle is produced by running that handle kind's producer chain against the
+ * same engine instance the exercise runs in.
+ */
+export type ArgumentSpec =
+  | { readonly kind: "literal"; readonly value: unknown }
+  | { readonly kind: "handle"; readonly handleKind: string; readonly ordinal: number };
+
 export interface Exercise {
   readonly contract: string;
   readonly route: string;
+  readonly arity: string;
   readonly call: (...args: readonly unknown[]) => unknown;
-  readonly args: readonly unknown[];
+  readonly args: readonly ArgumentSpec[];
+  readonly providers: Readonly<Record<string, Provider>>;
   readonly minimumResultCount: number;
   readonly maximumResultCount: number;
   readonly resultCodec: string | null;
   readonly resultNullable: boolean;
   readonly minimumArgumentCount: number;
+  /**
+   * False when the route destroys the engine object it was given. A second
+   * invocation would then be addressing something that no longer exists, so
+   * the repetition-based properties observe the harness rather than the
+   * contract and are recorded as not applicable instead.
+   */
+  readonly repeatable: boolean;
   readonly scratchReuse: boolean;
   readonly errorModel: boolean;
 }
@@ -29,7 +50,7 @@ function detail(value: unknown): string {
 }
 
 function emit(report: Report, exercise: Exercise, property: string, disposition: string, note: string): boolean {
-  report(`${MARKER}\t${exercise.contract}\t${exercise.route}\t${property}\t${disposition}\t${note}`);
+  report(`${MARKER}\t${exercise.contract}\t${exercise.route}#${exercise.arity}\t${property}\t${disposition}\t${note}`);
   return disposition !== "mismatched";
 }
 
@@ -50,22 +71,65 @@ function codecHolds(exercise: Exercise, value: unknown): boolean {
   return true;
 }
 
-function invoke(exercise: Exercise): { thrown: false; value: unknown } | { thrown: true; error: unknown } {
+function invoke(call: (...args: readonly unknown[]) => unknown, args: readonly unknown[]):
+  { thrown: false; value: unknown } | { thrown: true; error: unknown } {
   try {
-    return { thrown: false, value: exercise.call(...exercise.args) };
+    return { thrown: false, value: call(...args) };
   } catch (error) {
     return { thrown: true, error };
   }
 }
 
+/**
+ * Resolve the argument list, running each handle kind's producer chain against
+ * the live engine. A producer that cannot deliver is reported as an explicit
+ * blocker rather than a mismatch: it is evidence about handle provenance, not
+ * about this route's contract.
+ */
+function resolveArguments(report: Report, exercise: Exercise): readonly unknown[] | null {
+  const resolved: unknown[] = [];
+  for (const spec of exercise.args) {
+    if (spec.kind === "literal") {
+      resolved.push(spec.value);
+      continue;
+    }
+    const provider = exercise.providers[spec.handleKind];
+    if (provider === undefined) {
+      emit(report, exercise, "handle-provenance", "blocked-no-provider", spec.handleKind);
+      return null;
+    }
+    let produced: unknown;
+    try {
+      produced = provider(spec.ordinal);
+    } catch (error) {
+      emit(report, exercise, "handle-provenance", "blocked-producer-raised", `${spec.handleKind}: ${detail(error)}`);
+      return null;
+    }
+    if (produced === undefined || produced === null) {
+      emit(report, exercise, "handle-provenance", "blocked-producer-absent", spec.handleKind);
+      return null;
+    }
+    emit(report, exercise, "handle-provenance", "observed", `${spec.handleKind}#${spec.ordinal}`);
+    resolved.push(produced);
+  }
+  return resolved;
+}
+
 export function runExercise(report: Report, exercise: Exercise): boolean {
   let ok = true;
+
+  const args = resolveArguments(report, exercise);
+  if (args === null) {
+    // The contract keeps its blocker; nothing was observed and nothing is
+    // claimed. A separate exercise of the same contract may still succeed.
+    return true;
+  }
 
   // result-arity: the boundary either produced a value consistent with the
   // declared marshalling program, or refused the synthesized argument through
   // the declared error model. Both are honest observations; only a shape the
   // plan forbids is a mismatch.
-  const first = invoke(exercise);
+  const first = invoke(exercise.call, args);
   if (first.thrown) {
     ok = emit(report, exercise, "result-arity", "observed-as-target-exception", detail(first.error)) && ok;
   } else if (!arityHolds(exercise, first.value)) {
@@ -81,10 +145,13 @@ export function runExercise(report: Report, exercise: Exercise): boolean {
   // scratch-reuse: the declared scratch contract is caller-owned, bounded and
   // reentrant. Repeated invocation must therefore keep producing the same
   // disposition; a leaking or exhausting arena diverges here.
-  if (exercise.scratchReuse) {
+  if (exercise.scratchReuse && !exercise.repeatable) {
+    ok = emit(report, exercise, "scratch-reuse", "not-applicable",
+      "route destroys its engine object, so repetition would not address the same object") && ok;
+  } else if (exercise.scratchReuse) {
     let diverged = "";
     for (let index = 0; index < SCRATCH_REPETITIONS && diverged === ""; index += 1) {
-      const repeat = invoke(exercise);
+      const repeat = invoke(exercise.call, args);
       if (repeat.thrown !== first.thrown) {
         diverged = `repetition ${index} changed disposition`;
       } else if (!repeat.thrown && !arityHolds(exercise, repeat.value)) {
@@ -108,8 +175,13 @@ export function runExercise(report: Report, exercise: Exercise): boolean {
     }
     if (!raised) {
       ok = emit(report, exercise, "error-model", "mismatched", "under-supplied call did not raise") && ok;
+    } else if (!exercise.repeatable) {
+      // The raise is observed; re-invoking to prove the boundary stayed usable
+      // would destroy a second engine object, so it is deliberately withheld.
+      ok = emit(report, exercise, "error-model", "observed-raise-only",
+        "raised; boundary re-invocation withheld for a destructive route") && ok;
     } else {
-      const after = invoke(exercise);
+      const after = invoke(exercise.call, args);
       ok = after.thrown === first.thrown
         ? emit(report, exercise, "error-model", "observed", "raised and boundary remained usable") && ok
         : emit(report, exercise, "error-model", "mismatched", "boundary disposition changed after a raised call") && ok;

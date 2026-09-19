@@ -63,6 +63,22 @@ class Runtime::Impl {
     captureEntrypoints();
   }
 
+  /// Evaluate AOT units into this runtime WITHOUT claiming the application
+  /// entrypoints. This is the mixing seam: the same Hermes runtime then holds
+  /// `shermes`-compiled native code and, after `load()`, ordinary bytecode.
+  /// A unit evaluated here may install globals the later bundle reaches, which
+  /// is how a typed-native route replaces a JSI crossing in-place.
+  void evaluateStaticUnits(const StaticUnitCreator* unitCreators, size_t unitCount) {
+    if (loaded_) throw std::runtime_error("Static units must be evaluated before the application bundle");
+    if (!unitCreators || unitCount == 0) return;
+    auto* hermes = jsi::castInterface<facebook::hermes::IHermes>(runtime_.get());
+    if (!hermes) throw std::runtime_error("Hermes runtime does not expose the Static Hermes interface");
+    for (size_t index = 0; index < unitCount; ++index) {
+      if (!unitCreators[index]) throw std::invalid_argument("Static Hermes unit creator is null");
+      hermes->evaluateSHUnit(unitCreators[index]);
+    }
+  }
+
   void loadStatic(
       const StaticUnitCreator* unitCreators,
       size_t unitCount,
@@ -436,6 +452,11 @@ Runtime::Runtime(Host& host) : impl_(std::make_unique<Impl>(host)) {}
 Runtime::~Runtime() = default;
 void Runtime::load(const std::string& source, const std::string& sourceUrl) {
   impl_->load(source, sourceUrl);
+}
+void Runtime::evaluateStaticUnits(
+    const StaticUnitCreator* unitCreators,
+    size_t unitCount) {
+  impl_->evaluateStaticUnits(unitCreators, unitCount);
 }
 void Runtime::loadStatic(
     const StaticUnitCreator* unitCreators,
