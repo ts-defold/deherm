@@ -11,28 +11,34 @@ import { runContract as contract_0151 } from "./contracts/contract_0151";
 import { runContract as contract_0152 } from "./contracts/contract_0152";
 import { runContract as contract_0153 } from "./contracts/contract_0153";
 import { runContract as contract_0154 } from "./contracts/contract_0154";
-import { runContract as contract_0160 } from "./contracts/contract_0160";
+import { runContract as contract_0155 } from "./contracts/contract_0155";
 import { runContract as contract_0161 } from "./contracts/contract_0161";
 import { runContract as contract_0162 } from "./contracts/contract_0162";
 import { runContract as contract_0163 } from "./contracts/contract_0163";
 import { runContract as contract_0164 } from "./contracts/contract_0164";
 import { runContract as contract_0165 } from "./contracts/contract_0165";
+import { runContract as contract_0166 } from "./contracts/contract_0166";
+import { runContract as contract_0167 } from "./contracts/contract_0167";
+import { runContract as contract_0169 } from "./contracts/contract_0169";
+import { runContract as contract_0170 } from "./contracts/contract_0170";
 import { runContract as contract_0171 } from "./contracts/contract_0171";
 import { runContract as contract_0172 } from "./contracts/contract_0172";
 import { runContract as contract_0173 } from "./contracts/contract_0173";
 import { runContract as contract_0174 } from "./contracts/contract_0174";
 import { runContract as contract_0175 } from "./contracts/contract_0175";
+import { runContract as contract_0176 } from "./contracts/contract_0176";
 import { runContract as contract_0177 } from "./contracts/contract_0177";
 import { runContract as contract_0178 } from "./contracts/contract_0178";
-import { runContract as contract_0179 } from "./contracts/contract_0179";
+import { runContract as contract_0180 } from "./contracts/contract_0180";
+import { runContract as contract_0181 } from "./contracts/contract_0181";
 import { runContract as contract_0182 } from "./contracts/contract_0182";
-import { runContract as contract_0183 } from "./contracts/contract_0183";
-import { runContract as contract_0201 } from "./contracts/contract_0201";
-import { runContract as contract_0202 } from "./contracts/contract_0202";
-import { runContract as contract_0203 } from "./contracts/contract_0203";
-import { runContract as contract_0212 } from "./contracts/contract_0212";
-import { runContract as contract_0214 } from "./contracts/contract_0214";
-import { runContract as contract_0215 } from "./contracts/contract_0215";
+import { runContract as contract_0185 } from "./contracts/contract_0185";
+import { runContract as contract_0186 } from "./contracts/contract_0186";
+import { runContract as contract_0204 } from "./contracts/contract_0204";
+import { runContract as contract_0205 } from "./contracts/contract_0205";
+import { runContract as contract_0206 } from "./contracts/contract_0206";
+import { runContract as contract_0217 } from "./contracts/contract_0217";
+import { runContract as contract_0218 } from "./contracts/contract_0218";
 import type { Report } from "./harness";
 
 export const contracts: Readonly<Record<string, (report: Report) => boolean>> = {
@@ -48,26 +54,32 @@ export const contracts: Readonly<Record<string, (report: Report) => boolean>> = 
   "contract_0152": contract_0152,
   "contract_0153": contract_0153,
   "contract_0154": contract_0154,
-  "contract_0160": contract_0160,
+  "contract_0155": contract_0155,
   "contract_0161": contract_0161,
   "contract_0162": contract_0162,
   "contract_0163": contract_0163,
   "contract_0164": contract_0164,
   "contract_0165": contract_0165,
+  "contract_0166": contract_0166,
+  "contract_0167": contract_0167,
+  "contract_0169": contract_0169,
+  "contract_0170": contract_0170,
   "contract_0171": contract_0171,
   "contract_0172": contract_0172,
   "contract_0173": contract_0173,
   "contract_0174": contract_0174,
   "contract_0175": contract_0175,
+  "contract_0176": contract_0176,
   "contract_0177": contract_0177,
   "contract_0178": contract_0178,
-  "contract_0179": contract_0179,
+  "contract_0180": contract_0180,
+  "contract_0181": contract_0181,
   "contract_0182": contract_0182,
-  "contract_0183": contract_0183,
-  "contract_0201": contract_0201,
-  "contract_0202": contract_0202,
-  "contract_0203": contract_0203,
-  "contract_0212": contract_0212,
-  "contract_0214": contract_0214,
-  "contract_0215": contract_0215,
+  "contract_0185": contract_0185,
+  "contract_0186": contract_0186,
+  "contract_0204": contract_0204,
+  "contract_0205": contract_0205,
+  "contract_0206": contract_0206,
+  "contract_0217": contract_0217,
+  "contract_0218": contract_0218,
 };

@@ -10,16 +10,16 @@ export function runContract(report: Report): boolean {
   let ok = true;
   ok = runExercise(report, {
     contract: "contract_0163",
-    route: "script:buffer.get_stream",
+    route: "script:buffer.copy_stream",
     arity: "required",
-    call: buffer.getStream as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"handle","handleKind":"buffer-data","ordinal":0},{"kind":"literal","value":"deherm_conformance"}],
+    call: buffer.copyStream as unknown as (...args: readonly unknown[]) => unknown,
+    args: [{"kind":"handle","handleKind":"buffer-stream","ordinal":0}, {"kind":"literal","value":0}, {"kind":"handle","handleKind":"buffer-stream","ordinal":1}, {"kind":"literal","value":0}, {"kind":"literal","value":0}],
     providers,
-    minimumResultCount: 1,
-    maximumResultCount: 1,
+    minimumResultCount: 0,
+    maximumResultCount: 0,
     resultCodec: null,
     resultNullable: false,
-    minimumArgumentCount: 2,
+    minimumArgumentCount: 5,
     repeatable: true,
     scratchReuse: true,
     errorModel: true

@@ -21,6 +21,20 @@ struct Operation {
   uint8_t maximumResultCount;
   uint8_t resultCount;
   /**
+   * Dense semantic borrowed-handle kind of this route's single declared
+   * result, or zero when the result is not a rooted engine handle.
+   *
+   * A route's lowering family is a single-winner precedence in which a
+   * table-shaped parameter outranks a handle, so a constructor that takes a
+   * definition record is marshalled here rather than by the handle-lowering
+   * table - while still returning a live engine object. Without this the
+   * result would cross as an anonymous Lua userdata and every handle-lowered
+   * consumer would refuse it. The numbering is the one
+   * script_handle_lowering::SemanticHandleKind uses, derived by both
+   * generators from the same pinned classification.
+   */
+  uint16_t resultSemanticKind;
+  /**
    * Per-call frame scratch this route's value shapes can reach, derived from
    * the same projected signature the arity fields come from. A transport sizes
    * its frame from these; a backend may not address scratch beyond them.

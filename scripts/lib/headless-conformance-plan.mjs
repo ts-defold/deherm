@@ -46,11 +46,30 @@ const ADDRESS_MEMBERS = Object.freeze(["url"]);
 const ABSENT_MEMBER = "nil";
 
 /**
+ * The context every fixture supplies unconditionally. A route needing only
+ * this observes nothing but its own arguments, which is what makes it usable
+ * as a synthesized value inhabitant.
+ */
+const AMBIENT_CONTEXT = "engine";
+
+/** An optional parameter a positional call has to pass over, spelled as nil. */
+const ABSENT_ARGUMENT = Object.freeze({ kind: "literal", value: null });
+
+/**
  * Parameter names that address an element of a Lua-side collection. Lua is
  * one-based, so zero is never an inhabitant of such a parameter and the scalar
  * inhabitant would be refused by every engine range check.
  */
 const ONE_BASED_INDEX_PARAMETER = /(^|_)index$/;
+
+/**
+ * How deep a synthesized record may nest before the harness gives up.
+ *
+ * A declared record whose required fields are themselves inhabitable is an
+ * inhabitant like any other; a recursive one fails closed here rather than
+ * looping.
+ */
+const RECORD_SYNTHESIS_DEPTH_LIMIT = 3;
 
 /** Most routes carrying one contract are redundant evidence; exercise a bounded sample. */
 export const MAX_EXERCISES_PER_CONTRACT = 16;
@@ -173,7 +192,9 @@ const INPUT_PATHS = Object.freeze({
   scalarDispatch: "packages/bindings/generated/defold-script-scalar-dispatch.json",
   borrowedHandles: "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
   routeAvailability: "packages/bindings/generated/defold-script-route-availability-profiles.json",
-  handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json"
+  handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
+  valueLayouts: "packages/bindings/generated/defold-value-layouts.json",
+  projection: "packages/bindings/generated/defold-script-projection-ir.json"
 });
 
 /**
@@ -262,7 +283,7 @@ function kindAdmissible(profile, algebra, kindId) {
  * component address is satisfied by the profile's published address, and
  * anything else falls back to the scalar inhabitants.
  */
-function synthesizeArgument(parameter, context) {
+function synthesizeArgument(parameter, context, depth = 0) {
   const rawType = parameter?.rawType;
   if (typeof rawType !== "string" || rawType.length === 0) return { ok: false, reason: "untyped-parameter" };
   const { profile, providers, algebra, ordinals } = context;
@@ -305,6 +326,37 @@ function synthesizeArgument(parameter, context) {
     }
   }
 
+  // A Defold value type is inhabited by calling the engine's own zero-argument
+  // constructor for it. Which route that is comes from the pinned IR - the one
+  // route with no required parameter whose single declared result is that
+  // value type - not from a name written here.
+  const valueConstructor = context.valueConstructors?.get(rawType);
+  if (valueConstructor) {
+    return { ok: true, spec: { kind: "value", valueType: rawType, accessor: valueConstructor.accessor } };
+  }
+
+  // A declared record is inhabited field by field. Only required fields are
+  // synthesized: an optional field the harness leaves out is a legal call, and
+  // a required field it cannot inhabit fails the whole parameter closed with
+  // that field's own reason rather than a generic one.
+  const record = context.records?.get(rawType);
+  if (record) {
+    if (depth >= RECORD_SYNTHESIS_DEPTH_LIMIT) {
+      return { ok: false, reason: `record-synthesis-depth-exceeded:${rawType}` };
+    }
+    const fields = [];
+    for (const field of record.fields ?? []) {
+      if (field.optional) continue;
+      const synthesized = synthesizeArgument(
+        { rawName: field.rawName, rawType: field.rawType }, context, depth + 1);
+      if (!synthesized.ok) {
+        return { ok: false, reason: `${synthesized.reason}@${rawType}.${field.rawName}` };
+      }
+      fields.push({ name: field.rawName, value: synthesized.spec });
+    }
+    return { ok: true, spec: { kind: "record", recordType: rawType, fields } };
+  }
+
   for (const member of members) {
     const kindId = algebra.kindByRawType.get(member);
     if (kindId !== undefined) {
@@ -317,6 +369,33 @@ function synthesizeArgument(parameter, context) {
     }
   }
   return { ok: false, reason: `unsynthesizable-parameter-type:${rawType}` };
+}
+
+/**
+ * Zero-argument constructors for the Defold value types the pinned layout
+ * report models.
+ *
+ * Discovered, not listed: a route with no required parameter whose single
+ * declared result is that value type constructs an inhabitant of it. The
+ * candidate set is the pinned layout report's own type names, so a value type
+ * Defold adds or removes moves this set without an edit here.
+ */
+export function buildValueConstructors(irFunctions, valueLayouts, isCallable = () => true) {
+  const valueTypes = new Set([
+    ...Object.keys(valueLayouts?.transparent ?? {}),
+    ...Object.keys(valueLayouts?.opaque ?? {})
+  ]);
+  const byType = new Map();
+  const sorted = [...irFunctions].sort((left, right) => (left.id < right.id ? -1 : left.id > right.id ? 1 : 0));
+  for (const irFunction of sorted) {
+    const returns = irFunction.returns ?? [];
+    if (returns.length !== 1 || !valueTypes.has(returns[0])) continue;
+    if ((irFunction.parameters ?? []).some((parameter) => !parameter.optional)) continue;
+    if (byType.has(returns[0])) continue;
+    if (!isCallable(irFunction)) continue;
+    byType.set(returns[0], { routeId: irFunction.id, accessor: accessorPath(irFunction) });
+  }
+  return byType;
 }
 
 // The generated TypeScript surface spells nested module segments in camel
@@ -357,6 +436,9 @@ export function classifyRoute({
   providers = new Map(),
   algebra = EMPTY_ALGEBRA,
   availability = EMPTY_AVAILABILITY,
+  valueConstructors = new Map(),
+  records = new Map(),
+  projectionRow = null,
   admitDestructive = false
 }) {
   if (!irFunction) return { eligible: false, reason: "absent-from-script-projection" };
@@ -396,23 +478,56 @@ export function classifyRoute({
     return { eligible: false, reason: "multi-result-shape-unmodelled" };
   }
   const classificationRow = algebra.rowsById.get(unit.identity.id) ?? null;
-  const context = { profile, providers, algebra, ordinals: { handles: new Map(), addresses: 0 } };
+  const context = {
+    profile, providers, algebra, valueConstructors, records,
+    ordinals: { handles: new Map(), addresses: 0 }
+  };
+  // Lua argument passing is positional, so an optional parameter that sits
+  // before a required one is a hole that still has to be filled. The
+  // minimum-arity call therefore fills it with an explicit nil - which is what
+  // "this optional parameter is absent" means in a positional call - and only
+  // the optional *tail* after the last required parameter may be truncated.
+  // Dropping the hole instead would silently shift every later argument left,
+  // and the engine would type-check the wrong value.
+  // Optionality is taken from the projected signature when there is one. The
+  // projection corrects a documented-optional parameter the registered Lua
+  // surface proves is required, and synthesizing from the uncorrected IR would
+  // silently call the route with fewer arguments than the engine accepts.
+  const projectedParameters = projectionRow?.signature?.parameters ?? null;
+  const parameters = (irFunction.parameters ?? []).map((parameter, index) => {
+    const projected = projectedParameters?.[index];
+    return projected === undefined || projected.optional === parameter.optional
+      ? parameter
+      : { ...parameter, optional: projected.optional };
+  });
+  const synthesizedByIndex = parameters.map((parameter) => synthesizeArgument(parameter, context));
+  let lastRequiredIndex = -1;
+  for (const [index, parameter] of parameters.entries()) {
+    if (parameter.optional) continue;
+    if (!synthesizedByIndex[index].ok) return { eligible: false, reason: synthesizedByIndex[index].reason };
+    lastRequiredIndex = index;
+  }
   const required = [];
-  const optional = [];
-  let sawRequiredAfterOptional = false;
-  for (const parameter of irFunction.parameters ?? []) {
-    const synthesized = synthesizeArgument(parameter, context);
-    if (parameter.optional) {
-      // Lua positional arguments cannot skip a hole: stop extending the
-      // optional tail at the first inhabitant this harness cannot synthesize.
-      if (synthesized.ok && !sawRequiredAfterOptional) optional.push(synthesized.spec);
-      else sawRequiredAfterOptional = true;
+  const widened = [];
+  for (let index = 0; index <= lastRequiredIndex; index += 1) {
+    const synthesized = synthesizedByIndex[index];
+    if (!parameters[index].optional) {
+      required.push(synthesized.spec);
+      widened.push(synthesized.spec);
       continue;
     }
-    if (!synthesized.ok) return { eligible: false, reason: synthesized.reason };
-    required.push(synthesized.spec);
+    required.push(ABSENT_ARGUMENT);
+    widened.push(synthesized.ok ? synthesized.spec : ABSENT_ARGUMENT);
   }
-  if (required.length < universalBinding.minimumArgumentCount) {
+  const optional = [];
+  for (let index = lastRequiredIndex + 1; index < parameters.length; index += 1) {
+    // Stop extending the tail at the first inhabitant this harness cannot
+    // synthesize; beyond it every position would be a guess.
+    if (!synthesizedByIndex[index].ok) break;
+    optional.push(synthesizedByIndex[index].spec);
+  }
+  if (required.length < universalBinding.minimumArgumentCount ||
+      required.length > universalBinding.maximumArgumentCount) {
     return { eligible: false, reason: "argument-arity-disagrees-with-projection" };
   }
   const base = {
@@ -437,8 +552,8 @@ export function classifyRoute({
     // An optional tail the harness can inhabit is a second, additive
     // observation of the same route at a wider arity. It never replaces the
     // required-only observation.
-    optionalExercise: optional.length > 0 && !destructive
-      ? { ...base, arity: "required-and-optional", arguments: [...required, ...optional] }
+    optionalExercise: (optional.length > 0 || widened.some((spec, index) => spec !== required[index])) && !destructive
+      ? { ...base, arity: "required-and-optional", arguments: [...widened, ...optional] }
       : null
   };
 }
@@ -467,7 +582,7 @@ export function handleProducers(irFunctions, algebra) {
   return producers.sort((left, right) => (left.id < right.id ? -1 : left.id > right.id ? 1 : 0));
 }
 
-export function buildHandleProviders({ profile, algebra, availability, lookup }) {
+export function buildHandleProviders({ profile, algebra, availability, lookup, valueConstructors, records }) {
   const providers = new Map();
   const producers = handleProducers([...lookup.irById.values()], algebra);
 
@@ -490,7 +605,10 @@ export function buildHandleProviders({ profile, algebra, availability, lookup })
         profile,
         providers,
         algebra,
-        availability
+        availability,
+        valueConstructors,
+        records,
+        projectionRow: lookup.projectionById.get(producer.id) ?? null
       });
       if (!decision.eligible) continue;
       providers.set(kindId, {
@@ -510,29 +628,44 @@ export function buildHandleProviders({ profile, algebra, availability, lookup })
 /**
  * Cross-transport agreement for each handle kind a fixture profile can root.
  *
- * A borrowed handle crosses the boundary as a semantic handle only on routes
- * the handle-lowering table covers. When a kind's producer is outside that
- * table while its consumers are inside it, the producer's value is not the
- * representation the consumers accept, and every consumer refuses a handle
- * that a live engine really did produce. That disagreement is recorded here
- * rather than left to be rediscovered from a runtime transcript.
+ * A handle-lowered consumer accepts exactly one representation: a
+ * generation-checked semantic handle rooted in the shared registry. Two
+ * transports can produce it - the handle-lowering table, and the
+ * universal-value transport for a route whose declared result the
+ * classification names as a rooted handle kind. What matters is therefore
+ * whether the producer's transport captures the kind semantically at all, not
+ * which table the producer happens to live in: a constructor that takes a
+ * definition record is marshalled by the universal transport by construction,
+ * because a table-shaped parameter outranks a handle when its lowering family
+ * is chosen.
+ *
+ * When no transport captures the producer's result semantically while its
+ * consumers are handle-lowered, every consumer refuses a handle that a live
+ * engine really did produce. That disagreement is recorded here rather than
+ * left to be rediscovered from a runtime transcript.
  */
-export function handleTransportAgreement(providers, loweredRouteIds, consumersByKind) {
+export function handleTransportAgreement(providers, loweredRouteIds, consumersByKind, semanticCaptureByRoute = new Map()) {
   return [...providers.values()]
     .sort((left, right) => (left.handleKind < right.handleKind ? -1 : 1))
     .map((provider) => {
       const consumers = consumersByKind.get(provider.handleKind) ?? [];
       const loweredConsumers = consumers.filter((id) => loweredRouteIds.has(id));
       const producerLowered = loweredRouteIds.has(provider.routeId);
+      const universalCapture = semanticCaptureByRoute.get(provider.routeId) === provider.handleKind;
+      const producerTransport = producerLowered
+        ? "handle-lowering"
+        : universalCapture ? "universal-value-semantic-capture" : "universal-value-anonymous";
       return {
         handleKind: provider.handleKind,
         producerRouteId: provider.routeId,
         producerHandleLowered: producerLowered,
+        producerTransport,
+        producerCapturesSemanticHandle: producerLowered || universalCapture,
         consumerCount: consumers.length,
         handleLoweredConsumerCount: loweredConsumers.length,
-        agreement: producerLowered || loweredConsumers.length === 0
+        agreement: producerLowered || universalCapture || loweredConsumers.length === 0
           ? "agreed"
-          : "producer-outside-handle-lowering"
+          : "producer-outside-semantic-handle-capture"
       };
     });
 }
@@ -572,10 +705,17 @@ export function buildHeadlessConformancePlan(documents, {
     irById: new Map(documents.scriptIr.value.functions.map((item) => [item.id, item])),
     universalById: new Map(documents.universalValueBindings.value.bindings.map((item) => [item.id, item])),
     scalarById: new Map(documents.scalarDispatch.value.bindings.map((item) => [item.id, item])),
-    unitById: new Map(loweringPlan.units.map((unit) => [unit.identity.id, unit]))
+    unitById: new Map(loweringPlan.units.map((unit) => [unit.identity.id, unit])),
+    projectionById: new Map((documents.projection?.value?.rows ?? []).map((row) => [row.id, row]))
   };
 
   const loweredRouteIds = new Set((documents.handleLowering?.value?.routes ?? []).map((route) => route.id));
+  // The universal transport captures a declared rooted-handle result into the
+  // same semantic registry the handle-lowering table uses, so a route here
+  // produces a representation handle-lowered consumers accept.
+  const semanticCaptureByRoute = new Map(documents.universalValueBindings.value.bindings
+    .filter((binding) => binding.resultSemanticKind)
+    .map((binding) => [binding.id, binding.resultSemanticKind]));
   const consumersByKind = new Map();
   for (const irFunction of lookup.irById.values()) {
     for (const parameter of irFunction.parameters ?? []) {
@@ -588,9 +728,29 @@ export function buildHeadlessConformancePlan(documents, {
     }
   }
 
+  // A route is only usable as a value constructor when the plan can actually
+  // call it, and when calling it observes nothing but the value: it must be in
+  // the universal catalog, its conformance case must be safe, and it must need
+  // no context beyond the ambient engine. The last condition is what keeps a
+  // synthesized inhabitant from silently reading the surrounding game object -
+  // `go.get_position` would also satisfy the shape.
+  const valueConstructors = buildValueConstructors(
+    [...lookup.irById.values()],
+    documents.valueLayouts?.value ?? null,
+    (irFunction) => {
+      const conformanceCase = lookup.conformanceById.get(irFunction.id);
+      return lookup.universalById.has(irFunction.id) &&
+        conformanceCase?.execution?.policy === "safe" &&
+        (conformanceCase.requiredContexts ?? []).every((context) => context === AMBIENT_CONTEXT);
+    }
+  );
+  const records = new Map((documents.scriptIr.value.types ?? [])
+    .filter((type) => type.kind === "class")
+    .map((type) => [type.name, type]));
+
   const profileProviders = new Map(FIXTURE_PROFILES.map((profile) => [
     profile.id,
-    buildHandleProviders({ profile, algebra, availability, lookup })
+    buildHandleProviders({ profile, algebra, availability, lookup, valueConstructors, records })
   ]));
 
   const byContract = new Map();
@@ -628,6 +788,9 @@ export function buildHeadlessConformancePlan(documents, {
             providers,
             algebra,
             availability,
+            valueConstructors,
+            records,
+            projectionRow: lookup.projectionById.get(unit.identity.id) ?? null,
             admitDestructive
           });
           if (decision.eligible) {
@@ -766,7 +929,7 @@ export function buildHeadlessConformancePlan(documents, {
       handleProviders: [...profileProviders.get(profile.id).values()]
         .sort((left, right) => (left.handleKind < right.handleKind ? -1 : 1)),
       handleTransportAgreement: handleTransportAgreement(
-        profileProviders.get(profile.id), loweredRouteIds, consumersByKind)
+        profileProviders.get(profile.id), loweredRouteIds, consumersByKind, semanticCaptureByRoute)
     })),
     usedProfiles,
     inputs: Object.fromEntries(Object.entries(INPUT_PATHS).map(([name, relative]) => [

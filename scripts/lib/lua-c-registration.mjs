@@ -488,7 +488,11 @@ function collectFunctionDefinitions(code, origin, into) {
       bodyEnd: close,
       code: code.slice(open + 1, close),
       file: origin.file,
-      macroExpanded: origin.macroExpanded ?? false
+      macroExpanded: origin.macroExpanded ?? false,
+      // Where this definition starts in the FILE: its own header, or the macro
+      // invocation that generated it. It is what a preceding documentation
+      // comment is attached to.
+      headerStart: origin.headerStart ?? match.index + match[1].length
     };
     const existing = into.get(name);
     if (existing) existing.push(record); else into.set(name, [record]);
@@ -532,6 +536,7 @@ function collectMacroGeneratedDefinitions(file, written) {
         path: file.path,
         file,
         line: lineAt(file.lines, match.index),
+        headerStart: match.index + (match[1] ? 1 : 0),
         macroExpanded: true
       }, generated);
     }
@@ -644,6 +649,36 @@ export function collectSdkStackHelpers(headers) {
     }
   }
   return index;
+}
+
+// Defold documents a Lua route in a `/*# ... @name module.member */` comment
+// written directly above the C function that implements it. That annotation and
+// the registration array in the same translation unit are two independent claims
+// about the same C symbol, and they can disagree: `script_engine.cpp` documents
+// `@name sys.set_render_enable` above a function its own registration array
+// registers as `set_render_enabled`. Reading the annotation back off the comment
+// is what makes the documented spelling checkable against the registered one,
+// for the engine and for any extension using the same convention.
+//
+// The annotation belongs to a definition only when nothing but whitespace, a
+// storage class and a return type separates them, so a comment further up the
+// file is never attributed to an unrelated function.
+const DOCUMENTATION_COMMENT = /^\/\*[#*]/;
+const DOCUMENTED_NAME = /@name\s+([A-Za-z_][\w.]*)/;
+
+export function documentedNameOf(definition) {
+  const file = definition.file;
+  const start = definition.headerStart;
+  if (typeof start !== "number") return null;
+  let chosen = null;
+  for (const comment of file.comments) {
+    if (comment.end > start) break;
+    chosen = comment;
+  }
+  if (!chosen || !DOCUMENTATION_COMMENT.test(chosen.text)) return null;
+  if (!/^[\s\w:*&]*$/.test(file.text.slice(chosen.end, start))) return null;
+  const match = DOCUMENTED_NAME.exec(chosen.text);
+  return match ? { name: match[1], line: lineAt(file.lines, chosen.start) } : null;
 }
 
 // A Lua user type is named where it is registered, so `TYPE_HASH_BODY` can be

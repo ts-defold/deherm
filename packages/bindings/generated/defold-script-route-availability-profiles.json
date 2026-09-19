@@ -4,9 +4,9 @@
   "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
   "inputEvidence": {
     "policy": "packages/bindings/overrides/script-route-availability-profiles.json",
-    "policySha256": "3f57a4ab298d166c4655f349647040910a1feb4ed69360f62b6dfa69117f44a9",
+    "policySha256": "2aa62ed6214d4d2fccc986f6a659e597475187c9f9dfc71e3ab252641601d5d7",
     "borrowedClassification": "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
-    "borrowedClassificationSha256": "8884e9042789b27655162577651feb63a79ce9c0611938817f439826cc44b3b9",
+    "borrowedClassificationSha256": "d21931dbcd4587137084a0372d750e1487d26d64ee0d3fbffa50b441c2276d12",
     "scriptIr": "packages/bindings/generated/defold-script-api-ir.json",
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "sourceHashes": {
@@ -56,9 +56,9 @@
     {
       "feature": "core",
       "registeredFunctionCount": 26,
-      "matchedHandleRouteCount": 8,
+      "matchedHandleRouteCount": 9,
       "registeredNamesSha256": "6bfb4658daf610734ea101ca7ac50380250a8d721491ef5664662bd68f315aa9",
-      "matchedStableIdsSha256": "ad5e39e5516566a8dff4fcd0fc3293e3da5da05596399a45e9535c92bd528298",
+      "matchedStableIdsSha256": "86e5f753e7deffad8bb8427a640cbc4176cfecaebd4dddc0910c829e03e743c2",
       "documentedButUnregisteredCount": 0,
       "registeredDocumentedRouteCount": 26,
       "registrationOnlyRouteCount": 0,
@@ -67,9 +67,9 @@
     {
       "feature": "box2d-v2",
       "registeredFunctionCount": 145,
-      "matchedHandleRouteCount": 114,
+      "matchedHandleRouteCount": 124,
       "registeredNamesSha256": "dcbe463207b43828f3e2ced43d310c2aff4f531b9873b4c5f6c140787b1a1688",
-      "matchedStableIdsSha256": "c82377be77c6c63af36e3c7acc2b2dc46209033eeb308d99bfe2b2ec454ca429",
+      "matchedStableIdsSha256": "998f1c9558b133669d5406a247c2adbbcd55526b4de461b4af680745ec186d18",
       "documentedButUnregisteredCount": 0,
       "registeredDocumentedRouteCount": 145,
       "registrationOnlyRouteCount": 0,
@@ -78,9 +78,9 @@
     {
       "feature": "box2d-v3",
       "registeredFunctionCount": 233,
-      "matchedHandleRouteCount": 179,
+      "matchedHandleRouteCount": 187,
       "registeredNamesSha256": "709f4cead8e6def66d85562058f755e4a82ce6a7262ca278ddeae770a95c7f64",
-      "matchedStableIdsSha256": "19abd1fcc0eca660df7613707c0a3712dc1a3b907ca2354775e3f4d3ccbbd010",
+      "matchedStableIdsSha256": "6ec3bd6b09c3b2ee0d162c6ab3336f2bb5578dd707ec9ebc714ce35014388758",
       "documentedButUnregisteredCount": 2,
       "registeredDocumentedRouteCount": 219,
       "registrationOnlyRouteCount": 14,
@@ -104,9 +104,9 @@
     {
       "feature": "bullet3d",
       "registeredFunctionCount": 172,
-      "matchedHandleRouteCount": 131,
+      "matchedHandleRouteCount": 139,
       "registeredNamesSha256": "986a9a71f4a6904a603e70dd614e8c3ffa1d48a17c16bd81cf288975e6539e8d",
-      "matchedStableIdsSha256": "bbc0af9b310369951d6a36bec3a9f7c39763292c3c85295cb4e95e6790a96383",
+      "matchedStableIdsSha256": "4e27633d8b120a704868d56c5706e7ece886b5211c65e0da3ef35290e9834f9b",
       "documentedButUnregisteredCount": 0,
       "registeredDocumentedRouteCount": 172,
       "registrationOnlyRouteCount": 0,
@@ -219,10 +219,10 @@
   "handleFeatures": {
     "core": {
       "capabilityBit": 1,
-      "documentedRouteCount": 8,
-      "availableRouteCount": 8,
-      "documentedRouteSetSha256": "ad5e39e5516566a8dff4fcd0fc3293e3da5da05596399a45e9535c92bd528298",
-      "availableRouteSetSha256": "ad5e39e5516566a8dff4fcd0fc3293e3da5da05596399a45e9535c92bd528298",
+      "documentedRouteCount": 9,
+      "availableRouteCount": 9,
+      "documentedRouteSetSha256": "86e5f753e7deffad8bb8427a640cbc4176cfecaebd4dddc0910c829e03e743c2",
+      "availableRouteSetSha256": "86e5f753e7deffad8bb8427a640cbc4176cfecaebd4dddc0910c829e03e743c2",
       "documentedRoutes": [
         {
           "id": "script:buffer.copy_buffer",
@@ -270,6 +270,13 @@
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "runtime-global"
         },
@@ -328,6 +335,13 @@
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "runtime-global"
         },
@@ -343,10 +357,10 @@
     },
     "box2d-v2": {
       "capabilityBit": 2,
-      "documentedRouteCount": 114,
-      "availableRouteCount": 114,
-      "documentedRouteSetSha256": "c82377be77c6c63af36e3c7acc2b2dc46209033eeb308d99bfe2b2ec454ca429",
-      "availableRouteSetSha256": "c82377be77c6c63af36e3c7acc2b2dc46209033eeb308d99bfe2b2ec454ca429",
+      "documentedRouteCount": 124,
+      "availableRouteCount": 124,
+      "documentedRouteSetSha256": "998f1c9558b133669d5406a247c2adbbcd55526b4de461b4af680745ec186d18",
+      "availableRouteSetSha256": "998f1c9558b133669d5406a247c2adbbcd55526b4de461b4af680745ec186d18",
       "documentedRoutes": [
         {
           "id": "script:b2d.joint.get_body_b",
@@ -359,6 +373,13 @@
           "id": "script:b2d.joint.get_body_a",
           "stableId": 76897113,
           "rawName": "b2d.joint.get_body_a",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_pulley",
+          "stableId": 105428164,
+          "rawName": "b2d.joint.create_pulley",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -468,6 +489,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_friction",
+          "stableId": 517998087,
+          "rawName": "b2d.joint.create_friction",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_force",
           "stableId": 543146849,
           "rawName": "b2d.joint.set_max_force",
@@ -479,6 +507,13 @@
           "stableId": 673579190,
           "rawName": "b2d.fixture.is_sensor",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -811,6 +846,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -829,6 +871,13 @@
           "stableId": 2599386826,
           "rawName": "b2d.joint.set_motor_speed",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_rope",
+          "stableId": 2656060889,
+          "rawName": "b2d.joint.create_rope",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -916,6 +965,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_gear",
+          "stableId": 3014196138,
+          "rawName": "b2d.joint.create_gear",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.apply_force_to_center",
           "stableId": 3039406416,
           "rawName": "b2d.body.apply_force_to_center",
@@ -927,6 +983,13 @@
           "stableId": 3042755438,
           "rawName": "b2d.body.get_world_point",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -947,6 +1010,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -1004,6 +1074,13 @@
           "stableId": 3553552188,
           "rawName": "b2d.joint.get_local_axis_a",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -1144,6 +1221,13 @@
           "stableId": 4261927433,
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         }
       ],
@@ -1163,6 +1247,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_pulley",
+          "stableId": 105428164,
+          "rawName": "b2d.joint.create_pulley",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.fixture.get_restitution",
           "stableId": 109722038,
           "rawName": "b2d.fixture.get_restitution",
@@ -1268,6 +1359,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_friction",
+          "stableId": 517998087,
+          "rawName": "b2d.joint.create_friction",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_force",
           "stableId": 543146849,
           "rawName": "b2d.joint.set_max_force",
@@ -1279,6 +1377,13 @@
           "stableId": 673579190,
           "rawName": "b2d.fixture.is_sensor",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -1611,6 +1716,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -1629,6 +1741,13 @@
           "stableId": 2599386826,
           "rawName": "b2d.joint.set_motor_speed",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_rope",
+          "stableId": 2656060889,
+          "rawName": "b2d.joint.create_rope",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -1716,6 +1835,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_gear",
+          "stableId": 3014196138,
+          "rawName": "b2d.joint.create_gear",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.apply_force_to_center",
           "stableId": 3039406416,
           "rawName": "b2d.body.apply_force_to_center",
@@ -1727,6 +1853,13 @@
           "stableId": 3042755438,
           "rawName": "b2d.body.get_world_point",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -1747,6 +1880,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -1804,6 +1944,13 @@
           "stableId": 3553552188,
           "rawName": "b2d.joint.get_local_axis_a",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -1945,21 +2092,35 @@
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
         }
       ],
       "unavailableRoutes": []
     },
     "box2d-v3": {
       "capabilityBit": 4,
-      "documentedRouteCount": 181,
-      "availableRouteCount": 179,
-      "documentedRouteSetSha256": "244364602f6ff102d100759f02e1362f809c9f323095e89c0b9a6eaecad4a584",
-      "availableRouteSetSha256": "19abd1fcc0eca660df7613707c0a3712dc1a3b907ca2354775e3f4d3ccbbd010",
+      "documentedRouteCount": 189,
+      "availableRouteCount": 187,
+      "documentedRouteSetSha256": "b95a397a9381845c62a2f228fe104b61a86f905f51ffb4fab61d3d6fe7a6ed9d",
+      "availableRouteSetSha256": "6ec3bd6b09c3b2ee0d162c6ab3336f2bb5578dd707ec9ebc714ce35014388758",
       "documentedRoutes": [
         {
           "id": "script:b2d.joint.get_body_b",
           "stableId": 26564256,
           "rawName": "b2d.joint.get_body_b",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_motor",
+          "stableId": 61804422,
+          "rawName": "b2d.joint.create_motor",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -2069,6 +2230,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_filter",
+          "stableId": 365344467,
+          "rawName": "b2d.joint.create_filter",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_user_data",
           "stableId": 366616171,
           "rawName": "b2d.body.get_user_data",
@@ -2158,6 +2326,13 @@
           "stableId": 700729222,
           "rawName": "b2d.joint.get_linear_offset",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -2743,6 +2918,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -2862,6 +3044,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.enable_sleep",
           "stableId": 3138438891,
           "rawName": "b2d.body.enable_sleep",
@@ -2907,6 +3096,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -2985,6 +3181,13 @@
           "stableId": 3555473695,
           "rawName": "b2d.chain.get_segment_count",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -3212,6 +3415,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.get_min_length",
           "stableId": 4268770728,
           "rawName": "b2d.joint.get_min_length",
@@ -3231,6 +3441,13 @@
           "id": "script:b2d.joint.get_body_b",
           "stableId": 26564256,
           "rawName": "b2d.joint.get_body_b",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_motor",
+          "stableId": 61804422,
+          "rawName": "b2d.joint.create_motor",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -3340,6 +3557,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_filter",
+          "stableId": 365344467,
+          "rawName": "b2d.joint.create_filter",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.set_linear_velocity",
           "stableId": 391829082,
           "rawName": "b2d.body.set_linear_velocity",
@@ -3421,6 +3645,13 @@
           "stableId": 700729222,
           "rawName": "b2d.joint.get_linear_offset",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -3998,6 +4229,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -4117,6 +4355,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.enable_sleep",
           "stableId": 3138438891,
           "rawName": "b2d.body.enable_sleep",
@@ -4162,6 +4407,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -4240,6 +4492,13 @@
           "stableId": 3555473695,
           "rawName": "b2d.chain.get_segment_count",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -4464,6 +4723,13 @@
           "stableId": 4261927433,
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -4502,10 +4768,10 @@
     },
     "bullet3d": {
       "capabilityBit": 8,
-      "documentedRouteCount": 131,
-      "availableRouteCount": 131,
-      "documentedRouteSetSha256": "bbc0af9b310369951d6a36bec3a9f7c39763292c3c85295cb4e95e6790a96383",
-      "availableRouteSetSha256": "bbc0af9b310369951d6a36bec3a9f7c39763292c3c85295cb4e95e6790a96383",
+      "documentedRouteCount": 139,
+      "availableRouteCount": 139,
+      "documentedRouteSetSha256": "4e27633d8b120a704868d56c5706e7ece886b5211c65e0da3ef35290e9834f9b",
+      "availableRouteSetSha256": "4e27633d8b120a704868d56c5706e7ece886b5211c65e0da3ef35290e9834f9b",
       "documentedRoutes": [
         {
           "id": "script:bullet3d.rigid_body.apply_impulse",
@@ -4610,6 +4876,13 @@
           "stableId": 353606235,
           "rawName": "bullet3d.constraint.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -4750,6 +5023,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -4935,6 +5215,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.rigid_body.get_linear_velocity",
           "stableId": 1859883727,
           "rawName": "bullet3d.rigid_body.get_linear_velocity",
@@ -4953,6 +5240,13 @@
           "stableId": 1886699882,
           "rawName": "bullet3d.rigid_body.apply_force_at_relative_position",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -5110,6 +5404,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -5163,6 +5464,13 @@
           "stableId": 3174044920,
           "rawName": "bullet3d.rigid_body.has_flag",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -5243,6 +5551,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.get_type_name",
           "stableId": 3552548231,
           "rawName": "bullet3d.constraint.get_type_name",
@@ -5296,6 +5611,13 @@
           "stableId": 3774839951,
           "rawName": "bullet3d.rigid_body.apply_central_impulse",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -5532,6 +5854,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_slider_limits",
           "stableId": 418897303,
           "rawName": "bullet3d.constraint.set_slider_limits",
@@ -5669,6 +5998,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -5854,6 +6190,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.rigid_body.get_linear_velocity",
           "stableId": 1859883727,
           "rawName": "bullet3d.rigid_body.get_linear_velocity",
@@ -5872,6 +6215,13 @@
           "stableId": 1886699882,
           "rawName": "bullet3d.rigid_body.apply_force_at_relative_position",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -6029,6 +6379,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -6082,6 +6439,13 @@
           "stableId": 3174044920,
           "rawName": "bullet3d.rigid_body.has_flag",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -6162,6 +6526,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.get_type_name",
           "stableId": 3552548231,
           "rawName": "bullet3d.constraint.get_type_name",
@@ -6215,6 +6586,13 @@
           "stableId": 3774839951,
           "rawName": "bullet3d.rigid_body.apply_central_impulse",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -6356,8 +6734,8 @@
         "box2d-v2",
         "bullet3d"
       ],
-      "documentedRouteCount": 253,
-      "availableRouteCount": 253,
+      "documentedRouteCount": 272,
+      "availableRouteCount": 272,
       "documentedRoutes": [
         {
           "id": "script:b2d.joint.get_body_b",
@@ -6399,6 +6777,13 @@
           "stableId": 92274755,
           "rawName": "bullet3d.rigid_body.get_inverse_mass",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_pulley",
+          "stableId": 105428164,
+          "rawName": "b2d.joint.create_pulley",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -6556,6 +6941,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.set_linear_velocity",
           "stableId": 391829082,
           "rawName": "b2d.body.set_linear_velocity",
@@ -6640,6 +7032,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_friction",
+          "stableId": 517998087,
+          "rawName": "b2d.joint.create_friction",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.is_valid",
           "stableId": 537048135,
           "rawName": "bullet3d.constraint.is_valid",
@@ -6700,6 +7099,13 @@
           "stableId": 696282104,
           "rawName": "bullet3d.world.is_valid",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -6812,6 +7218,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -7186,6 +7599,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.rigid_body.get_linear_velocity",
           "stableId": 1859883727,
           "rawName": "bullet3d.rigid_body.get_linear_velocity",
@@ -7218,6 +7638,13 @@
           "stableId": 1888837992,
           "rawName": "b2d.body.is_fixed_rotation",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -7417,6 +7844,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.world.get_gravity",
           "stableId": 2585594286,
           "rawName": "bullet3d.world.get_gravity",
@@ -7449,6 +7883,13 @@
           "stableId": 2620477658,
           "rawName": "bullet3d.world.set_gravity",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_rope",
+          "stableId": 2656060889,
+          "rawName": "b2d.joint.create_rope",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -7564,6 +8005,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -7589,6 +8037,13 @@
           "stableId": 3011734241,
           "rawName": "bullet3d.constraint.set_frame_b",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_gear",
+          "stableId": 3014196138,
+          "rawName": "b2d.joint.create_gear",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -7627,6 +8082,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
@@ -7655,6 +8117,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.reset_mass_data",
           "stableId": 3269475957,
           "rawName": "b2d.body.reset_mass_data",
@@ -7665,6 +8134,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -7781,6 +8257,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_motor_torque",
           "stableId": 3534238178,
           "rawName": "b2d.joint.set_max_motor_torque",
@@ -7806,6 +8289,13 @@
           "stableId": 3553552188,
           "rawName": "b2d.joint.get_local_axis_a",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -7891,6 +8381,20 @@
           "rawName": "b2d.joint.get_max_force",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -8128,6 +8632,13 @@
           "stableId": 4261927433,
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         }
       ],
@@ -8175,6 +8686,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_pulley",
+          "stableId": 105428164,
+          "rawName": "b2d.joint.create_pulley",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.fixture.get_restitution",
           "stableId": 109722038,
           "rawName": "b2d.fixture.get_restitution",
@@ -8329,6 +8847,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.set_linear_velocity",
           "stableId": 391829082,
           "rawName": "b2d.body.set_linear_velocity",
@@ -8413,6 +8938,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_friction",
+          "stableId": 517998087,
+          "rawName": "b2d.joint.create_friction",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.is_valid",
           "stableId": 537048135,
           "rawName": "bullet3d.constraint.is_valid",
@@ -8473,6 +9005,13 @@
           "stableId": 696282104,
           "rawName": "bullet3d.world.is_valid",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -8585,6 +9124,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -8959,6 +9505,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.rigid_body.get_linear_velocity",
           "stableId": 1859883727,
           "rawName": "bullet3d.rigid_body.get_linear_velocity",
@@ -8991,6 +9544,13 @@
           "stableId": 1888837992,
           "rawName": "b2d.body.is_fixed_rotation",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -9190,6 +9750,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.world.get_gravity",
           "stableId": 2585594286,
           "rawName": "bullet3d.world.get_gravity",
@@ -9222,6 +9789,13 @@
           "stableId": 2620477658,
           "rawName": "bullet3d.world.set_gravity",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_rope",
+          "stableId": 2656060889,
+          "rawName": "b2d.joint.create_rope",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -9337,6 +9911,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -9362,6 +9943,13 @@
           "stableId": 3011734241,
           "rawName": "bullet3d.constraint.set_frame_b",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_gear",
+          "stableId": 3014196138,
+          "rawName": "b2d.joint.create_gear",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -9400,6 +9988,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
@@ -9428,6 +10023,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.reset_mass_data",
           "stableId": 3269475957,
           "rawName": "b2d.body.reset_mass_data",
@@ -9438,6 +10040,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -9554,6 +10163,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_motor_torque",
           "stableId": 3534238178,
           "rawName": "b2d.joint.set_max_motor_torque",
@@ -9579,6 +10195,13 @@
           "stableId": 3553552188,
           "rawName": "b2d.joint.get_local_axis_a",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -9664,6 +10287,20 @@
           "rawName": "b2d.joint.get_max_force",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -9902,6 +10539,13 @@
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
         }
       ],
       "unavailableRoutes": []
@@ -9914,13 +10558,20 @@
         "box2d-v3",
         "bullet3d"
       ],
-      "documentedRouteCount": 320,
-      "availableRouteCount": 318,
+      "documentedRouteCount": 337,
+      "availableRouteCount": 335,
       "documentedRoutes": [
         {
           "id": "script:b2d.joint.get_body_b",
           "stableId": 26564256,
           "rawName": "b2d.joint.get_body_b",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_motor",
+          "stableId": 61804422,
+          "rawName": "b2d.joint.create_motor",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -10149,6 +10800,20 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_filter",
+          "stableId": 365344467,
+          "rawName": "b2d.joint.create_filter",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_user_data",
           "stableId": 366616171,
           "rawName": "b2d.body.get_user_data",
@@ -10332,6 +10997,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.apply_angular_impulse",
           "stableId": 726881113,
           "rawName": "b2d.body.apply_angular_impulse",
@@ -10497,6 +11169,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -10962,6 +11641,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.get_current_length",
           "stableId": 1858724003,
           "rawName": "b2d.joint.get_current_length",
@@ -11022,6 +11708,13 @@
           "stableId": 1923506897,
           "rawName": "b2d.shape.get_sensor_capacity",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -11299,6 +11992,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.world.get_gravity",
           "stableId": 2585594286,
           "rawName": "bullet3d.world.get_gravity",
@@ -11439,6 +12139,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -11509,6 +12216,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
@@ -11558,6 +12272,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.shape.are_contact_events_enabled",
           "stableId": 3217929986,
           "rawName": "b2d.shape.are_contact_events_enabled",
@@ -11575,6 +12296,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -11712,6 +12440,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_motor_torque",
           "stableId": 3534238178,
           "rawName": "b2d.joint.set_max_motor_torque",
@@ -11737,6 +12472,13 @@
           "stableId": 3555473695,
           "rawName": "b2d.chain.get_segment_count",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -11838,11 +12580,25 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.is_valid",
           "stableId": 3797032313,
           "rawName": "b2d.body.is_valid",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -12146,6 +12902,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.get_min_length",
           "stableId": 4268770728,
           "rawName": "b2d.joint.get_min_length",
@@ -12165,6 +12928,13 @@
           "id": "script:b2d.joint.get_body_b",
           "stableId": 26564256,
           "rawName": "b2d.joint.get_body_b",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_motor",
+          "stableId": 61804422,
+          "rawName": "b2d.joint.create_motor",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -12393,6 +13163,20 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_filter",
+          "stableId": 365344467,
+          "rawName": "b2d.joint.create_filter",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.set_linear_velocity",
           "stableId": 391829082,
           "rawName": "b2d.body.set_linear_velocity",
@@ -12568,6 +13352,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.apply_angular_impulse",
           "stableId": 726881113,
           "rawName": "b2d.body.apply_angular_impulse",
@@ -12733,6 +13524,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -13198,6 +13996,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.get_current_length",
           "stableId": 1858724003,
           "rawName": "b2d.joint.get_current_length",
@@ -13258,6 +14063,13 @@
           "stableId": 1923506897,
           "rawName": "b2d.shape.get_sensor_capacity",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -13527,6 +14339,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.world.get_gravity",
           "stableId": 2585594286,
           "rawName": "bullet3d.world.get_gravity",
@@ -13667,6 +14486,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -13737,6 +14563,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
@@ -13786,6 +14619,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.shape.are_contact_events_enabled",
           "stableId": 3217929986,
           "rawName": "b2d.shape.are_contact_events_enabled",
@@ -13803,6 +14643,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -13940,6 +14787,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_motor_torque",
           "stableId": 3534238178,
           "rawName": "b2d.joint.set_max_motor_torque",
@@ -13965,6 +14819,13 @@
           "stableId": 3555473695,
           "rawName": "b2d.chain.get_segment_count",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -14066,11 +14927,25 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.is_valid",
           "stableId": 3797032313,
           "rawName": "b2d.body.is_valid",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -14371,6 +15246,13 @@
           "stableId": 4261927433,
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -14414,8 +15296,8 @@
         "core",
         "box2d-v2"
       ],
-      "documentedRouteCount": 122,
-      "availableRouteCount": 122,
+      "documentedRouteCount": 133,
+      "availableRouteCount": 133,
       "documentedRoutes": [
         {
           "id": "script:b2d.joint.get_body_b",
@@ -14428,6 +15310,13 @@
           "id": "script:b2d.joint.get_body_a",
           "stableId": 76897113,
           "rawName": "b2d.joint.get_body_a",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_pulley",
+          "stableId": 105428164,
+          "rawName": "b2d.joint.create_pulley",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -14551,6 +15440,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_friction",
+          "stableId": 517998087,
+          "rawName": "b2d.joint.create_friction",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_force",
           "stableId": 543146849,
           "rawName": "b2d.joint.set_max_force",
@@ -14569,6 +15465,13 @@
           "stableId": 673579190,
           "rawName": "b2d.fixture.is_sensor",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -14922,6 +15825,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -14940,6 +15850,13 @@
           "stableId": 2599386826,
           "rawName": "b2d.joint.set_motor_speed",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_rope",
+          "stableId": 2656060889,
+          "rawName": "b2d.joint.create_rope",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -15027,6 +15944,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_gear",
+          "stableId": 3014196138,
+          "rawName": "b2d.joint.create_gear",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.apply_force_to_center",
           "stableId": 3039406416,
           "rawName": "b2d.body.apply_force_to_center",
@@ -15038,6 +15962,13 @@
           "stableId": 3042755438,
           "rawName": "b2d.body.get_world_point",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -15065,6 +15996,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -15125,6 +16063,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_angular_damping",
           "stableId": 3599094944,
           "rawName": "b2d.body.get_angular_damping",
@@ -15158,6 +16103,13 @@
           "rawName": "b2d.joint.get_max_force",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -15269,6 +16221,13 @@
           "stableId": 4261927433,
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         }
       ],
@@ -15288,6 +16247,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_pulley",
+          "stableId": 105428164,
+          "rawName": "b2d.joint.create_pulley",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.fixture.get_restitution",
           "stableId": 109722038,
           "rawName": "b2d.fixture.get_restitution",
@@ -15407,6 +16373,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_friction",
+          "stableId": 517998087,
+          "rawName": "b2d.joint.create_friction",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.set_max_force",
           "stableId": 543146849,
           "rawName": "b2d.joint.set_max_force",
@@ -15425,6 +16398,13 @@
           "stableId": 673579190,
           "rawName": "b2d.fixture.is_sensor",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -15778,6 +16758,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -15796,6 +16783,13 @@
           "stableId": 2599386826,
           "rawName": "b2d.joint.set_motor_speed",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_rope",
+          "stableId": 2656060889,
+          "rawName": "b2d.joint.create_rope",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -15883,6 +16877,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_gear",
+          "stableId": 3014196138,
+          "rawName": "b2d.joint.create_gear",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.apply_force_to_center",
           "stableId": 3039406416,
           "rawName": "b2d.body.apply_force_to_center",
@@ -15894,6 +16895,13 @@
           "stableId": 3042755438,
           "rawName": "b2d.body.get_world_point",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -15921,6 +16929,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -15981,6 +16996,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_angular_damping",
           "stableId": 3599094944,
           "rawName": "b2d.body.get_angular_damping",
@@ -16014,6 +17036,13 @@
           "rawName": "b2d.joint.get_max_force",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -16126,6 +17155,13 @@
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
         }
       ],
       "unavailableRoutes": []
@@ -16137,13 +17173,20 @@
         "core",
         "box2d-v3"
       ],
-      "documentedRouteCount": 189,
-      "availableRouteCount": 187,
+      "documentedRouteCount": 198,
+      "availableRouteCount": 196,
       "documentedRoutes": [
         {
           "id": "script:b2d.joint.get_body_b",
           "stableId": 26564256,
           "rawName": "b2d.joint.get_body_b",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_motor",
+          "stableId": 61804422,
+          "rawName": "b2d.joint.create_motor",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -16267,6 +17310,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_filter",
+          "stableId": 365344467,
+          "rawName": "b2d.joint.create_filter",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_user_data",
           "stableId": 366616171,
           "rawName": "b2d.body.get_user_data",
@@ -16363,6 +17413,13 @@
           "stableId": 700729222,
           "rawName": "b2d.joint.get_linear_offset",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -16969,6 +18026,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -17088,6 +18152,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
@@ -17140,6 +18211,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -17221,6 +18299,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_angular_damping",
           "stableId": 3599094944,
           "rawName": "b2d.body.get_angular_damping",
@@ -17275,6 +18360,13 @@
           "rawName": "b2d.body.is_valid",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -17452,6 +18544,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.joint.get_min_length",
           "stableId": 4268770728,
           "rawName": "b2d.joint.get_min_length",
@@ -17471,6 +18570,13 @@
           "id": "script:b2d.joint.get_body_b",
           "stableId": 26564256,
           "rawName": "b2d.joint.get_body_b",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_motor",
+          "stableId": 61804422,
+          "rawName": "b2d.joint.create_motor",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -17594,6 +18700,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_filter",
+          "stableId": 365344467,
+          "rawName": "b2d.joint.create_filter",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.set_linear_velocity",
           "stableId": 391829082,
           "rawName": "b2d.body.set_linear_velocity",
@@ -17682,6 +18795,13 @@
           "stableId": 700729222,
           "rawName": "b2d.joint.get_linear_offset",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_distance",
+          "stableId": 706695518,
+          "rawName": "b2d.joint.create_distance",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -18280,6 +19400,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_mouse",
+          "stableId": 2585544600,
+          "rawName": "b2d.joint.create_mouse",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_linear_velocity",
           "stableId": 2588459910,
           "rawName": "b2d.body.get_linear_velocity",
@@ -18399,6 +19526,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_weld",
+          "stableId": 3107146269,
+          "rawName": "b2d.joint.create_weld",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
@@ -18451,6 +19585,13 @@
           "id": "script:b2d.body.get_world",
           "stableId": 3271172727,
           "rawName": "b2d.body.get_world",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_prismatic",
+          "stableId": 3277564767,
+          "rawName": "b2d.joint.create_prismatic",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
@@ -18532,6 +19673,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:b2d.joint.create_wheel",
+          "stableId": 3577999200,
+          "rawName": "b2d.joint.create_wheel",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:b2d.body.get_angular_damping",
           "stableId": 3599094944,
           "rawName": "b2d.body.get_angular_damping",
@@ -18586,6 +19734,13 @@
           "rawName": "b2d.body.is_valid",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:b2d.joint.get_local_anchor_a",
@@ -18760,6 +19915,13 @@
           "stableId": 4261927433,
           "rawName": "b2d.body.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:b2d.joint.create_revolute",
+          "stableId": 4268006875,
+          "rawName": "b2d.joint.create_revolute",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -18803,8 +19965,8 @@
         "core",
         "bullet3d"
       ],
-      "documentedRouteCount": 139,
-      "availableRouteCount": 139,
+      "documentedRouteCount": 148,
+      "availableRouteCount": 148,
       "documentedRoutes": [
         {
           "id": "script:bullet3d.rigid_body.apply_impulse",
@@ -18923,6 +20085,13 @@
           "stableId": 353606235,
           "rawName": "bullet3d.constraint.get_type",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -19077,6 +20246,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -19269,6 +20445,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.rigid_body.get_linear_velocity",
           "stableId": 1859883727,
           "rawName": "bullet3d.rigid_body.get_linear_velocity",
@@ -19287,6 +20470,13 @@
           "stableId": 1886699882,
           "rawName": "bullet3d.rigid_body.apply_force_at_relative_position",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -19451,6 +20641,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -19511,6 +20708,13 @@
           "stableId": 3174044920,
           "rawName": "bullet3d.rigid_body.has_flag",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -19591,6 +20795,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.get_type_name",
           "stableId": 3552548231,
           "rawName": "bullet3d.constraint.get_type_name",
@@ -19645,6 +20856,20 @@
           "rawName": "bullet3d.rigid_body.apply_central_impulse",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:bullet3d.rigid_body.get_world",
@@ -19901,6 +21126,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_hinge2",
+          "stableId": 358009820,
+          "rawName": "bullet3d.constraint.create_hinge2",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_slider_limits",
           "stableId": 418897303,
           "rawName": "bullet3d.constraint.set_slider_limits",
@@ -20052,6 +21284,13 @@
           "stableId": 1043138825,
           "rawName": "bullet3d.collision_object.is_awake",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_cone_twist",
+          "stableId": 1095019524,
+          "rawName": "bullet3d.constraint.create_cone_twist",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -20244,6 +21483,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_point_to_point",
+          "stableId": 1855979400,
+          "rawName": "bullet3d.constraint.create_point_to_point",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.rigid_body.get_linear_velocity",
           "stableId": 1859883727,
           "rawName": "bullet3d.rigid_body.get_linear_velocity",
@@ -20262,6 +21508,13 @@
           "stableId": 1886699882,
           "rawName": "bullet3d.rigid_body.apply_force_at_relative_position",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_generic_6dof",
+          "stableId": 1926428006,
+          "rawName": "bullet3d.constraint.create_generic_6dof",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -20426,6 +21679,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+          "stableId": 2945060114,
+          "rawName": "bullet3d.constraint.create_generic_6dof_spring",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.set_frame_a",
           "stableId": 2961401384,
           "rawName": "bullet3d.constraint.set_frame_a",
@@ -20486,6 +21746,13 @@
           "stableId": 3174044920,
           "rawName": "bullet3d.rigid_body.has_flag",
           "operationClass": "checked-handle-input-terminal",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_hinge",
+          "stableId": 3217284614,
+          "rawName": "bullet3d.constraint.create_hinge",
+          "operationClass": "checked-handle-return-capture",
           "requiredContext": "explicit-physics-handle"
         },
         {
@@ -20566,6 +21833,13 @@
           "requiredContext": "explicit-physics-handle"
         },
         {
+          "id": "script:bullet3d.constraint.create_slider",
+          "stableId": 3528448698,
+          "rawName": "bullet3d.constraint.create_slider",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
           "id": "script:bullet3d.constraint.get_type_name",
           "stableId": 3552548231,
           "rawName": "bullet3d.constraint.get_type_name",
@@ -20620,6 +21894,20 @@
           "rawName": "bullet3d.rigid_body.apply_central_impulse",
           "operationClass": "checked-handle-input-terminal",
           "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:bullet3d.constraint.create_universal",
+          "stableId": 3786780596,
+          "rawName": "bullet3d.constraint.create_universal",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "explicit-physics-handle"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
         },
         {
           "id": "script:bullet3d.rigid_body.get_world",
@@ -20763,8 +22051,8 @@
       "features": [
         "core"
       ],
-      "documentedRouteCount": 8,
-      "availableRouteCount": 8,
+      "documentedRouteCount": 9,
+      "availableRouteCount": 9,
       "documentedRoutes": [
         {
           "id": "script:buffer.copy_buffer",
@@ -20812,6 +22100,13 @@
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "runtime-global"
         },
@@ -20870,6 +22165,13 @@
           "id": "script:buffer.get_stream",
           "stableId": 3111756709,
           "rawName": "buffer.get_stream",
+          "operationClass": "checked-handle-return-capture",
+          "requiredContext": "runtime-global"
+        },
+        {
+          "id": "script:buffer.create",
+          "stableId": 3797079608,
+          "rawName": "buffer.create",
           "operationClass": "checked-handle-return-capture",
           "requiredContext": "runtime-global"
         },

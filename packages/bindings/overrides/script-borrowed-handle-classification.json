@@ -3,11 +3,11 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "expectedCounts": {
     "checked-handle-input-terminal": 367,
-    "checked-handle-return-capture": 33,
+    "checked-handle-return-capture": 55,
     "checked-child-engine-object-invalidate": 2,
     "checked-self-engine-object-invalidate": 5,
     "declaration-token": 8,
-    "total": 415
+    "total": 437
   },
   "coverageClaim": "Classification and implementation-order planning only. A classified route is not runtime evidence and does not claim native, HTML5, or Static Hermes conformance.",
   "allocationClaim": "After fixed-capacity bridge registries and Lua stack/registry storage are prewarmed, the generated lookup and dispatch glue can avoid C++ heap allocation on handle-consuming calls. This does not claim that Lua, Defold, Box2D, Bullet, GUI, graphics, resource, or user callbacks are allocation-free; handle capture, object creation, table growth, and engine operations may allocate.",
@@ -167,6 +167,12 @@
       "source": "engine/gameobject/src/gameobject/gameobject_script.cpp",
       "sha256": "529f1ca5693d661173967dc9a44ddd827b73e587f24de0cfb7d3ef0b81accb74",
       "anchors": ["@name go.property", "resource constructors"]
+    },
+    {
+      "id": "box2d-world-v2",
+      "source": "engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_body_v2.cpp",
+      "sha256": "b53c8f37670a3d32525445d7b58a9f979b7a7146175afcf8b517ff6613a43296",
+      "anchors": ["void PushWorld(struct lua_State* L, void* world)", "lua_pushlightuserdata(L, world);"]
     }
   ],
   "handleKinds": [
@@ -192,6 +198,15 @@
       "id": "box2d-world",
       "rawTypes": ["b2World"],
       "representation": "lua-rooted-userdata",
+      "representationFeature": "box2d-v3",
+      "representationExceptions": [
+        {
+          "feature": "box2d-v2",
+          "representation": "lua-light-userdata",
+          "sourceEvidence": "box2d-world-v2",
+          "reason": "Box2D v2 pushes the world as a light userdata: no metatable, no generation, and no rooted identity a handle registry can capture or validate."
+        }
+      ],
       "ownership": "borrowed-engine-world",
       "validity": "Validate b2World_IsValid on every terminal call.",
       "invalidationBoundary": "Owning physics component-world destruction or Box2D generation mismatch.",
@@ -361,39 +376,226 @@
   ],
   "exceptionalRoutes": {
     "checked-handle-return-capture": [
-      { "id": "script:b2d.body.get_next", "stableId": 1887140972 },
-      { "id": "script:b2d.body.get_world", "stableId": 3271172727 },
-      { "id": "script:b2d.chain.from_shape", "stableId": 2813724309 },
-      { "id": "script:b2d.chain.get_world", "stableId": 1117101178 },
-      { "id": "script:b2d.get_body", "stableId": 1348712235 },
-      { "id": "script:b2d.get_world", "stableId": 3600623753 },
-      { "id": "script:b2d.joint.get_body_a", "stableId": 76897113 },
-      { "id": "script:b2d.joint.get_body_b", "stableId": 26564256 },
-      { "id": "script:b2d.joint.get_joint1", "stableId": 1578643662 },
-      { "id": "script:b2d.joint.get_joint2", "stableId": 1561866043 },
-      { "id": "script:b2d.joint.get_world", "stableId": 1990790943 },
-      { "id": "script:b2d.shape.get_body", "stableId": 2944082506 },
-      { "id": "script:b2d.shape.get_world", "stableId": 1138630650 },
-      { "id": "script:buffer.get_stream", "stableId": 3111756709 },
-      { "id": "script:bullet3d.collision_object.get_shape", "stableId": 463523689 },
-      { "id": "script:bullet3d.constraint.get_body_a", "stableId": 2420295687 },
-      { "id": "script:bullet3d.constraint.get_body_b", "stableId": 2437073306 },
-      { "id": "script:bullet3d.constraint.get_world", "stableId": 1391478857 },
-      { "id": "script:bullet3d.get_collision_object", "stableId": 4240041128 },
-      { "id": "script:bullet3d.get_rigid_body", "stableId": 986235210 },
-      { "id": "script:bullet3d.get_world", "stableId": 1630000402 },
-      { "id": "script:bullet3d.rigid_body.get_world", "stableId": 3815014814 },
-      { "id": "script:bullet3d.shape.get_collision_object", "stableId": 3986175953 },
-      { "id": "script:gui.clone", "stableId": 1520695164 },
-      { "id": "script:gui.get_parent", "stableId": 3125128426 },
-      { "id": "script:gui.new_box_node", "stableId": 4256374046 },
-      { "id": "script:gui.new_particlefx_node", "stableId": 2603122601 },
-      { "id": "script:gui.new_pie_node", "stableId": 2624398591 },
-      { "id": "script:gui.new_text_node", "stableId": 763092804 },
-      { "id": "script:render.constant_buffer", "stableId": 747345077 },
-      { "id": "script:resource.get_buffer", "stableId": 4087860613 },
-      { "id": "script:resource.load", "stableId": 306454494 },
-      { "id": "script:sys.load_buffer", "stableId": 667618348 }
+      {
+        "id": "script:b2d.body.get_next",
+        "stableId": 1887140972
+      },
+      {
+        "id": "script:b2d.body.get_world",
+        "stableId": 3271172727
+      },
+      {
+        "id": "script:b2d.chain.from_shape",
+        "stableId": 2813724309
+      },
+      {
+        "id": "script:b2d.chain.get_world",
+        "stableId": 1117101178
+      },
+      {
+        "id": "script:b2d.get_body",
+        "stableId": 1348712235
+      },
+      {
+        "id": "script:b2d.get_world",
+        "stableId": 3600623753
+      },
+      {
+        "id": "script:b2d.joint.create_distance",
+        "stableId": 706695518
+      },
+      {
+        "id": "script:b2d.joint.create_filter",
+        "stableId": 365344467
+      },
+      {
+        "id": "script:b2d.joint.create_friction",
+        "stableId": 517998087
+      },
+      {
+        "id": "script:b2d.joint.create_gear",
+        "stableId": 3014196138
+      },
+      {
+        "id": "script:b2d.joint.create_motor",
+        "stableId": 61804422
+      },
+      {
+        "id": "script:b2d.joint.create_mouse",
+        "stableId": 2585544600
+      },
+      {
+        "id": "script:b2d.joint.create_prismatic",
+        "stableId": 3277564767
+      },
+      {
+        "id": "script:b2d.joint.create_pulley",
+        "stableId": 105428164
+      },
+      {
+        "id": "script:b2d.joint.create_revolute",
+        "stableId": 4268006875
+      },
+      {
+        "id": "script:b2d.joint.create_rope",
+        "stableId": 2656060889
+      },
+      {
+        "id": "script:b2d.joint.create_weld",
+        "stableId": 3107146269
+      },
+      {
+        "id": "script:b2d.joint.create_wheel",
+        "stableId": 3577999200
+      },
+      {
+        "id": "script:b2d.joint.get_body_a",
+        "stableId": 76897113
+      },
+      {
+        "id": "script:b2d.joint.get_body_b",
+        "stableId": 26564256
+      },
+      {
+        "id": "script:b2d.joint.get_joint1",
+        "stableId": 1578643662
+      },
+      {
+        "id": "script:b2d.joint.get_joint2",
+        "stableId": 1561866043
+      },
+      {
+        "id": "script:b2d.joint.get_world",
+        "stableId": 1990790943
+      },
+      {
+        "id": "script:b2d.shape.get_body",
+        "stableId": 2944082506
+      },
+      {
+        "id": "script:b2d.shape.get_world",
+        "stableId": 1138630650
+      },
+      {
+        "id": "script:buffer.create",
+        "stableId": 3797079608
+      },
+      {
+        "id": "script:buffer.get_stream",
+        "stableId": 3111756709
+      },
+      {
+        "id": "script:bullet3d.collision_object.get_shape",
+        "stableId": 463523689
+      },
+      {
+        "id": "script:bullet3d.constraint.create_cone_twist",
+        "stableId": 1095019524
+      },
+      {
+        "id": "script:bullet3d.constraint.create_generic_6dof",
+        "stableId": 1926428006
+      },
+      {
+        "id": "script:bullet3d.constraint.create_generic_6dof_spring",
+        "stableId": 2945060114
+      },
+      {
+        "id": "script:bullet3d.constraint.create_hinge",
+        "stableId": 3217284614
+      },
+      {
+        "id": "script:bullet3d.constraint.create_hinge2",
+        "stableId": 358009820
+      },
+      {
+        "id": "script:bullet3d.constraint.create_point_to_point",
+        "stableId": 1855979400
+      },
+      {
+        "id": "script:bullet3d.constraint.create_slider",
+        "stableId": 3528448698
+      },
+      {
+        "id": "script:bullet3d.constraint.create_universal",
+        "stableId": 3786780596
+      },
+      {
+        "id": "script:bullet3d.constraint.get_body_a",
+        "stableId": 2420295687
+      },
+      {
+        "id": "script:bullet3d.constraint.get_body_b",
+        "stableId": 2437073306
+      },
+      {
+        "id": "script:bullet3d.constraint.get_world",
+        "stableId": 1391478857
+      },
+      {
+        "id": "script:bullet3d.get_collision_object",
+        "stableId": 4240041128
+      },
+      {
+        "id": "script:bullet3d.get_rigid_body",
+        "stableId": 986235210
+      },
+      {
+        "id": "script:bullet3d.get_world",
+        "stableId": 1630000402
+      },
+      {
+        "id": "script:bullet3d.rigid_body.get_world",
+        "stableId": 3815014814
+      },
+      {
+        "id": "script:bullet3d.shape.get_collision_object",
+        "stableId": 3986175953
+      },
+      {
+        "id": "script:gui.clone",
+        "stableId": 1520695164
+      },
+      {
+        "id": "script:gui.get_parent",
+        "stableId": 3125128426
+      },
+      {
+        "id": "script:gui.new_box_node",
+        "stableId": 4256374046
+      },
+      {
+        "id": "script:gui.new_particlefx_node",
+        "stableId": 2603122601
+      },
+      {
+        "id": "script:gui.new_pie_node",
+        "stableId": 2624398591
+      },
+      {
+        "id": "script:gui.new_text_node",
+        "stableId": 763092804
+      },
+      {
+        "id": "script:render.constant_buffer",
+        "stableId": 747345077
+      },
+      {
+        "id": "script:render.render_target",
+        "stableId": 1410796854
+      },
+      {
+        "id": "script:resource.get_buffer",
+        "stableId": 4087860613
+      },
+      {
+        "id": "script:resource.load",
+        "stableId": 306454494
+      },
+      {
+        "id": "script:sys.load_buffer",
+        "stableId": 667618348
+      }
     ],
     "checked-child-engine-object-invalidate": [
       { "id": "script:b2d.body.destroy_fixture", "stableId": 203543744 },

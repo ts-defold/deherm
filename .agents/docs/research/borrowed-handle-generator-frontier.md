@@ -10,12 +10,19 @@ status: active
 
 Status: generated classification and implementation plan, not runtime conformance evidence.
 
-The pinned Defold script API accounting contains 415 pending routes whose primary lowering family is `borrowed-handle`. The deterministic report at `packages/bindings/generated/defold-script-borrowed-handle-classification.json` assigns every route to one mutually exclusive operation class with a stable binding ID, concrete handle kind, required engine context, ownership policy, terminal validity rule, and invalidation boundary. The generator rejects input, source, stable-ID, exception-set, or count drift.
+The pinned Defold script API accounting contains 437 pending routes in the borrowed-handle census. The deterministic report at `packages/bindings/generated/defold-script-borrowed-handle-classification.json` assigns every route to one mutually exclusive operation class with a stable binding ID, concrete handle kind, required engine context, ownership policy, terminal validity rule, and invalidation boundary. The generator rejects input, source, stable-ID, exception-set, or count drift.
+
+Two structural bases admit a route, and every row records which one did:
+
+* `handle-lowering-family` (415 routes) - the binding pattern's primary lowering family is `borrowed-handle`.
+* `declared-handle-result` (22 routes) - the route's single declared result **is** a reviewed borrowed handle kind, whatever family owns its arguments.
+
+The second basis exists because lowering-family selection is a single-winner precedence in which a table-shaped parameter outranks a handle. Every constructor taking a definition record - `b2d.joint.create_*`, `bullet3d.constraint.create_*`, `buffer.create` - is therefore filed under the table family, and partitioning on the family alone covered only routes whose *arguments* are handle-shaped, which is to say accessors. A constructor is the primary way a program obtains a handle, so the census has to see it. The rule is the declared result type and nothing else: a union of scalars that merely admits a handle member (`go.get`) is not a handle result, and a sequence of handles (`b2d.body.get_joints`) is a table.
 
 ## Exact partition and order
 
 1. Implement the 367 `checked-handle-input-terminal` routes first. They consume an existing handle, run the original Defold Lua terminal validation, and neither capture a returned handle nor retire engine identity.
-2. Implement the 33 `checked-handle-return-capture` routes next. Each return must be checked against its reviewed concrete kind before the exact Lua userdata is rooted. Numeric graphics handles remain branded scalar values rather than Lua registry entries.
+2. Implement the 55 `checked-handle-return-capture` routes next. Each return must be checked against its reviewed concrete kind before the exact Lua userdata is rooted. Numeric graphics handles remain branded scalar values rather than Lua registry entries.
 3. Implement the two `checked-child-engine-object-invalidate` routes without
    retiring the parent body host handle. `b2d.body.destroy_fixture` and
    `b2d.body.destroy_shape` destroy a child selected by integer index; the body
@@ -26,7 +33,11 @@ The pinned Defold script API accounting contains 415 pending routes whose primar
    `false`; retiring the host slot would incorrectly prevent that API behavior.
 5. Implement the 8 `declaration-token` routes in the component/property compiler. `resource_data` is declaration metadata accepted by `go.property`; it is not a runtime handle.
 
-The exact module census is Box2D 206, Bullet3D 131, GUI 55, runtime buffer routes 8, render routes 7, and declaration-only routes 8.
+The exact module census is Box2D 218, Bullet3D 139, GUI 55, runtime buffer routes 9, render routes 8, and declaration-only routes 8.
+
+## Representation is scoped to the backend that implements a kind
+
+A handle kind's representation is a property of the Defold backend the active runtime profile selects, not of the kind's name. `b2World` is the case that proved it: the v3 sources push a rooted userdata with a metatable, while Box2D v2's `PushWorld` pushes a **light** userdata with no metatable, no generation, and no identity a registry can capture. A kind therefore declares the feature its stated representation was derived from plus one exception per feature that implements it differently, each with its own pinned source and hash. `generate-script-handle-lowering.mjs` joins that against the availability model and emits `capturableProfileMask` per kind, so both transports refuse a capture by declaration in a profile that does not root the kind, instead of discovering the difference on the Lua stack.
 
 The 206 Box2D rows are a documentation union, not one linkable runtime surface.
 Pinned Defold build and Lua-registration sources show mutually exclusive

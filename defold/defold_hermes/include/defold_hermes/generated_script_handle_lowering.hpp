@@ -47,6 +47,15 @@ struct HandleKind {
   const char* id;
   const char* representation;
   const char* ownership;
+  /**
+   * Runtime profiles in which this kind is a rooted, generation-checked
+   * identity. A kind whose backend representation differs by profile - Box2D
+   * v2 pushes its world as a light userdata with no identity at all - is
+   * capturable only in the profiles whose selected feature implements it as a
+   * rooted userdata, and the router refuses a capture elsewhere by
+   * declaration instead of by inspecting the Lua value.
+   */
+  uint8_t capturableProfileMask;
 };
 
 struct ValueCodec {
@@ -127,6 +136,8 @@ bool routeAvailableInProfile(const Route& route, const RuntimeProfile& profile) 
 RuntimeProfileDetectionStatus detectRuntimeProfile(lua_State* state, RuntimeProfileDetection* output,
     char* error, size_t errorCapacity) noexcept;
 const Route* find(uint32_t stableId) noexcept;
+/** Whether a semantic handle kind is a rooted identity in this runtime profile. */
+bool handleKindCapturableInProfile(SemanticHandleKind kind, const RuntimeProfile& profile) noexcept;
 
 #if DEHERM_PROFILE_ENABLED
 /** Generated telemetry identity for the lua-stack transport. Declared only when
@@ -153,6 +164,8 @@ class CapturedLuaRouter {
   bool captureInstance(int stackIndex) noexcept;
   void detachInstance() noexcept;
   bool captureHandle(int stackIndex, SemanticHandleKind kind, ScriptValue* output) noexcept;
+  /** Whether this kind is a rooted identity in the profile this router is bound to. */
+  bool capturableKind(SemanticHandleKind kind) const noexcept;
   bool dispatch(ScriptCallFrame* frame, char* error, size_t capacity) noexcept;
   bool queueRelease(const ScriptValue& value) noexcept;
   void drainReleased() noexcept;

@@ -1,0 +1,1152 @@
+{
+  "schemaVersion": 1,
+  "generator": "scripts/generate-lua-registration-surface.mjs",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "scope": "The subset of the registered-vs-declared findings that a downstream generator may act on: each one is backed by positive evidence in C source and holds in every mutually exclusive engine build variant. Absence of a registration is reported in the surface report and never gated.",
+  "actions": {
+    "block-emission": "The documented route is not callable under this name. A generated binding must not emit it as a callable route.",
+    "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
+  },
+  "sourceReport": "packages/bindings/generated/defold-lua-registration-surface.json",
+  "sourceReportSha256": "0f90a905d7f7ab05beecfdf6c3387246faf0cd9235ad797abb5c078844dc66a9",
+  "engineTargets": [
+    "defold-engine-box2d-v2",
+    "defold-engine-box2d-v3"
+  ],
+  "counts": {
+    "findings": 38,
+    "routesBlocked": 1,
+    "parametersCorrected": 37,
+    "byKind": {
+      "documented-optional-slot-required-by-c": 37,
+      "registered-under-a-different-name": 1
+    },
+    "byAction": {
+      "block-emission": 1,
+      "require-parameter": 37
+    }
+  },
+  "findings": [
+    {
+      "route": "camera.get_aspect_ratio",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:50",
+          "registeredAt": "render/src/render/render_script_camera.cpp:550",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:50",
+          "registeredAt": "render/src/render/render_script_camera.cpp:550",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_auto_aspect_ratio",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:59",
+          "registeredAt": "render/src/render/render_script_camera.cpp:561",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:59",
+          "registeredAt": "render/src/render/render_script_camera.cpp:561",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_enabled",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:83",
+          "registeredAt": "render/src/render/render_script_camera.cpp:542",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:83",
+          "registeredAt": "render/src/render/render_script_camera.cpp:542",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_far_z",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:90",
+          "registeredAt": "render/src/render/render_script_camera.cpp:556",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:90",
+          "registeredAt": "render/src/render/render_script_camera.cpp:556",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_fov",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:97",
+          "registeredAt": "render/src/render/render_script_camera.cpp:552",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:97",
+          "registeredAt": "render/src/render/render_script_camera.cpp:552",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_near_z",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:104",
+          "registeredAt": "render/src/render/render_script_camera.cpp:554",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:104",
+          "registeredAt": "render/src/render/render_script_camera.cpp:554",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_orthographic_auto_zoom",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:112",
+          "registeredAt": "render/src/render/render_script_camera.cpp:560",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:112",
+          "registeredAt": "render/src/render/render_script_camera.cpp:560",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_orthographic_mode",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:119",
+          "registeredAt": "render/src/render/render_script_camera.cpp:563",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:119",
+          "registeredAt": "render/src/render/render_script_camera.cpp:563",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_orthographic_zoom",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:127",
+          "registeredAt": "render/src/render/render_script_camera.cpp:558",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:127",
+          "registeredAt": "render/src/render/render_script_camera.cpp:558",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_projection",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:134",
+          "registeredAt": "render/src/render/render_script_camera.cpp:540",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:134",
+          "registeredAt": "render/src/render/render_script_camera.cpp:540",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.get_view",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:141",
+          "registeredAt": "render/src/render/render_script_camera.cpp:541",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:141",
+          "registeredAt": "render/src/render/render_script_camera.cpp:541",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.set_aspect_ratio",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:202",
+          "registeredAt": "render/src/render/render_script_camera.cpp:551",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:202",
+          "registeredAt": "render/src/render/render_script_camera.cpp:551",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.set_auto_aspect_ratio",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:211",
+          "registeredAt": "render/src/render/render_script_camera.cpp:562",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:211",
+          "registeredAt": "render/src/render/render_script_camera.cpp:562",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.set_far_z",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:218",
+          "registeredAt": "render/src/render/render_script_camera.cpp:557",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:218",
+          "registeredAt": "render/src/render/render_script_camera.cpp:557",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.set_fov",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:225",
+          "registeredAt": "render/src/render/render_script_camera.cpp:553",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:225",
+          "registeredAt": "render/src/render/render_script_camera.cpp:553",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.set_near_z",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:232",
+          "registeredAt": "render/src/render/render_script_camera.cpp:555",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:232",
+          "registeredAt": "render/src/render/render_script_camera.cpp:555",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.set_orthographic_mode",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:239",
+          "registeredAt": "render/src/render/render_script_camera.cpp:564",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:239",
+          "registeredAt": "render/src/render/render_script_camera.cpp:564",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "camera.set_orthographic_zoom",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "camera"
+      },
+      "reason": "declared optional, derived required from checked accessor CheckRenderCamera",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/camera.lua:247",
+          "registeredAt": "render/src/render/render_script_camera.cpp:559",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/camera.lua:247",
+          "registeredAt": "render/src/render/render_script_camera.cpp:559",
+          "accessors": [
+            "CheckRenderCamera"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "collectionfactory.get_status",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/collectionfactory.lua:119",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:496",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/collectionfactory.lua:119",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:496",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "collectionfactory.load",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/collectionfactory.lua:136",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:494",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/collectionfactory.lua:136",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:494",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "collectionfactory.set_prototype",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/collectionfactory.lua:154",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:497",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/collectionfactory.lua:154",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:497",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "collectionfactory.unload",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/collectionfactory.lua:170",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:495",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/collectionfactory.lua:170",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collection_factory.cpp:495",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "collectionproxy.set_collection",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/collectionproxy.lua:118",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collectionproxy.cpp:303",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/collectionproxy.lua:118",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_collectionproxy.cpp:303",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "factory.get_status",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/factory.lua:93",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:465",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/factory.lua:93",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:465",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "factory.load",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/factory.lua:110",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:463",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/factory.lua:110",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:463",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "factory.set_prototype",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/factory.lua:127",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:466",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/factory.lua:127",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:466",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "factory.unload",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "url"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::GetComponentFromLua",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/factory.lua:143",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:464",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/factory.lua:143",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_factory.cpp:464",
+          "accessors": [
+            "dmScript::GetComponentFromLua"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "go.animate",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 7,
+        "name": "delay"
+      },
+      "reason": "declared optional, derived required from checked accessor luaL_checknumber",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/go.lua:372",
+          "registeredAt": "gameobject/src/gameobject/gameobject_script.cpp:2361",
+          "accessors": [
+            "luaL_checknumber"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/go.lua:372",
+          "registeredAt": "gameobject/src/gameobject/gameobject_script.cpp:2361",
+          "accessors": [
+            "luaL_checknumber"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "go.set_parent",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "id"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::ResolveURL",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/go.lua:920",
+          "registeredAt": "gameobject/src/gameobject/gameobject_script.cpp:2353",
+          "accessors": [
+            "dmScript::ResolveURL"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/go.lua:920",
+          "registeredAt": "gameobject/src/gameobject/gameobject_script.cpp:2353",
+          "accessors": [
+            "dmScript::ResolveURL"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "gui.set",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 3,
+        "name": "value"
+      },
+      "reason": "declared optional, derived required from checked accessor dmGameObject::LuaToVar,dmScript::ToQuat,dmScript::ToVector3,dmScript::ToVector4,lua_isnil,lua_isnumber,lua_tonumber",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/gui.lua:1776",
+          "registeredAt": "gui/src/gui_script.cpp:4991",
+          "accessors": [
+            "dmGameObject::LuaToVar",
+            "dmScript::ToQuat",
+            "dmScript::ToVector3",
+            "dmScript::ToVector4",
+            "lua_isnil",
+            "lua_isnumber",
+            "lua_tonumber"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/gui.lua:1776",
+          "registeredAt": "gui/src/gui_script.cpp:4991",
+          "accessors": [
+            "dmGameObject::LuaToVar",
+            "dmScript::ToQuat",
+            "dmScript::ToVector3",
+            "dmScript::ToVector4",
+            "lua_isnil",
+            "lua_isnumber",
+            "lua_tonumber"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "html5.set_interaction_listener",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "callback"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::CreateCallback,luaL_checkany,lua_isnil",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/html5.lua:56",
+          "registeredAt": "script/src/script_html5_js.cpp:197",
+          "accessors": [
+            "dmScript::CreateCallback",
+            "luaL_checkany",
+            "lua_isnil"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/html5.lua:56",
+          "registeredAt": "script/src/script_html5_js.cpp:197",
+          "accessors": [
+            "dmScript::CreateCallback",
+            "luaL_checkany",
+            "lua_isnil"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "model.set_blend_weights",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 2,
+        "name": "weights"
+      },
+      "reason": "declared optional, derived required from checked accessor luaL_checktype,lua_isnil,lua_objlen,lua_rawgeti",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/model.lua:203",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_model.cpp:799",
+          "accessors": [
+            "luaL_checktype",
+            "lua_isnil",
+            "lua_objlen",
+            "lua_rawgeti"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/model.lua:203",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_model.cpp:799",
+          "accessors": [
+            "luaL_checktype",
+            "lua_isnil",
+            "lua_objlen",
+            "lua_rawgeti"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "resource.create_sound_data",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 2,
+        "name": "options"
+      },
+      "reason": "declared optional, derived required from checked accessor luaL_checktype",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/resource.lua:234",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_resource.cpp:3453",
+          "accessors": [
+            "luaL_checktype"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/resource.lua:234",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_resource.cpp:3453",
+          "accessors": [
+            "luaL_checktype"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "resource.create_texture_async",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 4,
+        "name": "callback"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::CreateCallback",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/resource.lua:460",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_resource.cpp:3452",
+          "accessors": [
+            "dmScript::CreateCallback"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/resource.lua:460",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_resource.cpp:3452",
+          "accessors": [
+            "dmScript::CreateCallback"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "sound.set_gain",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 2,
+        "name": "gain"
+      },
+      "reason": "declared optional, derived required from checked accessor luaL_checknumber",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/sound.lua:245",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_sound.cpp:751",
+          "accessors": [
+            "luaL_checknumber"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/sound.lua:245",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_sound.cpp:751",
+          "accessors": [
+            "luaL_checknumber"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "sound.set_pan",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 2,
+        "name": "pan"
+      },
+      "reason": "declared optional, derived required from checked accessor luaL_checknumber",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/sound.lua:277",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_sound.cpp:752",
+          "accessors": [
+            "luaL_checknumber"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/sound.lua:277",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_sound.cpp:752",
+          "accessors": [
+            "luaL_checknumber"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "sys.set_render_enable",
+      "kind": "registered-under-a-different-name",
+      "action": "block-emission",
+      "callableAs": "sys.set_render_enabled",
+      "parameter": null,
+      "reason": "documented as 'sys.set_render_enable' but 'EngineSys_SetRenderEnabled' is registered as 'sys.set_render_enabled'",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "engine/src/script/script_engine.cpp:92",
+          "registeredAt": "engine/src/script/script_engine.cpp:131",
+          "registrationArray": "EngineSys_methods"
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "engine/src/script/script_engine.cpp:92",
+          "registeredAt": "engine/src/script/script_engine.cpp:131",
+          "registrationArray": "EngineSys_methods"
+        }
+      ]
+    },
+    {
+      "route": "window.set_listener",
+      "kind": "documented-optional-slot-required-by-c",
+      "action": "require-parameter",
+      "callableAs": null,
+      "parameter": {
+        "index": 1,
+        "name": "callback"
+      },
+      "reason": "declared optional, derived required from checked accessor dmScript::CreateCallback,luaL_checkany,lua_isnil",
+      "evidence": [
+        {
+          "target": "defold-engine-box2d-v2",
+          "documentedAt": "doc/window.lua:156",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_window.cpp:459",
+          "accessors": [
+            "dmScript::CreateCallback",
+            "luaL_checkany",
+            "lua_isnil"
+          ]
+        },
+        {
+          "target": "defold-engine-box2d-v3",
+          "documentedAt": "doc/window.lua:156",
+          "registeredAt": "gamesys/src/gamesys/scripts/script_window.cpp:459",
+          "accessors": [
+            "dmScript::CreateCallback",
+            "luaL_checkany",
+            "lua_isnil"
+          ]
+        }
+      ]
+    }
+  ]
+}

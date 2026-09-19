@@ -141,6 +141,19 @@ class ScriptAdapter {
       ScriptValue* borrowedHandles = nullptr,
       uint32_t borrowedHandleCapacity = 0,
       uint32_t* borrowedHandleCount = nullptr) noexcept;
+  /**
+   * Decide a universal-value result the route declares to be a rooted
+   * borrowed handle, capturing it into the semantic registry so it is the
+   * same identity the handle-lowering table's consumers accept. Returns
+   * false when the value is not this transport's to decide, leaving it to the
+   * generic reader.
+   */
+  bool readUniversalSemanticHandleResult(
+      const universal_value::Operation& operation,
+      int stackIndex,
+      int resultCount,
+      ScriptValue* output,
+      bool* ok) noexcept;
   bool captureLuaClosure(int stackIndex, ScriptValue* output) noexcept;
   url_binding::DispatchStatus invokeUrl(
       const url_binding::Operation& operation,

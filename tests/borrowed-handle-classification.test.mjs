@@ -38,32 +38,83 @@ const sourceInputs = await inputs();
 const generated = generateBorrowedHandleClassification(sourceInputs);
 const checked = JSON.parse(await text("packages/bindings/generated/defold-script-borrowed-handle-classification.json"));
 
-test("partitions all 415 borrowed-handle routes exactly once", () => {
-  assert.equal(generated.routeCount, 415);
+test("partitions all 437 borrowed-handle routes exactly once", () => {
+  assert.equal(generated.routeCount, 437);
   assert.deepEqual(generated.operationClassCounts, {
     "checked-handle-input-terminal": 367,
     "checked-child-engine-object-invalidate": 2,
-    "checked-handle-return-capture": 33,
+    "checked-handle-return-capture": 55,
     "checked-self-engine-object-invalidate": 5,
     "declaration-token": 8
   });
   assert.deepEqual(generated.moduleCounts, {
-    b2d: 206,
-    buffer: 4,
-    bullet3d: 131,
+    b2d: 218,
+    buffer: 5,
+    bullet3d: 139,
     go: 1,
     gui: 55,
-    render: 7,
+    render: 8,
     resource: 10,
     sys: 1
   });
-  assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 415);
+  assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 437);
   assert.deepEqual(checked, generated);
+});
+
+test("admits a handle producer on its declared result, whatever shape its arguments take", () => {
+  assert.deepEqual(generated.censusBasisCounts, {
+    "declared-handle-result": 22,
+    "handle-lowering-family": 415
+  });
+  // A constructor taking a definition record is filed under the table lowering
+  // family, because a table-shaped parameter outranks a handle when the family
+  // is chosen. It is still a producer, and the partition has to see it.
+  const constructor = generated.rows.find(({ id }) => id === "script:b2d.joint.create_distance");
+  assert.equal(constructor.censusBasis, "declared-handle-result");
+  assert.equal(constructor.loweringFamily, "lua-table");
+  assert.equal(constructor.operationClass, "checked-handle-return-capture");
+  assert.deepEqual(constructor.returnHandleKinds, ["box2d-joint"]);
+  assert.equal(constructor.hostHandleEffect, "capture-return");
+
+  // Every handle-returning `create_*` is in, and no name pattern selected them:
+  // the census basis is the declared result type, and it also admits producers
+  // whose names read as accessors.
+  const producers = generated.rows.filter(({ operationClass }) => operationClass === "checked-handle-return-capture");
+  assert.equal(producers.filter(({ member }) => member.startsWith("create_")).length, 20);
+  assert.ok(producers.some(({ member }) => member.startsWith("get_")));
+  assert.ok(producers.every(({ returnHandleKinds }) => returnHandleKinds.length === 1));
+
+  // A union of scalars that merely admits a handle member is not a handle
+  // result, and a sequence of handles is a table.
+  assert.equal(generated.rows.find(({ id }) => id === "script:b2d.body.get_joints"), undefined);
+  assert.equal(generated.rows.find(({ id }) => id === "script:go.get"), undefined);
+});
+
+test("scopes a handle kind's representation to the backend that implements it", () => {
+  const world = generated.handleKinds.find(({ id }) => id === "box2d-world");
+  assert.equal(world.representationIsFeatureScoped, true);
+  assert.deepEqual(world.capturableFeatures, ["box2d-v3"]);
+  assert.deepEqual(world.uncapturableFeatures, ["box2d-v2"]);
+  const legacy = world.representations.find(({ feature }) => feature === "box2d-v2");
+  assert.equal(legacy.representation, "lua-light-userdata");
+  assert.equal(legacy.capturable, false);
+  assert.match(legacy.reason, /light userdata/);
+  assert.deepEqual(legacy.sourceEvidence, ["box2d-world-v2"]);
+
+  const body = generated.handleKinds.find(({ id }) => id === "box2d-body");
+  assert.equal(body.representationIsFeatureScoped, false);
+  assert.equal(body.capturableFeatures, null);
+  assert.deepEqual(body.representations, [{
+    feature: null,
+    representation: "lua-rooted-userdata",
+    capturable: true,
+    sourceEvidence: ["box2d-body"]
+  }]);
 });
 
 test("assigns stable IDs, concrete representations, context, and validity metadata", () => {
   assert.ok(generated.rows.every((row) => row.stableId === stableBindingId(row.id)));
-  assert.equal(new Set(generated.rows.map(({ stableId }) => stableId)).size, 415);
+  assert.equal(new Set(generated.rows.map(({ stableId }) => stableId)).size, 437);
   assert.ok(generated.rows.every(({ inputHandleKinds, returnHandleKinds }) =>
     inputHandleKinds.length + returnHandleKinds.length > 0));
 

@@ -38,6 +38,14 @@ sources:
     resource: upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_fixture_v2.cpp
     title: Box2D v2 fixture script bindings
     author: team:defold
+  - id: script-box2d-joint-v2
+    resource: upstream/defold/engine/gamesys/src/gamesys/scripts/box2d/v2/script_box2d_joint_v2.cpp
+    title: Box2D v2 joint script bindings, including the joint constructors and PushJoint
+    author: team:defold
+  - id: script-bullet3d-constraint
+    resource: upstream/defold/engine/gamesys/src/gamesys/scripts/bullet3d/script_bullet3d_constraint.cpp
+    title: Bullet constraint constructors and their required parameter records
+    author: team:defold
 ---
 
 # Finding
@@ -167,9 +175,9 @@ assigned the profile that makes the most of its routes eligible.
 
 | Profile | Collection | Engine configuration | Contracts |
 | --- | --- | --- | ---: |
-| `engine` | one game object with the déherm script | - | 14 |
+| `engine` | one game object with the déherm script | - | 15 |
 | `physics-2d` | plus two dynamic box collision objects | `physics.type=2D` | 12 |
-| `physics-3d` | plus two dynamic box collision objects | `physics.type=3D` | 8 |
+| `physics-3d` | plus two dynamic box collision objects | `physics.type=3D` | 13 |
 
 The second collision object exists so a route needing two *distinct* engine
 objects is given two: each occurrence of one handle kind in one call takes its
@@ -204,10 +212,19 @@ instance.
 | --- | --- |
 | `engine` | `buffer-data`, `buffer-stream`, `resource-declaration` |
 | `physics-2d` | the above plus `box2d-world`, `box2d-body`, `box2d-joint` |
-| `physics-3d` | the above plus `bullet-world`, `bullet-object`, `bullet-shape` |
+| `physics-3d` | the above plus `bullet-world`, `bullet-object`, `bullet-shape`, `bullet-constraint` |
 
-`box2d-joint` is reached at depth two: `b2d.get_body` at two distinct addresses
-feeds `b2d.joint.create_distance`.
+`box2d-joint` is reached through `b2d.joint.create_distance`, fed by
+`b2d.get_body` at two distinct component addresses. `bullet-constraint` is
+reached at depth two through `bullet3d.constraint.create_cone_twist`, fed by
+`bullet3d.get_collision_object` and a synthesized
+`bullet3d.constraint.cone_twist_params` record whose required `vector3` and
+`quaternion` fields come from the engine's own `vmath` constructors.
+
+This is the same definition of "producer" the borrowed-handle classification
+uses, and it was the classification - not the harness - that used to disagree
+with it: see *No handle-lowered consumer accepted a `box2d-joint` the engine
+produced* below.
 
 # Runtime profile
 
@@ -232,18 +249,21 @@ Defold `7f0f554`, arm64 macOS, headless, runtime profile
 
 | Outcome | Contracts |
 | --- | --- |
-| observed | 31 |
+| observed | 37 |
 | mismatched | 0 |
 | engine fault | 0 |
 | blocked | 3 |
-| unreachable | 48 |
+| unreachable | 45 |
 
-129 routes were exercised across 34 fixtures in 135 exercises, producing 82
-`result-arity:observed`, 49 `result-arity:observed-as-target-exception`, 129
-`scratch-reuse:observed`, 104 `error-model:observed` and 90
+171 routes were exercised across 40 fixtures in 189 exercises, producing 123
+`result-arity:observed`, 59 `result-arity:observed-as-target-exception`, 179
+`scratch-reuse:observed`, 168 `error-model:observed` and 157
 `handle-provenance:observed`. A refused synthesized argument is recorded as
 `observed-as-target-exception`, not as a mismatch: it is evidence the declared
 error model holds, not evidence about the route's semantics.
+
+The previous run of this lane recorded 31 observed, 48 unreachable, 129 routes
+exercised, 82 `result-arity:observed` and 90 `handle-provenance:observed`.
 
 The three blocked contracts are honest runtime blockers, not skips: `buffer-data`
 has no producer the harness can feed a real resource path to
@@ -300,31 +320,99 @@ router now separates the three causes and refuses a light userdata by name:
 semantic handle result is a light userdata with no rooted identity
 ```
 
-The borrowed-handle classification describes `box2d-world` as
-`lua-rooted-userdata` because it is derived from the **v3** sources; under the
-v2 backend the representation is a raw pointer with no metatable and no
-generation to check. Refusing it is correct; the classification's
-representation is profile-dependent and currently is not.
+The classification described `box2d-world` as `lua-rooted-userdata` because it
+was derived from the **v3** sources; under the v2 backend the representation is
+a raw pointer with no metatable and no generation to check. Refusing it is
+correct, but the representation was stated once for the kind while it is a
+property of the backend the runtime profile selects.
 
-## No handle-lowered consumer accepts a `box2d-joint` the engine produced
+**Resolved.** A handle kind now declares the feature its stated representation
+was derived from and one exception per feature that implements it differently,
+each with its own pinned source:
 
-`b2d.joint.create_distance` is absent from both the borrowed-handle
-classification and the handle-lowering route table, so its result crosses the
+```json
+{ "feature": "box2d-v2", "representation": "lua-light-userdata", "capturable": false,
+  "sourceEvidence": ["box2d-world-v2"],
+  "reason": "Box2D v2 pushes the world as a light userdata: no metatable, no generation, and no rooted identity a handle registry can capture or validate." }
+```
+
+`generate-script-handle-lowering.mjs` joins that against the availability
+model's feature-to-profile map and emits `capturableProfileMask` per kind, so
+`box2d-world` is a rooted identity in `v3-bullet` and `v3-no-bullet` and in no
+other profile. Both transports refuse a capture of an uncapturable kind by
+declaration rather than by inspecting the Lua value, and the transcript now
+reads:
+
+```
+box2d-world: semantic handle kind is not a rooted identity in the active runtime profile
+```
+
+## No handle-lowered consumer accepted a `box2d-joint` the engine produced
+
+`b2d.joint.create_distance` was absent from both the borrowed-handle
+classification and the handle-lowering route table, so its result crossed the
 boundary through the universal-value transport rather than as a semantic
-handle. All 82 handle-lowered `b2Joint` consumers then reject it with
+handle. All 82 handle-lowered `b2Joint` consumers then rejected it with
 `handle argument codec mismatch`; 21 of them were exercised and every one
-refused a handle a live engine really had produced. The plan records the
-disagreement per profile as machine-readable state:
+refused a handle a live engine really had produced.
+
+The cause was structural, not a missing row. A route's *lowering family* is a
+single-winner precedence in which a table-shaped parameter outranks a handle,
+so every constructor that takes a definition record - `b2d.joint.create_*`,
+`bullet3d.constraint.create_*`, `buffer.create` - lands in the table family.
+Partitioning the borrowed-handle census on that family therefore covered only
+routes whose *arguments* are handle-shaped, which is to say accessors, and hid
+every constructor: the primary way a program obtains a handle in the first
+place.
+
+**Resolved on the declared result type.** A route now joins the census when
+either its lowering family is `borrowed-handle` *or* its single declared result
+**is** a reviewed borrowed handle kind - every non-absent member of that result
+resolving to the same kind. Each row carries which basis admitted it:
+
+```json
+{ "id": "script:b2d.joint.create_distance", "censusBasis": "declared-handle-result",
+  "loweringFamily": "lua-table", "operationClass": "checked-handle-return-capture",
+  "returnHandleKinds": ["box2d-joint"], "hostHandleEffect": "capture-return" }
+```
+
+That rule is a value-shape rule, not a name pattern and not a route list. It
+admits 22 further routes - 20 `create_*`, `buffer.create`, `render.render_target` -
+and it deliberately refuses two shapes that would otherwise look like
+producers: `go.get` returns a union of scalars that merely *admits*
+`resource_data`, and `b2d.body.get_joints` returns a *sequence* of handles,
+which is a table.
+
+The second half is representation. A handle-lowered consumer accepts exactly
+one thing: a generation-checked semantic handle rooted in the shared registry.
+The universal-value transport now produces it too. Each operation carries the
+dense `resultSemanticKind` of its declared result - the same numbering
+`SemanticHandleKind` uses, derived by both generators from the pinned
+classification through `scripts/lib/semantic-handle-kinds.mjs` - and
+`ScriptAdapter::readUniversalSemanticHandleResult` captures that result through
+the same `CapturedLuaRouter` registry instead of reading it as an anonymous
+userdata. 54 routes declare such a result; 21 of them are constructors this
+transport owns.
+
+Nothing was added to the handle-lowering table: the table's *consumers* now
+accept what the constructor produces, because both transports produce the same
+identity. The plan records the agreement on that fact rather than on table
+membership:
 
 ```json
 { "handleKind": "box2d-joint", "producerRouteId": "script:b2d.joint.create_distance",
-  "producerHandleLowered": false, "consumerCount": 88,
-  "handleLoweredConsumerCount": 82, "agreement": "producer-outside-handle-lowering" }
+  "producerHandleLowered": false, "producerTransport": "universal-value-semantic-capture",
+  "producerCapturesSemanticHandle": true, "consumerCount": 88,
+  "handleLoweredConsumerCount": 82, "agreement": "agreed" }
 ```
 
-The classification's producer partition covers only routes whose *name* reads
-as an accessor; every `create_*` route that returns a handle is outside it.
-That is the input to fix, not the harness.
+Against the live engine all 21 refusals are gone. 10 became
+`result-arity:observed`; the other 11 became honest engine-semantics target
+exceptions, because the distance joint really did reach Box2D and Box2D
+refused the joint-type-specific operations by name -
+`b2d.joint.get_joint_angle can only be used with revolute joints.` That is
+evidence about the route, where before there was evidence only about the
+transport.
 
 ## `b2d.fixture.get_aabb` aborts before the first physics step
 
@@ -348,25 +436,44 @@ unreachable contracts carry these machine-readable blocker families:
 
 | Family | Contracts | Routes |
 | --- | --- | --- |
-| `context-fixture-missing` | 18 | 118 |
+| `context-fixture-missing` | 19 | 119 |
 | `route-unavailable-in-runtime-profile` | 9 | 49 |
-| `no-handle-producer-chain` | 3 | 37 |
 | `multi-result-shape-unmodelled` | 4 | 22 |
 | `no-generated-universal-adapter` | 3 | 9 |
 | `unsynthesizable-parameter-type` | 7 | 8 |
-| `execution-policy-destructive` | 5 | 5 |
+| `execution-policy-destructive` | 4 | 4 |
 | `lua-stack-blocked-capability` | 1 | 2 |
 | `execution-policy-context-blocked` | 1 | 1 |
 
-`unsynthesizable-parameter-type` has fallen from 402 routes to 8: what remains
-is four callback function types, `go.PLAYBACK`, a `vector3`, and one record
-parameter. The physics handle algebra is no longer in it.
+`no-handle-producer-chain` is gone. It was 3 contracts and 37
+`btTypedConstraint` routes, because every `bullet3d.constraint.create_*` takes
+a required parameter record and the harness could inhabit neither the record
+nor the Defold values inside it. Three structural rules removed it, none of
+them naming a route:
 
-`no-handle-producer-chain` is 37 `btTypedConstraint` routes. Every
-`bullet3d.constraint.create_*` takes a required parameter record
-(`bullet3d.constraint.hinge_params` and friends), so the kind has no root
-producer at all. `b2Shape` and `b2Chain` are in the same position and are
-counted under the runtime-profile blocker in this build.
+* a declared record is inhabited field by field from its required fields only,
+  bounded at three levels of nesting;
+* a Defold value type the pinned layout report models is inhabited by the
+  engine's own constructor for it, discovered as the route with no required
+  parameter whose single declared result is that value type and whose
+  conformance case needs no context beyond the ambient engine - which is what
+  keeps `go.get_position`, whose shape also fits, from silently reading the
+  surrounding game object in place of `vmath.vector3`;
+* an optional parameter that sits *before* a required one is a hole a
+  positional Lua call still has to fill, so the minimum-arity call passes an
+  explicit nil there and only the optional tail after the last required
+  parameter may be truncated. Dropping the hole shifted every later argument
+  left, and the engine type-checked the wrong value:
+  `bullet3d.constraint.create_cone_twist` received its parameter record where
+  it expected `body_b` and answered `Expected user type
+  bullet3d_collision_object`.
+
+`bullet-constraint` is now rooted in the `physics-3d` profile at depth two, and
+its 37 routes are exercised against a live Bullet world.
+
+`unsynthesizable-parameter-type` holds at 8 routes: what remains is callback
+function types and enum-typed parameters. The physics handle algebra is no
+longer in it.
 
 `context-fixture-missing` is no longer a call for somebody to write a fixture.
 For the two large contexts no fixture is sufficient, and the plan says why:

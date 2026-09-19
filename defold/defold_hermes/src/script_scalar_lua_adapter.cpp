@@ -2047,6 +2047,57 @@ bool ScriptAdapter::readUniversalValue(
   }
 }
 
+// Capture a declared borrowed-handle result into the generation-checked
+// semantic registry, so a handle this transport produced is the same rooted
+// identity the handle-lowering table's consumers accept.
+//
+// Which routes reach here is not an accident of naming. A route's lowering
+// family is a single-winner precedence in which a table-shaped parameter
+// outranks a handle, so every constructor that takes a definition record -
+// `b2d.joint.create_*`, `bullet3d.constraint.create_*` - is marshalled by this
+// transport even though its declared result is a live engine object. Before
+// this, that result crossed as an anonymous Lua userdata and every
+// handle-lowered consumer of the kind refused it with a codec mismatch.
+//
+// Returns true when it decided the result; `*ok` is false when it decided it
+// as a failure. Returning false means the generic reader still owns the value.
+bool ScriptAdapter::readUniversalSemanticHandleResult(
+    const universal_value::Operation& operation,
+    int stackIndex,
+    int resultCount,
+    ScriptValue* output,
+    bool* ok) noexcept {
+  if (operation.resultSemanticKind == 0 || resultCount != 1 || !handleRouter_) return false;
+  const auto kind = static_cast<::defold_hermes::script_handle_lowering::SemanticHandleKind>(
+      operation.resultSemanticKind);
+  // Representation is a property of the backend the active runtime profile
+  // selects, not of the kind: Box2D v2 pushes its world as a light userdata
+  // with no identity at all. Refuse by declaration rather than by inspecting
+  // what happens to be on the stack.
+  if (!handleRouter_->capturableKind(kind)) {
+    *ok = fail("Universal-value semantic handle kind is not a rooted identity in the active runtime profile");
+    return true;
+  }
+  const int type = lua_type(state_, stackIndex);
+  // A declared-optional handle result legitimately comes back absent; that is
+  // a value, not a representation failure, so the generic reader owns it.
+  if (type == LUA_TNIL) return false;
+  if (type == LUA_TLIGHTUSERDATA) {
+    *ok = fail("Universal-value semantic handle result is a light userdata with no rooted identity");
+    return true;
+  }
+  if (type != LUA_TUSERDATA) {
+    *ok = fail("Universal-value semantic handle result is not a userdata");
+    return true;
+  }
+  if (!handleRouter_->captureHandle(stackIndex, kind, output)) {
+    *ok = fail("Universal-value semantic handle registry is exhausted");
+    return true;
+  }
+  *ok = true;
+  return true;
+}
+
 universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
     const universal_value::Operation& operation,
     ScriptCallFrame* frame,
@@ -2108,10 +2159,14 @@ universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
   const void* ancestors[universal_value::kMaximumDepth]{};
   if (ok) {
     for (int index = 0; index < actualResultCount; ++index) {
-      if (!readUniversalValue(callBase + 1 + index, &frame->results[index], frame,
-              0, ancestors, 0)) {
-        ok = false;
-        break;
+      if (!readUniversalSemanticHandleResult(operation, callBase + 1 + index,
+              actualResultCount, &frame->results[index], &ok)) {
+        if (!ok) break;
+        if (!readUniversalValue(callBase + 1 + index, &frame->results[index], frame,
+                0, ancestors, 0)) {
+          ok = false;
+          break;
+        }
       }
     }
   }

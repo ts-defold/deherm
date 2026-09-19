@@ -24,7 +24,12 @@ export const inputPaths = Object.freeze({
   copiedRecords: "packages/bindings/generated/defold-script-copied-value-record-blockers.json",
   opaqueRecords: "packages/bindings/generated/defold-script-opaque-record-blockers.json",
   engineMatrix: "packages/bindings/generated/defold-script-real-engine-matrix.json",
-  availabilityProfiles: "packages/bindings/generated/defold-script-route-availability-profiles.json"
+  availabilityProfiles: "packages/bindings/generated/defold-script-route-availability-profiles.json",
+  // The registered-vs-declared gate. Its findings are the subset of the Lua
+  // registration verifier that carries positive evidence in C source and holds
+  // in every mutually exclusive engine build variant, so they are acted on here
+  // rather than only reported.
+  registrationGate: "packages/bindings/generated/defold-lua-registration-gate.json"
 });
 
 function sha256(text) {
@@ -267,6 +272,64 @@ function buildAvailabilityIndex(report, defoldRevision) {
   return { catalogSha256: report.catalogSha256, routes: result };
 }
 
+// Group the gate's findings by the documented route name they address. The
+// verifier names a route exactly as the script IR does, so nothing is matched
+// by shape or by prefix.
+function buildRegistrationGate(gate, defoldRevision) {
+  if (gate.defoldRevision !== defoldRevision) {
+    throw new Error("Lua registration gate revision is stale against the script IR");
+  }
+  if (!/^[0-9a-f]{64}$/.test(gate.sourceReportSha256 ?? "")) {
+    throw new Error("Lua registration gate has no valid source-report digest");
+  }
+  const byRoute = new Map();
+  for (const finding of gate.findings ?? []) {
+    if (!finding.route) throw new Error("Lua registration gate contains a finding without a route");
+    byRoute.set(finding.route, [...(byRoute.get(finding.route) ?? []), finding]);
+  }
+  return { sourceReportSha256: gate.sourceReportSha256, byRoute };
+}
+
+// Apply the gate to one route. A `block-emission` finding means the documented
+// name is not callable, which is a semantic hole rather than a signature to
+// emit. A `require-parameter` finding corrects the declared optionality of one
+// slot, because the C body refuses its omission on every path.
+function applyRegistrationGate(gate, fn, parameters) {
+  const findings = gate.byRoute.get(fn.rawName) ?? [];
+  if (!findings.length) {
+    return { registration: { token: "registration-verified", sourceReportSha256: gate.sourceReportSha256, findings: [] }, holes: [] };
+  }
+  const holes = [];
+  const applied = [];
+  for (const finding of findings) {
+    if (finding.action === "block-emission") {
+      holes.push(`registration:${finding.kind}`);
+      applied.push({ kind: finding.kind, action: finding.action, parameter: null, callableAs: finding.callableAs ?? null, reason: finding.reason });
+      continue;
+    }
+    if (finding.action === "require-parameter") {
+      const slot = parameters[finding.parameter.index - 1];
+      if (!slot) throw new Error(`${fn.rawName}: gate corrects parameter ${finding.parameter.index}, which the script IR does not declare`);
+      if (slot.name !== finding.parameter.name) {
+        throw new Error(`${fn.rawName}: gate corrects parameter '${finding.parameter.name}' but the script IR declares '${slot.name}'`);
+      }
+      slot.optional = false;
+      slot.optionalityCorrectedBy = "lua-registration-gate";
+      applied.push({ kind: finding.kind, action: finding.action, parameter: finding.parameter, callableAs: null, reason: finding.reason });
+      continue;
+    }
+    throw new Error(`${fn.rawName}: unknown Lua registration gate action '${finding.action}'`);
+  }
+  return {
+    registration: {
+      token: holes.length ? "registration-blocked" : "registration-corrected",
+      sourceReportSha256: gate.sourceReportSha256,
+      findings: applied
+    },
+    holes
+  };
+}
+
 function routeAvailability(fn, stableId, catalog) {
   const exact = catalog.routes.get(stableId);
   if (!exact) return moduleAvailability(fn.modulePath);
@@ -338,6 +401,7 @@ export function generateScriptProjectionIr(textInputs) {
     throw new Error("script pattern/accounting census is stale against the script IR");
   }
   const availabilityCatalog = buildAvailabilityIndex(parsed.availabilityProfiles, ir.defoldRevision);
+  const registrationGate = buildRegistrationGate(parsed.registrationGate, ir.defoldRevision);
 
   const indexes = {
     patterns: indexRows(patterns.bindings, "patterns"),
@@ -389,6 +453,9 @@ export function generateScriptProjectionIr(textInputs) {
       value: parseValueShape(parameter.rawType, pattern.parameterCodecs[index]?.codecs ?? []),
       sourceType: parameter.rawType
     }));
+    // The C source outranks the declaration: a slot the body refuses to default
+    // is corrected here, and a name the engine never registers is blocked.
+    const gated = applyRegistrationGate(registrationGate, fn, parameters);
     const returns = fn.returns.map((rawType, index) => ({
       index,
       value: parseValueShape(rawType, pattern.returnCodecs[index]?.codecs ?? []),
@@ -420,6 +487,7 @@ export function generateScriptProjectionIr(textInputs) {
     if (callback.token === "callback-policy-unresolved") semanticHoles.push("callback-lifetime-policy");
     if (facts.handle && !related.handles) semanticHoles.push("handle-ownership-lifetime-policy");
     if (facts.unknown.length > 0) semanticHoles.push("value-shape-parser");
+    semanticHoles.push(...gated.holes);
     if (account.category === "pending") semanticHoles.push(`lowering:${account.reason.loweringFamily}`);
     const explicitBlockers = [
       related.dynamics?.blocker,
@@ -447,6 +515,7 @@ export function generateScriptProjectionIr(textInputs) {
       },
       context,
       availability: routeAvailability(fn, stableId, availabilityCatalog),
+      registration: gated.registration,
       effects: {
         ownership: related.handles ? {
           token: "generation-checked-host-handle",
@@ -503,6 +572,7 @@ export function generateScriptProjectionIr(textInputs) {
     loweringFamilyCounts: countBy(rows, ({ loweringFamily }) => loweringFamily),
     contextCounts: countBy(rows, ({ context }) => context.token),
     availabilityCounts: countBy(rows, ({ availability }) => availability.token),
+    registrationCounts: countBy(rows, ({ registration }) => registration.token),
     semanticHoleCounts: countBy(holeRows.flatMap((row) => row.generation.semanticHoles.map((hole) => ({ hole }))), ({ hole }) => hole),
     semanticHoles: holeRows.map(({ id, generation }) => ({ id, tokens: generation.semanticHoles })),
     rows

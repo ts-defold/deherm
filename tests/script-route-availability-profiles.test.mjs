@@ -56,10 +56,10 @@ test("the six pinned profiles are inferred from Defold manifests and cover full 
   });
   assert.deepEqual(Object.fromEntries(Object.entries(report.handleFeatures).map(([id, feature]) =>
     [id, [feature.documentedRouteCount, feature.availableRouteCount]])), {
-    core: [8, 8],
-    "box2d-v2": [114, 114],
-    "box2d-v3": [181, 179],
-    bullet3d: [131, 131]
+    core: [9, 9],
+    "box2d-v2": [124, 124],
+    "box2d-v3": [189, 187],
+    bullet3d: [139, 139]
   });
   const noPhysics = new Set(stableIds(report.profiles["no-physics"]));
   for (const profile of Object.values(report.profiles)) {
@@ -116,10 +116,10 @@ test("source hash and census drift abort generation", async () => {
     ]), /build evidence hash drifted/);
 
     const countDriftPolicy = join(outputRoot, "count-drift.json");
-    await writeFile(countDriftPolicy, policy.replace('"box2d-v3": 179', '"box2d-v3": 180'));
+    await writeFile(countDriftPolicy, policy.replace('"box2d-v3": 187', '"box2d-v3": 188'));
     assert.throws(() => run([
       "scripts/generate-script-route-availability-profiles.mjs", "--policy", countDriftPolicy, "--out-root", outputRoot
-    ]), /box2d-v3: expected 180 registered handle routes, found 179/);
+    ]), /box2d-v3: expected 188 registered handle routes, found 187/);
   } finally {
     await rm(outputRoot, { recursive: true, force: true });
   }

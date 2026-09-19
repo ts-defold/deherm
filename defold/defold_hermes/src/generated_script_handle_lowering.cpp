@@ -20,21 +20,21 @@ namespace {
 constexpr int64_t kMaxExactInteger = 9007199254740991LL;
 
 constexpr HandleKind kKinds[] = {
-  {SemanticHandleKind::kBox2dBody, "box2d-body", "lua-rooted-userdata", "borrowed-engine-object"},
-  {SemanticHandleKind::kBox2dChain, "box2d-chain", "lua-rooted-userdata", "borrowed-or-explicit-native-lifecycle"},
-  {SemanticHandleKind::kBox2dJoint, "box2d-joint", "lua-rooted-userdata", "borrowed-or-explicit-native-lifecycle"},
-  {SemanticHandleKind::kBox2dShape, "box2d-shape", "lua-rooted-userdata", "borrowed-body-child"},
-  {SemanticHandleKind::kBox2dWorld, "box2d-world", "lua-rooted-userdata", "borrowed-engine-world"},
-  {SemanticHandleKind::kBufferData, "buffer-data", "lua-rooted-userdata", "wrapper-dependent-owner-c-owner-lua-or-owner-resource"},
-  {SemanticHandleKind::kBufferStream, "buffer-stream", "lua-rooted-userdata", "borrowed-view-rooting-parent-buffer"},
-  {SemanticHandleKind::kBulletConstraint, "bullet-constraint", "lua-rooted-userdata", "explicit-native-lifecycle"},
-  {SemanticHandleKind::kBulletObject, "bullet-object", "lua-rooted-userdata", "borrowed-component-object"},
-  {SemanticHandleKind::kBulletShape, "bullet-shape", "lua-rooted-userdata", "borrowed-object-child-view"},
-  {SemanticHandleKind::kBulletWorld, "bullet-world", "lua-rooted-userdata", "borrowed-engine-world"},
-  {SemanticHandleKind::kGraphicsRenderTarget, "graphics-render-target", "numeric-graphics-asset-handle", "borrowed-or-explicit-native-lifecycle"},
-  {SemanticHandleKind::kGraphicsTexture, "graphics-texture", "numeric-graphics-asset-handle", "borrowed-resource-or-render-target-asset"},
-  {SemanticHandleKind::kGuiNode, "gui-node", "lua-rooted-userdata", "borrowed-scene-node"},
-  {SemanticHandleKind::kRenderConstantBuffer, "render-constant-buffer", "lua-rooted-userdata", "lua-owned-native-object"},
+  {SemanticHandleKind::kBox2dBody, "box2d-body", "lua-rooted-userdata", "borrowed-engine-object", 63},
+  {SemanticHandleKind::kBox2dChain, "box2d-chain", "lua-rooted-userdata", "borrowed-or-explicit-native-lifecycle", 63},
+  {SemanticHandleKind::kBox2dJoint, "box2d-joint", "lua-rooted-userdata", "borrowed-or-explicit-native-lifecycle", 63},
+  {SemanticHandleKind::kBox2dShape, "box2d-shape", "lua-rooted-userdata", "borrowed-body-child", 63},
+  {SemanticHandleKind::kBox2dWorld, "box2d-world", "lua-rooted-userdata", "borrowed-engine-world", 48},
+  {SemanticHandleKind::kBufferData, "buffer-data", "lua-rooted-userdata", "wrapper-dependent-owner-c-owner-lua-or-owner-resource", 63},
+  {SemanticHandleKind::kBufferStream, "buffer-stream", "lua-rooted-userdata", "borrowed-view-rooting-parent-buffer", 63},
+  {SemanticHandleKind::kBulletConstraint, "bullet-constraint", "lua-rooted-userdata", "explicit-native-lifecycle", 63},
+  {SemanticHandleKind::kBulletObject, "bullet-object", "lua-rooted-userdata", "borrowed-component-object", 63},
+  {SemanticHandleKind::kBulletShape, "bullet-shape", "lua-rooted-userdata", "borrowed-object-child-view", 63},
+  {SemanticHandleKind::kBulletWorld, "bullet-world", "lua-rooted-userdata", "borrowed-engine-world", 63},
+  {SemanticHandleKind::kGraphicsRenderTarget, "graphics-render-target", "numeric-graphics-asset-handle", "borrowed-or-explicit-native-lifecycle", 63},
+  {SemanticHandleKind::kGraphicsTexture, "graphics-texture", "numeric-graphics-asset-handle", "borrowed-resource-or-render-target-asset", 63},
+  {SemanticHandleKind::kGuiNode, "gui-node", "lua-rooted-userdata", "borrowed-scene-node", 63},
+  {SemanticHandleKind::kRenderConstantBuffer, "render-constant-buffer", "lua-rooted-userdata", "lua-owned-native-object", 63},
 };
 
 constexpr ValueCodec kArguments[] = {
@@ -2504,6 +2504,12 @@ RuntimeProfileDetectionStatus detectRuntimeProfile(lua_State* state, RuntimeProf
   return output->status;
 }
 
+bool handleKindCapturableInProfile(SemanticHandleKind kind, const RuntimeProfile& profile) noexcept {
+  const auto index = static_cast<uint16_t>(kind);
+  if (index == 0 || index > kHandleKindCount) return false;
+  return (kKinds[index - 1].capturableProfileMask & profile.mask) != 0;
+}
+
 const Route* find(uint32_t stableId) noexcept {
   size_t first = 0, count = kRouteCount;
   while (count) { const size_t step = count / 2, position = first + step; const Route& route = kRoutes[kStableOrder[position]];
@@ -2614,6 +2620,10 @@ void CapturedLuaRouter::detachInstance() noexcept {
   instanceRef_ = LUA_NOREF;
 }
 
+bool CapturedLuaRouter::capturableKind(SemanticHandleKind kind) const noexcept {
+  return activeProfile_ != nullptr && handleKindCapturableInProfile(kind, *activeProfile_);
+}
+
 bool CapturedLuaRouter::captureHandle(int stackIndex, SemanticHandleKind kind, ScriptValue* output) noexcept {
   if (!state_ || !registry_ || !output || kind == SemanticHandleKind::kNone ||
       captureHandleTrampolineRef_ == LUA_NOREF || captureHandleTrampolineRef_ == LUA_REFNIL) return false;
@@ -2695,6 +2705,15 @@ bool CapturedLuaRouter::read(int index, const ValueCodec& codec, ScriptValue* ou
   *output = {};
   if (lua_isnil(state_, index) && (codec.mask & kNil)) { output->tag = ScriptValueTag::kNull; return true; }
   if (codec.semanticKind != SemanticHandleKind::kNone) {
+    // Representation is a property of the backend, not of the kind: Box2D v2
+    // pushes its world as a light userdata with no identity at all, while v3
+    // pushes a rooted one. The classification states that per feature and the
+    // generated table carries it per runtime profile, so the refusal is a
+    // declaration rather than a discovery about the value on the stack.
+    if (activeProfile_ && !handleKindCapturableInProfile(codec.semanticKind, *activeProfile_)) {
+      fail(error, capacity, "semantic handle kind is not a rooted identity in the active runtime profile");
+      return false;
+    }
     // lua_isuserdata is true for a light userdata, which carries no
     // metatable and therefore no rooted identity the semantic-handle registry
     // can generation-check. Refuse it by name so the failure is attributable

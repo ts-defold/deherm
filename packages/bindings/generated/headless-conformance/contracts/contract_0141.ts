@@ -13,7 +13,7 @@ export function runContract(report: Report): boolean {
     route: "script:b2d.body.destroy_fixture",
     arity: "required",
     call: b2d.body.destroyFixture as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"handle","handleKind":"box2d-body","ordinal":0},{"kind":"literal","value":1}],
+    args: [{"kind":"handle","handleKind":"box2d-body","ordinal":0}, {"kind":"literal","value":1}],
     providers,
     minimumResultCount: 0,
     maximumResultCount: 0,

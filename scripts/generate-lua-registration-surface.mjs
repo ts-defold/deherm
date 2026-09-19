@@ -27,12 +27,14 @@ import {
   collectSdkStackHelpers,
   collectUserTypes,
   compareText,
+  documentedNameOf,
   interpretRegistrations
 } from "./lib/lua-c-registration.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const defaultPolicy = "packages/bindings/overrides/lua-registration-surface-targets.json";
 const defaultOutput = "packages/bindings/generated/defold-lua-registration-surface.json";
+const gateOutput = "packages/bindings/generated/defold-lua-registration-gate.json";
 const textDecoder = new TextDecoder();
 
 const SOURCE_EXTENSIONS = /\.(?:c|cc|cpp|cxx|m|mm)$/i;
@@ -366,6 +368,13 @@ function registeredRoutes(interpretation, project, helpers, blockers) {
         routes.push(route);
         continue;
       }
+      // The `@name` annotation the implementation carries is an independent
+      // claim about the same C symbol, so a mismatch with the registered
+      // spelling means the documented name is not callable.
+      const documented = documentedNameOf(definitions[0]);
+      route.documentedName = documented
+        ? { name: documented.name, line: documented.line, matchesRegistration: documented.name === fullName }
+        : null;
       const analysis = analyzeFunctionBody(definitions[0], helpers, project);
       route.body = analysis;
       for (const item of analysis.undecided) {
@@ -689,6 +698,10 @@ async function analyzeTarget(target, policy) {
         inDeclaredModule: declaredModules.has(route.module),
         cFunction: route.cFunction,
         registration: route.registration,
+        // The `@name` the implementation carries. When it differs from the
+        // registered spelling, this row is the callable half of a documented
+        // name that is not.
+        documentedName: route.documentedName ?? null,
         derivedArity: route.body?.arity ?? null
       });
       continue;
@@ -698,6 +711,7 @@ async function analyzeTarget(target, policy) {
       module: route.module,
       cFunction: route.cFunction,
       registration: route.registration,
+      documentedName: route.documentedName ?? null,
       declaration: { source: declaration.source, parameters: declaration.parameters.length, returns: declaration.returns, missingFunctionType: declaration.missingFunctionType ?? false },
       ...diffRoute(route, declaration)
     });
@@ -813,6 +827,131 @@ async function analyzeTarget(target, policy) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// The gate. The report above is a description of two descriptions; this is the
+// small, machine-readable subset a downstream generator may act on.
+//
+// Only findings backed by POSITIVE evidence in C source are gated. "The parser
+// found no registration" is absence of evidence and has innocent explanations -
+// a Lua-side module such as luasocket, a `go.property` declaration token, a
+// build variant this target excludes - so it stays in the report and never
+// reaches the gate. What does reach it is evidence that says what the source
+// *does*: a registration array that registers the same C function under another
+// name, a registration entry commented out, a C body that refuses a missing
+// argument the declaration calls optional.
+//
+// Findings must hold in every engine target. The two Box2D builds are mutually
+// exclusive link-time variants, so a route present in one and absent in the
+// other is a variant fact, not a defect, and must not gate anything.
+function buildGate(targets, engineTargetIds) {
+  const perTarget = engineTargetIds.map((id) => {
+    const target = targets[id];
+    const unregistered = new Map(target.declaredButUnregistered.map((row) => [row.name, row]));
+    const findings = new Map();
+    const record = (route, finding) => {
+      const existing = findings.get(route);
+      if (!existing) findings.set(route, finding);
+    };
+
+    // A documented name whose implementation is registered under a different
+    // spelling. Both halves are read out of the same translation unit: the
+    // `@name` annotation above the C function, and the registration array entry
+    // that names it.
+    for (const row of target.registeredButUndeclared) {
+      const documented = row.documentedName;
+      if (!documented || documented.name === row.name) continue;
+      if (!unregistered.has(documented.name)) continue;
+      record(documented.name, {
+        route: documented.name,
+        kind: "registered-under-a-different-name",
+        action: "block-emission",
+        callableAs: row.name,
+        parameter: null,
+        reason: `documented as '${documented.name}' but '${row.cFunction}' is registered as '${row.name}'`,
+        evidence: {
+          target: id,
+          documentedAt: `${row.registration.path}:${documented.line}`,
+          registeredAt: `${row.registration.path}:${row.registration.line}`,
+          registrationArray: row.registration.array
+        }
+      });
+    }
+
+    // A registration entry that exists in the source but is commented out.
+    for (const row of target.declaredButUnregistered) {
+      const commented = row.commentedOutRegistration;
+      if (!commented) continue;
+      record(row.name, {
+        route: row.name,
+        kind: "registration-commented-out",
+        action: "block-emission",
+        callableAs: null,
+        parameter: null,
+        reason: `the registration entry for '${row.name}' is present but commented out`,
+        evidence: {
+          target: id,
+          documentedAt: row.source,
+          registeredAt: `${commented.path}:${commented.line}`,
+          registrationArray: commented.array
+        }
+      });
+    }
+
+    // A slot the declaration calls optional whose C body refuses its omission on
+    // every path. Following the declaration would emit an optional parameter
+    // whose absence raises a Lua error.
+    for (const route of target.routes) {
+      for (const parameter of route.parameters ?? []) {
+        if (parameter.optionality?.correction !== "require-slot") continue;
+        record(`${route.name}#${parameter.index}`, {
+          route: route.name,
+          kind: "documented-optional-slot-required-by-c",
+          action: "require-parameter",
+          callableAs: null,
+          parameter: { index: parameter.index, name: parameter.declared?.name ?? null },
+          reason: parameter.optionality.reason,
+          evidence: {
+            target: id,
+            documentedAt: route.declaration.source,
+            registeredAt: `${route.registration.path}:${route.registration.line}`,
+            accessors: parameter.derived?.accessors ?? []
+          }
+        });
+      }
+    }
+    return findings;
+  });
+
+  // Intersect: a finding gates only where every engine target reaches it.
+  const [first, ...rest] = perTarget;
+  const findings = [];
+  for (const [key, finding] of first ?? new Map()) {
+    const agreeing = rest.every((other) => other.get(key)?.kind === finding.kind);
+    if (!agreeing) continue;
+    findings.push({ ...finding, evidence: [finding.evidence, ...rest.map((other) => other.get(key).evidence)] });
+  }
+  findings.sort((left, right) =>
+    compareText(left.route, right.route) ||
+    (left.parameter?.index ?? 0) - (right.parameter?.index ?? 0) ||
+    compareText(left.kind, right.kind));
+
+  const countBy = (selector) => {
+    const counts = {};
+    for (const finding of findings) counts[selector(finding)] = (counts[selector(finding)] ?? 0) + 1;
+    return Object.fromEntries(Object.entries(counts).sort(([left], [right]) => compareText(left, right)));
+  };
+  return {
+    findings,
+    counts: {
+      findings: findings.length,
+      routesBlocked: new Set(findings.filter((item) => item.action === "block-emission").map((item) => item.route)).size,
+      parametersCorrected: findings.filter((item) => item.action === "require-parameter").length,
+      byKind: countBy((item) => item.kind),
+      byAction: countBy((item) => item.action)
+    }
+  };
+}
+
 async function generate(options) {
   const policyText = await readFile(inputPath(options.policy), "utf8");
   const policy = JSON.parse(policyText);
@@ -842,16 +981,45 @@ async function generate(options) {
     totals,
     targets
   };
-  return `${JSON.stringify(report, null, 2)}\n`;
+  const surface = `${JSON.stringify(report, null, 2)}\n`;
+
+  // The gate only speaks for the engine, whose targets are the mutually
+  // exclusive build variants of one tree. An extension target is a separate
+  // product with its own emission decision, and an unverifiable target has no
+  // evidence to gate with.
+  const engineTargetIds = Object.entries(targets)
+    .filter(([, target]) => target.kind === "engine-tree" && target.status === "verified")
+    .map(([id]) => id)
+    .sort(compareText);
+  const gated = engineTargetIds.length ? buildGate(targets, engineTargetIds) : { findings: [], counts: null };
+  const gate = {
+    schemaVersion: 1,
+    generator: "scripts/generate-lua-registration-surface.mjs",
+    defoldRevision: policy.defoldRevision,
+    scope: "The subset of the registered-vs-declared findings that a downstream generator may act on: each one is backed by positive evidence in C source and holds in every mutually exclusive engine build variant. Absence of a registration is reported in the surface report and never gated.",
+    actions: {
+      "block-emission": "The documented route is not callable under this name. A generated binding must not emit it as a callable route.",
+      "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
+    },
+    sourceReport: defaultOutput,
+    sourceReportSha256: sha256(surface),
+    engineTargets: engineTargetIds,
+    counts: gated.counts,
+    findings: gated.findings
+  };
+  return { surface, gate: `${JSON.stringify(gate, null, 2)}\n` };
 }
 
 const options = parseArgs(process.argv.slice(2));
-const output = await generate(options);
-const destination = join(options.outRoot, defaultOutput);
-if (options.check) {
-  const current = await readFile(destination, "utf8");
-  assert(current === output, `${defaultOutput} is stale; regenerate it`);
-} else {
+const generated = await generate(options);
+const outputs = [[defaultOutput, generated.surface], [gateOutput, generated.gate]];
+for (const [relativePath, text] of outputs) {
+  const destination = join(options.outRoot, relativePath);
+  if (options.check) {
+    const current = await readFile(destination, "utf8");
+    assert(current === text, `${relativePath} is stale; regenerate it`);
+    continue;
+  }
   await mkdir(dirname(destination), { recursive: true });
-  await writeFile(destination, output);
+  await writeFile(destination, text);
 }

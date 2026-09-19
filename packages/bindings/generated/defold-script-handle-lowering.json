@@ -30,9 +30,9 @@
     },
     "hashes": {
       "policy": "4a3874d56311637cc6571c7a3a3faef758604e0f053e4f44b18b346e81aeb006",
-      "projection": "4de82f5733210c41c7db0a8f36bec521cf2582a95d062fe130c9b0b62b140410",
-      "classification": "8884e9042789b27655162577651feb63a79ce9c0611938817f439826cc44b3b9",
-      "availability": "a15b5fae86aa4f91ec093c27098a03f0d6ac8f830615e9eff4922a049db8a216"
+      "projection": "a3370e1a8e88b4c4cfdf4b9a9464b3a3d189ea7e597f884ceae516281910cf57",
+      "classification": "d21931dbcd4587137084a0372d750e1487d26d64ee0d3fbffa50b441c2276d12",
+      "availability": "c0e3a3928cea05d3ddab734917d11914b5ee2b80640eb06433303a90cc135b66"
     },
     "availabilityCatalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"
   },
@@ -124,8 +124,30 @@
       "sourceEvidence": [
         "box2d-body"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "box2d-body"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 1,
-      "enumName": "Box2dBody"
+      "enumName": "Box2dBody",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "box2d-chain",
@@ -139,8 +161,30 @@
       "sourceEvidence": [
         "box2d-chain"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "box2d-chain"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 2,
-      "enumName": "Box2dChain"
+      "enumName": "Box2dChain",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "box2d-joint",
@@ -154,8 +198,30 @@
       "sourceEvidence": [
         "box2d-joint"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "box2d-joint"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 3,
-      "enumName": "Box2dJoint"
+      "enumName": "Box2dJoint",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "box2d-shape",
@@ -169,8 +235,30 @@
       "sourceEvidence": [
         "box2d-shape"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "box2d-shape"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 4,
-      "enumName": "Box2dShape"
+      "enumName": "Box2dShape",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "box2d-world",
@@ -184,8 +272,39 @@
       "sourceEvidence": [
         "box2d-world"
       ],
+      "representationIsFeatureScoped": true,
+      "representations": [
+        {
+          "feature": "box2d-v2",
+          "representation": "lua-light-userdata",
+          "capturable": false,
+          "sourceEvidence": [
+            "box2d-world-v2"
+          ],
+          "reason": "Box2D v2 pushes the world as a light userdata: no metatable, no generation, and no rooted identity a handle registry can capture or validate."
+        },
+        {
+          "feature": "box2d-v3",
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "box2d-world"
+          ]
+        }
+      ],
+      "capturableFeatures": [
+        "box2d-v3"
+      ],
+      "uncapturableFeatures": [
+        "box2d-v2"
+      ],
       "numericId": 5,
-      "enumName": "Box2dWorld"
+      "enumName": "Box2dWorld",
+      "capturableProfiles": [
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 48
     },
     {
       "id": "buffer-data",
@@ -200,8 +319,31 @@
         "buffer-sdk",
         "buffer-script"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "buffer-script",
+            "buffer-sdk"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 6,
-      "enumName": "BufferData"
+      "enumName": "BufferData",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "buffer-stream",
@@ -215,8 +357,30 @@
       "sourceEvidence": [
         "buffer-script"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "buffer-script"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 7,
-      "enumName": "BufferStream"
+      "enumName": "BufferStream",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "bullet-constraint",
@@ -230,8 +394,30 @@
       "sourceEvidence": [
         "bullet-constraint"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "bullet-constraint"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 8,
-      "enumName": "BulletConstraint"
+      "enumName": "BulletConstraint",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "bullet-object",
@@ -247,8 +433,31 @@
         "bullet-object",
         "bullet-rigid-body"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "bullet-object",
+            "bullet-rigid-body"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 9,
-      "enumName": "BulletObject"
+      "enumName": "BulletObject",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "bullet-shape",
@@ -263,8 +472,31 @@
         "bullet-shape",
         "bullet-object"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "bullet-object",
+            "bullet-shape"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 10,
-      "enumName": "BulletShape"
+      "enumName": "BulletShape",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "bullet-world",
@@ -278,8 +510,30 @@
       "sourceEvidence": [
         "bullet-world"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "bullet-world"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 11,
-      "enumName": "BulletWorld"
+      "enumName": "BulletWorld",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "graphics-render-target",
@@ -293,8 +547,30 @@
       "sourceEvidence": [
         "render-script"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "numeric-graphics-asset-handle",
+          "capturable": true,
+          "sourceEvidence": [
+            "render-script"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 12,
-      "enumName": "GraphicsRenderTarget"
+      "enumName": "GraphicsRenderTarget",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "graphics-texture",
@@ -308,8 +584,30 @@
       "sourceEvidence": [
         "render-script"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "numeric-graphics-asset-handle",
+          "capturable": true,
+          "sourceEvidence": [
+            "render-script"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 13,
-      "enumName": "GraphicsTexture"
+      "enumName": "GraphicsTexture",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "gui-node",
@@ -324,8 +622,31 @@
         "gui-script",
         "gui-core"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "gui-core",
+            "gui-script"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 14,
-      "enumName": "GuiNode"
+      "enumName": "GuiNode",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     },
     {
       "id": "render-constant-buffer",
@@ -339,8 +660,30 @@
       "sourceEvidence": [
         "render-script"
       ],
+      "representationIsFeatureScoped": false,
+      "representations": [
+        {
+          "feature": null,
+          "representation": "lua-rooted-userdata",
+          "capturable": true,
+          "sourceEvidence": [
+            "render-script"
+          ]
+        }
+      ],
+      "capturableFeatures": null,
+      "uncapturableFeatures": null,
       "numericId": 15,
-      "enumName": "RenderConstantBuffer"
+      "enumName": "RenderConstantBuffer",
+      "capturableProfiles": [
+        "bullet-only",
+        "default-legacy-bullet",
+        "legacy-no-bullet",
+        "no-physics",
+        "v3-bullet",
+        "v3-no-bullet"
+      ],
+      "capturableProfileMask": 63
     }
   ],
   "contractShapeCount": 151,

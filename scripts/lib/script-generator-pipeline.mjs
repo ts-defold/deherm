@@ -39,6 +39,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/lib/script-generator-pipeline.mjs",
   "packages/compiler/src/script-public-api-policy.mjs",
   "scripts/lib/script-universal-selection.mjs",
+  "scripts/lib/semantic-handle-kinds.mjs",
   "scripts/lib/script-semantic-overrides.mjs",
   "packages/cli/src/names.mjs"
 ]);
@@ -78,7 +79,14 @@ export const scriptPinnedInputs = Object.freeze([
   // The canonical lowering plan is an immutable declared authority with its own
   // deep-check gate. The recording engine joins it by exact route identity and
   // records any byte-level drift against the plan's own declared input hashes.
-  "packages/bindings/generated/defold-binding-lowering-plan.json"
+  "packages/bindings/generated/defold-binding-lowering-plan.json",
+  // The Lua registration gate is owned by `luaRegistrationSurfaceGenerator`,
+  // whose inputs are a whole source tree and so cannot join this clean room. Its
+  // output is one enumerable file, which the projection IR reads as a declared
+  // authority the same way it reads the lowering plan: source-derived findings
+  // about which documented routes are callable and which documented slots the C
+  // body refuses to default.
+  "packages/bindings/generated/defold-lua-registration-gate.json"
 ]);
 
 export const generatedScriptArtifacts = Object.freeze([
@@ -228,7 +236,11 @@ export const luaRegistrationSurfaceGenerator = Object.freeze({
     "packages/bindings/generated/defold-script-api-ir.json"
   ]),
   artifacts: Object.freeze([
-    "packages/bindings/generated/defold-lua-registration-surface.json"
+    "packages/bindings/generated/defold-lua-registration-surface.json",
+    // The gate: the subset of the report backed by positive evidence in C
+    // source and agreed by every mutually exclusive engine build variant. It is
+    // small and stable on purpose, because the script graph consumes it.
+    "packages/bindings/generated/defold-lua-registration-gate.json"
   ]),
   steps: Object.freeze([
     Object.freeze({ runtime: "node", script: "scripts/generate-lua-registration-surface.mjs" })

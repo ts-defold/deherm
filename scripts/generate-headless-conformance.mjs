@@ -231,7 +231,13 @@ export type Provider = (ordinal: number) => unknown;
  */
 export type ArgumentSpec =
   | { readonly kind: "literal"; readonly value: unknown }
-  | { readonly kind: "handle"; readonly handleKind: string; readonly ordinal: number };
+  | { readonly kind: "handle"; readonly handleKind: string; readonly ordinal: number }
+  /**
+   * A value the running engine has to construct - a Defold value or a record
+   * of them. It is a thunk rather than data because the constructor is an
+   * engine call, and it must happen inside the exercise, not at module load.
+   */
+  | { readonly kind: "constructed"; readonly make: () => unknown };
 
 export interface Exercise {
   readonly contract: string;
@@ -306,6 +312,15 @@ function resolveArguments(report: Report, exercise: Exercise): readonly unknown[
   for (const spec of exercise.args) {
     if (spec.kind === "literal") {
       resolved.push(spec.value);
+      continue;
+    }
+    if (spec.kind === "constructed") {
+      try {
+        resolved.push(spec.make());
+      } catch (error) {
+        emit(report, exercise, "handle-provenance", "blocked-value-constructor-raised", detail(error));
+        return null;
+      }
       continue;
     }
     const provider = exercise.providers[spec.handleKind];
@@ -414,17 +429,53 @@ function providerModuleName(profileId) {
   return `providers/${profileId}`;
 }
 
-function renderArgument(spec, { ordinalExpression }) {
+function renderArgument(spec, context) {
+  const { ordinalExpression } = context;
   if (spec.kind === "literal") return literal(spec.value);
   if (spec.kind === "address") return `address(${ordinalExpression(spec.ordinal)})`;
+  if (spec.kind === "value") return `${spec.accessor.join(".")}()`;
+  if (spec.kind === "record") {
+    const fields = spec.fields.map((field) =>
+      `${literal(field.name)}: ${renderArgument(field.value, context)}`);
+    return fields.length === 0 ? "{}" : `{ ${fields.join(", ")} }`;
+  }
   return `resolve(${literal(spec.handleKind)}, ${ordinalExpression(spec.ordinal)})`;
+}
+
+/**
+ * The `@deherm/sdk` roots an argument specification reaches.
+ *
+ * A synthesized Defold value calls the engine's own constructor, so its module
+ * has to be imported beside the route being exercised.
+ */
+function specImportRoots(spec, output = new Set()) {
+  if (spec.kind === "value") output.add(spec.accessor[0]);
+  if (spec.kind === "record") for (const field of spec.fields) specImportRoots(field.value, output);
+  return output;
+}
+
+/**
+ * Render one exercise's argument list as a TypeScript expression.
+ *
+ * A literal or a handle reference is data and stays JSON; a synthesized value
+ * or record has to be constructed by the running engine, so it is emitted as a
+ * thunk the harness evaluates at call time rather than at module load.
+ */
+function renderExerciseArguments(args, context) {
+  const rendered = args.map((spec) => spec.kind === "literal" || spec.kind === "handle"
+    ? literal(spec)
+    : `{ kind: "constructed", make: (): unknown => (${renderArgument(spec, context)}) }`);
+  return `[${rendered.join(", ")}]`;
 }
 
 // One providers module per fixture profile. A provider is the generated
 // producer chain for one borrowed handle kind, so a consumer route never needs
 // a hand-authored scenario to obtain a live engine object.
 function providersModule(profile, providers) {
-  const roots = [...new Set(providers.flatMap((provider) => provider.accessor[0]))].sort();
+  const roots = [...new Set(providers.flatMap((provider) => [
+    provider.accessor[0],
+    ...provider.arguments.flatMap((spec) => [...specImportRoots(spec)])
+  ]))].sort();
   const addresses = profile.componentAddresses;
   const lines = [
     GENERATED_BANNER,
@@ -473,7 +524,10 @@ function providersModule(profile, providers) {
 
 function contractModule(contract) {
   const addresses = profileById.get(contract.profile).componentAddresses;
-  const roots = [...new Set(contract.exercises.map((exercise) => exercise.accessor[0]))].sort();
+  const roots = [...new Set(contract.exercises.flatMap((exercise) => [
+    exercise.accessor[0],
+    ...exercise.arguments.flatMap((spec) => [...specImportRoots(spec)])
+  ]))].sort();
   const lines = [
     GENERATED_BANNER,
     `// Contract ${contract.id}: ${contract.routeCount} routes intern to this contract,`,
@@ -498,7 +552,7 @@ function contractModule(contract) {
     lines.push(`    route: ${literal(exercise.routeId)},`);
     lines.push(`    arity: ${literal(exercise.arity)},`);
     lines.push(`    call: ${accessor} as unknown as (...args: readonly unknown[]) => unknown,`);
-    lines.push(`    args: ${literal(args)},`);
+    lines.push(`    args: ${renderExerciseArguments(args, { ordinalExpression: () => "0" })},`);
     lines.push("    providers,");
     lines.push(`    minimumResultCount: ${exercise.minimumResultCount},`);
     lines.push(`    maximumResultCount: ${exercise.maximumResultCount},`);

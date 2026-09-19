@@ -69,6 +69,32 @@ function isInvalidatorName(rawName) {
   return /(^|\.)(delete|destroy)(_|$)/.test(rawName);
 }
 
+/** Type member that means "this result may be absent"; it never names a handle kind. */
+const ABSENT_TYPE_MEMBER = "nil";
+
+function typeMembers(rawType) {
+  return String(rawType ?? "").split("|").map((member) => member.trim()).filter(Boolean);
+}
+
+/**
+ * The reviewed handle kind a route's declared result *is*, or null.
+ *
+ * "Is" is the whole point: every non-absent member of the single declared
+ * result must resolve to the same reviewed kind. A union of scalars that
+ * happens to admit a handle member (`go.get`) is not a handle result, and a
+ * sequence of handles (`b2Joint[]`) is a table, not a handle.
+ */
+function declaredHandleResultKind(irFunction, rawTypeToKind) {
+  const returns = irFunction?.returns ?? [];
+  if (returns.length !== 1) return null;
+  const members = typeMembers(returns[0]).filter((member) => member !== ABSENT_TYPE_MEMBER);
+  if (members.length === 0) return null;
+  const kinds = new Set(members.map((member) => rawTypeToKind.get(member)));
+  if (kinds.size !== 1) return null;
+  const [kind] = kinds;
+  return kind ?? null;
+}
+
 function countBy(rows, selector) {
   const counts = {};
   for (const row of rows) {
@@ -112,12 +138,77 @@ function validateSourceEvidence(override, sourceTexts) {
   return evidenceById;
 }
 
+const REPRESENTATIONS = [
+  "lua-rooted-userdata",
+  "numeric-graphics-asset-handle",
+  "declaration-only-token",
+  // A raw pointer with no metatable and no generation. It is a handle kind by
+  // declared type and not one by representation: nothing about it can be
+  // rooted, validated, or generation-checked, so a transport must refuse it
+  // rather than manufacture an identity for it.
+  "lua-light-userdata"
+];
+
+/** Representations a transport can root as a generation-checked identity. */
+const CAPTURABLE_REPRESENTATIONS = ["lua-rooted-userdata", "numeric-graphics-asset-handle"];
+
+/**
+ * Representation is a property of the backend that implements a kind, not of
+ * the kind's name.
+ *
+ * `b2World` is the case that forced this: the v3 sources push a rooted
+ * userdata with a metatable, and Box2D v2's `PushWorld` pushes a *light*
+ * userdata with no identity at all. Declaring one representation for the kind
+ * made the classification silently wrong under half the runtime profiles the
+ * availability model already distinguishes. A kind therefore declares the
+ * feature its stated representation was derived from, and one exception entry
+ * per feature that implements it differently, each with its own pinned source.
+ */
+function representationsFor(kind, evidenceById) {
+  const exceptions = kind.representationExceptions ?? [];
+  if (exceptions.length === 0) {
+    assert(kind.representationFeature === undefined,
+      `${kind.id}: declares a representation feature without any representation exception`);
+    return [{ feature: null, representation: kind.representation, capturable: CAPTURABLE_REPRESENTATIONS.includes(kind.representation), sourceEvidence: [...kind.sourceEvidence].sort(compareText) }];
+  }
+  assert(typeof kind.representationFeature === "string" && kind.representationFeature.length > 0,
+    `${kind.id}: representation exceptions require the feature the stated representation holds for`);
+  const seen = new Set([kind.representationFeature]);
+  const rows = [{
+    feature: kind.representationFeature,
+    representation: kind.representation,
+    capturable: CAPTURABLE_REPRESENTATIONS.includes(kind.representation),
+    sourceEvidence: [...kind.sourceEvidence].sort(compareText)
+  }];
+  for (const exception of exceptions) {
+    assert(typeof exception.feature === "string" && exception.feature.length > 0,
+      `${kind.id}: representation exception has no feature`);
+    assert(!seen.has(exception.feature), `${kind.id}: feature '${exception.feature}' declares two representations`);
+    seen.add(exception.feature);
+    assert(REPRESENTATIONS.includes(exception.representation),
+      `${kind.id}: unsupported representation '${exception.representation}' for feature '${exception.feature}'`);
+    assert(evidenceById.has(exception.sourceEvidence),
+      `${kind.id}: representation exception cites unknown source evidence '${exception.sourceEvidence}'`);
+    assert(typeof exception.reason === "string" && exception.reason.length > 0,
+      `${kind.id}: representation exception for '${exception.feature}' has no reason`);
+    rows.push({
+      feature: exception.feature,
+      representation: exception.representation,
+      capturable: CAPTURABLE_REPRESENTATIONS.includes(exception.representation),
+      sourceEvidence: [exception.sourceEvidence],
+      reason: exception.reason
+    });
+  }
+  return rows.sort((left, right) => compareText(left.feature, right.feature));
+}
+
 function validateHandleKinds(override, evidenceById) {
   const kindById = uniqueMap(override.handleKinds, "borrowed-handle kinds");
   const rawTypeToKind = new Map();
+  const representationsByKind = new Map();
   for (const kind of override.handleKinds) {
     assert(Array.isArray(kind.rawTypes) && kind.rawTypes.length > 0, `${kind.id}: no raw handle types`);
-    assert(["lua-rooted-userdata", "numeric-graphics-asset-handle", "declaration-only-token"].includes(kind.representation),
+    assert(REPRESENTATIONS.includes(kind.representation),
       `${kind.id}: unsupported representation '${kind.representation}'`);
     for (const rawType of kind.rawTypes) {
       assert(!rawTypeToKind.has(rawType), `${rawType}: assigned to multiple concrete handle kinds`);
@@ -129,8 +220,9 @@ function validateHandleKinds(override, evidenceById) {
     for (const field of ["ownership", "validity", "invalidationBoundary"]) {
       assert(typeof kind[field] === "string" && kind[field].length > 0, `${kind.id}: missing ${field}`);
     }
+    representationsByKind.set(kind.id, representationsFor(kind, evidenceById));
   }
-  return { kindById, rawTypeToKind };
+  return { kindById, rawTypeToKind, representationsByKind };
 }
 
 function validateExceptionalRoutes(override, borrowedById) {
@@ -165,18 +257,40 @@ export function generateBorrowedHandleClassification(inputs) {
 
   const irById = uniqueMap(ir.functions, "script API IR");
   const patternById = uniqueMap(patterns.bindings, "script binding patterns");
-  // Universal fallback accounting answers whether a route is callable; the
-  // structural pattern remains the source of truth for specialized lowering.
-  // This keeps all handle routes eligible for a faster generated shape even
-  // after the generic path has made them executable.
-  const borrowedPatternIds = new Set(patterns.bindings
-    .filter(({ loweringFamily }) => loweringFamily === "borrowed-handle")
-    .map(({ id }) => id));
+
+  const evidenceById = validateSourceEvidence(override, inputs.sourceTexts);
+  const { rawTypeToKind, representationsByKind } = validateHandleKinds(override, evidenceById);
+
+  // Two structural reasons put a route in this census, and the second is what
+  // makes a constructor visible to the handle lane at all.
+  //
+  //   `handle-lowering-family` - the binding pattern's lowering family is
+  //     `borrowed-handle`, so the marshalling family that owns handle-shaped
+  //     calls already owns this route.
+  //   `declared-handle-result` - the route's single declared result *is* a
+  //     reviewed borrowed handle kind, whatever family owns its arguments.
+  //
+  // Lowering-family selection is a single-winner precedence in which a
+  // table-shaped parameter outranks a handle, so every `create_*` that takes a
+  // definition record lands in the table family. Partitioning on the family
+  // alone therefore left the census covering only routes whose arguments
+  // happen to be handle-shaped - accessors - and hid every constructor, which
+  // is the primary way a program obtains a handle in the first place. The
+  // second basis is derived from the declared result type, never from the
+  // member name and never from a reviewed route list.
+  const censusBasisById = new Map();
+  for (const binding of patterns.bindings) {
+    if (binding.loweringFamily === "borrowed-handle") {
+      censusBasisById.set(binding.id, "handle-lowering-family");
+    } else if (declaredHandleResultKind(irById.get(binding.id), rawTypeToKind)) {
+      censusBasisById.set(binding.id, "declared-handle-result");
+    }
+  }
   // Native value dispatch owns GUI node reads/writes with a tighter generated
   // shape. Keep the borrowed-handle classifier structural, but do not emit a
   // second competing lowering recipe for routes already specialized there.
   const borrowedAccountingRows = accounting.rows.filter(
-    ({ id, evidence }) => borrowedPatternIds.has(id) && evidence?.generator !== "native-value-dispatch",
+    ({ id, evidence }) => censusBasisById.has(id) && evidence?.generator !== "native-value-dispatch",
   );
   const borrowedById = uniqueMap(borrowedAccountingRows, "borrowed-handle accounting rows");
   assert(borrowedById.size === override.expectedCounts.total,
@@ -186,15 +300,13 @@ export function generateBorrowedHandleClassification(inputs) {
     const fn = irById.get(id);
     const pattern = patternById.get(id);
     assert(fn, `${id}: borrowed-handle accounting row is absent from pinned IR`);
-    assert(pattern?.loweringFamily === "borrowed-handle", `${id}: binding pattern is not borrowed-handle`);
+    assert(pattern, `${id}: borrowed-handle accounting row has no binding pattern`);
     assert(fn.rawName === accountingRow.rawName && fn.source === accountingRow.source && fn.line === accountingRow.line,
       `${id}: accounting provenance differs from pinned IR`);
     assert(pattern.rawName === fn.rawName && pattern.source === fn.source && pattern.line === fn.line,
       `${id}: pattern provenance differs from pinned IR`);
   }
 
-  const evidenceById = validateSourceEvidence(override, inputs.sourceTexts);
-  const { rawTypeToKind } = validateHandleKinds(override, evidenceById);
   const exceptional = validateExceptionalRoutes(override, borrowedById);
   const declarationIds = new Set(override.exceptionalRoutes["declaration-token"].map(({ id }) => id));
   const producerIds = new Set(override.exceptionalRoutes["checked-handle-return-capture"].map(({ id }) => id));
@@ -256,6 +368,8 @@ export function generateBorrowedHandleClassification(inputs) {
       member: accountingRow.member,
       source: binding.source,
       line: binding.line,
+      censusBasis: censusBasisById.get(id),
+      loweringFamily: binding.loweringFamily,
       operationClass,
       invalidatedIdentity: operationClass === "checked-child-engine-object-invalidate" ? "child-index" :
         operationClass === "checked-self-engine-object-invalidate" ? "self-underlying" : null,
@@ -278,7 +392,26 @@ export function generateBorrowedHandleClassification(inputs) {
 
   const handleKinds = [...override.handleKinds]
     .sort((left, right) => compareText(left.id, right.id))
-    .map((kind) => ({ ...kind, rawTypes: [...kind.rawTypes].sort(compareText) }));
+    .map(({ representationExceptions, representationFeature, ...kind }) => {
+      const representations = representationsByKind.get(kind.id);
+      const featureScoped = representations.some(({ feature }) => feature !== null);
+      return {
+        ...kind,
+        rawTypes: [...kind.rawTypes].sort(compareText),
+        // `representation` remains the representation under which this kind is
+        // a runtime identity at all; `representations` is the authority on
+        // which backend feature produces which, and is the only place to read
+        // it from when more than one does.
+        representationIsFeatureScoped: featureScoped,
+        representations,
+        capturableFeatures: featureScoped
+          ? representations.filter(({ capturable }) => capturable).map(({ feature }) => feature)
+          : null,
+        uncapturableFeatures: featureScoped
+          ? representations.filter(({ capturable }) => !capturable).map(({ feature }) => feature)
+          : null
+      };
+    });
   const inputEvidence = {
     scriptIrSha256: sha256(inputs.irText),
     scriptApiAccountingSha256: sha256(inputs.accountingText),
@@ -305,6 +438,7 @@ export function generateBorrowedHandleClassification(inputs) {
     inputEvidence,
     routeCount: rows.length,
     operationClassCounts,
+    censusBasisCounts: countBy(rows, ({ censusBasis }) => censusBasis),
     moduleCounts: countBy(rows, ({ rawName }) => rawName.split(".")[0]),
     operationClassModuleCounts: Object.fromEntries(OPERATION_CLASSES.map((operationClass) => [
       operationClass,

@@ -221,11 +221,14 @@ locale; regeneration tests compare byte output under `C` and Czech locales.
 
 Two mechanical predicates dominate the next work:
 
-1. The script handle algebra selects 407 runtime routes without route IDs: 367
-   checked terminal calls, 33 producers, five self-invalidators, and two child
-   invalidators. The immediate honest execution ceiling is 343 with current
-   context attachments and pinned runtime symbols; generation still covers all
-   407.
+1. The script handle algebra classifies 437 runtime routes without route IDs:
+   367 checked terminal calls, 55 producers, five self-invalidators, two child
+   invalidators and eight declaration tokens. 407 of them are also selected
+   into the handle-lowering table; the 22 producers admitted on their declared
+   result type keep the marshalling family their arguments select, and capture
+   their result into the same semantic registry from there. The immediate
+   honest execution ceiling for the table is 343 with current context
+   attachments and pinned runtime symbols; generation still covers all 407.
 2. The dmSDK C-string/value algebra selects 20 global closed-shape declarations.
    Fourteen have defensible first-wave copy-in/copy-out policies; six remain
    generated with explicit domain, thread, registry-lifetime, or lifecycle

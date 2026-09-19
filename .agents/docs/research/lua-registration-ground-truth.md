@@ -34,6 +34,14 @@ sources:
     resource: ../../../packages/bindings/generated/defold-lua-registration-surface.json
     title: Generated registered-vs-declared surface report
     author: team:ts-defold
+  - id: gate
+    resource: ../../../packages/bindings/generated/defold-lua-registration-gate.json
+    title: Generated registration gate consumed by the script projection IR
+    author: team:ts-defold
+  - id: projection
+    resource: ../../../scripts/generate-script-projection-ir.mjs
+    title: Script projection IR, which applies the gate
+    author: team:ts-defold
   - id: defold-engine
     resource: ../../../upstream/defold/engine
     title: Pinned Defold engine tree at upstream.lock DEFOLD_REV
@@ -76,7 +84,9 @@ declaration disagree?*
 from its C/C++ sources and diff it against its **declared** surface. Targets are
 declared in `packages/bindings/overrides/lua-registration-surface-targets.json`;
 the generated report is
-`packages/bindings/generated/defold-lua-registration-surface.json`.
+`packages/bindings/generated/defold-lua-registration-surface.json`, and the
+subset of it a downstream generator may act on is
+`packages/bindings/generated/defold-lua-registration-gate.json`.
 
 There is no per-route and no per-module list anywhere in the lane. The policy
 names source roots, the mutually exclusive build variants a target selects
@@ -107,9 +117,20 @@ route-availability generator already models.
 *required*; `luaL_opt*` makes it *optional*; `lua_to*`, `lua_is*`,
 `lua_isnoneornil` observe a slot that may be absent, which is exactly what
 `map_id[optional]` was trying to say in prose. Argument positions come from
-integer literals, from single-assignment integer locals, from
-`AbsIndex(L, <literal>)`, and from helpers that take a literal slot and hand its
-index back (`int def_index = CheckDefinitionTable(L, 3);`).
+integer literals, from folded literal arithmetic, from single-assignment integer
+locals, from `AbsIndex(L, <literal>)`, and from helpers that take a literal slot
+and hand its index back (`int def_index = CheckDefinitionTable(L, 3);`). The
+pseudo-indices `LUA_REGISTRYINDEX`, `LUA_GLOBALSINDEX`, `LUA_ENVIRONINDEX` and
+`lua_upvalueindex(n)` address the registry, the globals table or an upvalue, so
+like an explicitly negative index they prove nothing about an argument.
+
+Where the slot sits inside the body matters as much as which call reads it. A
+call at the body's own statement level runs on every path that reaches it; a call
+at brace depth 1 or more runs only on its branch. So `luaL_checknumber(L, 2)` at
+the top of `Sound_SetGain` proves slot 2 is always refused when missing, while
+the same call inside `if (top >= 2)` proves nothing of the kind, and the slot is
+reported `undecided` with reason `branch-dependent-requirement` rather than
+corrected.
 
 **The helper vocabulary is enumerated, not listed.** Declared helpers come from
 the pinned dmSDK headers: any free function whose first parameter is `lua_State*`
@@ -122,7 +143,52 @@ the user type `b2Body` - the name it was registered under via
 `dmScript::RegisterUserType` - and astar's `get_map(lua_State* L, int nArg)`
 resolves to an optional number because its body calls `luaL_optinteger` on that
 slot. Which integer parameter is a stack index is decided by the body, never by
-its name.
+its name, and a helper addresses *every* integer parameter its body shows stack
+evidence for: `CheckJointDefBodies(L, 1, 2, &a, &b, &world)` reads two argument
+positions in one call.
+
+A helper name is an **overload set**, resolved the way C++ resolves it: by the
+number of arguments the call supplies, with a file-static definition shadowing a
+shared one of the same arity. This is load-bearing rather than pedantic. The
+engine overloads `GuiScriptInstance_Check(lua_State*, int)` against
+`GuiScriptInstance_Check(lua_State*)`, and only the first addresses an argument;
+the second reads the running instance out of the registry. Resolving both to the
+two-argument form made 135 perfectly ordinary calls look like undecidable stack
+indices.
+
+What a helper proves about its slot is then the combination of two incomplete
+kinds of evidence, and the direction of the combination is chosen so the unsound
+failure cannot happen:
+
+* An **explicit absence test** in the body wins outright. Box2D's
+  `CheckMaxResults` opens with `if (lua_isnoneornil(L, index)) return 0;` and
+  only then calls `luaL_checkinteger`, so its `luaL_check*` sits on the else-path
+  and the slot really is optional. Letting the check win there emitted a required
+  parameter for a slot the engine defaults - a wrong signature in every project
+  that ran the generator. The same test written arithmetically,
+  `if (lua_gettop(L) == instance_arg && ...)` in `ResolveInstance`, counts too.
+* Failing that, a **`required` from either side** wins, because the body scan is
+  a *lower* bound: a body that raises down a path the parser cannot follow reads
+  as a probe. Demoting a required slot to optional emits a signature that permits
+  a call the engine refuses; over-requiring is visible at compile time, and
+  under-requiring is not.
+* An **argument-raising call at the body's own statement level** - `luaL_typerror`
+  or `luaL_argerror` naming the slot - makes it required however it was read on
+  the way there. `dmScript::CheckHashOrString` returns early for a hash and for a
+  string and then runs `luaL_typerror(L, index, "hash or string expected")`
+  unconditionally, so its slot is required even though `ToHash`, `lua_type` and
+  `lua_tolstring` are all non-raising. Reading that one fall-through path turned
+  29 false disagreements into agreement.
+
+**The documented name the implementation carries.** Defold writes a route's
+documentation in a `/*# ... @name module.member */` comment directly above the C
+function that implements it. That annotation and the registration array in the
+same translation unit are two independent claims about the same C symbol, and
+they can disagree. The annotation is attributed to a definition only when nothing
+but whitespace, a storage class and a return type separates them, so a comment
+further up the file is never misattributed - across the pinned engine that rule
+attaches 435 annotations with zero spurious mismatches, and finds exactly one
+real one.
 
 **Results and constants.** Literal `return N` values, `DM_LUA_STACK_CHECK`, and
 tail delegation (`return Other(L);`) give result arity; the push sequence gives
@@ -174,19 +240,52 @@ registration symbols and are selected against each other at link time.
 | **Documented but unregistered** | **61** | **135** |
 | **Registered but undocumented** | **57** | **43** |
 | Commented-out registrations found | 2 | 4 |
-| Per-route verdict: agree | 259 | 227 |
-| Per-route verdict: partially undecided | 290 | 255 |
-| Per-route verdict: disagree | 270 | 263 |
-| Per-route verdict: undecided | 48 | 48 |
+| Per-route verdict: agree | 316 | 284 |
+| Per-route verdict: partially undecided | 377 | 338 |
+| Per-route verdict: disagree | 174 | 171 |
+| Per-route verdict: undecided | 0 | 0 |
 | Parameter slots compared | 1,508 | 1,409 |
-| Parameter slots disagreeing | 348 | 336 |
-| Parameter slots undecided | 522 | 478 |
-| **Blockers (unparseable)** | **391 over 302 routes** | **394 over 309 routes** |
+| Parameter slots disagreeing | 206 | 203 |
+| Parameter slots undecided | 543 | 491 |
+| **Blockers (unparseable)** | **152 over 110 routes** | **156 over 116 routes** |
 
 The documented surface is 926 routes. On the v3 build 867 of them are actually
 registered; 61 are not. Coverage counted against documentation is therefore not
-coverage: 57 registered routes have no documentation at all, and only 259 of the
+coverage: 57 registered routes have no documentation at all, and only 316 of the
 867 matched routes agree on every parameter, arity and result.
+
+### What the blocker queue looked like, and what it is now
+
+The first run of this verifier left 391 blockers over 302 of the 867 matched
+routes, and 259 routes fully agreeing. Working that queue down meant adding
+general parsing rules, never per-route knowledge. Five rules account for the
+whole move:
+
+| Rule | Blockers cleared (v3) |
+| --- | ---: |
+| A file-scope function-like macro invocation *is* a function definition, expanded in place - `BIT_OP(bit_band, &=)`, `GET_CAMERA_DATA_PROPERTY_FN(FarZ, lua_pushnumber)`, `LUAGETSETV3(Position, PROPERTY_POSITION)` - and `##` pastes rather than stringifying | 48 |
+| A called name is an overload *set*, selected by the number of arguments the call supplies: `GuiScriptInstance_Check(L)` reads the running instance out of the registry while `GuiScriptInstance_Check(L, index)` reads a slot, so the one-argument form addresses no argument and is decided rather than unparseable | 135 |
+| `LUA_REGISTRYINDEX`, `LUA_GLOBALSINDEX`, `LUA_ENVIRONINDEX` and `lua_upvalueindex(n)` are pseudo-indices, not positions in the argument window | 27 |
+| Additive arithmetic over integer literals in an index expression is folded, because macro expansion produces `luaL_checknumber(L, 1 + 2)` | 8 |
+| A helper addresses *every* integer parameter its body shows stack evidence for, not just the first: `CheckJointDefBodies(L, 1, 2, &a, &b, &world)` reads two argument positions in one call | 30 |
+
+| | before | after |
+| --- | ---: | ---: |
+| Blockers | 391 | **152** |
+| Routes carrying a blocker | 302 | **110** |
+| Routes fully agreeing | 259 | **316** |
+| Routes with no decidable verdict at all | 48 | **0** |
+| Parameter slots disagreeing | 348 | **206** |
+
+The `undecided` bucket is empty because it was entirely
+`unresolved-c-function`: 48 routes whose registered symbol existed only as a
+macro expansion. What remains is genuinely undecidable by a structural reading:
+45 stack indices computed at runtime (`barg(L, i)` in a loop,
+`lua_rawgeti(L, shape_def.m_VerticesIndex, i)`, `GetShapeValueIndex(L, 1)`), 43
+non-literal return expressions (`_G.unpack` and `_G.select` really are variadic
+in their result count), 23 argument positions inside the derived window that no
+recognised accessor reads, and 21 documented modules with no registration array
+anywhere in the target.
 
 ## What the disagreements are
 
@@ -219,15 +318,81 @@ they are `go.property` declaration tokens rather than registered functions. The
 `socket` and `socket.dns` rows are luasocket's Lua-side modules, which have no C
 registration by construction.
 
-**Optionality the C body does not enforce.** The largest disagreement family is a
-slot documented as required whose C body reads it with a non-raising accessor, so
-a missing argument is silently defaulted rather than refused. Each such row names
-the accessor that decided it.
+**Optionality: whose defect is it?** A slot whose documented optionality and
+whose C body disagree is not one finding but four, and the difference decides
+whether a generated signature is unsound. Every such row now carries a
+`classification`, a `defect` and a `correction` next to the accessor that decided
+it (v3 counts):
+
+| classification | what the source says | defect | correction |
+| --- | --- | --- | ---: |
+| `documentation-permits-refused-call` (37) | declared optional; the body refuses the omission at its own statement level | the declaration | **require the slot** |
+| `engine-tolerates-omission` (88) | declared required; the body reads the slot with a non-raising accessor, so omitting it substitutes that accessor's zero value rather than raising | neither | none |
+| `branch-dependent-requirement` (67) | declared optional; the body's `luaL_check*` for that slot sits inside a branch, so it proves nothing about the fall-through | undecided | none |
+| `engine-guards-omission` (3) | declared required; the body tests the slot's presence explicitly | neither | none |
+
+Only the first is a defect a generator must act on. `sound.set_gain` documents
+`@param [gain]` and its body runs `luaL_checknumber(L, 2)` unconditionally:
+`sound.set_gain("#sound")` is a runtime Lua error, and déherm would have emitted
+`gain?: number`. The second family is the opposite shape and is **not** a
+signature defect: the documentation is the narrower contract, emitting it rejects
+no call the engine accepts at runtime, and widening it would advertise behaviour
+the documentation never describes. It is reported so it is visible, and nothing
+more. The third is a refusal, not a finding.
 
 **Branch-dependent arity is not claimed.** When the body branches on
 `lua_gettop`, a `luaL_check*` below the branch does not prove the slot is always
 required, so the arity verdict is `undecided` with reason
-`branch-dependent-minimum` rather than a false `disagree`.
+`branch-dependent-minimum` rather than a false `disagree`. The same applies to
+the argument window as a whole: a body that recorded an undecidable stack index
+bounds nothing, so its arity verdict is `undecided` with reason
+`undecided-stack-index` and a slot it never reached is `undecided` rather than
+`declared-only`.
+
+# From report to gate
+
+Until now nothing consumed these findings. The verifier described two
+descriptions and stopped. It now also emits
+`packages/bindings/generated/defold-lua-registration-gate.json`, which
+`scripts/generate-script-projection-ir.mjs` reads as a declared authority - the
+same way it already reads the canonical lowering plan - and applies to the
+projected signature of every route.
+
+The gate is deliberately much smaller than the report, because only findings
+backed by **positive** evidence in C source may act:
+
+* **`registered-under-a-different-name` → `block-emission`.** The `@name`
+  annotation above a C function and the registration array that names the same
+  function disagree. `sys.set_render_enable` is documented; what is registered is
+  `sys.set_render_enabled`.
+* **`registration-commented-out` → `block-emission`.** The registration entry
+  exists in the source and is commented out.
+* **`documented-optional-slot-required-by-c` → `require-parameter`.** The
+  declaration calls the slot optional and the body refuses its omission on every
+  path.
+
+"The parser found no registration" is **absence** of evidence and has innocent
+explanations - a Lua-side module such as luasocket, a `go.property` declaration
+token, a build variant this target excludes - so it stays in the report and never
+reaches the gate. Nor does any finding that the two mutually exclusive Box2D
+builds do not both witness: a route present in one variant and absent in the
+other is a variant fact, not a defect. Each finding therefore carries one
+evidence row per engine target, and the lane's test asserts that.
+
+On the pinned engine the gate carries 38 findings. In the projection IR they
+become:
+
+| | routes |
+| --- | ---: |
+| `registration-verified` | 888 |
+| `registration-corrected` (a parameter's declared optionality overridden by the C body) | 37 |
+| `registration-blocked` (semantic hole `registration:registered-under-a-different-name`) | 1 |
+
+A corrected parameter carries `optionalityCorrectedBy: "lua-registration-gate"`
+so the override is visible in the artifact rather than folded silently into the
+declaration, and applying a correction is itself checked: the gate names the slot
+by index *and* by declared name, and the projection throws if the script IR
+disagrees with either.
 
 # Applied to the two ingested extensions
 
@@ -298,13 +463,20 @@ This is **generation and static-analysis evidence only**. Nothing here was
 compiled, linked, or executed. The verifier reads C source; it does not prove
 that a registered route behaves as its body suggests at runtime, and a
 disagreement it reports is a disagreement between two static descriptions, not a
-runtime failure. The 391 blockers on the v3 engine target are exactly the places
+runtime failure. The 152 blockers on the v3 engine target are exactly the places
 where the static reading stopped, and they are reported rather than assumed away.
+
+The gate inherits that boundary. `require-parameter` says the C body refuses a
+missing argument, not that the engine behaves as documented once it has one, and
+`block-emission` says a name is not registered, not that the route is absent from
+the product. Neither has been observed at runtime.
 
 The lane owns its own generator registry
 (`luaRegistrationSurfaceGenerator` in `scripts/lib/script-generator-pipeline.mjs`)
 rather than joining the script clean-room graph, because its inputs cannot be
 enumerated ahead of the parse: which files register which Lua names is exactly
 what it decides, while the clean-room check copies an enumerated evidence subset
-into a temporary root. It is verified by `pnpm check:lua-registration-surface`
+into a temporary root. Its *output* is enumerable, so the gate file is listed in
+`scriptPinnedInputs` and the clean room copies it in like any other declared
+authority. It is verified by `pnpm check:lua-registration-surface`
 and `tests/lua-registration-surface.test.mjs` instead.

@@ -2,16 +2,16 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "expectedFeatureCounts": {
-    "core": 8,
-    "box2d-v2": 114,
-    "box2d-v3": 181,
-    "bullet3d": 131
+    "core": 9,
+    "box2d-v2": 124,
+    "box2d-v3": 189,
+    "bullet3d": 139
   },
   "expectedAvailableFeatureCounts": {
-    "core": 8,
-    "box2d-v2": 114,
-    "box2d-v3": 179,
-    "bullet3d": 131
+    "core": 9,
+    "box2d-v2": 124,
+    "box2d-v3": 187,
+    "bullet3d": 139
   },
   "expectedRouteFeatureCounts": {
     "core": 26,
@@ -38,20 +38,20 @@
     "bullet3d": 0
   },
   "expectedProfileCounts": {
-    "default-legacy-bullet": 253,
-    "v3-bullet": 320,
-    "legacy-no-bullet": 122,
-    "v3-no-bullet": 189,
-    "bullet-only": 139,
-    "no-physics": 8
+    "default-legacy-bullet": 272,
+    "v3-bullet": 337,
+    "legacy-no-bullet": 133,
+    "v3-no-bullet": 198,
+    "bullet-only": 148,
+    "no-physics": 9
   },
   "expectedRuntimeProfileCounts": {
-    "default-legacy-bullet": 253,
-    "v3-bullet": 318,
-    "legacy-no-bullet": 122,
-    "v3-no-bullet": 187,
-    "bullet-only": 139,
-    "no-physics": 8
+    "default-legacy-bullet": 272,
+    "v3-bullet": 335,
+    "legacy-no-bullet": 133,
+    "v3-no-bullet": 196,
+    "bullet-only": 148,
+    "no-physics": 9
   },
   "expectedRouteProfileCounts": {
     "default-legacy-bullet": 343,

@@ -301,3 +301,149 @@ test("the committed engine report is fail-closed and complete", async () => {
 test("the committed engine report is regenerable byte for byte", async () => {
   await execFileAsync("node", ["scripts/generate-lua-registration-surface.mjs", "--check"], { cwd: repositoryRoot });
 });
+
+test("a file-scope macro that expands to a Lua C function is read like any other body", () => {
+  const sources = [{
+    path: "src/macro.cpp",
+    text: `
+      #define BIT_OP(func, opr) \\
+          static int func(lua_State *L) { \\
+              lua_Number b = luaL_checknumber(L, 1); \\
+              lua_Number n = luaL_checknumber(L, 2); \\
+              lua_pushnumber(L, b opr n); return 1; }
+      BIT_OP(demo_band, &)
+      #define GETTER(name, reader) \\
+          static int Demo_Get##name(lua_State* L) { \\
+              reader(L, luaL_checkinteger(L, 1)); \\
+              return 1; }
+      GETTER(Width, lua_pushnumber)
+      static const luaL_reg Demo_methods[] = {
+        {"band", demo_band}, {"get_width", Demo_GetWidth}, {0, 0}
+      };
+      static void Initialize(lua_State* L) { luaL_register(L, "demo", Demo_methods); lua_pop(L, 1); }
+    `
+  }];
+  const { project, helpers, interpretation } = analyze(sources);
+  // The registration array names symbols that exist only as macro expansions;
+  // token pasting must produce `Demo_GetWidth`, not a stringified `Demo_Get#`.
+  assert.deepEqual(
+    interpretation.modules.get("demo").functions.map((item) => item.cFunction).sort(),
+    ["Demo_GetWidth", "demo_band"]
+  );
+  const band = analyzeFunctionBody(project.functionsByName.get("demo_band")[0], helpers, project);
+  assert.deepEqual(band.arity, { min: 2, max: 2, variadic: false, branchDependent: false });
+  assert.deepEqual(band.parameters.map((item) => item.types), [["number"], ["number"]]);
+  assert.equal(band.results.min, 1);
+});
+
+test("an overload that addresses no stack index is decided, not blocked", () => {
+  const sources = [{
+    path: "src/overload.cpp",
+    text: `
+      static Scene* Instance_Check(lua_State* L, int index) {
+        return (Scene*) lua_touserdata(L, index);
+      }
+      static Scene* Instance_Check(lua_State* L) {
+        lua_rawgeti(L, LUA_REGISTRYINDEX, g_instance);
+        Scene* scene = Instance_Check(L, -1);
+        lua_pop(L, 1);
+        return scene;
+      }
+      static int demo_here(lua_State* L) {
+        Scene* scene = Instance_Check(L);
+        lua_pushnumber(L, scene->value);
+        return 1;
+      }
+      static const luaL_reg Demo_methods[] = { {"here", demo_here}, {0, 0} };
+      static void Initialize(lua_State* L) { luaL_register(L, "demo", Demo_methods); lua_pop(L, 1); }
+    `
+  }];
+  const { project, helpers } = analyze(sources);
+  const here = analyzeFunctionBody(project.functionsByName.get("demo_here")[0], helpers, project);
+  // The one-argument overload reads the registry, not an argument, so the route
+  // takes no arguments and nothing is left unparseable.
+  assert.deepEqual(here.arity, { min: 0, max: 0, variadic: false, branchDependent: false });
+  assert.deepEqual(here.undecided, []);
+});
+
+test("a presence test on a slot outranks a check below it", () => {
+  const sources = [{
+    path: "src/guarded.cpp",
+    text: `
+      static int CheckMaxResults(lua_State* L, int index) {
+        if (lua_isnoneornil(L, index)) { return 0; }
+        int max_results = luaL_checkinteger(L, index);
+        return max_results;
+      }
+      static dmhash_t CheckName(lua_State* L, int index) {
+        if (lua_type(L, index) == LUA_TSTRING) { return dmHashString64(lua_tostring(L, index)); }
+        luaL_typerror(L, index, "string expected");
+        return 0;
+      }
+      static int demo_query(lua_State* L) {
+        dmhash_t name = CheckName(L, 1);
+        int limit = CheckMaxResults(L, 2);
+        lua_pushnumber(L, limit);
+        return 1;
+      }
+      static const luaL_reg Demo_methods[] = { {"query", demo_query}, {0, 0} };
+      static void Initialize(lua_State* L) { luaL_register(L, "demo", Demo_methods); lua_pop(L, 1); }
+    `
+  }];
+  const { project, helpers } = analyze(sources);
+  const query = analyzeFunctionBody(project.functionsByName.get("demo_query")[0], helpers, project);
+  // `CheckMaxResults` returns early when the slot is absent, so its `luaL_check*`
+  // sits on the else-path and the slot is optional whatever the helper is named.
+  assert.equal(query.parameters[1].optional, true);
+  assert.equal(query.parameters[1].evidence, "presence-guarded");
+  // `CheckName` falls through to an argument-raising call, so its slot is
+  // required even though every accessor it used on the way is non-raising.
+  assert.equal(query.parameters[0].optional, false);
+  assert.equal(query.parameters[0].evidence, "checked");
+  assert.equal(query.parameters[0].requirementUnconditional, true);
+  assert.deepEqual(query.undecided, []);
+});
+
+test("the gate carries only findings with positive source evidence in every engine variant", async () => {
+  const report = await readReport();
+  const gate = JSON.parse(await readFile(
+    path.join(repositoryRoot, luaRegistrationSurfaceGenerator.artifacts[1]), "utf8"));
+  assert.equal(gate.schemaVersion, 1);
+  assert.equal(gate.sourceReport, luaRegistrationSurfaceGenerator.artifacts[0]);
+  assert.deepEqual(gate.engineTargets, ["defold-engine-box2d-v2", "defold-engine-box2d-v3"]);
+  assert.ok(gate.findings.length > 0);
+
+  const gatedKinds = new Set([
+    "registered-under-a-different-name",
+    "registration-commented-out",
+    "documented-optional-slot-required-by-c"
+  ]);
+  const declaredNames = new Set(gate.engineTargets.flatMap((id) =>
+    report.targets[id].declaredButUnregistered.map((row) => row.name)));
+  for (const finding of gate.findings) {
+    assert.ok(gatedKinds.has(finding.kind), finding.kind);
+    assert.ok(["block-emission", "require-parameter"].includes(finding.action), finding.action);
+    // Every finding must be witnessed independently by each engine variant, so a
+    // route that differs only between mutually exclusive builds never gates.
+    assert.equal(finding.evidence.length, gate.engineTargets.length, finding.route);
+    assert.deepEqual([...finding.evidence].map((item) => item.target).sort(), gate.engineTargets);
+    if (finding.action === "block-emission") {
+      assert.ok(declaredNames.has(finding.route), `${finding.route} must be documented but unregistered`);
+    } else {
+      assert.ok(finding.parameter?.index > 0);
+    }
+  }
+
+  // Absence of a registration is not positive evidence and must never gate: the
+  // luasocket Lua modules and the `go.property` declaration tokens are reported
+  // as unregistered but carry no finding.
+  const gated = new Set(gate.findings.map((finding) => finding.route));
+  const v3 = report.targets["defold-engine-box2d-v3"];
+  const unexplained = v3.declaredButUnregistered
+    .filter((row) => !row.commentedOutRegistration)
+    .filter((row) => gated.has(row.name));
+  assert.deepEqual(
+    unexplained.map((row) => row.name).filter((name) => name !== "sys.set_render_enable"),
+    []
+  );
+});

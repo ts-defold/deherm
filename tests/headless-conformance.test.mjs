@@ -97,14 +97,27 @@ test("a fixture only ever calls a route from a context the harness supplies", ()
     assert.ok(exercise.accessor.length >= 2, exercise.routeId);
     assert.ok(exercise.arguments.length >= exercise.minimumArgumentCount, exercise.routeId);
     assert.ok(exercise.maximumResultCount <= 1, exercise.routeId);
-    for (const argument of exercise.arguments) {
-      assert.ok(["literal", "address", "handle"].includes(argument.kind), exercise.routeId);
+    // A synthesized argument is one of five shapes, and each is either data or
+    // a construction the running engine performs: a literal inhabitant, an
+    // explicit nil for an optional parameter a positional call has to pass
+    // over, one of the profile's published component addresses, a handle from
+    // a producer chain, a Defold value from the engine's own zero-argument
+    // constructor, or a record of those.
+    const assertArgument = (argument) => {
+      assert.ok(["literal", "address", "handle", "value", "record"].includes(argument.kind), exercise.routeId);
       if (argument.kind === "literal") {
-        assert.ok(["number", "boolean", "string"].includes(typeof argument.value), exercise.routeId);
+        assert.ok(argument.value === null || ["number", "boolean", "string"].includes(typeof argument.value),
+          exercise.routeId);
+      } else if (argument.kind === "value") {
+        assert.ok(argument.accessor.length >= 2, exercise.routeId);
+      } else if (argument.kind === "record") {
+        assert.ok(typeof argument.recordType === "string" && argument.recordType.length > 0, exercise.routeId);
+        for (const field of argument.fields) assertArgument(field.value);
       } else {
         assert.ok(Number.isInteger(argument.ordinal) && argument.ordinal >= 0, exercise.routeId);
       }
-    }
+    };
+    for (const argument of exercise.arguments) assertArgument(argument);
   }
   assert.deepEqual(plan.suppliedContexts, [...SUPPLIED_CONTEXTS]);
   assert.deepEqual(plan.unsuppliedContexts.map((entry) => entry.context), UNSUPPLIED_CONTEXTS.map((entry) => entry.context));

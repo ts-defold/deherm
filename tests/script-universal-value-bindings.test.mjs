@@ -69,9 +69,10 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
   // stack frame from it. Both are generated, so the only thing worth asserting
   // is that they are still the same numbers - a frame narrower than the
   // descriptor would reject calls the descriptor accepts.
-  const declared = [...descriptors.matchAll(/^ {2}\{0x[0-9a-f]{8}u, "([^"]+)", "[^"]*", "[^"]*", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
-    .map(([, id, , maximumArgumentCount, , maximumResultCount, , inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena]) => ({
+  const declared = [...descriptors.matchAll(/^ {2}\{0x[0-9a-f]{8}u, "([^"]+)", "[^"]*", "[^"]*", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
+    .map(([, id, , maximumArgumentCount, , maximumResultCount, , resultSemanticKind, inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena]) => ({
       id,
+      resultSemanticKind: Number(resultSemanticKind),
       maximumArgumentCount: Number(maximumArgumentCount),
       maximumResultCount: Number(maximumResultCount),
       inputTableEntryCapacity: Number(inputTableEntryCapacity),
@@ -81,6 +82,18 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
     }));
   assert.equal(declared.length, report.candidateCount);
   assert.deepEqual(declared.map(({ id }) => id), report.bindings.map(({ id }) => id));
+
+  // A route whose declared result is a rooted borrowed handle captures it into
+  // the same generation-checked registry the handle-lowering table uses, so a
+  // constructor marshalled here still produces a handle that table's consumers
+  // accept. Zero everywhere else.
+  const semanticKinds = new Map(declared.map(({ id, resultSemanticKind }) => [id, resultSemanticKind]));
+  for (const binding of report.bindings) {
+    assert.equal(semanticKinds.get(binding.id) > 0, Boolean(binding.resultSemanticKind), binding.id);
+  }
+  const constructor = report.bindings.find(({ id }) => id === "script:b2d.joint.create_distance");
+  assert.equal(constructor.resultSemanticKind, "box2d-joint");
+  assert.equal(constructor.loweringFamily, "lua-table");
 
   const profiles = [...dispatcher.matchAll(/&runContractFrame<(\d+)u, (\d+)u, (\d+)u, (\d+)u, (true|false), (true|false)>,/g)]
     .map(([, argumentCapacity, resultCapacity, inputEntryCapacity, outputEntryCapacity, matrix4Arena, urlArena]) => ({

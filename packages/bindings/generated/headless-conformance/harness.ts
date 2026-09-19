@@ -16,7 +16,13 @@ export type Provider = (ordinal: number) => unknown;
  */
 export type ArgumentSpec =
   | { readonly kind: "literal"; readonly value: unknown }
-  | { readonly kind: "handle"; readonly handleKind: string; readonly ordinal: number };
+  | { readonly kind: "handle"; readonly handleKind: string; readonly ordinal: number }
+  /**
+   * A value the running engine has to construct - a Defold value or a record
+   * of them. It is a thunk rather than data because the constructor is an
+   * engine call, and it must happen inside the exercise, not at module load.
+   */
+  | { readonly kind: "constructed"; readonly make: () => unknown };
 
 export interface Exercise {
   readonly contract: string;
@@ -91,6 +97,15 @@ function resolveArguments(report: Report, exercise: Exercise): readonly unknown[
   for (const spec of exercise.args) {
     if (spec.kind === "literal") {
       resolved.push(spec.value);
+      continue;
+    }
+    if (spec.kind === "constructed") {
+      try {
+        resolved.push(spec.make());
+      } catch (error) {
+        emit(report, exercise, "handle-provenance", "blocked-value-constructor-raised", detail(error));
+        return null;
+      }
       continue;
     }
     const provider = exercise.providers[spec.handleKind];

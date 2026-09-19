@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { semanticHandleKinds } from "./lib/semantic-handle-kinds.mjs";
+
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
 
@@ -221,6 +223,15 @@ struct HandleKind {
   const char* id;
   const char* representation;
   const char* ownership;
+  /**
+   * Runtime profiles in which this kind is a rooted, generation-checked
+   * identity. A kind whose backend representation differs by profile - Box2D
+   * v2 pushes its world as a light userdata with no identity at all - is
+   * capturable only in the profiles whose selected feature implements it as a
+   * rooted userdata, and the router refuses a capture elsewhere by
+   * declaration instead of by inspecting the Lua value.
+   */
+  uint8_t capturableProfileMask;
 };
 
 struct ValueCodec {
@@ -301,6 +312,8 @@ bool routeAvailableInProfile(const Route& route, const RuntimeProfile& profile) 
 RuntimeProfileDetectionStatus detectRuntimeProfile(lua_State* state, RuntimeProfileDetection* output,
     char* error, size_t errorCapacity) noexcept;
 const Route* find(uint32_t stableId) noexcept;
+/** Whether a semantic handle kind is a rooted identity in this runtime profile. */
+bool handleKindCapturableInProfile(SemanticHandleKind kind, const RuntimeProfile& profile) noexcept;
 
 #if DEHERM_PROFILE_ENABLED
 /** Generated telemetry identity for the lua-stack transport. Declared only when
@@ -327,6 +340,8 @@ class CapturedLuaRouter {
   bool captureInstance(int stackIndex) noexcept;
   void detachInstance() noexcept;
   bool captureHandle(int stackIndex, SemanticHandleKind kind, ScriptValue* output) noexcept;
+  /** Whether this kind is a rooted identity in the profile this router is bound to. */
+  bool capturableKind(SemanticHandleKind kind) const noexcept;
   bool dispatch(ScriptCallFrame* frame, char* error, size_t capacity) noexcept;
   bool queueRelease(const ScriptValue& value) noexcept;
   void drainReleased() noexcept;
@@ -405,7 +420,7 @@ const dispositionCpp = Object.freeze({
 
 function renderSource(report) {
   const kinds = report.handleKinds.map((kind) =>
-    `  {SemanticHandleKind::k${kind.enumName}, ${cppString(kind.id)}, ${cppString(kind.representation)}, ${cppString(kind.ownership)}},`).join("\n");
+    `  {SemanticHandleKind::k${kind.enumName}, ${cppString(kind.id)}, ${cppString(kind.representation)}, ${cppString(kind.ownership)}, ${kind.capturableProfileMask}},`).join("\n");
   const arguments_ = report.argumentCodecs.map((codec) =>
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
   const results = report.resultCodecs.map((codec) =>
@@ -641,6 +656,12 @@ RuntimeProfileDetectionStatus detectRuntimeProfile(lua_State* state, RuntimeProf
   return output->status;
 }
 
+bool handleKindCapturableInProfile(SemanticHandleKind kind, const RuntimeProfile& profile) noexcept {
+  const auto index = static_cast<uint16_t>(kind);
+  if (index == 0 || index > kHandleKindCount) return false;
+  return (kKinds[index - 1].capturableProfileMask & profile.mask) != 0;
+}
+
 const Route* find(uint32_t stableId) noexcept {
   size_t first = 0, count = kRouteCount;
   while (count) { const size_t step = count / 2, position = first + step; const Route& route = kRoutes[kStableOrder[position]];
@@ -751,6 +772,10 @@ void CapturedLuaRouter::detachInstance() noexcept {
   instanceRef_ = LUA_NOREF;
 }
 
+bool CapturedLuaRouter::capturableKind(SemanticHandleKind kind) const noexcept {
+  return activeProfile_ != nullptr && handleKindCapturableInProfile(kind, *activeProfile_);
+}
+
 bool CapturedLuaRouter::captureHandle(int stackIndex, SemanticHandleKind kind, ScriptValue* output) noexcept {
   if (!state_ || !registry_ || !output || kind == SemanticHandleKind::kNone ||
       captureHandleTrampolineRef_ == LUA_NOREF || captureHandleTrampolineRef_ == LUA_REFNIL) return false;
@@ -832,6 +857,15 @@ bool CapturedLuaRouter::read(int index, const ValueCodec& codec, ScriptValue* ou
   *output = {};
   if (lua_isnil(state_, index) && (codec.mask & kNil)) { output->tag = ScriptValueTag::kNull; return true; }
   if (codec.semanticKind != SemanticHandleKind::kNone) {
+    // Representation is a property of the backend, not of the kind: Box2D v2
+    // pushes its world as a light userdata with no identity at all, while v3
+    // pushes a rooted one. The classification states that per feature and the
+    // generated table carries it per runtime profile, so the refusal is a
+    // declaration rather than a discovery about the value on the stack.
+    if (activeProfile_ && !handleKindCapturableInProfile(codec.semanticKind, *activeProfile_)) {
+      fail(error, capacity, "semantic handle kind is not a rooted identity in the active runtime profile");
+      return false;
+    }
     // lua_isuserdata is true for a light userdata, which carries no
     // metatable and therefore no rooted identity the semantic-handle registry
     // can generation-check. Refuse it by name so the failure is attributable
@@ -985,10 +1019,8 @@ export function generateScriptHandleLowering(textInputs) {
     throw new Error(`algebraic handle route census drifted: expected ${policy.selection.expectedRouteCount}, got ${selected.length}`);
   }
 
-  const handleKinds = classification.handleKinds
-    .filter(({ representation }) => representation !== "declaration-only-token")
-    .sort((left, right) => compareCodeUnits(left.id, right.id))
-    .map((kind, index) => ({ ...kind, numericId: index + 1, enumName: pascal(kind.id) }));
+  const handleKinds = semanticHandleKinds(classification)
+    .map((kind) => ({ ...kind, enumName: pascal(kind.id) }));
   const kindById = Object.fromEntries(handleKinds.map((kind) => [kind.id, kind]));
   const rawTypeToKind = new Map();
   for (const kind of handleKinds) for (const rawType of kind.rawTypes) {
@@ -1026,6 +1058,30 @@ export function generateScriptHandleLowering(textInputs) {
     id,
     new Set((profile.availableRoutes ?? []).map(({ id: routeId }) => routeId))
   ]));
+
+  // Which runtime profiles root a handle kind as a generation-checked
+  // identity. A kind whose representation is the same in every backend is
+  // capturable everywhere; one the classification scopes per feature -
+  // `box2d-world`, which Box2D v2 pushes as a light userdata - is capturable
+  // only in the profiles that select a feature implementing it as a rooted
+  // userdata. Without this the router discovers the difference at the Lua
+  // stack, and can only describe it as the shape of the value it found.
+  for (const kind of handleKinds) {
+    if (!kind.representationIsFeatureScoped) {
+      kind.capturableProfiles = runtimeProfiles.map(({ id }) => id);
+      kind.capturableProfileMask = runtimeProfiles.reduce((mask, { mask: bit }) => mask | bit, 0);
+      continue;
+    }
+    const capturable = new Set(kind.capturableFeatures ?? []);
+    const uncapturable = new Set(kind.uncapturableFeatures ?? []);
+    const profiles = runtimeProfiles.filter(({ id }) => {
+      const features = availability.profiles[id]?.features ?? [];
+      return features.some((feature) => capturable.has(feature)) &&
+        !features.some((feature) => uncapturable.has(feature));
+    });
+    kind.capturableProfiles = profiles.map(({ id }) => id);
+    kind.capturableProfileMask = profiles.reduce((mask, { mask: bit }) => mask | bit, 0);
+  }
 
   const argumentCodecs = [];
   const resultCodecs = [];
