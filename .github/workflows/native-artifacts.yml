@@ -87,6 +87,16 @@ on:
 permissions:
   contents: write
 
+# Serialize. Runs with identical inputs compute the SAME tag, so concurrent runs
+# race each other creating that release and clobbering each other's assets -
+# which has already cost this repository a release that ended up holding two
+# assets of fifteen. Queue rather than cancel: these lanes take tens of minutes
+# and a cancelled run can leave a release half-populated, which the plan job's
+# completeness check would then have to repair on the next push.
+concurrency:
+  group: native-artifacts
+  cancel-in-progress: false
+
 jobs:
   # One place decides what this run is called and whether it has anything to do.
   # `fingerprint` hashes the inputs that determine each artifact family, so two
