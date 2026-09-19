@@ -51,6 +51,11 @@ FROM ubuntu:24.04 AS build
 ARG ANDROID_ABI
 ARG ANDROID_API
 ARG NDK_VERSION
+# ICU and Hermes are both memory-heavy C++ builds. GitHub exposes the runner's
+# CPU count inside the container, but `-j$(nproc)` can exceed its memory and
+# turn a deterministic build into an NDK clang segfault/OOM. ABI rows already
+# run in parallel at the workflow level; cap concurrency inside each row.
+ARG BUILD_JOBS=2
 # Digests for android-ndk-r25b-linux.zip, pinned so the container is
 # reproducible and the download is verified rather than trusted.
 #
@@ -195,7 +200,7 @@ RUN mkdir -p /work/icu/host && cd /work/icu/host && \
     /src/icu/source/configure \
       --disable-shared --enable-static \
       --disable-tests --disable-samples --disable-extras --disable-layoutex && \
-    make -j"$(nproc)"
+    make -j"${BUILD_JOBS}"
 
 # The CLDR data sources, published as a separate asset in the same ICU release
 # and listed in the same SHASUM512.txt.
@@ -243,7 +248,7 @@ RUN cmake -S /src/hermes -B /work/host -G Ninja \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
       -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_INTL=OFF && \
-    cmake --build /work/host --target hermesc shermes --parallel
+    cmake --build /work/host --target hermesc shermes --parallel "${BUILD_JOBS}"
 
 # The ICU configuration macros below are part of the ABI of the ICU headers, so
 # they are set once and applied to BOTH the ICU build and the Hermes build that
@@ -295,7 +300,7 @@ RUN set -eu; \
       --with-data-packaging=static \
       --disable-shared --enable-static \
       --disable-tools --disable-tests --disable-samples --disable-extras --disable-layoutex && \
-    make -j"$(nproc)" && make install && \
+    make -j"${BUILD_JOBS}" && make install && \
     echo "--- ICU static libraries for ${ANDROID_ABI} ---" && \
     ls -l "${ICU_PREFIX}/lib"/libicu*.a
 
@@ -384,7 +389,7 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DHERMES_ENABLE_DEBUGGER=OFF \
       -DHERMES_ENABLE_INTL=OFF \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
-    cmake --build /work/build --target hermesvm_a jsi --parallel
+    cmake --build /work/build --target hermesvm_a jsi --parallel "${BUILD_JOBS}"
 
 # The development library: a SECOND compilation with the debugger, which also
 # turns on HERMES_MEMORY_INSTRUMENTATION (chained at the pinned tree's
@@ -412,7 +417,7 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
       -DHERMES_ENABLE_DEBUGGER=ON \
       -DHERMES_ENABLE_INTL=OFF \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
-    cmake --build /work/build-debug --target hermesvm_a jsi --parallel
+    cmake --build /work/build-debug --target hermesvm_a jsi --parallel "${BUILD_JOBS}"
 
 # Merging ICU and fbjni in is what makes the archive self-contained. Extender
 # force-loads extension archives, so anything left undefined here becomes an

@@ -81,6 +81,11 @@ on:
       - packages/compiler/ttsc/**
       - packages/toolchains/defold-bundle-targets.json
       - packages/toolchains/host-compilers.json
+      - scripts/lib/artifact-releases.mjs
+      - scripts/manage-native-artifacts.mjs
+      - scripts/manage-host-compilers.mjs
+      - scripts/plan-native-artifact-builds.mjs
+      - scripts/ci/upload-release-asset.sh
       - scripts/package-defold-extension.sh
       - .github/workflows/native-artifacts.yml
 
@@ -117,9 +122,18 @@ jobs:
       target_title: ${{ steps.compute.outputs.target_title }}
       hermes_host_title: ${{ steps.compute.outputs.hermes_host_title }}
       dehermc_title: ${{ steps.compute.outputs.dehermc_title }}
-      target_exists: ${{ steps.compute.outputs.target_exists }}
-      hermes_host_exists: ${{ steps.compute.outputs.hermes_host_exists }}
-      dehermc_exists: ${{ steps.compute.outputs.dehermc_exists }}
+      linux_matrix: ${{ steps.compute.outputs.linux_matrix }}
+      windows_matrix: ${{ steps.compute.outputs.windows_matrix }}
+      android_matrix: ${{ steps.compute.outputs.android_matrix }}
+      apple_matrix: ${{ steps.compute.outputs.apple_matrix }}
+      hermes_host_matrix: ${{ steps.compute.outputs.hermes_host_matrix }}
+      dehermc_matrix: ${{ steps.compute.outputs.dehermc_matrix }}
+      linux_any: ${{ steps.compute.outputs.linux_any }}
+      windows_any: ${{ steps.compute.outputs.windows_any }}
+      android_any: ${{ steps.compute.outputs.android_any }}
+      apple_any: ${{ steps.compute.outputs.apple_any }}
+      hermes_host_any: ${{ steps.compute.outputs.hermes_host_any }}
+      dehermc_any: ${{ steps.compute.outputs.dehermc_any }}
       android_ndk_version: ${{ steps.sdk.outputs.android_ndk_version }}
       android_ndk_api: ${{ steps.sdk.outputs.android_ndk_api }}
       android_64_ndk_api: ${{ steps.sdk.outputs.android_64_ndk_api }}
@@ -162,50 +176,28 @@ jobs:
           target_tag="$(emit target node scripts/manage-native-artifacts.mjs release-metadata)"
           hermes_host_tag="$(emit hermes_host node scripts/manage-host-compilers.mjs release-metadata hermes-host)"
           dehermc_tag="$(emit dehermc node scripts/manage-host-compilers.mjs release-metadata dehermc)"
-          # A COMPLETE release means these exact inputs have already been built,
-          # and rebuilding would produce the same bytes at best while churning
-          # the digests users pinned at worst.
-          #
-          # Completeness is decided on the assets, never on the tag. An early
-          # run created both releases up front and then failed every build lane,
-          # leaving one release empty and the other holding two assets of
-          # fifteen - and an existence check treated both as finished forever,
-          # reporting success for a workflow that had built nothing. Releases
-          # are now created by the first successful upload, so an empty one
-          # cannot exist, but the asset check still guards a partial run.
-          complete() {
-            local tag="$1" expected="$2"
-            gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1 || return 1
-            local present
-            present="$(gh release view "$tag" --repo "${{ github.repository }}" \
-              --json assets --jq '.assets[].name' | sort)"
-            local missing
-            missing="$(comm -23 <(printf '%s\n' "$expected" | sort) <(printf '%s\n' "$present"))"
-            if [ -n "$missing" ]; then
-              echo "release $tag is incomplete; missing:" >&2
-              printf '  %s\n' $missing >&2
-              return 1
+          # Fingerprints identify releases; asset names identify rows inside a
+          # release. A retry after one failed row must build that row only, not
+          # clobber the fourteen assets that already proved successful.
+          mkdir -p build/ci-present-assets
+          present() {
+            local tag="$1" destination="$2"
+            if gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+              gh release view "$tag" --repo "${{ github.repository }}" \
+                --json assets --jq '.assets[].name' | sort -u > "$destination"
+            else
+              : > "$destination"
             fi
           }
+          present "$target_tag" build/ci-present-assets/native-artifacts.txt
+          present "$hermes_host_tag" build/ci-present-assets/hermes-host.txt
+          present "$dehermc_tag" build/ci-present-assets/dehermc.txt
 
-          if complete "$target_tag" "$(node scripts/manage-native-artifacts.mjs expected-assets)"; then
-            echo "target_exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "target_exists=false" >> "$GITHUB_OUTPUT"
-          fi
-          # Per family, not per host: the ten Hermes compilers and the five
-          # dehermc binaries live in different releases now, and one being
-          # complete says nothing about the other.
-          if complete "$hermes_host_tag" "$(node scripts/manage-host-compilers.mjs expected-assets hermes-host)"; then
-            echo "hermes_host_exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "hermes_host_exists=false" >> "$GITHUB_OUTPUT"
-          fi
-          if complete "$dehermc_tag" "$(node scripts/manage-host-compilers.mjs expected-assets dehermc)"; then
-            echo "dehermc_exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "dehermc_exists=false" >> "$GITHUB_OUTPUT"
-          fi
+          node scripts/plan-native-artifact-builds.mjs \
+            --present native-artifacts=build/ci-present-assets/native-artifacts.txt \
+            --present hermes-host=build/ci-present-assets/hermes-host.txt \
+            --present dehermc=build/ci-present-assets/dehermc.txt \
+            --github-output "$GITHUB_OUTPUT"
       # The SDK levels every cross build has to match are the engine's own,
       # derived from upstream/defold/build_tools/sdk.py. Reading them here keeps
       # the container and Xcode invocations from carrying a second, drifting
@@ -235,12 +227,11 @@ jobs:
 
   go-compiler:
     needs: plan
-    if: needs.plan.outputs.dehermc_exists != 'true'
+    if: needs.plan.outputs.dehermc_any == 'true'
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
-      matrix:
-        host: [darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64]
+      matrix: ${{ fromJSON(needs.plan.outputs.dehermc_matrix) }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -275,32 +266,32 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.dehermc_tag }}" "${{ github.repository }}" \
-            "build/artifacts/dehermc-${{ matrix.host }}.tar.gz" "dehermc-${{ matrix.host }}.tar.gz"
+            "build/artifacts/dehermc-${{ matrix.host }}.tar.gz" "${{ matrix.asset }}"
 
   # ── Target libraries: one libhermes.a per Defold bundle target ──────────────
 
   linux:
     needs: plan
-    if: needs.plan.outputs.target_exists != 'true'
+    if: needs.plan.outputs.linux_any == 'true'
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - runner: ubuntu-24.04
-            docker_platform: linux/amd64
-            defold_platform: x86_64-linux
-          - runner: ubuntu-24.04-arm
-            docker_platform: linux/arm64
-            defold_platform: arm64-linux
+      matrix: ${{ fromJSON(needs.plan.outputs.linux_matrix) }}
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: docker/setup-buildx-action@v3
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
       - run: bash scripts/bootstrap-upstreams.sh hermes
-      - run: docker buildx build --platform ${{ matrix.docker_platform }} --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} -f toolchains/hermes/Dockerfile.linux .
+      - run: |
+          docker buildx build \
+            --platform ${{ matrix.docker_platform }} \
+            --cache-from type=gha,scope=hermes-${{ matrix.target }} \
+            --cache-to type=gha,mode=max,scope=hermes-${{ matrix.target }} \
+            --output type=local,dest=build/artifacts/${{ matrix.target }} \
+            -f toolchains/hermes/Dockerfile.linux .
       # The container emits `hermes.tar.gz`, already reproducible, already
       # holding both the release and debugger-enabled libraries. The upload
       # names it for the target; renaming a file does not change its bytes.
@@ -311,7 +302,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz" "hermes-${{ matrix.defold_platform }}.tar.gz"
+            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
 
   # ── Windows: Defold's own toolchain when we can reach it ────────────────────
   #
@@ -327,11 +318,14 @@ jobs:
   # rather than no artifact. Exactly one of the two ever runs.
   windows:
     needs: plan
-    if: needs.plan.outputs.target_exists != 'true' && needs.plan.outputs.registry_credential == 'true'
+    if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential == 'true'
     runs-on: ubuntu-24.04
+    strategy:
+      matrix: ${{ fromJSON(needs.plan.outputs.windows_matrix) }}
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: docker/setup-buildx-action@v3
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
@@ -344,7 +338,13 @@ jobs:
       # real Google identity that can mint a token.
       - uses: google-github-actions/setup-gcloud@v3
       - run: gcloud auth configure-docker europe-west1-docker.pkg.dev --quiet
-      - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
+      - run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --cache-from type=gha,scope=hermes-${{ matrix.target }} \
+            --cache-to type=gha,mode=max,scope=hermes-${{ matrix.target }} \
+            --output type=local,dest=build/artifacts/${{ matrix.target }} \
+            -f toolchains/hermes/Dockerfile.win32 .
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
@@ -352,15 +352,17 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/x86_64-win32/hermes.tar.gz" "hermes-x86_64-win32.tar.gz"
+            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
 
   # The fallback when no registry credential is configured. build-windows.sh
   # records why this artifact makes a weaker provenance claim than every other
   # lane's.
   windows-native:
     needs: plan
-    if: needs.plan.outputs.target_exists != 'true' && needs.plan.outputs.registry_credential != 'true'
+    if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential != 'true'
     runs-on: windows-2022
+    strategy:
+      matrix: ${{ fromJSON(needs.plan.outputs.windows_matrix) }}
     defaults:
       run:
         shell: bash
@@ -397,7 +399,7 @@ jobs:
           bash toolchains/hermes/build-windows.sh \
             "$PWD/upstream/hermes" \
             "$PWD/build/win32" \
-            "$PWD/build/artifacts/x86_64-win32/hermes.tar.gz"
+            "$PWD/build/artifacts/${{ matrix.target }}/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
@@ -405,28 +407,19 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/x86_64-win32/hermes.tar.gz" "hermes-x86_64-win32.tar.gz"
+            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
 
   android:
     needs: plan
-    if: needs.plan.outputs.target_exists != 'true'
+    if: needs.plan.outputs.android_any == 'true'
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - defold_platform: armv7-android
-            abi: armeabi-v7a
-            api_kind: android_ndk_api
-          - defold_platform: arm64-android
-            abi: arm64-v8a
-            api_kind: android_64_ndk_api
-          - defold_platform: x86_64-android
-            abi: x86_64
-            api_kind: android_64_ndk_api
+      matrix: ${{ fromJSON(needs.plan.outputs.android_matrix) }}
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
+      - uses: docker/setup-buildx-action@v3
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
@@ -437,7 +430,9 @@ jobs:
             --build-arg ANDROID_ABI=${{ matrix.abi }} \
             --build-arg ANDROID_API=${{ needs.plan.outputs[matrix.api_kind] }} \
             --build-arg NDK_VERSION=${{ needs.plan.outputs.android_ndk_version }} \
-            --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} \
+            --cache-from type=gha,scope=hermes-${{ matrix.target }} \
+            --cache-to type=gha,mode=max,scope=hermes-${{ matrix.target }} \
+            --output type=local,dest=build/artifacts/${{ matrix.target }} \
             -f toolchains/hermes/Dockerfile.android .
       - env:
           GH_TOKEN: ${{ github.token }}
@@ -446,19 +441,18 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz" "hermes-${{ matrix.defold_platform }}.tar.gz"
+            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
 
   # macOS x64, iOS and the iOS simulator need the Apple SDKs, so there is no
   # container path for them. One macOS runner builds all four Apple targets and
   # reuses a single host-compiler build across them.
   apple:
     needs: plan
-    if: needs.plan.outputs.target_exists != 'true'
+    if: needs.plan.outputs.apple_any == 'true'
     runs-on: macos-15
     strategy:
       fail-fast: false
-      matrix:
-        defold_platform: [arm64-osx, x86_64-osx, arm64-ios, arm64_sim-ios]
+      matrix: ${{ fromJSON(needs.plan.outputs.apple_matrix) }}
     env:
       DEFOLD_MACOSX_VERSION_MIN: ${{ needs.plan.outputs.macosx_version_min }}
       DEFOLD_IPHONEOS_VERSION_MIN: ${{ needs.plan.outputs.iphoneos_version_min }}
@@ -472,10 +466,10 @@ jobs:
       - run: brew install ninja cmake
       - run: |
           bash toolchains/hermes/build-apple.sh \
-            ${{ matrix.defold_platform }} \
+            ${{ matrix.target }} \
             "$PWD/upstream/hermes" \
-            "$PWD/build/hermes/${{ matrix.defold_platform }}" \
-            "$PWD/build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz"
+            "$PWD/build/hermes/${{ matrix.target }}" \
+            "$PWD/build/artifacts/${{ matrix.target }}/hermes.tar.gz"
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.target_title }}
@@ -483,7 +477,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
-            "build/artifacts/${{ matrix.defold_platform }}/hermes.tar.gz" "hermes-${{ matrix.defold_platform }}.tar.gz"
+            "build/artifacts/${{ matrix.target }}/hermes.tar.gz" "${{ matrix.asset }}"
 
   # ── Host compilers: hermesc and shermes, one pair per user host ─────────────
   #
@@ -492,23 +486,11 @@ jobs:
   # point.
   host-compilers:
     needs: plan
-    if: needs.plan.outputs.hermes_host_exists != 'true'
+    if: needs.plan.outputs.hermes_host_any == 'true'
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          # ubuntu-22.04 rather than 24.04 sets the shipped glibc floor at 2.35,
-          # so the published compilers run on hosts older than the runner.
-          - runner: ubuntu-22.04
-            host: linux-x64
-          - runner: ubuntu-22.04-arm
-            host: linux-arm64
-          - runner: macos-15
-            host: darwin-arm64
-          - runner: macos-15-intel
-            host: darwin-x64
-          - runner: windows-2022
-            host: win32-x64
+      # ubuntu-22.04 rather than 24.04 sets the shipped glibc floor at 2.35.
+      matrix: ${{ fromJSON(needs.plan.outputs.hermes_host_matrix) }}
     runs-on: ${{ matrix.runner }}
     defaults:
       run:
@@ -548,7 +530,7 @@ jobs:
         run: |
           bash scripts/ci/upload-release-asset.sh \
             "${{ needs.plan.outputs.hermes_host_tag }}" "${{ github.repository }}" \
-            "build/artifacts/hermes-host-${{ matrix.host }}.tar.gz" "hermes-host-${{ matrix.host }}.tar.gz"
+            "build/artifacts/hermes-host-${{ matrix.host }}.tar.gz" "${{ matrix.asset }}"
 
   # A run that published nothing verifiable is a run that taught us nothing.
   # This reports what each release now carries, so the gap between the matrix

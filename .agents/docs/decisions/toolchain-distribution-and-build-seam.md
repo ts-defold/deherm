@@ -437,6 +437,25 @@ reads the derived SDK pins once and feeds them to the cross builds. The `plan`
 job computes all three tags and decides each family's skip independently, on the
 assets that release actually holds rather than on the tag's existence.
 
+The skip is **per asset**, not merely per complete release.
+`scripts/plan-native-artifact-builds.mjs` maps every publishable asset to exactly
+one executor row and subtracts the names already present under that family's
+fingerprinted tag. A partial retry therefore schedules only the missing rows;
+tests exercise empty, complete and one-row-missing releases and reject an asset
+that appears in two lanes. The upload boundary repeats the existence check and
+never uses `--clobber`, so a manual dispatch or an external publisher that wins
+after planning cannot overwrite immutable bytes.
+
+Workflow-level concurrency remains one queued `native-artifacts` group with
+`cancel-in-progress: false`. This is intentionally broader than a branch: two
+branches can compute the same content-addressed tag, so branch-scoped locks
+would still race. Queueing lets the later run observe the first run's published
+rows and collapse to a no-op instead of cancelling a long build halfway through
+a release. Docker target lanes additionally use BuildKit's GitHub Actions cache
+scoped by bundle target. The cache is only a compile accelerator: BuildKit
+validates its content graph, and the release identity remains the declared
+family fingerprint plus asset name.
+
 | Lane | Runner | Produces |
 | --- | --- | --- |
 | `linux` | `ubuntu-24.04`, `ubuntu-24.04-arm` | `x86_64-linux`, `arm64-linux` via `Dockerfile.linux` |
@@ -473,41 +492,23 @@ rule producing `bin/hermesc` at all and died at ninja graph load on
 `external/node-api-tests` and `external/node-api-cts`; `HERMES_ENABLE_NAPI=OFF`
 already removes both, so the reason was gone and only the workaround remained.
 
-## The Android lane is blocked on unicode, not on a flag
+## The Android lane uses pinned static ICU
 
-The three Android targets do not build. `-DHERMES_IS_ANDROID=ON` reaches
-`find_package(fbjni REQUIRED CONFIG)` at the pinned tree's
-`CMakeLists.txt:777`, but removing the flag only moves the failure, because
-`include/hermes/Platform/Unicode/PlatformUnicode.h` selects the unicode backend
-from `__ANDROID__` - a **preprocessor** macro the NDK toolchain defines - and
-not from that CMake option. The NDK build therefore compiles
-`PlatformUnicodeJava.cpp`, whose first include is `<fbjni/fbjni.h>`.
+The earlier Java-unicode route was not viable for Defold: the pinned NDK carries
+no fbjni and exposes shared ICU only at API 31+, while Defold targets API 19/21.
+`Dockerfile.android` now builds digest-pinned ICU 73.2 and a pinned, trimmed
+fbjni archive per ABI, selects Hermes' ICU backend, and merges both dependencies
+into each release/debug `libhermes.a`. The complete rationale, data filter,
+source pins and symbol assertions live in
+[Android ICU and fbjni](android-icu-and-fbjni.md).
 
-What the NDK actually offers, read out of the central directory of the pinned
-`android-ndk-r25b-linux.zip`:
-
-* **No fbjni.** No archive entry matches `fbjni`. The Java backend would also
-  need `com/facebook/hermes/unicode/AndroidUnicodeUtils` on the APK classpath
-  and fbjni initialised with the process's JavaVM; React Native ships both in
-  its Hermes AAR, and a Defold APK carries neither.
-* **ICU headers at every level, `libicu.so` only at API 31+.** The sysroot
-  carries `usr/include/unicode/*.h` unconditionally, and `libicu.so` only under
-  `.../31/`, `.../32/` and `.../33/`. The pinned engine builds Android at API 19
-  (armv7) and 21 (64-bit), so there is nothing to link at Defold's floor - and
-  even at 31 it is a **shared** library the engine would then have to satisfy.
-
-`HERMES_UNICODE_LITE` is not an option: `PlatformUnicodeLite.cpp` has empty
-`convertToCase` and `normalize` bodies and a `dateFormat` returning the literal
-string `"dateFormat not implemented"`. `String.cpp:985` has an ASCII fast path,
-so this is not a harmless stub - it silently breaks `toUpperCase`/`toLowerCase`
-for every non-ASCII string.
-
-What remains is a statically linked ICU built for Android inside
-`Dockerfile.android` and merged into the archive. That satisfies the
-no-shared-dependency constraint, and it introduces a new pinned upstream with
-real size consequences (ICU data), so it is a decision to take here rather than
-a CI fix to slip in. Until it is taken, the lane fails at the named `find_package`
-and `Dockerfile.android` records why.
+The first CI attempt still failed in all three Android rows and GitHub exposed
+only the failing Docker step without an authenticated log download. A local
+arm64 reproduction is therefore the current diagnostic authority. Until that
+build completes, Extender links the result, and an APK survives host-object GC,
+Android remains **emitted but runtime-unverified**. In particular, source-level
+configuration of the empty Hermes finalizer runner closes the known fbjni
+`JavaVM` abort but is not device execution evidence.
 
 `wasm_pthread-web` is the one `blocked` target. The web lane runs scripts on the
 browser's own engine through the Emscripten glue, and every recorded observation
@@ -532,8 +533,8 @@ not declare. `--json` emits the same report as data.
   Defold platform, including mobile) are sized independently and neither implies
   the other.
 * A Defold repin rebuilds nothing. A Hermes repin rebuilds the Hermes families
-  and leaves `dehermc` alone. Each family's release is skipped on its own
-  assets.
+  and leaves `dehermc` alone. Each published asset is skipped independently
+  inside its family's release, so a partial retry rebuilds only failed rows.
 * A user who resolved a Defold revision through the policy index is told which
   tags and which asset names go with it - see *The entry also answers "what do I
   download?"* in the layered API policy cache decision.

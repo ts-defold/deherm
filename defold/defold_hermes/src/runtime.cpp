@@ -37,12 +37,29 @@ std::string asString(jsi::Runtime& runtime, const jsi::Value& value) {
   return value.toString(runtime).utf8(runtime);
 }
 
+std::unique_ptr<jsi::Runtime> makeRuntime() {
+#if defined(DM_PLATFORM_ANDROID)
+  // Hermes' Android default wraps its finalizer worker in fbjni::ThreadScope.
+  // React Native initializes fbjni from JNI_OnLoad; Defold owns the process
+  // entry point and does not. An explicitly empty runner suppresses that
+  // platform default while preserving Hermes' own serial finalizer worker.
+  // It must be ThreadRunner{}: passing bare {} means std::nullopt and selects
+  // the crashing JNI default again.
+  return facebook::hermes::makeHermesRuntime(
+      ::hermes::vm::RuntimeConfig::Builder()
+          .withFinalizerThreadRunner(::hermes::vm::ThreadRunner{})
+          .build());
+#else
+  return facebook::hermes::makeHermesRuntime();
+#endif
+}
+
 }  // namespace
 
 class Runtime::Impl {
  public:
   explicit Impl(Host& host)
-      : host_(host), runtime_(facebook::hermes::makeHermesRuntime()), identity_(acquireRuntimeId()) {
+      : host_(host), runtime_(makeRuntime()), identity_(acquireRuntimeId()) {
     callbacks_ = std::make_unique<CallbackRegistry>(
         *runtime_, 4096, identity_);
     installHost();

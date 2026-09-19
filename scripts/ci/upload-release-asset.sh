@@ -90,8 +90,30 @@ if ! ensure_release; then
   exit 1
 fi
 
+# The plan normally filters this row out before a runner is allocated. Check
+# again at the mutation boundary: a manually dispatched run or an external
+# publisher may have filled the row after planning, and immutable
+# content-addressed assets must never be overwritten in either case.
+asset_exists() {
+  gh release view "$tag" --repo "$repo" --json assets \
+    --jq ".assets[] | select(.name == \"$asset_name\") | .name" 2>/dev/null \
+    | grep -Fxq "$asset_name"
+}
+
+if asset_exists; then
+  echo "$tag already carries $asset_name; fingerprinted row is current, skipping upload"
+  exit 0
+fi
+
 for attempt in $(seq 1 "$attempts"); do
-  if gh release upload "$tag" "$staged" --repo "$repo" --clobber; then
+  if gh release upload "$tag" "$staged" --repo "$repo"; then
+    exit 0
+  fi
+
+  # If another publisher won the exact-name race, its immutable asset is now
+  # authoritative. Do not delete and replace it with --clobber.
+  if asset_exists; then
+    echo "$tag acquired $asset_name while this upload was in flight; keeping the published asset"
     exit 0
   fi
 

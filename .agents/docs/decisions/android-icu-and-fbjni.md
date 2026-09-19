@@ -130,7 +130,7 @@ definition of `lyra::detail::getExceptionTraceHolder`, which
 built. The image asserts the property that actually matters instead of the
 file list: the archive must define neither `JNI_OnLoad` nor `__cxa_throw`.
 
-# The latent runtime fatal this leaves open
+# The Android finalizer-thread integration
 
 `ThreadScope`'s constructor throws when fbjni has never been given a `JavaVM`
 (`fbjni/cxx/fbjni/detail/Environment.cpp:266`):
@@ -175,12 +175,21 @@ thread unwrapped, and it has to be spelled
 `withFinalizerThreadRunner(ThreadRunner{})`, because a bare `{}` is `nullopt`
 and selects the platform default again.
 
-This decision does **not** apply that fix: the runtime construction site is
-outside this change. It is recorded here as an open, understood risk with a
-known one-line remedy, and it must be closed before any Android packaged-engine
-run is treated as evidence. Nothing about the Android archive itself is wrong -
-the archive has to carry `ThreadScope` either way, because `hermes.cpp`
-references it unconditionally.
+`defold/defold_hermes/src/runtime.cpp` now applies that exact configuration on
+`DM_PLATFORM_ANDROID`: its `makeRuntime()` builds a `RuntimeConfig` with
+`withFinalizerThreadRunner(::hermes::vm::ThreadRunner{})`. Other platforms keep
+Hermes' default configuration. A source-level regression test rejects both a
+missing Android branch and the deceptively different bare `{}` spelling.
+
+This closes the deterministic configuration defect, but it is **not packaged
+Android runtime evidence**. The Android archive still has to build in CI, link
+through Extender into an APK, and survive a host-function/host-object GC on a
+device or emulator before that runtime lane is marked verified. Until then the
+policy/report must describe Android as emitted but runtime-unverified rather
+than silently treating the source fix as execution evidence. Nothing about the
+archive carrying `ThreadScope` changes: `hermes.cpp` references it
+unconditionally even when the configured empty runner makes it unreachable at
+runtime.
 
 # The ICU data filter
 
@@ -242,6 +251,18 @@ Two consequences are behavioural and are accepted rather than hidden:
 
 `Intl` - the API where per-locale formatting is actually specified - is OFF on
 every target, so neither changes a behaviour this project claims to provide.
+
+# Build concurrency
+
+The three ABI rows are independent and run concurrently in CI. Inside a row,
+ICU and Hermes default to `BUILD_JOBS=2` instead of inheriting every visible CPU
+from `nproc`: both are memory-heavy C++ graphs, and unbounded parallelism made
+an NDK clang process segfault during the locally reproduced ICU compile while
+the hosted runs ended only with Docker exit 1. Two workers keep peak memory
+bounded without serialising the ABI matrix. The value is a Docker build
+argument for controlled experiments, and the Dockerfile that declares its
+default is part of the native-artifact fingerprint, so changing it cannot reuse
+an old release identity.
 
 # Size cost
 

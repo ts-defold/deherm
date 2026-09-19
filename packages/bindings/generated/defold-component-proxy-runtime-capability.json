@@ -101,7 +101,7 @@
     },
     "runtimeSource": {
       "path": "defold/defold_hermes/src/runtime.cpp",
-      "sha256": "3137d27383f2d695f62358ef75e1da0c58c18cc460eaf597697e8a5abf4ca70c"
+      "sha256": "e9da8da3a693235242064bebaaaee115110c3d6e11290ebf53c8958a2e28f44d"
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
