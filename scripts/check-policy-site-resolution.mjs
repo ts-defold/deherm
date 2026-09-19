@@ -58,12 +58,24 @@ function serve(directory) {
       response.writeHead(404).end();
     }
   });
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    // A restricted host may deny loopback sockets. Surface that as the real
+    // error instead of leaving the promise unsettled (which Node reports only
+    // as exit code 13 and hides the cause).
+    server.once("error", reject);
     server.listen(0, "127.0.0.1", () => resolve({
       server,
       tampered,
       origin: `http://127.0.0.1:${server.address().port}`,
-      close: () => new Promise((done) => server.close(done))
+      close: () => new Promise((done, reject) => {
+        // Node's fetch implementation keeps loopback HTTP/1.1 connections
+        // alive. `server.close()` waits for those sockets and left this check
+        // suspended until Node exited with code 13 for an unsettled top-level
+        // await. Stop accepting requests, then explicitly retire the idle
+        // consumer connections the check itself created.
+        server.close((error) => error ? reject(error) : done());
+        server.closeIdleConnections();
+      })
     }));
   });
 }

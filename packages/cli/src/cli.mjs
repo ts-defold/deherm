@@ -17,6 +17,7 @@ Commands:
   (no command) Launch the interactive project/dev TUI
   create       Scaffold a Defold + TypeScript project and generate its SDK
   doctor       Report host compilers, per-target Hermes archives, the project, and its extension APIs
+  policy       Fetch, authenticate, and cache the Pages policy for the project's Defold revision
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
   materialize-dmsdk  Emit deterministic native provider C++ from a dmSDK usage document
@@ -473,6 +474,41 @@ export async function run(argv = process.argv.slice(2)) {
     return 0;
   }
   if (options.command === "doctor") return await runDoctor(options);
+  if (options.command === "policy") {
+    const { assertResolvedDefoldRevision, resolveDefoldRevision } = await import("./defold-revision.mjs");
+    const { resolvePublishedPolicy } = await import("./policy-client.mjs");
+    const packageRoot = path.resolve(import.meta.dirname, "../../..");
+    const projectRoot = options.project
+      ? await findProjectRoot(process.cwd(), options.project)
+      : await findProjectRoot(process.cwd()).catch(() => null);
+    const resolution = await resolveDefoldRevision({
+      projectRoot: projectRoot ?? process.cwd(),
+      explicit: options.defoldSdk,
+      bob: options.bob
+    });
+    const revision = assertResolvedDefoldRevision(resolution);
+    const index = JSON.parse(await readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-policy-index.json"), "utf8"));
+    const result = await resolvePublishedPolicy(revision, { index });
+    const summary = {
+      schemaVersion: 1,
+      defoldRevision: result.revision,
+      policyRoot: result.entry.policyRoot,
+      generator: result.entry.generator,
+      namespaces: Object.keys(result.policy.subtrees).filter((name) => !name.startsWith("@")).length,
+      objects: result.objects.size,
+      written: result.written,
+      cacheRoot: result.cacheRoot,
+      source: result.source,
+      revisionSource: resolution.source
+    };
+    if (options.json) console.log(JSON.stringify(summary, null, 2));
+    else {
+      console.log(`Verified Defold ${summary.defoldRevision} -> policy ${summary.policyRoot.slice(0, 12)}`);
+      console.log(`${summary.namespaces} namespaces, ${summary.objects} authenticated objects; ${summary.written} cache file(s) written`);
+      console.log(`Cache: ${summary.cacheRoot}`);
+    }
+    return 0;
+  }
   if (options.command === "verify-bundle") {
     // The pre-Bob gate. It never inspects the extension inventory or regenerates
     // anything, so it stays usable on a build server that only ever runs Bob,

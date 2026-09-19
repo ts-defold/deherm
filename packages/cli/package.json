@@ -11,6 +11,7 @@
     "./conformance": "./src/conformance.mjs",
     "./dmsdk": "./src/dmsdk.mjs",
     "./generate": "./src/generate.mjs",
-    "./project": "./src/project.mjs"
+    "./project": "./src/project.mjs",
+    "./policy-client": "./src/policy-client.mjs"
   }
 }

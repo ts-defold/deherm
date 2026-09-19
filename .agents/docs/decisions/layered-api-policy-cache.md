@@ -452,6 +452,25 @@ say. Runtime conformance remains the headless engine harness's job.
 
 # Layer 0 in the CLI
 
+`deherm policy` is the explicit network boundary. It resolves the project's
+exact Defold SHA (or `--defold-sdk <sha>`), fetches that SHA's entry using the
+base and templates in the shipped index, authenticates the policy root and
+every namespace object against the digest in its path, and writes only those
+verified bytes beneath `~/.cache/deherm/policies/v1` (or
+`DEHERM_CACHE_HOME`/`XDG_CACHE_HOME`). A second resolution performs no cache
+writes. The shipped index is a trust anchor for revisions it already names,
+but not a frozen catalogue: a newer npm package can resolve a Defold revision
+published after it by fetching `v1/index/<sha>.json` directly.
+
+The policy cache and the generated-surface cache are intentionally distinct.
+The policy is source-derived API evidence; the surface additionally contains
+the revision-specific TypeScript SDK and executable lowering products consumed
+by `deherm generate`. `deherm policy` makes the former available today. Until
+the deterministic policy-to-surface materializer is wired into generation,
+`deherm generate` still requires a complete packaged/user/project surface and
+will report `defold-surface-not-cached` rather than pretending that a cached
+policy alone is executable glue.
+
 `packages/cli/src/defold-surface.mjs` resolves layer 0 by Defold revision
 alone, across three roots, stopping at the first that holds a complete surface
 for that exact revision:
@@ -521,6 +540,7 @@ the emitted tree and the evidence.
 | The published base, as configuration rather than a constant | `packages/bindings/policy-site.json` |
 | The emitted `v1` tree | `scripts/build-policy-site.mjs` |
 | The end-to-end consumer proof, including a tampered-object control | `scripts/check-policy-site-resolution.mjs` |
+| The shipped CLI resolver and immutable local policy cache | `packages/cli/src/policy-client.mjs`, `deherm policy` |
 | Channel tracking and revision repinning | `scripts/track-defold-channels.mjs` |
 | Publish and watch | `.github/workflows/policy-site.yml`, `.github/workflows/policy-revisions.yml` |
 
