@@ -15,7 +15,7 @@ inline constexpr std::size_t kBindingCount = 923;
 inline constexpr std::size_t kParameterSlotCount = 1577;
 inline constexpr std::size_t kReturnSlotCount = 624;
 inline constexpr std::uint8_t kVariableArity = 255;
-inline constexpr std::string_view kDescriptorAbiSha256 = "c9436592d52ed41bdbf83833304093aa2d12e0e837ab5e0ca6a95b1aabc15e74";
+inline constexpr std::string_view kDescriptorAbiSha256 = "5643ec253011e30c605098542f1ee9e1aac2a7963703bc341ed096a5518c6cd0";
 
 enum class Family : std::uint8_t {
   DynamicValues = 0,
@@ -37,7 +37,8 @@ enum Codec : std::uint16_t {
   CodecCallback = 16,
   CodecDynamic = 32,
   CodecPolymorphic = 64,
-  CodecNil = 128
+  CodecNil = 128,
+  CodecUnknown = 256
 };
 
 enum Trait : std::uint16_t {
@@ -50,7 +51,8 @@ enum Trait : std::uint16_t {
   TraitDocumentedOverloadConformance = 32,
   TraitGenericRuntimeDispatch = 64,
   TraitFixedMultiResult = 128,
-  TraitHeterogeneousUnion = 256
+  TraitHeterogeneousUnion = 256,
+  TraitUnregisteredType = 512
 };
 
 enum ParameterFlag : std::uint8_t {

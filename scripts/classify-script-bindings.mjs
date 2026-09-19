@@ -99,7 +99,17 @@ function classifyType(rawType, registry, seen = new Set()) {
   if (source === "...") return { codecs: ["dynamic"], unresolved: [], flags: ["variable-results"] };
   if (source === "any") return { codecs: ["dynamic"], unresolved: [], flags: ["dynamic-any"] };
   if (source === "T") return { codecs: ["polymorphic"], unresolved: [], flags: ["generic-runtime-tag"] };
-  if (source.startsWith("fun(")) return { codecs: ["callback"], unresolved: [], flags: ["callback-lifetime"] };
+  // Both spellings Defold has used for a function type. 1.14.0 annotates
+  // callbacks in LuaLS syntax - `fun(self:script_instance, url:url, result:boolean)`,
+  // 108 of them - and 1.13.1 writes the same parameters as `function(self, url,
+  // result)`, with no `fun(` anywhere. Recognising only the newer spelling made
+  // every 1.13.1 callback classify as an unregistered type, which pushed routes
+  // like collectionfactory.load out of the callback-lifecycle family and made
+  // their reviewed lifecycle policy look wrong. The pinned revision uses
+  // `function(` only in prose, so this changes nothing there.
+  if (source.startsWith("fun(") || source.startsWith("function(")) {
+    return { codecs: ["callback"], unresolved: [], flags: ["callback-lifetime"] };
+  }
 
   const union = splitTopLevel(source);
   if (union.length > 1) return mergeCodecs(union.map((part) => classifyType(part, registry, seen)), source);

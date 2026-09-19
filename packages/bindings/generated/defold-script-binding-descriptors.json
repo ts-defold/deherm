@@ -14,7 +14,7 @@
     "scriptIrSemanticSha256": "571d7e77aa483af7e656f1deec127152f7e939f4b3d2e58e1858a90cdcd9c3a4",
     "bindingPatternsSemanticSha256": "01cf9d0d212a9d51315d0df53a09d4d6a26bed1929e733575f2e4fd543268366"
   },
-  "descriptorAbiSha256": "c9436592d52ed41bdbf83833304093aa2d12e0e837ab5e0ca6a95b1aabc15e74",
+  "descriptorAbiSha256": "5643ec253011e30c605098542f1ee9e1aac2a7963703bc341ed096a5518c6cd0",
   "bindingCount": 923,
   "parameterSlotCount": 1577,
   "returnSlotCount": 624,
@@ -36,7 +36,8 @@
     "callback": 16,
     "dynamic": 32,
     "polymorphic": 64,
-    "nil": 128
+    "nil": 128,
+    "unknown": 256
   },
   "traits": {
     "variable-arguments": 1,
@@ -47,7 +48,8 @@
     "documented-overload-conformance": 32,
     "generic-runtime-dispatch": 64,
     "fixed-multi-result": 128,
-    "heterogeneous-union": 256
+    "heterogeneous-union": 256,
+    "unregistered-type": 512
   },
   "parameterFlags": {
     "optional": 1,

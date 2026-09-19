@@ -186,6 +186,13 @@ function parameterName(value, index) {
   return safeParameterIdentifier(candidate, index);
 }
 
+// Every named type mentioned by a raw type expression: `b2Body`, `b2Body|nil`,
+// `table<string, b2Shape>` and `b2Joint[]` all mention handle types, and a
+// presence test that only matched a bare name would miss them.
+function typeNames(rawType) {
+  return typeof rawType === "string" ? rawType.match(/[A-Za-z_][A-Za-z0-9_.]*/g) ?? [] : [];
+}
+
 function parseArchive(lifecycleNames) {
   const archive = unzipSync(new Uint8Array(requireBuffer));
   const classes = new Map();
@@ -807,14 +814,35 @@ assertUniquePublicScriptRoots(new Set([
 ]));
 const trees = buildApiTrees(model);
 
-// A reviewed semantic handle type the archive does not declare at this revision
-// is a type that does not exist here - a backend that was not shipped, or a
-// spelling that changed. That is a policy difference for this revision, not an
-// error: the kind is withdrawn and the raw type falls back to opaque, the same
-// outcome as evidence going void. Refusing instead would mean no revision that
-// dropped a handle type could ever be derived.
+// Is a reviewed semantic handle type present at this revision?
+//
+// The test used to be "the archive declares an `---@alias` for it". That is not
+// the same question, and at Defold 1.13.1 it answers wrongly for every handle
+// type at once: 1.13.1 declares ZERO aliases while 1.14.0 declares 98, yet both
+// annotate the very same parameters `---@param body b2Body`. The alias
+// declarations are documentation Defold added later; the type was always there.
+// Testing for them withdrew all sixteen handle kinds from a revision that has
+// them, which then surfaced downstream as "Unknown codec 'unknown'".
+//
+// What establishes that a type exists at a revision is that the archive USES
+// it - as a parameter type, a return type or a field type - whether or not it
+// also declares it. A type that is neither declared nor mentioned anywhere is
+// genuinely not part of this revision's surface: a backend that was not shipped,
+// or a spelling that changed. That is a policy difference, so the kind is
+// withdrawn and the raw type falls back to opaque, the same outcome as evidence
+// going void. Refusing instead would mean no revision that dropped a handle type
+// could ever be derived.
+const referencedTypeNames = new Set();
+for (const fn of model.functions) {
+  for (const parameter of fn.parameters) for (const name of typeNames(parameter.rawType)) referencedTypeNames.add(name);
+  for (const rawType of fn.returns) for (const name of typeNames(rawType)) referencedTypeNames.add(name);
+}
+for (const entry of model.classes) {
+  for (const field of entry.fields) for (const name of typeNames(field.rawType)) referencedTypeNames.add(name);
+}
+for (const entry of model.aliases) referencedTypeNames.add(entry.name);
 const absentHandleTypes = [...semanticHandleTypes.keys()]
-  .filter((rawType) => !model.aliases.some(({ name }) => name === rawType));
+  .filter((rawType) => !referencedTypeNames.has(rawType));
 for (const rawType of absentHandleTypes) {
   semanticHandleTypes.delete(rawType);
   recordAudit({

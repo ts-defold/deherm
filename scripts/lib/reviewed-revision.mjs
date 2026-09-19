@@ -46,8 +46,10 @@
 // explains the three classifications and what each does to what we emit.
 
 import { appendFileSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
-import { classifyReviewedSource, recordAudit } from "./revision-audit.mjs";
+import { MOVED, VOID, classifyReviewedSource, recordAudit } from "./revision-audit.mjs";
 
 const REVISION = /^[0-9a-f]{40}$/;
 
@@ -179,4 +181,72 @@ export function observeReviewedSource({ input, id, source, evidence, reviewed, d
     }, env);
   }
   return { ...verdict, id };
+}
+
+/**
+ * Load every Defold source a reviewed input cites, tolerating the ones that are
+ * not there.
+ *
+ * A generator that opens each cited path with a bare `readFile` dies with ENOENT
+ * on the first source a revision does not have - which for Defold 1.13.1 is the
+ * whole `bullet3d` backend, present on `dev` and absent from stable. That is not
+ * a broken generator or a broken review; it is a backend that revision did not
+ * ship, and the right response is to withdraw the entries resting on it and
+ * carry on.
+ *
+ * Returns the texts that loaded, and the set of cited paths that are withdrawn
+ * for this revision - absent, or present with a reviewed anchor gone. Callers
+ * drop the routes those paths support. Every outcome is audited.
+ *
+ * @param {object} options
+ * @param {string} options.input     repository-relative path of the reviewed file
+ * @param {string} options.defoldRoot  path to `upstream/defold`
+ * @param {Array<{path?: string, source?: string, sha256: string, anchors?: string[]}>} options.evidence
+ * @returns {Promise<{texts: Map<string, string>, withdrawn: Set<string>, verdicts: object[]}>}
+ */
+export async function loadReviewedSources({ input, defoldRoot, evidence, reviewed, derived, env = process.env }) {
+  const texts = new Map();
+  const withdrawn = new Set();
+  const verdicts = [];
+  for (const record of evidence) {
+    const relative = record.path ?? record.source;
+    const text = await readFile(join(defoldRoot, relative), "utf8").catch(() => null);
+    const verdict = observeReviewedSource({
+      input, id: `${relative}`, source: text, evidence: record, reviewed, derived, env
+    });
+    verdicts.push(verdict);
+    if (verdict.status === VOID) withdrawn.add(relative);
+    else texts.set(relative, text);
+  }
+  return { texts, withdrawn, verdicts };
+}
+
+/**
+ * A reviewed census count, checked against the revision it was counted at.
+ *
+ * A reviewed input records expectations like "there are 145 registered box2d-v2
+ * routes". Those numbers are evidence: a person counted them at one revision,
+ * and at THAT revision a disagreement is a real regression and stays a hard
+ * failure - it is most of what `pnpm check` is for.
+ *
+ * At any other revision the same comparison says nothing except that Defold
+ * changed, which is the thing we are here to measure. Asserting it there turns
+ * every engine change into a refusal. So the count becomes an observation, and
+ * the difference is what the derivation reports.
+ *
+ * @returns {{agreed: boolean, expected: number, observed: number}}
+ */
+export function expectReviewedCount({ input, label, expected, observed, reviewed, derived, env = process.env }) {
+  if (expected === observed) return { agreed: true, expected, observed };
+  if (reviewed === derived) {
+    throw new Error(
+      `${input}: ${label} expected ${expected}, found ${observed} at the reviewed revision ${reviewed}. ` +
+      "Nothing about Defold moved, so this is a regression in this tree."
+    );
+  }
+  recordAudit({
+    input, id: label, status: MOVED, reason: "census",
+    expected, observed, reviewed, derived
+  }, env);
+  return { agreed: false, expected, observed };
 }

@@ -23,7 +23,18 @@ const CODEC_ENTRIES = [
   ["callback", "Callback", 1 << 4],
   ["dynamic", "Dynamic", 1 << 5],
   ["polymorphic", "Polymorphic", 1 << 6],
-  ["nil", "Nil", 1 << 7]
+  ["nil", "Nil", 1 << 7],
+  // A type the reference archive NAMES but never declares. `classify-script-bindings.mjs`
+  // has always produced this codec (`unregistered-type:<name>`) and already routes it to
+  // the borrowed-handle family, because a named-but-undeclared type is a distinct opaque
+  // value and nothing more can be said about it. This table simply had no bit for it,
+  // which was invisible at the pinned revision - Defold 1.14.0 declares every type it
+  // references, so the codec never occurs - and fatal at 1.13.1, which declares zero
+  // `---@alias` entries against 1.14.0's 98 and leaves 108 referenced type names
+  // undeclared. Those aliases are documentation Defold added later; the types were
+  // always there, and a revision must not become underivable because its docs are
+  // thinner.
+  ["unknown", "Unknown", 1 << 8]
 ];
 
 const TRAIT_ENTRIES = [
@@ -35,7 +46,11 @@ const TRAIT_ENTRIES = [
   ["documented-overload-conformance", "DocumentedOverloadConformance", 1 << 5],
   ["generic-runtime-dispatch", "GenericRuntimeDispatch", 1 << 6],
   ["fixed-multi-result", "FixedMultiResult", 1 << 7],
-  ["heterogeneous-union", "HeterogeneousUnion", 1 << 8]
+  ["heterogeneous-union", "HeterogeneousUnion", 1 << 8],
+  // The route takes or returns a type the reference archive names but never
+  // declares. Paired with the `unknown` codec above; see that comment for why a
+  // revision with thinner documentation must still derive.
+  ["unregistered-type", "UnregisteredType", 1 << 9]
 ];
 
 const PARAMETER_FLAG_ENTRIES = [
@@ -78,9 +93,14 @@ function codecMask(codecs, context) {
   return mask;
 }
 
+// Some traits carry a parameter after a colon - the union's members, the
+// undeclared type's name. The descriptor table stores the KIND; the parameter
+// is detail for a reader, not a bit.
+const PARAMETERISED_TRAITS = ["heterogeneous-union:", "unregistered-type:"];
+
 function traitKind(trait) {
-  if (trait.startsWith("heterogeneous-union:")) return "heterogeneous-union";
-  return trait;
+  const prefix = PARAMETERISED_TRAITS.find((candidate) => trait.startsWith(candidate));
+  return prefix ? prefix.slice(0, -1) : trait;
 }
 
 function traitMask(traits, context) {

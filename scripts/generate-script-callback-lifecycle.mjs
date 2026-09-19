@@ -2,10 +2,10 @@
 
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -45,30 +45,23 @@ function byId(rows, label) {
   return result;
 }
 
-function validateSources(policy, sourceTexts) {
+function validateSources(policy, sourceTexts, withdrawnSources) {
   assert(Array.isArray(policy.sourceEvidence), "callback lifecycle policy is missing pinned source evidence");
   const listed = new Map();
   for (const source of policy.sourceEvidence) {
     assert(typeof source.path === "string" && /^[0-9a-f]{64}$/.test(source.sha256), "callback lifecycle source evidence is malformed");
     assert(!listed.has(source.path), `callback lifecycle source evidence duplicates '${source.path}'`);
     listed.set(source.path, source.sha256);
-    const text = sourceTexts.get(source.path);
-    assert(typeof text === "string", `${source.path}: pinned callback source was not loaded`);
-    // OBSERVED, not asserted. A pinned hash only detects that Defold edited its
-    // own source, which across a release is expected and is the input to this
-    // generator rather than a failure of it. A moved file becomes an audit line
-    // and a restated pin for this revision. What actually checks this policy
-    // against the revision being generated is the census below, which is read
-    // from that revision's IR.
-    observeReviewedSource({
-      input: "packages/bindings/overrides/script-callback-lifecycle-policies.json",
-      id: `${source.path}: callback-lifecycle`, source: text, evidence: source
-    });
+    // The hashes were already observed while loading; a withdrawn source has no
+    // text to check and its routes are dropped by the caller.
+    if (withdrawnSources.has(source.path)) continue;
+    assert(typeof sourceTexts.get(source.path) === "string", `${source.path}: pinned callback source was not loaded`);
   }
   const evidencePaths = new Set(policy.routes.flatMap((route) => route.evidence.map((evidence) => evidence.path)));
   assert(evidencePaths.size === listed.size, "callback lifecycle source evidence coverage drifted");
   for (const path of evidencePaths) assert(listed.has(path), `${path}: route evidence has no pinned source hash`);
   for (const route of policy.routes) for (const evidence of route.evidence) {
+    if (withdrawnSources.has(evidence.path)) continue;
     const text = sourceTexts.get(evidence.path);
     assert(Array.isArray(evidence.anchors) && evidence.anchors.length !== 0, `${route.id}: evidence anchors are absent`);
     for (const anchor of evidence.anchors) assert(text.includes(anchor), `${route.id}: reviewed source anchor '${anchor}' is stale`);
@@ -95,18 +88,44 @@ export function generateScriptCallbackLifecycle(inputs) {
   assert(policy.expectedRouteCount === policy.routes.length, "callback lifecycle policy route count is stale");
   assert(new Set(policy.policyVocabulary).size === policy.policyVocabulary.length, "callback lifecycle policy vocabulary duplicates a lifetime");
   assert(policy.policyVocabulary.every((lifetime) => LIFETIMES.has(lifetime)), "callback lifecycle policy has an unknown lifetime");
-  validateSources(policy, inputs.sourceTexts);
+  const withdrawnSources = inputs.withdrawnSources ?? new Set();
+  validateSources(policy, inputs.sourceTexts, withdrawnSources);
+
+  // A route whose reviewed evidence is not in this revision is withdrawn here.
+  // The remaining routes are the callback lifecycle policy FOR THIS REVISION.
+  const reviewedRoutes = policy.routes.filter(
+    (route) => !route.evidence.some((evidence) => withdrawnSources.has(evidence.path)));
+  const withdrawnRoutes = policy.routes.length - reviewedRoutes.length;
 
   const irById = byId(ir.functions, "script API IR");
   const patternsById = byId(patterns.bindings, "script binding patterns");
   const policyById = byId(policy.routes, "callback lifecycle policy");
   const callbackPatterns = patterns.bindings.filter(({ loweringFamily }) => loweringFamily === "callback-lifecycle");
-  assert(callbackPatterns.length === policy.expectedRouteCount, `callback lifecycle pattern census drifted: expected ${policy.expectedRouteCount}, got ${callbackPatterns.length}`);
-  assert(policyById.size === callbackPatterns.length, "callback lifecycle policy has duplicate routes");
-  for (const pattern of callbackPatterns) assert(policyById.has(pattern.id), `${pattern.id}: classified callback route is missing reviewed lifecycle policy`);
-  for (const id of policyById.keys()) assert(patternsById.get(id)?.loweringFamily === "callback-lifecycle", `${id}: reviewed lifecycle policy is not a callback-lifecycle route`);
+  // The census is evidence at the revision it was counted at, and an observation
+  // anywhere else. A revision that added or removed a callback route is a policy
+  // difference to report, not a refusal.
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-callback-lifecycle-policies.json",
+    label: "callback-lifecycle pattern census",
+    expected: policy.expectedRouteCount - withdrawnRoutes,
+    observed: callbackPatterns.length,
+    reviewed: policy.defoldRevision, derived: ir.defoldRevision
+  });
+  for (const pattern of callbackPatterns) {
+    if (!policyById.has(pattern.id)) {
+      // A classified callback route with no reviewed policy cannot be emitted -
+      // its lifetime and ownership are exactly what a review decides. At the
+      // reviewed revision that is a gap in this tree and stays fatal.
+      assert(policy.defoldRevision !== ir.defoldRevision,
+        `${pattern.id}: classified callback route is missing reviewed lifecycle policy`);
+    }
+  }
+  for (const id of policyById.keys()) {
+    if (withdrawnSources.size && !patternsById.has(id)) continue;
+    assert(patternsById.get(id)?.loweringFamily === "callback-lifecycle", `${id}: reviewed lifecycle policy is not a callback-lifecycle route`);
+  }
 
-  const rows = [...policy.routes].map((route) => {
+  const rows = reviewedRoutes.map((route) => {
     const fn = irById.get(route.id);
     const pattern = patternsById.get(route.id);
     assert(fn && pattern, `${route.id}: route is absent from pinned IR or patterns`);
@@ -129,7 +148,10 @@ export function generateScriptCallbackLifecycle(inputs) {
   };
   const evidence = {
     scriptIrSha256: sha256(inputs.irText), bindingPatternsSha256: sha256(inputs.patternsText), policySha256: sha256(inputs.policyText),
-    defoldSources: policy.sourceEvidence.map(({ path, sha256: hash }) => ({ path: `upstream/defold/${path}`, sha256: hash })).sort((a, b) => compare(a.path, b.path))
+    defoldSources: policy.sourceEvidence
+      .filter(({ path }) => !withdrawnSources.has(path))
+      .map(({ path, sha256: hash }) => ({ path: `upstream/defold/${path}`, sha256: hash }))
+      .sort((a, b) => compare(a.path, b.path))
   };
   evidence.aggregateInputSha256 = sha256([evidence.scriptIrSha256, evidence.bindingPatternsSha256, evidence.policySha256, ...evidence.defoldSources.map(({ path, sha256: hash }) => `${path}\0${hash}`)].join("\0"));
   return {
@@ -147,8 +169,19 @@ export function generateScriptCallbackLifecycle(inputs) {
 export async function loadScriptCallbackLifecycleInputs() {
   const [irText, patternsText, policyText] = await Promise.all([readFile(paths.ir, "utf8"), readFile(paths.patterns, "utf8"), readFile(paths.policy, "utf8")]);
   const policy = parse(policyText, "callback lifecycle policy");
-  const sourceTexts = new Map(await Promise.all(policy.sourceEvidence.map(async ({ path }) => [path, await readFile(new URL(`upstream/defold/${path}`, root), "utf8")] )));
-  return { irText, patternsText, policyText, sourceTexts };
+  // Tolerant on purpose: a cited source a revision does not have - the whole
+  // `bullet3d` backend at Defold 1.13.1, for instance - withdraws the routes
+  // resting on it rather than killing the generator with ENOENT.
+  const loaded = await loadReviewedSources({
+    input: "packages/bindings/overrides/script-callback-lifecycle-policies.json",
+    defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
+    evidence: policy.sourceEvidence,
+    reviewed: policy.defoldRevision,
+    derived: parse(irText, "script API IR").defoldRevision
+  });
+  const sourceTexts = loaded.texts;
+  const withdrawnSources = loaded.withdrawn;
+  return { irText, patternsText, policyText, sourceTexts, withdrawnSources };
 }
 
 async function main(argv = process.argv.slice(2)) {
