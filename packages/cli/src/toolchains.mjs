@@ -31,13 +31,91 @@ export function extensionPlatform(defoldPlatform) {
   return defoldPlatform.endsWith("-macos") ? `${defoldPlatform.slice(0, -"-macos".length)}-osx` : defoldPlatform;
 }
 
+export async function readNativeArtifactManifest() {
+  return JSON.parse(await readFile(path.join(packageRoot, "packages", "toolchains", "native-artifacts.json"), "utf8"));
+}
+
+export async function readDefoldBundleTargets() {
+  return JSON.parse(await readFile(path.join(packageRoot, "packages", "toolchains", "defold-bundle-targets.json"), "utf8"));
+}
+
+// What this installed package can and cannot bundle, per Defold bundle target.
+// Every platform the pinned engine's Extender accepts appears here with an
+// explicit status: a target that is absent from the manifest would leave a user
+// who selects it with silence instead of a blocker naming the platform, which is
+// worse than saying the archive is missing.
+export async function nativeArtifactReport(projectRoot) {
+  const manifest = await readNativeArtifactManifest();
+  const bundleTargets = await readDefoldBundleTargets();
+  const rows = [];
+  for (const entry of bundleTargets.targets) {
+    const artifact = manifest.targets?.[entry.target];
+    if (!artifact) {
+      rows.push({
+        target: entry.target,
+        kind: entry.kind,
+        status: "undeclared",
+        ok: false,
+        detail: `${bundleTargets.source} declares ${entry.target} and the installed déherm package does not mention it`
+      });
+      continue;
+    }
+    const row = {
+      target: entry.target,
+      kind: entry.kind,
+      status: artifact.status,
+      builder: artifact.builder ?? null,
+      library: artifact.library ?? null,
+      blocker: artifact.blocker ?? null,
+      bundleable: artifact.status === "vendored" || artifact.status === "vendored-source",
+      ok: artifact.status === "vendored" || artifact.status === "vendored-source",
+      detail: ""
+    };
+    if (artifact.status === "vendored") {
+      try {
+        const bytes = await readFile(path.join(packageRoot, artifact.library));
+        const sha256 = createHash("sha256").update(bytes).digest("hex");
+        row.sha256 = sha256;
+        row.ok = sha256 === artifact.sha256;
+        row.detail = row.ok ? `${sha256.slice(0, 12)} (${bytes.byteLength} bytes)` : "vendored archive does not match its pinned digest";
+      } catch {
+        row.ok = false;
+        row.detail = `vendored archive missing at ${artifact.library}`;
+      }
+      if (row.ok && projectRoot) {
+        row.project = await assertProjectNativeArtifact(projectRoot, entry.target).then(
+          (installed) => ({ ok: true, file: installed.file }),
+          (error) => ({ ok: false, detail: error.message })
+        );
+      }
+    } else if (artifact.status === "vendored-source") {
+      row.detail = artifact.library;
+    } else if (artifact.status === "required-missing") {
+      row.detail = `no ${path.basename(artifact.library)} in this package; CI builds it with ${artifact.builder}`;
+    } else {
+      row.detail = `${artifact.blocker?.code ?? artifact.status}: ${artifact.blocker?.reason ?? "no reason recorded"}`;
+    }
+    rows.push(row);
+  }
+  return {
+    schemaVersion: 1,
+    defoldRevision: manifest.defoldRevision,
+    hermesRevision: manifest.hermesRevision,
+    source: bundleTargets.source,
+    targets: rows
+  };
+}
+
 export async function assertProjectNativeArtifact(projectRoot, defoldPlatform) {
   const target = extensionPlatform(defoldPlatform);
-  const manifest = JSON.parse(await readFile(path.join(packageRoot, "packages", "toolchains", "native-artifacts.json"), "utf8"));
+  const manifest = await readNativeArtifactManifest();
   const artifact = manifest.targets?.[target];
   if (!artifact) throw new Error(`The installed déherm package does not declare a ${target} Hermes artifact`);
+  if (artifact.status === "blocked" || artifact.status === "retired-upstream") {
+    throw new Error(`The installed déherm package cannot bundle for ${target} (${artifact.blocker?.code ?? artifact.status}): ${artifact.blocker?.reason ?? "no reason recorded"}`);
+  }
   if (artifact.status !== "vendored") {
-    throw new Error(`The installed déherm package does not contain the required ${target} Hermes artifact (status: ${artifact.status})`);
+    throw new Error(`The installed déherm package does not contain the required ${target} Hermes artifact (status: ${artifact.status}; CI builds it with ${artifact.builder ?? "no declared builder"})`);
   }
   const file = path.join(projectRoot, "defold_hermes", "lib", target, path.basename(artifact.library));
   let bytes;

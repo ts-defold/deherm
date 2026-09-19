@@ -1,14 +1,62 @@
 name: native-artifacts
 
+# Two independent matrices, deliberately kept apart in this file because
+# conflating them has already cost review time.
+#
+#   * target libraries - one libhermes.a per Defold BUNDLE TARGET, because Bob
+#     uploads it to Extender for whatever platform is being bundled. A user on
+#     macOS bundling for Android needs the Android archive and none of their own.
+#   * host compilers - hermesc and shermes per USER HOST, because they run on
+#     the user's machine. Both are pure compilers, so shipping them imposes no
+#     native toolchain requirement on the user.
+#
+# The target list is derived from the pinned Defold sources into
+# packages/toolchains/defold-bundle-targets.json, so a Defold release that adds
+# a bundle platform fails `manage-native-artifacts.mjs verify` rather than
+# silently leaving that platform unbuilt.
+#
+# Vendor a completed run with:
+#   node scripts/manage-native-artifacts.mjs pull --run <id> --partial
+#   node scripts/manage-host-compilers.mjs pull --run <id> --partial
+
 on:
   workflow_dispatch:
   push:
     paths:
       - upstream.lock
       - toolchains/hermes/**
+      - packages/toolchains/defold-bundle-targets.json
       - scripts/package-defold-extension.sh
+      - .github/workflows/native-artifacts.yml
 
 jobs:
+  # The SDK levels every cross build has to match are the engine's own, derived
+  # from upstream/defold/build_tools/sdk.py. Reading them here keeps the
+  # container and Xcode invocations from carrying a second, drifting copy.
+  sdk:
+    runs-on: ubuntu-24.04
+    outputs:
+      android_ndk_version: ${{ steps.read.outputs.android_ndk_version }}
+      android_ndk_api: ${{ steps.read.outputs.android_ndk_api }}
+      android_64_ndk_api: ${{ steps.read.outputs.android_64_ndk_api }}
+      iphoneos_version_min: ${{ steps.read.outputs.iphoneos_version_min }}
+      macosx_version_min: ${{ steps.read.outputs.macosx_version_min }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: read
+        run: |
+          node -e '
+            const sdk = require("./packages/toolchains/defold-bundle-targets.json").sdk;
+            const out = [
+              ["android_ndk_version", sdk.androidNdkVersion],
+              ["android_ndk_api", sdk.androidNdkApiVersion],
+              ["android_64_ndk_api", sdk.android64NdkApiVersion],
+              ["iphoneos_version_min", sdk.iphoneosVersionMin],
+              ["macosx_version_min", sdk.macosxVersionMin]
+            ];
+            require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, out.map(([k, v]) => `${k}=${v}`).join("\n") + "\n");
+          '
+
   linux:
     strategy:
       fail-fast: false
@@ -38,5 +86,110 @@ jobs:
       - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
       - uses: actions/upload-artifact@v4
         with:
-          name: hermes-x86_64-win32-parts
-          path: build/artifacts/x86_64-win32/
+          name: hermes-x86_64-win32
+          path: build/artifacts/x86_64-win32/hermes.lib
+
+  android:
+    needs: sdk
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - defold_platform: armv7-android
+            abi: armeabi-v7a
+            api_kind: android_ndk_api
+          - defold_platform: arm64-android
+            abi: arm64-v8a
+            api_kind: android_64_ndk_api
+          - defold_platform: x86_64-android
+            abi: x86_64
+            api_kind: android_64_ndk_api
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --build-arg ANDROID_ABI=${{ matrix.abi }} \
+            --build-arg ANDROID_API=${{ needs.sdk.outputs[matrix.api_kind] }} \
+            --build-arg NDK_VERSION=${{ needs.sdk.outputs.android_ndk_version }} \
+            --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} \
+            -f toolchains/hermes/Dockerfile.android .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hermes-${{ matrix.defold_platform }}
+          path: build/artifacts/${{ matrix.defold_platform }}/libhermes.a
+
+  # macOS x64, iOS and the iOS simulator need the Apple SDKs, so there is no
+  # container path for them. One macOS runner builds all four Apple targets and
+  # reuses a single host-compiler build across them.
+  apple:
+    needs: sdk
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+      matrix:
+        defold_platform: [arm64-osx, x86_64-osx, arm64-ios, arm64_sim-ios]
+    env:
+      DEFOLD_MACOSX_VERSION_MIN: ${{ needs.sdk.outputs.macosx_version_min }}
+      DEFOLD_IPHONEOS_VERSION_MIN: ${{ needs.sdk.outputs.iphoneos_version_min }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - run: brew install ninja cmake
+      - run: |
+          bash toolchains/hermes/build-apple.sh \
+            ${{ matrix.defold_platform }} \
+            "$PWD/upstream/hermes" \
+            "$PWD/build/hermes/${{ matrix.defold_platform }}" \
+            "$PWD/build/artifacts/${{ matrix.defold_platform }}/libhermes.a"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hermes-${{ matrix.defold_platform }}
+          path: build/artifacts/${{ matrix.defold_platform }}/libhermes.a
+
+  # hermesc and shermes, one pair per user host. Each pair is built on a runner
+  # of that host's own architecture: these are the binaries other builds import,
+  # so cross-compiling them would defeat the point.
+  host-compilers:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # ubuntu-22.04 rather than 24.04 sets the shipped glibc floor at 2.35,
+          # so the published compilers run on hosts older than the runner.
+          - runner: ubuntu-22.04
+            host: linux-x64
+          - runner: ubuntu-22.04-arm
+            host: linux-arm64
+          - runner: macos-15
+            host: darwin-arm64
+          - runner: macos-15-intel
+            host: darwin-x64
+          - runner: windows-2022
+            host: win32-x64
+    runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends clang cmake lld ninja-build python3
+      - if: runner.os == 'macOS'
+        run: brew install ninja cmake
+      - if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+      - if: runner.os == 'Windows'
+        run: choco install ninja --no-progress -y
+      - run: |
+          bash toolchains/hermes/build-host-compilers.sh \
+            "$PWD/upstream/hermes" \
+            "$PWD/build/host-compilers/${{ matrix.host }}" \
+            "$PWD/build/artifacts/host-compilers/${{ matrix.host }}/bin"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: host-compilers-${{ matrix.host }}
+          path: build/artifacts/host-compilers/${{ matrix.host }}/bin/*

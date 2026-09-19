@@ -18,3 +18,20 @@ platforms:
     x86_64-win32:
         context:
             flags: ["-std=c++17", "-fexceptions"]
+    arm64-ios:
+        context:
+            frameworks: ["CoreFoundation"]
+            flags: ["-std=c++17", "-fexceptions"]
+    arm64_sim-ios:
+        context:
+            frameworks: ["CoreFoundation"]
+            flags: ["-std=c++17", "-fexceptions"]
+    armv7-android:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]
+    arm64-android:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]
+    x86_64-android:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]

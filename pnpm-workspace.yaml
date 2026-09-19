@@ -1,5 +1,6 @@
 packages:
   - "packages/*"
+  - "toolchains/host-compilers/*"
   - "examples/*"
 
 allowBuilds:

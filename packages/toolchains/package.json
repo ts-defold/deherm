@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./native-artifacts.json": "./native-artifacts.json"
+    "./native-artifacts.json": "./native-artifacts.json",
+    "./defold-bundle-targets.json": "./defold-bundle-targets.json",
+    "./host-compilers.json": "./host-compilers.json"
   }
 }

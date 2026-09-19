@@ -16,7 +16,7 @@ const help = `deherm <command> [options]
 Commands:
   (no command) Launch the interactive project/dev TUI
   create       Scaffold a Defold + TypeScript project and generate its SDK
-  doctor       Validate the project and report discoverable extension APIs
+  doctor       Report host compilers, per-target Hermes archives, the project, and its extension APIs
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
   materialize-dmsdk  Emit deterministic native provider C++ from a dmSDK usage document
@@ -41,7 +41,8 @@ Options:
   --plan <path>      Conformance plan used by the report command
   --observation <path>  Observation JSON to merge; may be repeated
   --surface <name>   all, script, or dmsdk (default: all)
-  --target <name>    Conformance runtime target (default: source dmSDK platform)
+  --target <name>    Conformance runtime target (default: source dmSDK platform);
+                     for doctor, the comma-separated Defold bundle target(s) you intend to ship
   --context <names>  Comma-separated available contexts; may be repeated
   --entry <path>     TypeScript game entry point for dev
   --watch <path>     Source tree watched by dev (default: entry directory)
@@ -173,6 +174,100 @@ function printExtensions(inventory) {
   for (const archive of inventory.dependencyArchivesWithoutManifest ?? []) {
     console.log(`--  dependency  no-ext-manifest  ${archive.files} file(s), ${archive.luaModules} Lua module(s)  ${archive.archive}`);
   }
+}
+
+// `deherm doctor` has to answer one question: can this host build a bundle for
+// the targets the user intends to ship? That is two independent matrices - the
+// host compilers that run here, and the per-target Hermes archives Bob uploads
+// to Extender - plus the project itself. Reporting only the project would leave
+// a user to discover a missing Android archive from an Extender link error.
+async function runDoctor(options) {
+  const { hostCompilerReport } = await import("./host-compilers.mjs");
+  const { nativeArtifactReport } = await import("./toolchains.mjs");
+  const requested = options.target
+    ? options.target.split(",").map((value) => value.trim()).filter(Boolean)
+    : null;
+
+  let inventory = null;
+  let projectError = null;
+  try {
+    inventory = await inspectDefoldProject({
+      project: options.project,
+      selectProject: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
+      requireDehermRuntime: true
+    });
+  } catch (error) {
+    // A user asking what their toolchain can build should get that answer even
+    // outside a project, so the missing project is a reported finding rather
+    // than a thrown one.
+    projectError = error instanceof Error ? error.message : String(error);
+  }
+
+  const hosts = await hostCompilerReport();
+  const artifacts = await nativeArtifactReport(inventory?.projectRoot);
+  const unknownTargets = (requested ?? []).filter((target) => !artifacts.targets.some((row) => row.target === target));
+  const selected = artifacts.targets.filter((row) => !requested || requested.includes(row.target));
+  const currentHost = hosts.hosts.find((host) => host.current);
+  const failures = [];
+  if (!currentHost?.ok) failures.push(`host compilers: ${currentHost?.detail ?? `no record for ${hosts.currentHost}`}`);
+  for (const target of unknownTargets) {
+    failures.push(`--target ${target} is not a Defold bundle target declared by ${artifacts.source}`);
+  }
+  if (requested) {
+    for (const row of selected) {
+      if (!row.ok) failures.push(`${row.target}: ${row.detail}`);
+      else if (row.project && !row.project.ok) failures.push(`${row.target}: ${row.project.detail}`);
+    }
+  }
+  const projectErrors = inventory?.diagnostics.filter(({ severity }) => severity === "error") ?? [];
+
+  if (options.json) {
+    console.log(JSON.stringify({
+      schemaVersion: 1,
+      ok: failures.length === 0 && !projectErrors.length && !projectError,
+      project: inventory ? { root: inventory.projectRoot, summary: inventory.summary, diagnostics: inventory.diagnostics } : { error: projectError },
+      hostCompilers: hosts,
+      bundleTargets: { ...artifacts, requested, unknownTargets },
+      failures
+    }, null, 2));
+    return failures.length || projectErrors.length || projectError ? 1 : 0;
+  }
+
+  console.log(`${currentHost?.ok ? "ok" : "!!"} host compilers ${hosts.currentHost} (this host): ${currentHost?.status ?? "unknown-host"} ${currentHost?.detail ?? ""}`.trimEnd());
+  for (const host of hosts.hosts) {
+    if (host.current) continue;
+    console.log(`${host.ok ? "ok" : "--"} host compilers ${host.host}: ${host.status} ${host.detail}`);
+  }
+  for (const row of selected) {
+    // Without an explicit --target, a target the user is not shipping is
+    // information, not a failure; with one, it is the question they asked.
+    const severity = row.ok ? "ok" : requested ? "!!" : "--";
+    console.log(`${severity} target ${row.target}: ${row.status} ${row.detail}`);
+    if (row.project && !row.project.ok) console.log(`${requested ? "!!" : "--"}   project extension: ${row.project.detail}`);
+  }
+  for (const target of unknownTargets) {
+    console.log(`!! target ${target}: not a Defold bundle target declared by ${artifacts.source}`);
+  }
+  if (!inventory) {
+    console.log(`-- project: ${projectError}`);
+    return failures.length ? 1 : 0;
+  }
+
+  const summary = inventory.summary;
+  console.log(`${projectErrors.length ? "!!" : "ok"} project: ${inventory.projectRoot}`);
+  console.log(`ok extensions: ${summary.localExtensions} local, ${summary.dependencyExtensions} dependency`);
+  console.log(`ok script APIs: ${summary.scriptApiFiles} file(s), ${summary.scriptModules} module declaration(s)`);
+  console.log(`ok native APIs: ${summary.publicHeaders} public header(s), ${summary.extensionsRequiringNativeSchema} schema(s) required`);
+  if (summary.extensionsWithoutApiMetadata) {
+    console.log(`-- metadata: ${summary.extensionsWithoutApiMetadata} extension(s) expose no discoverable API metadata`);
+  }
+  if (summary.dependencyArchivesWithoutManifest) {
+    console.log(`-- dependencies: ${summary.dependencyArchivesWithoutManifest} resolved archive(s) declare no ext.manifest and contribute no bindings`);
+  }
+  for (const diagnostic of inventory.diagnostics) {
+    console.log(`${diagnostic.severity === "error" ? "!!" : "--"} ${diagnostic.path}: ${diagnostic.message}`);
+  }
+  return failures.length || projectErrors.length ? 1 : 0;
 }
 
 export async function run(argv = process.argv.slice(2)) {
@@ -337,10 +432,11 @@ export async function run(argv = process.argv.slice(2)) {
     else console.log(formatBugPool(result.document, { cwd: process.cwd(), poolFile: result.poolFile }));
     return 0;
   }
+  if (options.command === "doctor") return await runDoctor(options);
   const inventory = await inspectDefoldProject({
     project: options.project,
     selectProject: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
-    requireDehermRuntime: options.command === "generate" || options.command === "doctor"
+    requireDehermRuntime: options.command === "generate"
   });
   if (options.command === "extensions") {
     if (options.json) console.log(JSON.stringify(inventory, null, 2));
@@ -399,24 +495,6 @@ export async function run(argv = process.argv.slice(2)) {
       if (result.stderr.trim()) console.error(result.stderr.trimEnd());
     }
     return result.passed ? 0 : 1;
-  }
-  if (options.command === "doctor") {
-    const ok = !inventory.diagnostics.some(({ severity }) => severity === "error");
-    const summary = inventory.summary;
-    console.log(`${ok ? "ok" : "!!"} project: ${inventory.projectRoot}`);
-    console.log(`ok extensions: ${summary.localExtensions} local, ${summary.dependencyExtensions} dependency`);
-    console.log(`ok script APIs: ${summary.scriptApiFiles} file(s), ${summary.scriptModules} module declaration(s)`);
-    console.log(`ok native APIs: ${summary.publicHeaders} public header(s), ${summary.extensionsRequiringNativeSchema} schema(s) required`);
-    if (summary.extensionsWithoutApiMetadata) {
-      console.log(`-- metadata: ${summary.extensionsWithoutApiMetadata} extension(s) expose no discoverable API metadata`);
-    }
-    if (summary.dependencyArchivesWithoutManifest) {
-      console.log(`-- dependencies: ${summary.dependencyArchivesWithoutManifest} resolved archive(s) declare no ext.manifest and contribute no bindings`);
-    }
-    for (const diagnostic of inventory.diagnostics) {
-      console.log(`${diagnostic.severity === "error" ? "!!" : "--"} ${diagnostic.path}: ${diagnostic.message}`);
-    }
-    return ok ? 0 : 1;
   }
   throw new Error(`Unknown command: ${options.command}\n\n${help}`);
 }

@@ -4,17 +4,32 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     rm -rf /var/lib/apt/lists/*
 COPY upstream/hermes /src/hermes
 COPY toolchains/hermes/windows-msvc.cmake /toolchain/windows-msvc.cmake
+COPY toolchains/hermes/package-msvc.sh /usr/local/bin/package-msvc
 WORKDIR /work
+
+# Hermes compiles its own internal JavaScript to bytecode during the build, so
+# the cross build needs host compilers it can actually execute rather than the
+# Windows binaries it is producing.
+RUN cmake -S /src/hermes -B /work/host -G Ninja \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DHERMES_ENABLE_TEST_SUITE=OFF \
+      -DHERMES_ENABLE_INTL=OFF && \
+    cmake --build /work/host --target hermesc shermes --parallel
+
+# One hermes.lib, not loose parts: manage-native-artifacts.mjs installs the
+# single archive Extender force-loads, and uploading the pieces would leave the
+# merge to a step that does not exist.
 RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_TOOLCHAIN_FILE=/toolchain/windows-msvc.cmake \
+      -DIMPORT_HOST_COMPILERS=/work/host/ImportHostCompilers.cmake \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
       -DHERMES_ENABLE_TOOLS=OFF \
       -DHERMES_ENABLE_DEBUGGER=OFF \
       -DHERMES_ENABLE_INTL=OFF \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
-    cmake --build /work/build --target hermesvm_a jsi --parallel
+    cmake --build /work/build --target hermesvm_a jsi --parallel && \
+    package-msvc /work/build /out/hermes.lib
 
 FROM scratch
-COPY --from=0 /work/build/lib/hermesvm_a.lib /hermesvm_a.lib
-COPY --from=0 /work/build/jsi/jsi.lib /jsi.lib
+COPY --from=0 /out/hermes.lib /hermes.lib

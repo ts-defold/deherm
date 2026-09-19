@@ -56,6 +56,30 @@ try {
   checks.push({ ok: false, name: "bob.jar", detail: "missing; run npm run bootstrap:bob" });
 }
 
+// The repository doctor reports what this checkout can build; `deherm doctor`
+// reports the same two matrices from a user's installed package. Summarising
+// them here keeps "which platforms am I still missing" answerable without
+// reading two JSON manifests.
+for (const [name, script, key] of [
+  ["target archives", "manage-native-artifacts.mjs", "targets"],
+  ["host compilers", "manage-host-compilers.mjs", "hosts"]
+]) {
+  const result = spawnSync(process.execPath, [new URL(script, import.meta.url).pathname, "report"], { encoding: "utf8" });
+  if (result.status !== 0) {
+    checks.push({ ok: false, name, detail: (result.stderr ?? "").trim().split("\n").at(-1) || "report failed" });
+    continue;
+  }
+  const rows = JSON.parse(result.stdout)[key];
+  const ready = rows.filter((row) => row.status === "vendored" || row.status === "vendored-source");
+  const blocked = rows.filter((row) => row.status === "blocked" || row.status === "retired-upstream");
+  const pending = rows.filter((row) => row.status === "required-missing");
+  checks.push({
+    ok: pending.length === 0,
+    name,
+    detail: `${ready.length}/${rows.length} available${pending.length ? `; missing ${pending.map((row) => row.target ?? row.host).join(", ")}` : ""}${blocked.length ? `; blocked ${blocked.map((row) => `${row.target ?? row.host} (${row.blocker?.code})`).join(", ")}` : ""}`
+  });
+}
+
 if (process.platform === "darwin") {
   const sdk = spawnSync("xcrun", ["--sdk", "macosx", "--show-sdk-version"], { encoding: "utf8" });
   checks.push({

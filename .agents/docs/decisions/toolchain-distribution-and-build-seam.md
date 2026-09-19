@@ -3,9 +3,17 @@ type: Architecture Decision
 title: Ship precompiled target libraries and host compilers, and emit C into the extension for Bob
 description: CI builds Hermes per target in containers, the package vendors those plus per-host hermesc/shermes, and generated C is assembled into the extension so Bob and Extender compile it - locally or in the cloud.
 tags: [decision, packaging, toolchain, bob, extender, static-hermes, ci]
-status: proposed
+status: accepted
 generated: { by: claude/opus-5, at: 2026-09-18T23:50:00-04:00 }
 sources:
+  - id: build-input
+    resource: ../../../upstream/defold/share/extender/build_input.yml
+    title: Extender platform definitions for the pinned engine
+    author: team:defold
+  - id: defold-sdk-versions
+    resource: ../../../upstream/defold/build_tools/sdk.py
+    title: Engine SDK, NDK and deployment-target pins
+    author: team:defold
   - id: product-contract
     resource: ./generator-product-contract.md
     title: Ship a deterministic API compiler, not hand-authored bindings
@@ -57,12 +65,65 @@ with an explicit status. A target that is absent from the manifest is worse than
 one marked `required-missing`, because the user gets silence instead of a
 blocker naming the platform.
 
+## The target list is derived, never hand-written
+
+`scripts/generate-defold-bundle-targets.mjs` reads the pinned engine's own
+`share/extender/build_input.yml` - the file Extender itself consults to decide
+what it can build - and writes `packages/toolchains/defold-bundle-targets.json`.
+The structural rule is Extender's: a `platforms` key without `-` is a shared
+group context, a `<arch>-<group>` key is selectable, and a selectable key with an
+empty body is one upstream retired but kept so old manifests still parse
+(`x86-osx` today). The same pass derives the NDK revision, the Android API
+levels and the iOS/macOS deployment minimums from `build_tools/sdk.py`, because a
+cross build against a different level than the engine's own is an ABI mismatch
+Extender would only find at link time.
+
+`manage-native-artifacts.mjs verify` compares the manifest against that derived
+list in both directions, so a Defold release that adds a bundle platform fails
+here rather than leaving a user to discover it.
+
+## Statuses
+
+| Status | Meaning |
+| --- | --- |
+| `vendored` | present in this package and matching its pinned digest |
+| `vendored-source` | the target links generated JavaScript, not a Hermes archive |
+| `required-missing` | a container or CI build path exists; the artifact is not in this checkout |
+| `blocked` | cannot be produced yet, and `blocker` says why in machine-readable form |
+| `retired-upstream` | the pinned engine keeps the key only so old manifests parse |
+
+`verify --complete` names every gap in one report instead of throwing on the
+first, because filling the matrix one unnamed target at a time is a serial
+guessing game.
+
 # Host compilers
 
 `hermesc` (TypeScript/JS → bytecode) and `shermes` (typed TypeScript → C) run on
 the user's machine and must ship per host: macOS arm64 and x64, Linux x64 and
 arm64, Windows x64. Both are pure compilers - text in, text out - so shipping
 them imposes no native toolchain requirement on the user.
+
+They ship as **optional per-host packages**
+(`@ts-defold/deherm-compilers-<platform>-<arch>`, declaring `os` and `cpu`),
+not vendored inside the main package. Vendoring all five would put several
+hundred megabytes of LLVM-derived binaries into every install so that one of them
+could be used. The main package does not hard-depend on them either, so a host
+with no published build still installs cleanly and gets a diagnostic instead of a
+failed install.
+
+`packages/toolchains/host-compilers.json` is the pinned record, managed by
+`scripts/manage-host-compilers.mjs` with the same
+`fingerprint`/`install`/`record`/`verify`/`pull` verbs as the target archives.
+Resolution (`packages/cli/src/host-compilers.mjs`) checks the installed package
+first and the in-tree staging directory second, verifies the SHA-256 of each
+binary against that record, and **fails closed**: a mismatch or a missing package
+raises an error naming the host and the exact package to install. There is no
+fallback to whatever compiler happens to be on `PATH`, because a build that
+silently proceeds without `hermesc` produces exactly the stale-bundle failure the
+build seam exists to prevent.
+
+The published Linux compilers are built on `ubuntu-22.04` runners, which sets
+their glibc floor at 2.35.
 
 # The build seam
 
@@ -105,6 +166,43 @@ an interactive session:
   fingerprints must match the sources Bob sees, or déherm runs on the build
   machine and needs the host compilers there. Both are workable; an unchecked
   mismatch is not.
+
+# What builds what
+
+`.github/workflows/native-artifacts.yml` carries both matrices, kept apart in
+one file because conflating them has already cost review time. A `sdk` job reads
+the derived SDK pins once and feeds them to the cross builds.
+
+| Lane | Runner | Produces |
+| --- | --- | --- |
+| `linux` | `ubuntu-24.04`, `ubuntu-24.04-arm` | `x86_64-linux`, `arm64-linux` via `Dockerfile.linux` |
+| `windows` | `ubuntu-24.04` | `x86_64-win32` via `Dockerfile.win32`, merged to one `hermes.lib` |
+| `android` | `ubuntu-24.04` | `armv7`, `arm64`, `x86_64` via `Dockerfile.android` and the engine's NDK pin |
+| `apple` | `macos-15` | `arm64-osx`, `x86_64-osx`, `arm64-ios`, `arm64_sim-ios` via `build-apple.sh` |
+| `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts |
+
+iOS and macOS x64 need the Apple SDKs, so they have no container path and run on
+a macOS runner. Android needs the NDK, pinned by digest inside the container
+rather than trusted from the network.
+
+Every cross build first builds host `hermesc`/`shermes` and passes them through
+`-DIMPORT_HOST_COMPILERS`, because Hermes compiles its own internal JavaScript to
+bytecode during the build and cannot execute the binaries it is producing.
+
+`wasm_pthread-web` is the one `blocked` target. The web lane runs scripts on the
+browser's own engine through the Emscripten glue, and every recorded observation
+is of the single-threaded `wasm-web` bundle; the pthread bundle would run the
+engine on a worker with shared memory, which no evidence here covers.
+
+# Reporting it to the user
+
+`deherm doctor` answers the only question that matters at the seam: can this
+host build a bundle for the targets I intend to ship? It prints the host
+compilers (this host first), then every bundle target with its status, blocker
+and - inside a project - whether the installed extension actually carries the
+archive its digest claims. `--target <list>` turns the targets the user names
+into failures rather than information, and rejects a name the pinned engine does
+not declare. `--json` emits the same report as data.
 
 # Consequences
 

@@ -1,0 +1,30 @@
+{
+  "name": "@ts-defold/deherm-compilers-win32-x64",
+  "version": "0.0.0",
+  "description": "hermesc and shermes built for win32/x64 hosts, consumed by @ts-defold/deherm",
+  "type": "module",
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "exports": {
+    "./package.json": "./package.json",
+    "./bin/hermesc.exe": "./bin/hermesc.exe",
+    "./bin/shermes.exe": "./bin/shermes.exe"
+  },
+  "files": [
+    "bin/"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ts-defold/deherm.git"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

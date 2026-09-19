@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "source": "upstream/defold/share/extender/build_input.yml",
+  "sourceSha256": "4fdc4e2b76faf952ca54a74b4259a0be3bcd14d8e91c0545d161bc98181b85d4",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sdk": {
+    "androidNdkVersion": "25b",
+    "androidNdkApiVersion": "19",
+    "android64NdkApiVersion": "21",
+    "androidTargetApiLevel": "36",
+    "iphoneosVersionMin": "11.0",
+    "macosxVersionMin": "10.15"
+  },
+  "groups": [
+    "android",
+    "ios",
+    "linux",
+    "osx",
+    "web",
+    "win32"
+  ],
+  "targets": [
+    {
+      "target": "arm64_sim-ios",
+      "architecture": "arm64_sim",
+      "group": "ios",
+      "kind": "bundle"
+    },
+    {
+      "target": "arm64-android",
+      "architecture": "arm64",
+      "group": "android",
+      "kind": "bundle"
+    },
+    {
+      "target": "arm64-ios",
+      "architecture": "arm64",
+      "group": "ios",
+      "kind": "bundle"
+    },
+    {
+      "target": "arm64-linux",
+      "architecture": "arm64",
+      "group": "linux",
+      "kind": "bundle"
+    },
+    {
+      "target": "arm64-osx",
+      "architecture": "arm64",
+      "group": "osx",
+      "kind": "bundle"
+    },
+    {
+      "target": "armv7-android",
+      "architecture": "armv7",
+      "group": "android",
+      "kind": "bundle"
+    },
+    {
+      "target": "wasm_pthread-web",
+      "architecture": "wasm_pthread",
+      "group": "web",
+      "kind": "bundle"
+    },
+    {
+      "target": "wasm-web",
+      "architecture": "wasm",
+      "group": "web",
+      "kind": "bundle"
+    },
+    {
+      "target": "x86_64-android",
+      "architecture": "x86_64",
+      "group": "android",
+      "kind": "bundle"
+    },
+    {
+      "target": "x86_64-linux",
+      "architecture": "x86_64",
+      "group": "linux",
+      "kind": "bundle"
+    },
+    {
+      "target": "x86_64-osx",
+      "architecture": "x86_64",
+      "group": "osx",
+      "kind": "bundle"
+    },
+    {
+      "target": "x86_64-win32",
+      "architecture": "x86_64",
+      "group": "win32",
+      "kind": "bundle"
+    },
+    {
+      "target": "x86-osx",
+      "architecture": "x86",
+      "group": "osx",
+      "kind": "retired"
+    }
+  ]
+}

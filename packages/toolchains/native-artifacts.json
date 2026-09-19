@@ -1,7 +1,15 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "hermesRevision": "4947871513667919bf2fe225134af3e3a1a3772c",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "bundleTargets": "./defold-bundle-targets.json",
+  "statuses": {
+    "vendored": "The archive is present in this package and matches the pinned digest.",
+    "vendored-source": "The target links a source artifact instead of a Hermes archive.",
+    "required-missing": "A container or CI build path exists; the artifact has not been pulled into this checkout.",
+    "blocked": "The artifact cannot be produced yet; `blocker` names why.",
+    "retired-upstream": "The pinned Defold sources keep the platform key only so old manifests parse."
+  },
   "targets": {
     "arm64-osx": {
       "host": {
@@ -19,7 +27,7 @@
         "platform": "darwin",
         "architecture": "x64"
       },
-      "builder": "macos-native",
+      "builder": "macos-apple-sdk",
       "status": "required-missing",
       "library": "defold/defold_hermes/lib/x86_64-osx/libhermes.a"
     },
@@ -50,11 +58,66 @@
       "status": "required-missing",
       "library": "defold/defold_hermes/lib/x86_64-win32/hermes.lib"
     },
+    "arm64-ios": {
+      "host": null,
+      "builder": "macos-apple-sdk",
+      "status": "required-missing",
+      "library": "defold/defold_hermes/lib/arm64-ios/libhermes.a"
+    },
+    "arm64_sim-ios": {
+      "host": null,
+      "builder": "macos-apple-sdk",
+      "status": "required-missing",
+      "library": "defold/defold_hermes/lib/arm64_sim-ios/libhermes.a"
+    },
+    "armv7-android": {
+      "host": null,
+      "builder": "docker-android-ndk",
+      "status": "required-missing",
+      "library": "defold/defold_hermes/lib/armv7-android/libhermes.a"
+    },
+    "arm64-android": {
+      "host": null,
+      "builder": "docker-android-ndk",
+      "status": "required-missing",
+      "library": "defold/defold_hermes/lib/arm64-android/libhermes.a"
+    },
+    "x86_64-android": {
+      "host": null,
+      "builder": "docker-android-ndk",
+      "status": "required-missing",
+      "library": "defold/defold_hermes/lib/x86_64-android/libhermes.a"
+    },
     "wasm-web": {
       "host": null,
       "builder": "browser-host",
       "status": "vendored-source",
       "library": "defold/defold_hermes/lib/web/library_defold_hermes.js"
+    },
+    "wasm_pthread-web": {
+      "host": null,
+      "builder": "browser-host",
+      "status": "blocked",
+      "library": "defold/defold_hermes/lib/web/library_defold_hermes.js",
+      "blocker": {
+        "code": "web-pthread-browser-host-unproven",
+        "reason": "The web lane runs scripts on the browser's own JavaScript engine through the Emscripten JS glue, and every recorded observation is of the single-threaded wasm-web bundle. A wasm_pthread-web bundle runs the engine on a pthread worker with a shared memory, where the same glue would have to marshal host-engine calls across threads; no evidence for that exists in this project.",
+        "requires": [
+          "A worker-thread browser-host transport design for lib/web/library_defold_hermes.js",
+          "A wasm_pthread-web packaged-engine observation recorded like the wasm-web one"
+        ]
+      }
+    },
+    "x86-osx": {
+      "host": null,
+      "builder": null,
+      "status": "retired-upstream",
+      "library": null,
+      "blocker": {
+        "code": "upstream-platform-retired",
+        "reason": "upstream/defold/share/extender/build_input.yml declares x86-osx with an empty body, kept only so old manifests parse. Extender carries no toolchain for it, so no Hermes archive can be produced or used.",
+        "requires": []
+      }
     }
   }
 }
