@@ -76,8 +76,12 @@ jobs:
       macosx_version_min: ${{ steps.sdk.outputs.macosx_version_min }}
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
-        with: { node-version: '22' }
+        with: { node-version: '22', cache: 'pnpm' }
+      # The fingerprint reads Defold's build_input.yml, so it needs the `yaml`
+      # dependency. Nothing else here runs project code.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: compute
         env:
           GH_TOKEN: ${{ github.token }}
