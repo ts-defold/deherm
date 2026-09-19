@@ -80,7 +80,7 @@ cmake -S "$hermes_source" -B "$cross_build" -G Ninja \
   -DHERMES_ENABLE_TOOLS=OFF \
   -DHERMES_ENABLE_NAPI=OFF \
   -DHERMES_ENABLE_DEBUGGER=OFF \
-  -DHERMES_ENABLE_INTL=OFF \
+  -DHERMES_ENABLE_INTL=ON \
   -DHERMES_BUILD_SHARED_JSI=OFF
 cmake --build "$cross_build" --target hermesvm_a jsi --parallel
 

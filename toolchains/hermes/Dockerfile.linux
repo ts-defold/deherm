@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 ARG TARGET_ARCH=x86_64
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    binutils ca-certificates clang cmake git lld ninja-build python3 && \
+    binutils ca-certificates clang cmake git libicu-dev lld ninja-build python3 && \
     rm -rf /var/lib/apt/lists/*
 
 COPY upstream/hermes /src/hermes
@@ -16,8 +16,8 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DHERMES_ENABLE_TOOLS=OFF \
       -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_DEBUGGER=OFF \
-      -DHERMES_ENABLE_INTL=OFF \
-      -DHERMES_UNICODE_LITE=ON \
+      -DHERMES_ENABLE_INTL=ON \
+      -DHERMES_USE_STATIC_ICU=ON \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
     cmake --build /work/build --target hermesvm_a jsi --parallel && \
     package-posix /work/build /out/libhermes.a

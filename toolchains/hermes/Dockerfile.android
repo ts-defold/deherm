@@ -63,7 +63,7 @@ RUN if [ "$NDK_VERSION" != "25b" ]; then \
     fi
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    ca-certificates clang cmake curl git lld ninja-build python3 unzip && \
+    ca-certificates clang cmake curl git libicu-dev lld ninja-build python3 unzip && \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSLo /tmp/ndk.zip "https://dl.google.com/android/repository/android-ndk-r${NDK_VERSION}-linux.zip" && \
@@ -89,8 +89,7 @@ RUN cmake -S /src/hermes -B /work/host -G Ninja \
       -DCMAKE_C_COMPILER=clang \
       -DCMAKE_CXX_COMPILER=clang++ \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
-      -DHERMES_ENABLE_INTL=OFF \
-      -DHERMES_UNICODE_LITE=ON && \
+      -DHERMES_ENABLE_INTL=OFF && \
     cmake --build /work/host --target hermesc shermes --parallel
 
 RUN cmake -S /src/hermes -B /work/build -G Ninja \
