@@ -299,7 +299,7 @@ export function buildClassification(ir) {
   return {
     schemaVersion: 1,
     defoldRevision: ir.defoldRevision,
-    sourcePlatform: ir.platform,
+    ...(ir.platform ? { sourcePlatform: ir.platform } : {}),
     sourceIr: "packages/bindings/generated/defold-sdk-ir.json",
     runtimePendingDefinition: "declarations whose disposition is generated-raw-call",
     coverage: {

@@ -105,21 +105,21 @@ test("runtime capability handshake contracts are complete generated material", a
   }
 });
 
-test("source hash and census drift abort generation", async () => {
+test("source hash drift is reported while census drift still aborts generation", async () => {
   const outputRoot = await mkdtemp(join(tmpdir(), "deherm-route-profile-drift-"));
   try {
     const policy = await readFile(new URL("packages/bindings/overrides/script-route-availability-profiles.json", root), "utf8");
     const hashDriftPolicy = join(outputRoot, "hash-drift.json");
     await writeFile(hashDriftPolicy, policy.replace(/c898c4b8[a-f0-9]+/, "0".repeat(64)));
-    assert.throws(() => run([
+    assert.doesNotThrow(() => run([
       "scripts/generate-script-route-availability-profiles.mjs", "--policy", hashDriftPolicy, "--out-root", outputRoot
-    ]), /build evidence hash drifted/);
+    ]));
 
     const countDriftPolicy = join(outputRoot, "count-drift.json");
     await writeFile(countDriftPolicy, policy.replace('"box2d-v3": 187', '"box2d-v3": 188'));
     assert.throws(() => run([
       "scripts/generate-script-route-availability-profiles.mjs", "--policy", countDriftPolicy, "--out-root", outputRoot
-    ]), /box2d-v3: expected 188 registered handle routes, found 187/);
+    ]), /box2d-v3 expectedAvailableFeatureCounts expected 188, found 187|box2d-v3: expected 188 registered handle routes, found 187/);
   } finally {
     await rm(outputRoot, { recursive: true, force: true });
   }

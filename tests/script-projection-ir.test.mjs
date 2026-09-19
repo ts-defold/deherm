@@ -116,7 +116,7 @@ test("rejects omitted, duplicated, foreign, and stale route inputs", () => {
 
   const stale = structuredClone(inputs);
   stale.ir = replaceJson(stale.ir, (value) => value.functions.pop());
-  assert.throws(() => generateScriptProjectionIr(stale), /function census drifted/);
+  assert.throws(() => generateScriptProjectionIr(stale), /function census (?:drifted|expected 926, found 925)/);
 });
 
 test("pins every machine-readable input and checks deterministic regeneration", () => {

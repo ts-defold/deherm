@@ -1,5 +1,6 @@
 #include <defold_hermes/component_hermes_backend.hpp>
 #include <defold_hermes/component_proxy_lua_gate.hpp>
+#include <defold_hermes/active_game_object_context.hpp>
 #include <defold_hermes/runtime.hpp>
 
 #include <dmsdk/dlib/hash.h>
@@ -22,6 +23,59 @@ namespace {
 
 int gCurrentInstance = LUA_NOREF;
 defold_hermes::Runtime* gRuntime = nullptr;
+
+struct TestGameObject {
+  uint32_t generation = 7;
+  uint64_t identifier = 0x1234u;
+  float position[3]{};
+};
+
+TestGameObject gGameObject;
+int gCollection = 0;
+
+bool IsGameObjectAttachmentLive(
+    void* owner,
+    uint32_t slot,
+    uint32_t generation) noexcept {
+  return owner == &gGameObject && slot == 0 && generation == gGameObject.generation;
+}
+
+bool BuildCurrentGameObject(
+    void*,
+    void* luaState,
+    defold_hermes::game_object::ActiveContext* out) noexcept {
+  if (!luaState || !out) return false;
+  *out = {
+    &gGameObject,
+    &gCollection,
+    gGameObject.identifier,
+    gGameObject.generation,
+    {&gGameObject, 0, gGameObject.generation, IsGameObjectAttachmentLive}
+  };
+  return true;
+}
+
+uint32_t GameObjectGeneration(void*, void* instance) noexcept {
+  return static_cast<TestGameObject*>(instance)->generation;
+}
+
+void* GameObjectCollection(void*, void*) noexcept { return &gCollection; }
+
+uint64_t GameObjectIdentifier(void*, void* instance) noexcept {
+  return static_cast<TestGameObject*>(instance)->identifier;
+}
+
+void GameObjectPosition(void*, void* instance, float* xyz) noexcept {
+  auto* object = static_cast<TestGameObject*>(instance);
+  for (size_t lane = 0; lane < 3; ++lane) xyz[lane] = object->position[lane];
+}
+
+void SetGameObjectPosition(void*, void* instance, const float* xyz) noexcept {
+  auto* object = static_cast<TestGameObject*>(instance);
+  for (size_t lane = 0; lane < 3; ++lane) object->position[lane] = xyz[lane];
+}
+
+void SetGameObjectRotation(void*, void*, const float*) noexcept {}
 
 [[noreturn]] void Fail(const char* message) {
   std::fprintf(stderr, "component-runtime-hermes-e2e:error:%s\n", message);
@@ -88,6 +142,19 @@ int main(int argc, char** argv) {
   lua_State* state = luaL_newstate();
   if (!state) Fail("unable to create Lua state");
   luaL_openlibs(state);
+
+  if (!defold_hermes::game_object::installTerminalApi({
+          nullptr,
+          GameObjectGeneration,
+          GameObjectCollection,
+          GameObjectIdentifier,
+          GameObjectPosition,
+          SetGameObjectPosition,
+          SetGameObjectRotation
+      }) ||
+      !defold_hermes::game_object::installCurrentInstanceApi({nullptr, BuildCurrentGameObject})) {
+    Fail("unable to install the test game-object context provider");
+  }
 
   TestHost host;
   defold_hermes::Runtime runtime(host);
@@ -188,6 +255,8 @@ int main(int argc, char** argv) {
 
   replacement.finalize();
   luaRuntime.shutdown();
+  defold_hermes::game_object::uninstallCurrentInstanceApi();
+  defold_hermes::game_object::uninstallTerminalApi();
   gRuntime = nullptr;
   lua_close(state);
   std::puts("component-runtime-hermes-e2e:compiler-registry-component-only-bootstrap:ok");

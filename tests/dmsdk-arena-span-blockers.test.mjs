@@ -60,7 +60,7 @@ test("arena-span blocker generator rejects schema, revision, provenance, and dup
   assert.throws(() => generate({
     ...inputs,
     policyText: withJson(inputs.policyText, (policy) => { policy.defoldRevision = "0".repeat(40); })
-  }), /different Defold revisions/);
+  }), /was reviewed against Defold .* but .* is being generated/);
   assert.throws(() => generate({
     ...inputs,
     shapesText: withJson(inputs.shapesText, (shapes) => { shapes.sourceHashes.ir = "0".repeat(64); })

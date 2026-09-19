@@ -26,12 +26,12 @@ test("all generated Lua ABI methods have stage-qualified native provider evidenc
   assert.deepEqual(report.providerInstalledMethods, report.requiredLuaMethods);
   assert.deepEqual(report.adapterExecutableMethods, report.requiredLuaMethods);
   assert.deepEqual(report.packagedDefoldEngineVerifiedMethods, []);
-  assert.match(extension, /registerUnavailableLuaApi/);
+  assert.match(extension, /gComponentWebBackend = std::make_unique/);
   assert.match(extension, /gComponentLuaRuntime->registerLuaApi/);
   for (const method of report.requiredLuaMethods) {
     assert.match(report.methodDisposition[method].nativeDynamicHermes, /harness-proven-packaged-engine-unverified/);
     assert.match(report.methodDisposition[method].nativeStaticHermes, /^fail-closed/);
-    assert.match(report.methodDisposition[method].html5BrowserHost, /^fail-closed/);
+    assert.match(report.methodDisposition[method].html5BrowserHost, /^provider-compiled-browser/);
   }
   assert.equal(report.evidence.packagedDefoldEngine, "unverified");
 });

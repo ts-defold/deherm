@@ -180,6 +180,10 @@ try {
       servicePort: 38123,
       debounceMs: 20,
       useTtsc: false,
+      // Host-compiler distribution is covered by the toolchain matrix. This
+      // installed-package fixture owns watcher/coordinator behavior and must be
+      // deterministic without a release download.
+      bytecode: false,
       services
     });
     console.log(`DEV_LOOP_RESULT ${JSON.stringify({

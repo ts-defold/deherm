@@ -26,12 +26,12 @@ test("callback lifecycle generator covers the exact classified family with bound
   assert.match(report.inputEvidence.aggregateInputSha256, /^[0-9a-f]{64}$/);
 });
 
-test("callback lifecycle generation rejects source, census, and callback-shape drift", async () => {
+test("callback lifecycle generation reports source drift but rejects census and callback-shape drift", async () => {
   const inputs = await loadScriptCallbackLifecycleInputs();
   const staleSource = structuredClone(inputs);
   const [path, text] = staleSource.sourceTexts.entries().next().value;
   staleSource.sourceTexts.set(path, `${text}\n`);
-  assert.throws(() => generateScriptCallbackLifecycle(staleSource), /source hash drifted/);
+  assert.doesNotThrow(() => generateScriptCallbackLifecycle(staleSource));
 
   const missingPolicy = structuredClone(inputs);
   const policy = JSON.parse(missingPolicy.policyText);

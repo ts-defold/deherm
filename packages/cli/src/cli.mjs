@@ -67,6 +67,7 @@ Options:
   --no-launch        Watch/build without automatically launching the local game
   --web              Also launch the packaged HTML5 build in a headless browser
   --no-ttsc          Disable ttsc transforms for a diagnostic dev build
+  --no-bytecode      Keep the development bundle as JavaScript (offline diagnostic)
   --shard <i/n>      Stable zero-based shard selection (default: 0/1)
   --strict           Fail a report unless every required selected stage passed
   --check            Verify materialized output without writing it
@@ -106,6 +107,7 @@ export function parseArguments(argv) {
     // so a non-interactive run can drive the browser edit loop too.
     else if (value === "--web") options.web = true;
     else if (value === "--no-ttsc") options.useTtsc = false;
+    else if (value === "--no-bytecode") options.bytecode = false;
     else if (value === "--no-harvest") options.harvest = false;
     else if (value === "--pool") options.pool = args.shift();
     else if (value === "--session-log") options.sessionLogs.push(args.shift());

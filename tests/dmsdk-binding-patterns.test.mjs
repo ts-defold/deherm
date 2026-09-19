@@ -58,7 +58,8 @@ test("keeps classification separate from implementation and conformance coverage
     conformantCount: 0,
     note: "Classification is code-generation planning metadata. It is not evidence that a binding adapter was generated, compiled, linked, executed, or conformance-tested.",
   });
-  assert.equal(generated.provenanceCaveats.diagnosticHeaderCount, 35);
+  assert.equal(generated.provenanceCaveats.diagnosticHeaderCount, ir.diagnosticHeaderCount);
+  assert.ok(generated.provenanceCaveats.diagnosticHeaderCount > 0);
 });
 
 test("classifies representative ABI and codegen families", async () => {

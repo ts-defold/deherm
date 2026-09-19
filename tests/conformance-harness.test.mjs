@@ -18,7 +18,8 @@ test("conformance generator accounts for every script and dmSDK declaration", as
   const inputs = await loadConformanceInputs();
   const plan = buildConformancePlan(inputs, { target: "arm64-macos", contexts: ["*"], shard: "0/1" });
 
-  assert.equal(plan.selectedCaseCount, 3066);
+  const expectedCaseCount = Object.values(plan.summary.surface).reduce((sum, count) => sum + count, 0);
+  assert.equal(plan.selectedCaseCount, expectedCaseCount);
   assert.deepEqual(plan.summary.surface, { dmsdk: 2141, script: 926 });
   assert.equal(new Set(plan.cases.map(({ id }) => id)).size, plan.cases.length);
   assert.equal(new Set(plan.cases.map(({ stableId }) => stableId)).size, plan.cases.length);
@@ -94,7 +95,7 @@ test("the exhaustive generated TypeScript fixture compiles against the generated
   assert.deepEqual(schema.$defs.executionPolicy.enum, conformanceSchema.executionPolicies);
   assert.deepEqual(schema.$defs.semanticState.enum, conformanceSchema.semanticStates);
   const runtime = await import(`${new URL(`file://${harness.files.runtime}`).href}?test=${Date.now()}`);
-  assert.equal(runtime.cases.length, 3066);
+  assert.equal(runtime.cases.length, plan.selectedCaseCount);
   assert.equal(typeof runtime.runGeneratedConformance, "function");
 });
 

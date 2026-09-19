@@ -40,6 +40,7 @@ test("command-specific target parsing keeps dev endpoints separate from conforma
   assert.equal(conformance.target, "js-web");
   assert.deepEqual(conformance.targets, []);
   assert.equal(parseArguments(["materialize-dmsdk", "--check"]).check, true);
+  assert.equal(parseArguments(["dev", "--no-bytecode"]).bytecode, false);
   assert.throws(() => parseArguments(["generate", "--check"]), /Unknown option: --check/);
 });
 
@@ -163,7 +164,8 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
     "dev",
     "--project", project,
     "--once",
-    "--headless"
+    "--headless",
+    "--no-bytecode"
   ], { cwd: project });
   assert.match(development.stdout, /\[deherm\] build-succeeded generation=1/);
   await readFile(path.join(project, ".deherm", "dev", "app.dehermc"), "utf8");

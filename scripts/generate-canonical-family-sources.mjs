@@ -38,7 +38,9 @@ function validateAuthority(plan, emission) {
 function selectedUnits(plan, emission) {
   const seen = new Set();
   const stableIds = new Set();
-  return emission.units.map((selected) => {
+  const units = [];
+  const delegatedSurfaceCounts = {};
+  for (const selected of emission.units) {
     if (seen.has(selected.id)) throw new Error(`Binding emission plan repeats '${selected.id}'`);
     seen.add(selected.id);
     const unit = plan.units[selected.sourceUnit];
@@ -48,7 +50,21 @@ function selectedUnits(plan, emission) {
     if (unit.identity.surface !== selected.surface || unit.sourceState.loweringFamily !== selected.loweringFamily) {
       throw new Error(`${selected.id}: selected family identity drifted`);
     }
-    if (unit.identity.surface !== "script" || unit.abi.invoker?.kind !== "cached-lua-route" ||
+    // This artifact is the uniform script-route reachability gate. dmSDK has
+    // its own generated family ABIs (including the universal direct-memory
+    // fallback), so routing those symbols through defoldHermesScriptCall would
+    // silently reinterpret a native ABI as a Lua-stack ABI. Keep the complete
+    // emission plan authoritative, but delegate non-script surfaces to their
+    // generated transports and account for them in the manifest/report.
+    if (unit.identity.surface !== "script") {
+      if (unit.abi.state !== "existing-generated-entry" ||
+          (typeof unit.abi.symbol !== "string" && typeof unit.abi.plannedSymbol !== "string")) {
+        throw new Error(`${selected.id}: selected non-script surface has no generated ABI entry`);
+      }
+      delegatedSurfaceCounts[unit.identity.surface] = (delegatedSurfaceCounts[unit.identity.surface] ?? 0) + 1;
+      continue;
+    }
+    if (unit.abi.invoker?.kind !== "cached-lua-route" ||
         unit.abi.invoker.stableId !== unit.identity.stableId) {
       throw new Error(`${selected.id}: no uniform generated script dispatch ABI is proven`);
     }
@@ -57,8 +73,14 @@ function selectedUnits(plan, emission) {
     }
     if (stableIds.has(unit.identity.stableId)) throw new Error(`${selected.id}: canonical stable ID collides in selected output`);
     stableIds.add(unit.identity.stableId);
-    return unit;
-  }).sort((left, right) => left.identity.stableId - right.identity.stableId || compareCodeUnits(left.identity.id, right.identity.id));
+    units.push(unit);
+  }
+  units.sort((left, right) => left.identity.stableId - right.identity.stableId || compareCodeUnits(left.identity.id, right.identity.id));
+  return {
+    units,
+    delegatedSurfaceCounts: Object.fromEntries(Object.entries(delegatedSurfaceCounts)
+      .sort(([left], [right]) => compareCodeUnits(left, right)))
+  };
 }
 
 function groupUnits(units) {
@@ -248,7 +270,7 @@ addToLibrary(LibraryDehermCanonicalRelease);
 `;
 }
 
-function requirementsReport(plan, emission, units) {
+function requirementsReport(plan, emission, units, delegatedSurfaceCounts) {
   const diagnosticBlockerCounts = {};
   const diagnosticSelectionCounts = {};
   for (const diagnostic of emission.diagnostics) {
@@ -278,7 +300,9 @@ function requirementsReport(plan, emission, units) {
     sourcePlanSha256: plan.planSha256,
     sourceEmissionPlanSha256: emission.emissionPlanSha256,
     canonicalUnitCount: plan.units.length,
-    selectedEmitUnits: units.length,
+    selectedEmitUnits: emission.units.length,
+    selectedScriptEmitUnits: units.length,
+    delegatedSurfaceCounts,
     status,
     selectionCounts: Object.fromEntries(Object.entries(selectionCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
     blockerCounts: Object.fromEntries(Object.entries(blockerCounts).sort(([left], [right]) => compareCodeUnits(left, right))),
@@ -297,7 +321,8 @@ function requirementsReport(plan, emission, units) {
 
 export function generateCanonicalFamilyArtifacts(plan, emission) {
   validateAuthority(plan, emission);
-  const units = selectedUnits(plan, emission);
+  const selection = selectedUnits(plan, emission);
+  const { units, delegatedSurfaceCounts } = selection;
   const groups = groupUnits(units);
   const prefix = `canonical/${emission.target}`;
   const artifacts = new Map();
@@ -312,7 +337,7 @@ export function generateCanonicalFamilyArtifacts(plan, emission) {
   artifacts.set(`${prefix}/sources.cmake`, cmakeSource(emission.target, groupPaths));
   if (emission.target === "staticHermesCAbi") artifacts.set(`${prefix}/static-hermes.js`, staticHermesSource(units));
   if (emission.target === "browserWasmHost") artifacts.set(`${prefix}/browser-library.js`, browserSource(units));
-  const requirements = requirementsReport(plan, emission, units);
+  const requirements = requirementsReport(plan, emission, units, delegatedSurfaceCounts);
   artifacts.set(`${prefix}/requirements.json`, `${JSON.stringify(requirements, null, 2)}\n`);
   const manifestBody = {
     schemaVersion: 1,
@@ -320,7 +345,9 @@ export function generateCanonicalFamilyArtifacts(plan, emission) {
     profileId: emission.profileId,
     sourcePlanSha256: plan.planSha256,
     sourceEmissionPlanSha256: emission.emissionPlanSha256,
+    selectedEmissionUnitCount: emission.units.length,
     routeCount: units.length,
+    delegatedSurfaceCounts,
     groupCount: groups.length,
     groups: groups.map((group, index) => ({
       index,

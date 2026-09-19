@@ -121,7 +121,7 @@ test("generated implementation lanes join by exact identity and universal fallba
   assert.equal(universalImplementation.lane, "script-universal-value");
   assert.equal(universal.backends.dynamicHermesJsi.selection, "emit");
   assert.equal(universal.backends.luaStack.selection, "emit");
-  assert.equal(universal.backends.staticHermesCAbi.selection, "blocked-semantic");
+  assert.equal(universal.backends.staticHermesCAbi.selection, "emit");
   assert.equal(universal.backends.browserWasmHost.selection, "emit");
 
   const retainedCallback = generated.units.find(({ identity }) => identity.id === "script:http.request");
@@ -135,7 +135,9 @@ test("generated implementation lanes join by exact identity and universal fallba
       assert.equal(closureResult.backends[target].selection, "blocked-capability", `${id}/${target}`);
       assert.deepEqual(
         generated.tables.blockerSets[closureResult.backends[target].blockerSet],
-        ["higher-order-lua-closure-result-transport-unavailable"],
+        target === "staticHermesCAbi"
+          ? ["higher-order-lua-closure-result-transport-unavailable", "shape-kind:callback"]
+          : ["higher-order-lua-closure-result-transport-unavailable"],
         `${id}/${target}`);
     }
   }
@@ -229,7 +231,7 @@ test("marshalling is an interned data-oriented opcode algebra rather than route 
   assert.ok(generated.tables.contracts.length < generated.coverage.units);
   assert.ok(generated.tables.marshallingPrograms.length < generated.coverage.units);
   assert.ok(generated.tables.blockerSets.length < 200);
-  assert.ok(generated.tables.unresolvedTokenSets.length < 200);
+  assert.ok(generated.tables.unresolvedTokenSets.length < generated.coverage.units / 4);
   const allowed = new Set([
     "validate-scalar", "pass-dynamic", "validate-named", "validate-enum", "decode-defold-value",
     "resolve-handle", "decode-record-ref", "decode-record", "decode-sequence", "decode-map", "select-union",

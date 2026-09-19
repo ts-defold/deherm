@@ -34,6 +34,10 @@ function emission(authority, target, usage) {
   );
 }
 
+function selectedScriptUnits(authority, selected) {
+  return selected.units.filter((unit) => authority.plan.units[unit.sourceUnit].identity.surface === "script");
+}
+
 async function writeArtifacts(root, artifacts) {
   for (const [relative, source] of artifacts) {
     const path = join(root, relative);
@@ -72,7 +76,9 @@ test("dynamic canonical families emit only reachable routes and compile as a det
   if (!cxx) return t.skip("No C++ compiler is available");
   const authority = await authorities();
   const allSelected = emission(authority, "dynamicHermesJsi", { schemaVersion: 1, dynamicAccess: true, symbols: [] });
-  const capable = allSelected.units.map((unit) => authority.plan.units[unit.sourceUnit]);
+  const capable = allSelected.units
+    .map((unit) => authority.plan.units[unit.sourceUnit])
+    .filter((unit) => unit.identity.surface === "script");
   const families = new Map();
   for (const unit of capable) if (!families.has(unit.sourceState.loweringFamily)) families.set(unit.sourceState.loweringFamily, unit);
   assert.ok(families.size > 2, "fixture needs selected and omitted canonical lowering families");
@@ -133,17 +139,24 @@ test("the complete currently authorized Dynamic Hermes family inventory compiles
   if (!cxx) return t.skip("No C++ compiler is available");
   const authority = await authorities();
   const selected = emission(authority, "dynamicHermesJsi", { schemaVersion: 1, dynamicAccess: true, symbols: [] });
+  const scriptUnits = selectedScriptUnits(authority, selected);
   const generated = generateCanonicalFamilyArtifacts(authority.plan, selected);
-  assert.equal(generated.manifest.routeCount, selected.units.length);
+  assert.equal(generated.manifest.selectedEmissionUnitCount, selected.units.length);
+  assert.equal(generated.manifest.routeCount, scriptUnits.length);
+  assert.deepEqual(generated.manifest.delegatedSurfaceCounts, { dmsdk: selected.units.length - scriptUnits.length });
+  const scriptFamilyCounts = {};
+  for (const selectedUnit of scriptUnits) {
+    scriptFamilyCounts[selectedUnit.loweringFamily] = (scriptFamilyCounts[selectedUnit.loweringFamily] ?? 0) + 1;
+  }
   assert.deepEqual(
     generated.manifest.groups.map((group) => [group.loweringFamily, group.routeCount]),
-    Object.entries(selected.familyCounts)
+    Object.entries(scriptFamilyCounts).sort(([left], [right]) => left.localeCompare(right))
   );
   const temporary = await mkdtemp(join(tmpdir(), "deherm-canonical-full-dynamic-"));
   try {
     await writeArtifacts(temporary, generated.artifacts);
-    const firstId = selected.units[0].id;
-    const stableId = authority.plan.units[selected.units[0].sourceUnit].identity.stableId;
+    const firstId = scriptUnits[0].id;
+    const stableId = authority.plan.units[scriptUnits[0].sourceUnit].identity.stableId;
     assert.equal(typeof firstId, "string");
     await compileAndRun(
       cxx,
@@ -155,7 +168,7 @@ test("the complete currently authorized Dynamic Hermes family inventory compiles
 #include <stdint.h>
 extern "C" int defoldHermesScriptCall(uint32_t, uint32_t, const uint8_t*, const uint8_t*, const double*, const uint64_t*, const uint32_t*, const uint32_t*, const char*, uint32_t, uint8_t*, uint8_t*, double*, uint64_t*, char*, uint32_t, uint32_t*) { return 1; }
 int main() {
-  return dehermCanonicalReleaseRouteCount() == ${selected.units.length}u && dehermCanonicalReleaseRouteEnabled(${stableId}u) ? 0 : 1;
+  return dehermCanonicalReleaseRouteCount() == ${scriptUnits.length}u && dehermCanonicalReleaseRouteEnabled(${stableId}u) ? 0 : 1;
 }
 `
     );
@@ -170,8 +183,12 @@ for (const target of ["staticHermesCAbi", "browserWasmHost"]) {
     if (!cxx) return t.skip("No C++ compiler is available");
     const authority = await authorities();
     const selected = emission(authority, target, { schemaVersion: 1, dynamicAccess: true, symbols: [] });
+    const scriptUnits = selectedScriptUnits(authority, selected);
     const generated = generateCanonicalFamilyArtifacts(authority.plan, selected);
-    assert.equal(generated.manifest.routeCount, selected.units.length);
+    assert.equal(generated.manifest.selectedEmissionUnitCount, selected.units.length);
+    assert.equal(generated.manifest.routeCount, scriptUnits.length);
+    assert.deepEqual(generated.requirements.delegatedSurfaceCounts,
+      { dmsdk: selected.units.length - scriptUnits.length });
     assert.ok(generated.manifest.routeCount > 0);
     assert.ok(generated.manifest.groupCount > 0);
     assert.equal(generated.requirements.status, "authority-satisfied-for-selected-script-units");
@@ -190,13 +207,13 @@ for (const target of ["staticHermesCAbi", "browserWasmHost"]) {
     const temporary = await mkdtemp(join(tmpdir(), `deherm-${target}-`));
     try {
       await writeArtifacts(temporary, generated.artifacts);
-      const selectedStableId = authority.plan.units[selected.units[0].sourceUnit].identity.stableId;
+      const selectedStableId = authority.plan.units[scriptUnits[0].sourceUnit].identity.stableId;
       await compileAndRun(cxx, temporary, target, ["src/registry.cpp", ...generated.manifest.groups.map((group) => group.source)], `
 #include "deherm_canonical_release.h"
 #include <stdint.h>
 extern "C" int defoldHermesScriptCall(uint32_t, uint32_t, const uint8_t*, const uint8_t*, const double*, const uint64_t*, const uint32_t*, const uint32_t*, const char*, uint32_t, uint8_t*, uint8_t*, double*, uint64_t*, char*, uint32_t, uint32_t*) { return 31; }
 int main() {
-  if (dehermCanonicalReleaseRouteCount() != ${selected.units.length}u) return 1;
+  if (dehermCanonicalReleaseRouteCount() != ${scriptUnits.length}u) return 1;
   if (dehermCanonicalReleaseRoutes() == nullptr) return 2;
   if (!dehermCanonicalReleaseRouteEnabled(${selectedStableId}u)) return 3;
   return dehermCanonicalReleaseDispatch(${selectedStableId}u, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr) == 31 ? 0 : 4;
