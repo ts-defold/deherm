@@ -14,6 +14,7 @@ import { createIncrementalCompiler } from "./compiler.mjs";
 import { createDefoldBuilder } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
 import { createEngineController } from "./engine-process.mjs";
+import { BROWSER_TARGET_ID, createBrowserTarget } from "./browser-target.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "./model.mjs";
 import { normalizeResourcePaths } from "./protocol.mjs";
 import { startResourceServer } from "./resource-server.mjs";
@@ -278,6 +279,34 @@ export async function runDevSession(options = {}) {
     resourceUri: () => resourceServer?.baseUrl,
     env: { DM_SERVICE_PORT: String(servicePort) }
   });
+  // The HTML5 target of the same session. It is a peer of the native engine,
+  // not a mode of it: both can run at once, each reports its own generation and
+  // its own telemetry, and the console lists both. A browser page has no engine
+  // service, so this one is reloaded by pushing the built bundle into the page;
+  // the page acknowledges with the same fingerprint event the engine logs.
+  const browser = (services.createBrowserTarget ?? createBrowserTarget)({
+    projectRoot,
+    emit,
+    targetId: BROWSER_TARGET_ID,
+    bundleFile: outputFile,
+    bundleDirectory: options.webBundle,
+    chromeBinary: options.chrome,
+    headless: options.browserHeadless,
+    telemetryIntervalMs: options.telemetryIntervalMs
+  });
+  // A build the browser target is running must reach the page, and only a
+  // build that succeeded may be pushed. This is the browser's equivalent of the
+  // coordinator's resource-reload post, kept out of the coordinator because it
+  // is a different transport with a different acknowledgement path.
+  listeners.add((event) => {
+    if (event.type !== "build-succeeded" || !browser.running()) return;
+    void browser.activate(event.generation).catch((error) => emit({
+      type: "log",
+      level: "error",
+      source: "browser",
+      message: `pushing bundle generation ${event.generation} into the page failed: ${error instanceof Error ? error.message : String(error)}`
+    }));
+  });
   await coordinator.requestBuild([path.relative(projectRoot, entryPoint).split(path.sep).join("/") || path.basename(entryPoint)]);
 
   if (options.once) {
@@ -370,10 +399,26 @@ export async function runDevSession(options = {}) {
     source: "dev",
     message: `automatic Defold build/launch failed: ${error instanceof Error ? error.message : String(error)}`
   }));
+  // The HTML5 target is opt-in at startup and always available on the `w`
+  // intent. Launching it here is what lets a non-interactive session drive the
+  // browser edit loop, and it waits for the first bundle so the page is pushed
+  // a generation that exists.
+  const webStartup = options.web
+    ? startup.then(() => browser.launch())
+      .then((started) => started && browser.activate(model.lastSuccessfulGeneration || undefined))
+      .catch((error) => emit({
+        type: "log",
+        level: "error",
+        source: "browser",
+        message: `HTML5 target could not start: ${error instanceof Error ? error.message : String(error)}`
+      }))
+    : Promise.resolve();
   const close = async () => {
     watcher.close();
     await startup;
+    await webStartup;
     await developmentLoop;
+    await browser.stop();
     await engine.stop();
     await coordinator.close();
     await builder?.close();
@@ -407,6 +452,23 @@ export async function runDevSession(options = {}) {
               type: "log",
               level: "error",
               source: "coordinator",
+              message: error instanceof Error ? error.message : String(error)
+            }));
+          }
+          else if (intent.type === "web") {
+            // Launching serves the packaged wasm-web bundle on a scoped
+            // loopback port, opens it in a dedicated headless Chrome profile,
+            // and pushes the current bundle in. Stopping releases all three.
+            const action = browser.running()
+              ? browser.stop()
+              : browser.launch().then(async (started) => {
+                if (started) await browser.activate(model.lastSuccessfulGeneration || undefined);
+                return started;
+              });
+            void action.catch((error) => emit({
+              type: "log",
+              level: "error",
+              source: "browser",
               message: error instanceof Error ? error.message : String(error)
             }));
           }

@@ -5,4 +5,12 @@
 # `ext.manifest` context into one per-build setting, so the C++ standard and
 # exception flags `defold_hermes` already asks for are the ones this unit is
 # compiled under, and a flag added here would land on `defold_hermes` too.
+#
+# RUNTIME: hermes. This extension is a transport of the Hermes
+# runtime, not a platform-neutral one. Its sources call `_sh_*` entry points
+# that only `libhermes.a` defines, and an `ext.manifest` cannot exclude a
+# platform - Extender compiles every `src/` file it is given. The upload gate
+# is therefore `.defignore`, maintained by
+# `packages/cli/src/typed-native.mjs`, and each generated source additionally
+# fails closed with a named #error if it ever reaches a non-Hermes toolchain.
 name: "defold_hermes_typed_native"

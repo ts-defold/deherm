@@ -66,6 +66,15 @@ if [[ ! -f "$project_root/game.project" ]]; then
   exit 1
 fi
 
+# A `shermes -emit-c` unit is a transport of the Hermes runtime. Bob discovers
+# extensions by walking the project, and an ext.manifest cannot exclude a
+# platform, so a unit a previous native build materialised would otherwise be
+# uploaded for wasm-web too and fail the link on undefined _sh_* symbols. This
+# reconciles the project's .defignore against the selected target before Bob
+# walks it; it never deletes the unit.
+node "$repo_root/scripts/assemble-typed-native-extension.mjs" \
+  --project "$project_root" --target "$platform" --reconcile
+
 case "$platform" in
   *-web)
     # HTML5 executes authored JavaScript in the browser. The extension's

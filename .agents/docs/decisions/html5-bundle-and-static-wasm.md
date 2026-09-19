@@ -136,6 +136,55 @@ registers `globalThis.__defoldAppV1`; the Wasm engine waits for that registratio
 before invoking `init`. Development can serve the same artifact from a local
 server and replace a runtime generation without relinking the engine.
 
+# The browser has no Hermes, and the build must say so
+
+Two consequences of the browser runtime having no Hermes are now enforced
+rather than assumed.
+
+**A typed-native unit cannot travel to a web target.** `shermes -emit-c` output
+is a transport of the `hermes` runtime: the emitted C calls `_sh_*` entry
+points that only `libhermes.a` defines. Bob discovers extensions by walking the
+project and an `ext.manifest` cannot exclude a platform, so a unit a native
+build materialised would otherwise be uploaded for `wasm-web` and fail the link
+on undefined `_sh_ljs_create_environment`, `_sh_model_s22_p8_rel` and friends.
+The build now decides this from pinned data and applies the decision to the
+project before Bob walks it - a `.defignore` entry maintained by
+`packages/cli/src/typed-native.mjs` - and the assembler refuses a non-Hermes
+target with the machine-readable code `typed-native-requires-hermes-runtime`.
+See the tooling note for the exact seams. Nothing is deleted: the same unit is
+revealed again by the next Hermes-runtime build.
+
+**Browser activation is implemented, through a different transport.** An HTML5
+page exposes no Defold engine service, so a bundle cannot be posted to it as a
+resource reload. `lib/web/library_defold_hermes.js` now installs
+`globalThis.__defoldHermesDevV1` when the host loads, and its `activate`
+performs the same transaction the native extension performs, in the same order:
+evaluate the candidate, validate that it registered a lifecycle or a component
+registry and carries its own 64-hex fingerprint, run the candidate's `init`,
+*then* finalize the outgoing generation, and rebind every live component
+attachment to the new definitions by id so the engine-side Lua proxies, their
+`self` tables and their component ids survive. A candidate that throws leaves
+the running generation active, and a component whose registered schema
+fingerprint changed is refused rather than rebound, because a property-schema
+change is a project build. Both outcomes log the same
+`DEHERM_EVENT bundle-activated|bundle-rejected fingerprint=... initial=false`
+line the native extension logs, so one parser serves both targets and a reload
+that changed nothing is distinguishable from a real activation.
+
+One difference is structural and is reported rather than hidden: the browser
+host has exactly one JavaScript realm, so a candidate is evaluated in the same
+global it replaces. Rollback restores the registered surface - app, component
+registry, fingerprint - and cannot undo arbitrary global writes a failing
+candidate performed on its way to failing.
+
+**Telemetry is measured or named, never imitated.** The browser host reports
+component instances, callback roots and their capacities, the engine's frame
+delta where an application lifecycle is attached, and `performance.memory`
+under its own `jsHeap*` names. The Hermes heap, the Lua handle registry and the
+value bridge's arena high-water mark have no browser equivalent, and each is
+returned with the reason it cannot be measured. `hermesHeapAvailable` is false
+on this target and the console shows the gaps as gaps.
+
 # Static Hermes fused-Wasm pipeline
 
 ```mermaid

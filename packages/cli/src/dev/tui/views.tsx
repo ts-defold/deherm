@@ -173,11 +173,17 @@ export function BundlePanel({ snapshot, focusedScope, ui, actions, height, flex 
 
 function targetRow(target) {
   const telemetry = target.telemetry ?? {};
+  const gaps = (target.capabilities ?? []).filter((capability) => capability.available === false);
   return {
     key: target.id,
     id: target.id,
     name: target.name ?? target.id,
     status: target.status,
+    // Which projection this target is: the console lists the native engine and
+    // the browser host side by side, and they do not measure the same things.
+    runtimeKind: target.runtime ?? "hermes",
+    gaps,
+    gapCount: gaps.length ? String(gaps.length).padStart(4) : "   —",
     applied: String(target.appliedGeneration ?? "—").padStart(3),
     signalled: String(target.signalledGeneration ?? "—"),
     pending: String(target.pendingGeneration ?? "—"),
@@ -378,12 +384,14 @@ export function TargetsView({ snapshot, focusedScope, ui, actions, height }) {
           accessibleLabel="Targets"
           columns={[
             { key: "name", header: "target", flex: 2, minWidth: 8 },
+            { key: "runtimeKind", header: "runtime", width: 8 },
             { key: "applied", header: "gen", width: 5 },
             { key: "fingerprint", header: "fingerprint", width: 15 },
             { key: "status", header: "phase", flex: 2, minWidth: 8, render: (value) => <Text style={{ fg: statusColor(value) }} textOverflow="ellipsis">{String(value)}</Text> },
             { key: "runtime", header: "rt", width: 5 },
             { key: "resource", header: "res", width: 5 },
-            { key: "frame", header: "frame dt", width: 9 }
+            { key: "frame", header: "frame dt", width: 9 },
+            { key: "gapCount", header: "gaps", width: 5 }
           ]}
           data={rows}
           getRowKey={(row) => row.key}
@@ -394,9 +402,26 @@ export function TargetsView({ snapshot, focusedScope, ui, actions, height }) {
           border="none"
         />
         </Pane>
+        <CapabilityGapLine rows={rows} />
         <Text style={{ fg: dim }} textOverflow="ellipsis">enter opens the focused target · y copies the selection</Text>
       </Column>
     </FocusPanel>
+  );
+}
+
+// A gap is stated, never implied by an empty cell. The count is in the table so
+// a reader knows to open the row; this names the first one so the common case
+// costs no keystrokes.
+function CapabilityGapLine({ rows }) {
+  const withGaps = rows.filter((row) => row.gaps.length > 0);
+  if (withGaps.length === 0) {
+    return <Text style={{ fg: dim }} textOverflow="ellipsis">no declared capability gaps</Text>;
+  }
+  const first = withGaps[0];
+  return (
+    <Text style={{ fg: prism[1] }} textOverflow="ellipsis">
+      {`${first.name}: ${first.gaps.length} capability gap(s) · ${first.gaps[0].name} · enter for all`}
+    </Text>
   );
 }
 
@@ -621,7 +646,16 @@ function detailFields(detail, snapshot) {
         ["resource generation", row.resource],
         ["frame dt", row.frame],
         ["Hermes heap", telemetry.hermesHeapAvailable ? `${formatBytes(telemetry.hermesHeapBytes)} / ${formatBytes(telemetry.hermesHeapSizeBytes)}` : "unavailable"],
-        ["diagnostic", row.target.diagnostic ?? "none"]
+        ...(Number.isFinite(telemetry.jsHeapBytes)
+          ? [["page JS heap", `${formatBytes(telemetry.jsHeapBytes)} / ${formatBytes(telemetry.jsHeapSizeBytes)}`]]
+          : []),
+        ["component instances", String(telemetry.componentInstances ?? "—")],
+        ["callback roots", String(telemetry.callbackRoots ?? "—")],
+        ["diagnostic", row.target.diagnostic ?? "none"],
+        // Every declared gap is listed with its reason. This is the whole point
+        // of carrying capabilities on the target: an operator reads why a
+        // counter is missing instead of guessing from a dash.
+        ...row.gaps.map((gap) => [`gap · ${gap.name}`, gap.reason])
       ]
     };
   }

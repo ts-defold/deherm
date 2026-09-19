@@ -52,6 +52,10 @@ Options:
   --service-port <n> Local Defold engine service port (default: 8001)
   --resource <path>  Generated typed bundle resource (default: /deherm/app.dehermc)
   --target <url>     For dev, a Defold engine service URL; may be repeated
+  --web-bundle <path>   Packaged wasm-web bundle the dev HTML5 target serves
+                        (default: the newest under <project>/build/bundle or ./build/bundle)
+  --chrome <path>    Chrome binary the dev HTML5 target drives
+  --browser-window   Run that Chrome with a window instead of headless
   --pool <path>      Runtime bug pool JSON (default: <project>/.deherm/dev/bug-pool.json)
   --session-log <path>  Session log harvested by bugs; may be repeated
   --transcript <path>   Packaged-run transcript harvested by bugs; may be repeated
@@ -59,6 +63,7 @@ Options:
   --once             Build one development generation and exit
   --headless         Use line-oriented output instead of the Rezi console
   --no-launch        Watch/build without automatically launching the local game
+  --web              Also launch the packaged HTML5 build in a headless browser
   --no-ttsc          Disable ttsc transforms for a diagnostic dev build
   --shard <i/n>      Stable zero-based shard selection (default: 0/1)
   --strict           Fail a report unless every required selected stage passed
@@ -95,6 +100,9 @@ export function parseArguments(argv) {
     else if (value === "--once") options.once = true;
     else if (value === "--headless") options.headless = true;
     else if (value === "--no-launch") options.autoLaunch = false;
+    // Launch the HTML5 target with the session rather than on the `w` intent,
+    // so a non-interactive run can drive the browser edit loop too.
+    else if (value === "--web") options.web = true;
     else if (value === "--no-ttsc") options.useTtsc = false;
     else if (value === "--no-harvest") options.harvest = false;
     else if (value === "--pool") options.pool = args.shift();
@@ -122,6 +130,12 @@ export function parseArguments(argv) {
     else if (value === "--build-server") options.buildServer = args.shift();
     else if (value === "--service-port") options.servicePort = Number(args.shift());
     else if (value === "--resource") options.resourcePath = args.shift();
+    // The HTML5 target of a dev session. The bundle is produced by a wasm-web
+    // Bob build; this names where it landed when it is not where Bob usually
+    // puts it, and which browser to drive.
+    else if (value === "--web-bundle") options.webBundle = args.shift();
+    else if (value === "--chrome") options.chrome = args.shift();
+    else if (value === "--browser-window") options.browserHeadless = false;
     else throw new Error(`Unknown option: ${value}`);
   }
   if (options.command === "dev" && !options.json && options.headless === undefined && (!process.stdin.isTTY || !process.stdout.isTTY)) {

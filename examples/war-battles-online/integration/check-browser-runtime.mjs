@@ -13,13 +13,25 @@
 // transcript, the CDP-observed page state, and the absence of page errors.
 
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { createServer } from "node:net";
-import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { readFile, writeFile } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+// The server, the scoped loopback ports, the dedicated Chrome profile, the CDP
+// client and the teardown are the development browser target's machinery; this
+// gate is the other consumer of it rather than a second copy.
+import {
+  defaultChromeBinary,
+  freeLoopbackPort,
+  openBundlePage,
+  waitFor
+} from "../../../packages/cli/src/dev/browser-host.mjs";
+
+import { projectionEnvelope } from "./projections.mjs";
+
+/** The projection this gate observes. */
+export const PROJECTION_ID = "browser-wasm-web";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
@@ -27,8 +39,7 @@ const bundleDirectory = process.env.DEHERM_WAR_BATTLES_WEB_BUNDLE
   ?? resolve(repositoryRoot, "build/bundle/War Battles");
 const bundleResource = resolve(exampleRoot, "defold/deherm/app.dehermc");
 const evidencePath = resolve(exampleRoot, "evidence/browser-runtime-wasm-web.json");
-const chromeBinary = process.env.DEHERM_CHROME
-  ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
 
 // Exact markers the port emits through the host log. Everything before
 // `war-battles:` is engine or extension provenance; everything after is the
@@ -70,91 +81,6 @@ for (const argument of argumentSet) {
   }
 }
 
-async function freePort() {
-  return new Promise((resolvePort, reject) => {
-    const probe = createServer();
-    probe.on("error", reject);
-    probe.listen(0, "127.0.0.1", () => {
-      const { port } = probe.address();
-      probe.close(() => resolvePort(port));
-    });
-  });
-}
-
-async function waitFor(predicate, { timeoutMs, intervalMs = 150, what }) {
-  const deadline = Date.now() + timeoutMs;
-  let lastError;
-  while (Date.now() < deadline) {
-    try {
-      const value = await predicate();
-      if (value) return value;
-    } catch (error) {
-      lastError = error;
-    }
-    await new Promise((sleep) => setTimeout(sleep, intervalMs));
-  }
-  throw new Error(`Timed out waiting for ${what}${lastError ? `: ${lastError.message}` : ""}`);
-}
-
-/** Minimal CDP client. One page target, request/response plus event capture. */
-async function connect(webSocketDebuggerUrl) {
-  const socket = new WebSocket(webSocketDebuggerUrl);
-  await new Promise((ready, failed) => {
-    socket.addEventListener("open", ready, { once: true });
-    socket.addEventListener("error", failed, { once: true });
-  });
-  let nextId = 1;
-  const pending = new Map();
-  const waiters = new Map();
-  const transcript = [];
-  const failures = [];
-  socket.addEventListener("message", ({ data }) => {
-    const message = JSON.parse(data);
-    if (message.id) {
-      const continuation = pending.get(message.id);
-      if (!continuation) return;
-      pending.delete(message.id);
-      if (message.error) continuation.reject(new Error(message.error.message));
-      else continuation.resolve(message.result);
-      return;
-    }
-    const queued = waiters.get(message.method);
-    if (queued?.length) {
-      waiters.delete(message.method);
-      for (const notify of queued) notify(message.params);
-    }
-    if (message.method === "Runtime.consoleAPICalled") {
-      const rendered = message.params.args
-        .map((argument) => argument.value ?? argument.description ?? "")
-        .join(" ");
-      // The browser host prefixes every application log line; engine output
-      // arrives as Emscripten's own console lines.
-      transcript.push(rendered.replace(/^\[defold-hermes\] /, "").replace(/\n$/, ""));
-    } else if (message.method === "Runtime.exceptionThrown") {
-      failures.push({ kind: "exception", detail: message.params.exceptionDetails.text });
-    } else if (message.method === "Log.entryAdded" && message.params.entry.level === "error") {
-      failures.push({
-        kind: "log",
-        detail: message.params.entry.text,
-        url: message.params.entry.url ?? null
-      });
-    }
-  });
-  const send = (method, params = {}) => {
-    const id = nextId++;
-    const result = new Promise((ok, no) => pending.set(id, { resolve: ok, reject: no }));
-    socket.send(JSON.stringify({ id, method, params }));
-    return result;
-  };
-  const waitForEvent = (method, timeoutMs = 30_000) => new Promise((ok, no) => {
-    const timer = setTimeout(() => no(new Error(`Timed out waiting for CDP event ${method}`)), timeoutMs);
-    const queue = waiters.get(method) ?? [];
-    queue.push((params) => { clearTimeout(timer); ok(params); });
-    waiters.set(method, queue);
-  });
-  return { socket, send, waitForEvent, transcript, failures };
-}
-
 function missing(transcript) {
   const absent = [];
   for (const marker of [...REQUIRED_ENGINE_MARKERS, ...REQUIRED_GAME_MARKERS]) {
@@ -177,39 +103,21 @@ async function run() {
     .exec(bundleBytes.toString("utf8"))?.[1];
   assert.ok(expectedFingerprint, `No build fingerprint in ${bundleResource}`);
 
-  const port = Number.parseInt(process.env.DEHERM_WAR_BATTLES_HTTP_PORT ?? "", 10) || await freePort();
-  const debuggingPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_CDP_PORT ?? "", 10) || await freePort();
-  const pageUrl = `http://127.0.0.1:${port}/${encodeURIComponent("index.html")}`;
-  const profile = await mkdtemp(join(tmpdir(), "deherm-war-battles-chrome."));
+  const port = Number.parseInt(process.env.DEHERM_WAR_BATTLES_HTTP_PORT ?? "", 10) || await freeLoopbackPort();
+  const debuggingPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_CDP_PORT ?? "", 10) || await freeLoopbackPort();
 
-  const server = spawn(process.execPath, [resolve(repositoryRoot, "scripts/serve.mjs")], {
-    cwd: bundleDirectory,
-    env: { ...process.env, PORT: String(port) },
-    stdio: ["ignore", "ignore", "pipe"]
+  const page = await openBundlePage({
+    bundleDirectory,
+    port,
+    debuggingPort,
+    chromeBinary,
+    // This gate asserts over the whole transcript, so it keeps one.
+    retain: true,
+    keepProfile: argumentSet.has("--keep")
   });
-  const browser = spawn(chromeBinary, [
-    "--headless=new",
-    "--use-angle=swiftshader",
-    "--enable-unsafe-swiftshader",
-    `--remote-debugging-port=${debuggingPort}`,
-    `--user-data-dir=${profile}`,
-    "--no-first-run",
-    "--no-default-browser-check",
-    pageUrl
-  ], { stdio: ["ignore", "ignore", "pipe"] });
+  const { client, pageUrl, profile } = page;
 
-  let client;
   try {
-    await waitFor(async () => (await fetch(pageUrl)).ok, { timeoutMs: 15_000, what: "the local bundle server" });
-    const target = await waitFor(async () => {
-      const targets = await (await fetch(`http://127.0.0.1:${debuggingPort}/json/list`)).json();
-      return targets.find((candidate) => candidate.type === "page" && candidate.url === pageUrl);
-    }, { timeoutMs: 30_000, what: "the headless Chrome page target" });
-
-    client = await connect(target.webSocketDebuggerUrl);
-    await client.send("Page.enable");
-    await client.send("Runtime.enable");
-    await client.send("Log.enable");
     const cleared = client.waitForEvent("Runtime.executionContextsCleared");
     const loaded = client.waitForEvent("Page.loadEventFired");
     await client.send("Page.reload", { ignoreCache: true });
@@ -252,8 +160,8 @@ async function run() {
 
     const cameraSamples = client.transcript.filter((line) => line.startsWith("war-battles:camera:"));
     const evidence = {
-      schemaVersion: 1,
-      scope: "Packaged wasm-web browser execution of the War Battles port. Marker and CDP evidence only; no visual claim.",
+      schemaVersion: 2,
+      projection: projectionEnvelope(PROJECTION_ID),
       platform: "wasm-web",
       bundleFingerprint: expectedFingerprint,
       bundleSha256: createHash("sha256").update(bundleBytes).digest("hex"),
@@ -279,17 +187,11 @@ async function run() {
     }
     return evidence;
   } finally {
-    // Only the three processes this gate created are terminated, and the
-    // dedicated Chrome profile is removed.
-    try { client?.socket.close(); } catch { /* the socket may already be closed */ }
-    for (const child of [browser, server]) {
-      if (child.exitCode === null && child.signalCode === null) child.kill("SIGTERM");
-    }
-    await new Promise((done) => setTimeout(done, 500));
-    for (const child of [browser, server]) {
-      if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
-    }
-    if (!argumentSet.has("--keep")) await rm(profile, { recursive: true, force: true });
+    // Only what this gate created is released: the CDP socket, the browser, the
+    // loopback server, and the dedicated Chrome profile. `--keep` retains the
+    // profile for inspection and nothing else.
+    await page.close();
+    if (argumentSet.has("--keep")) console.log(`war-battles-browser-runtime:profile:${profile}`);
   }
 }
 

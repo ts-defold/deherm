@@ -51,7 +51,8 @@ ordinary edit loop.
 | Gate symbol-level reachability | `pnpm test:reachability` | Fixture project; checker/module-graph cross-check; dead-symbol retention through the emitted C |
 | Check Static Hermes declarations/export unit | `pnpm check:static-hermes` | Parses `extern_c` and proves a library-shaped exported unit without `main` |
 | Generate the typed-native JS bridge | `pnpm generate:typed-native-bridge` | Sound-typed unit that replaces `__defoldScriptBridgeV1` with the AOT lane, claiming the plan's `staticHermesCAbi` routes |
-| Assemble `shermes -emit-c` into a project | `pnpm assemble:typed-native --project <dir> [--profile]` | Materialises `<dir>/defold_hermes_typed_native/` for Bob and Extender |
+| Assemble `shermes -emit-c` into a project | `pnpm assemble:typed-native --project <dir> [--target <platform>] [--profile]` | Materialises `<dir>/defold_hermes_typed_native/` for Bob and Extender; refuses a non-Hermes target with `typed-native-requires-hermes-runtime` and exit 3 |
+| Decide a target's typed-native upload | `pnpm assemble:typed-native --project <dir> --target <platform> --reconcile` | No `shermes`; maintains the project's `.defignore` so Bob cannot upload a Hermes-runtime unit to a browser-runtime target |
 | Exercise the cached Lua bridge | `pnpm test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
 | Stage the native extension | `pnpm package:defold` | Defold package directory/archive inputs |
 | Prepare pinned local Extender | `pnpm extender:prepare` | Builds the pinned jars and maps the installed Xcode SDK |
@@ -62,6 +63,8 @@ ordinary edit loop.
 | Run headless contract conformance | `pnpm test:headless-conformance:runtime` | Generates per-contract fixtures from their fixture profile, compiles content with Bob, links the in-process headless engine driver, asserts the engine's detected runtime profile matches the plan, and records contract -> observed/mismatched/blocked/unreachable |
 | Build/bundle the HTML5 game | `pnpm bob:web:build`; `pnpm bob:web:bundle` | Uses pinned emsdk 4.0.6 through local Extender |
 | Verify a running HTML5 bundle | `pnpm test:html5:runtime` | Reload-synchronized CDP lifecycle and binding proof |
+| Prove the packaged HTML5 port executes | `pnpm test:html5:war-battles` | Serves the bundle on a scoped loopback port, drives headless Chrome, asserts the marker transcript |
+| Prove the HTML5 edit loop | `pnpm test:html5:war-battles-hot-reload` | Runs `deherm dev --web`, edits a source, and requires the page to acknowledge that exact new fingerprint |
 | Reuse a running local Extender | `pnpm bob:build`; `pnpm bob:bundle` | Local port 9010 is the default |
 | Measure binding-transport cost | `pnpm bench:transports` | Raw Lua, lua-stack, c-abi-native, typed-native, all uninstrumented |
 | Measure with telemetry on | `pnpm bench:transports:profiled` | Same binary with `DEHERM_PROFILE=ON`; also drains the telemetry ring |
@@ -223,6 +226,36 @@ result as a project-local extension, `<project>/defold_hermes_typed_native/`,
 which Bob uploads and Extender compiles like any other extension source. The
 user still compiles nothing natively.
 
+### The unit belongs to one runtime
+
+A `shermes -emit-c` unit is a transport of the **`hermes` runtime**, not a
+platform-neutral optimisation: its emitted C calls `_sh_*` entry points that
+only `libhermes.a` defines, and the canonical plan gives `staticHermesCAbi` the
+runtime id `hermes`. The `browser` runtime embeds no Hermes, so such a unit is
+meaningless for `wasm-web` and uploading one fails the link on undefined
+symbols rather than changing a transport.
+
+Bob discovers extensions by walking the project for `ext.manifest`, and an
+`ext.manifest` cannot exclude a platform - Extender compiles every `src/` file
+it is handed. The gate therefore lives at the two seams that decide what Bob
+sees, in `packages/cli/src/typed-native.mjs`:
+
+* `typedNativeDisposition(platform)` answers from pinned data alone - the
+  bundle-target table generated from Extender's `build_input.yml` and the
+  native-artifact manifest's declared builder, which must agree. The assembler
+  refuses a non-Hermes target with the code `typed-native-requires-hermes-runtime`
+  and exit 3, and an unknown platform fails closed rather than being guessed.
+* `reconcileTypedNativeUpload({ projectRoot, platform })` makes the answer true
+  on disk by maintaining one `.defignore` entry before Bob walks the project.
+  `scripts/bob.sh` and the dev session's builder both call it, in both
+  directions, so a unit a native build paid for is hidden from a web build and
+  revealed again by the next Hermes build. The files are never deleted.
+
+Each generated source additionally carries `#if defined(__EMSCRIPTEN__) ...
+#error "deherm typed-native-requires-hermes-runtime: ..."`, so anything that
+bypasses the gate gets one named compile error instead of a pile of undefined
+`_sh_*` symbols at link time.
+
 It is a sibling extension rather than files inside `defold_hermes/` because the
 shared extension is per-release while the emitted unit is per-project. Nothing
 in `defold_hermes/` changes per project: the assembled extension declares its
@@ -276,6 +309,14 @@ These are the installed-package commands verified from a local tarball. The
 package name is not published yet; in this checkout use `pnpm cli --` before
 the command and options. No arguments launches the TUI; `create` works before
 any `game.project` exists.
+
+`generate` and `dev` resolve the project's Defold engine revision before they
+read anything version-specific, and refuse rather than assume one - see
+[API source resolution](decisions/api-source-resolution.md). `--defold-sdk <sha>`
+states it outright and always wins; `--bob <path>` (or `DEHERM_BOB`) points at a
+Bob jar to be asked for its own engine sha1. A project that names no revision is
+a blocker listing every source that was checked, and a revision this package has
+no generated surface for is a blocker rather than another revision's types.
 
 `generate` reads local extensions and Bob-resolved ZIPs, then writes:
 

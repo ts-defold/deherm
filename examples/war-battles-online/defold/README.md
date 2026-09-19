@@ -156,16 +156,75 @@ into the same Hermes runtime as the bytecode bundle. The unit installs itself
 over the script bridge, so the routes it claims cross into the engine through
 `extern_c` and every other route keeps crossing over JSI in the same binary.
 
-Add `--profile` to the assemble step to build with transport telemetry on. The
-running game then prints a `DEHERM_EVENT transport-span` census every two
-seconds, naming the transport, route, call count and mean nanoseconds of every
-binding crossing. A recorded run is in
+The shipped default is telemetry **off**. Add `--profile` to the assemble step
+to build with transport telemetry on: the running game then prints a
+`DEHERM_EVENT transport-span` census every two seconds and one final census
+after teardown, naming the transport, route, call count and mean nanoseconds of
+every binding crossing. `pnpm check:profile-shipped-default` refuses a commit
+whose `generated_build_config.h` is the instrumented header a `--profile` run
+leaves behind, so re-assemble without `--profile` when you are done.
+
+Record a census with
+
+```sh
+node integration/check-typed-native-transport.mjs --run with-typed-native --record-evidence
+```
+
+A recorded run is in
 [`../evidence/packaged-typed-native-transport-arm64-macos.json`](../evidence/packaged-typed-native-transport-arm64-macos.json):
-13 routes on `typed-native`, and `gui.get_node`/`gui.set_text` - the two routes
+14 routes on `typed-native`, and `gui.get_node`/`gui.set_text` - the two routes
 whose value type is a retained `node` handle - on `jsi`.
 
-The directory is generated. Delete it and rebuild and the game still runs, with
-every route back on JSI; that is the control run in the same evidence file.
+The directory is generated. Delete it, rebuild, and record with `--run control`
+and the game still runs with every route back on JSI; that control is in the
+same evidence file, and it is what makes the split the assembly rather than the
+instrument.
+
+It is also **runtime-scoped**. A `shermes` unit executes only where a Hermes
+runtime exists, so the assemble step takes `--target` and refuses a
+browser-runtime target with `typed-native-requires-hermes-runtime`, and every
+build reconciles the project's `.defignore` so Bob cannot upload this extension
+for `wasm-web`. `scripts/bob.sh` does that automatically; a hand-run `bob.jar`
+should be preceded by
+
+```sh
+node scripts/assemble-typed-native-extension.mjs \
+  --project examples/war-battles-online/defold --target <platform> --reconcile
+```
+
+## The three projections
+
+This port runs in three projections of the same IR, and each carries its own
+evidence because each is a first-class artifact rather than a variant of
+another. The set is declared in
+[`../integration/projections.mjs`](../integration/projections.mjs) and checked
+by `pnpm check:war-battles-projections`, which fails by name when a declared
+projection has no evidence.
+
+| Projection | Runtime | Transport | Profile | Gate |
+|---|---|---|---|---|
+| `native-arm64-macos` | `hermes` | `jsi` + `typed-native` | engine-detected | `pnpm --filter @deherm/example-war-battles-online runtime:packaged` |
+| `browser-wasm-web` | `browser` | `direct-memory` | browser | `pnpm test:html5:war-battles` |
+| `native-arm64-macos-typed-native-transport` | `hermes` | `typed-native` + `jsi` | `DEHERM_PROFILE` | `node integration/check-typed-native-transport.mjs --run <slot>` |
+
+None of them claims visual correctness: every one reads markers, engine state,
+or a transport census, and nothing here can inspect a window or a canvas.
+
+## Graceful shutdown and component teardown
+
+SIGTERM and SIGINT tear `dmengine` down without running a single component
+`final()`, so the only way to exercise teardown is the engine service:
+`POST /post/@system/exit`. The native runtime gate terminates that way and
+requires `war-battles:player-final`, which `player.script.ts` emits after a
+`msg.post` from `final()` returns.
+
+A port is not an engine. Defold sets `SO_REUSEADDR`/`SO_REUSEPORT` on its
+listening sockets, so two engines on the default service port both bind it and
+an exit post can be absorbed by the wrong one. The gate starts the engine with
+`DM_SERVICE_PORT=dynamic`, reads the port back out of that engine's own
+transcript, and refuses to post until the listeners on it are exactly that
+process. Stop any stray `dmengine` before running it; the gate will say so by
+pid rather than post into one of them.
 
 The project exposes the repository extension through its example-local
 `defold_hermes` dependency link, so a full native build requires the pinned
@@ -191,6 +250,14 @@ pnpm runtime:browser
 `scripts/bob.sh` builds this project directly when `DEFOLD_HERMES_PROJECT`
 names it, so `DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold pnpm
 bob:web:bundle` is the wrapped equivalent.
+
+The same bundle is what `deherm dev` launches as its HTML5 target - press `w`
+in the console, or pass `--web` for a non-interactive run. The session serves
+it on a scoped loopback port, drives a dedicated headless Chrome profile, and
+pushes each rebuilt bundle into the page, which acknowledges the exact
+fingerprint it activated. `pnpm test:html5:war-battles-hot-reload` proves that
+edit loop end to end. A TypeScript edit does not change the Wasm engine, so it
+needs no rebundle; changing the extension or `game.project` does.
 
 See [PLAYABLE-BLOCKERS.md](./PLAYABLE-BLOCKERS.md) for the exact observed
 boundary and the remaining blockers, and [reference/README.md](./reference/README.md)

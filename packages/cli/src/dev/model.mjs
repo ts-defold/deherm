@@ -96,7 +96,21 @@ export function applyDevEvent(model, event) {
     }
     case "target-configured": {
       const item = target(model, event.id);
-      Object.assign(item, { status: "unverified", url: event.url, name: event.name });
+      Object.assign(item, {
+        status: "unverified",
+        url: event.url,
+        name: event.name,
+        // Which runtime executes game code there. Two targets of one session
+        // are not interchangeable, and the console must not imply they are.
+        runtime: event.runtime ?? item.runtime ?? "hermes"
+      });
+      return changed(model);
+    }
+    // What a target cannot do, declared by the target itself. A gap is shown
+    // as a gap; it is never a blank column the reader has to interpret.
+    case "target-capabilities": {
+      const item = target(model, event.id);
+      item.capabilities = (event.capabilities ?? []).map((capability) => ({ ...capability }));
       return changed(model);
     }
     case "target-disconnected": {
@@ -213,6 +227,14 @@ export function applyDevEvent(model, event) {
         ? item.telemetry.frameSamples
         : [...(item.telemetry.frameSamples ?? []), event.values.frameDtMs].slice(-60);
       item.telemetry = { ...item.telemetry, ...event.values, frameSamples: samples, at };
+      // A target may report, with each sample, which counters it could not
+      // measure. Merging them here keeps "unavailable" a first-class answer
+      // rather than an absent field that reads as zero.
+      if (event.capabilities) {
+        const merged = new Map((item.capabilities ?? []).map((capability) => [capability.name, capability]));
+        for (const capability of event.capabilities) merged.set(capability.name, { ...capability });
+        item.capabilities = [...merged.values()];
+      }
       return changed(model);
     }
     case "engine-starting": {
@@ -292,7 +314,11 @@ export function snapshotDevModel(model) {
       ...model.lastBuildMetrics,
       modules: model.lastBuildMetrics.modules?.map((value) => ({ ...value }))
     } : undefined,
-    targets: [...model.targets.values()].map((value) => ({ ...value, telemetry: { ...value.telemetry } })),
+    targets: [...model.targets.values()].map((value) => ({
+      ...value,
+      telemetry: { ...value.telemetry },
+      capabilities: value.capabilities ? value.capabilities.map((capability) => ({ ...capability })) : undefined
+    })),
     logs: model.logs.map((value) => ({ ...value })),
     history: model.history.map((value) => ({ ...value, resources: value.resources ? [...value.resources] : undefined }))
   };

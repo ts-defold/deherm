@@ -4,10 +4,19 @@
   "extension": "defold_hermes_typed_native",
   "unit": "sh_export_deherm_typed_native",
   "transport": "typed-native",
-  "profile": true,
+  "requiresRuntime": "hermes",
+  "assembledForTarget": "arm64-macos",
+  "assembledForExtenderTarget": "arm64-osx",
+  "uploadGate": {
+    "mechanism": ".defignore",
+    "entry": "/defold_hermes_typed_native",
+    "appliedBy": "packages/cli/src/typed-native.mjs",
+    "note": "Bob filters extension discovery through .defignore, and an ext.manifest cannot exclude a platform."
+  },
+  "profile": false,
   "laneSources": {
     "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
-    "packages/static-hermes/src/generated/script-typed-native-bridge.ts": "1ddbfc42f12008f141879f95a5eea7e1a97f6e41431ecf197d1e06654983abf8"
+    "packages/static-hermes/src/generated/script-typed-native-bridge.ts": "71a5383a4fa616f7014358600d0c546fe2c6cb65038be836ae44cf3b2633cb3b"
   },
   "vendoredHeaders": {
     "hermes/Support/sh_tryfast_fp_cvt.h": "765d5904d92d2fbfe1c0fbd7a7da1c1e50f3b66a467b21f4721538a444386d15",
@@ -27,9 +36,9 @@
   "compiledWithAssertsOff": true,
   "externCalleeCount": 37,
   "externCallSiteCount": 67,
-  "emittedCSha256": "cd9cdec20a31a8a308a2f9bde72e294610310952c68fc4d61822d78fcbf811c5",
-  "emittedCBytes": 240414,
-  "adaptedSourceSha256": "e551fd0b83f075d9db4dd6a2ac018fa48112e17ee09eae1d439f152121d8400d",
+  "emittedCSha256": "3ed34496f6af1d0897f9cc5e96e028740ca55bf4099e4e139073d13bc42aa4f2",
+  "emittedCBytes": 250408,
+  "adaptedSourceSha256": "48c9c272a76364452121557d69be845a433501b23253396896922163bf7afa7b",
   "evidenceBoundary": {
     "cEmission": "observed",
     "compilation": "requires-extender",

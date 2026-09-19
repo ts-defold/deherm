@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "scope": "Development-session HTML5 target: launch, declared capability gaps, browser-measured telemetry, and one fingerprint-acknowledged hot reload. Event and page evidence only; no visual claim.",
+  "platform": "wasm-web",
+  "pageUrl": "http://127.0.0.1:<scoped-loopback-port>/index.html",
+  "loadedFingerprint": "1295fb69e459971a1297e6e868afb8fdae53cfb249258870ef4157b4c2529750",
+  "activatedFingerprint": "7f113cbe563c6402f3a638d1ddba74e0dcbedc730782d1a92745685ef4f206b0",
+  "browserBundleGeneration": 2,
+  "buildGeneration": 2,
+  "telemetry": {
+    "measured": {
+      "runtimeId": 1,
+      "bundleGeneration": 1,
+      "componentInstances": 3,
+      "componentCapacity": 1024,
+      "callbackRoots": 0,
+      "callbackCapacity": 4096,
+      "hermesHeapAvailable": false
+    },
+    "measuredFrameDelta": false,
+    "measuredPageHeap": true,
+    "unavailable": [
+      {
+        "name": "frameDtMs",
+        "available": false,
+        "reason": "No application lifecycle is attached, so the engine never calls the browser host update. A component-only bundle measures no frame delta here; Defold's own frame timing is inside the Wasm engine."
+      },
+      {
+        "name": "hermesHeapBytes",
+        "available": false,
+        "reason": "The browser runtime embeds no Hermes. performance.memory measures the page JavaScript heap and is reported as jsHeapBytes instead."
+      },
+      {
+        "name": "hermesHeapPeakBytes",
+        "available": false,
+        "reason": "The browser runtime embeds no Hermes."
+      },
+      {
+        "name": "luaHandles",
+        "available": false,
+        "reason": "The Lua value registry lives inside the Wasm engine and exports no counter to the browser host."
+      },
+      {
+        "name": "arenaHighWaterBytes",
+        "available": false,
+        "reason": "The generated browser value bridge resets its per-call arena state and records no high-water mark; adding one is a generator change."
+      }
+    ]
+  },
+  "capabilityGaps": [
+    {
+      "name": "hermes-heap",
+      "available": false,
+      "reason": "The browser runtime embeds no Hermes. performance.memory reports the page's JavaScript heap and is shown under its own name."
+    },
+    {
+      "name": "lua-handles",
+      "available": false,
+      "reason": "The Lua value registry lives inside the Wasm engine and exports no counter to the browser host."
+    },
+    {
+      "name": "arena-high-water",
+      "available": false,
+      "reason": "The generated browser value bridge resets per-call arena state and records no high-water mark; adding one is a generator change."
+    },
+    {
+      "name": "typed-native-transport",
+      "available": false,
+      "reason": "typed-native is a transport of the Hermes runtime; the browser projection lowers every route to direct-memory instead."
+    },
+    {
+      "name": "engine-service-reload",
+      "available": false,
+      "reason": "An HTML5 page exposes no Defold engine service, so a bundle is pushed into the page over CDP rather than posted as a resource reload."
+    },
+    {
+      "name": "wasm-rebuild-in-session",
+      "available": false,
+      "reason": "A wasm-web engine is produced by Bob and Extender, not by this session. A TypeScript edit does not change the engine, so the session reloads the bundle inside the running page; changing the extension or game.project needs a new wasm-web bundle."
+    },
+    {
+      "name": "visual-verification",
+      "available": false,
+      "reason": "Nothing here inspects the canvas. The observable surface is the console transcript, page errors, and what the page reports when asked."
+    }
+  ]
+}

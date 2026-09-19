@@ -307,9 +307,17 @@ The first implementation should support:
    `Resource.Reload` POST directly. This requires a real interoperability test;
    generated protocol code or a tiny verified encoder is preferable to a
    hand-maintained payload.
-3. **HTML5 adapter.** A browser page cannot expose the native engine service.
-   Connect outward to the local daemon with loopback WebSocket/SSE, transfer the
-   envelope, validate it, and run the same candidate/commit/rollback lifecycle.
+3. **HTML5 adapter - implemented, over CDP rather than a page-owned socket.**
+   A browser page cannot expose the native engine service, so the daemon drives
+   the page instead of waiting to be called: `packages/cli/src/dev/browser-target.mjs`
+   serves the packaged `wasm-web` bundle on a scoped loopback port, opens it in
+   a dedicated headless Chrome profile, and pushes each built bundle into the
+   page through `globalThis.__defoldHermesDevV1.activate`. The page runs the
+   same candidate/commit/rollback lifecycle described above and logs the same
+   `DEHERM_EVENT bundle-activated fingerprint=... initial=false` line, so the
+   controller joins a browser activation to a build exactly as it joins a native
+   one. A page-owned outbound socket would remove the CDP dependency and remains
+   the eventual shape; it is not needed for the edit loop.
 
 Because the native engine responds before actual recreation, the controller
 must wait for a structured `DEHERM_EVENT` activation or rejection event carrying
@@ -397,8 +405,8 @@ the backend's raw-write marker so it reaches the operator's clipboard across
 SSH, with a local `pbcopy`/`clip`/`wl-copy`/`xclip` fallback; a copy is only
 reported when a transport actually accepted it.
 
-The Targets view lists generation, bundle fingerprint, phase, and per-target
-telemetry with drill-in; the Generations view is the build timeline with bytes,
+The Targets view lists runtime, generation, bundle fingerprint, phase,
+per-target telemetry and declared capability gaps with drill-in; the Generations view is the build timeline with bytes,
 module delta, duration, and activation outcome, where `built` means produced and
 `activated` means a runtime acknowledged that exact fingerprint. The Instances
 view renders an explicit "requires runtime instance channel" empty state: the
@@ -407,6 +415,35 @@ engine emits `DEHERM_EVENT telemetry` once a second carrying
 that identifies an individual instance, so per-instance rows here could only be
 fabricated. Listing identities needs a runtime instance channel, and that
 protocol change is owned outside this console.
+
+## The HTML5 target is a peer, not a mode
+
+`w` launches or stops the packaged HTML5 build; `--web` does the same at
+session start so a non-interactive run can drive the browser edit loop. Both
+targets can run at once, and the Targets view says which runtime each one is,
+because they do not measure the same things.
+
+What the browser genuinely reports is reported: live component instances and
+the pool capacity, live callback roots and their capacity, the engine's frame
+delta where an application lifecycle is attached, and `performance.memory`
+under its own `jsHeap*` names. What it cannot report is named with its reason
+rather than left blank or filled in - the Hermes heap (there is no Hermes), the
+Lua handle registry (inside the Wasm engine, with no export), the value
+bridge's arena high-water mark (the generated bridge records none), and the
+frame delta for a component-only bundle (the engine calls the host's
+application update only through a bootstrap attachment). The target also
+declares the gaps that are not counters at all: no typed-native transport, no
+engine-service reload, no wasm relink inside the session, and no visual
+verification of any kind.
+
+`examples/war-battles-online/integration/check-browser-hot-reload.mjs`
+(`pnpm test:html5:war-battles-hot-reload`) runs the shipped CLI in its JSON
+event mode, launches the HTML5 target, records the fingerprint the page is
+running, edits one TypeScript source, and requires the page to acknowledge the
+exact new fingerprint as a non-initial activation. A rebuild that changes
+nothing produces the running fingerprint and cannot satisfy it. Recorded as
+`examples/war-battles-online/evidence/browser-hot-reload-wasm-web.json`. This
+is event and page evidence; no claim is made about what the canvas draws.
 
 # `deherm dev` control plane
 

@@ -250,6 +250,24 @@ test("TUI p key requests an engine play/stop toggle without leaving the dashboar
   assert.equal(harness.evidence.disposed, true);
 });
 
+test("TUI w key requests the HTML5 target without leaving the dashboard", async () => {
+  // The browser target is a peer of the native engine, reachable by one key,
+  // and the console stays a view: it asks the session for the target and owns
+  // no server, browser or profile of its own.
+  const harness = lifecycleHarness(["w", "q"]);
+  const intents = [];
+  await runDevTui({
+    createApp: harness.createApp,
+    snapshot,
+    onIntent: (intent) => intents.push(intent.type),
+    viewport: () => ({ cols: 120, rows: 30 }),
+    refreshMs: 1,
+    reducedMotion: true
+  });
+  assert.deepEqual(intents, ["web"]);
+  assert.equal(harness.evidence.disposed, true);
+});
+
 test("TUI log navigation suspends and resumes tail following", async () => {
   const harness = lifecycleHarness(["pageup", "end", "q"]);
   await runDevTui({
@@ -404,6 +422,45 @@ test("the targets view reports generation, bundle fingerprint, phase, and teleme
   assert.match(text, /abababababab/);
   assert.match(text, /connected/);
   assert.match(text, /8\.20 ms/);
+});
+
+test("the targets view lists the HTML5 target beside the native one and names its gaps", () => {
+  // Two projections of one session. They do not measure the same things, so
+  // the view says which runtime each target is and how many capability gaps it
+  // declared; a missing counter is never shown as a blank the reader must
+  // interpret.
+  const text = renderConsole({ cols: 150, rows: 48 }, createUiState({ view: "targets" }), snapshot({
+    targets: [
+      {
+        id: "local-engine",
+        name: "local:8001",
+        url: "http://127.0.0.1:8001",
+        status: "connected",
+        runtime: "hermes",
+        appliedGeneration: 4,
+        telemetry: { bundleFingerprint: "ab".repeat(32), runtimeId: 17, resourceGeneration: 6, frameDtMs: 8.2 }
+      },
+      {
+        id: "browser-host",
+        name: "chrome:51234",
+        url: "http://127.0.0.1:51234/index.html",
+        status: "connected",
+        runtime: "browser",
+        appliedGeneration: 4,
+        telemetry: { bundleFingerprint: "cd".repeat(32), runtimeId: 1, resourceGeneration: 2, hermesHeapAvailable: false },
+        capabilities: [
+          { name: "hermes-heap", available: false, reason: "The browser runtime embeds no Hermes." },
+          { name: "lua-handles", available: false, reason: "The Lua value registry lives inside the Wasm engine." }
+        ]
+      }
+    ]
+  })).toText();
+  assert.match(text, /local:8001/);
+  assert.match(text, /chrome:51234/);
+  assert.match(text, /hermes/);
+  assert.match(text, /browser/);
+  assert.match(text, /capability gap/);
+  assert.match(text, /hermes-heap/);
 });
 
 test("the generations view is a build timeline with its activation outcome", () => {

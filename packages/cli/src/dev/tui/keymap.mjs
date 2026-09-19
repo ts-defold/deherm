@@ -54,6 +54,7 @@ export function devKeymapEntries(actions = {}) {
   const call = (name, ...args) => () => actions[name]?.(...args);
   const entries = [
     { sequence: "p", scope: "global", group: "Session", description: "Launch or stop the built Defold game", hint: "play/stop", footer: "always", run: call("play") },
+    { sequence: "w", scope: "global", group: "Session", description: "Launch or stop the HTML5 build in a headless browser", hint: "web", footer: "always", run: call("web") },
     { sequence: "r", scope: "global", group: "Session", description: "Signal a hot reload to every target", hint: "reload", footer: "always", run: call("reload") },
     { sequence: "b", scope: "global", group: "Session", description: "Full rebuild and relaunch", hint: "rebuild", footer: "wide", run: call("rebuild") },
     { sequence: "q", scope: "global", group: "Session", description: "Quit the dev session and stop the engine", hint: "quit", footer: "never", run: call("quit") },

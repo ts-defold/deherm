@@ -32,9 +32,19 @@
 // None of this rewrites logic. Every transform is structural, derived from the
 // pinned declarations, and verified by the assert that follows it.
 //
+// The unit is a transport of one runtime, not of every target. `shermes` emits
+// calls to `_sh_*` entry points that only `libhermes.a` defines, so the unit
+// belongs to targets whose runtime is `hermes` and to no others. The assembler
+// therefore takes a target, refuses with a machine-readable code for a target
+// whose runtime has no Hermes, and reconciles whether Bob may see an already
+// materialised unit at all. See `packages/cli/src/typed-native.mjs`.
+//
 // Usage:
 //   node scripts/assemble-typed-native-extension.mjs \
-//     --project examples/war-battles-online/defold [--profile] [--shermes <path>]
+//     --project examples/war-battles-online/defold \
+//     [--target arm64-macos] [--profile] [--shermes <path>]
+//   node scripts/assemble-typed-native-extension.mjs \
+//     --project <dir> --target wasm-web --reconcile
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -44,10 +54,17 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { recordBuildArtifact, installedToolchain } from "../packages/cli/src/build-artifacts.mjs";
+import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
+import {
+  TYPED_NATIVE_EXTENSION,
+  TYPED_NATIVE_RUNTIME,
+  reconcileTypedNativeUpload,
+  typedNativeDisposition
+} from "../packages/cli/src/typed-native.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-const kExtensionName = "defold_hermes_typed_native";
+const kExtensionName = TYPED_NATIVE_EXTENSION;
 const kUnitName = "deherm_typed_native";
 // Emitted as C, adapted to compile as C++, because Extender has one merged
 // language setting for the whole build. See the note at the top of this file.
@@ -79,6 +96,8 @@ function sha256(value) {
 function parseArguments(argv) {
   const options = {
     project: null,
+    target: process.env.DEFOLD_HERMES_PLATFORM || hostDefoldPlatform(),
+    reconcile: false,
     profile: false,
     shermes: path.join(repositoryRoot, "build/native/bin/shermes"),
     hermesInclude: path.join(repositoryRoot, "upstream/hermes/include"),
@@ -87,6 +106,15 @@ function parseArguments(argv) {
   for (let index = 2; index < argv.length; ++index) {
     const argument = argv[index];
     if (argument === "--profile") { options.profile = true; continue; }
+    // Decide and apply the upload disposition without running `shermes`. This
+    // is what a build wrapper calls before Bob walks the project.
+    if (argument === "--reconcile") { options.reconcile = true; continue; }
+    if (argument === "--target") {
+      const value = argv[++index];
+      assert.ok(value, "--target requires a value");
+      options.target = value;
+      continue;
+    }
     if (argument === "--project" || argument === "--shermes" ||
         argument === "--hermes-include" || argument === "--hermes-config-include") {
       const value = argv[++index];
@@ -141,7 +169,36 @@ function renderExtensionManifest() {
 # \`ext.manifest\` context into one per-build setting, so the C++ standard and
 # exception flags \`defold_hermes\` already asks for are the ones this unit is
 # compiled under, and a flag added here would land on \`defold_hermes\` too.
+#
+# RUNTIME: ${TYPED_NATIVE_RUNTIME}. This extension is a transport of the Hermes
+# runtime, not a platform-neutral one. Its sources call \`_sh_*\` entry points
+# that only \`libhermes.a\` defines, and an \`ext.manifest\` cannot exclude a
+# platform - Extender compiles every \`src/\` file it is given. The upload gate
+# is therefore \`.defignore\`, maintained by
+# \`packages/cli/src/typed-native.mjs\`, and each generated source additionally
+# fails closed with a named #error if it ever reaches a non-Hermes toolchain.
 name: "${kExtensionName}"
+`;
+}
+
+/**
+ * Fail closed, by name, if this unit reaches a toolchain whose target has no
+ * Hermes. The upload gate is `.defignore`; this is what happens when something
+ * bypasses it. `__EMSCRIPTEN__` is defined by the compiler itself, so the guard
+ * needs no Defold header and works in the emitted C unit as well as in the
+ * registration shell.
+ */
+export function renderRuntimeGuard() {
+  return `// A \`shermes -emit-c\` unit is a transport of the '${TYPED_NATIVE_RUNTIME}' runtime. The web
+// targets run game code on the browser's own JavaScript engine and embed no
+// Hermes, so this translation unit has nothing to call there. Saying so here
+// turns a pile of undefined _sh_* symbols at link time into one named refusal
+// at compile time. The build-time gate that normally prevents this is the
+// .defignore entry maintained by packages/cli/src/typed-native.mjs.
+#if defined(__EMSCRIPTEN__) || defined(DM_PLATFORM_HTML5)
+#error "deherm typed-native-requires-hermes-runtime: this unit is a Hermes-runtime transport and cannot be compiled for a browser-runtime target"
+#endif
+
 `;
 }
 
@@ -320,7 +377,7 @@ function renderArchiveMatchPrologue({ assertsOff, observed }) {
 }
 
 function renderRegistrationSource() {
-  return `// Materialised by scripts/assemble-typed-native-extension.mjs. Do not edit.
+  return `${renderRuntimeGuard()}// Materialised by scripts/assemble-typed-native-extension.mjs. Do not edit.
 //
 // Two jobs, both small.
 //
@@ -379,7 +436,12 @@ DM_DECLARE_EXTENSION(
 `;
 }
 
-function renderBuildConfig(profile) {
+// The shipped default is telemetry OFF. `checkShippedProfileDefault` in
+// scripts/check-profile-compile-out.mjs re-renders this with `profile` false
+// and refuses a checkout whose committed header says anything else, so an
+// instrumented header cannot reach a commit by being left behind after a
+// profiling run.
+export function renderBuildConfig(profile) {
   const header = `// Materialised by scripts/assemble-typed-native-extension.mjs. Do not edit.
 //
 // The extension Bob uploads is project-specific: a build materialises the
@@ -414,9 +476,43 @@ function renderBuildConfig(profile) {
 `;
 }
 
+/**
+ * The disposition of an already-materialised unit for one target, applied to
+ * the project on disk. No `shermes`, no emission, no removal of files: a unit
+ * a native build paid for stays on disk and is hidden from a web build.
+ */
+export async function reconcile(options) {
+  const projectRoot = path.resolve(options.project);
+  const result = await reconcileTypedNativeUpload({ projectRoot, platform: options.target });
+  return { ...result, extensionRoot: path.join(projectRoot, kExtensionName) };
+}
+
 export async function assemble(options) {
   const projectRoot = path.resolve(options.project);
   const extensionRoot = path.join(projectRoot, kExtensionName);
+
+  // A typed-native unit is a transport of the `hermes` runtime. Deciding this
+  // before anything is emitted is what keeps a browser-runtime target from
+  // acquiring a unit whose symbols its link can never resolve.
+  const disposition = await typedNativeDisposition(options.target);
+  if (!disposition.eligible) {
+    const refusal = {
+      schemaVersion: 1,
+      refused: true,
+      code: disposition.code,
+      generator: "scripts/assemble-typed-native-extension.mjs",
+      extension: kExtensionName,
+      requiresRuntime: TYPED_NATIVE_RUNTIME,
+      target: disposition.platform,
+      extenderTarget: disposition.extenderTarget,
+      runtime: disposition.runtimeId,
+      reason: disposition.reason,
+      // The refusal is not the whole answer: an earlier native build may have
+      // left a unit on disk, and that unit must not reach this target's upload.
+      reconciled: await reconcileTypedNativeUpload({ projectRoot, platform: options.target })
+    };
+    return { extensionRoot, refusal, manifest: null, written: [], recorded: null };
+  }
 
   const laneSources = [];
   for (const relative of kLaneSources) {
@@ -478,7 +574,7 @@ export async function assemble(options) {
     `extern_c callees have no parsed C declaration: ${unresolved.join(", ")}`);
   const prelude = renderPrelude([...declarations.values()]);
   const assertState = await resolveArchiveAssertState(path.join(repositoryRoot, kVendoredLibraryRoot));
-  const adapted = `${renderArchiveMatchPrologue(assertState)}${adaptEmittedCToCxx(emittedC, kPreludeHeader)}`;
+  const adapted = `${renderRuntimeGuard()}${renderArchiveMatchPrologue(assertState)}${adaptEmittedCToCxx(emittedC, kPreludeHeader)}`;
 
   const headers = await resolveHermesHeaderClosure(options.hermesInclude, options.hermesConfigInclude);
 
@@ -514,6 +610,18 @@ export async function assemble(options) {
     extension: kExtensionName,
     unit: `sh_export_${kUnitName}`,
     transport: "typed-native",
+    // The unit executes only where a Hermes runtime exists. Recorded next to
+    // the artifact so a consumer can answer the question without re-deriving
+    // it, and so an upload gate can be checked against the artifact it guards.
+    requiresRuntime: TYPED_NATIVE_RUNTIME,
+    assembledForTarget: disposition.platform,
+    assembledForExtenderTarget: disposition.extenderTarget,
+    uploadGate: {
+      mechanism: ".defignore",
+      entry: `/${kExtensionName}`,
+      appliedBy: "packages/cli/src/typed-native.mjs",
+      note: "Bob filters extension discovery through .defignore, and an ext.manifest cannot exclude a platform."
+    },
     profile: options.profile,
     laneSources: Object.fromEntries(laneSources.map(({ relative, source }) => [relative, sha256(source)])),
     vendoredHeaders: Object.fromEntries([...headers]
@@ -556,12 +664,29 @@ export async function assemble(options) {
     recorded = { record: null, written: false, reason: error.message };
   }
 
-  return { extensionRoot, manifest, written, recorded };
+  // A target that can carry the unit must not be left with the exclusion a
+  // previous web build applied.
+  const reconciled = await reconcileTypedNativeUpload({ projectRoot, platform: options.target });
+
+  return { extensionRoot, manifest, written, recorded, reconciled, refusal: null };
 }
 
 export async function run(argv = process.argv) {
   const options = parseArguments(argv);
+  if (options.reconcile) {
+    const result = await reconcile(options);
+    console.log(`typed-native: ${result.message}`);
+    return result;
+  }
   const result = await assemble(options);
+  if (result.refusal) {
+    // Machine-readable on stdout, and a non-zero exit, because asking for this
+    // artifact for this target is a request that cannot be satisfied - not a
+    // build step that silently did nothing.
+    console.log(JSON.stringify(result.refusal, null, 2));
+    process.exitCode = 3;
+    return result;
+  }
   const files = await readdir(path.join(result.extensionRoot, "src"));
   console.log(
     `assembled ${kExtensionName} into ${path.relative(repositoryRoot, result.extensionRoot)}: ` +

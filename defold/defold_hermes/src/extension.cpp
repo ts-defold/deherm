@@ -310,9 +310,19 @@ bool ActivateBundle(bool initial) {
 
 #if defined(DM_PLATFORM_HTML5)
   if (!initial) {
+    // A browser reload does not arrive here. HTML5 has no engine service to
+    // post a Defold resource reload to, so the browser host's activation
+    // transaction is driven from outside the page through
+    // `globalThis.__defoldHermesDevV1.activate` (lib/web/library_defold_hermes.js),
+    // which stages the candidate, commits it, and logs the same
+    // `DEHERM_EVENT bundle-activated` acknowledgement this function logs for a
+    // native runtime. Reaching this branch means something re-staged the
+    // archived resource instead, and that path is deliberately inert: the
+    // committed generation keeps running.
     gRejectedBundleGeneration = bundle.generation;
     dmLogWarning(
-        "Browser bundle generation %llu is staged but browser-host activation is not implemented",
+        "Browser bundle generation %llu was staged through the Defold resource path, which the browser host "
+        "does not activate; the development control plane activates a browser bundle through __defoldHermesDevV1",
         static_cast<unsigned long long>(bundle.generation));
     return false;
   }

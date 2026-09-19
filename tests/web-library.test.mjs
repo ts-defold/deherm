@@ -14,24 +14,38 @@ test("browser bootstrap installs the generated universal script provider", () =>
   assert.doesNotMatch(extensionBootstrapSource, /__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_BRIDGE\.install\(\)/);
 });
 
-async function loadLibrary() {
+async function loadLibrary(options = {}) {
   const source = await readFile(
     new URL("../defold/defold_hermes/lib/web/library_defold_hermes.js", import.meta.url),
     "utf8"
   );
+  const componentSource = await readFile(
+    new URL("../defold/defold_hermes/lib/web/component_bridge.js", import.meta.url),
+    "utf8"
+  );
+  const logs = [];
+  const record = (level) => (...parts) => logs.push({ level, text: parts.join(" ") });
   const context = vm.createContext({
-    console,
-    performance: { now: () => 0 },
-    UTF8ToString: () => "void 0",
+    console: options.captureConsole
+      ? { log: record("log"), warn: record("warn"), error: record("error") }
+      : console,
+    performance: { now: () => 0, memory: options.memory },
+    UTF8ToString: () => options.bundleSource ?? "void 0",
+    stringToUTF8: () => {},
     autoAddDeps() {},
     addToLibrary() {}
   });
   vm.runInContext(source, context, { filename: "library_defold_hermes.js" });
+  vm.runInContext(componentSource, context, { filename: "component_bridge.js" });
   const library = context.LibraryDefoldHermes;
   context.DEFOLD_HERMES_WEB_CALLBACKS = library.$DEFOLD_HERMES_WEB_CALLBACKS;
   context.DEFOLD_HERMES_BRIDGE = library.$DEFOLD_HERMES_BRIDGE;
+  // The component pool is a peer library in the same Emscripten link, so the
+  // bridge reaches it as a bare global exactly as it does in a real build.
+  context.DEFOLD_HERMES_COMPONENTS = context.LibraryDefoldHermesComponents.$DEFOLD_HERMES_COMPONENTS;
+  context.DEFOLD_HERMES_SCRIPT_UNIVERSAL = { install: () => ({ call() {} }) };
   context.DEFOLD_HERMES_GENERATED_MODULES = { install: () => ({}) };
-  return { context, library };
+  return { context, library, logs };
 }
 
 test("web callback reset invalidates handles across runtime reloads", async () => {
@@ -231,4 +245,164 @@ test("browser script bridge declares helpers, supports bounded stack reentrancy,
   assert.equal(stack, 8);
   assert.throws(() => bridge.call(1, [{}]), /does not yet support tables/);
   assert.equal(stack, 8);
+});
+
+// The browser host's hot-reload transaction. HTML5 has no engine service, so a
+// reload arrives through `__defoldHermesDevV1.activate` from the development
+// control plane rather than as a Defold resource recreate. What is asserted
+// here is the transaction, not the transport: ordering, rollback, component
+// rebinding, and the fingerprint acknowledgement the CLI joins back to a build.
+
+function bundle({ fingerprint, init = "", final = "", update = "", components = null }) {
+  return `
+    globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__ = ${JSON.stringify(fingerprint)};
+    globalThis.__defoldAppV1 = {
+      init() { ${init} },
+      update(dt) { ${update} },
+      final() { ${final} }
+    };
+    ${components ? `globalThis.__defoldComponentsV1 = ${components};` : ""}
+  `;
+}
+
+const fingerprintA = "a".repeat(64);
+const fingerprintB = "b".repeat(64);
+
+async function loadedBridge(options = {}) {
+  const loaded = await loadLibrary({ captureConsole: true, ...options });
+  loaded.context.DEFOLD_HERMES_BRIDGE.load(0, 0);
+  return loaded;
+}
+
+test("browser activation commits a candidate and acknowledges its exact fingerprint", async () => {
+  const marks = [];
+  const { context, logs } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA, init: "globalThis.mark('a:init')", final: "globalThis.mark('a:final')" })
+  });
+  context.mark = (value) => marks.push(value);
+  const bridge = context.DEFOLD_HERMES_BRIDGE;
+  bridge.init();
+
+  const result = bridge.activate(bundle({
+    fingerprint: fingerprintB,
+    init: "globalThis.mark('b:init')"
+  }));
+
+  assert.equal(result.status, "activated");
+  assert.equal(result.fingerprint, fingerprintB);
+  assert.equal(result.generation, 2);
+  assert.equal(bridge.generation, 2);
+  // The candidate initializes before the outgoing generation finalizes, which
+  // is what makes a rejected candidate survivable. Native orders it the same way.
+  assert.deepEqual(marks, ["a:init", "b:init", "a:final"]);
+  assert.ok(logs.some(({ text }) => text.includes(
+    `DEHERM_EVENT bundle-activated fingerprint=${fingerprintB} resource_generation=2 runtime_id=0 initial=false`)));
+});
+
+test("a browser candidate that throws leaves the running generation active", async () => {
+  const marks = [];
+  const { context, logs } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA, update: "globalThis.mark('a:update')" })
+  });
+  context.mark = (value) => marks.push(value);
+  const bridge = context.DEFOLD_HERMES_BRIDGE;
+  bridge.init();
+  const running = bridge.app;
+
+  const result = bridge.activate(bundle({
+    fingerprint: fingerprintB,
+    init: "throw new Error('candidate init failed')"
+  }));
+
+  assert.equal(result.status, "rejected");
+  assert.match(result.diagnostic, /candidate init failed/);
+  assert.equal(bridge.app, running, "the previous generation must still be the active one");
+  assert.equal(bridge.generation, 1);
+  assert.equal(context.__DEFOLD_HERMES_BUILD_FINGERPRINT__, fingerprintA);
+  assert.equal(context.__defoldAppV1, running);
+  bridge.update(0.016);
+  assert.deepEqual(marks, ["a:update"]);
+  // A rejection names the candidate's own fingerprint, so the control plane
+  // can tell which pending build was refused rather than only that one was.
+  assert.ok(logs.some(({ text }) => text.includes(
+    `DEHERM_EVENT bundle-rejected fingerprint=${fingerprintB} resource_generation=2`)));
+});
+
+test("a browser candidate without a fingerprint cannot be acknowledged", async () => {
+  const { context } = await loadedBridge({ bundleSource: bundle({ fingerprint: fingerprintA }) });
+  const bridge = context.DEFOLD_HERMES_BRIDGE;
+  const result = bridge.activate("globalThis.__defoldAppV1 = { init() {} };");
+  assert.equal(result.status, "rejected");
+  assert.match(result.diagnostic, /no build fingerprint/);
+  assert.equal(bridge.generation, 1);
+});
+
+test("browser activation rebinds live component attachments under their existing identities", async () => {
+  const registry = `{
+    "player": {
+      schemaFingerprint: "schema-1",
+      contextKind: "game-object",
+      definition: { onReload(self) { self.reloaded = (self.reloaded || 0) + 1; } }
+    }
+  }`;
+  const { context } = await loadedBridge({ bundleSource: bundle({ fingerprint: fingerprintA, components: registry }) });
+  const components = context.DEFOLD_HERMES_COMPONENTS;
+  const handle = components.attach("player", "schema-1", "game-object");
+  components.setProperty(handle.slot, handle.generation, "speed", 4);
+
+  const result = context.DEFOLD_HERMES_BRIDGE.activate(bundle({ fingerprint: fingerprintB, components: registry }));
+
+  assert.equal(result.status, "activated");
+  assert.equal(result.reboundComponents, 1);
+  const entry = components.resolve(handle.slot, handle.generation);
+  assert.equal(entry.self.speed, 4, "the attachment's self table survives the swap");
+  assert.equal(entry.self.reloaded, 1, "the new definition's onReload runs once");
+});
+
+test("a component schema change is refused rather than rebound", async () => {
+  const registryOf = (schema) => `{
+    "player": { schemaFingerprint: ${JSON.stringify(schema)}, contextKind: "game-object", definition: {} }
+  }`;
+  const { context } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registryOf("schema-1") })
+  });
+  const components = context.DEFOLD_HERMES_COMPONENTS;
+  const handle = components.attach("player", "schema-1", "game-object");
+
+  const result = context.DEFOLD_HERMES_BRIDGE.activate(
+    bundle({ fingerprint: fingerprintB, components: registryOf("schema-2") }));
+
+  assert.equal(result.status, "rejected");
+  assert.match(result.diagnostic, /schema fingerprint changed/);
+  assert.equal(context.DEFOLD_HERMES_BRIDGE.generation, 1);
+  assert.equal(components.resolve(handle.slot, handle.generation).schema, "schema-1");
+});
+
+test("browser telemetry reports measured counters and names every gap", async () => {
+  const { context } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA }),
+    memory: { usedJSHeapSize: 4096, totalJSHeapSize: 8192, jsHeapSizeLimit: 65536 }
+  });
+  context.DEFOLD_HERMES_WEB_CALLBACKS.acquire(() => {});
+  context.DEFOLD_HERMES_BRIDGE.update(0.02);
+
+  const telemetry = context.DEFOLD_HERMES_BRIDGE.telemetry();
+  assert.equal(telemetry.runtime, "browser");
+  assert.equal(telemetry.available.callbackRoots, 1);
+  assert.equal(telemetry.available.frameDtMs, 20);
+  assert.equal(telemetry.available.jsHeapBytes, 4096);
+  assert.equal(telemetry.frames, 1);
+  // Every native counter with no browser equivalent is named with its reason;
+  // none of them is filled in with a number that means something else.
+  for (const counter of ["hermesHeapBytes", "hermesHeapPeakBytes", "luaHandles", "arenaHighWaterBytes"]) {
+    assert.equal(typeof telemetry.unavailable[counter], "string", `${counter} must carry a reason`);
+  }
+});
+
+test("the development entry point is installed by load and removed by reset", async () => {
+  const { context } = await loadedBridge({ bundleSource: bundle({ fingerprint: fingerprintA }) });
+  assert.equal(typeof context.__defoldHermesDevV1.activate, "function");
+  assert.equal(typeof context.__defoldHermesDevV1.telemetry, "function");
+  context.DEFOLD_HERMES_BRIDGE.finalize();
+  assert.equal(context.__defoldHermesDevV1, undefined);
 });

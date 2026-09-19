@@ -5,6 +5,7 @@ import { access, chmod, mkdir, readFile, readdir, rename, rm, stat, writeFile } 
 import path from "node:path";
 
 import { assertProjectNativeArtifact, defoldToolchain, hostDefoldPlatform } from "../toolchains.mjs";
+import { reconcileTypedNativeUpload } from "../typed-native.mjs";
 
 async function exists(file, mode) {
   try {
@@ -185,6 +186,12 @@ export async function createDefoldBuilder(options) {
   const build = (reason = "change") => {
     const operation = loop.then(async () => {
       emit({ type: "defold-build-started", reason });
+      // Bob walks the project for extensions and an ext.manifest cannot exclude
+      // a platform, so the upload set is decided here: a typed-native unit is a
+      // Hermes-runtime transport and must not travel to a browser-runtime
+      // target. Reported only when it changes; a steady state is not news.
+      const upload = await reconcileTypedNativeUpload({ projectRoot, platform });
+      if (upload.changed) emit({ type: "log", source: "bob", message: `typed-native: ${upload.message}` });
       const before = previous;
       const args = [
         "-jar", bob,

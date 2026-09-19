@@ -1,3 +1,13 @@
+// A `shermes -emit-c` unit is a transport of the 'hermes' runtime. The web
+// targets run game code on the browser's own JavaScript engine and embed no
+// Hermes, so this translation unit has nothing to call there. Saying so here
+// turns a pile of undefined _sh_* symbols at link time into one named refusal
+// at compile time. The build-time gate that normally prevents this is the
+// .defignore entry maintained by packages/cli/src/typed-native.mjs.
+#if defined(__EMSCRIPTEN__) || defined(DM_PLATFORM_HTML5)
+#error "deherm typed-native-requires-hermes-runtime: this unit is a Hermes-runtime transport and cannot be compiled for a browser-runtime target"
+#endif
+
 // Materialised by scripts/assemble-typed-native-extension.mjs. Do not edit.
 //
 // Two jobs, both small.

@@ -242,6 +242,7 @@ export async function runDevTui(options) {
 
   const actions = {
     play: () => intent("play"),
+    web: () => intent("web"),
     reload: () => intent("reload"),
     rebuild: () => intent("rebuild"),
     quit: requestStop,

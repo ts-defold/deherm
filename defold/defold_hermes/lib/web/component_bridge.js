@@ -115,6 +115,36 @@ var LibraryDefoldHermesComponents = {
       return this.dispatch(slot, generation, 'onReload', []);
     },
 
+    // Rebind every live attachment to the definitions a newly activated bundle
+    // registered, under the identities the engine still holds. This is the
+    // browser half of what a Defold `.script` reload does natively: the
+    // component instance, its `self` table and its stable id survive, the
+    // lifecycle functions are replaced, `init` is not called again, and
+    // `onReload` is. A slot whose registered schema fingerprint changed is not
+    // rebound: a property-schema change is an editor build, not a bundle swap.
+    rebindAll: function() {
+      var outcome = {rebound: 0, live: this.live, failed: []};
+      if (!this.slots) return outcome;
+      for (var index = 0; index < this.capacity; ++index) {
+        var entry = this.slots[index];
+        if (!entry.live) continue;
+        try {
+          var registered = this.entry(entry.componentId);
+          if (registered.schemaFingerprint !== entry.schema) {
+            throw new Error('Component schema fingerprint changed; a property-schema change needs a project build');
+          }
+          this.reload(index, entry.generation);
+          ++outcome.rebound;
+        } catch (failure) {
+          outcome.failed.push({
+            componentId: entry.componentId,
+            message: failure && failure.message ? failure.message : String(failure)
+          });
+        }
+      }
+      return outcome;
+    },
+
     detach: function(slot, generation) {
       if (!this.slots || slot >= this.capacity) return;
       var entry = this.slots[slot];
