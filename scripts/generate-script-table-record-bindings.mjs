@@ -2,10 +2,10 @@
 
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -37,9 +37,20 @@ export async function loadInputs() {
   const [irText, patternsText, accountingText, schemasText, policyText] = await Promise.all(
     [paths.ir, paths.patterns, paths.accounting, paths.schemas, paths.policy].map((path) => readFile(path, "utf8")));
   const policy = JSON.parse(policyText);
-  const sourceTexts = new Map(await Promise.all(policy.sources.map(async ({ path }) =>
-    [path, await readFile(new URL(`upstream/defold/${path}`, root), "utf8")])));
-  return { irText, patternsText, accountingText, schemasText, policyText, sourceTexts };
+  // Tolerant on purpose: the reviewed policy cites `script_bullet3d.cpp`, a
+  // backend Defold 1.13.1 does not ship. A bare `readFile` died with ENOENT on
+  // it; a source this revision does not have - or one that lost a reviewed
+  // anchor - is withdrawn instead, and the routes resting on it are dropped.
+  const loaded = await loadReviewedSources({
+    input: "packages/bindings/overrides/script-table-record-bindings.json",
+    defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
+    evidence: policy.sources,
+    derived: JSON.parse(irText).defoldRevision
+  });
+  return {
+    irText, patternsText, accountingText, schemasText, policyText,
+    sourceTexts: loaded.texts, withdrawnSources: loaded.withdrawn
+  };
 }
 
 function fieldCodec(field, id) {
@@ -184,23 +195,23 @@ export function generate(inputs) {
   assert(ir.defoldRevision === patterns.defoldRevision && ir.defoldRevision === accounting.defoldRevision && ir.defoldRevision === schemas.defoldRevision, "table-record inputs use different Defold revisions");
   assert(patterns.sourceSha256 === sha256(inputs.irText), "table-record binding patterns are stale against script IR");
   assert(accounting.inputEvidence?.scriptIrSha256 === sha256(inputs.irText) && accounting.inputEvidence?.bindingPatternsSha256 === sha256(inputs.patternsText), "table-record accounting provenance is stale");
+  const withdrawnSources = inputs.withdrawnSources ?? new Set();
   const sourceByKey = new Map();
   for (const source of policy.sources) {
     assert(!sourceByKey.has(source.key), `${source.key}: duplicate table-record source`);
+    // The reviewed hash was OBSERVED while loading, not asserted: it only
+    // detects that Defold edited its own source, which across a release is
+    // expected and is the input to this generator rather than a failure of it.
+    // What actually checks this policy against the revision being generated is
+    // the census below, which is read from that revision's IR.
+    if (withdrawnSources.has(source.path)) continue;
     const text = inputs.sourceTexts.get(source.path);
     assert(typeof text === "string", `${source.path}: pinned table-record source was not loaded`);
-    // OBSERVED, not asserted. A pinned hash only detects that Defold edited its
-    // own source, which across a release is expected and is the input to this
-    // generator rather than a failure of it. A moved file becomes an audit line
-    // and a restated pin for this revision. What actually checks this policy
-    // against the revision being generated is the census below, which is read
-    // from that revision's IR.
-    observeReviewedSource({
-      input: "packages/bindings/overrides/script-table-record-bindings.json",
-      id: `${source.key}: table-record`, source: text, evidence: source
-    });
     sourceByKey.set(source.key, { ...source, text });
   }
+  // A reviewed route whose cited source this revision does not have is
+  // withdrawn for this revision rather than emitted on evidence that is gone.
+  const reviewedRoutes = policy.routes.filter(({ source }) => sourceByKey.has(source));
   const fnById = new Map(ir.functions.map((fn) => [fn.id, fn])), patternById = new Map(patterns.bindings.map((row) => [row.id, row])), schemaById = new Map(schemas.rows.map((row) => [row.id, row])), types = new Map(ir.types.map((type) => [type.name, type]));
   const tableRoutes = accounting.rows.filter(({ id, evidence }) =>
     patternById.get(id)?.loweringFamily === "lua-table" && evidence?.generator !== "native-value-dispatch");
@@ -215,7 +226,7 @@ export function generate(inputs) {
   for (const { id } of tableRoutes) { const schema = schemaById.get(id), pattern = patternById.get(id); assert(schema?.family === "lua-table" && pattern && JSON.stringify(schema.parameters) === JSON.stringify(pattern.parameterCodecs) && JSON.stringify(schema.returns) === JSON.stringify(pattern.returnCodecs), `${id}: table-record schema classification drifted`); }
   const safeIds = new Set(tableRoutes.map(({ id }) => id).filter((id) => routeIsMechanicallySafe(schemaById.get(id), fnById.get(id), types)));
   const seen = new Set();
-  const rows = policy.routes.map((rule) => {
+  const rows = reviewedRoutes.map((rule) => {
     assert(!seen.has(rule.id), `${rule.id}: duplicate reviewed table-record route`); seen.add(rule.id);
     assert(tableRouteIds.has(rule.id), `${rule.id}: reviewed table-record route is not in the structural lua-table scope`);
     assert(safeIds.has(rule.id), `${rule.id}: reviewed route is not a mechanically safe finite fixed record`);
@@ -230,14 +241,15 @@ export function generate(inputs) {
   expectReviewedCount({
     input: "packages/bindings/overrides/script-table-record-bindings.json",
     label: "table-record candidate census",
-    expected: policy.expectedCandidateCount, observed: rows.length
+    expected: policy.expectedCandidateCount - (policy.routes.length - reviewedRoutes.length),
+    observed: rows.length
   }); assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "table-record stable ID collision");
   const selectedIds = new Set(rows.map(({ id }) => id));
   const blockedRoutes = tableRoutes.filter(({ id }) => !selectedIds.has(id)).map(({ id }) => { const schema = schemaById.get(id); return { id, stableId: stableBindingId(id), bucket: schema.bucket, blocker: blockerFor(schema) }; }).sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
   const blockerCounts = Object.fromEntries(Object.keys(policy.expectedBlockerCounts).sort(compare).map((blocker) => [blocker, blockedRoutes.filter((row) => row.blocker === blocker).length]));
   assert(JSON.stringify(blockerCounts) === JSON.stringify(policy.expectedBlockerCounts), `table-record blocker taxonomy drifted: ${JSON.stringify(blockerCounts)}`);
   assert(blockedRoutes.length + rows.length === tableRoutes.length, "table-record candidate/blocker partition drifted");
-  const report = { schemaVersion: 1, defoldRevision: ir.defoldRevision, scope: "The reviewed, finite fixed-record subset of the structural lua-table routes not owned by native value dispatch", coverageClaim: "All listed candidates have generated fail-closed descriptors and a native-dynamic captured-Lua adapter using caller-owned bounded record storage. Static Hermes, packaged-engine, and browser execution are not claimed.", routeCount: tableRoutes.length, mechanicallySafeFixedRecordCount: safeIds.size, candidateCount: rows.length, executableCount: rows.length, blockedCount: blockedRoutes.length, targetSupport: { nativeDynamicHermes: "generated-executable-shared-script-adapter", nativeStaticHermes: "not-integrated", html5BrowserHost: "not-executable-no-provider" }, blockerTaxonomy: { "unbounded-typed-sequence": "IR supplies element codecs but no maximum length or dense-array policy.", "unbounded-typed-map": "IR supplies key/value codecs but no maximum-entry, own-key, or collision policy.", "dynamic-recursive-values": "Recursive or any-valued tables require bounded depth, entry, cycle, and value-union policies.", "tagged-table-union": "A table branch needs an explicit discriminator and ambiguity rejection.", "opaque-or-nested-record": "The record has an unresolved nested or opaque context.", "reviewed-semantic-record": "The table shape has ownership, binary, discriminator, or borrowed-handle semantics outside the structural IR.", "handle-or-callback-crossing": "The route crosses a handle or callback in addition to a record; no first-wave ownership/lifetime codec is installed.", "copied-defold-value-record": "The fixed record also crosses a copied Defold value; this needs a value codec wave.", "target-context-or-platform-state-record": "The scalar record is coupled to platform state, engine context, or target side effects and has no reviewed provider." }, blockerCounts, inputEvidence: { scriptIrSha256: sha256(inputs.irText), bindingPatternsSha256: sha256(inputs.patternsText), accountingSha256: sha256(inputs.accountingText), tableTupleSchemaSha256: sha256(inputs.schemasText), reviewedPolicySha256: sha256(inputs.policyText), defoldSources: policy.sources.map(({ path, sha256: hash }) => ({ path: `upstream/defold/${path}`, sha256: hash })) }, bindings: rows, blockedRoutes };
+  const report = { schemaVersion: 1, defoldRevision: ir.defoldRevision, scope: "The reviewed, finite fixed-record subset of the structural lua-table routes not owned by native value dispatch", coverageClaim: "All listed candidates have generated fail-closed descriptors and a native-dynamic captured-Lua adapter using caller-owned bounded record storage. Static Hermes, packaged-engine, and browser execution are not claimed.", routeCount: tableRoutes.length, mechanicallySafeFixedRecordCount: safeIds.size, candidateCount: rows.length, executableCount: rows.length, blockedCount: blockedRoutes.length, targetSupport: { nativeDynamicHermes: "generated-executable-shared-script-adapter", nativeStaticHermes: "not-integrated", html5BrowserHost: "not-executable-no-provider" }, blockerTaxonomy: { "unbounded-typed-sequence": "IR supplies element codecs but no maximum length or dense-array policy.", "unbounded-typed-map": "IR supplies key/value codecs but no maximum-entry, own-key, or collision policy.", "dynamic-recursive-values": "Recursive or any-valued tables require bounded depth, entry, cycle, and value-union policies.", "tagged-table-union": "A table branch needs an explicit discriminator and ambiguity rejection.", "opaque-or-nested-record": "The record has an unresolved nested or opaque context.", "reviewed-semantic-record": "The table shape has ownership, binary, discriminator, or borrowed-handle semantics outside the structural IR.", "handle-or-callback-crossing": "The route crosses a handle or callback in addition to a record; no first-wave ownership/lifetime codec is installed.", "copied-defold-value-record": "The fixed record also crosses a copied Defold value; this needs a value codec wave.", "target-context-or-platform-state-record": "The scalar record is coupled to platform state, engine context, or target side effects and has no reviewed provider." }, blockerCounts, inputEvidence: { scriptIrSha256: sha256(inputs.irText), bindingPatternsSha256: sha256(inputs.patternsText), accountingSha256: sha256(inputs.accountingText), tableTupleSchemaSha256: sha256(inputs.schemasText), reviewedPolicySha256: sha256(inputs.policyText), defoldSources: policy.sources.filter(({ path }) => !withdrawnSources.has(path)).map(({ path, sha256: hash }) => ({ path: `upstream/defold/${path}`, sha256: hash })) }, bindings: rows, blockedRoutes };
   return { report, ...renderRuntime(rows) };
 }
 
