@@ -259,6 +259,7 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
     assert.match(source, new RegExp(suffix.replace(/[{}$]/g, "\\$&")));
   }
   assert.match(source, /-nostdinc\+\+/);
+  assert.match(source, /"-D_WINDOWS -DDM_PLATFORM_WINDOWS/);
   assert.match(source, /if\(NOT IS_DIRECTORY "\$\{include_root\}"\)/);
   assert.match(source, /set\(CMAKE_ASM_COMPILER_TARGET x86_64-pc-win32-msvc\)/);
   assert.match(source, /set\(CMAKE_ASM_FLAGS_INIT "-target x86_64-pc-win32-msvc -m64"\)/);
