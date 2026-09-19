@@ -11,7 +11,11 @@ mkdir -p "$bob_dir"
 
 valid_bob=false
 if [[ -f "$bob_jar" ]]; then
-  actual_sha="$(shasum -a 256 "$bob_jar" | awk '{print $1}')"
+  actual_sha="$(node -e '
+    const { createHash } = require("node:crypto");
+    const { readFileSync } = require("node:fs");
+    process.stdout.write(createHash("sha256").update(readFileSync(process.argv[1])).digest("hex"));
+  ' "$bob_jar")"
   if [[ "$actual_sha" == "$DEFOLD_BOB_SHA256" ]]; then
     valid_bob=true
   else
@@ -23,7 +27,15 @@ if [[ "$valid_bob" != true ]]; then
   temporary="$bob_jar.download"
   trap 'rm -f "$temporary"' EXIT
   curl -fL --retry 3 --retry-delay 2 "$DEFOLD_BOB_URL" -o "$temporary"
-  printf '%s  %s\n' "$DEFOLD_BOB_SHA256" "$temporary" | shasum -a 256 -c -
+  actual_sha="$(node -e '
+    const { createHash } = require("node:crypto");
+    const { readFileSync } = require("node:fs");
+    process.stdout.write(createHash("sha256").update(readFileSync(process.argv[1])).digest("hex"));
+  ' "$temporary")"
+  if [[ "$actual_sha" != "$DEFOLD_BOB_SHA256" ]]; then
+    echo "Bob checksum mismatch: expected $DEFOLD_BOB_SHA256, got $actual_sha" >&2
+    exit 1
+  fi
   mv "$temporary" "$bob_jar"
   trap - EXIT
 fi

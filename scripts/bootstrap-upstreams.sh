@@ -66,7 +66,15 @@ if wants ref-doc; then
   ref_doc="$repo_root/upstream/ref-doc.zip"
   mkdir -p "$repo_root/upstream"
   curl -fL "$DEFOLD_REF_DOC_URL" -o "$ref_doc"
-  printf '%s  %s\n' "$DEFOLD_REF_DOC_SHA256" "$ref_doc" | shasum -a 256 -c -
+  actual_sha="$(node -e '
+    const { createHash } = require("node:crypto");
+    const { readFileSync } = require("node:fs");
+    process.stdout.write(createHash("sha256").update(readFileSync(process.argv[1])).digest("hex"));
+  ' "$ref_doc")"
+  if [[ "$actual_sha" != "$DEFOLD_REF_DOC_SHA256" ]]; then
+    echo "ref-doc.zip checksum mismatch: expected $DEFOLD_REF_DOC_SHA256, got $actual_sha" >&2
+    exit 1
+  fi
 fi
 
 # The pinned C library headers the dmSDK declaration parse resolves against.

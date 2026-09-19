@@ -31,12 +31,15 @@ const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
 
 test("policy host parity materializes every authoritative generator input", async () => {
   const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");
+  const bootstrap = await readFile(path.join(repositoryRoot, "scripts/bootstrap-upstreams.sh"), "utf8");
   const parity = workflow.slice(
     workflow.indexOf("  host-parity:"),
     workflow.indexOf("  engine-conformance:")
   );
 
   assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
+  assert.match(bootstrap, /createHash\("sha256"\)/u);
+  assert.doesNotMatch(bootstrap, /\bshasum\b/u);
 });
 
 // A deliberately tiny stand-in for the generated state, so the structural
