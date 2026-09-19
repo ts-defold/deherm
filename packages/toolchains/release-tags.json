@@ -71,8 +71,8 @@
       }
     },
     "native-artifacts": {
-      "tag": "libs-22b36222380a",
-      "fingerprint": "22b36222380a05c7fdd49002d01eb03633f466ecf1898ea64fbd3a54be055875",
+      "tag": "libs-47b30e37751f",
+      "fingerprint": "47b30e37751f15c6db5397670896e2c98ea463349a1a2f33d28c5f5413bd6391",
       "indexedBy": "bundleTarget",
       "summary": "libhermes.a / hermes.lib, per Defold bundle target",
       "assets": {

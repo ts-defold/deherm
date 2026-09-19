@@ -2,8 +2,10 @@ set(CMAKE_SYSTEM_NAME Windows)
 set(CMAKE_SYSTEM_PROCESSOR AMD64)
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
+set(CMAKE_ASM_COMPILER clang)
 set(CMAKE_C_COMPILER_TARGET x86_64-pc-win32-msvc)
 set(CMAKE_CXX_COMPILER_TARGET x86_64-pc-win32-msvc)
+set(CMAKE_ASM_COMPILER_TARGET x86_64-pc-win32-msvc)
 
 # The Extender image carries the exact MSVC and Windows SDK headers Defold uses,
 # but clang's GNU-style driver does not discover those roots merely because its
@@ -44,5 +46,11 @@ set(CMAKE_C_FLAGS_INIT
   "-m64 ${DEHERM_WINDOWS_DEFINE_FLAGS}${DEHERM_WINDOWS_INCLUDE_FLAGS}")
 set(CMAKE_CXX_FLAGS_INIT
   "-m64 -nostdinc++ ${DEHERM_WINDOWS_DEFINE_FLAGS}${DEHERM_WINDOWS_INCLUDE_FLAGS}")
+# Boost.Context selects its PE/GAS implementation for this target. Without an
+# explicit ASM target, CMake invokes host clang in ELF mode: the source is
+# correct COFF assembly, but `.def` and `.seh_*` are then rejected as unknown
+# directives. Keep the flag explicit as well as setting COMPILER_TARGET because
+# CMake 3.22's ASM driver does not consistently project the latter.
+set(CMAKE_ASM_FLAGS_INIT "-target x86_64-pc-win32-msvc -m64")
 set(CMAKE_EXE_LINKER_FLAGS_INIT "-fuse-ld=lld")
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
