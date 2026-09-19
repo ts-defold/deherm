@@ -16,15 +16,17 @@
   "routeCount": 926,
   "statusCounts": {
     "executed": 466,
-    "supported": 434,
-    "suspect": 26
+    "supported": 439,
+    "suspect": 21
   },
   "registrationCounts": {
-    "declared-but-unregistered": 25,
-    "registered": 901
+    "commented-out-upstream": 2,
+    "declared-but-unregistered": 18,
+    "registered": 901,
+    "registration-form-not-traced": 5
   },
   "harnessCoverageGaps": {
-    "context-fixture-missing": 182,
+    "context-fixture-missing": 187,
     "route-unavailable-in-runtime-profile": 110,
     "unsynthesizable-parameter-type": 53,
     "multi-result-shape-unmodelled": 28,
@@ -43,14 +45,14 @@
       "id": "script:b2d.body.get_user_data",
       "luaName": "b2d.body.get_user_data",
       "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "registration": "commented-out-upstream",
       "declaredAt": "doc/b2d.lua:611"
     },
     {
       "id": "script:b2d.body.set_user_data",
       "luaName": "b2d.body.set_user_data",
       "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "registration": "commented-out-upstream",
       "declaredAt": "doc/b2d.lua:840"
     },
     {
@@ -116,41 +118,6 @@
       "status": "suspect",
       "registration": "declared-but-unregistered",
       "declaredAt": "doc/socket.lua:59"
-    },
-    {
-      "id": "script:socket.dns.getaddrinfo",
-      "luaName": "socket.dns.getaddrinfo",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/socket.lua:70"
-    },
-    {
-      "id": "script:socket.dns.gethostname",
-      "luaName": "socket.dns.gethostname",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/socket.lua:76"
-    },
-    {
-      "id": "script:socket.dns.getnameinfo",
-      "luaName": "socket.dns.getnameinfo",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/socket.lua:95"
-    },
-    {
-      "id": "script:socket.dns.tohostname",
-      "luaName": "socket.dns.tohostname",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/socket.lua:104"
-    },
-    {
-      "id": "script:socket.dns.toip",
-      "luaName": "socket.dns.toip",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/socket.lua:113"
     },
     {
       "id": "script:socket.gettime",
@@ -263,6 +230,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:283",
       "source": "doc/b2d.lua"
     },
     {
@@ -279,6 +247,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:299",
       "source": "doc/b2d.lua"
     },
     {
@@ -287,6 +256,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:325",
       "source": "doc/b2d.lua"
     },
     {
@@ -295,6 +265,7 @@
       "status": "supported",
       "notExecutedHere": "unsynthesizable-parameter-type:b2d.shape.definition@b2d.fixture_definition.shape",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:357",
       "source": "doc/b2d.lua"
     },
     {
@@ -303,6 +274,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:366",
       "source": "doc/b2d.lua"
     },
     {
@@ -311,6 +283,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:373",
       "source": "doc/b2d.lua"
     },
     {
@@ -319,6 +292,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:384",
       "source": "doc/b2d.lua"
     },
     {
@@ -327,6 +301,7 @@
       "status": "supported",
       "notExecutedHere": "harness-effect-guard:dump",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:390",
       "source": "doc/b2d.lua"
     },
     {
@@ -345,6 +320,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:397",
       "source": "doc/b2d.lua"
     },
     {
@@ -363,6 +339,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:404",
       "source": "doc/b2d.lua"
     },
     {
@@ -381,6 +358,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:411",
       "source": "doc/b2d.lua"
     },
     {
@@ -413,6 +391,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:439",
       "source": "doc/b2d.lua"
     },
     {
@@ -421,6 +400,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:446",
       "source": "doc/b2d.lua"
     },
     {
@@ -521,6 +501,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:518",
       "source": "doc/b2d.lua"
     },
     {
@@ -581,6 +562,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:555",
       "source": "doc/b2d.lua"
     },
     {
@@ -589,6 +571,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:562",
       "source": "doc/b2d.lua"
     },
     {
@@ -605,6 +588,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:576",
       "source": "doc/b2d.lua"
     },
     {
@@ -613,6 +597,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:583",
       "source": "doc/b2d.lua"
     },
     {
@@ -621,6 +606,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:590",
       "source": "doc/b2d.lua"
     },
     {
@@ -643,8 +629,10 @@
       "id": "script:b2d.body.get_user_data",
       "luaName": "b2d.body.get_user_data",
       "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "registration": "commented-out-upstream",
       "declaredAt": "doc/b2d.lua:611",
+      "commentedOutAt": "gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+      "commentedOutFunction": "Body_GetUserData",
       "source": "doc/b2d.lua"
     },
     {
@@ -669,6 +657,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:632",
       "source": "doc/b2d.lua"
     },
     {
@@ -753,6 +742,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:690",
       "source": "doc/b2d.lua"
     },
     {
@@ -761,6 +751,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:697",
       "source": "doc/b2d.lua"
     },
     {
@@ -897,6 +888,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:793",
       "source": "doc/b2d.lua"
     },
     {
@@ -905,6 +897,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:800",
       "source": "doc/b2d.lua"
     },
     {
@@ -931,6 +924,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:816",
       "source": "doc/b2d.lua"
     },
     {
@@ -953,8 +947,10 @@
       "id": "script:b2d.body.set_user_data",
       "luaName": "b2d.body.set_user_data",
       "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "registration": "commented-out-upstream",
       "declaredAt": "doc/b2d.lua:840",
+      "commentedOutAt": "gamesys/src/gamesys/scripts/box2d/v3/script_box2d_body_v3.cpp",
+      "commentedOutFunction": "Body_SetUserData",
       "source": "doc/b2d.lua"
     },
     {
@@ -963,6 +959,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:847",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -971,6 +969,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:854",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -979,6 +979,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:861",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -987,6 +989,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:868",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -995,6 +999,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:875",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1003,6 +1009,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:882",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1011,6 +1019,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:889",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1019,6 +1029,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:896",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1027,6 +1039,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:903",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1035,6 +1049,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:910",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1043,6 +1059,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:917",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1051,6 +1069,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:924",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1059,6 +1079,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:931",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1067,6 +1089,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:940",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1075,6 +1099,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:948",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1083,6 +1109,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:957",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1091,6 +1119,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:965",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1099,6 +1129,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:973",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1107,6 +1139,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:981",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1115,6 +1149,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:989",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1123,6 +1159,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:997",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1141,6 +1179,8 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1005",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1159,6 +1199,8 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1014",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1167,6 +1209,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1023",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1175,6 +1219,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1031",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1183,6 +1229,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1039",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1201,6 +1249,8 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1047",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1219,6 +1269,8 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1088",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1227,6 +1279,8 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1097",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -1277,6 +1331,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1134",
       "source": "doc/b2d.lua"
     },
     {
@@ -1285,6 +1340,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1143",
       "source": "doc/b2d.lua"
     },
     {
@@ -1293,6 +1349,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1152",
       "source": "doc/b2d.lua"
     },
     {
@@ -1301,6 +1358,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1161",
       "source": "doc/b2d.lua"
     },
     {
@@ -1325,6 +1383,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1188",
       "source": "doc/b2d.lua"
     },
     {
@@ -1341,6 +1400,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1206",
       "source": "doc/b2d.lua"
     },
     {
@@ -1419,6 +1479,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1251",
       "source": "doc/b2d.lua"
     },
     {
@@ -1443,6 +1504,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1272",
       "source": "doc/b2d.lua"
     },
     {
@@ -1451,6 +1513,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1279",
       "source": "doc/b2d.lua"
     },
     {
@@ -1459,6 +1522,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1286",
       "source": "doc/b2d.lua"
     },
     {
@@ -1491,6 +1555,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1314",
       "source": "doc/b2d.lua"
     },
     {
@@ -1499,6 +1564,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1321",
       "source": "doc/b2d.lua"
     },
     {
@@ -1523,6 +1589,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1342",
       "source": "doc/b2d.lua"
     },
     {
@@ -1531,6 +1598,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1349",
       "source": "doc/b2d.lua"
     },
     {
@@ -1547,6 +1615,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1363",
       "source": "doc/b2d.lua"
     },
     {
@@ -1555,6 +1624,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1370",
       "source": "doc/b2d.lua"
     },
     {
@@ -1595,6 +1665,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1405",
       "source": "doc/b2d.lua"
     },
     {
@@ -1603,6 +1674,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1412",
       "source": "doc/b2d.lua"
     },
     {
@@ -1611,6 +1683,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1419",
       "source": "doc/b2d.lua"
     },
     {
@@ -1619,6 +1692,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1426",
       "source": "doc/b2d.lua"
     },
     {
@@ -1627,6 +1701,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1433",
       "source": "doc/b2d.lua"
     },
     {
@@ -1635,6 +1710,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1440",
       "source": "doc/b2d.lua"
     },
     {
@@ -1659,6 +1735,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1461",
       "source": "doc/b2d.lua"
     },
     {
@@ -1715,6 +1792,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1510",
       "source": "doc/b2d.lua"
     },
     {
@@ -1775,6 +1853,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1549",
       "source": "doc/b2d.lua"
     },
     {
@@ -1835,6 +1914,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1588",
       "source": "doc/b2d.lua"
     },
     {
@@ -1859,6 +1939,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1609",
       "source": "doc/b2d.lua"
     },
     {
@@ -1867,6 +1948,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1616",
       "source": "doc/b2d.lua"
     },
     {
@@ -1891,6 +1973,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1637",
       "source": "doc/b2d.lua"
     },
     {
@@ -1899,6 +1982,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1644",
       "source": "doc/b2d.lua"
     },
     {
@@ -1907,6 +1991,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1651",
       "source": "doc/b2d.lua"
     },
     {
@@ -1915,6 +2000,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1658",
       "source": "doc/b2d.lua"
     },
     {
@@ -1923,6 +2009,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1665",
       "source": "doc/b2d.lua"
     },
     {
@@ -1941,6 +2028,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1672",
       "source": "doc/b2d.lua"
     },
     {
@@ -1949,6 +2037,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1679",
       "source": "doc/b2d.lua"
     },
     {
@@ -1989,6 +2078,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1715",
       "source": "doc/b2d.lua"
     },
     {
@@ -2005,6 +2095,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1730",
       "source": "doc/b2d.lua"
     },
     {
@@ -2013,6 +2104,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1737",
       "source": "doc/b2d.lua"
     },
     {
@@ -2021,6 +2113,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1744",
       "source": "doc/b2d.lua"
     },
     {
@@ -2069,6 +2162,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1786",
       "source": "doc/b2d.lua"
     },
     {
@@ -2093,6 +2187,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1807",
       "source": "doc/b2d.lua"
     },
     {
@@ -2101,6 +2196,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1814",
       "source": "doc/b2d.lua"
     },
     {
@@ -2117,6 +2213,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1828",
       "source": "doc/b2d.lua"
     },
     {
@@ -2125,6 +2222,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1834",
       "source": "doc/b2d.lua"
     },
     {
@@ -2133,6 +2231,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1841",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2141,6 +2241,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1848",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2149,6 +2251,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1855",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2157,6 +2261,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1862",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2165,6 +2271,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1869",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/b2d.lua"
     },
     {
@@ -2173,6 +2281,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1876",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/b2d.lua"
     },
     {
@@ -2181,6 +2291,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1883",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/b2d.lua"
     },
     {
@@ -2189,6 +2301,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1890",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/b2d.lua"
     },
     {
@@ -2197,6 +2311,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1897",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2205,6 +2321,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1905",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/b2d.lua"
     },
     {
@@ -2213,6 +2331,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1912",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2221,6 +2341,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1919",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2229,6 +2351,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1926",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2237,6 +2361,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1933",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2245,6 +2371,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1940",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2253,6 +2381,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1947",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2261,6 +2391,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1954",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2269,6 +2401,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1961",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2287,6 +2421,8 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1968",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2305,6 +2441,8 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1978",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/b2d.lua"
     },
     {
@@ -2313,6 +2451,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:1985",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/b2d.lua"
     },
     {
@@ -2321,6 +2461,8 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2022",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/b2d.lua"
     },
     {
@@ -2329,6 +2471,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2033",
       "source": "doc/b2d.lua"
     },
     {
@@ -2362,6 +2505,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2081",
       "source": "doc/b2d.lua"
     },
     {
@@ -2380,6 +2524,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2088",
       "source": "doc/b2d.lua"
     },
     {
@@ -2398,6 +2543,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2095",
       "source": "doc/b2d.lua"
     },
     {
@@ -2416,6 +2562,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2102",
       "source": "doc/b2d.lua"
     },
     {
@@ -2434,6 +2581,7 @@
         ]
       },
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2109",
       "source": "doc/b2d.lua"
     },
     {
@@ -2442,6 +2590,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2116",
       "source": "doc/b2d.lua"
     },
     {
@@ -2450,6 +2599,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2123",
       "source": "doc/b2d.lua"
     },
     {
@@ -2458,6 +2608,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2130",
       "source": "doc/b2d.lua"
     },
     {
@@ -2466,6 +2617,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2137",
       "source": "doc/b2d.lua"
     },
     {
@@ -2474,6 +2626,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2144",
       "source": "doc/b2d.lua"
     },
     {
@@ -2482,6 +2635,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2151",
       "source": "doc/b2d.lua"
     },
     {
@@ -2490,6 +2644,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2158",
       "source": "doc/b2d.lua"
     },
     {
@@ -2498,6 +2653,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2165",
       "source": "doc/b2d.lua"
     },
     {
@@ -2506,6 +2662,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2172",
       "source": "doc/b2d.lua"
     },
     {
@@ -2514,6 +2671,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2180",
       "source": "doc/b2d.lua"
     },
     {
@@ -2522,6 +2680,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2187",
       "source": "doc/b2d.lua"
     },
     {
@@ -2530,6 +2689,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2194",
       "source": "doc/b2d.lua"
     },
     {
@@ -2538,6 +2698,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2201",
       "source": "doc/b2d.lua"
     },
     {
@@ -2562,6 +2723,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2231",
       "source": "doc/b2d.lua"
     },
     {
@@ -2570,6 +2732,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2240",
       "source": "doc/b2d.lua"
     },
     {
@@ -2578,6 +2741,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2247",
       "source": "doc/b2d.lua"
     },
     {
@@ -2586,6 +2750,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2254",
       "source": "doc/b2d.lua"
     },
     {
@@ -2594,6 +2759,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2262",
       "source": "doc/b2d.lua"
     },
     {
@@ -2602,6 +2768,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2269",
       "source": "doc/b2d.lua"
     },
     {
@@ -2610,6 +2777,7 @@
       "status": "supported",
       "notExecutedHere": "route-unavailable-in-runtime-profile:default-legacy-bullet",
       "registration": "registered",
+      "declaredAt": "doc/b2d.lua:2276",
       "source": "doc/b2d.lua"
     },
     {
@@ -2626,6 +2794,7 @@
       "status": "supported",
       "notExecutedHere": "variadic-argument-shape-unmodelled",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/bit.lua"
     },
     {
@@ -2642,6 +2811,7 @@
       "status": "supported",
       "notExecutedHere": "variadic-argument-shape-unmodelled",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/bit.lua"
     },
     {
@@ -2658,6 +2828,7 @@
       "status": "supported",
       "notExecutedHere": "variadic-argument-shape-unmodelled",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/bit.lua"
     },
     {
@@ -2724,6 +2895,7 @@
       "disposition": "blocked",
       "notExecutedHere": "not-in-conformance-plan",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/buffer.lua"
     },
     {
@@ -3144,6 +3316,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3162,6 +3335,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3180,6 +3354,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3198,6 +3373,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3216,6 +3392,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3234,6 +3411,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3252,6 +3430,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3270,6 +3449,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3420,6 +3600,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3438,6 +3619,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3652,6 +3834,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -3670,6 +3853,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -4254,6 +4438,7 @@
       "status": "supported",
       "notExecutedHere": "handle-kind-outside-fixture-profile:btCollisionShape",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -4272,6 +4457,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -4298,6 +4484,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -4316,6 +4503,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -4342,6 +4530,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/bullet3d.lua"
     },
     {
@@ -4826,6 +5015,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/collectionproxy.lua"
     },
     {
@@ -4844,6 +5034,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/collectionproxy.lua"
     },
     {
@@ -4894,6 +5085,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/compute.lua"
     },
     {
@@ -4902,6 +5094,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/compute.lua"
     },
     {
@@ -4910,6 +5103,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/compute.lua"
     },
     {
@@ -5132,6 +5326,7 @@
       "status": "supported",
       "notExecutedHere": "execution-policy-destructive",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/go.lua"
     },
     {
@@ -5158,6 +5353,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/go.lua"
     },
     {
@@ -5293,6 +5489,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/go.lua"
     },
     {
@@ -5488,6 +5685,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/gui.lua"
     },
     {
@@ -5948,6 +6146,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:gui-scene",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/gui.lua"
     },
     {
@@ -5964,6 +6163,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:gui-scene",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/gui.lua"
     },
     {
@@ -5972,6 +6172,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:gui-scene",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/gui.lua"
     },
     {
@@ -6064,6 +6265,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/gui.lua"
     },
     {
@@ -6536,6 +6738,7 @@
       "status": "supported",
       "notExecutedHere": "execution-policy-context-blocked",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/html5.lua"
     },
     {
@@ -6562,6 +6765,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:network",
       "registration": "registered",
+      "parserBlocker": "duplicate-registration",
       "source": "doc/http.lua"
     },
     {
@@ -6594,6 +6798,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/json.lua"
     },
     {
@@ -6602,6 +6807,7 @@
       "status": "supported",
       "notExecutedHere": "unsynthesizable-parameter-type:any",
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/json.lua"
     },
     {
@@ -6698,6 +6904,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/material.lua"
     },
     {
@@ -6706,6 +6913,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/material.lua"
     },
     {
@@ -6714,6 +6922,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/material.lua"
     },
     {
@@ -6722,6 +6931,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/material.lua"
     },
     {
@@ -6930,6 +7140,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/physics.lua"
     },
     {
@@ -7030,6 +7241,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/physics.lua"
     },
     {
@@ -7092,6 +7304,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/physics.lua"
     },
     {
@@ -7116,6 +7329,7 @@
       "status": "supported",
       "notExecutedHere": "variadic-argument-shape-unmodelled",
       "registration": "registered",
+      "parserBlocker": "unresolved-helper-overload",
       "source": "doc/builtins.lua"
     },
     {
@@ -7316,6 +7530,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/render.lua"
     },
     {
@@ -7324,6 +7539,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/render.lua"
     },
     {
@@ -7440,6 +7656,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/render.lua"
     },
     {
@@ -7448,6 +7665,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/render.lua"
     },
     {
@@ -7456,6 +7674,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/render.lua"
     },
     {
@@ -7464,6 +7683,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/render.lua"
     },
     {
@@ -7636,6 +7856,7 @@
       "status": "supported",
       "notExecutedHere": "context-fixture-missing:render-script",
       "registration": "registered",
+      "parserBlocker": "dynamic-stack-index",
       "source": "doc/render.lua"
     },
     {
@@ -7676,6 +7897,7 @@
       "status": "supported",
       "notExecutedHere": "unsynthesizable-parameter-type:resource.animation[]@resource.atlas.animations",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7684,6 +7906,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7702,6 +7925,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7720,6 +7944,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7738,6 +7963,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "argument-slot-without-stack-access",
       "source": "doc/resource.lua"
     },
     {
@@ -7794,6 +8020,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7827,6 +8054,7 @@
       "disposition": "blocked",
       "notExecutedHere": "not-in-conformance-plan",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7835,6 +8063,7 @@
       "status": "supported",
       "notExecutedHere": "unsynthesizable-parameter-type:resource.animation[]@resource.atlas.animations",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7852,6 +8081,7 @@
       "status": "executed",
       "disposition": "observed",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7860,6 +8090,7 @@
       "status": "supported",
       "notExecutedHere": "unsynthesizable-parameter-type:graphics.TEXTURE_TYPE@resource.texture_update_params.type",
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/resource.lua"
     },
     {
@@ -7889,41 +8120,51 @@
     {
       "id": "script:socket.dns.getaddrinfo",
       "luaName": "socket.dns.getaddrinfo",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "context-fixture-missing:network",
+      "registration": "registration-form-not-traced",
       "declaredAt": "doc/socket.lua:70",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/socket.lua"
     },
     {
       "id": "script:socket.dns.gethostname",
       "luaName": "socket.dns.gethostname",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "context-fixture-missing:network",
+      "registration": "registration-form-not-traced",
       "declaredAt": "doc/socket.lua:76",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/socket.lua"
     },
     {
       "id": "script:socket.dns.getnameinfo",
       "luaName": "socket.dns.getnameinfo",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "context-fixture-missing:network",
+      "registration": "registration-form-not-traced",
       "declaredAt": "doc/socket.lua:95",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/socket.lua"
     },
     {
       "id": "script:socket.dns.tohostname",
       "luaName": "socket.dns.tohostname",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "context-fixture-missing:network",
+      "registration": "registration-form-not-traced",
       "declaredAt": "doc/socket.lua:104",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/socket.lua"
     },
     {
       "id": "script:socket.dns.toip",
       "luaName": "socket.dns.toip",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "context-fixture-missing:network",
+      "registration": "registration-form-not-traced",
       "declaredAt": "doc/socket.lua:113",
+      "parserBlocker": "declared-module-never-registered",
       "source": "doc/socket.lua"
     },
     {
@@ -7974,6 +8215,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "duplicate-registration",
       "source": "doc/socket.lua"
     },
     {
@@ -8469,6 +8711,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/tilemap.lua"
     },
     {
@@ -8487,6 +8730,7 @@
         ]
       },
       "registration": "registered",
+      "parserBlocker": "undecided-result-arity",
       "source": "doc/tilemap.lua"
     },
     {

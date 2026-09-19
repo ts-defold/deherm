@@ -139,24 +139,58 @@ async function main() {
   }
 
   // Registration evidence: does the engine register this name anywhere.
+  //
+  // "Not in a registration array we resolved" is three different things, and
+  // calling all of them suspect was wrong - it labelled a mature engine's API
+  // on the strength of one probe.
+  //
+  //   commented out upstream   Defold wrote the entry and commented it out.
+  //       The parser already records these with the C function and the array
+  //       they were removed from. `b2d.body.get_user_data` sits in
+  //       script_box2d_body_v3.cpp behind `//{"get_user_data", Body_GetUserData},
+  //       - could return the game object id ? ur url?`. Documented and
+  //       deliberately unregistered is a real upstream inconsistency, and this
+  //       is the evidence for it.
+  //
+  //   parser could not trace   The registration exists but through a form the
+  //       parser does not follow. Every `socket.*` route is here: tcp.c:92
+  //       declares `luaL_Reg func[] = {{"tcp", global_create}, ...}` and
+  //       registers it with `luaL_openlib(L, NULL, func, 0)`, reached only
+  //       through the `mod[]` initialiser loop in luaopen_socket_core. The
+  //       routes exist; our parser cannot yet say so, which is a gap in us.
+  //
+  //   genuinely unresolved     Everything else.
   const registeredSomewhere = new Set();
   const declaredUnregistered = new Map();
+  const commentedOut = new Map();
+  const parserBlocked = new Map();
   for (const target of Object.values(registration.targets ?? {})) {
     for (const route of target.routes ?? []) registeredSomewhere.add(route.name);
     for (const row of target.declaredButUnregistered ?? []) {
       if (!declaredUnregistered.has(row.name)) declaredUnregistered.set(row.name, row);
+    }
+    for (const row of target.commentedOutRegistrations ?? []) {
+      if (!commentedOut.has(row.name)) commentedOut.set(row.name, row);
+    }
+    for (const row of target.blockers ?? []) {
+      if (row.route && !parserBlocked.has(row.route)) parserBlocked.set(row.route, row);
     }
   }
 
   const rows = ir.functions.map((fn) => {
     const luaName = fn.rawName;
     const disposition = runtime.get(fn.id) ?? null;
-    const registered = registeredSomewhere.has(luaName)
-      ? "registered"
-      : declaredUnregistered.has(luaName) ? "declared-but-unregistered" : "no-registration-evidence";
+    const registered = registeredSomewhere.has(luaName) ? "registered"
+      : commentedOut.has(luaName) ? "commented-out-upstream"
+      : parserBlocked.has(luaName) ? "registration-form-not-traced"
+      : declaredUnregistered.has(luaName) ? "declared-but-unregistered"
+      : "no-registration-evidence";
     // Only our own evidence contradicting the documentation makes a route
-    // suspect. Not having run it here does not.
-    const contradicted = registered === "declared-but-unregistered" || disposition === "mismatched";
+    // suspect. Neither "we did not run it" nor "our parser could not follow
+    // the registration form" is a statement about the route.
+    const contradicted = registered === "declared-but-unregistered"
+      || registered === "commented-out-upstream"
+      || disposition === "mismatched";
     const status = contradicted ? "suspect" : disposition === "observed" ? "executed" : "supported";
     return {
       id: fn.id,
@@ -169,9 +203,12 @@ async function main() {
       ...(mismatchDetail.has(fn.id) ? { mismatch: mismatchDetail.get(fn.id) } : {}),
       ...(arityDisagreement.has(luaName) ? { arityDisagreement: arityDisagreement.get(luaName) } : {}),
       registration: registered,
-      ...(registered === "declared-but-unregistered"
-        ? { declaredAt: declaredUnregistered.get(luaName).source }
+      ...(declaredUnregistered.has(luaName) ? { declaredAt: declaredUnregistered.get(luaName).source } : {}),
+      ...(commentedOut.has(luaName)
+        ? { commentedOutAt: `${commentedOut.get(luaName).path ?? commentedOut.get(luaName).registration?.path}`,
+            commentedOutFunction: commentedOut.get(luaName).cFunction }
         : {}),
+      ...(parserBlocked.has(luaName) ? { parserBlocker: parserBlocked.get(luaName).code } : {}),
       source: fn.source
     };
   }).sort((left, right) => left.id < right.id ? -1 : 1);
