@@ -163,6 +163,75 @@ will.
 * **Unchanged inputs publish nothing.** Re-deriving a revision whose inputs did
   not move yields the same hash and no new object.
 
+# Distribution: a content-addressed static site, plus one policy in the package
+
+Policies and native artifacts want opposite distribution, and conflating them is
+the mistake to avoid.
+
+| | policies | native artifacts |
+| --- | --- | --- |
+| Size | single-digit MB | 10-20 MB each |
+| Count | one per distinct engine surface, growing with Defold releases | four rows, rarely changing |
+| Addressing | content hash | build fingerprint |
+| Home | **static site** | **release assets** |
+
+Release assets suit a handful of large files with semantic tags. They suit
+thousands of small content-addressed blobs badly: a release carries UI and
+release-note meaning that a blob store does not want, and the set grows with
+every engine revision.
+
+## The URL scheme is the key
+
+A static site - GitHub Pages is sufficient - where the path *is* the hash:
+
+```
+/index/<defold-sha>.json     -> { "policyRoot": "<hash>", "generator": "<rev>" }
+/policy/<root-hash>.json     -> the policy root, naming its subtrees
+/subtree/<subtree-hash>.json -> one namespace's derived surface
+```
+
+Every object under `/policy` and `/subtree` is **immutable and infinitely
+cacheable**, because a change produces a different path rather than a new
+version of one. Unchanged subtrees across engine revisions are the same URL and
+therefore already in the caller's cache and the CDN's.
+
+## What needs trust, and what does not
+
+Content-addressed objects are **self-verifying**: fetch `/policy/<hash>.json`,
+hash the bytes, compare to the path. A hostile or corrupted mirror cannot
+substitute content without changing the hash, so the transport needs no trust
+beyond availability.
+
+The **index does** need trust - it is the only mutable mapping, and it is what
+says which policy belongs to a Defold revision. It is small (a pair of hashes
+per revision), so it ships inside the npm package and is the released
+authority. A fetched index may extend the shipped one for revisions published
+after that release, but never overrides an entry the package already asserts.
+
+## What ships in the package
+
+Exactly **one** policy: the revision the package was built against. That covers
+the common case of a current déherm with a current Defold at zero network cost,
+without the package growing by a policy for every engine release ever shipped.
+Everything else resolves through the layers already defined: packaged, then
+user cache, then project cache, then the static site, then local derivation.
+
+## The nightly job
+
+Watch `https://d.defold.com/<channel>/info.json` for each tracked channel. When
+a channel's `sha1` moves, derive that revision's policy and publish the objects
+and the index entry.
+
+Because objects are content-addressed, a revision whose declaration inputs did
+not change publishes **nothing** - the subtree hashes already exist and the
+index simply gains one more pointer at them. The job's steady-state cost is one
+index line per release, and a full policy only when the engine's declared
+surface actually moves.
+
+The same job is the natural home for re-running the registration verifier
+against each new revision, since a disagreement between the documented surface
+and the C that registers it is exactly what a new engine release can introduce.
+
 # What a policy records
 
 Not only what was resolved, but what was refused. Each entry carries its

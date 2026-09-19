@@ -73,17 +73,6 @@ const __dehermGlobal: any = globalThis;
 // here; the value is still the ordinary intrinsic and `isArray` is the exact
 // predicate the JSI encoder uses to separate sequences from records.
 const __dehermIsArray: any = __dehermGlobal.Array.isArray;
-// Prototype identity is the structural test that separates a plain record from
-// every other object. The JSI encoder knows three object shapes - sequence,
-// `Map`, and plain record - and enumerating anything else here would encode an
-// empty table instead of refusing, which is a silent wrong value rather than a
-// declined one.
-const __dehermGetPrototypeOf: any = __dehermGlobal.Object.getPrototypeOf;
-const __dehermRecordPrototype: any = __dehermGlobal.Object.prototype;
-// The exact constructor the JSI encoder tests against, so a `Map` is the same
-// table kind on both transports rather than two spellings of "an object".
-const __dehermMap: any = __dehermGlobal.Map;
-const __dehermMapPrototype: any = __dehermMap.prototype;
 const __DEHERM_U32: any = BigInt(0xffffffff);
 const __DEHERM_SHIFT32: any = BigInt(32);
 
@@ -173,37 +162,6 @@ function __dehermToStatic(value: any, depth: number): DehermStaticValue {
     }
     return new DehermStaticArray(items);
   }
-  const prototype: any = __dehermGetPrototypeOf(value);
-  if (prototype === __dehermMapPrototype) {
-    // The JSI encoder walks `Map.entries()` and tags the table `kMap`, keys
-    // encoded as values rather than as strings. Doing the same here is what
-    // makes a property table sent over this transport the same Lua table the
-    // engine would have received over JSI.
-    const source: any = value;
-    const mapKeys: Array<DehermStaticValue> = [];
-    const mapValues: Array<DehermStaticValue> = [];
-    const iterator: any = source.entries();
-    for (;;) {
-      const step: any = iterator.next();
-      if (step.done === true) break;
-      const pair: any = step.value;
-      const key: DehermStaticValue = __dehermToStatic(pair[0], depth + 1);
-      if (__dehermTypedNativeDeclined) return new DehermStaticUndefined();
-      mapValues.push(__dehermToStatic(pair[1], depth + 1));
-      if (__dehermTypedNativeDeclined) return new DehermStaticUndefined();
-      mapKeys.push(key);
-    }
-    return new DehermStaticMap(mapKeys, mapValues);
-  }
-  // Everything else that reaches here must be a plain record. A `Set` or a
-  // class instance enumerates to nothing, so encoding it would hand the engine
-  // an empty table and lose the caller's data without a word; the JSI bridge
-  // does know more shapes than this one, so declining the whole call is what
-  // keeps one observable behaviour across the two transports.
-  if (prototype !== __dehermRecordPrototype && prototype !== null) {
-    __dehermTypedNativeDeclined = true;
-    return new DehermStaticUndefined();
-  }
   const keys: Array<string> = [];
   const values: Array<DehermStaticValue> = [];
   for (const key in value) {
@@ -277,16 +235,6 @@ function __dehermFromStatic(value: DehermStaticValue): any {
     const out: any = {};
     for (let index: number = 0; index < item.values.length; ++index) {
       out[item.keys[index]] = __dehermFromStatic(item.values[index]);
-    }
-    return out;
-  }
-  if (value instanceof DehermStaticMap) {
-    // A `kMap` table keeps its key values, so the JSI decoder builds a real
-    // `Map` rather than an object with stringified keys. Same here.
-    const item: DehermStaticMap = raw;
-    const out: any = new __dehermMap();
-    for (let index: number = 0; index < item.values.length; ++index) {
-      out.set(__dehermFromStatic(item.keys[index]), __dehermFromStatic(item.values[index]));
     }
     return out;
   }

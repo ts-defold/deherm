@@ -1,23 +1,34 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "hermesRevision": "4947871513667919bf2fe225134af3e3a1a3772c",
+  "ttscVersion": "0.30.4",
   "packageScope": "@ts-defold",
   "packageVersion": "0.0.0",
   "distribution": "optional-per-host-package",
-  "note": "hermesc and shermes are pure compilers - text in, text out. shermes only emits C; Extender compiles it. Shipping them therefore imposes no native toolchain requirement on the user, and they are indexed by the user's HOST, never by the Defold bundle target.",
+  "note": "Three tools run on the user's own machine and are therefore indexed by the user's HOST, never by the Defold bundle target. hermesc and shermes are pure compilers - text in, text out - and deherm-tsc emits transformed TypeScript and a JSON manifest, so shipping all three imposes no native toolchain requirement on the user. Status is recorded per tool, not per host, because the three are produced by different builders on different schedules: deherm-tsc cross-compiles to all five hosts from one job, while hermesc and shermes must each be built on a runner of their own architecture.",
   "statuses": {
-    "vendored": "The binaries are present for this host and match the pinned digests.",
-    "required-missing": "A CI build path exists; the binaries have not been pulled into this checkout.",
-    "blocked": "The binaries cannot be produced for this host yet; `blocker` names why."
+    "vendored": "The binary is present for this host and matches its pinned digest.",
+    "required-missing": "A CI build path exists; the binary has not been pulled into this checkout.",
+    "blocked": "The binary cannot be produced for this host yet; `blocker` names why."
   },
-  "binaries": {
+  "tools": {
     "hermesc": {
       "role": "TypeScript/JavaScript to Hermes bytecode",
-      "invocation": "hermesc -emit-binary -out <bundle>.hbc <program>.js"
+      "invocation": "hermesc -emit-binary -out <bundle>.hbc <program>.js",
+      "origin": "upstream/hermes, built per host by toolchains/hermes/build-host-compilers.sh"
     },
     "shermes": {
       "role": "typed TypeScript to C, compiled by Extender",
-      "invocation": "shermes -typed -emit-c -o <unit>.c <program>.js"
+      "invocation": "shermes -typed -emit-c -o <unit>.c <program>.js",
+      "origin": "upstream/hermes, built per host by toolchains/hermes/build-host-compilers.sh"
+    },
+    "deherm-tsc": {
+      "role": "déherm's TypeScript transforms: DefoldHash literal lowering, resource-name diagnostics, and the symbol-level Defold API reachability manifest",
+      "invocation": "deherm-tsc transform --tsconfig <path> --plugins-json <manifest>",
+      "origin": "packages/compiler/ttsc/cmd/deherm-tsc linked against the ttsc Go module that arrives with the pinned npm package, cross-compiled by toolchains/go/build-deherm-tsc.sh",
+      "why": "ttsc builds a plugin's Go source into a sidecar on demand and accepts source only - `ITtscPlugin.source` states it does not accept a prebuilt binary path - and its plugin cache key hashes the SHA-256 of the user's own `go` binary, so a release cannot seed that cache either. Without this artifact every user's first build ran a multi-second-to-minutes `go build` of the typescript-go compiler against whatever unpinned Go happened to be reachable, which contradicts the product contract's \"the user compiles nothing natively\".",
+      "pureGo": true,
+      "cgo": "CGO_ENABLED=0 on all five hosts, so one job cross-compiles the whole matrix and no per-host C toolchain is involved."
     }
   },
   "hosts": {
@@ -26,13 +37,24 @@
         "platform": "darwin",
         "architecture": "arm64"
       },
-      "builder": "macos-native",
       "package": "@ts-defold/deherm-compilers-darwin-arm64",
       "directory": "toolchains/host-compilers/darwin-arm64",
-      "status": "required-missing",
-      "files": {
-        "hermesc": "bin/hermesc",
-        "shermes": "bin/shermes"
+      "tools": {
+        "hermesc": {
+          "file": "bin/hermesc",
+          "builder": "macos-native",
+          "status": "required-missing"
+        },
+        "shermes": {
+          "file": "bin/shermes",
+          "builder": "macos-native",
+          "status": "required-missing"
+        },
+        "deherm-tsc": {
+          "file": "bin/deherm-tsc",
+          "builder": "go-cross-compile",
+          "status": "required-missing"
+        }
       }
     },
     "darwin-x64": {
@@ -40,13 +62,24 @@
         "platform": "darwin",
         "architecture": "x64"
       },
-      "builder": "macos-native",
       "package": "@ts-defold/deherm-compilers-darwin-x64",
       "directory": "toolchains/host-compilers/darwin-x64",
-      "status": "required-missing",
-      "files": {
-        "hermesc": "bin/hermesc",
-        "shermes": "bin/shermes"
+      "tools": {
+        "hermesc": {
+          "file": "bin/hermesc",
+          "builder": "macos-native",
+          "status": "required-missing"
+        },
+        "shermes": {
+          "file": "bin/shermes",
+          "builder": "macos-native",
+          "status": "required-missing"
+        },
+        "deherm-tsc": {
+          "file": "bin/deherm-tsc",
+          "builder": "go-cross-compile",
+          "status": "required-missing"
+        }
       }
     },
     "linux-x64": {
@@ -54,13 +87,24 @@
         "platform": "linux",
         "architecture": "x64"
       },
-      "builder": "ubuntu-2204-native",
       "package": "@ts-defold/deherm-compilers-linux-x64",
       "directory": "toolchains/host-compilers/linux-x64",
-      "status": "required-missing",
-      "files": {
-        "hermesc": "bin/hermesc",
-        "shermes": "bin/shermes"
+      "tools": {
+        "hermesc": {
+          "file": "bin/hermesc",
+          "builder": "ubuntu-2204-native",
+          "status": "required-missing"
+        },
+        "shermes": {
+          "file": "bin/shermes",
+          "builder": "ubuntu-2204-native",
+          "status": "required-missing"
+        },
+        "deherm-tsc": {
+          "file": "bin/deherm-tsc",
+          "builder": "go-cross-compile",
+          "status": "required-missing"
+        }
       }
     },
     "linux-arm64": {
@@ -68,13 +112,24 @@
         "platform": "linux",
         "architecture": "arm64"
       },
-      "builder": "ubuntu-2204-arm-native",
       "package": "@ts-defold/deherm-compilers-linux-arm64",
       "directory": "toolchains/host-compilers/linux-arm64",
-      "status": "required-missing",
-      "files": {
-        "hermesc": "bin/hermesc",
-        "shermes": "bin/shermes"
+      "tools": {
+        "hermesc": {
+          "file": "bin/hermesc",
+          "builder": "ubuntu-2204-arm-native",
+          "status": "required-missing"
+        },
+        "shermes": {
+          "file": "bin/shermes",
+          "builder": "ubuntu-2204-arm-native",
+          "status": "required-missing"
+        },
+        "deherm-tsc": {
+          "file": "bin/deherm-tsc",
+          "builder": "go-cross-compile",
+          "status": "required-missing"
+        }
       }
     },
     "win32-x64": {
@@ -82,15 +137,26 @@
         "platform": "win32",
         "architecture": "x64"
       },
-      "builder": "windows-msvc-native",
       "package": "@ts-defold/deherm-compilers-win32-x64",
       "directory": "toolchains/host-compilers/win32-x64",
-      "status": "required-missing",
-      "files": {
-        "hermesc": "bin/hermesc.exe",
-        "shermes": "bin/shermes.exe"
+      "tools": {
+        "hermesc": {
+          "file": "bin/hermesc.exe",
+          "builder": "windows-msvc-native",
+          "status": "required-missing"
+        },
+        "shermes": {
+          "file": "bin/shermes.exe",
+          "builder": "windows-msvc-native",
+          "status": "required-missing"
+        },
+        "deherm-tsc": {
+          "file": "bin/deherm-tsc.exe",
+          "builder": "go-cross-compile",
+          "status": "required-missing"
+        }
       }
     }
   },
-  "glibcFloor": "The published Linux compilers are built on ubuntu-22.04 runners, so they require glibc 2.35 or newer on the user's host."
+  "glibcFloor": "The published Linux hermesc and shermes are built on ubuntu-22.04 runners, so they require glibc 2.35 or newer on the user's host. deherm-tsc is static pure Go and has no libc floor."
 }

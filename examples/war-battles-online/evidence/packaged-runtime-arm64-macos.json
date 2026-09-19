@@ -1,103 +1,86 @@
 {
-  "schemaVersion": 3,
-  "projection": {
-    "id": "native-arm64-macos",
-    "title": "Packaged arm64-macOS engine running the War Battles tutorial loop",
-    "runtime": "hermes",
-    "transport": [
-      "jsi",
-      "typed-native"
-    ],
-    "reachableSet": "complete",
-    "profile": "engine-detected",
-    "stage": "packaged-engine-runtime",
-    "observed": [
-      "The packaged engine loaded the TypeScript bundle into Dynamic Hermes and attached its generated TypeScript components.",
-      "The tutorial loop ran through real Defold APIs: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, a Box2D collision, the score, and the sprite-animation completion callback.",
-      "The following camera scrolled the 1920x1440 world and the player walk reached its clamped corner.",
-      "A graceful `@system/exit`, addressed to this engine's own dynamically assigned service port after proving it was the sole listener, ran component `final()` and the process exited 0.",
-      "No rejected engine diagnostic appeared at any point, shutdown included."
-    ],
-    "excluded": [
-      "which transport each route crossed on - that is the `native-arm64-macos-typed-native-transport` projection, and nothing here observes it",
-      "visual correctness: this gate reads an engine transcript and never inspects a window, a surface, or a pixel",
-      "all Defold component contexts or lifecycle combinations",
-      "the complete generated script or dmSDK surface",
-      "conformance, allocation, and performance claims",
-      "multiplayer transport execution"
-    ]
-  },
+  "schemaVersion": 2,
+  "scope": "war-battles-packaged-gui-typescript-dynamic-hermes",
   "target": "arm64-macos",
+  "runtime": "dynamic-hermes",
   "status": "observed-clean",
-  "artifactKey": "61f0d8c197d9967109feca18489f1e2e284a5a644973e4b2087e91e013f670db",
-  "sourceKey": "1c76e2862c5ba401e1deeefc35d76c02eefb5245533547546d52df7317f00ff2",
-  "evidenceKey": "c50b0e542bb272ac985454c7ee7b076878e2c4d9dcac1190eb370fc4626e4a5b",
+  "claim": "The packaged War Battles GUI proxy attached its generated TypeScript component, loaded the bundle in Dynamic Hermes, completed its TypeScript GUI initialization, first render, and first update render through real Defold APIs, and remained free of rejected diagnostics for the bounded settling window.",
+  "exclusions": [
+    "Static Hermes execution",
+    "HTML5 browser-host execution",
+    "all Defold component contexts or lifecycle combinations",
+    "the complete generated script or dmSDK surface",
+    "multiplayer transport execution"
+  ],
+  "artifactKey": "04b5b3e582976808a4e0b0dd69bbf35c4774d587551977f5883d47ac85e7997d",
+  "sourceKey": "717ef54a33740bafeb2a9f99a938f6e5e5ff91fbfec823e53ca5af927c80f5d4",
+  "evidenceKey": "11f66c2a8f71e65a727be4b0ac6fba49551e7ba04f3a49bd56cdddb35f7a60a5",
   "artifacts": [
     {
       "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
-      "bytes": 16187192,
-      "sha256": "99aada23f9bd94931ef33b8e1b9815a2c554cd9ef9c82921632e7a7b1590ea6c"
+      "bytes": 16168616,
+      "sha256": "fd8cd044a22c3790a3bb192f379bc16144321dcd3d2b3b156f8da5ef132c53f6"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.arcd",
-      "bytes": 291939,
-      "sha256": "a2d25aee81a9489647c69ec377f2b4b2e91d10bf7e15006bdf339614a76784de"
+      "bytes": 250967,
+      "sha256": "4f858eba6ab04726e791bf97c21b2595e47b4e84918031eff886c95dc0a9b24f"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.arci",
-      "bytes": 3648,
-      "sha256": "d7c90f7e6cfc296eea568a57588789fde1824af3b5083da81facb56d0206c1cf"
+      "bytes": 3408,
+      "sha256": "ada7b27e4cb22ad3c3cd842f8375a888d0f154e972b3665376f1dc4121cc4f95"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.dmanifest",
-      "bytes": 3535,
-      "sha256": "9122f12b26c1e340e34aa69a7da68939b72def39a3ad2b7a0d43e406cd14802b"
+      "bytes": 3318,
+      "sha256": "182d382561d07e59d1a131afea2c3fcb929c015c84eb23aaf57f99fad2fdc51a"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.projectc",
-      "bytes": 4903,
-      "sha256": "121746c1dd3536f8d536a7b22a7d70f6b7e90fc52f05beea014dfe7d066f5cd3"
+      "bytes": 4902,
+      "sha256": "219950d5492c807892418c0a597e93f841e36e45bdf97cd792f4e97aac8e9a32"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/deherm/app.dehermc",
-      "bytes": 91023,
-      "sha256": "d273437192190b7e458bff398a35e0662d07045440360bf094e154b9d740f276"
+      "bytes": 93540,
+      "sha256": "754e02df711a96f06445718940f91d120535b5615e71fc5278657f17796224ad"
     }
   ],
   "sourceInputs": [
     {
       "path": "defold/defold_hermes",
       "kind": "tree",
-      "fileCount": 171,
-      "bytes": 12869926,
-      "sha256": "054dff457f9e1a69b10474f097f6accbf3b0078ba8444e42dc717091dc7771a2"
+      "fileCount": 165,
+      "bytes": 12671087,
+      "sha256": "41dea64d6ae7061ad8696d84b4ecc1bf206d72d0f992b50a64eb580e0fd5ba82"
     },
     {
       "path": "examples/war-battles-online/defold",
       "kind": "tree",
-      "fileCount": 375,
-      "bytes": 1538416,
-      "sha256": "5d7985f1d876a2b65b6c54b68c624db2f889415e21f30edf332c8a2fa39be67e"
+      "fileCount": 354,
+      "bytes": 585192,
+      "sha256": "5dd9ce0bf55454627a1b6586cd598afd89e69936acd7ec30107c788a8d056a2c"
     },
     {
       "path": "upstream.lock",
-      "bytes": 925,
-      "sha256": "392cc4bc04a6f4d78c7dc7ab592b259b8409e2a1a3a0f3c9a24c3680d29d7903"
+      "bytes": 1124,
+      "sha256": "bdd075f2712a1aa3b4e486a4c426557e030d5b5cbe24bb767ebdcc0bd44dc951"
     },
     {
       "path": "examples/war-battles-online/defold/deherm.lock",
-      "bytes": 12487,
-      "sha256": "c1540fd65a8f98779866d42b2c725b4f01a12bf6da2f49a03b9f527eaad06e5f"
+      "bytes": 3431,
+      "sha256": "22e5bc63beacdd57bdcb0c1c9c0d9262ce4642c8cfe06873fcf9a1d78d9c9f43"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/ir/binding-lowering-plan.sentinel.json",
       "bytes": 6871,
-      "sha256": "d8dacd71df5c5be9d8f65f83f577c3f5be269ac77c7e5cafc330568253651b3c"
+      "sha256": "9a26735fc5c8c6b1e5fe582153704085e6497e7bb693936b6cb94ead0d04a609"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/generated/components/manifest.json",
-      "bytes": 11597,
-      "sha256": "54cbe905de5760fbde4edfacc029becf134c1036d4f4d85043f4a9281fd2c4f0"
+      "bytes": 8151,
+      "sha256": "5343f5c03ba0a77d6532c748309b857f9c3fc0ac38628b7e1c569ffe8d733684"
     }
   ],
   "observation": {
@@ -105,8 +88,6 @@
       "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
       "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
       "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
-      "INFO:DEFOLD_HERMES: war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
-      "INFO:DEFOLD_HERMES: war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
       "INFO:DEFOLD_HERMES: war-battles:ui-init",
       "INFO:DEFOLD_HERMES: war-battles:player-init:560.0:360.0",
       "INFO:DEFOLD_HERMES: war-battles:player-fire:560.0:360.0:1.00:0.00",
@@ -114,11 +95,7 @@
       "INFO:DEFOLD_HERMES: war-battles:rocket-hit",
       "INFO:DEFOLD_HERMES: war-battles:score:100",
       "INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done",
-      "INFO:DEFOLD_HERMES: war-battles:player-moved:1592.0:1072.0",
       "INFO:DEFOLD_HERMES: Extension update entered (application initialized: false)"
-    ],
-    "shutdownMarkers": [
-      "INFO:DEFOLD_HERMES: war-battles:player-final"
     ],
     "settleMs": 1500,
     "rejectedDiagnosticIds": [
@@ -132,14 +109,13 @@
       "component-runtime-unavailable"
     ],
     "termination": {
-      "method": "system-exit",
-      "exitCode": 0,
-      "signal": null,
-      "port": 56083
+      "method": "sigterm",
+      "exitCode": null,
+      "signal": "SIGTERM"
     },
     "transcript": {
-      "canonicalLineCount": 56,
-      "canonicalSha256": "42cddfd8db9a4fa5fc6dcafb96d6c483a0ee5fde35606a988e6b16374638ca0b"
+      "canonicalLineCount": 30,
+      "canonicalSha256": "876d6c3982bc23de46d9306fadaf80daa88eae4d01a2db70fb290a4ac300310a"
     }
   }
 }

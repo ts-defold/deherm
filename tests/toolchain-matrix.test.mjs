@@ -5,8 +5,9 @@ import path from "node:path";
 import test from "node:test";
 
 import { deriveBundleTargets } from "../scripts/generate-defold-bundle-targets.mjs";
-import { hostCompilerKey, inspectHostCompilers, hostCompilerReport, requireHostCompilers } from "../packages/cli/src/host-compilers.mjs";
+import { hostCompilerKey, inspectHostCompilers, hostCompilerReport, requireHostCompilers, requireHostTool } from "../packages/cli/src/host-compilers.mjs";
 import { nativeArtifactReport } from "../packages/cli/src/toolchains.mjs";
+import { dehermPluginManifest, transformCompilerIdentity, transformProject } from "../packages/cli/src/transform-compiler.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const knownTargetStatuses = new Set(["vendored", "vendored-source", "required-missing", "blocked", "retired-upstream"]);
@@ -53,19 +54,26 @@ test("every Defold bundle target carries an explicit status and never silence", 
   }
 });
 
-test("the host compiler matrix covers every supported host with a pinned record", async () => {
+test("the host tool matrix covers every supported host with a pinned record per tool", async () => {
   const manifest = await readJson("packages/toolchains/host-compilers.json");
   assert.deepEqual(Object.keys(manifest.hosts).sort(), ["darwin-arm64", "darwin-x64", "linux-arm64", "linux-x64", "win32-x64"]);
+  // Three tools run on the user's machine, not two. deherm-tsc is tracked the
+  // same way as the Hermes compilers because it has the same property: it runs
+  // on the host, it is indexed by the host, and without it shipped the user's
+  // machine compiles it - which is exactly the requirement the product contract
+  // says déherm does not impose.
+  assert.deepEqual(Object.keys(manifest.tools).sort(), ["deherm-tsc", "hermesc", "shermes"]);
   for (const [key, record] of Object.entries(manifest.hosts)) {
     assert.equal(`${record.host.platform}-${record.host.architecture}`, key);
     assert.ok(record.package.startsWith("@ts-defold/deherm-compilers-"), `${key} declares no publishable package`);
-    assert.deepEqual(Object.keys(record.files).sort(), ["hermesc", "shermes"], `${key} must ship both compilers`);
-    if (record.status === "vendored") {
-      for (const tool of Object.keys(record.files)) {
-        assert.match(record.binaries?.[tool]?.sha256 ?? "", /^[a-f0-9]{64}$/, `${key} ${tool} carries no pinned digest`);
+    assert.deepEqual(Object.keys(record.tools).sort(), ["deherm-tsc", "hermesc", "shermes"], `${key} must ship all three host tools`);
+    for (const [tool, toolRecord] of Object.entries(record.tools)) {
+      assert.ok(toolRecord.file, `${key} ${tool} names no file`);
+      if (toolRecord.status === "vendored") {
+        assert.match(toolRecord.sha256 ?? "", /^[a-f0-9]{64}$/, `${key} ${tool} carries no pinned digest`);
+      } else {
+        assert.ok(toolRecord.builder || toolRecord.blocker?.code, `${key} ${tool} is ${toolRecord.status} without a builder or a blocker`);
       }
-    } else {
-      assert.ok(record.builder || record.blocker?.code, `${key} is ${record.status} without a builder or a blocker`);
     }
     const declared = JSON.parse(await readFile(path.join(repositoryRoot, record.directory, "package.json"), "utf8"));
     assert.equal(declared.name, record.package);
@@ -77,16 +85,30 @@ test("the host compiler matrix covers every supported host with a pinned record"
 test("a host with no available build fails closed with an actionable diagnostic", async () => {
   const unknown = await inspectHostCompilers("sunos-sparc");
   assert.equal(unknown.ok, false);
-  assert.match(unknown.detail, /declares no hermesc\/shermes build for sunos-sparc/);
+  assert.match(unknown.detail, /declares no hermesc\/shermes\/deherm-tsc build for sunos-sparc/);
 
   const report = await hostCompilerReport();
   assert.equal(report.currentHost, hostCompilerKey());
   assert.equal(report.hosts.filter((host) => host.current).length, 1);
 
   const current = report.hosts.find((host) => host.current);
+  // Every tool is answered for by name, whether or not it resolved. A host
+  // report that omitted a tool would be silence about the one thing the user
+  // needs to know.
+  assert.deepEqual(Object.keys(current.tools).sort(), ["deherm-tsc", "hermesc", "shermes"]);
+  for (const tool of Object.values(current.tools)) {
+    assert.ok(tool.detail.length > 0, `${tool.tool} reported no detail`);
+    if (!tool.ok) {
+      await assert.rejects(requireHostTool(tool.tool), (error) => {
+        assert.match(error.message, new RegExp(`déherm cannot run ${tool.tool} on this host`));
+        return true;
+      });
+    }
+  }
   if (current.ok) {
     assert.ok(current.binaries.hermesc.sha256);
     assert.ok(current.binaries.shermes.sha256);
+    assert.ok(current.binaries["deherm-tsc"].sha256);
     await requireHostCompilers();
   } else {
     // Failing closed means the error names the host and how to fix it, never a
@@ -101,6 +123,45 @@ test("a host with no available build fails closed with an actionable diagnostic"
     });
   }
 });
+
+test("the transform compiler is driven by digest, or fails closed naming itself", async (t) => {
+  // The manifest is not optional and not a formality. ttsc pairs registrations
+  // with linked manifest entries by build order, so this one entry is what
+  // activates the single plugin deherm-tsc links; without it the host answers
+  // with the project unchanged and exit 0, which is indistinguishable from a
+  // project that declares no transforms.
+  const manifest = JSON.parse(dehermPluginManifest({ resourceSymbols: "./symbols.json" }));
+  assert.equal(manifest.length, 1);
+  assert.equal(manifest[0].stage, "transform");
+  assert.deepEqual(manifest[0].config, { resourceSymbols: "./symbols.json" });
+
+  const resolved = await transformCompilerIdentity().then((identity) => identity, () => null);
+  if (!resolved) {
+    // The published binary is not in this checkout, which is the normal state
+    // until CI has run. What must hold unconditionally is that the seam refuses
+    // rather than falling back to building Go on the user's machine.
+    await assert.rejects(transformProject({ tsconfig: "tests/fixtures/hash-literal/tsconfig.json" }), (error) => {
+      assert.match(error.message, /déherm cannot run deherm-tsc on this host/);
+      return true;
+    });
+    t.diagnostic("deherm-tsc is not staged in this checkout; exercised the fail-closed path only");
+    return;
+  }
+
+  assert.match(resolved.sha256, /^[a-f0-9]{64}$/);
+  assert.deepEqual(resolved.transforms, ["defold-hash-literal", "resource-name", "defold-api-usage"]);
+  assert.equal(resolved.host, hostCompilerKey());
+
+  const envelope = await transformProject({
+    tsconfig: path.join(repositoryRoot, "tests/fixtures/hash-literal/tsconfig.json")
+  });
+  const entry = Object.entries(envelope.typescript).find(([file]) => file.endsWith("hash-literal/entry.ts"));
+  assert.ok(entry, "the transform envelope must carry the fixture entry point");
+  // dmHashBufferNoReverse64("up"). If the transforms had not run, this would
+  // still read `hashLiteral("#up")` and the compile would have succeeded.
+  assert.match(entry[1], /export const up: DefoldHash<"up"> = 0x80356add32e752e9n;/);
+});
+
 
 test("the artifact report says what this package can bundle, per target", async () => {
   const report = await nativeArtifactReport();

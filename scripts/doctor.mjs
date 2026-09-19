@@ -62,21 +62,27 @@ try {
 // reading two JSON manifests.
 for (const [name, script, key] of [
   ["target archives", "manage-native-artifacts.mjs", "targets"],
-  ["host compilers", "manage-host-compilers.mjs", "hosts"]
+  // Host tools are reported per tool, not per host: hermesc and shermes are
+  // built per architecture and deherm-tsc cross-compiles to every host from one
+  // job, so "3/15 available" is the honest count and "which tool" is the
+  // actionable half of it.
+  ["host tools", "manage-host-compilers.mjs", "hosts"]
 ]) {
   const result = spawnSync(process.execPath, [new URL(script, import.meta.url).pathname, "report"], { encoding: "utf8" });
   if (result.status !== 0) {
     checks.push({ ok: false, name, detail: (result.stderr ?? "").trim().split("\n").at(-1) || "report failed" });
     continue;
   }
-  const rows = JSON.parse(result.stdout)[key];
-  const ready = rows.filter((row) => row.status === "vendored" || row.status === "vendored-source");
+  const reported = JSON.parse(result.stdout)[key];
+  const rows = key === "hosts" ? reported.flatMap((host) => host.tools) : reported;
+  const label = (row) => row.target ?? `${row.host} ${row.tool}`;
+  const ready = rows.filter((row) => (row.status === "vendored" || row.status === "vendored-source") && !row.invalid);
   const blocked = rows.filter((row) => row.status === "blocked" || row.status === "retired-upstream");
-  const pending = rows.filter((row) => row.status === "required-missing");
+  const pending = rows.filter((row) => row.status === "required-missing" || row.invalid);
   checks.push({
     ok: pending.length === 0,
     name,
-    detail: `${ready.length}/${rows.length} available${pending.length ? `; missing ${pending.map((row) => row.target ?? row.host).join(", ")}` : ""}${blocked.length ? `; blocked ${blocked.map((row) => `${row.target ?? row.host} (${row.blocker?.code})`).join(", ")}` : ""}`
+    detail: `${ready.length}/${rows.length} available${pending.length ? `; missing ${pending.map(label).join(", ")}` : ""}${blocked.length ? `; blocked ${blocked.map((row) => `${label(row)} (${row.blocker?.code})`).join(", ")}` : ""}`
   });
 }
 

@@ -1,34 +1,9 @@
 {
-  "schemaVersion": 2,
-  "projection": {
-    "id": "browser-wasm-web",
-    "title": "Packaged wasm-web bundle running the same tutorial loop in a browser",
-    "runtime": "browser",
-    "transport": [
-      "direct-memory"
-    ],
-    "reachableSet": "complete",
-    "profile": "browser",
-    "stage": "packaged-engine-runtime",
-    "observed": [
-      "A headless-Chrome load of the bundled wasm-web artifact started the Defold Emscripten engine and installed the generated browser host and script bridge.",
-      "The generated component registry installed every component, and the archived bundle fingerprint matched the source resource on disk.",
-      "The same tutorial loop reached the browser: camera initialisation and world bounds, GUI initialisation, player initialisation, a factory-spawned rocket, a Box2D collision, the score, the sprite-animation completion callback, and the clamped player walk.",
-      "Camera samples covering the unclamped, x-clamped and xy-clamped states.",
-      "No page error and no uncaught exception."
-    ],
-    "excluded": [
-      "Hermes: this projection runs the bundle on the browser's own JavaScript engine, so nothing here is evidence about Hermes",
-      "component teardown: the page is closed rather than shut down, so no `final()` is exercised on this projection",
-      "visual correctness: the gate asserts markers and CDP state, never pixels",
-      "the complete generated script or dmSDK surface",
-      "conformance, allocation, and performance claims",
-      "Lua-owned closure results, which fail closed on this transport"
-    ]
-  },
+  "schemaVersion": 1,
+  "scope": "Packaged wasm-web browser execution of the War Battles port. Marker and CDP evidence only; no visual claim.",
   "platform": "wasm-web",
-  "bundleFingerprint": "1295fb69e459971a1297e6e868afb8fdae53cfb249258870ef4157b4c2529750",
-  "bundleSha256": "d273437192190b7e458bff398a35e0662d07045440360bf094e154b9d740f276",
+  "bundleFingerprint": "384587f0da2ed4a92cd76fb48b3c648061f7d63917c177d3335e407c4d8bae66",
+  "bundleSha256": "87ad8a36ad9632132410b715e829741ec766f994d0508dd58e2c443bb05214fd",
   "state": {
     "documentReady": "complete",
     "engineStarted": true,
@@ -42,7 +17,7 @@
       "ExampleMath",
       "Timer"
     ],
-    "bundleFingerprint": "1295fb69e459971a1297e6e868afb8fdae53cfb249258870ef4157b4c2529750",
+    "bundleFingerprint": "384587f0da2ed4a92cd76fb48b3c648061f7d63917c177d3335e407c4d8bae66",
     "canvas": {
       "width": 756,
       "height": 425
@@ -77,7 +52,7 @@
     "war-battles:rocket-explosion-done",
     "war-battles:player-moved:1592.0:1072.0"
   ],
-  "cameraSampleCount": 12,
+  "cameraSampleCount": 11,
   "cameraClampStates": [
     "none",
     "x",

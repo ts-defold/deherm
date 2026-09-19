@@ -3,9 +3,15 @@
 // The host half of the toolchain, kept deliberately separate from
 // manage-native-artifacts.mjs because the two matrices are sized independently:
 // `libhermes.a` is indexed by the Defold BUNDLE TARGET Bob uploads to Extender,
-// while hermesc and shermes are indexed by the USER'S HOST. A user on macOS
-// bundling for Android needs the macOS compilers and the Android archive, and
-// neither matrix implies the other.
+// while hermesc, shermes and deherm-tsc are indexed by the USER'S HOST. A user
+// on macOS bundling for Android needs the macOS host tools and the Android
+// archive, and neither matrix implies the other.
+//
+// Status is recorded per tool rather than per host. deherm-tsc cross-compiles to
+// all five hosts from one job; hermesc and shermes must each be built on a
+// runner of their own architecture. A host-wide status would either hide a
+// published tool behind an unpublished one or claim a host is ready when only
+// part of it is.
 
 import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
@@ -15,13 +21,31 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifestPath = path.join(root, "packages", "toolchains", "host-compilers.json");
+
+// What determines the bytes of a host tool. The Hermes compilers come from the
+// pinned Hermes revision through one build script; deherm-tsc comes from its own
+// Go sources, its build script, and the ttsc module version pinned by the
+// lockfile. All of it is content, so a rebuild with unchanged inputs produces
+// the same fingerprint and CI can treat the release as already published.
 const inputs = [
   "upstream.lock",
-  "toolchains/hermes/build-host-compilers.sh"
+  "toolchains/hermes/build-host-compilers.sh",
+  "toolchains/go/build-deherm-tsc.sh",
+  "packages/compiler/go.mod",
+  "packages/compiler/ttsc/cmd/deherm-tsc/main.go",
+  "packages/compiler/ttsc/hash-literal/hash_literal.go",
+  "packages/compiler/ttsc/hash-literal/resource_name.go",
+  "packages/compiler/ttsc/hash-literal/api_usage.go"
 ];
 
 const missingStatuses = new Set(["required-missing", "blocked"]);
 const knownStatuses = new Set(["vendored", "required-missing", "blocked"]);
+
+// A host tool small enough to be a wrapper script or a Git LFS pointer is not
+// the artifact, and pinning its digest would make the lie permanent. hermesc and
+// shermes are multi-megabyte LLVM binaries; deherm-tsc links the whole
+// typescript-go compiler and lands around 20 MB.
+const MINIMUM_PLAUSIBLE_BYTES = 1_000_000;
 
 function digest(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -34,6 +58,11 @@ async function fingerprint() {
     hash.update(`${relative}\0${bytes.byteLength}\0`);
     hash.update(bytes);
   }
+  // The ttsc npm version decides which typescript-go deherm-tsc is linked
+  // against, so it belongs in the fingerprint even though no file above
+  // contains it.
+  const manifest = await readManifest();
+  hash.update(`ttsc\0${manifest.ttscVersion ?? "unknown"}\0`);
   return hash.digest("hex");
 }
 
@@ -58,24 +87,45 @@ async function filesBelow(directory) {
   return files;
 }
 
-async function recordHost(manifest, key) {
-  const record = manifest.hosts[key];
+function hostRecord(manifest, key) {
+  const record = manifest.hosts?.[key];
   if (!record) throw new Error(`Unknown host compiler key ${key}`);
-  const binaries = {};
-  for (const [tool, relative] of Object.entries(record.files)) {
-    const file = path.join(root, record.directory, relative);
-    const bytes = await readFile(file);
-    // hermesc and shermes are multi-megabyte LLVM-derived binaries. Anything
-    // small enough to be a wrapper script or a Git LFS pointer is not the
-    // artifact, and pinning its digest would make the lie permanent.
-    if (bytes.byteLength < 1_000_000) {
-      throw new Error(`${key} ${tool} is implausibly small (${bytes.byteLength} bytes)`);
-    }
-    binaries[tool] = { file: relative, sha256: digest(bytes), bytes: bytes.byteLength };
+  return record;
+}
+
+// Record one tool that is already sitting in the in-tree staging directory.
+async function recordTool(manifest, key, tool) {
+  const record = hostRecord(manifest, key);
+  const toolRecord = record.tools?.[tool];
+  if (!toolRecord) throw new Error(`${key} declares no ${tool}; declared tools are ${Object.keys(record.tools ?? {}).join(", ")}`);
+  const file = path.join(root, record.directory, toolRecord.file);
+  const bytes = await readFile(file);
+  if (bytes.byteLength < MINIMUM_PLAUSIBLE_BYTES) {
+    throw new Error(`${key} ${tool} is implausibly small (${bytes.byteLength} bytes)`);
   }
-  record.status = "vendored";
-  record.binaries = binaries;
-  return binaries;
+  toolRecord.status = "vendored";
+  toolRecord.sha256 = digest(bytes);
+  toolRecord.bytes = bytes.byteLength;
+  return toolRecord;
+}
+
+// Record every tool present for a host, leaving the ones that are not. One
+// runner failing never unpins another tool's digest.
+async function recordHost(manifest, key) {
+  const record = hostRecord(manifest, key);
+  const recorded = {};
+  for (const tool of Object.keys(record.tools ?? {})) {
+    try {
+      await stat(path.join(root, record.directory, record.tools[tool].file));
+    } catch {
+      continue;
+    }
+    recorded[tool] = await recordTool(manifest, key, tool);
+  }
+  if (!Object.keys(recorded).length) {
+    throw new Error(`No host tool is staged under ${record.directory} for ${key}`);
+  }
+  return recorded;
 }
 
 async function install(downloadRoot) {
@@ -83,28 +133,24 @@ async function install(downloadRoot) {
   const available = await filesBelow(path.resolve(downloadRoot));
   const installed = [];
   for (const [key, record] of Object.entries(manifest.hosts)) {
-    if (record.status === "blocked") continue;
-    const found = [];
-    for (const [tool, relative] of Object.entries(record.files)) {
-      const name = path.basename(relative);
-      const candidates = available.filter((file) => path.basename(file) === name && file.split(path.sep).includes(`host-compilers-${key}`));
+    for (const [tool, toolRecord] of Object.entries(record.tools ?? {})) {
+      if (toolRecord.status === "blocked") continue;
+      const name = path.basename(toolRecord.file);
+      const candidates = available.filter((file) =>
+        path.basename(file) === name && file.split(path.sep).includes(`host-compilers-${key}`));
       if (candidates.length > 1) throw new Error(`Expected one ${name} in host-compilers-${key}, found ${candidates.length}`);
-      if (candidates.length === 1) found.push([relative, candidates[0]]);
-      else if (found.length) throw new Error(`host-compilers-${key} carries only part of its compiler pair; ${tool} is missing`);
-    }
-    // A download that carries nothing for a host leaves that host alone, so one
-    // runner failing never silently unpins another host's digests.
-    if (!found.length) continue;
-    for (const [relative, source] of found) {
-      const destination = path.join(root, record.directory, relative);
+      // A download that carries nothing for a tool leaves that tool alone, so
+      // one runner failing never silently unpins another tool's digest.
+      if (candidates.length === 0) continue;
+      const destination = path.join(root, record.directory, toolRecord.file);
       await mkdir(path.dirname(destination), { recursive: true });
-      await cp(source, destination);
+      await cp(candidates[0], destination);
       // Artifact download loses the executable bit; a compiler that cannot be
       // executed is not installed, it is merely present.
-      if (!relative.endsWith(".exe")) await chmod(destination, 0o755);
+      if (!toolRecord.file.endsWith(".exe")) await chmod(destination, 0o755);
+      await recordTool(manifest, key, tool);
+      installed.push(`${key}/${tool}`);
     }
-    await recordHost(manifest, key);
-    installed.push(key);
   }
   await writeManifest(manifest);
   return installed;
@@ -114,53 +160,75 @@ async function report() {
   const manifest = await readManifest();
   const rows = [];
   for (const [key, record] of Object.entries(manifest.hosts)) {
-    const row = {
+    const tools = [];
+    for (const [tool, toolRecord] of Object.entries(record.tools ?? {})) {
+      const entry = {
+        host: key,
+        tool,
+        status: toolRecord.status,
+        builder: toolRecord.builder ?? null,
+        file: toolRecord.file,
+        blocker: toolRecord.blocker ?? null,
+        detail: ""
+      };
+      if (!knownStatuses.has(toolRecord.status)) {
+        entry.detail = `unknown status ${toolRecord.status}`;
+        entry.invalid = true;
+      } else if (toolRecord.status === "vendored") {
+        if (!/^[a-f0-9]{64}$/.test(toolRecord.sha256 ?? "")) {
+          entry.detail = "carries no pinned digest";
+          entry.invalid = true;
+        } else {
+          try {
+            const bytes = await readFile(path.join(root, record.directory, toolRecord.file));
+            if (digest(bytes) !== toolRecord.sha256) {
+              entry.detail = "checksum mismatch";
+              entry.invalid = true;
+            } else {
+              entry.sha256 = toolRecord.sha256;
+              entry.bytes = bytes.byteLength;
+              entry.detail = `${toolRecord.sha256.slice(0, 12)} (${bytes.byteLength} bytes)`;
+            }
+          } catch {
+            entry.detail = `missing at ${record.directory}/${toolRecord.file}`;
+            entry.invalid = true;
+          }
+        }
+      } else if (toolRecord.status === "required-missing") {
+        if (!toolRecord.builder) {
+          entry.detail = "required-missing without a builder";
+          entry.invalid = true;
+        } else entry.detail = `build with ${toolRecord.builder}`;
+      } else if (!toolRecord.blocker?.code || !toolRecord.blocker?.reason) {
+        entry.detail = "blocked without a machine-readable blocker";
+        entry.invalid = true;
+      } else entry.detail = toolRecord.blocker.code;
+      tools.push(entry);
+    }
+    tools.sort((left, right) => left.tool.localeCompare(right.tool));
+    const missing = tools.filter((entry) => entry.status !== "vendored" || entry.invalid);
+    rows.push({
       host: key,
       platform: record.host.platform,
       architecture: record.host.architecture,
       package: record.package,
-      builder: record.builder ?? null,
-      status: record.status,
-      blocker: record.blocker ?? null,
-      binaries: {},
-      detail: ""
-    };
-    if (!knownStatuses.has(record.status)) {
-      row.detail = `unknown status ${record.status}`;
-      row.invalid = true;
-    } else if (record.status === "vendored") {
-      const problems = [];
-      for (const [tool, relative] of Object.entries(record.files)) {
-        const pinned = record.binaries?.[tool];
-        if (!pinned?.sha256) {
-          problems.push(`${tool} carries no pinned digest`);
-          continue;
-        }
-        try {
-          const bytes = await readFile(path.join(root, record.directory, relative));
-          if (digest(bytes) !== pinned.sha256) problems.push(`${tool} checksum mismatch`);
-          else row.binaries[tool] = { sha256: pinned.sha256, bytes: bytes.byteLength };
-        } catch {
-          problems.push(`${tool} missing at ${record.directory}/${relative}`);
-        }
-      }
-      if (problems.length) {
-        row.detail = problems.join("; ");
-        row.invalid = true;
-      } else row.detail = Object.entries(row.binaries).map(([tool, value]) => `${tool} ${value.sha256.slice(0, 12)}`).join(", ");
-    } else if (record.status === "required-missing") {
-      if (!record.builder) {
-        row.detail = "required-missing without a builder";
-        row.invalid = true;
-      } else row.detail = `build with ${record.builder}`;
-    } else if (!record.blocker?.code || !record.blocker?.reason) {
-      row.detail = "blocked without a machine-readable blocker";
-      row.invalid = true;
-    } else row.detail = record.blocker.code;
-    rows.push(row);
+      status: missing.length === 0 ? "vendored" : tools.every((entry) => entry.status === "blocked") ? "blocked" : "required-missing",
+      invalid: tools.some((entry) => entry.invalid),
+      tools,
+      detail: missing.length === 0
+        ? tools.map((entry) => `${entry.tool} ${entry.sha256.slice(0, 12)}`).join(", ")
+        : missing.map((entry) => `${entry.tool}: ${entry.detail}`).join("; ")
+    });
   }
   rows.sort((left, right) => left.host.localeCompare(right.host));
-  return { schemaVersion: 1, hermesRevision: manifest.hermesRevision, packageVersion: manifest.packageVersion, hosts: rows };
+  return {
+    schemaVersion: 2,
+    hermesRevision: manifest.hermesRevision,
+    ttscVersion: manifest.ttscVersion ?? null,
+    packageVersion: manifest.packageVersion,
+    tools: Object.keys(manifest.tools ?? {}),
+    hosts: rows
+  };
 }
 
 async function verify(complete, json) {
@@ -168,17 +236,24 @@ async function verify(complete, json) {
   if (json) console.log(JSON.stringify(result, null, 2));
   const problems = [];
   for (const row of result.hosts) {
-    if (row.invalid) problems.push(`${row.host}: ${row.detail}`);
-    else if (complete && missingStatuses.has(row.status)) {
-      problems.push(`${row.host}: ${row.status}${row.blocker ? ` (${row.blocker.code}: ${row.blocker.reason})` : ` (${row.detail})`}`);
+    for (const entry of row.tools) {
+      if (entry.invalid) problems.push(`${row.host} ${entry.tool}: ${entry.detail}`);
+      else if (complete && missingStatuses.has(entry.status)) {
+        problems.push(`${row.host} ${entry.tool}: ${entry.status}${entry.blocker ? ` (${entry.blocker.code}: ${entry.blocker.reason})` : ` (${entry.detail})`}`);
+      }
     }
   }
   if (problems.length) {
-    throw new Error(`Host compiler matrix (${complete ? "complete" : "declared"}) failed:\n${problems.map((problem) => `- ${problem}`).join("\n")}`);
+    throw new Error(`Host tool matrix (${complete ? "complete" : "declared"}) failed:\n${problems.map((problem) => `- ${problem}`).join("\n")}`);
   }
   if (!json) {
-    for (const row of result.hosts) console.log(`${row.status === "vendored" ? "ok" : "--"} ${row.host}: ${row.status} ${row.detail}`);
-    console.log(`ok host compiler matrix (${complete ? "complete" : "declared"}): ${result.hosts.length} host(s)`);
+    for (const row of result.hosts) {
+      for (const entry of row.tools) {
+        console.log(`${entry.status === "vendored" ? "ok" : "--"} ${row.host} ${entry.tool}: ${entry.status} ${entry.detail}`);
+      }
+    }
+    const count = result.hosts.reduce((total, row) => total + row.tools.length, 0);
+    console.log(`ok host tool matrix (${complete ? "complete" : "declared"}): ${result.hosts.length} host(s), ${count} tool(s)`);
   }
 }
 
@@ -195,47 +270,75 @@ if (command === "fingerprint") console.log(await fingerprint());
 else if (command === "install") {
   if (!args[0]) throw new Error("install requires a downloaded artifact directory");
   const installed = await install(args[0]);
-  console.log(`installed ${installed.length} host compiler pair(s): ${installed.join(", ") || "none"}`);
+  console.log(`installed ${installed.length} host tool(s): ${installed.join(", ") || "none"}`);
 } else if (command === "record") {
   if (!args[0]) throw new Error("record requires a host key, for example darwin-arm64");
   const manifest = await readManifest();
-  const binaries = await recordHost(manifest, args[0]);
+  const recorded = args[1]
+    ? { [args[1]]: await recordTool(manifest, args[0], args[1]) }
+    : await recordHost(manifest, args[0]);
   await writeManifest(manifest);
-  console.log(`recorded ${args[0]} ${Object.entries(binaries).map(([tool, value]) => `${tool}=${value.sha256}`).join(" ")}`);
+  console.log(`recorded ${args[0]} ${Object.entries(recorded).map(([tool, value]) => `${tool}=${value.sha256}`).join(" ")}`);
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
 else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
 else if (command === "pull") {
-  const runIndex = args.indexOf("--run");
-  const runId = runIndex >= 0 ? args[runIndex + 1] : undefined;
-  if (!runId) throw new Error("pull requires --run <GitHub Actions run id>");
-  const destination = path.join(root, "build", "host-compiler-downloads", runId);
+  // Release assets, not workflow artifacts: a workflow artifact expires, is
+  // run-scoped and needs auth, and none of that survives to a user six months
+  // later. The tag is the input fingerprint, so many déherm versions share one
+  // artifact release.
+  const tagIndex = args.indexOf("--tag");
+  const tag = tagIndex >= 0 ? args[tagIndex + 1] : `host-tools-${await fingerprint()}`;
+  const destination = path.join(root, "build", "host-compiler-downloads", tag);
   await mkdir(destination, { recursive: true });
-  await run("gh", ["run", "download", runId, "--repo", "ts-defold/deherm", "--dir", destination]);
+  await run("gh", ["release", "download", tag, "--repo", "ts-defold/deherm", "--dir", destination, "--clobber", "--pattern", "host-compilers-*"]);
+  // Release assets are flat files named host-compilers-<host>-<tool>[.exe];
+  // `install` matches on the directory segment, so unpack each into its own.
+  for (const file of await filesBelow(destination)) {
+    const base = path.basename(file);
+    const match = /^host-compilers-(?<host>[^-]+-[^-]+)-(?<tool>.+?)(?<extension>\.exe)?$/.exec(base);
+    if (!match) continue;
+    const target = path.join(destination, `host-compilers-${match.groups.host}`, `${match.groups.tool}${match.groups.extension ?? ""}`);
+    await mkdir(path.dirname(target), { recursive: true });
+    await cp(file, target);
+  }
   const installed = await install(destination);
-  console.log(`installed ${installed.length} host compiler pair(s): ${installed.join(", ") || "none"}`);
+  console.log(`installed ${installed.length} host tool(s): ${installed.join(", ") || "none"}`);
   await verify(!args.includes("--partial"), false);
 } else if (command === "stage") {
-  // Copy this host's freshly built compilers out of a local CMake build, so the
-  // same record/verify path works without a CI round trip.
-  const [key, buildDir] = args;
-  if (!key || !buildDir) throw new Error("stage requires <host key> <cmake build directory>");
+  // Copy this host's freshly built tools out of a local build, so the same
+  // record/verify path works without a CI round trip.
+  const [key, buildDir, only] = args;
+  if (!key || !buildDir) throw new Error("stage requires <host key> <build directory> [tool]");
   const manifest = await readManifest();
-  const record = manifest.hosts[key];
-  if (!record) throw new Error(`Unknown host compiler key ${key}`);
-  for (const [tool, relative] of Object.entries(record.files)) {
-    const name = path.basename(relative);
-    const source = path.resolve(buildDir, "bin", name);
-    await stat(source).catch(() => {
-      throw new Error(`${tool} was not built at ${source}; run cmake --build <dir> --target ${tool}`);
-    });
-    const destination = path.join(root, record.directory, relative);
+  const record = hostRecord(manifest, key);
+  const staged = [];
+  for (const [tool, toolRecord] of Object.entries(record.tools ?? {})) {
+    if (only && tool !== only) continue;
+    const name = path.basename(toolRecord.file);
+    // hermesc and shermes land in a CMake build's bin/; deherm-tsc lands
+    // wherever build-deherm-tsc.sh was pointed. Accept either shape.
+    const candidates = [path.resolve(buildDir, "bin", name), path.resolve(buildDir, name)];
+    let source = null;
+    for (const candidate of candidates) {
+      if (await stat(candidate).then(() => true, () => false)) {
+        source = candidate;
+        break;
+      }
+    }
+    if (!source) {
+      if (only) throw new Error(`${tool} was not built at ${candidates.join(" or ")}`);
+      continue;
+    }
+    const destination = path.join(root, record.directory, toolRecord.file);
     await mkdir(path.dirname(destination), { recursive: true });
     await cp(source, destination);
-    if (!relative.endsWith(".exe")) await chmod(destination, 0o755);
+    if (!toolRecord.file.endsWith(".exe")) await chmod(destination, 0o755);
+    await recordTool(manifest, key, tool);
+    staged.push(tool);
   }
-  const binaries = await recordHost(manifest, key);
+  if (!staged.length) throw new Error(`Nothing to stage for ${key} from ${buildDir}`);
   await writeManifest(manifest);
-  console.log(`staged ${key} ${Object.keys(binaries).join(", ")}`);
+  console.log(`staged ${key} ${staged.join(", ")}`);
 } else {
-  throw new Error("Usage: manage-host-compilers.mjs {fingerprint|report|verify [--complete] [--json]|install <dir>|record <host>|stage <host> <build dir>|pull --run <id> [--partial]}");
+  throw new Error("Usage: manage-host-compilers.mjs {fingerprint|report|verify [--complete] [--json]|install <dir>|record <host> [tool]|stage <host> <build dir> [tool]|pull [--tag <tag>] [--partial]}");
 }

@@ -1,6 +1,6 @@
 name: native-artifacts
 
-# Two independent matrices, deliberately kept apart in this file because
+# Three independent matrices, deliberately kept apart in this file because
 # conflating them has already cost review time.
 #
 #   * target libraries - one libhermes.a per Defold BUNDLE TARGET, because Bob
@@ -8,16 +8,37 @@ name: native-artifacts
 #     macOS bundling for Android needs the Android archive and none of their own.
 #   * host compilers - hermesc and shermes per USER HOST, because they run on
 #     the user's machine. Both are pure compilers, so shipping them imposes no
-#     native toolchain requirement on the user.
+#     native toolchain requirement on the user. Each pair must be built on a
+#     runner of its own architecture: they are LLVM, and a cross build would
+#     need a second toolchain per host.
+#   * the transform compiler - deherm-tsc, also per USER HOST, but pure Go with
+#     CGO_ENABLED=0, so ONE runner cross-compiles the whole matrix. It is the
+#     cheapest artifact déherm ships and the one whose absence used to make
+#     every user's first build run a `go build` of the typescript-go compiler.
 #
 # The target list is derived from the pinned Defold sources into
 # packages/toolchains/defold-bundle-targets.json, so a Defold release that adds
 # a bundle platform fails `manage-native-artifacts.mjs verify` rather than
 # silently leaving that platform unbuilt.
 #
+# ── Why release assets and not workflow artifacts ────────────────────────────
+#
+# A workflow artifact expires (90 days by default), is scoped to one run, and
+# needs an authenticated API call to fetch. None of that survives to a user six
+# months after a déherm release. These are published as GitHub RELEASE ASSETS
+# under a tag that is the SHA-256 fingerprint of the inputs that determine the
+# artifact - upstream.lock, the Dockerfiles, the build and packaging scripts,
+# the Go sources and the pinned ttsc version. The artifacts are therefore
+# content-addressed: many déherm versions share one artifact release, and a
+# rebuild whose inputs have not changed finds the release already present and
+# does nothing.
+#
 # Vendor a completed run with:
-#   node scripts/manage-native-artifacts.mjs pull --run <id> --partial
-#   node scripts/manage-host-compilers.mjs pull --run <id> --partial
+#   node scripts/manage-native-artifacts.mjs pull [--tag <tag>] --partial
+#   node scripts/manage-host-compilers.mjs   pull [--tag <tag>] --partial
+#
+# Both default to the tag their own fingerprint names, so the usual invocation
+# takes no arguments at all.
 
 on:
   workflow_dispatch:
@@ -25,25 +46,64 @@ on:
     paths:
       - upstream.lock
       - toolchains/hermes/**
+      - toolchains/go/**
+      - packages/compiler/go.mod
+      - packages/compiler/ttsc/**
       - packages/toolchains/defold-bundle-targets.json
+      - packages/toolchains/host-compilers.json
       - scripts/package-defold-extension.sh
       - .github/workflows/native-artifacts.yml
 
+permissions:
+  contents: write
+
 jobs:
-  # The SDK levels every cross build has to match are the engine's own, derived
-  # from upstream/defold/build_tools/sdk.py. Reading them here keeps the
-  # container and Xcode invocations from carrying a second, drifting copy.
-  sdk:
+  # One place decides what this run is called and whether it has anything to do.
+  # `fingerprint` hashes the inputs that determine each artifact family, so two
+  # runs with identical inputs address the same release and the second is a
+  # no-op rather than a second copy.
+  plan:
     runs-on: ubuntu-24.04
     outputs:
-      android_ndk_version: ${{ steps.read.outputs.android_ndk_version }}
-      android_ndk_api: ${{ steps.read.outputs.android_ndk_api }}
-      android_64_ndk_api: ${{ steps.read.outputs.android_64_ndk_api }}
-      iphoneos_version_min: ${{ steps.read.outputs.iphoneos_version_min }}
-      macosx_version_min: ${{ steps.read.outputs.macosx_version_min }}
+      target_tag: ${{ steps.compute.outputs.target_tag }}
+      host_tag: ${{ steps.compute.outputs.host_tag }}
+      target_exists: ${{ steps.compute.outputs.target_exists }}
+      host_exists: ${{ steps.compute.outputs.host_exists }}
+      android_ndk_version: ${{ steps.sdk.outputs.android_ndk_version }}
+      android_ndk_api: ${{ steps.sdk.outputs.android_ndk_api }}
+      android_64_ndk_api: ${{ steps.sdk.outputs.android_64_ndk_api }}
+      iphoneos_version_min: ${{ steps.sdk.outputs.iphoneos_version_min }}
+      macosx_version_min: ${{ steps.sdk.outputs.macosx_version_min }}
     steps:
       - uses: actions/checkout@v4
-      - id: read
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - id: compute
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          target_tag="native-artifacts-$(node scripts/manage-native-artifacts.mjs fingerprint)"
+          host_tag="host-tools-$(node scripts/manage-host-compilers.mjs fingerprint)"
+          echo "target_tag=$target_tag" >> "$GITHUB_OUTPUT"
+          echo "host_tag=$host_tag" >> "$GITHUB_OUTPUT"
+          # An existing release means these exact inputs have already been
+          # built. Rebuilding would produce the same bytes at best and churn
+          # the digests users pinned at worst.
+          if gh release view "$target_tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "target_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "target_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          if gh release view "$host_tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "host_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "host_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      # The SDK levels every cross build has to match are the engine's own,
+      # derived from upstream/defold/build_tools/sdk.py. Reading them here keeps
+      # the container and Xcode invocations from carrying a second, drifting
+      # copy.
+      - id: sdk
         run: |
           node -e '
             const sdk = require("./packages/toolchains/defold-bundle-targets.json").sdk;
@@ -57,7 +117,86 @@ jobs:
             require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, out.map(([k, v]) => `${k}=${v}`).join("\n") + "\n");
           '
 
+  # Create the two releases once, before any lane uploads to them. `gh release
+  # upload --clobber` needs the release to exist, and a per-lane create would
+  # race across the matrix.
+  releases:
+    needs: plan
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          create() {
+            local tag="$1" title="$2"
+            if gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+              echo "release $tag already exists"
+              return
+            fi
+            gh release create "$tag" \
+              --repo "${{ github.repository }}" \
+              --title "$title" \
+              --notes "Content-addressed build artifacts. The tag is the SHA-256 fingerprint of the inputs that determine these bytes, so many déherm versions share this release and a rebuild with unchanged inputs is a no-op. Vendor with \`node scripts/manage-native-artifacts.mjs pull\` or \`node scripts/manage-host-compilers.mjs pull\`." \
+              --prerelease
+          }
+          if [ "${{ needs.plan.outputs.target_exists }}" != "true" ]; then
+            create "${{ needs.plan.outputs.target_tag }}" "Hermes target archives ${{ needs.plan.outputs.target_tag }}"
+          fi
+          if [ "${{ needs.plan.outputs.host_exists }}" != "true" ]; then
+            create "${{ needs.plan.outputs.host_tag }}" "Host tools ${{ needs.plan.outputs.host_tag }}"
+          fi
+
+  # ── The transform compiler ──────────────────────────────────────────────────
+  #
+  # One job, five hosts. deherm-tsc is pure Go: CGO_ENABLED=0 links it with no C
+  # toolchain on any host, so GOOS/GOARCH is the whole of cross-compilation and
+  # the five binaries are byte-reproducible from the same inputs. Contrast the
+  # host-compilers lane below, which needs a runner per architecture because
+  # hermesc and shermes are LLVM.
+  go-compiler:
+    needs: [plan, releases]
+    if: needs.plan.outputs.host_exists != 'true'
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [darwin-arm64, darwin-x64, linux-x64, linux-arm64, win32-x64]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: pnpm/action-setup@v4
+      # The ttsc Go module - and the typescript-go checkout under its shim/ -
+      # arrives with the npm package, pinned by pnpm-lock.yaml. It is not
+      # vendored into this repository, so there is exactly one statement of the
+      # compiler's provenance.
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: packages/compiler/go.mod
+          cache: false
+      - run: bash toolchains/go/build-deherm-tsc.sh ${{ matrix.host }} build/artifacts/host-compilers/${{ matrix.host }}/bin
+      # A binary that cannot answer for itself is not shippable. `version` is
+      # the identity `deherm doctor` reads back.
+      - if: matrix.host == 'linux-x64'
+        run: build/artifacts/host-compilers/linux-x64/bin/deherm-tsc version
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
+            gh release upload "${{ needs.plan.outputs.host_tag }}" \
+              "$file#host-compilers-${{ matrix.host }}-$(basename "$file")" \
+              --repo "${{ github.repository }}" --clobber
+          done
+
+  # ── Target libraries: one libhermes.a per Defold bundle target ──────────────
+
   linux:
+    needs: [plan, releases]
+    if: needs.plan.outputs.target_exists != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -73,24 +212,31 @@ jobs:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
       - run: docker buildx build --platform ${{ matrix.docker_platform }} --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} -f toolchains/hermes/Dockerfile.linux .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hermes-${{ matrix.defold_platform }}
-          path: build/artifacts/${{ matrix.defold_platform }}/libhermes.a
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ needs.plan.outputs.target_tag }}" \
+            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a#hermes-${{ matrix.defold_platform }}-libhermes.a" \
+            --repo "${{ github.repository }}" --clobber
 
   windows:
+    needs: [plan, releases]
+    if: needs.plan.outputs.target_exists != 'true'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
       - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hermes-x86_64-win32
-          path: build/artifacts/x86_64-win32/hermes.lib
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ needs.plan.outputs.target_tag }}" \
+            "build/artifacts/x86_64-win32/hermes.lib#hermes-x86_64-win32-hermes.lib" \
+            --repo "${{ github.repository }}" --clobber
 
   android:
-    needs: sdk
+    needs: [plan, releases]
+    if: needs.plan.outputs.target_exists != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -112,28 +258,31 @@ jobs:
           docker buildx build \
             --platform linux/amd64 \
             --build-arg ANDROID_ABI=${{ matrix.abi }} \
-            --build-arg ANDROID_API=${{ needs.sdk.outputs[matrix.api_kind] }} \
-            --build-arg NDK_VERSION=${{ needs.sdk.outputs.android_ndk_version }} \
+            --build-arg ANDROID_API=${{ needs.plan.outputs[matrix.api_kind] }} \
+            --build-arg NDK_VERSION=${{ needs.plan.outputs.android_ndk_version }} \
             --output type=local,dest=build/artifacts/${{ matrix.defold_platform }} \
             -f toolchains/hermes/Dockerfile.android .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hermes-${{ matrix.defold_platform }}
-          path: build/artifacts/${{ matrix.defold_platform }}/libhermes.a
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ needs.plan.outputs.target_tag }}" \
+            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a#hermes-${{ matrix.defold_platform }}-libhermes.a" \
+            --repo "${{ github.repository }}" --clobber
 
   # macOS x64, iOS and the iOS simulator need the Apple SDKs, so there is no
   # container path for them. One macOS runner builds all four Apple targets and
   # reuses a single host-compiler build across them.
   apple:
-    needs: sdk
+    needs: [plan, releases]
+    if: needs.plan.outputs.target_exists != 'true'
     runs-on: macos-15
     strategy:
       fail-fast: false
       matrix:
         defold_platform: [arm64-osx, x86_64-osx, arm64-ios, arm64_sim-ios]
     env:
-      DEFOLD_MACOSX_VERSION_MIN: ${{ needs.sdk.outputs.macosx_version_min }}
-      DEFOLD_IPHONEOS_VERSION_MIN: ${{ needs.sdk.outputs.iphoneos_version_min }}
+      DEFOLD_MACOSX_VERSION_MIN: ${{ needs.plan.outputs.macosx_version_min }}
+      DEFOLD_IPHONEOS_VERSION_MIN: ${{ needs.plan.outputs.iphoneos_version_min }}
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
@@ -144,15 +293,21 @@ jobs:
             "$PWD/upstream/hermes" \
             "$PWD/build/hermes/${{ matrix.defold_platform }}" \
             "$PWD/build/artifacts/${{ matrix.defold_platform }}/libhermes.a"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: hermes-${{ matrix.defold_platform }}
-          path: build/artifacts/${{ matrix.defold_platform }}/libhermes.a
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ needs.plan.outputs.target_tag }}" \
+            "build/artifacts/${{ matrix.defold_platform }}/libhermes.a#hermes-${{ matrix.defold_platform }}-libhermes.a" \
+            --repo "${{ github.repository }}" --clobber
 
-  # hermesc and shermes, one pair per user host. Each pair is built on a runner
-  # of that host's own architecture: these are the binaries other builds import,
-  # so cross-compiling them would defeat the point.
+  # ── Host compilers: hermesc and shermes, one pair per user host ─────────────
+  #
+  # Each pair is built on a runner of that host's own architecture: these are
+  # the binaries other builds import, so cross-compiling them would defeat the
+  # point.
   host-compilers:
+    needs: [plan, releases]
+    if: needs.plan.outputs.host_exists != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -189,7 +344,37 @@ jobs:
             "$PWD/upstream/hermes" \
             "$PWD/build/host-compilers/${{ matrix.host }}" \
             "$PWD/build/artifacts/host-compilers/${{ matrix.host }}/bin"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: host-compilers-${{ matrix.host }}
-          path: build/artifacts/host-compilers/${{ matrix.host }}/bin/*
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for file in build/artifacts/host-compilers/${{ matrix.host }}/bin/*; do
+            gh release upload "${{ needs.plan.outputs.host_tag }}" \
+              "$file#host-compilers-${{ matrix.host }}-$(basename "$file")" \
+              --repo "${{ github.repository }}" --clobber
+          done
+
+  # A run that published nothing verifiable is a run that taught us nothing.
+  # This reports what each release now carries, so the gap between the matrix
+  # and the release is visible in the run summary rather than discovered by a
+  # user.
+  summary:
+    needs: [plan, go-compiler, linux, windows, android, apple, host-compilers]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          for tag in "${{ needs.plan.outputs.target_tag }}" "${{ needs.plan.outputs.host_tag }}"; do
+            {
+              echo "### $tag"
+              echo
+              echo '```'
+              gh release view "$tag" --repo "${{ github.repository }}" --json assets \
+                --jq '.assets[] | "\(.name)\t\(.size) bytes"' 2>&1 || echo "no release"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          done

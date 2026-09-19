@@ -239,15 +239,29 @@ else if (command === "install") {
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
 else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
 else if (command === "pull") {
-  const runIndex = args.indexOf("--run");
-  const runId = runIndex >= 0 ? args[runIndex + 1] : undefined;
-  if (!runId) throw new Error("pull requires --run <GitHub Actions run id>");
-  const destination = path.join(root, "build", "native-artifact-downloads", runId);
+  // Release assets, not workflow artifacts. A workflow artifact expires, is
+  // scoped to one run, and needs an authenticated API call to fetch; none of
+  // that survives to a user six months after a release. The tag defaults to
+  // this checkout's own input fingerprint, because the artifacts are
+  // content-addressed: many déherm versions share one artifact release.
+  const tagIndex = args.indexOf("--tag");
+  const tag = tagIndex >= 0 ? args[tagIndex + 1] : `native-artifacts-${await fingerprint()}`;
+  const destination = path.join(root, "build", "native-artifact-downloads", tag);
   await mkdir(destination, { recursive: true });
-  await run("gh", ["run", "download", runId, "--repo", "ts-defold/deherm", "--dir", destination]);
+  await run("gh", ["release", "download", tag, "--repo", "ts-defold/deherm", "--dir", destination, "--clobber", "--pattern", "hermes-*"]);
+  // Release assets are flat files named hermes-<target>-<library>; `install`
+  // matches on the directory segment, so unpack each into its own.
+  for (const file of await filesBelow(destination)) {
+    const base = path.basename(file);
+    const match = /^hermes-(?<target>.+?)-(?<library>libhermes\.a|hermes\.lib)$/.exec(base);
+    if (!match) continue;
+    const target = path.join(destination, `hermes-${match.groups.target}`, match.groups.library);
+    await mkdir(path.dirname(target), { recursive: true });
+    await cp(file, target);
+  }
   const installed = await install(destination);
   console.log(`installed ${installed.length} native artifact(s): ${installed.join(", ") || "none"}`);
   await verify(!args.includes("--partial"), false);
 } else {
-  throw new Error("Usage: manage-native-artifacts.mjs {fingerprint|report|verify [--complete] [--json]|install <dir>|record <target>|pull --run <id> [--partial]}");
+  throw new Error("Usage: manage-native-artifacts.mjs {fingerprint|report|verify [--complete] [--json]|install <dir>|record <target>|pull [--tag <tag>] [--partial]}");
 }

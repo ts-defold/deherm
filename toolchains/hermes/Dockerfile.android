@@ -20,17 +20,58 @@ FROM ubuntu:24.04
 ARG ANDROID_ABI
 ARG ANDROID_API
 ARG NDK_VERSION
-# The published SHA-256 of android-ndk-r25b-linux.zip. Pinned so the container
-# is reproducible and the download is verified rather than trusted.
+# Digests for android-ndk-r25b-linux.zip, pinned so the container is
+# reproducible and the download is verified rather than trusted.
+#
+# Two digests, because no single source publishes a strong one. Google's SDK
+# manifest schema carries SHA-1 only, and the r25b row has aged off every Google
+# HTML download page - the repository XML is now the only Google-hosted record
+# of it:
+#
+#   https://dl.google.com/android/repository/repository2-3.xml
+#     <archive><complete>
+#       <size>530975885</size>
+#       <checksum type="sha1">e27dcb9c8bcaa77b78ff68c3f23abcf6867959eb</checksum>
+#       <url>android-ndk-r25b-linux.zip</url>
+#     </complete><host-os>linux</host-os></archive>
+#
+# That size matches the Content-Length the download URL serves today, so the
+# manifest entry does describe the file being fetched. The SHA-256 comes from
+# F-Droid's signed android-sdk-transparency-log, which records SHA-1, SHA-256
+# and SHA-512 for the same URL; its SHA-1 matches Google's byte for byte, which
+# is what ties the stronger digest to the artifact Google describes:
+#
+#   https://raw.githubusercontent.com/f-droid/android-sdk-transparency-log/master/signed/checksums.json
+#
+# Checking both is strictly stronger than checking either: SHA-1 is the one
+# traceable to the vendor, SHA-256 is the one that is still collision-resistant,
+# and an attacker would have to satisfy both at the pinned length.
 ARG NDK_SHA256=403ac3e3020dd0db63a848dcaba6ceb2603bf64de90949d5c4361f848e44b005
+ARG NDK_SHA1=e27dcb9c8bcaa77b78ff68c3f23abcf6867959eb
+ARG NDK_BYTES=530975885
 
 RUN test -n "$ANDROID_ABI" && test -n "$ANDROID_API" && test -n "$NDK_VERSION"
+
+# The digests below are r25b's, and the NDK revision is derived from the pinned
+# engine rather than chosen here. A Defold release that moves the pin would
+# otherwise fail at `sha256sum -c` with no indication of why - say it plainly
+# instead, and name the two values that have to be replaced together.
+RUN if [ "$NDK_VERSION" != "25b" ]; then \
+      echo "Dockerfile.android pins the digests of android-ndk-r25b-linux.zip, but the engine asks for r${NDK_VERSION}." >&2; \
+      echo "Replace NDK_SHA1/NDK_SHA256/NDK_BYTES from https://dl.google.com/android/repository/repository2-3.xml and the F-Droid transparency log." >&2; \
+      exit 1; \
+    fi
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates clang cmake curl git lld ninja-build python3 unzip && \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl -fsSLo /tmp/ndk.zip "https://dl.google.com/android/repository/android-ndk-r${NDK_VERSION}-linux.zip" && \
+    actual_bytes="$(stat -c %s /tmp/ndk.zip)" && \
+    if [ "$actual_bytes" != "${NDK_BYTES}" ]; then \
+      echo "NDK archive is ${actual_bytes} bytes, expected ${NDK_BYTES}" >&2; exit 1; \
+    fi && \
+    echo "${NDK_SHA1}  /tmp/ndk.zip" | sha1sum -c - && \
     echo "${NDK_SHA256}  /tmp/ndk.zip" | sha256sum -c - && \
     unzip -q /tmp/ndk.zip -d /opt && rm /tmp/ndk.zip
 ENV ANDROID_NDK_HOME=/opt/android-ndk-r${NDK_VERSION}

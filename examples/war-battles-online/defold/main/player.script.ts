@@ -109,14 +109,7 @@ export default defineComponent({
   },
 
   final(_self: PlayerSelf): void {
-    // A structured call from `final` binds against the captured Lua script
-    // instance, which the extension must still hold at collection teardown.
-    // The marker is emitted after the call returns, so observing it is the
-    // only positive evidence that component teardown ran: neither SIGTERM nor
-    // SIGINT reaches `final`, so it takes a graceful `@system/exit` to get
-    // here. See `integration/check-graceful-shutdown.mjs`.
     msg.post(".", "release_input_focus");
-    __defoldHostV1.log("info", "war-battles:player-final");
   },
 
   update(self: PlayerSelf, dt: number): void {
