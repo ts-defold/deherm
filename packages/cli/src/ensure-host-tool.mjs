@@ -42,6 +42,13 @@ const moduleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".
  * sits beside it rather than inventing a second location. The path is keyed by
  * release tag, so two deherm versions sharing a tag share the download and a
  * new tag never overwrites an old one in place.
+ *
+ * It is GITIGNORED by default - this repository at .gitignore:19, and scaffolded
+ * projects through scaffold.mjs - so the default behaviour is to re-download per
+ * machine and per worktree. Committing it is a deliberate opt-in for anyone who
+ * wants teammates or CI to build with no network. Tag-keyed paths are what make
+ * that safe: a committed cache for one tag cannot collide with another, and a
+ * stale one is never silently preferred because the tag would not match.
  */
 export function projectRoot(from = process.cwd()) {
   let directory = path.resolve(from);
