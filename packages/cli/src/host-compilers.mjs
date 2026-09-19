@@ -34,7 +34,9 @@
 
 import { createHash } from "node:crypto";
 import { createRequire } from "node:module";
+import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 
 const packageRoot = path.resolve(import.meta.dirname, "../../..");
@@ -100,7 +102,12 @@ async function inspectHostTool(key, tool, record, roots) {
   }
   const attempts = [];
   for (const candidate of roots) {
-    const result = await verifiedBinary(path.join(candidate.root, record.file), record.sha256, `${key} ${tool}`);
+    // Release archives are flat - one directory of tools, no `bin/` - because
+    // the archive IS the unit and nesting the build tree's layout inside it
+    // would publish this machine's directory shape. The manifest's `file` is
+    // the VENDORED layout, so the cache root matches on basename instead.
+    const relative = candidate.flat ? path.basename(record.file) : record.file;
+    const result = await verifiedBinary(path.join(candidate.root, relative), record.sha256, `${key} ${tool}`);
     if (result.ok) {
       return { ...base, ok: true, source: candidate.source, sha256: result.sha256, bytes: result.bytes, path: result.file, detail: `${result.sha256.slice(0, 12)} (${candidate.source})` };
     }
@@ -112,6 +119,46 @@ async function inspectHostTool(key, tool, record, roots) {
 // One host's resolution, reported rather than thrown, so `deherm doctor` can
 // describe every host and every tool, and the build path can turn the current
 // host's failure into an error with the same words.
+// Where ensure-host-tool.mjs extracts archives for this host. Resolved lazily
+// and tolerantly: a missing cache is the ordinary state of a fresh install, not
+// an error. Both host families are returned because a host needs tools from
+// each, and they extract into separate tag directories.
+function findProjectRoot(from = process.cwd()) {
+  let directory = path.resolve(from);
+  for (;;) {
+    for (const marker of ["deherm.lock", "game.project", "package.json", ".git"]) {
+      if (existsSync(path.join(directory, marker))) return directory;
+    }
+    const parent = path.dirname(directory);
+    if (parent === directory) return path.resolve(from);
+    directory = parent;
+  }
+}
+
+function cachedFamilyRoots(key) {
+  const found = [];
+  try {
+    // Project-local, matching ensure-host-tool.mjs: a fetched toolchain belongs
+    // beside the project that uses it, where it can be committed, rather than
+    // in machine state no teammate or CI runner shares.
+    const base = process.env.DEHERM_TOOL_CACHE
+      ? path.resolve(process.env.DEHERM_TOOL_CACHE)
+      : path.join(findProjectRoot(), ".deherm", "cache", "toolchains");
+    const tags = JSON.parse(readFileSync(
+      path.join(packageRoot, "packages", "toolchains", "release-tags.json"), "utf8"));
+    for (const family of ["hermes-host", "dehermc"]) {
+      const tag = tags.families?.[family]?.tag;
+      if (!tag) continue;
+      const candidate = path.join(base, tag, key);
+      if (existsSync(candidate)) found.push(candidate);
+    }
+  } catch {
+    // No release-tags.json, no home directory, unreadable cache: all mean "not
+    // cached", which a missing root already expresses.
+  }
+  return found;
+}
+
 export async function inspectHostCompilers(key, manifest) {
   const resolved = manifest ?? await readHostCompilerManifest();
   const record = resolved.hosts?.[key];
@@ -128,6 +175,10 @@ export async function inspectHostCompilers(key, manifest) {
   const installed = resolvePackageDirectory(record.package);
   if (installed) roots.push({ source: "package", root: installed });
   roots.push({ source: "vendored", root: path.join(packageRoot, record.directory) });
+  // The fetch cache, last: a vendored tree or an explicitly installed per-host
+  // package is a deliberate choice by whoever set this checkout up and should
+  // win over something downloaded automatically.
+  for (const cached of cachedFamilyRoots(key)) roots.push({ source: "cache", root: cached, flat: true });
 
   const tools = {};
   for (const [tool, toolRecord] of Object.entries(record.tools ?? {})) {
@@ -196,9 +247,31 @@ export async function requireHostCompilers() {
 // diagnostic specific: a project that only runs the transforms should not be
 // told that hermesc is missing, and a release build that needs shermes should
 // not be told the transforms are fine.
-export async function requireHostTool(tool) {
+// Which release family publishes a tool. Kept beside the resolver rather than
+// read from release-tags.json, because a tool the package does not know about
+// is a packaging bug, not something to discover at runtime.
+function familyForTool(tool) {
+  if (tool === "hermesc" || tool === "shermes") return "hermes-host";
+  if (tool === "dehermc") return "dehermc";
+  return null;
+}
+
+export async function requireHostTool(tool, options = {}) {
   const key = hostCompilerKey();
-  const result = await inspectHostCompilers(key);
+  let result = await inspectHostCompilers(key);
+  // A miss is the NORMAL state of a fresh install: the tools are published as
+  // release archives rather than shipped in the package, so nothing has put
+  // them on disk yet. Fetch the one archive this host needs before deciding the
+  // tool is unavailable - failing closed here would be correct and useless,
+  // since no other code path was ever going to populate it.
+  if (result.tools?.[tool] && !result.tools[tool].ok && options.fetch !== false) {
+    const family = familyForTool(tool);
+    if (family) {
+      const { ensureHostFamily } = await import("./ensure-host-tool.mjs");
+      await ensureHostFamily(family, key, { onProgress: options.onProgress });
+      result = await inspectHostCompilers(key);
+    }
+  }
   const resolvedTool = result.tools?.[tool];
   if (!resolvedTool) {
     throw new Error(`déherm declares no ${tool} for ${key}; declared tools are ${Object.keys(result.tools ?? {}).join(", ") || "none"}`);
