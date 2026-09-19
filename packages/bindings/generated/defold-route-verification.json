@@ -16,12 +16,13 @@
   "routeCount": 926,
   "statusCounts": {
     "executed": 466,
-    "supported": 449,
-    "suspect": 11
+    "supported": 456,
+    "suspect": 4
   },
   "registrationCounts": {
     "commented-out-upstream": 2,
-    "declared-but-unregistered": 8,
+    "compile-time-intrinsic": 7,
+    "documented-name-mismatch": 1,
     "registered": 911,
     "registration-form-not-traced": 5
   },
@@ -32,10 +33,10 @@
     "multi-result-shape-unmodelled": 28,
     "execution-policy-destructive": 21,
     "handle-kind-outside-fixture-profile": 14,
+    "no-generated-universal-adapter": 11,
     "not-in-conformance-plan": 8,
     "execution-policy-interactive": 5,
     "variadic-argument-shape-unmodelled": 4,
-    "no-generated-universal-adapter": 4,
     "harness-effect-guard": 3,
     "execution-policy-context-blocked": 2,
     "lua-stack-blocked-capability": 2
@@ -65,60 +66,11 @@
       "registration": "registered"
     },
     {
-      "id": "script:resource.atlas",
-      "luaName": "resource.atlas",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/resource.lua:46"
-    },
-    {
-      "id": "script:resource.buffer",
-      "luaName": "resource.buffer",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/resource.lua:69"
-    },
-    {
-      "id": "script:resource.font",
-      "luaName": "resource.font",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/resource.lua:492"
-    },
-    {
-      "id": "script:resource.material",
-      "luaName": "resource.material",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/resource.lua:682"
-    },
-    {
-      "id": "script:resource.render_target",
-      "luaName": "resource.render_target",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/resource.lua:714"
-    },
-    {
-      "id": "script:resource.texture",
-      "luaName": "resource.texture",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/resource.lua:1040"
-    },
-    {
-      "id": "script:resource.tile_source",
-      "luaName": "resource.tile_source",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
-      "declaredAt": "doc/resource.lua:1063"
-    },
-    {
       "id": "script:sys.set_render_enable",
       "luaName": "sys.set_render_enable",
       "status": "suspect",
       "disposition": "observed",
-      "registration": "declared-but-unregistered",
+      "registration": "documented-name-mismatch",
       "declaredAt": "doc/sys.lua:722"
     }
   ],
@@ -7809,16 +7761,18 @@
     {
       "id": "script:resource.atlas",
       "luaName": "resource.atlas",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "no-generated-universal-adapter",
+      "registration": "compile-time-intrinsic",
       "declaredAt": "doc/resource.lua:46",
       "source": "doc/resource.lua"
     },
     {
       "id": "script:resource.buffer",
       "luaName": "resource.buffer",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "no-generated-universal-adapter",
+      "registration": "compile-time-intrinsic",
       "declaredAt": "doc/resource.lua:69",
       "source": "doc/resource.lua"
     },
@@ -7900,8 +7854,9 @@
     {
       "id": "script:resource.font",
       "luaName": "resource.font",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "no-generated-universal-adapter",
+      "registration": "compile-time-intrinsic",
       "declaredAt": "doc/resource.lua:492",
       "source": "doc/resource.lua"
     },
@@ -7957,8 +7912,9 @@
     {
       "id": "script:resource.material",
       "luaName": "resource.material",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "no-generated-universal-adapter",
+      "registration": "compile-time-intrinsic",
       "declaredAt": "doc/resource.lua:682",
       "source": "doc/resource.lua"
     },
@@ -7973,8 +7929,9 @@
     {
       "id": "script:resource.render_target",
       "luaName": "resource.render_target",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "no-generated-universal-adapter",
+      "registration": "compile-time-intrinsic",
       "declaredAt": "doc/resource.lua:714",
       "source": "doc/resource.lua"
     },
@@ -8027,16 +7984,18 @@
     {
       "id": "script:resource.texture",
       "luaName": "resource.texture",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "no-generated-universal-adapter",
+      "registration": "compile-time-intrinsic",
       "declaredAt": "doc/resource.lua:1040",
       "source": "doc/resource.lua"
     },
     {
       "id": "script:resource.tile_source",
       "luaName": "resource.tile_source",
-      "status": "suspect",
-      "registration": "declared-but-unregistered",
+      "status": "supported",
+      "notExecutedHere": "no-generated-universal-adapter",
+      "registration": "compile-time-intrinsic",
       "declaredAt": "doc/resource.lua:1063",
       "source": "doc/resource.lua"
     },
@@ -8634,8 +8593,12 @@
       "luaName": "sys.set_render_enable",
       "status": "suspect",
       "disposition": "observed",
-      "registration": "declared-but-unregistered",
+      "registration": "documented-name-mismatch",
       "declaredAt": "doc/sys.lua:722",
+      "registeredAs": {
+        "registeredName": "sys.set_render_enabled",
+        "at": "engine/src/script/script_engine.cpp:131"
+      },
       "source": "doc/sys.lua"
     },
     {

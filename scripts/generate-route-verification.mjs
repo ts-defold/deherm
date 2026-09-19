@@ -55,8 +55,10 @@
 // this run did not exercise. That is a to-do list for us. It is not a caveat
 // on the route and it is not published as one.
 
+import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { componentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -164,8 +166,21 @@ async function main() {
   const declaredUnregistered = new Map();
   const commentedOut = new Map();
   const parserBlocked = new Map();
+  // A name the engine registers that the documentation spells differently. The
+  // registration parse already pairs them: `sys.set_render_enabled` is
+  // registered at script_engine.cpp:131 and carries `documentedName:
+  // "sys.set_render_enable"` - Defold's doc comment is missing the final "d".
+  // That is an upstream documentation bug, and knowing the registered name is
+  // the difference between "this route is a mystery" and "call the other one".
+  const registeredUnder = new Map();
   for (const target of Object.values(registration.targets ?? {})) {
     for (const route of target.routes ?? []) registeredSomewhere.add(route.name);
+    for (const row of target.registeredButUndeclared ?? []) {
+      const documented = row.documentedName?.name;
+      if (documented && documented !== row.name && !registeredUnder.has(documented)) {
+        registeredUnder.set(documented, { registeredName: row.name, at: `${row.registration?.path}:${row.registration?.line}` });
+      }
+    }
     for (const row of target.declaredButUnregistered ?? []) {
       if (!declaredUnregistered.has(row.name)) declaredUnregistered.set(row.name, row);
     }
@@ -177,10 +192,34 @@ async function main() {
     }
   }
 
+  // Routes the COMPILER lowers rather than the runtime calling.
+  //
+  // `resource.atlas("/x.atlas")` has no Lua registration anywhere because it is
+  // not a runtime call: it appears only as the value of a `go.property`
+  // declaration, which our component proxy generator lowers into a real
+  // `go.property(...)` line in the emitted Lua. Defold's own example in
+  // script_resource.cpp:75 is exactly that.
+  //
+  // Derived by intersection rather than listed, and asserted to be exact: a
+  // resource kind our proxy generator lowers must be one the engine does not
+  // register, and vice versa. If Defold adds an eighth kind, or starts
+  // registering one of these at runtime, the assertion below says so instead of
+  // the route silently changing category.
+  const loweredKinds = new Set(Object.values(componentProxyConstants.resourceKinds)
+    .map((kind) => `resource.${kind}`));
+  const compileTimeIntrinsics = new Set(
+    [...loweredKinds].filter((name) => !registeredSomewhere.has(name)));
+  const loweredButRegistered = [...loweredKinds].filter((name) => registeredSomewhere.has(name));
+  assert.deepEqual(loweredButRegistered, [],
+    `the component proxy lowers ${loweredButRegistered.join(", ")} at compile time, but the engine ` +
+    "registers them at runtime - one of the two is now wrong");
+
   const rows = ir.functions.map((fn) => {
     const luaName = fn.rawName;
     const disposition = runtime.get(fn.id) ?? null;
     const registered = registeredSomewhere.has(luaName) ? "registered"
+      : registeredUnder.has(luaName) ? "documented-name-mismatch"
+      : compileTimeIntrinsics.has(luaName) ? "compile-time-intrinsic"
       : commentedOut.has(luaName) ? "commented-out-upstream"
       : parserBlocked.has(luaName) ? "registration-form-not-traced"
       : declaredUnregistered.has(luaName) ? "declared-but-unregistered"
@@ -188,8 +227,12 @@ async function main() {
     // Only our own evidence contradicting the documentation makes a route
     // suspect. Neither "we did not run it" nor "our parser could not follow
     // the registration form" is a statement about the route.
+    // A compile-time intrinsic is not suspect: it has no runtime registration
+    // because it is not a runtime call. Everything else here is our evidence
+    // disagreeing with Defold's documentation, which is worth an issue.
     const contradicted = registered === "declared-but-unregistered"
       || registered === "commented-out-upstream"
+      || registered === "documented-name-mismatch"
       || disposition === "mismatched";
     const status = contradicted ? "suspect" : disposition === "observed" ? "executed" : "supported";
     return {
@@ -209,6 +252,7 @@ async function main() {
             commentedOutFunction: commentedOut.get(luaName).cFunction }
         : {}),
       ...(parserBlocked.has(luaName) ? { parserBlocker: parserBlocked.get(luaName).code } : {}),
+      ...(registeredUnder.has(luaName) ? { registeredAs: registeredUnder.get(luaName) } : {}),
       source: fn.source
     };
   }).sort((left, right) => left.id < right.id ? -1 : 1);
