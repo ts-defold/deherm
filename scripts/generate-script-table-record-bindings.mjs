@@ -5,7 +5,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { declaredDerivation, expectReviewedCount, loadReviewedSources, expectSameRevision } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectReviewedCount, expectSameRevision, loadReviewedSources } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -234,17 +235,31 @@ export function generate(inputs) {
   for (const { id } of tableRoutes) { const schema = schemaById.get(id), pattern = patternById.get(id); assert(schema?.family === "lua-table" && pattern && JSON.stringify(schema.parameters) === JSON.stringify(pattern.parameterCodecs) && JSON.stringify(schema.returns) === JSON.stringify(pattern.returnCodecs), `${id}: table-record schema classification drifted`); }
   const safeIds = new Set(tableRoutes.map(({ id }) => id).filter((id) => routeIsMechanicallySafe(schemaById.get(id), fnById.get(id), types)));
   const seen = new Set();
-  const rows = reviewedRoutes.map((rule) => {
+  const rows = reviewedRoutes.flatMap((rule) => {
     assert(!seen.has(rule.id), `${rule.id}: duplicate reviewed table-record route`); seen.add(rule.id);
-    assert(tableRouteIds.has(rule.id), `${rule.id}: reviewed table-record route is not in the structural lua-table scope`);
-    assert(safeIds.has(rule.id), `${rule.id}: reviewed route is not a mechanically safe finite fixed record`);
+    // A reviewed route this revision no longer documents as a finite fixed
+    // record, or no longer classifies into the structural lua-table scope, is a
+    // review this revision does not bear out. Fatal where it was read;
+    // withdrawn and reported in a declared derivation of another revision.
+    for (const [ok, message, reason] of [
+      [tableRouteIds.has(rule.id), `${rule.id}: reviewed table-record route is not in the structural lua-table scope`, "out-of-scope"],
+      [safeIds.has(rule.id), `${rule.id}: reviewed route is not a mechanically safe finite fixed record`, "unsafe-record"]
+    ]) {
+      if (ok) continue;
+      assert(declaredDerivation(), message);
+      recordAudit({
+        input: "packages/bindings/overrides/script-table-record-bindings.json",
+        id: rule.id, status: VOID, reason, detail: message
+      });
+      return [];
+    }
     const context = contexts.get(rule.requiredContext); assert(context, `${rule.id}: unsupported or missing required context`);
     const fn = fnById.get(rule.id), schema = schemaById.get(rule.id), type = types.get(rule.recordType), source = sourceByKey.get(rule.source);
     assert(source && Array.isArray(rule.sourceAnchors) && rule.sourceAnchors.every((anchor) => source.text.includes(anchor)), `${rule.id}: reviewed source anchor drifted`);
     const alternatives = fn.returns.length === 1 ? fn.returns[0].split("|").map((value) => value.trim()) : [];
     assert(type?.kind === "class" && fn.returns.length === 1 && alternatives.includes(rule.recordType) && schema.returns.length === 1 && schema.returns[0].rawType === fn.returns[0], `${rule.id}: reviewed record type drifted`);
     const argumentCodecs = fn.parameters.map(({ rawType }) => scalarTypes.get(rawType)); assert(argumentCodecs.every(Boolean), `${rule.id}: reviewed scalar argument type drifted`);
-    return { id: rule.id, stableId: stableBindingId(rule.id), modulePath: fn.modulePath, member: fn.member, requiredContext: rule.requiredContext, context, source: `upstream/defold/${source.path}`, sourceSha256: source.sha256, sourceAnchors: rule.sourceAnchors, argumentCodecs, fields: type.fields.map((field) => ({ name: field.rawName, codec: fieldCodec(field, rule.id) })), reason: rule.reason };
+    return [{ id: rule.id, stableId: stableBindingId(rule.id), modulePath: fn.modulePath, member: fn.member, requiredContext: rule.requiredContext, context, source: `upstream/defold/${source.path}`, sourceSha256: source.sha256, sourceAnchors: rule.sourceAnchors, argumentCodecs, fields: type.fields.map((field) => ({ name: field.rawName, codec: fieldCodec(field, rule.id) })), reason: rule.reason }];
   }).sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
   expectReviewedCount({
     input: "packages/bindings/overrides/script-table-record-bindings.json",
@@ -255,7 +270,14 @@ export function generate(inputs) {
   const selectedIds = new Set(rows.map(({ id }) => id));
   const blockedRoutes = tableRoutes.filter(({ id }) => !selectedIds.has(id)).map(({ id }) => { const schema = schemaById.get(id); return { id, stableId: stableBindingId(id), bucket: schema.bucket, blocker: blockerFor(schema) }; }).sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
   const blockerCounts = Object.fromEntries(Object.keys(policy.expectedBlockerCounts).sort(compare).map((blocker) => [blocker, blockedRoutes.filter((row) => row.blocker === blocker).length]));
-  assert(JSON.stringify(blockerCounts) === JSON.stringify(policy.expectedBlockerCounts), `table-record blocker taxonomy drifted: ${JSON.stringify(blockerCounts)}`);
+  // Reported per blocker, so a derivation names WHICH bucket moved rather than
+  // printing two objects at a reader.
+  for (const [blocker, expected] of Object.entries(policy.expectedBlockerCounts)) {
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-table-record-bindings.json",
+      label: `table-record blocker census:${blocker}`, expected, observed: blockerCounts[blocker]
+    });
+  }
   assert(blockedRoutes.length + rows.length === tableRoutes.length, "table-record candidate/blocker partition drifted");
   const report = { schemaVersion: 1, defoldRevision: ir.defoldRevision, scope: "The reviewed, finite fixed-record subset of the structural lua-table routes not owned by native value dispatch", coverageClaim: "All listed candidates have generated fail-closed descriptors and a native-dynamic captured-Lua adapter using caller-owned bounded record storage. Static Hermes, packaged-engine, and browser execution are not claimed.", routeCount: tableRoutes.length, mechanicallySafeFixedRecordCount: safeIds.size, candidateCount: rows.length, executableCount: rows.length, blockedCount: blockedRoutes.length, targetSupport: { nativeDynamicHermes: "generated-executable-shared-script-adapter", nativeStaticHermes: "not-integrated", html5BrowserHost: "not-executable-no-provider" }, blockerTaxonomy: { "unbounded-typed-sequence": "IR supplies element codecs but no maximum length or dense-array policy.", "unbounded-typed-map": "IR supplies key/value codecs but no maximum-entry, own-key, or collision policy.", "dynamic-recursive-values": "Recursive or any-valued tables require bounded depth, entry, cycle, and value-union policies.", "tagged-table-union": "A table branch needs an explicit discriminator and ambiguity rejection.", "opaque-or-nested-record": "The record has an unresolved nested or opaque context.", "reviewed-semantic-record": "The table shape has ownership, binary, discriminator, or borrowed-handle semantics outside the structural IR.", "handle-or-callback-crossing": "The route crosses a handle or callback in addition to a record; no first-wave ownership/lifetime codec is installed.", "copied-defold-value-record": "The fixed record also crosses a copied Defold value; this needs a value codec wave.", "target-context-or-platform-state-record": "The scalar record is coupled to platform state, engine context, or target side effects and has no reviewed provider." }, blockerCounts, inputEvidence: { scriptIrSha256: sha256(inputs.irText), bindingPatternsSha256: sha256(inputs.patternsText), accountingSha256: sha256(inputs.accountingText), tableTupleSchemaSha256: sha256(inputs.schemasText), reviewedPolicySha256: sha256(inputs.policyText), defoldSources: policy.sources.filter(({ path }) => !withdrawnSources.has(path)).map(({ path, sha256: hash }) => ({ path: `upstream/defold/${path}`, sha256: hash })) }, bindings: rows, blockedRoutes };
   return { report, ...renderRuntime(rows) };

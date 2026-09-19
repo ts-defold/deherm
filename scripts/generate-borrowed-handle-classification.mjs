@@ -400,20 +400,21 @@ export function generateBorrowedHandleClassification(inputs) {
   disagree(mechanicallyInvalidatingNames, invalidatorIds,
     "reviewed invalidators differ from mechanically discovered delete/destroy routes",
     "unreviewed-handle-invalidator");
-  // A route whose only handle types belonged to a withdrawn kind has no reviewed
-  // representation at this revision either.
+  // A route that resolves to no reviewed handle kind at this revision - because
+  // the kind was withdrawn with its source, or because the route reaches the
+  // census on a declared result type this revision spells differently - has no
+  // reviewed representation to emit against.
+  const resolvedKinds = (codecs) => codecs.filter(hasHandle)
+    .flatMap((codec) => codec.rawType.split("|").map((type) => rawTypeToKind.get(type)).filter(Boolean));
   for (const id of borrowedById.keys()) {
     const binding = patternById.get(id);
-    const codecs = [...binding.parameterCodecs, ...binding.returnCodecs].filter(hasHandle);
-    if (!codecs.length) continue;
-    if (!codecs.some((codec) => codec.rawType.split("|").some((type) => rawTypeToKind.has(type)))) {
-      assert(declaredDerivation(), `${id}: borrowed-handle route has no reviewed handle representation`);
-      withdrawnRoutes.add(id);
-      recordAudit({
-        input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
-        id, status: VOID, reason: "withdrawn-handle-kind"
-      });
-    }
+    if (resolvedKinds(binding.parameterCodecs).length + resolvedKinds(binding.returnCodecs).length) continue;
+    assert(declaredDerivation(), `${id}: borrowed-handle route has no reviewed handle representation`);
+    withdrawnRoutes.add(id);
+    recordAudit({
+      input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+      id, status: VOID, reason: "withdrawn-handle-kind"
+    });
   }
 
   const stableIdOwners = new Map();
