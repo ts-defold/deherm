@@ -71,8 +71,23 @@ const ONE_BASED_INDEX_PARAMETER = /(^|_)index$/;
  */
 const RECORD_SYNTHESIS_DEPTH_LIMIT = 3;
 
-/** Most routes carrying one contract are redundant evidence; exercise a bounded sample. */
-export const MAX_EXERCISES_PER_CONTRACT = 16;
+/**
+ * How many routes a contract exercises.
+ *
+ * This was 16, with the rationale that "most routes carrying one contract are
+ * redundant evidence; exercise a bounded sample". That is true when the thing
+ * being established is the CONTRACT - a sample does prove the contract holds.
+ * It is false for per-route verification, which is what the generated surface
+ * now publishes: a route that was never exercised is not verified, and a
+ * sibling route with the same contract passing is not evidence about this one.
+ * The sample left 305 eligible routes unexercised and therefore unverifiable.
+ *
+ * So every eligible route is exercised. The remaining cap is the optional-arity
+ * budget, which is genuinely redundant evidence - a second arity of a route
+ * already exercised - and is bounded so a contract with many optional
+ * parameters cannot crowd out its siblings.
+ */
+export const MAX_OPTIONAL_EXERCISES_PER_CONTRACT = 16;
 
 /** Repetitions used by the bounded-scratch property. */
 export const SCRATCH_REUSE_REPETITIONS = 64;
@@ -874,11 +889,16 @@ export function buildHeadlessConformancePlan(documents, {
       blockers
     };
     if (chosen.eligible.length > 0) {
+      // A destructive contract still exercises exactly one route: the engine
+      // instance is disposable, but a destroyed engine object must not be seen
+      // by a sibling exercise. Every other contract exercises all of its
+      // eligible routes, because an unexercised route cannot be verified.
       const destructive = chosen.eligible.some((exercise) => exercise.destructive);
-      const exercises = chosen.eligible.slice(0, destructive ? 1 : MAX_EXERCISES_PER_CONTRACT);
-      // The optional-arity variants ride in the remaining budget so a wider
-      // arity is never bought by dropping a route from the sample.
-      const budget = Math.max(0, MAX_EXERCISES_PER_CONTRACT - exercises.length);
+      const exercises = destructive ? chosen.eligible.slice(0, 1) : chosen.eligible;
+      // The optional-arity variants are bounded: they are a second arity of a
+      // route already exercised, so they are redundant in a way the routes
+      // themselves are not.
+      const budget = destructive ? 0 : MAX_OPTIONAL_EXERCISES_PER_CONTRACT;
       const exercisedRoutes = new Set(exercises.map((exercise) => exercise.routeId));
       const extras = chosen.optional
         .filter((exercise) => exercisedRoutes.has(exercise.routeId))
@@ -927,7 +947,7 @@ export function buildHeadlessConformancePlan(documents, {
     suppliedContexts: [...SUPPLIED_CONTEXTS],
     unsuppliedContexts: UNSUPPLIED_CONTEXTS.map((entry) => ({ ...entry })),
     scratchReuseRepetitions: SCRATCH_REUSE_REPETITIONS,
-    maxExercisesPerContract: MAX_EXERCISES_PER_CONTRACT,
+    maxOptionalExercisesPerContract: MAX_OPTIONAL_EXERCISES_PER_CONTRACT,
     providerChainDepthLimit: PROVIDER_CHAIN_DEPTH_LIMIT,
     fixtureProfiles: FIXTURE_PROFILES.map((profile) => ({
       id: profile.id,

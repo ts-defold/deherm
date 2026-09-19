@@ -55,11 +55,20 @@ const outputPath = path.join(generated, "defold-route-verification.json");
 
 const read = async (name) => JSON.parse(await readFile(path.join(generated, name), "utf8"));
 
-/** Runtime dispositions the conformance report can record, best first. */
-const RANK = { observed: 3, mismatched: 2, blocked: 1 };
-
-function bestDisposition(left, right) {
-  return (RANK[right] ?? 0) > (RANK[left] ?? 0) ? right : left;
+/**
+ * A route's runtime verdict across every property observed for it.
+ *
+ * Taking the BEST disposition was wrong and hid a real finding: `go.set_parent`
+ * had result-arity and scratch-reuse observed and its error-model MISMATCHED,
+ * and reported as verified. A route is verified only when something was
+ * observed and nothing disagreed - one mismatched property is the whole
+ * route's answer, because it is a property of that route that does not hold.
+ */
+function routeVerdict(dispositions) {
+  if (dispositions.some((value) => String(value).includes("mismatch"))) return "mismatched";
+  if (dispositions.some((value) => value === "observed")) return "observed";
+  if (dispositions.some((value) => String(value).startsWith("blocked"))) return "blocked";
+  return dispositions[0] ?? null;
 }
 
 async function main() {
@@ -72,11 +81,21 @@ async function main() {
   ]);
 
   // Runtime evidence: what the engine actually did, per route.
-  const runtime = new Map();
+  const observedByRoute = new Map();
   for (const contract of report.contracts ?? []) {
     for (const property of contract.properties ?? []) {
       const id = String(property.route).split("#")[0];
-      runtime.set(id, bestDisposition(runtime.get(id) ?? "", property.disposition));
+      observedByRoute.set(id, [...(observedByRoute.get(id) ?? []), property.disposition]);
+    }
+  }
+  const runtime = new Map([...observedByRoute].map(([id, list]) => [id, routeVerdict(list)]));
+  // What a mismatched route actually disagreed about, so the issue says so.
+  const mismatchDetail = new Map();
+  for (const contract of report.contracts ?? []) {
+    for (const property of contract.properties ?? []) {
+      if (!String(property.disposition).includes("mismatch")) continue;
+      const id = String(property.route).split("#")[0];
+      mismatchDetail.set(id, `${property.property}: ${property.detail ?? "mismatched"}`);
     }
   }
 
@@ -87,6 +106,25 @@ async function main() {
       for (const id of blocker.routeIds ?? []) {
         if (!untestedReason.has(id)) untestedReason.set(id, blocker.reason);
       }
+    }
+  }
+
+  // Arity evidence. The registration parse compares each route's documented
+  // parameter list against what its C implementation actually reads, and
+  // records a verdict. 304 of 1660 route rows disagree, and nothing read it.
+  // This is a REPORT, not a verdict on the route: the parser infers a minimum
+  // from `luaL_check*` accessors and is conservative where the engine treats an
+  // absent argument as a default - `go.set_parent()` with no arguments is valid
+  // and unparents the caller, which the runtime confirmed. It is published so
+  // the disagreements can be worked through rather than rediscovered.
+  const arityDisagreement = new Map();
+  for (const target of Object.values(registration.targets ?? {})) {
+    for (const route of target.routes ?? []) {
+      if (route.arity?.verdict !== "disagree" || arityDisagreement.has(route.name)) continue;
+      arityDisagreement.set(route.name, {
+        documented: [route.arity.declaredMinimum, route.arity.declaredMaximum],
+        derived: [route.arity.derived?.min, route.arity.derived?.max]
+      });
     }
   }
 
@@ -115,6 +153,8 @@ async function main() {
       status,
       ...(disposition ? { disposition } : {}),
       ...(status === "untested" ? { reason: untestedReason.get(fn.id) ?? "not-in-conformance-plan" } : {}),
+      ...(mismatchDetail.has(fn.id) ? { mismatch: mismatchDetail.get(fn.id) } : {}),
+      ...(arityDisagreement.has(luaName) ? { arityDisagreement: arityDisagreement.get(luaName) } : {}),
       registration: registered,
       ...(registered === "declared-but-unregistered"
         ? { declaredAt: declaredUnregistered.get(luaName).source }
@@ -156,8 +196,10 @@ async function main() {
       }
       return Object.fromEntries(Object.entries(counts).sort(([, a], [, b]) => b - a));
     })(),
-    wantsIssue: wantsIssue.map(({ id, luaName, status, disposition, registration, declaredAt }) =>
-      ({ id, luaName, status, ...(disposition ? { disposition } : {}), registration, ...(declaredAt ? { declaredAt } : {}) })),
+    arityDisagreementCount: rows.filter(({ arityDisagreement: value }) => value).length,
+    wantsIssue: wantsIssue.map(({ id, luaName, status, disposition, mismatch, registration, declaredAt }) =>
+      ({ id, luaName, status, ...(disposition ? { disposition } : {}), ...(mismatch ? { mismatch } : {}),
+         registration, ...(declaredAt ? { declaredAt } : {}) })),
     routes: rows
   };
 
@@ -177,6 +219,7 @@ async function main() {
   if (Object.keys(artifact.untestedReasonCounts).length) {
     console.log(`  untested because: ${Object.entries(artifact.untestedReasonCounts).map(([k, v]) => `${v} ${k}`).join(", ")}`);
   }
+  console.log(`  ${artifact.arityDisagreementCount} route(s) where the documented arity and the parsed C implementation disagree (reported, not a verdict)`);
   if (wantsIssue.length) {
     console.log(`  ${wantsIssue.length} route(s) ship with evidence against them and want an issue:`);
     for (const row of wantsIssue.slice(0, 25)) {

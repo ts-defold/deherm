@@ -489,7 +489,13 @@ function providersModule(profile, providers) {
     "  return ADDRESSES.length === 0 ? \"\" : (ADDRESSES[ordinal % ADDRESSES.length] as string);",
     "}",
     "",
-    "function resolve(handleKind: string, ordinal: number): unknown {",
+    // Exported, because a nested handle - one inside a constructed record
+    // argument - is rendered as a `resolve(...)` call in the CONTRACT file,
+    // which has no other way to reach this profile's provider chain. Top-level
+    // handle arguments are passed as descriptors and never needed it, so this
+    // only surfaced once every eligible route was exercised rather than a
+    // sample of sixteen per contract.
+    "export function resolve(handleKind: string, ordinal: number): unknown {",
     "  const provider = providers[handleKind];",
     "  if (provider === undefined) return undefined;",
     "  try {",
@@ -535,7 +541,7 @@ function contractModule(contract) {
     `// Fixture profile: ${contract.profile}.`,
     `import { ${roots.join(", ")} } from "@deherm/sdk";`,
     'import { runExercise, type Report } from "../harness";',
-    `import { providers } from "../${providerModuleName(contract.profile)}";`,
+    "PROVIDER_IMPORT_PLACEHOLDER",
     "",
     "export function runContract(report: Report): boolean {",
     "  let ok = true;"
@@ -567,7 +573,19 @@ function contractModule(contract) {
   lines.push("  return ok;");
   lines.push("}");
   lines.push("");
-  return lines.join("\n");
+  // A handle nested inside a constructed record argument renders as a
+  // `resolve(...)` call, which lives in the profile's providers module; a
+  // top-level handle argument renders as a descriptor and never needs it. Rather
+  // than re-deriving which argument shapes nest a handle - and missing one -
+  // the import is decided from the text that was actually emitted. An unused
+  // import would not survive `noUnusedLocals`, and a missing one is the build
+  // failure that surfaced when every eligible route started being exercised
+  // instead of sixteen per contract.
+  const body = lines.join("\n");
+  const providerImports = /\bresolve\(/.test(body) ? "providers, resolve" : "providers";
+  return body.replace(
+    "PROVIDER_IMPORT_PLACEHOLDER",
+    `import { ${providerImports} } from "../${providerModuleName(contract.profile)}";`);
 }
 
 function registryModule(fixtures) {

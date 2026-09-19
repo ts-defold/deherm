@@ -15,15 +15,15 @@
   },
   "routeCount": 926,
   "statusCounts": {
-    "untested": 761,
-    "verified": 165
+    "untested": 450,
+    "unverified": 9,
+    "verified": 467
   },
   "registrationCounts": {
     "declared-but-unregistered": 25,
     "registered": 901
   },
   "untestedReasonCounts": {
-    "not-in-conformance-plan": 311,
     "context-fixture-missing": 195,
     "route-unavailable-in-runtime-profile": 110,
     "unsynthesizable-parameter-type": 53,
@@ -38,6 +38,7 @@
     "execution-policy-context-blocked": 2,
     "lua-stack-blocked-capability": 2
   },
+  "arityDisagreementCount": 162,
   "wantsIssue": [
     {
       "id": "script:b2d.body.get_user_data",
@@ -52,6 +53,56 @@
       "status": "untested",
       "registration": "declared-but-unregistered",
       "declaredAt": "doc/b2d.lua:840"
+    },
+    {
+      "id": "script:b2d.world.cast_ray_closest",
+      "luaName": "b2d.world.cast_ray_closest",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
+    },
+    {
+      "id": "script:buffer.copy_buffer",
+      "luaName": "buffer.copy_buffer",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
+    },
+    {
+      "id": "script:buffer.copy_stream",
+      "luaName": "buffer.copy_stream",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
+    },
+    {
+      "id": "script:buffer.get_bytes",
+      "luaName": "buffer.get_bytes",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
+    },
+    {
+      "id": "script:buffer.get_stream",
+      "luaName": "buffer.get_stream",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
+    },
+    {
+      "id": "script:go.set",
+      "luaName": "go.set",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
+    },
+    {
+      "id": "script:go.set_parent",
+      "luaName": "go.set_parent",
+      "status": "unverified",
+      "disposition": "mismatched",
+      "mismatch": "error-model: under-supplied call did not raise",
+      "registration": "registered"
     },
     {
       "id": "script:resource.atlas",
@@ -87,6 +138,20 @@
       "status": "untested",
       "registration": "declared-but-unregistered",
       "declaredAt": "doc/resource.lua:714"
+    },
+    {
+      "id": "script:resource.set",
+      "luaName": "resource.set",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
+    },
+    {
+      "id": "script:resource.set_buffer",
+      "luaName": "resource.set_buffer",
+      "status": "unverified",
+      "disposition": "blocked",
+      "registration": "registered"
     },
     {
       "id": "script:resource.texture",
@@ -210,7 +275,8 @@
     {
       "id": "script:sys.set_render_enable",
       "luaName": "sys.set_render_enable",
-      "status": "untested",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "declared-but-unregistered",
       "declaredAt": "doc/sys.lua:722"
     }
@@ -325,6 +391,16 @@
       "luaName": "b2d.body.enable_contact_events",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -333,6 +409,16 @@
       "luaName": "b2d.body.enable_hit_events",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -341,6 +427,16 @@
       "luaName": "b2d.body.enable_sleep",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -437,6 +533,16 @@
       "luaName": "b2d.body.get_linear_velocity_from_local_point",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -445,6 +551,16 @@
       "luaName": "b2d.body.get_linear_velocity_from_world_point",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -467,24 +583,44 @@
     {
       "id": "script:b2d.body.get_local_point",
       "luaName": "b2d.body.get_local_point",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.get_local_vector",
       "luaName": "b2d.body.get_local_vector",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.get_mass",
       "luaName": "b2d.body.get_mass",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -515,8 +651,8 @@
     {
       "id": "script:b2d.body.get_position",
       "luaName": "b2d.body.get_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -555,8 +691,8 @@
     {
       "id": "script:b2d.body.get_type",
       "luaName": "b2d.body.get_type",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -580,8 +716,8 @@
     {
       "id": "script:b2d.body.get_world_center",
       "luaName": "b2d.body.get_world_center",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -596,56 +732,76 @@
     {
       "id": "script:b2d.body.get_world_point",
       "luaName": "b2d.body.get_world_point",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.get_world_vector",
       "luaName": "b2d.body.get_world_vector",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.is_active",
       "luaName": "b2d.body.is_active",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.is_awake",
       "luaName": "b2d.body.is_awake",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.is_bullet",
       "luaName": "b2d.body.is_bullet",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.is_fixed_rotation",
       "luaName": "b2d.body.is_fixed_rotation",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.is_sleeping_allowed",
       "luaName": "b2d.body.is_sleeping_allowed",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -676,72 +832,112 @@
     {
       "id": "script:b2d.body.set_active",
       "luaName": "b2d.body.set_active",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_angular_damping",
       "luaName": "b2d.body.set_angular_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_angular_velocity",
       "luaName": "b2d.body.set_angular_velocity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_awake",
       "luaName": "b2d.body.set_awake",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_bullet",
       "luaName": "b2d.body.set_bullet",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_fixed_rotation",
       "luaName": "b2d.body.set_fixed_rotation",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_gravity_scale",
       "luaName": "b2d.body.set_gravity_scale",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_linear_damping",
       "luaName": "b2d.body.set_linear_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.body.set_linear_velocity",
       "luaName": "b2d.body.set_linear_velocity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -772,8 +968,18 @@
     {
       "id": "script:b2d.body.set_sleeping_allowed",
       "luaName": "b2d.body.set_sleeping_allowed",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -788,8 +994,8 @@
     {
       "id": "script:b2d.body.set_transform",
       "luaName": "b2d.body.set_transform",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -925,8 +1131,8 @@
     {
       "id": "script:b2d.fixture.get_density",
       "luaName": "b2d.fixture.get_density",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -941,16 +1147,16 @@
     {
       "id": "script:b2d.fixture.get_friction",
       "luaName": "b2d.fixture.get_friction",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.fixture.get_restitution",
       "luaName": "b2d.fixture.get_restitution",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -965,32 +1171,52 @@
     {
       "id": "script:b2d.fixture.get_type",
       "luaName": "b2d.fixture.get_type",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.fixture.is_sensor",
       "luaName": "b2d.fixture.is_sensor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.fixture.refilter",
       "luaName": "b2d.fixture.refilter",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.fixture.set_density",
       "luaName": "b2d.fixture.set_density",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          4,
+          4
+        ],
+        "derived": [
+          3,
+          4
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1005,24 +1231,34 @@
     {
       "id": "script:b2d.fixture.set_friction",
       "luaName": "b2d.fixture.set_friction",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.fixture.set_restitution",
       "luaName": "b2d.fixture.set_restitution",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.fixture.set_sensor",
       "luaName": "b2d.fixture.set_sensor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1031,14 +1267,24 @@
       "luaName": "b2d.fixture.set_shape",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:b2d.shape.definition",
+      "arityDisagreement": {
+        "documented": [
+          4,
+          4
+        ],
+        "derived": [
+          3,
+          4
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.fixture.test_point",
       "luaName": "b2d.fixture.test_point",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1079,6 +1325,16 @@
       "luaName": "b2d.joint.create_filter",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1175,6 +1431,16 @@
       "luaName": "b2d.joint.enable_limit",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1183,6 +1449,16 @@
       "luaName": "b2d.joint.enable_motor",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1191,6 +1467,16 @@
       "luaName": "b2d.joint.enable_spring",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1381,8 +1667,8 @@
     {
       "id": "script:b2d.joint.get_limit_state",
       "luaName": "b2d.joint.get_limit_state",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1413,72 +1699,72 @@
     {
       "id": "script:b2d.joint.get_local_anchor_a",
       "luaName": "b2d.joint.get_local_anchor_a",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_local_anchor_b",
       "luaName": "b2d.joint.get_local_anchor_b",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_local_axis_a",
       "luaName": "b2d.joint.get_local_axis_a",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_lower_limit",
       "luaName": "b2d.joint.get_lower_limit",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_max_force",
       "luaName": "b2d.joint.get_max_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_max_length",
       "luaName": "b2d.joint.get_max_length",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_max_motor_force",
       "luaName": "b2d.joint.get_max_motor_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_max_motor_torque",
       "luaName": "b2d.joint.get_max_motor_torque",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_max_torque",
       "luaName": "b2d.joint.get_max_torque",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1495,14 +1781,24 @@
       "luaName": "b2d.joint.get_motor_force",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_motor_speed",
       "luaName": "b2d.joint.get_motor_speed",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1511,22 +1807,32 @@
       "luaName": "b2d.joint.get_motor_torque",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_mouse_target",
       "luaName": "b2d.joint.get_mouse_target",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_ratio",
       "luaName": "b2d.joint.get_ratio",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1535,6 +1841,16 @@
       "luaName": "b2d.joint.get_reaction_force",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1543,22 +1859,32 @@
       "luaName": "b2d.joint.get_reaction_torque",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_reference_angle",
       "luaName": "b2d.joint.get_reference_angle",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_spring_damping_ratio",
       "luaName": "b2d.joint.get_spring_damping_ratio",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1573,16 +1899,16 @@
     {
       "id": "script:b2d.joint.get_type",
       "luaName": "b2d.joint.get_type",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.get_upper_limit",
       "luaName": "b2d.joint.get_upper_limit",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1597,24 +1923,24 @@
     {
       "id": "script:b2d.joint.is_active",
       "luaName": "b2d.joint.is_active",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.is_limit_enabled",
       "luaName": "b2d.joint.is_limit_enabled",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.is_motor_enabled",
       "luaName": "b2d.joint.is_motor_enabled",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1663,6 +1989,16 @@
       "luaName": "b2d.joint.set_collide_connected",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1677,32 +2013,32 @@
     {
       "id": "script:b2d.joint.set_damping_ratio",
       "luaName": "b2d.joint.set_damping_ratio",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_frequency",
       "luaName": "b2d.joint.set_frequency",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_hertz",
       "luaName": "b2d.joint.set_hertz",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_length",
       "luaName": "b2d.joint.set_length",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1717,8 +2053,8 @@
     {
       "id": "script:b2d.joint.set_limits",
       "luaName": "b2d.joint.set_limits",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1749,40 +2085,40 @@
     {
       "id": "script:b2d.joint.set_max_force",
       "luaName": "b2d.joint.set_max_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_max_length",
       "luaName": "b2d.joint.set_max_length",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_max_motor_force",
       "luaName": "b2d.joint.set_max_motor_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_max_motor_torque",
       "luaName": "b2d.joint.set_max_motor_torque",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_max_torque",
       "luaName": "b2d.joint.set_max_torque",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1797,24 +2133,24 @@
     {
       "id": "script:b2d.joint.set_motor_speed",
       "luaName": "b2d.joint.set_motor_speed",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_mouse_target",
       "luaName": "b2d.joint.set_mouse_target",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
     {
       "id": "script:b2d.joint.set_ratio",
       "luaName": "b2d.joint.set_ratio",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1829,8 +2165,8 @@
     {
       "id": "script:b2d.joint.set_spring_damping_ratio",
       "luaName": "b2d.joint.set_spring_damping_ratio",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -1999,6 +2335,16 @@
       "luaName": "b2d.shape.is_valid",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -2007,6 +2353,16 @@
       "luaName": "b2d.shape.ray_cast",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          4
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -2045,8 +2401,8 @@
     {
       "id": "script:b2d.world.cast_ray_closest",
       "luaName": "b2d.world.cast_ray_closest",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -2071,6 +2427,16 @@
       "luaName": "b2d.world.enable_continuous",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -2079,6 +2445,16 @@
       "luaName": "b2d.world.enable_sleeping",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -2087,6 +2463,16 @@
       "luaName": "b2d.world.enable_speculative",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -2095,6 +2481,16 @@
       "luaName": "b2d.world.enable_warm_starting",
       "status": "untested",
       "reason": "route-unavailable-in-runtime-profile:default-legacy-bullet",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/b2d.lua"
     },
@@ -2373,16 +2769,16 @@
     {
       "id": "script:buffer.copy_buffer",
       "luaName": "buffer.copy_buffer",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
       "registration": "registered",
       "source": "doc/buffer.lua"
     },
     {
       "id": "script:buffer.copy_stream",
       "luaName": "buffer.copy_stream",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
       "registration": "registered",
       "source": "doc/buffer.lua"
     },
@@ -2391,14 +2787,34 @@
       "luaName": "buffer.create",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:({ name:hash|string, type:buffer.VALUE_TYPE, count:number })[]",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/buffer.lua"
     },
     {
       "id": "script:buffer.get_bytes",
       "luaName": "buffer.get_bytes",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/buffer.lua"
     },
@@ -2413,8 +2829,8 @@
     {
       "id": "script:buffer.get_stream",
       "luaName": "buffer.get_stream",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
       "registration": "registered",
       "source": "doc/buffer.lua"
     },
@@ -2589,72 +3005,82 @@
     {
       "id": "script:bullet3d.collision_object.has_contact_response",
       "luaName": "bullet3d.collision_object.has_contact_response",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_active",
       "luaName": "bullet3d.collision_object.is_active",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_awake",
       "luaName": "bullet3d.collision_object.is_awake",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_ghost_object",
       "luaName": "bullet3d.collision_object.is_ghost_object",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_kinematic",
       "luaName": "bullet3d.collision_object.is_kinematic",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_rigid_body",
       "luaName": "bullet3d.collision_object.is_rigid_body",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_static",
       "luaName": "bullet3d.collision_object.is_static",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_static_or_kinematic",
       "luaName": "bullet3d.collision_object.is_static_or_kinematic",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.is_valid",
       "luaName": "bullet3d.collision_object.is_valid",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2669,80 +3095,90 @@
     {
       "id": "script:bullet3d.collision_object.set_awake",
       "luaName": "bullet3d.collision_object.set_awake",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_ccd_motion_threshold",
       "luaName": "bullet3d.collision_object.set_ccd_motion_threshold",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_ccd_swept_sphere_radius",
       "luaName": "bullet3d.collision_object.set_ccd_swept_sphere_radius",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_contact_processing_threshold",
       "luaName": "bullet3d.collision_object.set_contact_processing_threshold",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_deactivation_time",
       "luaName": "bullet3d.collision_object.set_deactivation_time",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_friction",
       "luaName": "bullet3d.collision_object.set_friction",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_position",
       "luaName": "bullet3d.collision_object.set_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_restitution",
       "luaName": "bullet3d.collision_object.set_restitution",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_rotation",
       "luaName": "bullet3d.collision_object.set_rotation",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.collision_object.set_world_transform",
       "luaName": "bullet3d.collision_object.set_world_transform",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2751,6 +3187,16 @@
       "luaName": "bullet3d.constraint.create_cone_twist",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2759,6 +3205,16 @@
       "luaName": "bullet3d.constraint.create_generic_6dof",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2767,6 +3223,16 @@
       "luaName": "bullet3d.constraint.create_generic_6dof_spring",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2775,6 +3241,16 @@
       "luaName": "bullet3d.constraint.create_hinge",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2783,6 +3259,16 @@
       "luaName": "bullet3d.constraint.create_hinge2",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2791,6 +3277,16 @@
       "luaName": "bullet3d.constraint.create_point_to_point",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2799,6 +3295,16 @@
       "luaName": "bullet3d.constraint.create_slider",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2807,6 +3313,16 @@
       "luaName": "bullet3d.constraint.create_universal",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2823,6 +3339,16 @@
       "luaName": "bullet3d.constraint.enable_cone_twist_motor",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2831,6 +3357,16 @@
       "luaName": "bullet3d.constraint.enable_spring",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2927,6 +3463,16 @@
       "luaName": "bullet3d.constraint.get_frame_a",
       "status": "untested",
       "reason": "multi-result-shape-unmodelled",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -2935,6 +3481,16 @@
       "luaName": "bullet3d.constraint.get_frame_b",
       "status": "untested",
       "reason": "multi-result-shape-unmodelled",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3077,144 +3633,184 @@
     {
       "id": "script:bullet3d.constraint.is_valid",
       "luaName": "bullet3d.constraint.is_valid",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_6dof_motor",
       "luaName": "bullet3d.constraint.set_6dof_motor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_angular_only",
       "luaName": "bullet3d.constraint.set_angular_only",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_cone_twist_limits",
       "luaName": "bullet3d.constraint.set_cone_twist_limits",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_cone_twist_motor_target",
       "luaName": "bullet3d.constraint.set_cone_twist_motor_target",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_frame_a",
       "luaName": "bullet3d.constraint.set_frame_a",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_frame_b",
       "luaName": "bullet3d.constraint.set_frame_b",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_hinge_axis",
       "luaName": "bullet3d.constraint.set_hinge_axis",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_hinge_limits",
       "luaName": "bullet3d.constraint.set_hinge_limits",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_hinge_motor",
       "luaName": "bullet3d.constraint.set_hinge_motor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_hinge_motor_target",
       "luaName": "bullet3d.constraint.set_hinge_motor_target",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_limit",
       "luaName": "bullet3d.constraint.set_limit",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_pivots",
       "luaName": "bullet3d.constraint.set_pivots",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_slider_limits",
       "luaName": "bullet3d.constraint.set_slider_limits",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_slider_motor",
       "luaName": "bullet3d.constraint.set_slider_motor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_spring_damping",
       "luaName": "bullet3d.constraint.set_spring_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_spring_equilibrium_point",
       "luaName": "bullet3d.constraint.set_spring_equilibrium_point",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.constraint.set_spring_stiffness",
       "luaName": "bullet3d.constraint.set_spring_stiffness",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3223,6 +3819,16 @@
       "luaName": "bullet3d.get_collision_object",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3231,6 +3837,16 @@
       "luaName": "bullet3d.get_rigid_body",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3253,64 +3869,64 @@
     {
       "id": "script:bullet3d.rigid_body.apply_central_force",
       "luaName": "bullet3d.rigid_body.apply_central_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.apply_central_impulse",
       "luaName": "bullet3d.rigid_body.apply_central_impulse",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.apply_force",
       "luaName": "bullet3d.rigid_body.apply_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.apply_force_at_relative_position",
       "luaName": "bullet3d.rigid_body.apply_force_at_relative_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.apply_impulse",
       "luaName": "bullet3d.rigid_body.apply_impulse",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.apply_linear_impulse",
       "luaName": "bullet3d.rigid_body.apply_linear_impulse",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.apply_torque",
       "luaName": "bullet3d.rigid_body.apply_torque",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.apply_torque_impulse",
       "luaName": "bullet3d.rigid_body.apply_torque_impulse",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3333,40 +3949,40 @@
     {
       "id": "script:bullet3d.rigid_body.get_angular_damping",
       "luaName": "bullet3d.rigid_body.get_angular_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_angular_factor",
       "luaName": "bullet3d.rigid_body.get_angular_factor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_angular_sleeping_threshold",
       "luaName": "bullet3d.rigid_body.get_angular_sleeping_threshold",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_angular_velocity",
       "luaName": "bullet3d.rigid_body.get_angular_velocity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_center_of_mass_position",
       "luaName": "bullet3d.rigid_body.get_center_of_mass_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3381,112 +3997,112 @@
     {
       "id": "script:bullet3d.rigid_body.get_flags",
       "luaName": "bullet3d.rigid_body.get_flags",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_gravity",
       "luaName": "bullet3d.rigid_body.get_gravity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_inverse_mass",
       "luaName": "bullet3d.rigid_body.get_inverse_mass",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_linear_damping",
       "luaName": "bullet3d.rigid_body.get_linear_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_linear_factor",
       "luaName": "bullet3d.rigid_body.get_linear_factor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_linear_sleeping_threshold",
       "luaName": "bullet3d.rigid_body.get_linear_sleeping_threshold",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_linear_velocity",
       "luaName": "bullet3d.rigid_body.get_linear_velocity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_linear_velocity_from_local_point",
       "luaName": "bullet3d.rigid_body.get_linear_velocity_from_local_point",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_linear_velocity_from_world_point",
       "luaName": "bullet3d.rigid_body.get_linear_velocity_from_world_point",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_local_inertia",
       "luaName": "bullet3d.rigid_body.get_local_inertia",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_mass",
       "luaName": "bullet3d.rigid_body.get_mass",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_total_force",
       "luaName": "bullet3d.rigid_body.get_total_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_total_torque",
       "luaName": "bullet3d.rigid_body.get_total_torque",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.get_velocity_in_local_point",
       "luaName": "bullet3d.rigid_body.get_velocity_in_local_point",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3501,112 +4117,122 @@
     {
       "id": "script:bullet3d.rigid_body.has_flag",
       "luaName": "bullet3d.rigid_body.has_flag",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.is_valid",
       "luaName": "bullet3d.rigid_body.is_valid",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_angular_damping",
       "luaName": "bullet3d.rigid_body.set_angular_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_angular_factor",
       "luaName": "bullet3d.rigid_body.set_angular_factor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_angular_velocity",
       "luaName": "bullet3d.rigid_body.set_angular_velocity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_damping",
       "luaName": "bullet3d.rigid_body.set_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_flags",
       "luaName": "bullet3d.rigid_body.set_flags",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_gravity",
       "luaName": "bullet3d.rigid_body.set_gravity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_linear_damping",
       "luaName": "bullet3d.rigid_body.set_linear_damping",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_linear_factor",
       "luaName": "bullet3d.rigid_body.set_linear_factor",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_linear_velocity",
       "luaName": "bullet3d.rigid_body.set_linear_velocity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_mass",
       "luaName": "bullet3d.rigid_body.set_mass",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_mass_properties",
       "luaName": "bullet3d.rigid_body.set_mass_properties",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
     {
       "id": "script:bullet3d.rigid_body.set_sleeping_thresholds",
       "luaName": "bullet3d.rigid_body.set_sleeping_thresholds",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3655,6 +4281,16 @@
       "luaName": "bullet3d.shape.is_valid",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3679,6 +4315,16 @@
       "luaName": "bullet3d.world.cast_ray",
       "status": "untested",
       "reason": "handle-kind-outside-fixture-profile:btDiscreteDynamicsWorld",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          5
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3695,6 +4341,16 @@
       "luaName": "bullet3d.world.cast_ray_closest",
       "status": "untested",
       "reason": "handle-kind-outside-fixture-profile:btDiscreteDynamicsWorld",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          4
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3703,6 +4359,16 @@
       "luaName": "bullet3d.world.cast_shape",
       "status": "untested",
       "reason": "handle-kind-outside-fixture-profile:btDiscreteDynamicsWorld",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          5
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3719,6 +4385,16 @@
       "luaName": "bullet3d.world.cast_shape_closest",
       "status": "untested",
       "reason": "handle-kind-outside-fixture-profile:btDiscreteDynamicsWorld",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          4
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3767,6 +4443,16 @@
       "luaName": "bullet3d.world.is_valid",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/bullet3d.lua"
     },
@@ -3807,6 +4493,16 @@
       "luaName": "camera.get_aspect_ratio",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3815,6 +4511,16 @@
       "luaName": "camera.get_auto_aspect_ratio",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3831,6 +4537,16 @@
       "luaName": "camera.get_enabled",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3839,6 +4555,16 @@
       "luaName": "camera.get_far_z",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3847,6 +4573,16 @@
       "luaName": "camera.get_fov",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3855,30 +4591,70 @@
       "luaName": "camera.get_near_z",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.get_orthographic_auto_zoom",
       "luaName": "camera.get_orthographic_auto_zoom",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.get_orthographic_mode",
       "luaName": "camera.get_orthographic_mode",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.get_orthographic_zoom",
       "luaName": "camera.get_orthographic_zoom",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3887,6 +4663,16 @@
       "luaName": "camera.get_projection",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3895,62 +4681,72 @@
       "luaName": "camera.get_view",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.screen_to_world",
       "luaName": "camera.screen_to_world",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.screen_xy_to_world",
       "luaName": "camera.screen_xy_to_world",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.set_aspect_ratio",
       "luaName": "camera.set_aspect_ratio",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.set_auto_aspect_ratio",
       "luaName": "camera.set_auto_aspect_ratio",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.set_far_z",
       "luaName": "camera.set_far_z",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.set_fov",
       "luaName": "camera.set_fov",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.set_near_z",
       "luaName": "camera.set_near_z",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
@@ -3959,38 +4755,68 @@
       "luaName": "camera.set_orthographic_mode",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:camera.ORTHO_MODE",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.set_orthographic_zoom",
       "luaName": "camera.set_orthographic_zoom",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:camera.world_to_screen",
       "luaName": "camera.world_to_screen",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/camera.lua"
     },
     {
       "id": "script:collectionfactory.create",
       "luaName": "collectionfactory.create",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/collectionfactory.lua"
     },
     {
       "id": "script:collectionfactory.get_status",
       "luaName": "collectionfactory.get_status",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/collectionfactory.lua"
     },
@@ -4005,24 +4831,54 @@
     {
       "id": "script:collectionfactory.set_prototype",
       "luaName": "collectionfactory.set_prototype",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/collectionfactory.lua"
     },
     {
       "id": "script:collectionfactory.unload",
       "luaName": "collectionfactory.unload",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/collectionfactory.lua"
     },
     {
       "id": "script:collectionproxy.get_resources",
       "luaName": "collectionproxy.get_resources",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/collectionproxy.lua"
     },
@@ -4031,6 +4887,16 @@
       "luaName": "collectionproxy.load",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:fun(self:script_instance, message_id:hash, message:collectionproxy.load_data, sender:url)",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/collectionproxy.lua"
     },
@@ -4039,6 +4905,16 @@
       "luaName": "collectionproxy.set_collection",
       "status": "untested",
       "reason": "multi-result-shape-unmodelled",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/collectionproxy.lua"
     },
@@ -4093,32 +4969,32 @@
     {
       "id": "script:crash.get_backtrace",
       "luaName": "crash.get_backtrace",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/crash.lua"
     },
     {
       "id": "script:crash.get_extra_data",
       "luaName": "crash.get_extra_data",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/crash.lua"
     },
     {
       "id": "script:crash.get_modules",
       "luaName": "crash.get_modules",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/crash.lua"
     },
     {
       "id": "script:crash.get_signum",
       "luaName": "crash.get_signum",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/crash.lua"
     },
@@ -4141,8 +5017,8 @@
     {
       "id": "script:crash.load_previous",
       "luaName": "crash.load_previous",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/crash.lua"
     },
@@ -4157,8 +5033,8 @@
     {
       "id": "script:crash.set_file_path",
       "luaName": "crash.set_file_path",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/crash.lua"
     },
@@ -4189,8 +5065,18 @@
     {
       "id": "script:factory.get_status",
       "luaName": "factory.get_status",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/factory.lua"
     },
@@ -4205,16 +5091,36 @@
     {
       "id": "script:factory.set_prototype",
       "luaName": "factory.set_prototype",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/factory.lua"
     },
     {
       "id": "script:factory.unload",
       "luaName": "factory.unload",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/factory.lua"
     },
@@ -4269,8 +5175,8 @@
     {
       "id": "script:go.cancel_animations",
       "luaName": "go.cancel_animations",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
@@ -4285,16 +5191,26 @@
     {
       "id": "script:go.exists",
       "luaName": "go.exists",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get",
       "luaName": "go.get",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/go.lua"
     },
@@ -4303,78 +5219,88 @@
       "luaName": "go.get_id",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_parent",
       "luaName": "go.get_parent",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_position",
       "luaName": "go.get_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_rotation",
       "luaName": "go.get_rotation",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_scale",
       "luaName": "go.get_scale",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_scale_uniform",
       "luaName": "go.get_scale_uniform",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_world_position",
       "luaName": "go.get_world_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_world_rotation",
       "luaName": "go.get_world_rotation",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_world_scale",
       "luaName": "go.get_world_scale",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.get_world_scale_uniform",
       "luaName": "go.get_world_scale_uniform",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
@@ -4391,70 +5317,111 @@
       "luaName": "go.property",
       "status": "untested",
       "reason": "no-generated-universal-adapter",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.set",
       "luaName": "go.set",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          4
+        ],
+        "derived": [
+          4,
+          4
+        ]
+      },
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.set_parent",
       "luaName": "go.set_parent",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "mismatched",
+      "mismatch": "error-model: under-supplied call did not raise",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          3
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.set_position",
       "luaName": "go.set_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.set_rotation",
       "luaName": "go.set_rotation",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.set_scale",
       "luaName": "go.set_scale",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.set_scale_xy",
       "luaName": "go.set_scale_xy",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.update_world_transform",
       "luaName": "go.update_world_transform",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/go.lua"
     },
     {
       "id": "script:go.world_to_local_position",
       "luaName": "go.world_to_local_position",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/go.lua"
     },
@@ -4463,6 +5430,16 @@
       "luaName": "go.world_to_local_transform",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/go.lua"
     },
@@ -4487,6 +5464,16 @@
       "luaName": "gui.animate",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          5,
+          8
+        ],
+        "derived": [
+          8,
+          8
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -4543,6 +5530,16 @@
       "luaName": "gui.get",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -4967,6 +5964,16 @@
       "luaName": "gui.move_above",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -4975,6 +5982,16 @@
       "luaName": "gui.move_below",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5039,6 +6056,16 @@
       "luaName": "gui.play_particlefx",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5079,6 +6106,16 @@
       "luaName": "gui.set",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          4
+        ],
+        "derived": [
+          4,
+          4
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5111,6 +6148,16 @@
       "luaName": "gui.set_clipping_inverted",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5127,6 +6174,16 @@
       "luaName": "gui.set_clipping_visible",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5143,6 +6200,16 @@
       "luaName": "gui.set_enabled",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5151,6 +6218,16 @@
       "luaName": "gui.set_euler",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5199,6 +6276,16 @@
       "luaName": "gui.set_inherit_alpha",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5239,6 +6326,16 @@
       "luaName": "gui.set_line_break",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5375,6 +6472,16 @@
       "luaName": "gui.set_slice9",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5415,6 +6522,16 @@
       "luaName": "gui.set_visible",
       "status": "untested",
       "reason": "context-fixture-missing:gui-scene",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/gui.lua"
     },
@@ -5453,8 +6570,8 @@
     {
       "id": "script:hash",
       "luaName": "hash",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/builtins.lua"
     },
@@ -5479,6 +6596,16 @@
       "luaName": "html5.set_interaction_listener",
       "status": "untested",
       "reason": "execution-policy-context-blocked",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/html5.lua"
     },
@@ -5501,24 +6628,24 @@
     {
       "id": "script:image.load",
       "luaName": "image.load",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/image.lua"
     },
     {
       "id": "script:image.load_buffer",
       "luaName": "image.load_buffer",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/image.lua"
     },
     {
       "id": "script:json.decode",
       "luaName": "json.decode",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/json.lua"
     },
@@ -5533,24 +6660,24 @@
     {
       "id": "script:label.get_layout_objects",
       "luaName": "label.get_layout_objects",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/label.lua"
     },
     {
       "id": "script:label.get_text",
       "luaName": "label.get_text",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/label.lua"
     },
     {
       "id": "script:label.set_text",
       "luaName": "label.set_text",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/label.lua"
     },
@@ -5565,16 +6692,16 @@
     {
       "id": "script:liveupdate.get_mounts",
       "luaName": "liveupdate.get_mounts",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/liveupdate.lua"
     },
     {
       "id": "script:liveupdate.is_built_with_excluded_files",
       "luaName": "liveupdate.is_built_with_excluded_files",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/liveupdate.lua"
     },
@@ -5653,48 +6780,58 @@
     {
       "id": "script:model.cancel",
       "luaName": "model.cancel",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/model.lua"
     },
     {
       "id": "script:model.get_aabb",
       "luaName": "model.get_aabb",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/model.lua"
     },
     {
       "id": "script:model.get_blend_weights",
       "luaName": "model.get_blend_weights",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/model.lua"
     },
     {
       "id": "script:model.get_go",
       "luaName": "model.get_go",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/model.lua"
     },
     {
       "id": "script:model.get_mesh_aabb",
       "luaName": "model.get_mesh_aabb",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/model.lua"
     },
     {
       "id": "script:model.get_mesh_enabled",
       "luaName": "model.get_mesh_enabled",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          0,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/model.lua"
     },
@@ -5719,14 +6856,34 @@
       "luaName": "model.set_blend_weights",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:number[]|nil",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/model.lua"
     },
     {
       "id": "script:model.set_mesh_enabled",
       "luaName": "model.set_mesh_enabled",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          0,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/model.lua"
     },
@@ -5741,8 +6898,18 @@
     {
       "id": "script:msg.url",
       "luaName": "msg.url",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          0
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/msg.lua"
     },
@@ -5765,16 +6932,16 @@
     {
       "id": "script:particlefx.set_constant",
       "luaName": "particlefx.set_constant",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/particlefx.lua"
     },
     {
       "id": "script:particlefx.stop",
       "luaName": "particlefx.stop",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/particlefx.lua"
     },
@@ -5805,48 +6972,48 @@
     {
       "id": "script:physics.get_group",
       "luaName": "physics.get_group",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.get_joint_properties",
       "luaName": "physics.get_joint_properties",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.get_joint_reaction_force",
       "luaName": "physics.get_joint_reaction_force",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.get_joint_reaction_torque",
       "luaName": "physics.get_joint_reaction_torque",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.get_maskbit",
       "luaName": "physics.get_maskbit",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.get_shape",
       "luaName": "physics.get_shape",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
@@ -5871,6 +7038,16 @@
       "luaName": "physics.set_event_listener",
       "status": "verified",
       "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/physics.lua"
     },
@@ -5885,32 +7062,62 @@
     {
       "id": "script:physics.set_group",
       "luaName": "physics.set_group",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.set_hflip",
       "luaName": "physics.set_hflip",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.set_joint_properties",
       "luaName": "physics.set_joint_properties",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.set_maskbit",
       "luaName": "physics.set_maskbit",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/physics.lua"
     },
@@ -5925,24 +7132,34 @@
     {
       "id": "script:physics.set_vflip",
       "luaName": "physics.set_vflip",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.update_mass",
       "luaName": "physics.update_mass",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
     {
       "id": "script:physics.wakeup",
       "luaName": "physics.wakeup",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/physics.lua"
     },
@@ -5965,64 +7182,84 @@
     {
       "id": "script:profiler.enable",
       "luaName": "profiler.enable",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
     {
       "id": "script:profiler.enable_ui",
       "luaName": "profiler.enable_ui",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
     {
       "id": "script:profiler.get_cpu_usage",
       "luaName": "profiler.get_cpu_usage",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
     {
       "id": "script:profiler.get_memory_usage",
       "luaName": "profiler.get_memory_usage",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
     {
       "id": "script:profiler.log_text",
       "luaName": "profiler.log_text",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
     {
       "id": "script:profiler.recorded_frame_count",
       "luaName": "profiler.recorded_frame_count",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
     {
       "id": "script:profiler.scope_begin",
       "luaName": "profiler.scope_begin",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
     {
       "id": "script:profiler.scope_end",
       "luaName": "profiler.scope_end",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
@@ -6045,8 +7282,18 @@
     {
       "id": "script:profiler.set_ui_vsync_wait_visible",
       "luaName": "profiler.set_ui_vsync_wait_visible",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/profiler.lua"
     },
@@ -6079,6 +7326,16 @@
       "luaName": "render.delete_render_target",
       "status": "untested",
       "reason": "execution-policy-destructive",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6127,6 +7384,16 @@
       "luaName": "render.draw_debug3d",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6151,6 +7418,16 @@
       "luaName": "render.enable_texture",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6247,6 +7524,16 @@
       "luaName": "render.set_camera",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6255,6 +7542,16 @@
       "luaName": "render.set_color_mask",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          4,
+          4
+        ],
+        "derived": [
+          0,
+          5
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6263,6 +7560,16 @@
       "luaName": "render.set_compute",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6287,6 +7594,16 @@
       "luaName": "render.set_depth_mask",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6295,6 +7612,16 @@
       "luaName": "render.set_listener",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6319,6 +7646,16 @@
       "luaName": "render.set_render_target",
       "status": "untested",
       "reason": "context-fixture-missing:render-script",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/render.lua"
     },
@@ -6399,16 +7736,26 @@
     {
       "id": "script:resource.create_buffer",
       "luaName": "resource.create_buffer",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/resource.lua"
     },
     {
       "id": "script:resource.create_sound_data",
       "luaName": "resource.create_sound_data",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/resource.lua"
     },
@@ -6417,6 +7764,16 @@
       "luaName": "resource.create_texture",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:graphics.TEXTURE_TYPE@resource.texture_creation_params.type",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          3
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/resource.lua"
     },
@@ -6425,6 +7782,16 @@
       "luaName": "resource.create_texture_async",
       "status": "untested",
       "reason": "multi-result-shape-unmodelled",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          4
+        ],
+        "derived": [
+          4,
+          4
+        ]
+      },
       "registration": "registered",
       "source": "doc/resource.lua"
     },
@@ -6440,8 +7807,8 @@
     {
       "id": "script:resource.get_atlas",
       "luaName": "resource.get_atlas",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/resource.lua"
     },
@@ -6456,24 +7823,24 @@
     {
       "id": "script:resource.get_render_target_info",
       "luaName": "resource.get_render_target_info",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/resource.lua"
     },
     {
       "id": "script:resource.get_text_metrics",
       "luaName": "resource.get_text_metrics",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/resource.lua"
     },
     {
       "id": "script:resource.get_texture_info",
       "luaName": "resource.get_texture_info",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/resource.lua"
     },
@@ -6514,8 +7881,8 @@
     {
       "id": "script:resource.set",
       "luaName": "resource.set",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
       "registration": "registered",
       "source": "doc/resource.lua"
     },
@@ -6530,8 +7897,8 @@
     {
       "id": "script:resource.set_buffer",
       "luaName": "resource.set_buffer",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "unverified",
+      "disposition": "blocked",
       "registration": "registered",
       "source": "doc/resource.lua"
     },
@@ -6664,6 +8031,16 @@
       "luaName": "socket.skip",
       "status": "untested",
       "reason": "context-fixture-missing:network",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/socket.lua"
     },
@@ -6731,8 +8108,8 @@
     {
       "id": "script:sound.get_groups",
       "luaName": "sound.get_groups",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sound.lua"
     },
@@ -6755,24 +8132,34 @@
     {
       "id": "script:sound.is_music_playing",
       "luaName": "sound.is_music_playing",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sound.lua"
     },
     {
       "id": "script:sound.is_phone_call_active",
       "luaName": "sound.is_phone_call_active",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sound.lua"
     },
     {
       "id": "script:sound.pause",
       "luaName": "sound.pause",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/sound.lua"
     },
@@ -6787,8 +8174,18 @@
     {
       "id": "script:sound.set_gain",
       "luaName": "sound.set_gain",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/sound.lua"
     },
@@ -6803,16 +8200,26 @@
     {
       "id": "script:sound.set_pan",
       "luaName": "sound.set_pan",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          2
+        ],
+        "derived": [
+          2,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/sound.lua"
     },
     {
       "id": "script:sound.stop",
       "luaName": "sound.stop",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sound.lua"
     },
@@ -6835,32 +8242,52 @@
     {
       "id": "script:sprite.set_hflip",
       "luaName": "sprite.set_hflip",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/sprite.lua"
     },
     {
       "id": "script:sprite.set_vflip",
       "luaName": "sprite.set_vflip",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          1,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/sprite.lua"
     },
     {
       "id": "script:sys.deserialize",
       "luaName": "sys.deserialize",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.exists",
       "luaName": "sys.exists",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
@@ -6875,104 +8302,104 @@
     {
       "id": "script:sys.get_application_info",
       "luaName": "sys.get_application_info",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_application_path",
       "luaName": "sys.get_application_path",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_config_boolean",
       "luaName": "sys.get_config_boolean",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_config_int",
       "luaName": "sys.get_config_int",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_config_number",
       "luaName": "sys.get_config_number",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_config_string",
       "luaName": "sys.get_config_string",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_connectivity",
       "luaName": "sys.get_connectivity",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_engine_info",
       "luaName": "sys.get_engine_info",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_host_path",
       "luaName": "sys.get_host_path",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_ifaddrs",
       "luaName": "sys.get_ifaddrs",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_save_file",
       "luaName": "sys.get_save_file",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.get_sys_info",
       "luaName": "sys.get_sys_info",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.load",
       "luaName": "sys.load",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
@@ -7013,6 +8440,16 @@
       "luaName": "sys.reboot",
       "status": "untested",
       "reason": "execution-policy-destructive",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          6
+        ],
+        "derived": [
+          6,
+          6
+        ]
+      },
       "registration": "registered",
       "source": "doc/sys.lua"
     },
@@ -7035,16 +8472,16 @@
     {
       "id": "script:sys.set_connectivity_host",
       "luaName": "sys.set_connectivity_host",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.set_engine_throttle",
       "luaName": "sys.set_engine_throttle",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
@@ -7059,8 +8496,8 @@
     {
       "id": "script:sys.set_render_enable",
       "luaName": "sys.set_render_enable",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "declared-but-unregistered",
       "declaredAt": "doc/sys.lua:722",
       "source": "doc/sys.lua"
@@ -7068,16 +8505,16 @@
     {
       "id": "script:sys.set_update_frequency",
       "luaName": "sys.set_update_frequency",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
     {
       "id": "script:sys.set_vsync_swap_interval",
       "luaName": "sys.set_vsync_swap_interval",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/sys.lua"
     },
@@ -7092,24 +8529,44 @@
     {
       "id": "script:tilemap.get_tile",
       "luaName": "tilemap.get_tile",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          4,
+          4
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/tilemap.lua"
     },
     {
       "id": "script:tilemap.get_tile_info",
       "luaName": "tilemap.get_tile_info",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          4,
+          4
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/tilemap.lua"
     },
     {
       "id": "script:tilemap.get_tiles",
       "luaName": "tilemap.get_tiles",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/tilemap.lua"
     },
@@ -7124,16 +8581,36 @@
     {
       "id": "script:tilemap.set_tile",
       "luaName": "tilemap.set_tile",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          5,
+          6
+        ],
+        "derived": [
+          6,
+          7
+        ]
+      },
       "registration": "registered",
       "source": "doc/tilemap.lua"
     },
     {
       "id": "script:tilemap.set_visible",
       "luaName": "tilemap.set_visible",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          2,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/tilemap.lua"
     },
@@ -7174,6 +8651,16 @@
       "luaName": "types.is_hash",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:any",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/types.lua"
     },
@@ -7182,6 +8669,16 @@
       "luaName": "types.is_matrix4",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:any",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/types.lua"
     },
@@ -7190,6 +8687,16 @@
       "luaName": "types.is_quat",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:any",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/types.lua"
     },
@@ -7198,6 +8705,16 @@
       "luaName": "types.is_url",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:any",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/types.lua"
     },
@@ -7206,6 +8723,16 @@
       "luaName": "types.is_vector",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:any",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          0
+        ]
+      },
       "registration": "registered",
       "source": "doc/types.lua"
     },
@@ -7214,6 +8741,16 @@
       "luaName": "types.is_vector3",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:any",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/types.lua"
     },
@@ -7222,6 +8759,16 @@
       "luaName": "types.is_vector4",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:any",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/types.lua"
     },
@@ -7236,16 +8783,16 @@
     {
       "id": "script:vmath.conj",
       "luaName": "vmath.conj",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.cross",
       "luaName": "vmath.cross",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7254,22 +8801,42 @@
       "luaName": "vmath.dot",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:T",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          0,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.euler_to_quat",
       "luaName": "vmath.euler_to_quat",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          3
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.inv",
       "luaName": "vmath.inv",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7278,6 +8845,16 @@
       "luaName": "vmath.length",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:vector3|vector4|quaternion",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7286,6 +8863,16 @@
       "luaName": "vmath.length_sqr",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:vector3|vector4|quaternion",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7300,16 +8887,16 @@
     {
       "id": "script:vmath.matrix4",
       "luaName": "vmath.matrix4",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_axis_angle",
       "luaName": "vmath.matrix4_axis_angle",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7324,72 +8911,82 @@
     {
       "id": "script:vmath.matrix4_frustum",
       "luaName": "vmath.matrix4_frustum",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_look_at",
       "luaName": "vmath.matrix4_look_at",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_orthographic",
       "luaName": "vmath.matrix4_orthographic",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_perspective",
       "luaName": "vmath.matrix4_perspective",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_quat",
       "luaName": "vmath.matrix4_quat",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_rotation_x",
       "luaName": "vmath.matrix4_rotation_x",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_rotation_y",
       "luaName": "vmath.matrix4_rotation_y",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_rotation_z",
       "luaName": "vmath.matrix4_rotation_z",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.matrix4_scale",
       "luaName": "vmath.matrix4_scale",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7398,6 +8995,16 @@
       "luaName": "vmath.matrix4_translation",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:vector3|vector4",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7406,6 +9013,16 @@
       "luaName": "vmath.mul_per_elem",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:T",
+      "arityDisagreement": {
+        "documented": [
+          2,
+          2
+        ],
+        "derived": [
+          0,
+          2
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7414,86 +9031,106 @@
       "luaName": "vmath.normalize",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:T",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.ortho_inv",
       "luaName": "vmath.ortho_inv",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.project",
       "luaName": "vmath.project",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat",
       "luaName": "vmath.quat",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          0
+        ],
+        "derived": [
+          4,
+          4
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat_axis_angle",
       "luaName": "vmath.quat_axis_angle",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat_basis",
       "luaName": "vmath.quat_basis",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat_from_to",
       "luaName": "vmath.quat_from_to",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat_matrix4",
       "luaName": "vmath.quat_matrix4",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat_rotation_x",
       "luaName": "vmath.quat_rotation_x",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat_rotation_y",
       "luaName": "vmath.quat_rotation_y",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.quat_rotation_z",
       "luaName": "vmath.quat_rotation_z",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7508,8 +9145,8 @@
     {
       "id": "script:vmath.rotate",
       "luaName": "vmath.rotate",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7518,6 +9155,16 @@
       "luaName": "vmath.slerp",
       "status": "untested",
       "reason": "unsynthesizable-parameter-type:T",
+      "arityDisagreement": {
+        "documented": [
+          3,
+          3
+        ],
+        "derived": [
+          1,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7532,16 +9179,36 @@
     {
       "id": "script:vmath.vector3",
       "luaName": "vmath.vector3",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          0
+        ],
+        "derived": [
+          3,
+          3
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
     {
       "id": "script:vmath.vector4",
       "luaName": "vmath.vector4",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          0
+        ],
+        "derived": [
+          4,
+          4
+        ]
+      },
       "registration": "registered",
       "source": "doc/vmath.lua"
     },
@@ -7598,6 +9265,16 @@
       "luaName": "window.set_listener",
       "status": "untested",
       "reason": "context-fixture-missing:window",
+      "arityDisagreement": {
+        "documented": [
+          0,
+          1
+        ],
+        "derived": [
+          1,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/window.lua"
     },
@@ -7606,6 +9283,16 @@
       "luaName": "window.set_mouse_lock",
       "status": "untested",
       "reason": "execution-policy-interactive",
+      "arityDisagreement": {
+        "documented": [
+          1,
+          1
+        ],
+        "derived": [
+          0,
+          1
+        ]
+      },
       "registration": "registered",
       "source": "doc/window.lua"
     },
@@ -7636,16 +9323,16 @@
     {
       "id": "script:zlib.deflate",
       "luaName": "zlib.deflate",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/zlib.lua"
     },
     {
       "id": "script:zlib.inflate",
       "luaName": "zlib.inflate",
-      "status": "untested",
-      "reason": "not-in-conformance-plan",
+      "status": "verified",
+      "disposition": "observed",
       "registration": "registered",
       "source": "doc/zlib.lua"
     }

@@ -6,7 +6,7 @@ const ADDRESSES: readonly string[] = [];
 function address(ordinal: number): string {
   return ADDRESSES.length === 0 ? "" : (ADDRESSES[ordinal % ADDRESSES.length] as string);
 }
-function resolve(handleKind: string, ordinal: number): unknown {
+export function resolve(handleKind: string, ordinal: number): unknown {
   const provider = providers[handleKind];
   if (provider === undefined) return undefined;
   try {
