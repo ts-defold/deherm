@@ -69,6 +69,45 @@ One symbol set drives every layer, so nothing can disagree:
 
 An unreachable route costs nothing: no TypeScript, no C, no object, no symbol.
 
+# Development is deliberately the inverse
+
+Reachability pruning applies to release builds only. **Development links the
+complete Defold API surface on purpose.**
+
+The expensive step in this project is not compiling TypeScript; it is compiling
+and linking native code through Bob and Extender. If the linked surface tracked
+what the game currently calls, then the first use of a new API would invalidate
+the extension and force a native rebuild - in the middle of iteration, for a
+one-line edit. Linking everything once removes that class of interruption
+entirely: a developer can reach for any of the 913 routes and the running engine
+already has it.
+
+That is already how it builds. Bob compiles the whole of
+`defold/defold_hermes/src/`, and `DEHERM_CANONICAL_RELEASE_DIR` is empty unless
+release generation sets it, so the pruned projection is opt-in.
+
+| | linked native surface | game code | relink triggered by |
+| --- | --- | --- | --- |
+| development | complete | bytecode over JSI | adding a native extension, or regenerating the surface |
+| release | reachable only | bytecode plus `extern_c` where lowered | every release build |
+
+Reachability is still computed in development, but only to *report*: the
+operator console can show what a release build would retain, long before anyone
+produces one. It never prunes what is linked.
+
+## The asymmetry this creates, and the gate it demands
+
+Development and release therefore do not link the same thing, and that is the
+one place this design can bite. A route exercised all through development can be
+absent from release if the checker failed to see its call site - a dynamic
+index, a computed member, a call reached only through a code path ttsc could not
+resolve.
+
+This is precisely why dynamic access must be *declared and diagnosed* rather
+than inferred, and why conformance evidence has to be attributed to the pruned
+projection. A release build is not a subset of a development build that has been
+tested; it is a different artifact, and it carries its own evidence.
+
 # Native lowering as a tier, not a target
 
 The reachable surface is lowered as far as each route's contract allows. These
