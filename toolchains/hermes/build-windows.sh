@@ -73,11 +73,10 @@
 # there is an ODR violation or heap corruption, not a clean link error, which
 # makes it a bad thing to discover from a user's crash report.
 #
-# So this lane is a FALLBACK. The registry denial that forced it reads
-# "Unauthenticated request", which suggests the grant is to any authenticated
-# Google identity rather than to named accounts - in which case a service
-# account credential restores Dockerfile.win32 and this file stops being the
-# path that ships.
+# This is the release-producing lane until the Extender-image cross toolchain's
+# standard-library probe is proven. Dockerfile.win32 remains a manually
+# dispatched advisory canary; it must not replace this path merely because a
+# registry credential is present.
 set -euo pipefail
 
 hermes_source="$1"

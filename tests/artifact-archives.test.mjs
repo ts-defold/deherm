@@ -195,3 +195,46 @@ test("package-archive.sh is an input to every family, because it decides the pub
     );
   }
 });
+
+test("the Windows archiver protects MSVC's /OUT option from Git Bash path rewriting", async (t) => {
+  const directory = await scratch(t);
+  const build = path.join(directory, "build");
+  const tools = path.join(directory, "bin");
+  const capture = path.join(directory, "argv.txt");
+  await mkdir(path.join(build, "lib"), { recursive: true });
+  await mkdir(path.join(build, "jsi"), { recursive: true });
+  await mkdir(tools, { recursive: true });
+  await writeFile(path.join(build, "lib", "hermesvm_a.lib"), "hermes");
+  await writeFile(path.join(build, "jsi", "jsi.lib"), "jsi");
+
+  const cygpath = path.join(tools, "cygpath");
+  const archiver = path.join(tools, "mock-lib");
+  await writeFile(cygpath, "#!/usr/bin/env bash\nprintf 'C:\\\\native\\\\hermes.lib\\n'\n");
+  await writeFile(
+    archiver,
+    "#!/usr/bin/env bash\nprintf '%s\\n' \"$MSYS2_ARG_CONV_EXCL\" \"$@\" > \"$CAPTURE\"\n"
+  );
+  await chmod(cygpath, 0o755);
+  await chmod(archiver, 0o755);
+
+  await execFileAsync("bash", [
+    path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"),
+    build,
+    path.join(directory, "hermes.lib")
+  ], {
+    env: {
+      ...process.env,
+      CAPTURE: capture,
+      LIB_TOOL: archiver,
+      PATH: `${tools}:${process.env.PATH}`
+    }
+  });
+
+  const args = (await readFile(capture, "utf8")).trimEnd().split("\n");
+  assert.equal(args[0], "/OUT:");
+  assert.equal(args[1], "/OUT:C:\\native\\hermes.lib");
+  assert.deepEqual(args.slice(2), [
+    path.join(build, "lib", "hermesvm_a.lib"),
+    path.join(build, "jsi", "jsi.lib")
+  ]);
+});

@@ -31,6 +31,13 @@ if [[ -f "$boost_archive" ]]; then
 fi
 
 # COFF archives carry no member timestamps of their own, so the merge is already
-# byte-reproducible; the pinned digest is what proves it.
-"$lib_tool" "/OUT:$output" "${members[@]}"
+# byte-reproducible; the pinned digest is what proves it. Under Git Bash, MSYS2
+# mistakes MSVC's `/OUT:` option for a POSIX path and rewrites the whole token
+# into `C:\Program Files\Git\OUT;...`. Convert only the value ourselves, then
+# exempt that option prefix; member paths remain eligible for normal conversion.
+lib_output="$output"
+if command -v cygpath >/dev/null 2>&1; then
+  lib_output="$(cygpath -w "$output")"
+fi
+MSYS2_ARG_CONV_EXCL="/OUT:" "$lib_tool" "/OUT:$lib_output" "${members[@]}"
 echo "package-msvc: wrote $output from ${#members[@]} library file(s)"
