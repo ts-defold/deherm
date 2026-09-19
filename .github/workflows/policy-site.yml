@@ -67,7 +67,20 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    # macOS for the same reason policy-revisions.yml pins it, and the first run
+    # on Linux proved it: `--check` RE-DERIVES the policy and compares it to the
+    # committed store, but the dmSDK IR is produced by parsing public headers
+    # with the HOST clang and `scripts/import-defold-sdk.py` labels its output
+    # `arm64-macos` unconditionally. The identical commit verifies on macOS and
+    # fails on ubuntu-24.04 with "2 policy objects are missing / 1 stored object
+    # disagrees with the derivation".
+    #
+    # That is a real defect, not a runner preference: the store is keyed on the
+    # Defold revision alone, so a policy that also depends on the deriving host
+    # is not what its own address claims. Pinning the runner makes publication
+    # correct today; it does not make the derivation host-independent, which is
+    # the actual fix and is tracked as its own task.
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
