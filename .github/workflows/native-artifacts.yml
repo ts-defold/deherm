@@ -230,7 +230,13 @@ jobs:
   windows:
     needs: [plan, releases]
     if: needs.plan.outputs.target_exists != 'true'
-    runs-on: ubuntu-24.04
+    # Native, not the Docker cross build: Defold's extender-winsdk image denies
+    # unauthenticated pulls and cannot be rebuilt without their private package
+    # host. build-windows.sh carries the full reasoning and the caveat.
+    runs-on: windows-2022
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
         with: { submodules: recursive }
@@ -238,7 +244,13 @@ jobs:
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
       - run: bash scripts/bootstrap-upstreams.sh hermes
-      - run: docker buildx build --platform linux/amd64 --output type=local,dest=build/artifacts/x86_64-win32 -f toolchains/hermes/Dockerfile.win32 .
+      - uses: ilammy/msvc-dev-cmd@v1
+      - run: choco install ninja --no-progress -y
+      - run: |
+          bash toolchains/hermes/build-windows.sh \
+            "$PWD/upstream/hermes" \
+            "$PWD/build/win32" \
+            "$PWD/build/artifacts/x86_64-win32/hermes.lib"
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
