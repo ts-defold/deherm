@@ -1043,7 +1043,7 @@ INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.get_m
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.get_signum#required	result-arity	observed-as-target-exception	Provided handle is invalid
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.get_signum#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.get_signum#required	error-model	observed	raised and boundary remained usable
-INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.load_previous#required	result-arity	observed	number
+INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.load_previous#required	result-arity	observed	object
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.load_previous#required	scratch-reuse	observed	64 repetitions
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.load_previous#required	error-model	not-applicable	route has no required argument to withhold
 INFO:DEFOLD_HERMES: deherm-headless-conformance	contract_0161	script:crash.set_file_path#required	result-arity	observed	undefined

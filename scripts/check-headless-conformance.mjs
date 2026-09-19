@@ -32,6 +32,9 @@ const evidencePath = path.join(repoRoot, ".agents/docs/data/headless-conformance
 const driverPath = path.join(repoRoot, "build/native/defold-hermes-headless-conformance-driver");
 const bobJar = path.join(repoRoot, "build/tooling/bob.jar");
 const MARKER = "deherm-headless-conformance";
+// `<name>:<lua type>` emitted once per documented route by the generated
+// route-resolution script on the index object.
+const RESOLUTION = /deherm-route-resolution:([^\s:]+):(\w+)\s*$/;
 const TICK_BUDGET = 8;
 
 function javaExecutable() {
@@ -93,6 +96,7 @@ const DETECTED_PROFILE = /Detected Defold runtime profile '([^']+)'/;
 
 function parseTranscript(transcript) {
   const observations = [];
+  const resolutions = new Map();
   const outcomes = new Map();
   const crashFrames = [];
   const detectedProfiles = new Set();
@@ -117,13 +121,25 @@ function parseTranscript(transcript) {
       inFlight = null;
       continue;
     }
+    // The resolution census, when the engine emits one. It cannot come from a
+    // Lua `print`: Defold maps that to `dmLogUserDebug` (script.cpp:453), which
+    // is compiled out of this release driver, so a generated Lua probe produces
+    // nothing here however correct it is. The census belongs in the extension's
+    // C init, where `lua_bridge.cpp` already walks `lua_getglobal` +
+    // `lua_getfield` + `lua_isfunction` for every bound route and has
+    // `dmLogInfo`. This reader is the consumer, waiting for that producer.
+    const resolved = RESOLUTION.exec(line);
+    if (resolved) {
+      if (resolved[1] !== "done") resolutions.set(resolved[1], resolved[2]);
+      continue;
+    }
     const index = line.indexOf(`${MARKER}\t`);
     if (index >= 0) {
       const [, contract, route, property, disposition, ...rest] = line.slice(index).split("\t");
       observations.push({ contract, route, property, disposition, detail: rest.join("\t") });
     }
   }
-  return { observations, outcomes, inFlight, crashFrames, detectedProfiles };
+  return { observations, outcomes, inFlight, crashFrames, detectedProfiles, resolutions };
 }
 
 async function runDriver(projectFile, remaining) {
@@ -172,6 +188,7 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
 
   const observations = [];
   const outcomes = new Map();
+  const resolutions = new Map();
   const transcripts = [];
   const detectedProfiles = new Set();
   let remaining = fixtures;
@@ -183,6 +200,9 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
     transcripts.push(result.transcript);
     const parsed = parseTranscript(result.transcript);
     observations.push(...parsed.observations);
+    // The census runs on the index object, which every driver invocation loads,
+    // so a later run confirms rather than contradicts an earlier one.
+    for (const [name, luaType] of parsed.resolutions) resolutions.set(name, luaType);
     for (const profile of parsed.detectedProfiles) detectedProfiles.add(profile);
     for (const [id, outcome] of parsed.outcomes) outcomes.set(id, outcome);
     const unfinished = remaining.filter((fixture) => !outcomes.has(fixture.id));
@@ -313,6 +333,13 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       totals[key] = (totals[key] ?? 0) + 1;
       return totals;
     }, {}),
+    // Which documented route names resolve in the running engine's Lua state.
+    // This is direct observation, and it settles questions no static parse of
+    // the registration arrays can: `socket.tcp` is registered through an
+    // initialiser loop whose `luaL_Reg` names are never read, so the parser
+    // never reaches tcp.c's own array - but the engine either has the function
+    // or it does not, and here it says which.
+    routeResolution: Object.fromEntries([...resolutions].sort(([a], [b]) => a < b ? -1 : 1)),
     contracts: results
   };
 

@@ -975,6 +975,11 @@ export function buildHeadlessConformancePlan(documents, {
       (total, item) => total + new Set(item.exercises.map((exercise) => exercise.routeId)).size, 0),
     exerciseCount: reachable.reduce((total, item) => total + item.exercises.length, 0),
     eligibleRouteCount: contracts.reduce((total, item) => total + item.eligibleRouteCount, 0),
+    // Every documented route's Lua name, so the generated harness can ask the
+    // engine which of them resolve. This is the whole documented surface, not
+    // the eligible subset: a route we cannot exercise can still be asked whether
+    // it exists.
+    documentedRouteNames: documents.scriptIr.value.functions.map(({ rawName }) => rawName).sort(),
     blockerSummary: summarizeBlockers(contracts),
     contracts
   };

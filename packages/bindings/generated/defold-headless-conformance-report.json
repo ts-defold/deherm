@@ -42,6 +42,7 @@
     "error-model:mismatched": 1,
     "handle-provenance:blocked-producer-absent": 1
   },
+  "routeResolution": {},
   "contracts": [
     {
       "id": "contract_0139",
@@ -5494,7 +5495,7 @@
           "route": "script:crash.load_previous#required",
           "property": "result-arity",
           "disposition": "observed",
-          "detail": "number"
+          "detail": "object"
         },
         {
           "contract": "contract_0161",
