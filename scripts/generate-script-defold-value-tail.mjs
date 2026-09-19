@@ -5,7 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -154,7 +154,11 @@ export function generateScriptDefoldValueTail(inputs) {
   const patternRows = patterns.bindings.filter(({ loweringFamily }) => loweringFamily === "defold-value");
   const alreadyOwned = new Set([...value.bindings, ...url.rows].map(({ id }) => id));
   const tailPatterns = patternRows.filter(({ id }) => !alreadyOwned.has(id));
-  assert(tailPatterns.length === policy.expectedRouteCount, `value-tail pattern census drifted: expected ${policy.expectedRouteCount}, got ${tailPatterns.length}`);
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
+    label: "value-tail pattern census",
+    expected: policy.expectedRouteCount, observed: tailPatterns.length
+  });
   const fnById = new Map(ir.functions.map((fn) => [fn.id, fn])); const patternById = new Map(tailPatterns.map((row) => [row.id, row]));
   const seen = new Set(); const rows = [];
   for (const family of policy.families) {

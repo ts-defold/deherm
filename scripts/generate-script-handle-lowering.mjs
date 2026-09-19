@@ -4,6 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { semanticHandleKinds } from "./lib/semantic-handle-kinds.mjs";
+import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
@@ -72,9 +73,18 @@ function countBy(rows, select) {
   return Object.fromEntries(Object.entries(counts).sort(([left], [right]) => compareCodeUnits(left, right)));
 }
 
+// A reviewed count map. Fatal in an ordinary generation, reported in a declared
+// derivation of another revision - see `expectReviewedCount`, which this defers
+// to per key so the report names WHICH bucket moved rather than dumping two
+// objects.
 function compareCounts(actual, expected, label) {
-  if (JSON.stringify(actual) !== JSON.stringify(Object.fromEntries(Object.entries(expected).sort(([a], [b]) => compareCodeUnits(a, b))))) {
-    throw new Error(`${label} drifted: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+  const sorted = Object.fromEntries(Object.entries(expected).sort(([a], [b]) => compareCodeUnits(a, b)));
+  if (JSON.stringify(actual) === JSON.stringify(sorted)) return;
+  for (const key of [...new Set([...Object.keys(sorted), ...Object.keys(actual)])].sort(compareCodeUnits)) {
+    expectReviewedCount({
+      input: "packages/bindings/overrides/script-handle-lowering-policy.json", label: `${label}:${key}`,
+      expected: sorted[key] ?? 0, observed: actual[key] ?? 0
+    });
   }
 }
 
@@ -1015,9 +1025,10 @@ export function generateScriptHandleLowering(textInputs) {
   const selected = projection.rows
     .filter((row) => algebraicallySelected(row, classificationById.get(row.id), policy))
     .sort((left, right) => compareCodeUnits(left.id, right.id));
-  if (selected.length !== policy.selection.expectedRouteCount) {
-    throw new Error(`algebraic handle route census drifted: expected ${policy.selection.expectedRouteCount}, got ${selected.length}`);
-  }
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-handle-lowering-policy.json", label: "algebraic handle route census",
+    expected: policy.selection.expectedRouteCount, observed: selected.length
+  });
 
   const handleKinds = semanticHandleKinds(classification)
     .map((kind) => ({ ...kind, enumName: pascal(kind.id) }));
@@ -1203,9 +1214,11 @@ export function generateScriptHandleLowering(textInputs) {
   const blocked = routes.filter(({ generation }) => generation.router === "blocked").length;
   const routerCandidates = routes.length - blocked;
   const runtimeUnavailable = routes.filter(({ profiles }) => !profiles.runtimeAvailable).length;
-  if (blocked !== policy.expected.blockedCount || routerCandidates !== policy.expected.routerCandidateCount || runtimeUnavailable !== policy.expected.runtimeUnavailableCount) {
-    throw new Error(`handle lowering disposition census drifted: ${routerCandidates} candidates, ${blocked} blocked, ${runtimeUnavailable} runtime-unavailable`);
-  }
+  for (const [label, expected, observed] of [
+    ["handle lowering blocked", policy.expected.blockedCount, blocked],
+    ["handle lowering router candidates", policy.expected.routerCandidateCount, routerCandidates],
+    ["handle lowering runtime-unavailable", policy.expected.runtimeUnavailableCount, runtimeUnavailable]
+  ]) expectReviewedCount({ input: "packages/bindings/overrides/script-handle-lowering-policy.json", label, expected, observed });
   for (const profile of runtimeProfiles) {
     profile.adapterExecutableRouteCount = routes.filter((route) =>
       route.generation.router === "emitted" && (route.profiles.runtimeMask & profile.mask) !== 0).length;

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
@@ -403,7 +404,10 @@ export async function build() {
   const declarations = ir.declarations
     .filter(({ id }) => scalarIds.has(id))
     .sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0);
-  if (declarations.length !== 31) throw new Error(`Expected the reviewed scalar-direct frontier to contain 31 declarations, got ${declarations.length}`);
+  expectReviewedCount({
+    input: "scripts/generate-dmsdk-scalar-thunks.mjs", label: "reviewed scalar-direct frontier declarations",
+    expected: 31, observed: declarations.length
+  });
 
   const emitted = [];
   const reportEntries = [];

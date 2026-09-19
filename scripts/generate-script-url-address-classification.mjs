@@ -5,7 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {
@@ -148,15 +148,15 @@ export function generateScriptUrlAddressClassification(inputs) {
   const irById = uniqueMap(ir.functions, "script API IR");
   uniqueMap(patterns.bindings, "script binding patterns");
   const classified = patterns.bindings.filter((row) => row.loweringFamily === "defold-value");
-  assert(classified.length === override.expectedCounts.classifiedDefoldValue,
-    `classified defold-value census drifted: expected ${override.expectedCounts.classifiedDefoldValue}, got ${classified.length}`);
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "classified defold-value census",
+    expected: override.expectedCounts.classifiedDefoldValue, observed: classified.length });
   const matrixIds = new Set();
   const urlIds = new Set();
   const urlCandidateIds = new Set();
   const remainderIds = new Set();
   const excludedUrlIds = new Set(override.excludedPreexistingUrlIds);
-  assert(excludedUrlIds.size === override.expectedCounts.excludedPreexistingUrl,
-    "excluded pre-existing URL route census drifted");
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "excluded pre-existing URL route census",
+    expected: override.expectedCounts.excludedPreexistingUrl, observed: excludedUrlIds.size });
   for (const pattern of classified) {
     const fn = irById.get(pattern.id);
     assert(fn, `${pattern.id}: pattern row is absent from pinned IR`);
@@ -172,12 +172,12 @@ export function generateScriptUrlAddressClassification(inputs) {
     }
     else remainderIds.add(pattern.id);
   }
-  assert(matrixIds.size === override.expectedCounts.matrix4Disjoint,
-    `matrix4 disjoint census drifted: expected ${override.expectedCounts.matrix4Disjoint}, got ${matrixIds.size}`);
-  assert(urlIds.size === override.expectedCounts.total,
-    `URL/address route count drifted: expected ${override.expectedCounts.total}, got ${urlIds.size}`);
-  assert(urlCandidateIds.size === override.expectedCounts.urlCandidates,
-    `URL/address candidate count drifted: expected ${override.expectedCounts.urlCandidates}, got ${urlCandidateIds.size}`);
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "matrix4 disjoint census",
+    expected: override.expectedCounts.matrix4Disjoint, observed: matrixIds.size });
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "URL/address route count",
+    expected: override.expectedCounts.total, observed: urlIds.size });
+  expectReviewedCount({ input: "packages/bindings/overrides/script-url-address-classification.json", label: "URL/address candidate count",
+    expected: override.expectedCounts.urlCandidates, observed: urlCandidateIds.size });
   for (const id of excludedUrlIds) assert(urlCandidateIds.has(id), `${id}: pinned URL exclusion left the candidate set`);
   assert(remainderIds.size === override.expectedCounts.nonMatrixNonUrl,
     `non-matrix/non-URL defold-value census drifted: expected ${override.expectedCounts.nonMatrixNonUrl}, got ${remainderIds.size}`);

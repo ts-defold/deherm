@@ -5,7 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
+import { declaredDerivation, expectReviewedCount, loadReviewedSources } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -108,16 +108,14 @@ export function generateScriptCallbackLifecycle(inputs) {
     input: "packages/bindings/overrides/script-callback-lifecycle-policies.json",
     label: "callback-lifecycle pattern census",
     expected: policy.expectedRouteCount - withdrawnRoutes,
-    observed: callbackPatterns.length,
-    reviewed: policy.defoldRevision, derived: ir.defoldRevision
+    observed: callbackPatterns.length
   });
   for (const pattern of callbackPatterns) {
     if (!policyById.has(pattern.id)) {
       // A classified callback route with no reviewed policy cannot be emitted -
       // its lifetime and ownership are exactly what a review decides. At the
       // reviewed revision that is a gap in this tree and stays fatal.
-      assert(policy.defoldRevision !== ir.defoldRevision,
-        `${pattern.id}: classified callback route is missing reviewed lifecycle policy`);
+      assert(declaredDerivation(), `${pattern.id}: classified callback route is missing reviewed lifecycle policy`);
     }
   }
   for (const id of policyById.keys()) {
@@ -176,7 +174,6 @@ export async function loadScriptCallbackLifecycleInputs() {
     input: "packages/bindings/overrides/script-callback-lifecycle-policies.json",
     defoldRoot: fileURLToPath(new URL("upstream/defold", root)),
     evidence: policy.sourceEvidence,
-    reviewed: policy.defoldRevision,
     derived: parse(irText, "script API IR").defoldRevision
   });
   const sourceTexts = loaded.texts;

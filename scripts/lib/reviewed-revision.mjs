@@ -222,31 +222,39 @@ export async function loadReviewedSources({ input, defoldRoot, evidence, reviewe
 }
 
 /**
- * A reviewed census count, checked against the revision it was counted at.
+ * A reviewed census count, checked where it means something.
  *
- * A reviewed input records expectations like "there are 145 registered box2d-v2
- * routes". Those numbers are evidence: a person counted them at one revision,
- * and at THAT revision a disagreement is a real regression and stays a hard
- * failure - it is most of what `pnpm check` is for.
+ * A reviewed input records expectations like "there are 145 registered
+ * box2d-v2 routes", and generators carry the same shape as bare literals -
+ * `if (bindings.length !== 90)`. Those numbers are evidence: a person counted
+ * them at one revision.
  *
- * At any other revision the same comparison says nothing except that Defold
- * changed, which is the thing we are here to measure. Asserting it there turns
- * every engine change into a refusal. So the count becomes an observation, and
- * the difference is what the derivation reports.
+ * In an ORDINARY generation a disagreement is a real regression in this tree
+ * and stays a hard failure. It is most of what `pnpm check` is for, and nothing
+ * here weakens it.
+ *
+ * Inside a DECLARED DERIVATION of another revision the same comparison says
+ * only that Defold changed, which is the thing the derivation exists to
+ * measure. Asserting it there turned every engine change into a refusal:
+ * deriving 1.13.1 stopped at "Expected 90 scalar bindings, got 117", where 117
+ * is not an error but the answer. So there the count becomes an observation and
+ * the difference is reported.
+ *
+ * The derivation is declared in the environment rather than inferred from a
+ * policy field, because most reviewed inputs do not carry a revision and the
+ * one place that does know is the process that set out to derive.
  *
  * @returns {{agreed: boolean, expected: number, observed: number}}
  */
-export function expectReviewedCount({ input, label, expected, observed, reviewed, derived, env = process.env }) {
+export function expectReviewedCount({ input, label, expected, observed, env = process.env }) {
   if (expected === observed) return { agreed: true, expected, observed };
-  if (reviewed === derived) {
+  const derived = declaredDerivation(env);
+  if (!derived) {
     throw new Error(
-      `${input}: ${label} expected ${expected}, found ${observed} at the reviewed revision ${reviewed}. ` +
-      "Nothing about Defold moved, so this is a regression in this tree."
+      `${input}: ${label} expected ${expected}, found ${observed}. ` +
+      "This is an ordinary generation, so nothing about Defold moved and this is a regression in this tree."
     );
   }
-  recordAudit({
-    input, id: label, status: MOVED, reason: "census",
-    expected, observed, reviewed, derived
-  }, env);
+  recordAudit({ input, id: label, status: MOVED, reason: "census", expected, observed, derived }, env);
   return { agreed: false, expected, observed };
 }

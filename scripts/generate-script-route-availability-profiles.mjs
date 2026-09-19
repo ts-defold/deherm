@@ -6,7 +6,7 @@ import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
+import { assertReviewedRevision, expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const defaultPolicy = "packages/bindings/overrides/script-route-availability-profiles.json";
@@ -232,25 +232,25 @@ async function generate(options) {
       .sort((left, right) => left.stableId - right.stableId);
     const registeredDocumentedNames = registeredNames.filter((rawName) => documentedNames.has(rawName));
     const registrationOnlyNames = registeredNames.filter((rawName) => !documentedNames.has(rawName)).sort(compareText);
-    assert(registeredDocumentedNames.length === policy.expectedRegisteredDocumentedCounts[feature],
-      `${feature}: expected ${policy.expectedRegisteredDocumentedCounts[feature]} registered documented routes, found ${registeredDocumentedNames.length}`);
-    assert(registrationOnlyNames.length === policy.expectedRegistrationOnlyCounts[feature],
-      `${feature}: expected ${policy.expectedRegistrationOnlyCounts[feature]} registration-only routes, found ${registrationOnlyNames.length}`);
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedRegisteredDocumentedCounts`,
+      expected: policy.expectedRegisteredDocumentedCounts[feature], observed: registeredDocumentedNames.length });
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedRegistrationOnlyCounts`,
+      expected: policy.expectedRegistrationOnlyCounts[feature], observed: registrationOnlyNames.length });
     const relevantPrefix = feature.startsWith("box2d-") ? "b2d." : feature === "bullet3d" ? "bullet3d." : null;
     const unmatched = relevantPrefix === null ? [] : borrowed.rows
       .filter((row) => row.rawName.startsWith(relevantPrefix) && !registeredNames.includes(row.rawName))
       .map((row) => row.rawName)
       .sort(compareText);
-    assert(matchingRows.length === policy.expectedAvailableFeatureCounts[feature],
-      `${feature}: expected ${policy.expectedAvailableFeatureCounts[feature]} registered handle routes, found ${matchingRows.length}; unregistered candidates: ${unmatched.join(", ")}`);
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedAvailableFeatureCounts`,
+      expected: policy.expectedAvailableFeatureCounts[feature], observed: matchingRows.length });
     const reviewedUnavailable = unavailableByFeature.get(feature) ?? [];
     for (const row of reviewedUnavailable) {
       assert(!registeredNames.includes(row.rawName), `${row.id}: reviewed unavailable route is now registered`);
     }
     const documentedRows = [...matchingRows.map(routeRow), ...reviewedUnavailable]
       .sort((left, right) => left.stableId - right.stableId);
-    assert(documentedRows.length === policy.expectedFeatureCounts[feature],
-      `${feature}: expected ${policy.expectedFeatureCounts[feature]} documented handle routes, found ${documentedRows.length}`);
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedFeatureCounts`,
+      expected: policy.expectedFeatureCounts[feature], observed: documentedRows.length });
     availableFeatureRows[feature] = matchingRows.map(routeRow);
     documentedFeatureRows[feature] = documentedRows;
     const availableScriptRows = registeredDocumentedNames
@@ -260,10 +260,10 @@ async function generate(options) {
       ...availableScriptRows,
       ...(unavailableScriptRoutesByFeature.get(feature) ?? [])
     ].sort((left, right) => left.stableId - right.stableId);
-    assert(availableScriptRows.length === policy.expectedAvailableRouteFeatureCounts[feature],
-      `${feature}: expected ${policy.expectedAvailableRouteFeatureCounts[feature]} registered script routes, found ${availableScriptRows.length}`);
-    assert(documentedScriptRows.length === policy.expectedRouteFeatureCounts[feature],
-      `${feature}: expected ${policy.expectedRouteFeatureCounts[feature]} documented script routes, found ${documentedScriptRows.length}`);
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedAvailableRouteFeatureCounts`,
+      expected: policy.expectedAvailableRouteFeatureCounts[feature], observed: availableScriptRows.length });
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${feature} expectedRouteFeatureCounts`,
+      expected: policy.expectedRouteFeatureCounts[feature], observed: documentedScriptRows.length });
     availableRouteFeatureRows[feature] = availableScriptRows;
     documentedRouteFeatureRows[feature] = documentedScriptRows;
     registrationAudit.push({
@@ -308,10 +308,10 @@ async function generate(options) {
     const unavailableRoutes = documentedRoutes.filter(({ stableId }) => !unavailableIds.has(stableId));
     const expectedCount = policy.expectedProfileCounts[manifest.id];
     const expectedRuntimeCount = policy.expectedRuntimeProfileCounts[manifest.id];
-    assert(documentedRoutes.length === expectedCount,
-      `${manifest.id}: expected ${expectedCount} documented routes, found ${documentedRoutes.length}`);
-    assert(availableRoutes.length === expectedRuntimeCount,
-      `${manifest.id}: expected ${expectedRuntimeCount} runtime routes, found ${availableRoutes.length}`);
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"expectedCount"}`,
+      expected: expectedCount, observed: documentedRoutes.length });
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"expectedRuntimeCount"}`,
+      expected: expectedRuntimeCount, observed: availableRoutes.length });
     const routeHash = routeSetSha256(availableRoutes);
     profiles[manifest.id] = {
       manifest: manifest.path,
@@ -338,10 +338,10 @@ async function generate(options) {
       .sort((left, right) => left.stableId - right.stableId);
     const routeAvailable = [...new Map(selectedAvailableRoutes.map((row) => [row.stableId, row])).values()]
       .sort((left, right) => left.stableId - right.stableId);
-    assert(routeDocumented.length === policy.expectedRouteProfileCounts[manifest.id],
-      `${manifest.id}: expected ${policy.expectedRouteProfileCounts[manifest.id]} documented script routes, found ${routeDocumented.length}`);
-    assert(routeAvailable.length === policy.expectedRuntimeRouteProfileCounts[manifest.id],
-      `${manifest.id}: expected ${policy.expectedRuntimeRouteProfileCounts[manifest.id]} registered script routes, found ${routeAvailable.length}`);
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"policy.expectedRouteProfileCounts[manifest.id]"}`,
+      expected: policy.expectedRouteProfileCounts[manifest.id], observed: routeDocumented.length });
+    expectReviewedCount({ input: "packages/bindings/overrides/script-route-availability-profiles.json", label: `${manifest.id} ${"policy.expectedRuntimeRouteProfileCounts[manifest.id]"}`,
+      expected: policy.expectedRuntimeRouteProfileCounts[manifest.id], observed: routeAvailable.length });
     const routeAvailableIds = new Set(routeAvailable.map(({ stableId }) => stableId));
     routeProfiles[manifest.id] = {
       manifest: manifest.path,

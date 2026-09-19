@@ -5,7 +5,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
-import { observeReviewedSource } from "./lib/reviewed-revision.mjs";
+import { expectReviewedCount, observeReviewedSource } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -204,7 +204,11 @@ export function generate(inputs) {
   const fnById = new Map(ir.functions.map((fn) => [fn.id, fn])), patternById = new Map(patterns.bindings.map((row) => [row.id, row])), schemaById = new Map(schemas.rows.map((row) => [row.id, row])), types = new Map(ir.types.map((type) => [type.name, type]));
   const tableRoutes = accounting.rows.filter(({ id, evidence }) =>
     patternById.get(id)?.loweringFamily === "lua-table" && evidence?.generator !== "native-value-dispatch");
-  assert(tableRoutes.length === policy.expectedLuaTableRouteCount, `table-record lua-table census drifted: ${tableRoutes.length}`);
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-table-record-bindings.json",
+    label: "table-record lua-table census",
+    expected: policy.expectedLuaTableRouteCount, observed: tableRoutes.length
+  });
   assert(new Set(tableRoutes.map(({ id }) => id)).size === tableRoutes.length, "table-record lua-table identities are duplicated");
   const tableRouteIds = new Set(tableRoutes.map(({ id }) => id));
   assert(schemas.familyCounts?.["lua-table"] === tableRoutes.length, "table-record schema lua-table census drifted");
@@ -223,7 +227,11 @@ export function generate(inputs) {
     const argumentCodecs = fn.parameters.map(({ rawType }) => scalarTypes.get(rawType)); assert(argumentCodecs.every(Boolean), `${rule.id}: reviewed scalar argument type drifted`);
     return { id: rule.id, stableId: stableBindingId(rule.id), modulePath: fn.modulePath, member: fn.member, requiredContext: rule.requiredContext, context, source: `upstream/defold/${source.path}`, sourceSha256: source.sha256, sourceAnchors: rule.sourceAnchors, argumentCodecs, fields: type.fields.map((field) => ({ name: field.rawName, codec: fieldCodec(field, rule.id) })), reason: rule.reason };
   }).sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
-  assert(rows.length === policy.expectedCandidateCount, `table-record candidate census drifted: ${rows.length}`); assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "table-record stable ID collision");
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-table-record-bindings.json",
+    label: "table-record candidate census",
+    expected: policy.expectedCandidateCount, observed: rows.length
+  }); assert(new Set(rows.map(({ stableId }) => stableId)).size === rows.length, "table-record stable ID collision");
   const selectedIds = new Set(rows.map(({ id }) => id));
   const blockedRoutes = tableRoutes.filter(({ id }) => !selectedIds.has(id)).map(({ id }) => { const schema = schemaById.get(id); return { id, stableId: stableBindingId(id), bucket: schema.bucket, blocker: blockerFor(schema) }; }).sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
   const blockerCounts = Object.fromEntries(Object.keys(policy.expectedBlockerCounts).sort(compare).map((blocker) => [blocker, blockedRoutes.filter((row) => row.blocker === blocker).length]));

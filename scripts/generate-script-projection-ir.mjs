@@ -3,6 +3,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const outputUrl = new URL("packages/bindings/generated/defold-script-projection-ir.json", root);
@@ -395,7 +396,10 @@ export function generateScriptProjectionIr(textInputs) {
   const parsed = Object.fromEntries(Object.entries(textInputs).map(([name, text]) => [name, parseJson(text, name)]));
   const { ir, patterns, accounting } = parsed;
   if (ir.counts?.functions !== 926 || ir.functions?.length !== 926) {
-    throw new Error(`script IR function census drifted: expected 926, got ${ir.functions?.length ?? "missing"}`);
+    expectReviewedCount({
+      input: "scripts/generate-script-projection-ir.mjs", label: "script IR function census",
+      expected: 926, observed: ir.functions?.length ?? -1
+    });
   }
   if (patterns.classifiedFunctionCount !== patterns.bindings?.length || accounting.functionCount !== ir.functions.length) {
     throw new Error("script pattern/accounting census is stale against the script IR");

@@ -7,6 +7,7 @@ import {
   stableBindingId as fnv1a32
 } from "./lib/binding-identity.mjs";
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
+import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const patternsUrl = new URL("packages/bindings/generated/defold-script-binding-patterns.json", root);
@@ -108,7 +109,13 @@ function makeOutputs(patternsText, irText, validatedOverrides) {
     })
     .sort((left, right) => left.stableId - right.stableId);
 
-  if (bindings.length !== 90) throw new Error(`Expected 90 scalar bindings, got ${bindings.length}`);
+  // 90 is the count at the revision this generator was written against. In an
+  // ordinary generation a different number is a regression; in a declared
+  // derivation it is what that revision has - 1.13.1 has 117 - and is reported.
+  expectReviewedCount({
+    input: "scripts/generate-scalar-lua-dispatch.mjs", label: "scalar bindings",
+    expected: 90, observed: bindings.length
+  });
   for (const id of validatedOverrides.keys()) {
     if (!usedOverrides.has(id)) throw new Error(`Semantic override does not match an emitted scalar binding: ${id}`);
   }

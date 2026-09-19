@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const root = new URL("../", import.meta.url);
 const paths = {
@@ -34,7 +35,11 @@ export function generate(inputs) {
   const sourceByKey = new Map();
   for (const source of policy.sources) { const text = inputs.sourceTexts.get(source.path); assert(!sourceByKey.has(source.key) && typeof text === "string" && sha256(text) === source.sha256, `${source.path}: pinned copied-value source drifted`); sourceByKey.set(source.key, { ...source, text }); }
   const frontierRows = frontier.blockedRoutes.filter(({ blocker }) => blocker === "copied-defold-value-record");
-  assert(frontierRows.length === policy.expectedRouteCount, `copied-value frontier census drifted: ${frontierRows.length}`);
+  expectReviewedCount({
+    input: "packages/bindings/overrides/script-copied-value-record-blockers.json",
+    label: "copied-value frontier census",
+    expected: policy.expectedRouteCount, observed: frontierRows.length
+  });
   const frontierIds = new Set(frontierRows.map(({ id }) => id)), fnById = new Map(ir.functions.map((fn) => [fn.id, fn]),), patternById = new Map(patterns.bindings.map((row) => [row.id, row]));
   const seen = new Set(); const routes = policy.routes.map((rule) => {
     assert(!seen.has(rule.id), `${rule.id}: duplicate copied-value blocker`); seen.add(rule.id); assert(frontierIds.has(rule.id), `${rule.id}: route left the copied-value frontier`);
