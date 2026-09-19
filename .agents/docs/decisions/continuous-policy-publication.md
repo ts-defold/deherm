@@ -75,6 +75,13 @@ updates issues, but does not withhold a coherent policy. The workflow never
 waits for a review PR. Pull requests remain useful for generator code changes,
 not as a checkpoint for mechanically derived engine revisions.
 
+The engine step is allowed to continue long enough to upload reports and update
+issues after a failure, but an infrastructure, compile, link, or harness failure
+still makes the engine job red at its final enforcement step. An unexecuted or
+unproven API route is evidence and does not fail the job; failure to run the
+evidence machinery itself is a CI failure. This prevents a green wrapper from
+masking a compiler or engine-launch defect.
+
 The consumer smoke is deliberately after publication and resolves
 `https://ts-defold.dev/deherm`; the local relocation/tamper test is not accepted
 as evidence that Pages deployed the new bytes. It waits for the public manifest

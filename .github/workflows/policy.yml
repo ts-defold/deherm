@@ -372,6 +372,11 @@ jobs:
           body="The policy was generated and remains published, but the real-engine evidence lane did not complete successfully for \`$revision\`.\n\nRun: $RUN_URL"
           number="$(gh issue list --state open --search "in:title $title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" 2>/dev/null | head -n1 || true)"
           if [ -n "$number" ]; then gh issue comment "$number" --body "$body"; else gh issue create --title "$title" --body "$body"; fi
+      - name: Enforce engine-lane infrastructure health
+        if: always() && steps.engine.outcome != 'success'
+        run: |
+          echo 'The real-engine lane failed before it could produce trustworthy execution evidence.' >&2
+          exit 1
 
   publish-site:
     name: Publish policy website
