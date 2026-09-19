@@ -27,6 +27,7 @@ okf_version: "0.2"
 * [Static Hermes extension authoring](decisions/static-hermes-extension-authoring.md) - Proposed strict-TypeScript extension SDK with generated Defold lifecycle, ABI, metadata, and browser projection.
 * [Hybrid TypeScript toolchain](decisions/hybrid-toolchain.md) - Lua scripts plus Hermes modules, coordinated by TypeScript 7 and ttsc.
 * [Runtime profiles and reachability](decisions/runtime-profiles-and-reachability.md) - Precompiled development runtimes, release-only AOT, and cross-layer tree shaking.
+* [netcode transport per target](decisions/netcode-transport-per-target.md) - Why netcode's socket layer is swappable, what carries its packets on each of the thirteen bundle targets, and the poisoned-syscall evidence that the HTML5 path is real.
 * [Delivery model](decisions/delivery-model.md) - What ships as a Defold library/native extension and what would require a fork.
 * [Release reachability and native lowering](decisions/release-reachability-and-native-lowering.md) - ttsc resolves the exact called symbols, release emits only those, and reachable code is lowered from bytecode to extern_c native.
 * [Toolchain distribution and the build seam](decisions/toolchain-distribution-and-build-seam.md) - CI-built per-target Hermes archives, per-host hermesc/shermes, and generated C assembled into the extension for Bob and Extender.
