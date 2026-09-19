@@ -1,0 +1,368 @@
+animations {
+  id: "tank-blue-hull"
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-blue-hull-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-red-hull"
+  images {
+    image: "/assets/derived/arena/tank-red-hull-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-red-hull-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-green-hull"
+  images {
+    image: "/assets/derived/arena/tank-green-hull-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-green-hull-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-sand-hull"
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/tank-sand-hull-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 12
+}
+animations {
+  id: "tank-blue-turret"
+  images {
+    image: "/assets/derived/arena/tank-blue-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-turret"
+  images {
+    image: "/assets/derived/arena/tank-red-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-turret"
+  images {
+    image: "/assets/derived/arena/tank-green-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-turret"
+  images {
+    image: "/assets/derived/arena/tank-sand-turret.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-blue-wreck"
+  images {
+    image: "/assets/derived/arena/tank-blue-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-red-wreck"
+  images {
+    image: "/assets/derived/arena/tank-red-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-green-wreck"
+  images {
+    image: "/assets/derived/arena/tank-green-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "tank-sand-wreck"
+  images {
+    image: "/assets/derived/arena/tank-sand-wreck.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "proj-cannon"
+  images {
+    image: "/assets/derived/arena/proj-cannon.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "proj-machinegun"
+  images {
+    image: "/assets/derived/arena/proj-machinegun.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "proj-railgun"
+  images {
+    image: "/assets/derived/arena/proj-railgun.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "proj-scatter"
+  images {
+    image: "/assets/derived/arena/proj-scatter.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "proj-mortar"
+  images {
+    image: "/assets/derived/arena/proj-mortar.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "proj-ricochet"
+  images {
+    image: "/assets/derived/arena/proj-ricochet-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/proj-ricochet-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 16
+}
+animations {
+  id: "explosion-small"
+  images {
+    image: "/assets/derived/arena/explosion-small-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-small-2.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-small-3.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-small-4.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-small-5.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-small-6.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 18
+}
+animations {
+  id: "explosion-big"
+  images {
+    image: "/assets/derived/arena/explosion-big-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-big-2.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-big-3.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-big-4.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-big-5.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-big-6.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-big-7.png"
+  }
+  images {
+    image: "/assets/derived/arena/explosion-big-8.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 16
+}
+animations {
+  id: "muzzle"
+  images {
+    image: "/assets/derived/arena/muzzle-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/muzzle-2.png"
+  }
+  images {
+    image: "/assets/derived/arena/muzzle-3.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 30
+}
+animations {
+  id: "spark"
+  images {
+    image: "/assets/derived/arena/spark-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/spark-2.png"
+  }
+  images {
+    image: "/assets/derived/arena/spark-3.png"
+  }
+  images {
+    image: "/assets/derived/arena/spark-4.png"
+  }
+  playback: PLAYBACK_ONCE_FORWARD
+  fps: 24
+}
+animations {
+  id: "pickup-machinegun"
+  images {
+    image: "/assets/derived/arena/pickup-machinegun-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-machinegun-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-cannon"
+  images {
+    image: "/assets/derived/arena/pickup-cannon-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-cannon-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-railgun"
+  images {
+    image: "/assets/derived/arena/pickup-railgun-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-railgun-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-scatter"
+  images {
+    image: "/assets/derived/arena/pickup-scatter-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-scatter-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-mortar"
+  images {
+    image: "/assets/derived/arena/pickup-mortar-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-mortar-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-ricochet"
+  images {
+    image: "/assets/derived/arena/pickup-ricochet-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-ricochet-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-health"
+  images {
+    image: "/assets/derived/arena/pickup-health-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-health-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-armor"
+  images {
+    image: "/assets/derived/arena/pickup-armor-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-armor-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-overdrive"
+  images {
+    image: "/assets/derived/arena/pickup-overdrive-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-overdrive-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "pickup-pad"
+  images {
+    image: "/assets/derived/arena/pickup-pad-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/pickup-pad-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 4
+}
+animations {
+  id: "hud-bar-back"
+  images {
+    image: "/assets/derived/arena/hud-bar-back.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hud-bar-fill"
+  images {
+    image: "/assets/derived/arena/hud-bar-fill.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hud-panel"
+  images {
+    image: "/assets/derived/arena/hud-panel.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "hud-tick"
+  images {
+    image: "/assets/derived/arena/hud-tick.png"
+  }
+  playback: PLAYBACK_NONE
+}
+extrude_borders: 2

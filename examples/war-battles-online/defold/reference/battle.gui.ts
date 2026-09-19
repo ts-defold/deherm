@@ -82,7 +82,9 @@ interface BattleGuiSelf {
 
 export default defineComponent({
   init(self: BattleGuiSelf): void {
-    self.battle = new PlayableBattle();
+    // The retained mockup is the 32-tank presentation target, so it asks for a
+    // full roster and two teams rather than the arena's default eight.
+    self.battle = new PlayableBattle({ players: MAX_PLAYERS, botSkill: 2, teams: true });
     self.accumulator = 0;
     self.up = false;
     self.down = false;
@@ -224,7 +226,7 @@ function render(self: BattleGuiSelf): void {
     const position = vmath.vector3(self.point.x, self.point.y, 0);
     gui.setPosition(body, position);
     gui.setColor(body, slot === localSlot ? self.local : world.playerTeam[slot] === 1 ? self.teamA : self.teamB);
-    gui.setEuler(body, vmath.vector3(0, 0, aimDegrees(world.playerAimX[slot]!, world.playerAimY[slot]!) + 90));
+    gui.setEuler(body, vmath.vector3(0, 0, aimDegrees(world.playerHullX[slot]!, world.playerHullY[slot]!) + 90));
   }
 
   let activeProjectiles = 0;

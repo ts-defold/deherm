@@ -1,141 +1,215 @@
-# War Battles Online core vertical slice
+# War Battles Online — Ultimate Edition
 
-This directory contains two things: the built Defold project under `defold/`,
-which is a port of the Defold **War Battles tutorial** to deherm TypeScript
-components, and an engine-independent, server-authoritative TypeScript
-simulation plus backend-neutral online transport boundary for a 32-player
-expansion of it.
+A top-down arena deathmatch, authored end to end in TypeScript and running as
+real Defold game objects: a tank you drive rather than a sprite you teleport,
+six weapons that fight differently, Quake-style pickups on respawn timers, a
+scrolling tilemap of cover and chokepoints, bots worth fighting, and a
+server-authoritative online mode over the WebTransport/QUIC boundary in `core/`.
 
-The built game is the tutorial: a tilemap level, a player game object that moves
-and spawns rockets from a factory, kinematic rocket/tank collision groups, and
-one GUI score node. The arm64-macOS custom engine has executed that whole loop
-through Dynamic Hermes; see [defold/PLAYABLE-BLOCKERS.md](./defold/PLAYABLE-BLOCKERS.md)
-for the exact observed markers.
+No Lua is authored anywhere in this example. Every component is a `.script.ts`
+or `.gui.ts` compiled through déherm.
 
-A packaged `wasm-web` bundle of the same scene has executed that whole loop in
-headless Chrome through the browser host, with no Hermes present: run
-`pnpm runtime:browser` from this package, or `pnpm test:html5:war-battles` from
-the repository root, after bundling for `wasm-web`. The gate serves the bundle
-on a scoped loopback port, drives a dedicated Chrome profile over CDP, asserts
-the bundle fingerprint and the exact marker set, and tears down everything it
-created. The recorded observation is
-[`evidence/browser-runtime-wasm-web.json`](./evidence/browser-runtime-wasm-web.json).
-Nothing inspects the canvas, so neither run is a visual claim.
-
-This is packaged local gameplay evidence, not Static Hermes, whole-API,
-allocation, or QUIC deployment evidence.
-
-The 32-player presentation mockup that used to be the built scene is retained,
-unbuilt, under [`defold/reference/`](./defold/reference/README.md).
-
-## What is implemented
-
-- 60 Hz integer/fixed-direction simulation with a stable player-slot iteration
-  order and generation-keyed entity ids.
-- Fixed-capacity structure-of-arrays stores for 32 players, 512 projectiles, and
-  256 ticks of input history. `BattleWorld.step()` contains no explicit object,
-  array, map, set, or closure construction. This is an architectural observation,
-  not a VM allocation measurement.
-- A validated 32-byte input command with match/player/tick/sequence identity,
-  axes, fire sub-tick, and a 32-snapshot acknowledgement window.
-- Caller-owned full snapshots for rollback/reconciliation. The fixed 13,716-byte
-  snapshot includes authoritative simulation state; the external input replay log
-  is intentionally separate and must be re-submitted after a rollback.
-- Data-driven cannon, autocannon, and railgun definitions plus damage, mobility,
-  and armor upgrade tracks.
-- A transport interface, deterministic in-memory adapter, browser WebTransport
-  client, Deno QUIC listener adapter, and an adoption boundary for an accepted
-  server WebTransport session.
-  Session/control/snapshot messages use independent reliable streams. Tick input
-  uses datagrams only when runtime capability and negotiated size permit it;
-  otherwise a cancellable reliable-stream fallback is explicit.
-- A pinned, self-hosted Colyseus H3 Docker browser gate that exposes both TCP
-  and UDP and refuses to count a WebSocket connection as a passing result.
-- A generated `.script.ts`/`.gui.ts` War Battles tutorial port that runs as
-  Defold game objects: tilemap, player sprite with arrow-key movement, a rocket
-  factory with a typed `dir` vector3 property, kinematic `rockets`/`tanks`
-  collision groups, a once-forward explosion, and a single GUI score node.
-- A retained, unbuilt `reference/battle.gui` presentation mockup with WASD
-  controls, independent tank turrets, 31 deterministic bots, a player-following
-  camera, a 160-node projectile render pool, HUD, upgrades, and restart loop.
-  It remains the visual target for a later presentation phase.
-- A headless match runner with deterministic bots, all three weapons, upgrade
-  purchases, snapshot restore/replay, a portable binary replay, and a 32-player
-  ten-minute simulated soak fixture.
-- An evidence-driven transport-selection state machine. Colyseus H3 is the
-  primary evaluation target; Deno and Quinn are explicit alternatives; WebRTC,
-  WebSocket, and offline modes keep their actual wire-protocol labels.
-
-This example is a private pnpm workspace package. From this directory, install
-once at the repository root and then use its own commands:
-
-```sh
-pnpm generate
-pnpm check
-pnpm play:headless
-pnpm play
-pnpm soak
-pnpm bundle:size
-pnpm dev
-pnpm runtime:packaged
+```
+core/        the engine-independent simulation, protocol, transport, server, client
+server/      a runnable Deno HTTP/3 server                    (server/README.md)
+defold/      the Defold project that renders and plays it     (defold/README.md)
+headless/    a deterministic match runner and replay format
+tools/       the art generator and the arena tilemap generator
+integration/ the runtime gates and their evidence envelopes
+evidence/    what each gate actually observed
 ```
 
-`pnpm generate` invokes the installed public `deherm` CLI, which generates both
-the project SDK/configuration and `.script.ts` component proxies, then refreshes
-the example's checked source snapshots. `pnpm dev` starts the compiler/watcher/
-hot-reload control plane. Run `pnpm play` in a second terminal to keep the
-already-built arm64-macOS game open while the watcher rebuilds its development
-resource. `pnpm runtime:packaged` launches the same engine as a bounded evidence
-probe; it is not the interactive play command. The evidence probe observes the
-exact runtime markers, rejects known failures, settles for 1.5 seconds, and
-terminates the engine.
+## Playing it
+
+```sh
+pnpm install                      # once, at the repository root
+cd examples/war-battles-online
+pnpm generate                     # SDK, component proxies, synced sources
+pnpm check                        # generated state, art, tilemap, types, 54 tests
+pnpm play                         # the built arm64-macOS engine
+```
+
+| Keys | Action |
+| --- | --- |
+| Arrows / WASD | Thrust. The tank has mass: it accelerates, drifts and coasts |
+| Space | Fire |
+| Shift | Boost — a limited, recharging burst |
+| `1`–`6` | Cannon, autocannon, railgun, scatter, mortar, ricochet |
+
+The scene opens on the tutorial's scripted demonstration, which is what the
+packaged runtime gates observe; **any key starts the match immediately**, and it
+starts on its own when the demonstration ends. For online play, see
+[`server/README.md`](./server/README.md).
+
+For a match with no engine at all:
+
+```sh
+pnpm play:headless                # 32 bots, one minute, deterministic
+pnpm soak                         # 32 bots, ten minutes, with a rollback check
+```
+
+## The game
+
+**Tanks have mass.** A tank thrusts, drags and coasts; it is not repositioned.
+The drive speed is enforced by refusing thrust that would exceed it, *not* by
+clamping the velocity vector, so an explosion can still throw a tank well past
+its own top speed — which is what makes splash knockback and rocket-jumping real
+rather than cancelled on the next tick. The hull chases the direction of travel
+and the turret chases the aim, at different rates, so a tank visibly drifts
+through a turn while still shooting where you are pointing.
+
+**Six weapons, six ways to fight.** Every tank spawns with the cannon and
+unlimited ammunition for it; the other five are picked up.
+
+| Weapon | Shape of the fight |
+| --- | --- |
+| Cannon | The floor. 30 damage, slow, always available |
+| Autocannon | 9 damage every 5 ticks with a little spread: suppression, not duels |
+| Railgun | 72 damage at 512 units a tick, pierces two tanks, 1.5 s between shots |
+| Scatter | Seven pellets in a fan, lethal in your face and useless across the map |
+| Mortar | 58 on impact plus 46 of falling-off splash, and enough knockback to ride |
+| Ricochet | 21 damage, four wall bounces, 2.5 s of life: shoot round the corner |
+
+**Pickups, on Quake timers.** Thirty-two pads, placed symmetrically, each with
+its own respawn clock: 12 s for the autocannon, 25 s for the railgun and the
+mortar, 15 s for health, 20 s for armour, 40 s for overdrive. A pad you cannot
+use is left standing rather than wasted. Picking a weapon up equips it unless
+what you are holding is already stronger. Armour absorbs two thirds of incoming
+damage until it is gone; overdrive doubles what you deal for ten seconds.
+
+**An arena, not a field.** 120x90 tiles of point-symmetric cover: bunkers with a
+doorway, long walls, crate clusters and sandbag lines, on a 15-tile lattice that
+guarantees at least eight tiles of corridor between any two blocks. Every open
+cell is reachable — the test suite floods the map to prove it. Cover is
+**not destructible**, on purpose: the grid is derived from a four-byte seed
+rather than stored, so a joining client rebuilds it exactly and the snapshot
+stays a fixed 17,560 bytes with no terrain delta codec.
+
+**Bots that are worth fighting.** A bot is a client, not a special case: it reads
+the world and emits the same 32-byte input packet a keyboard does, which is why
+the server can host them, a client can host them offline, and `BattleWorld` has
+no notion of "AI" at all. They break for health when hurt, contest the pad that
+would upgrade them, close to the range their current weapon actually wants,
+strafe across a target rather than walking into it, steer around cover with a
+remembered avoidance side so they do not dither in a doorway, notice when they
+are stuck, and lead a shot by the time the projectile will take to arrive. Four
+difficulty rows scale reaction time, aim error, lead accuracy, trigger
+discipline, greed and strafe. The suite asserts that nightmare beats recruits.
+
+**Short time to kill, and straight back in.** 100 health, 96 ticks dead, one
+second of half-damage spawn protection, and a spawn point chosen for distance
+from the nearest living enemy.
+
+## How it is put together
+
+The simulation is **integer-only**. There is no `Math.sin`, `Math.cos` or
+`Math.sqrt` anywhere in `BattleWorld`, because none of them is required to be
+bit-identical between two JavaScript engines and this world is stepped
+independently by a server and by every predicting client. Directions are Q8 unit
+vectors rather than angles, so slewing a turret is a normalised lerp over an
+exact integer square root, and no sine table is needed at all.
+
+Everything is fixed-capacity: 32 players, 512 projectiles, 32 pickup pads, 256
+ticks of input history, a 256-slot presentation event ring. `step()` constructs
+no object, array, map, set or closure; its scratch vectors are instance fields.
+That is an architectural property of the class, not a VM allocation measurement.
+
+The **Defold side is shaped by what the bindings can actually execute.** Only the
+current-instance shapes of `go.set_position` / `go.set_rotation` /
+`go.get_position` are implemented, so nothing writes another object's transform:
+the arena director creates objects and never moves them, and every hull, turret,
+projectile and pad reads the slot it was spawned for and moves itself. A tank is
+two game objects because the hull and the turret rotate independently and each
+has to be the thing that rotates.
+
+**Art is generated**, by `tools/generate-art.mjs`, from a palette histogrammed
+out of the pinned tutorial PNGs — the generator throws if asked for a colour that
+is not in that histogram. Same 16 px tiles, same chunky silhouettes, same 1 px
+`#2c2839` outline the tutorial sprites carry. It writes 70 files plus the atlas
+and the tilesource, is byte-reproducible, and has a `--check` mode wired into
+`pnpm check`. `tools/generate-arena-tilemap.mjs` then emits the tilemap from the
+*same* arena seed and the art manifest's tile ids, so the picture and the
+collision grid cannot drift apart.
+
+## Online
+
+`core/match-server.ts` is the authoritative match: one `BattleWorld`, one session
+per client, bots filling every slot no human has taken. `core/client.ts` is the
+predicting client: it runs the world locally, sends one input per tick on the
+unreliable lane, and on each authoritative snapshot restores and replays its own
+newer inputs so the local tank does not rubber-band while the rest of the arena
+snaps to the truth. Both talk to `GameTransport` and nothing else, so the same
+code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
+over anything else implementing four methods.
+
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 2, the
+tick input packet is still exactly 32 bytes (version 1 reserved byte 15 and
+wrote zero; it is now the weapon request, so every other offset is unchanged),
+and the session, control and snapshot lanes now carry a typed four-byte envelope
+whose kind fixes the lane it is allowed on. Full table in
+[`server/README.md`](./server/README.md).
+
+**What is and is not proven.** The two-client match, the prediction agreeing with
+the server exactly, the reconciliation replay, the full-match refusal, the
+rejection of a packet claiming another player's slot, and the reliable control
+lane are all covered by `test/core.test.mjs` over the in-memory transport. **No
+real QUIC session has been opened by any gate in this repository.** The Deno
+host and the certificate procedure are written and typechecked; running them is
+the next gate, not a result in hand.
+
+## Evidence, and what is currently stale
+
+[`evidence/headless-soak.json`](./evidence/headless-soak.json) is a ten-minute
+32-bot match: 36,000 ticks, a 36,864,032-byte replay of the inputs the real bot
+controller produced, 1,402 kills, and an authoritative restore-and-replay that
+finishes at the same state hash as uninterrupted play. In-process determinism
+only — not a network, Defold, rendering or allocation result.
+
+[`evidence/bundle-size.json`](./evidence/bundle-size.json) is regenerated by
+`pnpm bundle:size:update` and asserted byte-for-byte by the tests. JavaScript
+bundle measurements only; no Defold package or Hermes bytecode size is claimed.
+
+**The two packaged-engine evidence documents are stale.** Rebuilding the scene
+changed the authored project tree they are bound to, and re-recording them is a
+real engine run — Bob, a local Extender, a custom arm64-macOS engine, and for the
+browser a `wasm-web` bundle — which the change that broke them could not perform.
+The gates are unchanged and still refuse; the test suite names the debt with a
+skipped test and a companion test asserting that the gate does report staleness
+rather than passing quietly. See
+[`defold/PLAYABLE-BLOCKERS.md`](./defold/PLAYABLE-BLOCKERS.md) for the exact
+commands.
+
+The marker contract those gates assert on is deliberately preserved: the scripted
+demonstration, its coordinates and all ten of its markers are unchanged, and two
+markers were added on purpose — `war-battles:arena-init` and
+`war-battles:arena-engaged` — so a re-recorded run observes that the match itself
+started and not only that the tutorial loop ran. The browser gate's in-engine
+component count moved from five to eight for the same reason, and
+`test/integration.test.mjs` asserts that number against the generated component
+manifest so the two cannot drift.
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `pnpm generate` | Project SDK, component proxies, synced `core/` sources |
+| `pnpm check` | Generated state, art and tilemap freshness, types, tests |
+| `pnpm art` / `pnpm art:check` | Regenerate or verify the pixel art |
+| `pnpm tilemap` / `pnpm tilemap:check` | Regenerate or verify the arena tilemap |
+| `pnpm play` | Launch the built native engine |
+| `pnpm play:headless`, `pnpm soak` | Deterministic matches with no engine |
+| `pnpm serve` | The Deno HTTP/3 match server |
+| `pnpm dev` | Compiler, watcher and hot-reload control plane |
+| `pnpm runtime:packaged`, `pnpm runtime:browser` | The two packaged runtime gates |
+| `pnpm runtime:projections` | The projection-set gate |
+| `pnpm bundle:size`, `pnpm bundle:size:update` | Bundle measurement |
 
 The headless runner also accepts `--replay-out PATH` and `--replay-in PATH`.
 Writing and reading the same replay reproduces the same state and body hashes;
 the runner exits nonzero if its rollback result differs from uninterrupted play.
 
-## Current integration evidence
-
-The checked ten-minute simulation evidence is in
-[`evidence/headless-soak.json`](./evidence/headless-soak.json). At 60 Hz it runs
-36,000 ticks for 32 bots, processes a 36,864,032-byte replay, performs an
-authoritative restore/replay, and finishes both paths at state hash `238808479`.
-This is an in-process deterministic soak, not a network, Defold, rendering, or
-allocation-profile result.
-
-[`evidence/bundle-size.json`](./evidence/bundle-size.json) is regenerated by the
-measurement command and asserted byte-for-byte by the integration tests. With
-esbuild 0.25.10, the minified headless Node bundle is 21,229 bytes (6,049 gzip)
-and the diagnostic Defold-GUI bundle is 21,465 bytes (6,550 gzip). These
-are JavaScript bundle measurements only. No Defold package or Hermes bytecode
-size is claimed by this file.
-
-[`evidence/packaged-runtime-arm64-macos.json`](./evidence/packaged-runtime-arm64-macos.json)
-binds the successful run to the exact custom engine, archive index/data,
-compiled project, manifest, JavaScript bundle, complete packaged extension
-tree, authored Defold project tree, upstream/déherm locks, component manifest,
-and lowering-plan sentinel hashes. Its game-owned initialization marker is
-emitted only after TypeScript `init` resolves the 32 tank bodies, 32 turrets,
-160 projectile nodes and HUD nodes, performs the first render through
-`gui`/`vmath`, and posts input focus. A second game-owned marker follows the
-first TypeScript update and render. The harness then rejects
-error/fatal/script/traceback/bundle and
-component-runtime diagnostics during a bounded settling window, records the
-actual exit status/signal and canonical transcript digest, and records no
-volatile timestamp.
-
-The Defold frontend lives in [`defold`](./defold/README.md). The public CLI
-generates its single GUI proxy and passes shared, game-object, GUI, and render
-typechecking, generated-state verification, and a one-shot headless development
-build. Pinned Bob compiles the collection, GUI scene, input, font, and proxy into
-an arm64-macOS resource archive. Its current native-extension upload also
-contains the extension manifest, sources, headers, and packaged Hermes archive;
-the current custom engine build and launch passed the scoped packaged runtime
-gate. The generated global capability manifest still records
-`native-dynamic-hermes-harness-executable`/`runtimeConformant: false`, and the
-War Battles evidence intentionally does not rewrite that broader claim. Exact
-executed routes and remaining blockers are in
-[`defold/PLAYABLE-BLOCKERS.md`](./defold/PLAYABLE-BLOCKERS.md).
+The 32-player presentation mockup that used to be the built scene is retained,
+unbuilt, under [`defold/reference/`](./defold/reference/README.md).
 
 ## Transport architecture
 

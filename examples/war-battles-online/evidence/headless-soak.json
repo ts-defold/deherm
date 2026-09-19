@@ -1,7 +1,8 @@
 {
-  "schemaVersion": 1,
-  "observedOn": "2026-09-18",
+  "schemaVersion": 2,
+  "observedOn": "2026-09-19",
   "scope": "In-process deterministic simulation; no network, engine, renderer, or VM allocation profiling",
+  "fixture": "Recorded match: the real BotController drives all 32 tanks, and the replay is the input stream it produced",
   "players": 32,
   "ticks": 36000,
   "tickRate": 60,
@@ -9,12 +10,13 @@
   "replayBytes": 36864032,
   "seed": 12648430,
   "matchId": 77,
-  "stateHash": 238808479,
-  "replayBodyHash": 1903337259,
+  "mapSeed": 12648430,
+  "stateHash": 4041656263,
+  "replayBodyHash": 2921885044,
   "alivePlayers": 29,
-  "totalKills": 3,
+  "totalKills": 1402,
   "rollbackCount": 1,
   "rollbackMatchesUninterrupted": true,
-  "wallClockObservationMs": 478.6,
+  "wallClockObservationMs": 2506.0,
   "note": "Wall-clock duration is one local observation and is not asserted by tests; deterministic hashes and counts are asserted."
 }

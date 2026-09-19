@@ -18,3 +18,51 @@ key_trigger {
   input: KEY_SPACE
   action: "fire"
 }
+key_trigger {
+  input: KEY_W
+  action: "up"
+}
+key_trigger {
+  input: KEY_S
+  action: "down"
+}
+key_trigger {
+  input: KEY_A
+  action: "left"
+}
+key_trigger {
+  input: KEY_D
+  action: "right"
+}
+key_trigger {
+  input: KEY_LSHIFT
+  action: "boost"
+}
+key_trigger {
+  input: KEY_RSHIFT
+  action: "boost"
+}
+key_trigger {
+  input: KEY_1
+  action: "weapon1"
+}
+key_trigger {
+  input: KEY_2
+  action: "weapon2"
+}
+key_trigger {
+  input: KEY_3
+  action: "weapon3"
+}
+key_trigger {
+  input: KEY_4
+  action: "weapon4"
+}
+key_trigger {
+  input: KEY_5
+  action: "weapon5"
+}
+key_trigger {
+  input: KEY_6
+  action: "weapon6"
+}

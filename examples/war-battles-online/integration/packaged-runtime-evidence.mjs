@@ -33,6 +33,11 @@ export const REQUIRED_MARKERS = Object.freeze([
   "INFO:DEFOLD_HERMES: war-battles:score:100",
   "INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done",
   "INFO:DEFOLD_HERMES: war-battles:player-moved:1592.0:1072.0",
+  // The scripted demonstration ends by handing the scene to the arena, which
+  // creates the roster, the turrets and the pickup pads. Observing the engage
+  // marker is what distinguishes "the tutorial loop ran" from "the game started".
+  "INFO:DEFOLD_HERMES: war-battles:arena-init:players=8:online=0",
+  "INFO:DEFOLD_HERMES: war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline",
   "INFO:DEFOLD_HERMES: Extension update entered (application initialized: false)",
 ]);
 

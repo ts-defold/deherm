@@ -1,0 +1,4869 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "schemaVersion": 1,
+  "generator": "tools/generate-art.mjs",
+  "source": {
+    "tutorial": "defold/tutorial-war-battles",
+    "licensedRevision": "645d9a1bc6c164237116e685694fca94021fc001",
+    "resourceReference": "ts-defold/tsd-template-war-battles",
+    "referenceRevision": "a3e6b8d066110d8607bada4cc7f456eefc529218",
+    "artistCredit": "Luis Zuno",
+    "license": "../../licenses/defold-tutorial-war-battles-MIT.txt",
+    "note": "No tutorial pixels are copied. Only the colour histogram of the pinned tutorial PNGs is sampled; every new pixel is drawn from that sampled palette."
+  },
+  "determinism": {
+    "seed": 1095913025,
+    "rng": "mulberry32",
+    "zlibLevel": 9,
+    "pngFilter": "none (filter type 0 on every scanline)",
+    "timestamps": "none"
+  },
+  "palette": {
+    "sampledFrom": [
+      "map.png",
+      "units/tank/down/1.png",
+      "units/tank/down/2.png",
+      "units/infantry/down/1.png",
+      "fx/explosion/1.png",
+      "fx/explosion/2.png",
+      "fx/explosion/3.png",
+      "fx/explosion/4.png",
+      "fx/explosion/5.png",
+      "buildings/command-center/1.png",
+      "buildings/turret/1.png"
+    ],
+    "quantisation": {
+      "opaqueAlphaThreshold": 250,
+      "mergeRadiusRgb": 3,
+      "minPixelCount": 4,
+      "maxEntries": 72,
+      "rule": "Histogram every opaque pixel of the pinned sources, fold near-duplicates within the merge radius into the more frequent colour, drop anything below the minimum count, keep the most-used entries."
+    },
+    "entries": [
+      {
+        "hex": "#708646",
+        "rgb": [
+          112,
+          134,
+          70
+        ],
+        "count": 11095,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 11095
+          }
+        ]
+      },
+      {
+        "hex": "#607e41",
+        "rgb": [
+          96,
+          126,
+          65
+        ],
+        "count": 9620,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 9620
+          }
+        ]
+      },
+      {
+        "hex": "#4f8c9c",
+        "rgb": [
+          79,
+          140,
+          156
+        ],
+        "count": 8156,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 8156
+          }
+        ]
+      },
+      {
+        "hex": "#503b41",
+        "rgb": [
+          80,
+          59,
+          65
+        ],
+        "count": 4396,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 4396
+          }
+        ]
+      },
+      {
+        "hex": "#3e2c39",
+        "rgb": [
+          62,
+          44,
+          57
+        ],
+        "count": 3991,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [
+          "#3e2d3a"
+        ],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 3991
+          }
+        ]
+      },
+      {
+        "hex": "#85604e",
+        "rgb": [
+          133,
+          96,
+          78
+        ],
+        "count": 3466,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 3466
+          }
+        ]
+      },
+      {
+        "hex": "#bf9b68",
+        "rgb": [
+          191,
+          155,
+          104
+        ],
+        "count": 3354,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 3354
+          }
+        ]
+      },
+      {
+        "hex": "#644543",
+        "rgb": [
+          100,
+          69,
+          67
+        ],
+        "count": 2776,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 2776
+          }
+        ]
+      },
+      {
+        "hex": "#997a61",
+        "rgb": [
+          153,
+          122,
+          97
+        ],
+        "count": 2367,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 2367
+          }
+        ]
+      },
+      {
+        "hex": "#423438",
+        "rgb": [
+          66,
+          52,
+          56
+        ],
+        "count": 2311,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "fx/explosion/5.png",
+            "count": 947
+          },
+          {
+            "file": "fx/explosion/2.png",
+            "count": 852
+          },
+          {
+            "file": "fx/explosion/4.png",
+            "count": 322
+          },
+          {
+            "file": "fx/explosion/3.png",
+            "count": 190
+          }
+        ]
+      },
+      {
+        "hex": "#a37860",
+        "rgb": [
+          163,
+          120,
+          96
+        ],
+        "count": 1999,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1999
+          }
+        ]
+      },
+      {
+        "hex": "#764d53",
+        "rgb": [
+          118,
+          77,
+          83
+        ],
+        "count": 1928,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1928
+          }
+        ]
+      },
+      {
+        "hex": "#284020",
+        "rgb": [
+          40,
+          64,
+          32
+        ],
+        "count": 1838,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1838
+          }
+        ]
+      },
+      {
+        "hex": "#3c7887",
+        "rgb": [
+          60,
+          120,
+          135
+        ],
+        "count": 1738,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [
+          "#3b7685"
+        ],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1738
+          }
+        ]
+      },
+      {
+        "hex": "#4b4233",
+        "rgb": [
+          75,
+          66,
+          51
+        ],
+        "count": 1607,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1607
+          }
+        ]
+      },
+      {
+        "hex": "#fce8c0",
+        "rgb": [
+          252,
+          232,
+          192
+        ],
+        "count": 1483,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "fx/explosion/1.png",
+            "count": 716
+          },
+          {
+            "file": "fx/explosion/4.png",
+            "count": 364
+          },
+          {
+            "file": "fx/explosion/3.png",
+            "count": 340
+          },
+          {
+            "file": "fx/explosion/5.png",
+            "count": 63
+          }
+        ]
+      },
+      {
+        "hex": "#8a797e",
+        "rgb": [
+          138,
+          121,
+          126
+        ],
+        "count": 1478,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [
+          "#8a7a7f"
+        ],
+        "sources": [
+          {
+            "file": "fx/explosion/4.png",
+            "count": 437
+          },
+          {
+            "file": "fx/explosion/3.png",
+            "count": 428
+          },
+          {
+            "file": "fx/explosion/5.png",
+            "count": 381
+          },
+          {
+            "file": "fx/explosion/2.png",
+            "count": 232
+          }
+        ]
+      },
+      {
+        "hex": "#4d613a",
+        "rgb": [
+          77,
+          97,
+          58
+        ],
+        "count": 1473,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1473
+          }
+        ]
+      },
+      {
+        "hex": "#5d5643",
+        "rgb": [
+          93,
+          86,
+          67
+        ],
+        "count": 1341,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1341
+          }
+        ]
+      },
+      {
+        "hex": "#d4b978",
+        "rgb": [
+          212,
+          185,
+          120
+        ],
+        "count": 1240,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1240
+          }
+        ]
+      },
+      {
+        "hex": "#2c2839",
+        "rgb": [
+          44,
+          40,
+          57
+        ],
+        "count": 1210,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 686
+          },
+          {
+            "file": "units/tank/down/1.png",
+            "count": 159
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 151
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 146
+          },
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 68
+          }
+        ]
+      },
+      {
+        "hex": "#5fb8b2",
+        "rgb": [
+          95,
+          184,
+          178
+        ],
+        "count": 1199,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1199
+          }
+        ]
+      },
+      {
+        "hex": "#7a914b",
+        "rgb": [
+          122,
+          145,
+          75
+        ],
+        "count": 1060,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1060
+          }
+        ]
+      },
+      {
+        "hex": "#3a5d2f",
+        "rgb": [
+          58,
+          93,
+          47
+        ],
+        "count": 1004,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 1004
+          }
+        ]
+      },
+      {
+        "hex": "#363124",
+        "rgb": [
+          54,
+          49,
+          36
+        ],
+        "count": 891,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 891
+          }
+        ]
+      },
+      {
+        "hex": "#453a4e",
+        "rgb": [
+          69,
+          58,
+          78
+        ],
+        "count": 838,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 757
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 81
+          }
+        ]
+      },
+      {
+        "hex": "#a3766e",
+        "rgb": [
+          163,
+          118,
+          110
+        ],
+        "count": 806,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 806
+          }
+        ]
+      },
+      {
+        "hex": "#b5926a",
+        "rgb": [
+          181,
+          146,
+          106
+        ],
+        "count": 796,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 796
+          }
+        ]
+      },
+      {
+        "hex": "#fcbb66",
+        "rgb": [
+          252,
+          187,
+          102
+        ],
+        "count": 768,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "fx/explosion/4.png",
+            "count": 342
+          },
+          {
+            "file": "fx/explosion/5.png",
+            "count": 222
+          },
+          {
+            "file": "fx/explosion/3.png",
+            "count": 204
+          }
+        ]
+      },
+      {
+        "hex": "#8b7e56",
+        "rgb": [
+          139,
+          126,
+          86
+        ],
+        "count": 651,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 651
+          }
+        ]
+      },
+      {
+        "hex": "#515454",
+        "rgb": [
+          81,
+          84,
+          84
+        ],
+        "count": 591,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 508
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 46
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 23
+          },
+          {
+            "file": "units/tank/down/1.png",
+            "count": 13
+          },
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "hex": "#c95e2b",
+        "rgb": [
+          201,
+          94,
+          43
+        ],
+        "count": 591,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "fx/explosion/4.png",
+            "count": 323
+          },
+          {
+            "file": "fx/explosion/5.png",
+            "count": 250
+          },
+          {
+            "file": "fx/explosion/3.png",
+            "count": 18
+          }
+        ]
+      },
+      {
+        "hex": "#8a1a27",
+        "rgb": [
+          138,
+          26,
+          39
+        ],
+        "count": 542,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "fx/explosion/5.png",
+            "count": 343
+          },
+          {
+            "file": "fx/explosion/4.png",
+            "count": 199
+          }
+        ]
+      },
+      {
+        "hex": "#496f3b",
+        "rgb": [
+          73,
+          111,
+          59
+        ],
+        "count": 540,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 540
+          }
+        ]
+      },
+      {
+        "hex": "#738485",
+        "rgb": [
+          115,
+          132,
+          133
+        ],
+        "count": 504,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 446
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 38
+          },
+          {
+            "file": "units/tank/down/1.png",
+            "count": 13
+          },
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 4
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 3
+          }
+        ]
+      },
+      {
+        "hex": "#abe0dd",
+        "rgb": [
+          171,
+          224,
+          221
+        ],
+        "count": 418,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 418
+          }
+        ]
+      },
+      {
+        "hex": "#234a2e",
+        "rgb": [
+          35,
+          74,
+          46
+        ],
+        "count": 400,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 400
+          }
+        ]
+      },
+      {
+        "hex": "#c7a568",
+        "rgb": [
+          199,
+          165,
+          104
+        ],
+        "count": 313,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 313
+          }
+        ]
+      },
+      {
+        "hex": "#0a3f29",
+        "rgb": [
+          10,
+          63,
+          41
+        ],
+        "count": 312,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 312
+          }
+        ]
+      },
+      {
+        "hex": "#568547",
+        "rgb": [
+          86,
+          133,
+          71
+        ],
+        "count": 305,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 305
+          }
+        ]
+      },
+      {
+        "hex": "#116742",
+        "rgb": [
+          17,
+          103,
+          66
+        ],
+        "count": 280,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 280
+          }
+        ]
+      },
+      {
+        "hex": "#336333",
+        "rgb": [
+          51,
+          99,
+          51
+        ],
+        "count": 274,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 274
+          }
+        ]
+      },
+      {
+        "hex": "#9ca6a6",
+        "rgb": [
+          156,
+          166,
+          166
+        ],
+        "count": 268,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 224
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 22
+          },
+          {
+            "file": "units/tank/down/1.png",
+            "count": 14
+          },
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 4
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 4
+          }
+        ]
+      },
+      {
+        "hex": "#ab9b82",
+        "rgb": [
+          171,
+          155,
+          130
+        ],
+        "count": 266,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 266
+          }
+        ]
+      },
+      {
+        "hex": "#743f27",
+        "rgb": [
+          116,
+          63,
+          39
+        ],
+        "count": 192,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "units/tank/down/1.png",
+            "count": 84
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 84
+          },
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 24
+          }
+        ]
+      },
+      {
+        "hex": "#a17132",
+        "rgb": [
+          161,
+          113,
+          50
+        ],
+        "count": 164,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "units/tank/down/1.png",
+            "count": 77
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 77
+          },
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 10
+          }
+        ]
+      },
+      {
+        "hex": "#108720",
+        "rgb": [
+          16,
+          135,
+          32
+        ],
+        "count": 138,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 138
+          }
+        ]
+      },
+      {
+        "hex": "#ddbf76",
+        "rgb": [
+          221,
+          191,
+          118
+        ],
+        "count": 78,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 78
+          }
+        ]
+      },
+      {
+        "hex": "#d1b561",
+        "rgb": [
+          209,
+          181,
+          97
+        ],
+        "count": 77,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "units/tank/down/1.png",
+            "count": 38
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 38
+          },
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "hex": "#7b4f42",
+        "rgb": [
+          123,
+          79,
+          66
+        ],
+        "count": 66,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 66
+          }
+        ]
+      },
+      {
+        "hex": "#55393f",
+        "rgb": [
+          85,
+          57,
+          63
+        ],
+        "count": 62,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 62
+          }
+        ]
+      },
+      {
+        "hex": "#d6cbab",
+        "rgb": [
+          214,
+          203,
+          171
+        ],
+        "count": 59,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 59
+          }
+        ]
+      },
+      {
+        "hex": "#5a717e",
+        "rgb": [
+          90,
+          113,
+          126
+        ],
+        "count": 52,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [
+          "#59707d"
+        ],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 52
+          }
+        ]
+      },
+      {
+        "hex": "#436682",
+        "rgb": [
+          67,
+          102,
+          130
+        ],
+        "count": 48,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 48
+          }
+        ]
+      },
+      {
+        "hex": "#91644d",
+        "rgb": [
+          145,
+          100,
+          77
+        ],
+        "count": 47,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 47
+          }
+        ]
+      },
+      {
+        "hex": "#397180",
+        "rgb": [
+          57,
+          113,
+          128
+        ],
+        "count": 46,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [
+          "#3a7281",
+          "#397281"
+        ],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 46
+          }
+        ]
+      },
+      {
+        "hex": "#bccccc",
+        "rgb": [
+          188,
+          204,
+          204
+        ],
+        "count": 35,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 33
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "hex": "#8a7549",
+        "rgb": [
+          138,
+          117,
+          73
+        ],
+        "count": 28,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 27
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "hex": "#ccaa39",
+        "rgb": [
+          204,
+          170,
+          57
+        ],
+        "count": 28,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 26
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "hex": "#76c5e0",
+        "rgb": [
+          118,
+          197,
+          224
+        ],
+        "count": 21,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 21
+          }
+        ]
+      },
+      {
+        "hex": "#fadea7",
+        "rgb": [
+          250,
+          222,
+          167
+        ],
+        "count": 16,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "units/tank/down/1.png",
+            "count": 8
+          },
+          {
+            "file": "units/tank/down/2.png",
+            "count": 8
+          }
+        ]
+      },
+      {
+        "hex": "#6b4e37",
+        "rgb": [
+          107,
+          78,
+          55
+        ],
+        "count": 12,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 11
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 1
+          }
+        ]
+      },
+      {
+        "hex": "#c48d67",
+        "rgb": [
+          196,
+          141,
+          103
+        ],
+        "count": 12,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 12
+          }
+        ]
+      },
+      {
+        "hex": "#f1b76d",
+        "rgb": [
+          241,
+          183,
+          109
+        ],
+        "count": 11,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 11
+          }
+        ]
+      },
+      {
+        "hex": "#2f5e6a",
+        "rgb": [
+          47,
+          94,
+          106
+        ],
+        "count": 9,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 9
+          }
+        ]
+      },
+      {
+        "hex": "#a8744a",
+        "rgb": [
+          168,
+          116,
+          74
+        ],
+        "count": 8,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 8
+          }
+        ]
+      },
+      {
+        "hex": "#3d3643",
+        "rgb": [
+          61,
+          54,
+          67
+        ],
+        "count": 6,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 6
+          }
+        ]
+      },
+      {
+        "hex": "#ebd07a",
+        "rgb": [
+          235,
+          208,
+          122
+        ],
+        "count": 6,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "buildings/command-center/1.png",
+            "count": 4
+          },
+          {
+            "file": "buildings/turret/1.png",
+            "count": 2
+          }
+        ]
+      },
+      {
+        "hex": "#3e323f",
+        "rgb": [
+          62,
+          50,
+          63
+        ],
+        "count": 4,
+        "usedByGeneratedArt": false,
+        "mergedFrom": [
+          "#3e313e",
+          "#3e313f"
+        ],
+        "sources": [
+          {
+            "file": "map.png",
+            "count": 4
+          }
+        ]
+      },
+      {
+        "hex": "#fc3500",
+        "rgb": [
+          252,
+          53,
+          0
+        ],
+        "count": 4,
+        "usedByGeneratedArt": true,
+        "mergedFrom": [],
+        "sources": [
+          {
+            "file": "units/infantry/down/1.png",
+            "count": 4
+          }
+        ]
+      }
+    ],
+    "roles": {
+      "outline": "#2c2839",
+      "shadowDeep": "#453a4e",
+      "metalDark": "#515454",
+      "metalMid": "#738485",
+      "metalLight": "#9ca6a6",
+      "metalHi": "#bccccc",
+      "treadDark": "#3e2c39",
+      "treadBase": "#503b41",
+      "treadSheen": "#764d53",
+      "woodDark": "#644543",
+      "woodBase": "#85604e",
+      "woodLight": "#a37860",
+      "woodHi": "#bf9b68",
+      "groundDeep": "#284020",
+      "groundDark": "#607e41",
+      "groundBase": "#708646",
+      "groundLight": "#7a914b",
+      "dustMid": "#997a61",
+      "dustLight": "#bf9b68",
+      "goldDark": "#8a7549",
+      "goldBase": "#ccaa39",
+      "goldLight": "#ebd07a",
+      "hot": "#fce8c0",
+      "flame": "#fcbb66",
+      "ember": "#c95e2b",
+      "emberDeep": "#8a1a27",
+      "smokeLight": "#8a797e",
+      "smokeDark": "#423438",
+      "red": "#fc3500",
+      "skyBlue": "#76c5e0",
+      "seaBlue": "#4f8c9c",
+      "deepBlue": "#436682"
+    }
+  },
+  "teams": {
+    "order": [
+      "blue",
+      "red",
+      "green",
+      "sand"
+    ],
+    "rule": "Every team shares one shading ramp: shadow / base / light / highlight. blue and sand are 100% sampled (sand is literally the tutorial tank's hull ramp). red and green use hue-rotated variants where the sampled histogram has no colour at that hue - the sampled greens are all the olive of the ground itself, which would camouflage a tank.",
+    "ramps": {
+      "blue": {
+        "shadow": {
+          "hex": "#436682",
+          "origin": "sampled"
+        },
+        "base": {
+          "hex": "#4f8c9c",
+          "origin": "sampled"
+        },
+        "light": {
+          "hex": "#76c5e0",
+          "origin": "sampled"
+        },
+        "highlight": {
+          "hex": "#bccccc",
+          "origin": "sampled"
+        }
+      },
+      "red": {
+        "shadow": {
+          "hex": "#8a1a27",
+          "origin": "sampled"
+        },
+        "base": {
+          "hex": "#a13232",
+          "origin": "hue-rotated",
+          "role": "red.base",
+          "derivedFrom": "#a17132",
+          "derivedFromSources": [
+            "units/tank/down/1.png",
+            "units/tank/down/2.png",
+            "units/infantry/down/1.png"
+          ],
+          "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+          "sourceHue": 34.05,
+          "targetHue": 0,
+          "hueDelta": -34.05,
+          "saturation": 0.5261,
+          "lightness": 0.4137
+        },
+        "light": {
+          "hex": "#d16161",
+          "origin": "hue-rotated",
+          "role": "red.light",
+          "derivedFrom": "#d1b561",
+          "derivedFromSources": [
+            "units/tank/down/1.png",
+            "units/tank/down/2.png",
+            "units/infantry/down/1.png"
+          ],
+          "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+          "sourceHue": 45,
+          "targetHue": 0,
+          "hueDelta": -45,
+          "saturation": 0.549,
+          "lightness": 0.6
+        },
+        "highlight": {
+          "hex": "#faa7a7",
+          "origin": "hue-rotated",
+          "role": "red.highlight",
+          "derivedFrom": "#fadea7",
+          "derivedFromSources": [
+            "units/tank/down/1.png",
+            "units/tank/down/2.png"
+          ],
+          "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+          "sourceHue": 39.76,
+          "targetHue": 0,
+          "hueDelta": -39.76,
+          "saturation": 0.8925,
+          "lightness": 0.8176
+        }
+      },
+      "green": {
+        "shadow": {
+          "hex": "#27744b",
+          "origin": "hue-rotated",
+          "role": "green.shadow",
+          "derivedFrom": "#743f27",
+          "derivedFromSources": [
+            "units/tank/down/1.png",
+            "units/tank/down/2.png",
+            "units/infantry/down/1.png"
+          ],
+          "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+          "sourceHue": 18.7,
+          "targetHue": 148,
+          "hueDelta": 129.3,
+          "saturation": 0.4968,
+          "lightness": 0.3039
+        },
+        "base": {
+          "hex": "#32a166",
+          "origin": "hue-rotated",
+          "role": "green.base",
+          "derivedFrom": "#a17132",
+          "derivedFromSources": [
+            "units/tank/down/1.png",
+            "units/tank/down/2.png",
+            "units/infantry/down/1.png"
+          ],
+          "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+          "sourceHue": 34.05,
+          "targetHue": 148,
+          "hueDelta": 113.95,
+          "saturation": 0.5261,
+          "lightness": 0.4137
+        },
+        "light": {
+          "hex": "#61d195",
+          "origin": "hue-rotated",
+          "role": "green.light",
+          "derivedFrom": "#d1b561",
+          "derivedFromSources": [
+            "units/tank/down/1.png",
+            "units/tank/down/2.png",
+            "units/infantry/down/1.png"
+          ],
+          "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+          "sourceHue": 45,
+          "targetHue": 148,
+          "hueDelta": 103,
+          "saturation": 0.549,
+          "lightness": 0.6
+        },
+        "highlight": {
+          "hex": "#a7face",
+          "origin": "hue-rotated",
+          "role": "green.highlight",
+          "derivedFrom": "#fadea7",
+          "derivedFromSources": [
+            "units/tank/down/1.png",
+            "units/tank/down/2.png"
+          ],
+          "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+          "sourceHue": 39.76,
+          "targetHue": 148,
+          "hueDelta": 108.24,
+          "saturation": 0.8925,
+          "lightness": 0.8176
+        }
+      },
+      "sand": {
+        "shadow": {
+          "hex": "#743f27",
+          "origin": "sampled"
+        },
+        "base": {
+          "hex": "#a17132",
+          "origin": "sampled"
+        },
+        "light": {
+          "hex": "#d1b561",
+          "origin": "sampled"
+        },
+        "highlight": {
+          "hex": "#fadea7",
+          "origin": "sampled"
+        }
+      }
+    },
+    "derivations": [
+      {
+        "role": "red.base",
+        "hex": "#a13232",
+        "derivedFrom": "#a17132",
+        "derivedFromSources": [
+          "units/tank/down/1.png",
+          "units/tank/down/2.png",
+          "units/infantry/down/1.png"
+        ],
+        "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+        "sourceHue": 34.05,
+        "targetHue": 0,
+        "hueDelta": -34.05,
+        "saturation": 0.5261,
+        "lightness": 0.4137
+      },
+      {
+        "role": "red.light",
+        "hex": "#d16161",
+        "derivedFrom": "#d1b561",
+        "derivedFromSources": [
+          "units/tank/down/1.png",
+          "units/tank/down/2.png",
+          "units/infantry/down/1.png"
+        ],
+        "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+        "sourceHue": 45,
+        "targetHue": 0,
+        "hueDelta": -45,
+        "saturation": 0.549,
+        "lightness": 0.6
+      },
+      {
+        "role": "red.highlight",
+        "hex": "#faa7a7",
+        "derivedFrom": "#fadea7",
+        "derivedFromSources": [
+          "units/tank/down/1.png",
+          "units/tank/down/2.png"
+        ],
+        "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+        "sourceHue": 39.76,
+        "targetHue": 0,
+        "hueDelta": -39.76,
+        "saturation": 0.8925,
+        "lightness": 0.8176
+      },
+      {
+        "role": "green.shadow",
+        "hex": "#27744b",
+        "derivedFrom": "#743f27",
+        "derivedFromSources": [
+          "units/tank/down/1.png",
+          "units/tank/down/2.png",
+          "units/infantry/down/1.png"
+        ],
+        "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+        "sourceHue": 18.7,
+        "targetHue": 148,
+        "hueDelta": 129.3,
+        "saturation": 0.4968,
+        "lightness": 0.3039
+      },
+      {
+        "role": "green.base",
+        "hex": "#32a166",
+        "derivedFrom": "#a17132",
+        "derivedFromSources": [
+          "units/tank/down/1.png",
+          "units/tank/down/2.png",
+          "units/infantry/down/1.png"
+        ],
+        "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+        "sourceHue": 34.05,
+        "targetHue": 148,
+        "hueDelta": 113.95,
+        "saturation": 0.5261,
+        "lightness": 0.4137
+      },
+      {
+        "role": "green.light",
+        "hex": "#61d195",
+        "derivedFrom": "#d1b561",
+        "derivedFromSources": [
+          "units/tank/down/1.png",
+          "units/tank/down/2.png",
+          "units/infantry/down/1.png"
+        ],
+        "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+        "sourceHue": 45,
+        "targetHue": 148,
+        "hueDelta": 103,
+        "saturation": 0.549,
+        "lightness": 0.6
+      },
+      {
+        "role": "green.highlight",
+        "hex": "#a7face",
+        "derivedFrom": "#fadea7",
+        "derivedFromSources": [
+          "units/tank/down/1.png",
+          "units/tank/down/2.png"
+        ],
+        "rule": "sRGB -> HSL, replace H, keep S and L, HSL -> sRGB",
+        "sourceHue": 39.76,
+        "targetHue": 148,
+        "hueDelta": 108.24,
+        "saturation": 0.8925,
+        "lightness": 0.8176
+      }
+    ]
+  },
+  "outlineStyle": {
+    "finding": "The pinned tutorial sprites do carry a 1px dark border: #2c2839 is the single most common colour in units/tank/down/1.png (159 px), units/infantry/down/1.png (68 px), buildings/turret/1.png (146 px) and buildings/supply-depot/1.png (547 px), and it traces the silhouette.",
+    "applied": "#2c2839, 1px, 8-connected, on tanks, projectiles, pickups, crate and wall edges.",
+    "exceptions": {
+      "#423438": "Explosion frames 2+ use the tutorial explosion's own dark smoke instead of the sprite outline, matching fx/explosion/3-5.png.",
+      "#8a7549": "Floor markings use a gold/blue paint-edge instead of a hard black border.",
+      "none": "Self-luminous art (explosion frame 1, tracers, the railgun bolt, ricochet pulses, muzzle flashes, sparks, the pickup glow ring) and the HUD chips carry no border; fx/explosion/1.png in the tutorial is likewise a single flat colour with no border."
+    },
+    "difference": "The tutorial sprites feather the outermost outline pixel with partial alpha. The generated art keeps hard edges (alpha 0 or 255) so nearest-neighbour sampling at orthographic zoom 2 stays crisp."
+  },
+  "tileSheet": {
+    "file": "arena-tiles.png",
+    "tileSize": [
+      16,
+      16
+    ],
+    "columns": 8,
+    "rows": 3,
+    "cells": 24,
+    "cellsUsed": 17,
+    "cellsPadded": 7,
+    "padding": "trailing cells are fully transparent",
+    "defoldTileSource": "/main/arena-tiles.tilesource",
+    "sha256": "d9a9d6aefbce7ae1fd98cfaf2388678595919c6750f7db6d32b642ebee079222",
+    "size": [
+      128,
+      48
+    ],
+    "map": {
+      "ordering": "Defold tile order: 1-based, left to right, top row first",
+      "groundTileIds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "wallTileIds": {
+        "centre": 5,
+        "n": 6,
+        "s": 7,
+        "e": 8,
+        "w": 9,
+        "ne": 10,
+        "nw": 11,
+        "se": 12,
+        "sw": 13
+      },
+      "crateTileId": 14,
+      "sandbagTileId": 15,
+      "spawnPadTileId": 16,
+      "pickupPadTileId": 17,
+      "tiles": [
+        {
+          "id": 1,
+          "role": "ground.0",
+          "layer": "ground",
+          "cell": [
+            0,
+            0
+          ],
+          "pixelRect": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 2,
+          "role": "ground.1",
+          "layer": "ground",
+          "cell": [
+            1,
+            0
+          ],
+          "pixelRect": [
+            16,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 3,
+          "role": "ground.2",
+          "layer": "ground",
+          "cell": [
+            2,
+            0
+          ],
+          "pixelRect": [
+            32,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 4,
+          "role": "ground.3",
+          "layer": "ground",
+          "cell": [
+            3,
+            0
+          ],
+          "pixelRect": [
+            48,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 5,
+          "role": "wall.centre",
+          "layer": "ground",
+          "cell": [
+            4,
+            0
+          ],
+          "pixelRect": [
+            64,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 6,
+          "role": "wall.n",
+          "layer": "ground",
+          "cell": [
+            5,
+            0
+          ],
+          "pixelRect": [
+            80,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 7,
+          "role": "wall.s",
+          "layer": "ground",
+          "cell": [
+            6,
+            0
+          ],
+          "pixelRect": [
+            96,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 8,
+          "role": "wall.e",
+          "layer": "ground",
+          "cell": [
+            7,
+            0
+          ],
+          "pixelRect": [
+            112,
+            0,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 9,
+          "role": "wall.w",
+          "layer": "ground",
+          "cell": [
+            0,
+            1
+          ],
+          "pixelRect": [
+            0,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 10,
+          "role": "wall.ne",
+          "layer": "ground",
+          "cell": [
+            1,
+            1
+          ],
+          "pixelRect": [
+            16,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 11,
+          "role": "wall.nw",
+          "layer": "ground",
+          "cell": [
+            2,
+            1
+          ],
+          "pixelRect": [
+            32,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 12,
+          "role": "wall.se",
+          "layer": "ground",
+          "cell": [
+            3,
+            1
+          ],
+          "pixelRect": [
+            48,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 13,
+          "role": "wall.sw",
+          "layer": "ground",
+          "cell": [
+            4,
+            1
+          ],
+          "pixelRect": [
+            64,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 14,
+          "role": "crate",
+          "layer": "overlay",
+          "cell": [
+            5,
+            1
+          ],
+          "pixelRect": [
+            80,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 15,
+          "role": "sandbag",
+          "layer": "overlay",
+          "cell": [
+            6,
+            1
+          ],
+          "pixelRect": [
+            96,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 16,
+          "role": "spawnPad",
+          "layer": "overlay",
+          "cell": [
+            7,
+            1
+          ],
+          "pixelRect": [
+            112,
+            16,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 17,
+          "role": "pickupPad",
+          "layer": "overlay",
+          "cell": [
+            0,
+            2
+          ],
+          "pixelRect": [
+            0,
+            32,
+            16,
+            16
+          ]
+        }
+      ]
+    }
+  },
+  "sprites": [
+    {
+      "file": "tank-blue-hull-1.png",
+      "role": "tank.blue.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "dd2854f11def7b9fc3dff7222f5d9443b0ab456bac0a10e60c55929eabc069c2"
+    },
+    {
+      "file": "tank-blue-hull-2.png",
+      "role": "tank.blue.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "328d6a94c9beceb7a7432527d6084a1b32c335a3c898a17e1db3eae4eb2bf959"
+    },
+    {
+      "file": "tank-blue-turret.png",
+      "role": "tank.blue.turret",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        7,
+        11,
+        31,
+        20
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "69b80878f8c3f94743958346fe162ae481e2f1347831e5e5625e2ffa424ef292"
+    },
+    {
+      "file": "tank-blue-wreck.png",
+      "role": "tank.blue.wreck",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "63bb9523e7761ee7eede72a2e081dada4e20fa14df7628b50728794636ee8589"
+    },
+    {
+      "file": "tank-red-hull-1.png",
+      "role": "tank.red.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "b49bf41c77d9b3d552e5b97983c05583dfb4c219922ed81f533b29112f21a6d3"
+    },
+    {
+      "file": "tank-red-hull-2.png",
+      "role": "tank.red.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "550aa92dcde68fb4f070e50d98e6c78be0dd76126e8fddb1574eae6e3f200a04"
+    },
+    {
+      "file": "tank-red-turret.png",
+      "role": "tank.red.turret",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        7,
+        11,
+        31,
+        20
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "2fd5364e5ca29a2691d5d1adecc21c24c09fe2b07db8c11e08a97f314f1c902c"
+    },
+    {
+      "file": "tank-red-wreck.png",
+      "role": "tank.red.wreck",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "63bb9523e7761ee7eede72a2e081dada4e20fa14df7628b50728794636ee8589"
+    },
+    {
+      "file": "tank-green-hull-1.png",
+      "role": "tank.green.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "202eac275eca7b1f073d271840147b801e7e9716ca755dcec8984de10b6fee54"
+    },
+    {
+      "file": "tank-green-hull-2.png",
+      "role": "tank.green.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "3449d8b49ee3083d104e988100bd86004658d1e1010480e788fa0eb65f7078d1"
+    },
+    {
+      "file": "tank-green-turret.png",
+      "role": "tank.green.turret",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        7,
+        11,
+        31,
+        20
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "db2af5648aa7db0c0372ea24593ab51a0df766fb42da4c29a5a7f6b9d7af20fa"
+    },
+    {
+      "file": "tank-green-wreck.png",
+      "role": "tank.green.wreck",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "63bb9523e7761ee7eede72a2e081dada4e20fa14df7628b50728794636ee8589"
+    },
+    {
+      "file": "tank-sand-hull-1.png",
+      "role": "tank.sand.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "38160f66759f04d30aa6c3921241c029a0e66fca982db2e5174f889a59d57300"
+    },
+    {
+      "file": "tank-sand-hull-2.png",
+      "role": "tank.sand.hull",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "749786d44580578a11cf61c51d65afaa74ea4590c4102ce5c5e11e53b1924747"
+    },
+    {
+      "file": "tank-sand-turret.png",
+      "role": "tank.sand.turret",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        7,
+        11,
+        31,
+        20
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "c2df3b238671815eac02d44dbd0884f67f4fe4f64deebace473f3243efafd122"
+    },
+    {
+      "file": "tank-sand-wreck.png",
+      "role": "tank.sand.wreck",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "63bb9523e7761ee7eede72a2e081dada4e20fa14df7628b50728794636ee8589"
+    },
+    {
+      "file": "proj-cannon.png",
+      "role": "projectile",
+      "size": [
+        10,
+        10
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        0,
+        9,
+        9
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "12dd569b57ebe1a3b8b9060e46f8e14f4e3780d7e9baf2d6735e34fd856ab40d"
+    },
+    {
+      "file": "proj-machinegun.png",
+      "role": "projectile",
+      "size": [
+        8,
+        4
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        0,
+        7,
+        3
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "a6d2c872033b6189142dcc00250309794618e0c7044134d587d9ecd284b84f67"
+    },
+    {
+      "file": "proj-railgun.png",
+      "role": "projectile",
+      "size": [
+        20,
+        4
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        0,
+        19,
+        3
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "5017d65031021440fe345482a2cc39b6fb0922b3872002e103404640b13914c9"
+    },
+    {
+      "file": "proj-scatter.png",
+      "role": "projectile",
+      "size": [
+        6,
+        6
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        0,
+        5,
+        5
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "12752a9a4a8432dcd0feac9bfdea74566135c78a1353df48389f0dcd2835d321"
+    },
+    {
+      "file": "proj-mortar.png",
+      "role": "projectile",
+      "size": [
+        12,
+        12
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        0,
+        11,
+        11
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "7c89a293495a90cedf93ccfd96017ba7a2a30e6fe6050f39fa986a36b0138527"
+    },
+    {
+      "file": "proj-ricochet-1.png",
+      "role": "projectile",
+      "size": [
+        10,
+        10
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        2,
+        2,
+        7,
+        7
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "f251cce2d304740da9f20ed114df9416f5ea4309602124b5b2d0351d86cd5f58"
+    },
+    {
+      "file": "proj-ricochet-2.png",
+      "role": "projectile",
+      "size": [
+        10,
+        10
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        1,
+        1,
+        9,
+        8
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "ed6c76d23670fb992f4362de68c7ac988d65eb5ecb3b10cae4ff1f3219606ad9"
+    },
+    {
+      "file": "explosion-small-1.png",
+      "role": "fx",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        12,
+        13,
+        19,
+        19
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "6c635cfbba42aab8109b435291f5ef732d0eabe1e4bdba4e5c103b42245a8333"
+    },
+    {
+      "file": "explosion-small-2.png",
+      "role": "fx",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        5,
+        5,
+        26,
+        25
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "d1bb8f733e086540398832a621a1e74c05b3b3baadc7c5a0706be81af2a1dad2"
+    },
+    {
+      "file": "explosion-small-3.png",
+      "role": "fx",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        3,
+        3,
+        29,
+        27
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "a2012d90f49d1e44aed5590d9a75f58958f3b46f74682cc3ee8d63f9768bc443"
+    },
+    {
+      "file": "explosion-small-4.png",
+      "role": "fx",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        4,
+        29,
+        29
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "6cdadbe7588d038ce3290c163ceaf0090db6884801f03733d6892168d8f0cd36"
+    },
+    {
+      "file": "explosion-small-5.png",
+      "role": "fx",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        3,
+        2,
+        26,
+        27
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "845a3a5eb932a3235868469308ac17426501da57b86d746487f21345c90a44d6"
+    },
+    {
+      "file": "explosion-small-6.png",
+      "role": "fx",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        3,
+        3,
+        26,
+        27
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "6eab7d6d9fdd8dd05fb055d2399d353517ba6d35752cb66ec095c266021c9848"
+    },
+    {
+      "file": "explosion-big-1.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        25,
+        24,
+        39,
+        39
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "55a5bcb29d06649b1f3d6ad74835fac4fca9f6e4d9603aa559ff6edd525fa646"
+    },
+    {
+      "file": "explosion-big-2.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        15,
+        11,
+        52,
+        52
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "9131d121aef974d0fa894937c98dab5d914f13170b62e6698944200d0e71ba26"
+    },
+    {
+      "file": "explosion-big-3.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        12,
+        6,
+        57,
+        56
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "73021eddb36114b1a6973c41bfb4174f23c21d6211b66d9abf470f8a6340e0c5"
+    },
+    {
+      "file": "explosion-big-4.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        7,
+        6,
+        57,
+        56
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "61742cb2172b0553fcc7460b118fda9fa93a9d4b7a9f9bc9887a573ed77cf579"
+    },
+    {
+      "file": "explosion-big-5.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        9,
+        3,
+        59,
+        58
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "ad6f11519189c139d3cabfdb3048071b58bd55647a7f2cdb41cc9401e6436453"
+    },
+    {
+      "file": "explosion-big-6.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        61,
+        60
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "31c74b45d0c342578a6b177ce07dc68f63debbc3dfdc491500f02c38f5a57ae7"
+    },
+    {
+      "file": "explosion-big-7.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        5,
+        5,
+        60,
+        57
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "92f88e8c426a63e6d5e83f952695c8068b1a2dccaf6345d01615dd14e91f9106"
+    },
+    {
+      "file": "explosion-big-8.png",
+      "role": "fx",
+      "size": [
+        64,
+        64
+      ],
+      "outline": "#423438",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        11,
+        5,
+        55,
+        53
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "37e79e98f0839cbfbde0535111184ee8fb58a47e64f26f7cfdee75f41d1c8f0f"
+    },
+    {
+      "file": "muzzle-1.png",
+      "role": "fx",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        1,
+        4,
+        8,
+        11
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "eab848f1b0432afdb08996f87c28586f4748dde37263ffe46b39c52d7ea23451"
+    },
+    {
+      "file": "muzzle-2.png",
+      "role": "fx",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        1,
+        1,
+        15,
+        14
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "0b7815d15748aa260d74ed2e119094b8f1f052a7b966b4ea5bce0e2981c63c53"
+    },
+    {
+      "file": "muzzle-3.png",
+      "role": "fx",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        1,
+        5,
+        10,
+        10
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "69916bbcd8d4a791463e31ce4cd3a8ffbddec57aacdea04e8409ef0f779e1987"
+    },
+    {
+      "file": "spark-1.png",
+      "role": "fx",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        5,
+        5,
+        10,
+        10
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "f175a180b0294e42dfad6557a5692275219a5a7c2516a737c8ac02772c83a116"
+    },
+    {
+      "file": "spark-2.png",
+      "role": "fx",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        4,
+        3,
+        12,
+        11
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "a14621be776cac64414c010962703ece87cceba3ce43840efbf1737603ed2e7f"
+    },
+    {
+      "file": "spark-3.png",
+      "role": "fx",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        13,
+        13
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "5dd0a1d59373efebfb75161dbaae4274f197caa692752c7b73977903b57e04ea"
+    },
+    {
+      "file": "spark-4.png",
+      "role": "fx",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        1,
+        1,
+        14,
+        14
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "e04bdf9053ffeabb19e3c60449df85b7ab5ca82b7437434b3d9a65b111881fb3"
+    },
+    {
+      "file": "pickup-machinegun-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        3,
+        13,
+        13
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "7727a7bf0358fc64bf755bd8f9f8d426d670d51b53d12953f4f524290b9a613b"
+    },
+    {
+      "file": "pickup-machinegun-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        13,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "478c4da8a2a015f6476dbfa6960f8fca52796c6d08f4c2f69384c7759652c7fc"
+    },
+    {
+      "file": "pickup-cannon-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        4,
+        2,
+        11,
+        13
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "f9b158e7df976f14fd73d24ba1e4299c817b4d31edce24d9c6042575ec513c17"
+    },
+    {
+      "file": "pickup-cannon-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        4,
+        1,
+        11,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "782a95b625c35b6ceafc2aefdeab53e53a2896fcd828db310e905ba36cdb5842"
+    },
+    {
+      "file": "pickup-railgun-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        4,
+        13,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "8e6a6d74d34c7632ddd96b9d48485ef75ecda2dd8a918890abfa79e33b226aaa"
+    },
+    {
+      "file": "pickup-railgun-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        3,
+        13,
+        11
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "c185a9ad6b9b20d19ecc2f1799e361611e321727a1a6d3408e61016b8ca5497e"
+    },
+    {
+      "file": "pickup-scatter-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        1,
+        2,
+        14,
+        11
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "0fa7616f1f591f5a8793c4b86c00fc25551dc5b6dc11898ac0fee73b8fe011c3"
+    },
+    {
+      "file": "pickup-scatter-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        1,
+        1,
+        14,
+        10
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "845cde889898fc910de1b3f6bb5bf953b95509eef645b40020811db8be185462"
+    },
+    {
+      "file": "pickup-mortar-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        13,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "efeee0bc556dd95a46b20c72d8a88503f23d7418b10de6dc05b4064f0ad86d72"
+    },
+    {
+      "file": "pickup-mortar-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        1,
+        13,
+        11
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "d344d49ca62bee21b6cc56b9d02ea65d8481c5cc7b1c3b5ab436075dd1ec365e"
+    },
+    {
+      "file": "pickup-ricochet-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        13,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "c652ee5ecc1f2fc20bcd4072c89ff917838080ce0923a5c3e8bcc2c7780894cc"
+    },
+    {
+      "file": "pickup-ricochet-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        1,
+        13,
+        11
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "0c9e36b3bd7c2bc8ad3121045bbc71f1c8b9ea7cdbb7cfaea29d392cd8b2a115"
+    },
+    {
+      "file": "pickup-health-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        13,
+        13
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "95ebdeb5130545f8be2e9850817395c1461deb75623344e0c903f6f693fc485a"
+    },
+    {
+      "file": "pickup-health-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        1,
+        13,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "9faacbe9127d051c86c1414d6d535a03b61b607545ce4b25f0fa990f7ac2e9d6"
+    },
+    {
+      "file": "pickup-armor-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        13,
+        13
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "1f8b23187c0e0b328f376d5dd4f5aecb51a7fba7fb8c77ffbc0762fb8ecc9858"
+    },
+    {
+      "file": "pickup-armor-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        1,
+        13,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "7d74a1254afbf2cfe38c0184017f026381328f930980116563b11b37be835366"
+    },
+    {
+      "file": "pickup-overdrive-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        2,
+        12,
+        13
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "23fe36b93cd45d62715bb06ad92b4a2778148b610f8a96be68515c0c72ce101d"
+    },
+    {
+      "file": "pickup-overdrive-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        2,
+        1,
+        12,
+        12
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "1a50acc359c5473313c597d7065c43fec76607391311c9d81be068968a8ada78"
+    },
+    {
+      "file": "pickup-pad-1.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        0,
+        0,
+        15,
+        15
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "88aba226d92d93c77a2bdc93b19c51b4f4b7e38a26a5a4979aff59d7ee211c07"
+    },
+    {
+      "file": "pickup-pad-2.png",
+      "role": "pickup",
+      "size": [
+        16,
+        16
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        0,
+        0,
+        15,
+        15
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "354ece8ade728783c9a1ba4eda03309495e6cc78fd4eb0a2394888b2f6266524"
+    },
+    {
+      "file": "hud-bar-back.png",
+      "role": "ui",
+      "size": [
+        4,
+        4
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        0,
+        0,
+        3,
+        3
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "1aa481dbae503dc671a9ae545ac13b33f480eccc9e30eac03db9dff5b30ae3bf"
+    },
+    {
+      "file": "hud-bar-fill.png",
+      "role": "ui",
+      "size": [
+        4,
+        4
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        0,
+        0,
+        3,
+        3
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "8590f65f679455829b23f614736392e4f720d105f1ad3d69e66a25c2eaf29950"
+    },
+    {
+      "file": "hud-panel.png",
+      "role": "ui",
+      "size": [
+        8,
+        8
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        0,
+        0,
+        7,
+        7
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "665afbac356cc132500bd3700ebd82ebb74e87e93243e8fc9f4ed0a7bc29b72f"
+    },
+    {
+      "file": "hud-tick.png",
+      "role": "ui",
+      "size": [
+        4,
+        4
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": false,
+      "opaqueBbox": [
+        0,
+        0,
+        3,
+        3
+      ],
+      "verticalCentreOffset": null,
+      "sha256": "19b6ecd516bd70d2db178e7079d012bc60b4f99d4f13bf2e872123afe1a1d96e"
+    }
+  ],
+  "atlas": {
+    "file": "/main/arena-sprites.atlas",
+    "extrudeBorders": 2,
+    "sha256": "38d83bc84697632c4b8b0a9c001a7e7a879b194ec29b7798c85468d31293fcf6",
+    "animations": [
+      {
+        "id": "tank-blue-hull",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 12,
+        "frames": [
+          "tank-blue-hull-1.png",
+          "tank-blue-hull-2.png"
+        ]
+      },
+      {
+        "id": "tank-red-hull",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 12,
+        "frames": [
+          "tank-red-hull-1.png",
+          "tank-red-hull-2.png"
+        ]
+      },
+      {
+        "id": "tank-green-hull",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 12,
+        "frames": [
+          "tank-green-hull-1.png",
+          "tank-green-hull-2.png"
+        ]
+      },
+      {
+        "id": "tank-sand-hull",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 12,
+        "frames": [
+          "tank-sand-hull-1.png",
+          "tank-sand-hull-2.png"
+        ]
+      },
+      {
+        "id": "tank-blue-turret",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-blue-turret.png"
+        ]
+      },
+      {
+        "id": "tank-red-turret",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-red-turret.png"
+        ]
+      },
+      {
+        "id": "tank-green-turret",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-green-turret.png"
+        ]
+      },
+      {
+        "id": "tank-sand-turret",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-sand-turret.png"
+        ]
+      },
+      {
+        "id": "tank-blue-wreck",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-blue-wreck.png"
+        ]
+      },
+      {
+        "id": "tank-red-wreck",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-red-wreck.png"
+        ]
+      },
+      {
+        "id": "tank-green-wreck",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-green-wreck.png"
+        ]
+      },
+      {
+        "id": "tank-sand-wreck",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "tank-sand-wreck.png"
+        ]
+      },
+      {
+        "id": "proj-cannon",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "proj-cannon.png"
+        ]
+      },
+      {
+        "id": "proj-machinegun",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "proj-machinegun.png"
+        ]
+      },
+      {
+        "id": "proj-railgun",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "proj-railgun.png"
+        ]
+      },
+      {
+        "id": "proj-scatter",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "proj-scatter.png"
+        ]
+      },
+      {
+        "id": "proj-mortar",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "proj-mortar.png"
+        ]
+      },
+      {
+        "id": "proj-ricochet",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 16,
+        "frames": [
+          "proj-ricochet-1.png",
+          "proj-ricochet-2.png"
+        ]
+      },
+      {
+        "id": "explosion-small",
+        "playback": "PLAYBACK_ONCE_FORWARD",
+        "fps": 18,
+        "frames": [
+          "explosion-small-1.png",
+          "explosion-small-2.png",
+          "explosion-small-3.png",
+          "explosion-small-4.png",
+          "explosion-small-5.png",
+          "explosion-small-6.png"
+        ]
+      },
+      {
+        "id": "explosion-big",
+        "playback": "PLAYBACK_ONCE_FORWARD",
+        "fps": 16,
+        "frames": [
+          "explosion-big-1.png",
+          "explosion-big-2.png",
+          "explosion-big-3.png",
+          "explosion-big-4.png",
+          "explosion-big-5.png",
+          "explosion-big-6.png",
+          "explosion-big-7.png",
+          "explosion-big-8.png"
+        ]
+      },
+      {
+        "id": "muzzle",
+        "playback": "PLAYBACK_ONCE_FORWARD",
+        "fps": 30,
+        "frames": [
+          "muzzle-1.png",
+          "muzzle-2.png",
+          "muzzle-3.png"
+        ]
+      },
+      {
+        "id": "spark",
+        "playback": "PLAYBACK_ONCE_FORWARD",
+        "fps": 24,
+        "frames": [
+          "spark-1.png",
+          "spark-2.png",
+          "spark-3.png",
+          "spark-4.png"
+        ]
+      },
+      {
+        "id": "pickup-machinegun",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-machinegun-1.png",
+          "pickup-machinegun-2.png"
+        ]
+      },
+      {
+        "id": "pickup-cannon",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-cannon-1.png",
+          "pickup-cannon-2.png"
+        ]
+      },
+      {
+        "id": "pickup-railgun",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-railgun-1.png",
+          "pickup-railgun-2.png"
+        ]
+      },
+      {
+        "id": "pickup-scatter",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-scatter-1.png",
+          "pickup-scatter-2.png"
+        ]
+      },
+      {
+        "id": "pickup-mortar",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-mortar-1.png",
+          "pickup-mortar-2.png"
+        ]
+      },
+      {
+        "id": "pickup-ricochet",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-ricochet-1.png",
+          "pickup-ricochet-2.png"
+        ]
+      },
+      {
+        "id": "pickup-health",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-health-1.png",
+          "pickup-health-2.png"
+        ]
+      },
+      {
+        "id": "pickup-armor",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-armor-1.png",
+          "pickup-armor-2.png"
+        ]
+      },
+      {
+        "id": "pickup-overdrive",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-overdrive-1.png",
+          "pickup-overdrive-2.png"
+        ]
+      },
+      {
+        "id": "pickup-pad",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 4,
+        "frames": [
+          "pickup-pad-1.png",
+          "pickup-pad-2.png"
+        ]
+      },
+      {
+        "id": "hud-bar-back",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "hud-bar-back.png"
+        ]
+      },
+      {
+        "id": "hud-bar-fill",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "hud-bar-fill.png"
+        ]
+      },
+      {
+        "id": "hud-panel",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "hud-panel.png"
+        ]
+      },
+      {
+        "id": "hud-tick",
+        "playback": "PLAYBACK_NONE",
+        "fps": null,
+        "frames": [
+          "hud-tick.png"
+        ]
+      }
+    ]
+  },
+  "tileSource": {
+    "file": "/main/arena-tiles.tilesource",
+    "sha256": "86bcd507cc623a2f948987851eb1666300e9885f2aa4594772a0cfaf1a6b6ee5",
+    "note": "The stub `animations { id: \"anim\" }` block mirrors main/tutorial-map.tilesource; no tile animations are defined."
+  },
+  "rendering": {
+    "sampling": "nearest-neighbor",
+    "orthographicZoom": 2,
+    "rotationConvention": "sprites that rotate at runtime point +X at rotation 0"
+  },
+  "verification": [
+    {
+      "label": "wall block 4x4 is fully opaque",
+      "ok": true,
+      "detail": "0 transparent px"
+    },
+    {
+      "label": "wall seams carry no interior outline",
+      "ok": true,
+      "detail": "0 interior outline px"
+    },
+    {
+      "label": "wall block perimeter is a clean 1px border",
+      "ok": true,
+      "detail": "0 stray px"
+    },
+    {
+      "label": "sandbag tile is edge-to-edge opaque (wraps as a barrier)",
+      "ok": true,
+      "detail": "0 gap rows"
+    },
+    {
+      "label": "arena-tiles.png round-trips through the decoder",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-hull-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-blue-hull-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-hull-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-blue-hull-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-hull-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-blue-hull-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-hull-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-blue-hull-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-turret: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-blue-turret: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-turret: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[7,11,31,20]"
+    },
+    {
+      "label": "tank-blue-turret: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-wreck: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-blue-wreck: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-blue-wreck: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-blue-wreck: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-hull-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-red-hull-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-hull-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-red-hull-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-hull-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-red-hull-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-hull-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-red-hull-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-turret: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-red-turret: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-turret: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[7,11,31,20]"
+    },
+    {
+      "label": "tank-red-turret: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-wreck: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-red-wreck: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-red-wreck: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-red-wreck: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-hull-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-green-hull-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-hull-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-green-hull-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-hull-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-green-hull-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-hull-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-green-hull-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-turret: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-green-turret: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-turret: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[7,11,31,20]"
+    },
+    {
+      "label": "tank-green-turret: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-wreck: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-green-wreck: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-green-wreck: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-green-wreck: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-hull-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-sand-hull-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-hull-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-sand-hull-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-hull-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-sand-hull-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-hull-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-sand-hull-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-turret: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-sand-turret: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-turret: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[7,11,31,20]"
+    },
+    {
+      "label": "tank-sand-turret: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-wreck: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "tank-sand-wreck: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "tank-sand-wreck: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "tank-sand-wreck: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-cannon: decodes at 10x10",
+      "ok": true,
+      "detail": "10x10"
+    },
+    {
+      "label": "proj-cannon: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-cannon: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,9,9]"
+    },
+    {
+      "label": "proj-cannon: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-machinegun: decodes at 8x4",
+      "ok": true,
+      "detail": "8x4"
+    },
+    {
+      "label": "proj-machinegun: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-machinegun: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,7,3]"
+    },
+    {
+      "label": "proj-machinegun: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-railgun: decodes at 20x4",
+      "ok": true,
+      "detail": "20x4"
+    },
+    {
+      "label": "proj-railgun: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-railgun: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,19,3]"
+    },
+    {
+      "label": "proj-railgun: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-scatter: decodes at 6x6",
+      "ok": true,
+      "detail": "6x6"
+    },
+    {
+      "label": "proj-scatter: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-scatter: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,5,5]"
+    },
+    {
+      "label": "proj-scatter: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-mortar: decodes at 12x12",
+      "ok": true,
+      "detail": "12x12"
+    },
+    {
+      "label": "proj-mortar: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-mortar: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,11,11]"
+    },
+    {
+      "label": "proj-mortar: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-ricochet-1: decodes at 10x10",
+      "ok": true,
+      "detail": "10x10"
+    },
+    {
+      "label": "proj-ricochet-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-ricochet-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,7,7]"
+    },
+    {
+      "label": "proj-ricochet-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-ricochet-2: decodes at 10x10",
+      "ok": true,
+      "detail": "10x10"
+    },
+    {
+      "label": "proj-ricochet-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "proj-ricochet-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[1,1,9,8]"
+    },
+    {
+      "label": "proj-ricochet-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-small-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "explosion-small-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-small-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[12,13,19,19]"
+    },
+    {
+      "label": "explosion-small-1: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[12,13,19,19]"
+    },
+    {
+      "label": "explosion-small-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "explosion-small-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-small-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[5,5,26,25]"
+    },
+    {
+      "label": "explosion-small-2: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[5,5,26,25]"
+    },
+    {
+      "label": "explosion-small-3: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "explosion-small-3: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-small-3: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[3,3,29,27]"
+    },
+    {
+      "label": "explosion-small-3: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[3,3,29,27]"
+    },
+    {
+      "label": "explosion-small-4: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "explosion-small-4: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-small-4: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,4,29,29]"
+    },
+    {
+      "label": "explosion-small-4: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[2,4,29,29]"
+    },
+    {
+      "label": "explosion-small-5: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "explosion-small-5: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-small-5: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[3,2,26,27]"
+    },
+    {
+      "label": "explosion-small-5: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[3,2,26,27]"
+    },
+    {
+      "label": "explosion-small-6: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "explosion-small-6: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-small-6: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[3,3,26,27]"
+    },
+    {
+      "label": "explosion-small-6: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[3,3,26,27]"
+    },
+    {
+      "label": "explosion-big-1: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[25,24,39,39]"
+    },
+    {
+      "label": "explosion-big-1: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[25,24,39,39]"
+    },
+    {
+      "label": "explosion-big-2: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[15,11,52,52]"
+    },
+    {
+      "label": "explosion-big-2: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[15,11,52,52]"
+    },
+    {
+      "label": "explosion-big-3: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-3: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-3: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[12,6,57,56]"
+    },
+    {
+      "label": "explosion-big-3: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[12,6,57,56]"
+    },
+    {
+      "label": "explosion-big-4: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-4: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-4: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[7,6,57,56]"
+    },
+    {
+      "label": "explosion-big-4: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[7,6,57,56]"
+    },
+    {
+      "label": "explosion-big-5: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-5: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-5: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[9,3,59,58]"
+    },
+    {
+      "label": "explosion-big-5: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[9,3,59,58]"
+    },
+    {
+      "label": "explosion-big-6: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-6: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-6: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,61,60]"
+    },
+    {
+      "label": "explosion-big-6: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[2,2,61,60]"
+    },
+    {
+      "label": "explosion-big-7: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-7: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-7: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[5,5,60,57]"
+    },
+    {
+      "label": "explosion-big-7: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[5,5,60,57]"
+    },
+    {
+      "label": "explosion-big-8: decodes at 64x64",
+      "ok": true,
+      "detail": "64x64"
+    },
+    {
+      "label": "explosion-big-8: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "explosion-big-8: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[11,5,55,53]"
+    },
+    {
+      "label": "explosion-big-8: keeps 1px clearance inside the canvas",
+      "ok": true,
+      "detail": "[11,5,55,53]"
+    },
+    {
+      "label": "muzzle-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "muzzle-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "muzzle-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[1,4,8,11]"
+    },
+    {
+      "label": "muzzle-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "muzzle-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "muzzle-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "muzzle-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[1,1,15,14]"
+    },
+    {
+      "label": "muzzle-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "muzzle-3: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "muzzle-3: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "muzzle-3: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[1,5,10,10]"
+    },
+    {
+      "label": "muzzle-3: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "spark-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "spark-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "spark-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[5,5,10,10]"
+    },
+    {
+      "label": "spark-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "spark-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "spark-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[4,3,12,11]"
+    },
+    {
+      "label": "spark-3: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "spark-3: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "spark-3: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,13,13]"
+    },
+    {
+      "label": "spark-4: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "spark-4: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "spark-4: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[1,1,14,14]"
+    },
+    {
+      "label": "pickup-machinegun-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-machinegun-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-machinegun-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,3,13,13]"
+    },
+    {
+      "label": "pickup-machinegun-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-machinegun-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-machinegun-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,13,12]"
+    },
+    {
+      "label": "pickup-cannon-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-cannon-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-cannon-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[4,2,11,13]"
+    },
+    {
+      "label": "pickup-cannon-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-cannon-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-cannon-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[4,1,11,12]"
+    },
+    {
+      "label": "pickup-railgun-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-railgun-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-railgun-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,4,13,12]"
+    },
+    {
+      "label": "pickup-railgun-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-railgun-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-railgun-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,3,13,11]"
+    },
+    {
+      "label": "pickup-scatter-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-scatter-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-scatter-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[1,2,14,11]"
+    },
+    {
+      "label": "pickup-scatter-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-scatter-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-scatter-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[1,1,14,10]"
+    },
+    {
+      "label": "pickup-mortar-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-mortar-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-mortar-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,13,12]"
+    },
+    {
+      "label": "pickup-mortar-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-mortar-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-mortar-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,1,13,11]"
+    },
+    {
+      "label": "pickup-ricochet-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-ricochet-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-ricochet-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,13,12]"
+    },
+    {
+      "label": "pickup-ricochet-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-ricochet-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-ricochet-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,1,13,11]"
+    },
+    {
+      "label": "pickup-health-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-health-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-health-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,13,13]"
+    },
+    {
+      "label": "pickup-health-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-health-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-health-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,1,13,12]"
+    },
+    {
+      "label": "pickup-armor-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-armor-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-armor-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,13,13]"
+    },
+    {
+      "label": "pickup-armor-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-armor-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-armor-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,1,13,12]"
+    },
+    {
+      "label": "pickup-overdrive-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-overdrive-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-overdrive-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,2,12,13]"
+    },
+    {
+      "label": "pickup-overdrive-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-overdrive-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-overdrive-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[2,1,12,12]"
+    },
+    {
+      "label": "pickup-pad-1: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-pad-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-pad-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,15,15]"
+    },
+    {
+      "label": "pickup-pad-2: decodes at 16x16",
+      "ok": true,
+      "detail": "16x16"
+    },
+    {
+      "label": "pickup-pad-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "pickup-pad-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,15,15]"
+    },
+    {
+      "label": "hud-bar-back: decodes at 4x4",
+      "ok": true,
+      "detail": "4x4"
+    },
+    {
+      "label": "hud-bar-back: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "hud-bar-back: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,3,3]"
+    },
+    {
+      "label": "hud-bar-fill: decodes at 4x4",
+      "ok": true,
+      "detail": "4x4"
+    },
+    {
+      "label": "hud-bar-fill: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "hud-bar-fill: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,3,3]"
+    },
+    {
+      "label": "hud-panel: decodes at 8x8",
+      "ok": true,
+      "detail": "8x8"
+    },
+    {
+      "label": "hud-panel: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "hud-panel: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,7,7]"
+    },
+    {
+      "label": "hud-tick: decodes at 4x4",
+      "ok": true,
+      "detail": "4x4"
+    },
+    {
+      "label": "hud-tick: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "hud-tick: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,0,3,3]"
+    },
+    {
+      "label": "every atlas frame has a generated PNG",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "label": "every generated PNG is referenced by the atlas",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

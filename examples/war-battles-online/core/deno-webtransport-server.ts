@@ -28,7 +28,13 @@ export interface DenoWebTransportServerOptions {
   readonly maximumSessions?: number;
   readonly runtime?: DenoQuicRuntimeLike;
   readonly receiverForSession: (url: string) => TransportReceiver;
-  readonly onSession: (url: string, transport: GameTransport) => void;
+  /**
+   * Called once the session is adopted. The receiver this connection was built
+   * with is handed back rather than looked up by url: several clients reach the
+   * same endpoint url, and the adoption between the two callbacks awaits, so a
+   * url is not an identity a caller could correlate on.
+   */
+  readonly onSession: (url: string, transport: GameTransport, receiver: TransportReceiver) => void;
   readonly onError: (error: unknown) => void;
 }
 
@@ -121,7 +127,7 @@ export class DenoWebTransportServer {
       };
       const transport = await adoptServerWebTransportSession(session, countedReceiver);
       try {
-        options.onSession(session.url, transport);
+        options.onSession(session.url, transport, receiver);
       } catch (error: unknown) {
         options.onError(error);
         transport.close(4_002, "session handler rejected connection");

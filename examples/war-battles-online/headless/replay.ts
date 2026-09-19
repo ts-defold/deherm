@@ -1,14 +1,17 @@
 import {
-  INPUT_BUTTON_FIRE,
+  BotController,
   INPUT_PACKET_BYTES,
   MAX_PLAYERS,
+  createInputCommand,
   readInputPacket,
   writeInputPacket,
   type InputCommand,
 } from "../core/index.ts";
+import { initializeFixtureWorld } from "./fixture.ts";
 
 const REPLAY_MAGIC = 0x3152_4257; // "WBR1" little-endian
-const REPLAY_VERSION = 1;
+// Version 2 carries protocol version 2 packets, which added the weapon byte.
+const REPLAY_VERSION = 2;
 export const REPLAY_HEADER_BYTES = 32;
 
 export interface ReplayOptions {
@@ -23,6 +26,14 @@ export interface ReplayHeader extends ReplayOptions {
   readonly bodyHash: number;
 }
 
+/**
+ * Records a real match and hands back its input stream.
+ *
+ * The commands are produced by the actual `BotController` driving the actual
+ * fixture world, not by a noise function, so replaying them exercises the
+ * weapons, the pickups, the cover and the respawns a match really uses. The
+ * output is still only inputs: the simulation is never serialised here.
+ */
 export function buildBotReplay(options: Readonly<ReplayOptions>): Uint8Array {
   validateOptions(options);
   const packetCount = options.players * options.ticks;
@@ -37,13 +48,21 @@ export function buildBotReplay(options: Readonly<ReplayOptions>): Uint8Array {
   view.setUint32(20, packetCount, true);
   view.setUint32(28, REPLAY_HEADER_BYTES, true);
 
-  const command = emptyCommand();
+  const world = initializeFixtureWorld(options.matchId, options.players, options.seed);
+  const bots = new BotController();
+  const commands: InputCommand[] = [];
+  for (let playerId = 1; playerId <= options.players; playerId += 1) {
+    commands.push(createInputCommand(options.matchId, playerId));
+  }
   let offset = REPLAY_HEADER_BYTES;
   for (let tick = 1; tick <= options.ticks; tick += 1) {
     for (let playerId = 1; playerId <= options.players; playerId += 1) {
-      botCommand(command, options, playerId, tick);
+      const command = commands[playerId - 1]!;
+      bots.stage(world, command, playerId, tick);
       offset = writeInputPacket(replay, offset, command);
+      world.submitInput(command);
     }
+    world.step();
   }
   view.setUint32(24, fnv1a(replay, REPLAY_HEADER_BYTES), true);
   return replay;
@@ -84,42 +103,7 @@ export function readReplayCommand(
 }
 
 export function emptyCommand(): InputCommand {
-  return {
-    matchId: 0,
-    playerId: 1,
-    tick: 1,
-    sequence: 1,
-    moveX: 0,
-    moveY: 0,
-    aimX: 127,
-    aimY: 0,
-    buttons: 0,
-    fireSubtick: 255,
-    latestSnapshotTick: 0,
-    snapshotAckBits: 0,
-  };
-}
-
-function botCommand(
-  command: InputCommand,
-  options: Readonly<ReplayOptions>,
-  playerId: number,
-  tick: number,
-): void {
-  const teamOne = playerId <= Math.ceil(options.players / 2);
-  const noise = mix32(options.seed ^ Math.imul(tick, 0x9e37_79b1) ^ Math.imul(playerId, 0x85eb_ca6b));
-  command.matchId = options.matchId;
-  command.playerId = playerId;
-  command.tick = tick;
-  command.sequence = tick & 0xffff;
-  command.moveX = teamOne ? 1 : -1;
-  command.moveY = ((noise >>> 8) % 3) - 1;
-  command.aimX = teamOne ? 127 : -127;
-  command.aimY = ((noise >>> 16) % 5) === 0 ? (((noise >>> 24) & 1) === 0 ? -127 : 127) : 0;
-  command.buttons = ((noise & 15) === 0 || tick % (6 + playerId % 13) === 0) ? INPUT_BUTTON_FIRE : 0;
-  command.fireSubtick = command.buttons === 0 ? 255 : noise % 255;
-  command.latestSnapshotTick = tick > 2 ? tick - 2 : 0;
-  command.snapshotAckBits = tick > 32 ? 0xffff_ffff : (2 ** tick - 1) >>> 0;
+  return createInputCommand(0, 1);
 }
 
 function validateOptions(options: Readonly<ReplayOptions>): void {
@@ -135,16 +119,6 @@ function validateOptions(options: Readonly<ReplayOptions>): void {
   if (!Number.isInteger(options.matchId) || options.matchId < 0 || options.matchId > 0xffff_ffff) {
     throw new RangeError("matchId must be a uint32");
   }
-}
-
-function mix32(value: number): number {
-  let mixed = value >>> 0;
-  mixed ^= mixed >>> 16;
-  mixed = Math.imul(mixed, 0x7feb_352d);
-  mixed ^= mixed >>> 15;
-  mixed = Math.imul(mixed, 0x846c_a68b);
-  mixed ^= mixed >>> 16;
-  return mixed >>> 0;
 }
 
 function fnv1a(bytes: Uint8Array, start: number): number {

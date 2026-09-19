@@ -60,8 +60,26 @@ export const REQUIRED_GAME_MARKERS = Object.freeze([
   "war-battles:rocket-hit",
   "war-battles:score:100",
   "war-battles:rocket-explosion-done",
-  "war-battles:player-moved:1592.0:1072.0"
+  "war-battles:player-moved:1592.0:1072.0",
+  // The scripted demonstration ends by handing the scene to the arena, which
+  // creates the roster, the turrets and the pickup pads. Observing the engage
+  // marker is what distinguishes "the tutorial loop ran" from "the game started".
+  "war-battles:arena-init:players=8:online=0",
+  "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
 ]);
+
+/**
+ * Components the generated registry must install inside the engine.
+ *
+ * This is asserted here, in the browser, and separately in
+ * `test/integration.test.mjs` against the generated component manifest, so a
+ * component that is authored but never registered - or registered but never
+ * authored - shows up as a disagreement rather than as a silent pass. It moved
+ * from five to eight with the Ultimate Edition: the arena director, the tank
+ * hull/turret renderer and the pickup pad joined the four original components
+ * and the retained presentation mockup.
+ */
+export const EXPECTED_COMPONENT_COUNT = 8;
 
 // Camera samples carry a frame-dependent position, so the gate asserts the
 // scroll behaviour rather than one sampled coordinate.
@@ -153,7 +171,8 @@ async function run() {
     assert.equal(observed.hostRuntime, "browser", "Application did not use the browser host adapter");
     assert.equal(observed.scriptBridgeInstalled, true, "Generated browser script bridge was not installed");
     assert.equal(observed.scriptBridgeTarget, "html5-browser-host", "Script bridge reported the wrong target");
-    assert.equal(observed.componentsRegistered, 5, "Component registry did not install all five components");
+    assert.equal(observed.componentsRegistered, EXPECTED_COMPONENT_COUNT,
+      `Component registry did not install all ${EXPECTED_COMPONENT_COUNT} components`);
     assert.equal(observed.bundleFingerprint, expectedFingerprint, "Browser bundle fingerprint does not match the source resource");
     assert.deepEqual(missing(client.transcript), [], "Required browser markers are missing");
     assert.deepEqual(fatal, [], `Browser page errors: ${JSON.stringify(fatal)}`);
@@ -195,7 +214,13 @@ async function run() {
   }
 }
 
-run().catch((error) => {
-  console.error(error.stack ?? error.message);
-  process.exitCode = 1;
-});
+// Importing this module must not start a browser: `test/integration.test.mjs`
+// reads `EXPECTED_COMPONENT_COUNT` from it to keep the in-engine assertion and
+// the generated component manifest from drifting apart.
+const invoked = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (invoked) {
+  run().catch((error) => {
+    console.error(error.stack ?? error.message);
+    process.exitCode = 1;
+  });
+}

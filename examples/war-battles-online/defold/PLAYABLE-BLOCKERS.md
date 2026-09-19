@@ -1,11 +1,59 @@
 # Playable attachment evidence and remaining blockers
 
-The example is now a port of the Defold War Battles tutorial rather than the
-GUI-only presentation mockup. Gameplay runs as Defold game objects with sprite,
-factory, and collision-object components; the GUI is one score text node. The
-mockup is retained, unbuilt, under [`reference/`](./reference/README.md).
+The example is a top-down arena deathmatch built out of déherm TypeScript
+components. Gameplay runs as Defold game objects with sprite, factory and
+collision-object components; the GUI is the HUD. The 32-tank presentation mockup
+is retained, unbuilt, under [`reference/`](./reference/README.md).
 
-## Observed packaged-engine run
+## Evidence superseded by the Ultimate Edition
+
+**Read this first.** The two packaged-engine evidence documents -
+[`../evidence/packaged-runtime-arm64-macos.json`](../evidence/packaged-runtime-arm64-macos.json)
+and [`../evidence/browser-runtime-wasm-web.json`](../evidence/browser-runtime-wasm-web.json)
+- were recorded against the tutorial-scope scene. Rebuilding that scene into the
+arena changed the authored project tree they are hash-bound to, so both are now
+**stale and must be re-recorded**. Neither gate was weakened: they still refuse.
+
+Re-recording is a real engine run, not a file edit. It needs Bob, a running local
+Extender (`pnpm extender:status`) and a rebuilt custom engine, and for the
+browser a fresh `wasm-web` bundle:
+
+```sh
+# native
+pnpm bob:local:bundle
+pnpm --filter @deherm/example-war-battles-online runtime:packaged:record
+
+# browser
+DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold pnpm bob:web:bundle
+pnpm --filter @deherm/example-war-battles-online runtime:browser:record
+```
+
+`test/integration.test.mjs` carries a skipped test naming this debt and a
+companion test asserting that `check-packaged-runtime.mjs --check-sources`
+actually reports the staleness rather than passing quietly. Delete the skip when
+the evidence is re-recorded.
+
+### What changed in the marker contract, deliberately
+
+The scripted demonstration is unchanged: the same one-second shot, the same
+ten-second tour, the same coordinates, and all ten of the game-owned markers the
+gates assert. Two markers were **added**, because "the tutorial loop ran" and
+"the game started" are different claims and only the second one is now the
+interesting part:
+
+```text
+war-battles:arena-init:players=8:online=0
+war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline
+```
+
+The browser gate's in-engine component count moved from **five to eight**: the
+arena director, the tank hull/turret renderer and the pickup pad joined the four
+original components and the retained presentation mockup. It is exported from
+the gate as `EXPECTED_COMPONENT_COUNT` and asserted a second time in
+`test/integration.test.mjs` against the generated component manifest, so the
+number inside the engine and the number on disk cannot drift apart.
+
+## Observed packaged-engine run (tutorial-scope scene, superseded)
 
 A custom arm64-macOS engine built through the pinned local Extender was launched
 from `build/default` on 2026-09-18. Defold 1.14.0 loaded the archive, created
@@ -45,9 +93,12 @@ Not observed in engine output, and therefore not claimed:
 * pixel output. No screenshot or frame capture was taken. The tilemap, atlases,
   fonts, sprites, and GUI scene all compiled and loaded without a resource or
   component diagnostic, but "it renders correctly" is unverified.
-* keyboard input. `on_input` is wired to arrow keys plus space, and the same
-  `dispatchInput` path is exercised by the retained reference component, but no
-  key event was injected into this port.
+* keyboard input. `on_input` is wired to arrows, WASD, space, shift and `1`-`6`,
+  and the same `dispatchInput` path is exercised by the retained reference
+  component, but no key event was injected into this port by any gate. A human
+  has driven it in a browser; that is a report, not evidence this repository
+  holds.
+* everything the arena does. The run above predates it entirely.
 
 ## Provider defects fixed to reach this point
 
@@ -96,8 +147,42 @@ lands.
 
 ## Online boundary
 
-No Defold WebTransport client is attached. Browser WebTransport, Deno, Quinn,
-Colyseus H3, WebRTC, and WebSocket adapters remain behind the existing typed
-transport boundary. The deterministic 32-player simulation in `core/` is no
-longer driven by the built Defold project; it is retained for the headless
-match, bundle-size measurement, and the `reference/` presentation scene.
+The built Defold project now drives the simulation in `core/`, and
+`arena.script.ts` will open a `BattleClient` over the browser WebTransport
+adapter when `game.project` declares `[war_battles] server`. What that does and
+does not prove:
+
+* **Proven, in `test/core.test.mjs` over the in-memory transport pair:** two
+  clients joining one authoritative match and taking bot slots over; the
+  predicting client's state matching the server's exactly; a client that falls
+  behind reconciling by replaying its own inputs; a full match refusing a further
+  session with a typed reject; a session's forged packet for another player's
+  slot being rejected without moving that tank; an upgrade bought over the
+  reliable control lane.
+* **Not proven anywhere:** a real QUIC session. No gate in this repository has
+  opened one. `server/deno-main.ts` and the certificate procedure are written and
+  typechecked; Deno is not installed in the environment that wrote them.
+* **Native Defold has no WebTransport client.** `arena.script.ts` detects the
+  missing global, logs `war-battles:arena-online-unavailable:no-webtransport`
+  and plays offline. Generating that extension through the normal binding
+  pipeline remains the blocker it always was.
+* The resume token issued by `MatchServer` is a keyed hash, not a signed
+  credential. It proves the reconnect *path*, not the reconnect *security*, and
+  says so at its definition.
+
+## Route shapes this port deliberately does not use
+
+The scene is shaped by the bindings that have actually executed inside a
+packaged engine, not by what the generated surface declares:
+
+* `go.set_position` / `go.set_rotation` / `go.get_position` are used only in
+  their current-instance shape, so every entity moves itself and the director
+  moves nothing. This is why a tank is two game objects.
+* Object visibility is creation and deletion, not `enable`/`disable` messages.
+* The HUD is text only. `gui.get_node` and `gui.set_text` are the two GUI routes
+  with a packaged-engine observation behind them; `gui.set_size`, `gui.set_color`
+  and `gui.play_flipbook` are declared and used by the retained mockup, but this
+  port does not depend on them.
+* Pointer input is not bound. Defold's input-action shape for pointer motion has
+  not been executed through the generated binding, so the turret uses a target
+  assist rather than a guess at an unproven route.

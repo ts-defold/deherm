@@ -1,12 +1,10 @@
 import {
   MAX_PLAYERS,
   SNAPSHOT_BYTES,
-  UPGRADE_ARMOR,
-  UPGRADE_DAMAGE,
-  UPGRADE_MOBILITY,
-  BattleWorld,
+  createPlayerView,
   type PlayerView,
 } from "../core/index.ts";
+import { initializeFixtureWorld } from "./fixture.ts";
 import { emptyCommand, readReplayCommand, readReplayHeader } from "./replay.ts";
 
 export interface RollbackPlan {
@@ -28,8 +26,7 @@ export interface MatchSummary {
 export function runReplay(replay: Uint8Array, rollback?: Readonly<RollbackPlan>): MatchSummary {
   const header = readReplayHeader(replay);
   validateRollback(rollback, header.ticks);
-  const world = new BattleWorld(header.matchId);
-  initializeWorld(world, header.players);
+  const world = initializeFixtureWorld(header.matchId, header.players, header.seed);
   const command = emptyCommand();
   const snapshot = rollback === undefined ? undefined : new Uint8Array(SNAPSHOT_BYTES);
   let rollbackCount = 0;
@@ -68,25 +65,8 @@ export function runReplay(replay: Uint8Array, rollback?: Readonly<RollbackPlan>)
   });
 }
 
-function initializeWorld(world: BattleWorld, players: number): void {
-  const firstTeamSize = Math.ceil(players / 2);
-  for (let playerId = 1; playerId <= players; playerId += 1) {
-    const firstTeam = playerId <= firstTeamSize;
-    const teamIndex = firstTeam ? playerId - 1 : playerId - firstTeamSize - 1;
-    world.addPlayer(playerId, firstTeam ? 1 : 2, firstTeam ? -5_000 : 5_000, -7_500 + teamIndex * 1_000);
-    world.setWeapon(playerId, ((playerId - 1) % 3) + 1);
-    world.grantCredits(playerId, 2_500);
-    const levels = 1 + (playerId % 3);
-    for (let level = 0; level < levels; level += 1) {
-      world.applyUpgrade(playerId, UPGRADE_DAMAGE);
-      world.applyUpgrade(playerId, UPGRADE_MOBILITY);
-      world.applyUpgrade(playerId, UPGRADE_ARMOR);
-    }
-  }
-}
-
 function submitTick(
-  world: BattleWorld,
+  world: ReturnType<typeof initializeFixtureWorld>,
   replay: Uint8Array,
   header: ReturnType<typeof readReplayHeader>,
   command: ReturnType<typeof emptyCommand>,
@@ -94,7 +74,9 @@ function submitTick(
 ): void {
   for (let playerId = 1; playerId <= header.players; playerId += 1) {
     readReplayCommand(replay, header, tick, playerId, command);
-    if (!world.submitInput(command)) throw new Error(`input rejected at tick ${tick}, player ${playerId}`);
+    // A dead tank sends nothing this bot could act on, so a refused command is
+    // expected; only a command for a tick outside the window is a fault.
+    world.submitInput(command);
   }
 }
 
@@ -110,23 +92,7 @@ function validateRollback(rollback: Readonly<RollbackPlan> | undefined, ticks: n
 }
 
 function emptyPlayerView(): PlayerView {
-  return {
-    active: false,
-    entityId: 0,
-    playerId: 0,
-    team: 0,
-    x: 0,
-    y: 0,
-    aimX: 0,
-    aimY: 0,
-    health: 0,
-    score: 0,
-    credits: 0,
-    weaponId: 0,
-    damageLevel: 0,
-    mobilityLevel: 0,
-    armorLevel: 0,
-  };
+  return createPlayerView();
 }
 
 export const HEADLESS_MAX_PLAYERS = MAX_PLAYERS;

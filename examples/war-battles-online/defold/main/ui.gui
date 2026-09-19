@@ -25,6 +25,73 @@ nodes {
   id: "score"
   pivot: PIVOT_NW
 }
+nodes {
+  position {
+    x: 24.0
+    y: 48.0
+    z: 0.0
+  }
+  size {
+    x: 700.0
+    y: 32.0
+  }
+  color {
+    x: 0.82
+    y: 1.0
+    z: 0.54
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  text: ""
+  font: "score_font"
+  id: "status"
+  pivot: PIVOT_SW
+}
+nodes {
+  position {
+    x: 1256.0
+    y: 696.0
+    z: 0.0
+  }
+  size {
+    x: 420.0
+    y: 140.0
+  }
+  color {
+    x: 0.72
+    y: 0.86
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  text: ""
+  font: "score_font"
+  id: "frags"
+  pivot: PIVOT_NE
+  line_break: true
+}
+nodes {
+  position {
+    x: 24.0
+    y: 20.0
+    z: 0.0
+  }
+  size {
+    x: 900.0
+    y: 24.0
+  }
+  color {
+    x: 0.62
+    y: 0.66
+    z: 0.74
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  text: "ARROWS/WASD DRIVE   SPACE FIRE   SHIFT BOOST   1-6 WEAPON"
+  font: "score_font"
+  id: "hint"
+  pivot: PIVOT_SW
+}
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT
 max_nodes: 16

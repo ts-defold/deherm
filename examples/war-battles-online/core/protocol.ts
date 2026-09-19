@@ -1,9 +1,13 @@
-import {
-  INPUT_BUTTON_MASK,
-  MAX_PLAYERS,
-} from "./constants.ts";
+import { INPUT_BUTTON_MASK, MAX_PLAYERS, SNAPSHOT_BYTES, TICK_RATE } from "./constants.ts";
+import { WEAPON_COUNT } from "./content.ts";
 
-export const PROTOCOL_VERSION = 1;
+/**
+ * Version 2 adds the weapon-request byte to the tick input packet and the
+ * reliable session/control envelope below. The packet is still exactly 32 bytes:
+ * version 1 left byte 15 reserved and zero, and that is the byte the weapon
+ * request now occupies, so the layout of every other field is unchanged.
+ */
+export const PROTOCOL_VERSION = 2;
 export const INPUT_PACKET_BYTES = 32;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
@@ -18,12 +22,32 @@ export interface InputCommand {
   aimX: number;
   aimY: number;
   buttons: number;
+  /** Weapon the client wants to hold, or zero for "no change". */
+  weaponRequest: number;
   /** 0-254 is the firing instant within the tick; 255 means no sub-tick shot. */
   fireSubtick: number;
   /** Most recent authoritative snapshot tick observed by this client. */
   latestSnapshotTick: number;
   /** Receipt bits for latestSnapshotTick and its 31 predecessors. */
   snapshotAckBits: number;
+}
+
+export function createInputCommand(matchId: number, playerId: number): InputCommand {
+  return {
+    matchId,
+    playerId,
+    tick: 1,
+    sequence: 1,
+    moveX: 0,
+    moveY: 0,
+    aimX: 127,
+    aimY: 0,
+    buttons: 0,
+    weaponRequest: 0,
+    fireSubtick: 255,
+    latestSnapshotTick: 0,
+    snapshotAckBits: 0,
+  };
 }
 
 export function validateInputCommand(command: Readonly<InputCommand>): void {
@@ -38,6 +62,7 @@ export function validateInputCommand(command: Readonly<InputCommand>): void {
   signedAxis(command.aimY, "aimY");
   unsigned(command.buttons, 0xff, "buttons");
   if ((command.buttons & ~INPUT_BUTTON_MASK) !== 0) throw new RangeError("buttons contains an unknown bit");
+  unsigned(command.weaponRequest, WEAPON_COUNT, "weaponRequest");
   unsigned(command.fireSubtick, 0xff, "fireSubtick");
   unsigned(command.latestSnapshotTick, 0xffff_ffff, "latestSnapshotTick");
   unsigned(command.snapshotAckBits, 0xffff_ffff, "snapshotAckBits");
@@ -62,7 +87,7 @@ export function writeInputPacket(
   view.setInt8(12, command.aimX);
   view.setInt8(13, command.aimY);
   view.setUint8(14, command.fireSubtick);
-  view.setUint8(15, 0);
+  view.setUint8(15, command.weaponRequest);
   view.setUint32(16, command.tick, true);
   view.setUint16(20, command.sequence, true);
   view.setUint32(22, command.latestSnapshotTick, true);
@@ -90,6 +115,7 @@ export function readInputPacket(
   output.aimX = view.getInt8(12);
   output.aimY = view.getInt8(13);
   output.fireSubtick = view.getUint8(14);
+  output.weaponRequest = view.getUint8(15);
   output.tick = view.getUint32(16, true);
   output.sequence = view.getUint16(20, true);
   output.latestSnapshotTick = view.getUint32(22, true);
@@ -97,6 +123,223 @@ export function readInputPacket(
   validateInputCommand(output);
   return byteOffset + INPUT_PACKET_BYTES;
 }
+
+// --- reliable envelope ------------------------------------------------------
+//
+// Everything that is not a tick input crosses on a reliable lane inside one
+// four-byte envelope: magic, version, kind. The lane a message belongs on is
+// fixed by its kind, so a receiver that is handed a snapshot on the session lane
+// rejects it instead of guessing.
+
+const ENVELOPE_BYTES = 4;
+const ENVELOPE_MAGIC = 0x5743;
+
+export const MESSAGE_HELLO = 1;
+export const MESSAGE_WELCOME = 2;
+export const MESSAGE_REJECT = 3;
+export const MESSAGE_SNAPSHOT = 4;
+export const MESSAGE_CONTROL = 5;
+export const MESSAGE_PING = 6;
+export const MESSAGE_PONG = 7;
+
+export const RESUME_TOKEN_BYTES = 16;
+export const PLAYER_NAME_BYTES = 16;
+
+export const HELLO_BYTES = ENVELOPE_BYTES + 4 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES + 4;
+export const WELCOME_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
+export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
+export const PING_BYTES = ENVELOPE_BYTES + 8;
+export const SNAPSHOT_MESSAGE_BYTES = ENVELOPE_BYTES + 4 + SNAPSHOT_BYTES;
+export const REJECT_HEADER_BYTES = ENVELOPE_BYTES + 2;
+export const REJECT_MAXIMUM_BYTES = REJECT_HEADER_BYTES + 96;
+
+export const CONTROL_BUY_UPGRADE = 1;
+export const CONTROL_SET_WEAPON = 2;
+export const CONTROL_SUICIDE = 3;
+
+export const REJECT_VERSION = 1;
+export const REJECT_FULL = 2;
+export const REJECT_BAD_RESUME = 3;
+export const REJECT_RATE_LIMITED = 4;
+
+export interface HelloMessage {
+  clientSalt: number;
+  name: string;
+  /** All-zero means "no session to resume". */
+  resumeToken: Uint8Array;
+  preferredTeam: number;
+}
+
+export interface WelcomeMessage {
+  matchId: number;
+  playerId: number;
+  team: number;
+  maximumPlayers: number;
+  botCount: number;
+  mapSeed: number;
+  serverTick: number;
+  tickRate: number;
+  resumeToken: Uint8Array;
+}
+
+export interface ControlMessage {
+  action: number;
+  argument: number;
+}
+
+export interface PingMessage {
+  clientTime: number;
+  serverTick: number;
+}
+
+export interface RejectMessage {
+  code: number;
+  reason: string;
+}
+
+export function messageKind(payload: Uint8Array): number {
+  if (payload.byteLength < ENVELOPE_BYTES) throw new Error("reliable message is shorter than its envelope");
+  const view = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
+  if (view.getUint16(0, true) !== ENVELOPE_MAGIC) throw new Error("reliable message magic mismatch");
+  if (view.getUint8(2) !== PROTOCOL_VERSION) throw new Error("reliable message version mismatch");
+  return view.getUint8(3);
+}
+
+function envelope(target: Uint8Array, kind: number): DataView {
+  const view = new DataView(target.buffer, target.byteOffset, target.byteLength);
+  view.setUint16(0, ENVELOPE_MAGIC, true);
+  view.setUint8(2, PROTOCOL_VERSION);
+  view.setUint8(3, kind);
+  return view;
+}
+
+function expect(payload: Uint8Array, kind: number, bytes: number): DataView {
+  if (messageKind(payload) !== kind) throw new Error(`reliable message is not kind ${kind}`);
+  if (payload.byteLength < bytes) throw new Error(`reliable message of kind ${kind} is truncated`);
+  return new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
+}
+
+export function writeHello(target: Uint8Array, message: Readonly<HelloMessage>): number {
+  requireCapacity(target, HELLO_BYTES);
+  requireTokenLength(message.resumeToken);
+  const view = envelope(target, MESSAGE_HELLO);
+  view.setUint32(4, message.clientSalt >>> 0, true);
+  writeName(target, 8, message.name);
+  target.set(message.resumeToken, 8 + PLAYER_NAME_BYTES);
+  view.setUint8(8 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES, message.preferredTeam & 0xff);
+  view.setUint8(9 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES, 0);
+  view.setUint16(10 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES, 0, true);
+  return HELLO_BYTES;
+}
+
+export function readHello(payload: Uint8Array, output: HelloMessage): HelloMessage {
+  const view = expect(payload, MESSAGE_HELLO, HELLO_BYTES);
+  output.clientSalt = view.getUint32(4, true);
+  output.name = readName(payload, 8);
+  output.resumeToken.set(payload.subarray(8 + PLAYER_NAME_BYTES, 8 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES));
+  output.preferredTeam = view.getUint8(8 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES);
+  return output;
+}
+
+export function writeWelcome(target: Uint8Array, message: Readonly<WelcomeMessage>): number {
+  requireCapacity(target, WELCOME_BYTES);
+  requireTokenLength(message.resumeToken);
+  const view = envelope(target, MESSAGE_WELCOME);
+  view.setUint32(4, message.matchId >>> 0, true);
+  view.setUint8(8, message.playerId);
+  view.setUint8(9, message.team);
+  view.setUint8(10, message.maximumPlayers);
+  view.setUint8(11, message.botCount);
+  view.setUint32(12, message.mapSeed >>> 0, true);
+  view.setUint32(16, message.serverTick >>> 0, true);
+  target.set(message.resumeToken, 20);
+  return WELCOME_BYTES;
+}
+
+export function readWelcome(payload: Uint8Array, output: WelcomeMessage): WelcomeMessage {
+  const view = expect(payload, MESSAGE_WELCOME, WELCOME_BYTES);
+  output.matchId = view.getUint32(4, true);
+  output.playerId = view.getUint8(8);
+  output.team = view.getUint8(9);
+  output.maximumPlayers = view.getUint8(10);
+  output.botCount = view.getUint8(11);
+  output.mapSeed = view.getUint32(12, true);
+  output.serverTick = view.getUint32(16, true);
+  output.tickRate = TICK_RATE;
+  output.resumeToken.set(payload.subarray(20, 20 + RESUME_TOKEN_BYTES));
+  return output;
+}
+
+export function writeControl(target: Uint8Array, message: Readonly<ControlMessage>): number {
+  requireCapacity(target, CONTROL_BYTES);
+  const view = envelope(target, MESSAGE_CONTROL);
+  view.setUint8(4, message.action);
+  view.setUint8(5, message.argument);
+  view.setUint16(6, 0, true);
+  return CONTROL_BYTES;
+}
+
+export function readControl(payload: Uint8Array, output: ControlMessage): ControlMessage {
+  const view = expect(payload, MESSAGE_CONTROL, CONTROL_BYTES);
+  output.action = view.getUint8(4);
+  output.argument = view.getUint8(5);
+  return output;
+}
+
+export function writePing(target: Uint8Array, message: Readonly<PingMessage>, pong = false): number {
+  requireCapacity(target, PING_BYTES);
+  const view = envelope(target, pong ? MESSAGE_PONG : MESSAGE_PING);
+  view.setUint32(4, message.clientTime >>> 0, true);
+  view.setUint32(8, message.serverTick >>> 0, true);
+  return PING_BYTES;
+}
+
+export function readPing(payload: Uint8Array, output: PingMessage): PingMessage {
+  const kind = messageKind(payload);
+  if (kind !== MESSAGE_PING && kind !== MESSAGE_PONG) throw new Error("reliable message is not a ping");
+  if (payload.byteLength < PING_BYTES) throw new Error("ping is truncated");
+  const view = new DataView(payload.buffer, payload.byteOffset, payload.byteLength);
+  output.clientTime = view.getUint32(4, true);
+  output.serverTick = view.getUint32(8, true);
+  return output;
+}
+
+export function writeReject(target: Uint8Array, message: Readonly<RejectMessage>): number {
+  const text = encodeAscii(message.reason, REJECT_MAXIMUM_BYTES - REJECT_HEADER_BYTES);
+  requireCapacity(target, REJECT_HEADER_BYTES + text.length);
+  const view = envelope(target, MESSAGE_REJECT);
+  view.setUint8(4, message.code);
+  view.setUint8(5, text.length);
+  target.set(text, REJECT_HEADER_BYTES);
+  return REJECT_HEADER_BYTES + text.length;
+}
+
+export function readReject(payload: Uint8Array, output: RejectMessage): RejectMessage {
+  const view = expect(payload, MESSAGE_REJECT, REJECT_HEADER_BYTES);
+  output.code = view.getUint8(4);
+  const length = view.getUint8(5);
+  if (payload.byteLength < REJECT_HEADER_BYTES + length) throw new Error("reject reason is truncated");
+  output.reason = decodeAscii(payload.subarray(REJECT_HEADER_BYTES, REJECT_HEADER_BYTES + length));
+  return output;
+}
+
+/** Frames an already-written snapshot. `target` must be `SNAPSHOT_MESSAGE_BYTES`. */
+export function writeSnapshotHeader(target: Uint8Array, tick: number): number {
+  requireCapacity(target, SNAPSHOT_MESSAGE_BYTES);
+  const view = envelope(target, MESSAGE_SNAPSHOT);
+  view.setUint32(4, tick >>> 0, true);
+  return ENVELOPE_BYTES + 4;
+}
+
+/** The byte offset of the snapshot body inside a snapshot message. */
+export const SNAPSHOT_BODY_OFFSET = ENVELOPE_BYTES + 4;
+
+export function readSnapshotTick(payload: Uint8Array): number {
+  const view = expect(payload, MESSAGE_SNAPSHOT, SNAPSHOT_MESSAGE_BYTES);
+  return view.getUint32(4, true);
+}
+
+// --- helpers ----------------------------------------------------------------
 
 function packetChecksum(bytes: Uint8Array, offset: number, length: number): number {
   let first = 0xff;
@@ -114,6 +357,14 @@ function requirePacketRange(bytes: Uint8Array, byteOffset: number): void {
   }
 }
 
+function requireCapacity(bytes: Uint8Array, required: number): void {
+  if (bytes.byteLength < required) throw new RangeError(`message requires ${required} bytes`);
+}
+
+function requireTokenLength(token: Uint8Array): void {
+  if (token.byteLength !== RESUME_TOKEN_BYTES) throw new RangeError(`resume token must be ${RESUME_TOKEN_BYTES} bytes`);
+}
+
 function unsigned(value: number, maximum: number, label: string): void {
   if (!Number.isInteger(value) || value < 0 || value > maximum) {
     throw new RangeError(`${label} is outside its wire range`);
@@ -124,4 +375,40 @@ function signedAxis(value: number, label: string): void {
   if (!Number.isInteger(value) || value < -127 || value > 127) {
     throw new RangeError(`${label} must be an integer in [-127, 127]`);
   }
+}
+
+/**
+ * Names are fixed-width printable ASCII. Anything else is replaced, because a
+ * name crosses the wire from an untrusted peer and is rendered verbatim.
+ */
+function writeName(target: Uint8Array, offset: number, name: string): void {
+  const encoded = encodeAscii(name, PLAYER_NAME_BYTES);
+  target.fill(0, offset, offset + PLAYER_NAME_BYTES);
+  target.set(encoded, offset);
+}
+
+function readName(source: Uint8Array, offset: number): string {
+  return decodeAscii(source.subarray(offset, offset + PLAYER_NAME_BYTES));
+}
+
+function encodeAscii(text: string, maximum: number): Uint8Array {
+  const length = Math.min(text.length, maximum);
+  const bytes = new Uint8Array(length);
+  let written = 0;
+  for (let index = 0; index < length; index += 1) {
+    const code = text.charCodeAt(index);
+    bytes[written] = code >= 0x20 && code <= 0x7e ? code : 0x3f;
+    written += 1;
+  }
+  return bytes.subarray(0, written);
+}
+
+function decodeAscii(bytes: Uint8Array): string {
+  let text = "";
+  for (let index = 0; index < bytes.length; index += 1) {
+    const code = bytes[index]!;
+    if (code === 0) break;
+    text += String.fromCharCode(code >= 0x20 && code <= 0x7e ? code : 0x3f);
+  }
+  return text;
 }
