@@ -264,9 +264,13 @@ function buildShippedIndex({ site, entries }) {
     schemaVersion: 1,
     kind: "deherm.policy.index",
     comment:
-      "The only mutable mapping in the policy system, and the only part that needs trust. " +
-      "Objects are self-verifying, so a fetched index may extend this one for revisions " +
-      "published after this release, but never overrides an entry asserted here.",
+      "Maps a Defold revision to the policy derived from it. An entry is keyed by a revision " +
+      "Defold has already published and is written once, never rewritten, because that " +
+      "revision's declaration inputs are fixed forever. Consumers FETCH the entry they need " +
+      "from v1/index/<defold-sha>.json rather than relying on a shipped copy: Defold publishes " +
+      "nightlies daily, so an index that had to be re-released to stay current would be a pin, " +
+      "not an index. The policy an entry names is content-addressed and therefore " +
+      "self-verifying, so a substituted policy fails its own hash check.",
     base: {
       url: site.baseUrl,
       pathPrefix: site.pathPrefix,
