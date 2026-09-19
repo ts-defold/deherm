@@ -20,14 +20,27 @@
 # host and target are the same, CMake builds whatever host tool it needs itself,
 # and the two-pass structure and toolchain file both fall away.
 #
-# ── The provenance caveat ────────────────────────────────────────────────────
+# ── The provenance caveat, which is not small ────────────────────────────────
 #
-# The archive is now built against the runner's Windows SDK and MSVC rather than
-# the versions Defold pins in build_tools/sdk.py. MSVC has held its C++ ABI
-# stable since VS2015 and Extender links this archive rather than rebuilding it,
-# so this is compatible in practice - but it is a weaker claim than "built with
-# the toolchain Defold declares", and it is the one thing in this lane that
-# would be fixed by registry access rather than by more code here.
+# Nobody here runs Extender: users bundle through remote Bob against
+# build.defold.com, and that is unaffected by how this archive is produced. What
+# matters is that Extender COMPILES defold_hermes/src/*.cpp and then LINKS this
+# archive into the engine, so the archive must be ABI-compatible with Extender's
+# toolchain. Building inside Extender's own image is what guaranteed that.
+#
+# Building against the runner's MSVC and Windows SDK instead does not, and the
+# binding constraint is not the core C++ ABI - that has been stable since
+# VS2015. It is that Hermes's JSI surface passes std::string, std::shared_ptr
+# and other standard-library types across the boundary, so both sides must also
+# agree on the MSVC STL version and on CRT linkage (/MT versus /MD). A mismatch
+# there is an ODR violation or heap corruption, not a clean link error, which
+# makes it a bad thing to discover from a user's crash report.
+#
+# So this lane is a FALLBACK. The registry denial that forced it reads
+# "Unauthenticated request", which suggests the grant is to any authenticated
+# Google identity rather than to named accounts - in which case a service
+# account credential restores Dockerfile.win32 and this file stops being the
+# path that ships.
 set -euo pipefail
 
 hermes_source="$1"
