@@ -48,6 +48,7 @@ ordinary edit loop.
 | Compile and run matched Hermes bytecode | `pnpm run:device-dev` | `hermesc` produces `dist/sample.hbc` |
 | Run the browser-host contract | `pnpm run:web` | Local URL using the browser VM, not Hermes Wasm |
 | Generate reachable-only release bindings | `pnpm build:release-plan` | Filtered artifacts under `build/profiles/release` |
+| Gate symbol-level reachability | `pnpm test:reachability` | Fixture project; checker/module-graph cross-check; dead-symbol retention through the emitted C |
 | Check Static Hermes declarations/export unit | `pnpm check:static-hermes` | Parses `extern_c` and proves a library-shaped exported unit without `main` |
 | Exercise the cached Lua bridge | `pnpm test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
 | Stage the native extension | `pnpm package:defold` | Defold package directory/archive inputs |
@@ -64,6 +65,33 @@ ordinary edit loop.
 | Measure with telemetry on | `pnpm bench:transports:profiled` | Same binary with `DEHERM_PROFILE=ON`; also drains the telemetry ring |
 | Prove the telemetry compiles out | `pnpm test:profile-compile-out` | Builds both ways and reads the artifacts with `nm` and `strings` |
 
+`build:js` now also resolves **symbol-level Defold reachability**. It derives a
+script route symbol index into `build/ttsc/script-route-symbol-index.json`,
+runs the deherm ttsc plugin with `routeSymbols`/`apiUsage` pointed at
+`build/ttsc/`, and joins the checker's whole-program manifest to each
+entrypoint's retained inputs. The result lands in
+`dist/<entry>.defold-api-usage.json` beside the existing module-level
+`dist/<entry>.usage.json`, and the build prints one reachability line per
+entrypoint. The bundle itself is read back as an independent derivation - the
+generated SDK dispatches through `callScriptApi(<stableId>, args)` - and the
+build fails if the two disagree.
+
+A generated project gets the same thing without extra configuration:
+`deherm generate` writes `.deherm/generated/script-route-symbol-index.json`
+beside the resource symbol table and points the generated ttsc plugin entry at
+it, so every `pnpm dev` rebuild republishes
+`.deherm/generated/defold-api-usage.json` and the operator console shows what a
+release build would retain. Nothing in that path prunes what is linked.
+
+Plugin-entry configuration keys, all optional:
+
+| Key | Meaning |
+| --- | --- |
+| `routeSymbols` | Path to the script route symbol index. Without it, no manifest is produced. |
+| `apiUsage` | Where to write the usage manifest. Absent means the pass does not run. |
+| `profile` | `development` (default) records dynamic access; `release` refuses it unless declared. |
+| `dynamicApiAccess` | Declares that the project indexes the generated surface by computed name and accepts the complete surface. |
+
 `build:release-plan` emits canonical route glue under
 `build/profiles/release/canonical/<target>/`. For a native Dynamic-Hermes
 consumer, configure CMake with
@@ -74,6 +102,13 @@ and browser/Wasm currently produce reject-all registries plus
 `requirements.json`; those files are blocker evidence, not executable binding
 claims. Existing Lua-family implementation objects remain coarse-grained and
 are not yet proven dead-stripped.
+
+The same release root also carries `canonical/<target>/typed-native/`: the
+tier-2 lane re-rendered over the reachable set, plus a manifest naming the C
+symbols it retained and the ones it pruned. `scripts/build-static-hermes.mjs`
+takes `--typed-native-source <path>` to compile that pruned lane instead of the
+complete one, so `shermes -emit-c` emits no symbol for a route nothing calls.
+Without the flag it compiles the complete lane, which is what development wants.
 
 `DEHERM_PROFILE` is a build-time CMake option, OFF by default, that turns on
 generated timing spans at every binding transport boundary and a bounded

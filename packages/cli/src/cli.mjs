@@ -4,7 +4,7 @@ import { createInterface } from "node:readline/promises";
 
 import { compileConformanceHarness, generateConformanceHarness, readConformanceReport } from "./conformance.mjs";
 import { generateComponentProxies } from "../../compiler/src/component-proxy-generator.mjs";
-import { writeProjectResourceSymbols } from "./resource-symbols.mjs";
+import { writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "./resource-symbols.mjs";
 import { discoverProjectRoots, findProjectRoot, inspectDefoldProject } from "./project.mjs";
 import { installNativeExtension, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
 import { createDefoldProject } from "./scaffold.mjs";
@@ -495,7 +495,11 @@ export async function run(argv = process.argv.slice(2)) {
     const components = await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot });
     const componentCount = components.manifest.components.length;
     const resourceSymbols = await writeProjectResourceSymbols(inventory.projectRoot, output.root);
-    if (options.json) console.log(JSON.stringify({ ...output, nativeExtension, componentCount, resourceSymbols: { resources: resourceSymbols.table.resourceCount }, summary: inventory.summary }, null, 2));
+    // The checker resolves Defold reachability against this index. Development
+    // still links the complete surface; the index only lets the compiler report
+    // what a release build would retain.
+    const routeSymbols = await writeProjectRouteSymbolIndex(output.root);
+    if (options.json) console.log(JSON.stringify({ ...output, nativeExtension, componentCount, resourceSymbols: { resources: resourceSymbols.table.resourceCount }, routeSymbols: { routes: routeSymbols.index.routeCount }, summary: inventory.summary }, null, 2));
     else {
       console.log(`${output.cached ? "Current" : "Generated"} extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
       console.log(`${nativeExtension.installed ? "Installed" : "Current"} native extension in ${path.relative(process.cwd(), nativeExtension.root) || "."}`);
@@ -505,6 +509,7 @@ export async function run(argv = process.argv.slice(2)) {
         for (const [code, count] of Object.entries(output.projection.blockerCodes)) console.log(`   ${code}: ${count}`);
       }
       console.log(`Indexed ${resourceSymbols.table.resourceCount} Defold resource(s) for compile-time name resolution`);
+      console.log(`Indexed ${routeSymbols.index.routeCount} Defold route(s) for compile-time reachability`);
       console.log(`Pinned Defold API: ${output.defoldRevision}`);
       if (output.created.tsconfig) console.log("Created tsconfig.json referencing all generated TypeScript context projects");
       else if (output.migrated.tsconfig) console.log("Migrated the legacy generated tsconfig.json to TypeScript project references");

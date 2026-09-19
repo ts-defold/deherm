@@ -3,7 +3,7 @@ type: Architecture Decision
 title: Take release reachability from ttsc, and lower reachable code to native
 description: The checker resolves which API symbols a project actually calls; release builds emit only those, and the reachable surface is progressively lowered from bytecode to extern_c native code.
 tags: [decision, reachability, tree-shaking, ttsc, static-hermes, release, performance]
-status: proposed
+status: accepted
 generated: { by: claude/opus-5, at: 2026-09-19T00:10:00-04:00 }
 sources:
   - id: build-seam
@@ -20,9 +20,9 @@ sources:
     author: project:deherm
 ---
 
-# Why the current reachability is not enough
+# Why module-graph reachability was not enough
 
-`scripts/build.mjs` derives Defold API usage from esbuild's module graph:
+`scripts/build.mjs` used to derive Defold API usage from esbuild's module graph:
 
 ```js
 const usesCanonicalBindings = [...retainedInputs].some((input) =>
@@ -46,13 +46,48 @@ ttsc already resolves call sites against the generated SDK's declared interfaces
 against the project symbol table. The same checker position yields the exact set
 of API symbols a project calls.
 
-A release build therefore emits a **symbol-level** usage manifest from ttsc:
-every reached route by stable ID, with its call site. The bundler's module graph
+A build therefore emits a **symbol-level** usage manifest from ttsc: every
+reached route by stable ID, with its call site. The bundler's module graph
 remains a cross-check, never the authority.
 
 Dynamic access stays conservative and explicit. A project that indexes the SDK
 dynamically declares it and gets the full surface, with a diagnostic naming the
 site, rather than silently defeating the optimisation for everyone.
+
+## How the checker answers in canonical identity
+
+The checker can only name what TypeScript declares: `GuiApi.getNode`,
+`B2dApi.body.applyForce`. Everything downstream speaks route IDs
+(`script:gui.get_node`) and 32-bit stable IDs. A derived
+**script route symbol index** joins the two, one entry per route, and it is
+derived rather than authored - the script API IR owns the public spelling and
+the canonical lowering plan owns identity and disposition, so a member the two
+disagree about is a hard error rather than a silently unreachable route.
+
+The index is project state, not package state: `deherm generate` and every dev
+rebuild write it next to the resource symbol table, and this repository's own
+build writes it under `build/ttsc/`. The plugin entry points at it with
+`routeSymbols`, and names its output with `apiUsage`.
+
+Resolution follows the pattern the resource-name checker already uses. A
+property access resolves to a symbol; a symbol resolves to a `PropertySignature`
+declared in the generated `generated/script/types.ts`; the member path is
+rebuilt by walking that declaration's parents, since a nested Lua module is
+declared as an anonymous type literal inside its interface. Resolution is by
+symbol, so an aliased namespace, a re-export and a direct call all answer the
+same route.
+
+Computed access - `gui[name]` - is the one thing this cannot resolve. It is
+detected from the object's *type* rather than its symbol, because a project
+imports `gui` as an ordinary const: a type with at least one property declared
+in the generated script declarations is the generated surface, however the value
+reached that position. An undeclared computed access is a compile error under
+the release profile that names file, line and column; under the development
+profile it is recorded in the manifest and reported, never raised, because
+development links everything anyway and the edit loop is not the place for it.
+The release planner refuses a manifest that claims dynamic access without
+declaring it, so the profile the manifest was produced under cannot be used to
+slip past the gate.
 
 # What the reachable set prunes
 
@@ -62,10 +97,19 @@ One symbol set drives every layer, so nothing can disagree:
 | --- | --- |
 | TypeScript bundle | only reached SDK modules are retained |
 | Generated binding families | per-family C++ sources, route tables and registries |
-| CMake inputs | the emitted source list for the release extension |
-| Emitted C | `shermes -emit-c` runs only over reachable typed-native routes |
+| CMake inputs | `sources.cmake` lists only the families a reachable route lands in |
+| Emitted C | the typed-native lane handed to `shermes -emit-c` is re-rendered over the reachable set, so a pruned route has no `extern_c` declaration to emit |
 | dmSDK provider | `materialize-dmsdk` already prunes to declared usage |
-| Target gates | unreachable routes are absent, not merely disabled |
+| Target gates | unreachable routes are absent from the registry, the Static Hermes gate and the browser library, not merely disabled |
+
+A reached route may still legitimately not be emitted, and the plan says which
+cases those are rather than treating every one as a gap. A compile-time
+intrinsic - `go.property`, the `resource.*` constructors - never reaches any
+runtime target, because the compiler lowered it. A `typed-native` target is an
+acceleration tier over a baseline transport rather than a runtime of its own, so
+a route that cannot be soundly typed stays at the tier it qualifies for. On a
+baseline runtime transport every other non-emission still fails closed: a
+reached route with nothing to dispatch to is a hole in the shipped surface.
 
 An unreachable route costs nothing: no TypeScript, no C, no object, no symbol.
 
@@ -91,9 +135,11 @@ release generation sets it, so the pruned projection is opt-in.
 | development | complete | bytecode over JSI | adding a native extension, or regenerating the surface |
 | release | reachable only | bytecode plus `extern_c` where lowered | every release build |
 
-Reachability is still computed in development, but only to *report*: the
-operator console can show what a release build would retain, long before anyone
-produces one. It never prunes what is linked.
+Reachability is still computed in development, but only to *report*. Every dev
+rebuild reads the manifest the checker just wrote and publishes it to the
+console model, which shows one line - "release would retain 24/926 Defold routes
+across 7 namespace(s); development links all of them" - long before anyone
+produces a release. Nothing on that path touches what is linked.
 
 ## One projection among several, by design
 
@@ -190,16 +236,31 @@ the one it qualifies for, in the same binary, in the same runtime.
   and the timing telemetry already distinguishes the transports.
 * Generated C only exists for reachable routes, so the build seam's assembly
   step scales with the project.
+* The measured ratio is the point. The War Battles example - a real game -
+  resolves **24 routes** across seven namespaces out of 913 emittable ones, and
+  this repository's own runtime-smoke entrypoint resolves 33. The bundler's
+  module graph retains 125 routes for that same entrypoint, because it keeps
+  whole namespace objects; before this change the release planner retained all
+  913.
 
 # Gates
 
 Reachability is a claim about an artifact and must be checked against one:
 
 * A symbol absent from the reachable set must not appear in the final native or
-  Wasm artifact. `tests/release-build.test.mjs` already performs dead-symbol
-  retention checks; they extend to the emitted C and the typed-native lane.
+  Wasm artifact. `tests/release-reachability.test.mjs` compiles a fixture
+  project that calls seven routes, asserts that every one of the other 919
+  stable IDs is absent from the generated release registry, and runs
+  `shermes -emit-c` over the pruned typed-native lane to assert its pruned C
+  symbols are absent from the emitted C - while proving the gate is not vacuous
+  by emitting the complete lane and finding those same symbols there.
 * The ttsc symbol set and the bundler module graph must agree, or the build
-  fails. Two independent derivations disagreeing means one is wrong.
+  fails. Two independent derivations disagreeing means one is wrong. The bundle
+  is read directly for this: the generated SDK dispatches through
+  `callScriptApi(<stableId>, args)`, so the emitted integers are a census of the
+  routes the output can reach that owes nothing to the checker. Every resolved
+  route must appear there, and every namespace the bundle retained must be
+  claimed by a resolved route.
 * Conformance evidence must be attributed to the *pruned* release projection,
   not only the full development surface. Proving 913 routes in development and
   shipping 40 unproven ones is not evidence.

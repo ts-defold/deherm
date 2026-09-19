@@ -7,7 +7,8 @@ import {
   generateComponentProxies
 } from "../../../compiler/src/component-proxy-generator.mjs";
 import { recordBundleBuild } from "../build-artifacts.mjs";
-import { writeProjectResourceSymbols } from "../resource-symbols.mjs";
+import { writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../resource-symbols.mjs";
+import { readReleaseReachability } from "./release-reachability.mjs";
 import { createBugPoolRecorder, defaultBugPoolFile } from "./bug-pool.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
 import { createDefoldBuilder } from "./defold-builder.mjs";
@@ -231,6 +232,14 @@ export async function runDevSession(options = {}) {
     // from is recorded at the moment it is true rather than inferred later.
     // Recording hashes the files the bundler just read; it never recompiles.
     afterRebuild: options.recordBuildArtifacts === false ? undefined : async (build) => {
+      // Reporting only. The development extension keeps the complete linked
+      // surface whatever this says, so a new API call never forces a relink.
+      try {
+        const reachability = await readReleaseReachability(projectRoot);
+        if (reachability) emit({ type: "reachability", reachability });
+      } catch {
+        // A console that cannot read the manifest simply shows nothing.
+      }
       try {
         await recordBundleBuild({ projectRoot, build });
       } catch (error) {
@@ -250,6 +259,7 @@ export async function runDevSession(options = {}) {
       if (generatedComponents && !changedSources.some(isComponentSource)) return;
       await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
       await writeProjectResourceSymbols(projectRoot, path.join(projectRoot, ".deherm"));
+      await writeProjectRouteSymbolIndex(path.join(projectRoot, ".deherm"));
       generatedComponents = true;
     }
   });

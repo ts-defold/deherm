@@ -17,6 +17,7 @@ import {
   VirtualList
 } from "@rezi-ui/jsx";
 
+import { describeReleaseReachability } from "../release-reachability.mjs";
 import { PANEL_IDS, PANEL_TITLES } from "./keymap.mjs";
 import { logLines, renderLogRow, selectionSummary } from "./logViewport.mjs";
 import {
@@ -146,6 +147,7 @@ export function BundlePanel({ snapshot, focusedScope, ui, actions, height, flex 
           {`${formatBytes(metrics.bytes)}  ${delta(metrics.byteDelta)}  ${metrics.moduleCount ?? 0} modules`}
         </Text>
         <Text style={{ fg: dim }} textOverflow="ellipsis">{`build ${(metrics.durationMs ?? 0).toFixed(1)} ms`}</Text>
+        <Text style={{ fg: dim }} textOverflow="ellipsis">{describeReleaseReachability(snapshot.reachability)}</Text>
         <Pane height={Math.max(1, (height ?? 12) - 7)}>
         <Table
           id={PANEL_IDS.bundle}

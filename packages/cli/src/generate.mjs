@@ -782,6 +782,8 @@ function projectBaseConfig(outputDirectory) {
         enabled: true,
         inventory: `./${generated}/extensions.json`,
         resourceSymbols: `./${generated}/generated/resource-symbols.json`,
+        routeSymbols: `./${generated}/generated/script-route-symbol-index.json`,
+        apiUsage: `./${generated}/generated/defold-api-usage.json`,
         profile: "development"
       }]
     }

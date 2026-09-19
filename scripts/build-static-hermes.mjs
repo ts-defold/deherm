@@ -10,12 +10,17 @@ for (let index = 2; index < process.argv.length; index += 2) {
 
 const shermes = args.get("--shermes");
 const outputDirectory = args.get("--output-dir");
+// The typed-native lane handed to the C emitter. Development compiles the
+// complete lane on purpose; a release projection points this at its pruned
+// re-render so the emitted C carries no symbol for an unreachable route.
+const typedNativeSource = args.get("--typed-native-source")
+  ?? "packages/static-hermes/src/generated/script-vmath.ts";
 assert.ok(shermes, "--shermes is required");
 assert.ok(outputDirectory, "--output-dir is required");
 
 await mkdir(outputDirectory, { recursive: true });
 const generatedFfi = await readFile("packages/static-hermes/src/generated/ffi.js", "utf8");
-const generatedVmath = await readFile("packages/static-hermes/src/generated/script-vmath.ts", "utf8");
+const generatedVmath = await readFile(typedNativeSource, "utf8");
 const generatedUniversal = (await readFile("packages/static-hermes/src/generated/script-universal-value.ts", "utf8"))
   .replace(/^export \{.*\};$/m, "");
 const universalReport = JSON.parse(await readFile("packages/bindings/generated/defold-script-universal-value-bindings.json", "utf8"));

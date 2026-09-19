@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import { filterSchemaForUsage, generateArtifacts } from "./generate-bindings.mjs";
 import { generateBindingEmissionPlan } from "./generate-binding-emission-plan.mjs";
 import { generateCanonicalFamilyArtifacts } from "./generate-canonical-family-sources.mjs";
+import { generateTypedNativeProjection } from "./generate-typed-native-projection.mjs";
 import { ensureBindingLoweringPlan } from "./ensure-binding-lowering-plan.mjs";
 import { verifyGeneratedProject } from "../packages/cli/src/generate.mjs";
 
@@ -104,7 +105,30 @@ export function selectedTargetArtifacts(target) {
   return [...common, ...(targetFiles[target] ?? [])].sort(compareCodeUnits);
 }
 
-function releaseProjection({ cacheKey, target, profile, moduleUsage, componentUsage, emissionPlan, artifacts, canonical }) {
+function defoldApiReachability(defoldUsage, emissionPlan, canonical) {
+  const derivation = defoldUsage.derivation ?? {};
+  const emittableSurface = emissionPlan.treeShaking.totalPlanUnits;
+  return {
+    // The checker is the authority. The module graph is the cross-check, and a
+    // build that reached this point has already had them agree.
+    authority: derivation.authority ?? "unattributed",
+    crossCheck: derivation.crossCheck?.status ?? "not-performed",
+    dynamicAccess: defoldUsage.dynamicAccess === true,
+    declaredDynamicAccess: derivation.declaredDynamicAccess === true,
+    dynamicSites: derivation.dynamicSites ?? [],
+    routeIndexSha256: derivation.routeIndexSha256 ?? null,
+    surfaceRouteCount: derivation.surfaceRouteCount ?? null,
+    resolvedRouteCount: Array.isArray(defoldUsage.symbols) ? defoldUsage.symbols.length : 0,
+    emittedRouteCount: canonical.manifest.routeCount,
+    canonicalPlanUnits: emittableSurface,
+    reachableRouteIds: canonical.manifest.groups.flatMap(({ routeIds }) => routeIds).sort(compareCodeUnits),
+    evidence: defoldUsage.dynamicAccess === true
+      ? "Dynamic access was declared, so the complete profile-available surface is retained by design."
+      : "Every emitted route was resolved to a call site by the ttsc checker and confirmed present in the bundler's module graph."
+  };
+}
+
+function releaseProjection({ cacheKey, target, profile, moduleUsage, defoldUsage, componentUsage, emissionPlan, artifacts, canonical, typedNative }) {
   const symbolIds = moduleUsage.dynamicAccess === true
     ? artifacts.symbols.map(({ id }) => id)
     : moduleUsage.symbols.map((symbol) => typeof symbol === "string" ? symbol : symbol.id).sort(compareCodeUnits);
@@ -136,6 +160,18 @@ function releaseProjection({ cacheKey, target, profile, moduleUsage, componentUs
         : canonical.requirements.status === "blocked-by-canonical-plan"
           ? "The canonical plan authorizes no emitted routes for this target; the generated registry rejects every route and requirements.json records the exact blocker authority."
           : "Usage selected no canonical routes; the generated registry rejects every route.",
+      reachability: defoldApiReachability(defoldUsage, emissionPlan, canonical)
+    },
+    typedNativeLane: {
+      status: typedNative.manifest.retainedSymbols.length > 0 ? "reachable-subset-emitted" : "no-reachable-typed-native-route",
+      manifest: `canonical/${target}/typed-native/manifest.json`,
+      source: `canonical/${target}/typed-native/script-vmath.ts`,
+      surfaceRoutes: typedNative.manifest.surfaceRouteCount,
+      retainedRoutes: typedNative.manifest.retainedRouteIds.length,
+      retainedSymbols: typedNative.manifest.retainedSymbols,
+      prunedSymbols: typedNative.manifest.prunedSymbols,
+      evidence: "The typed-native lane handed to `shermes -emit-c` was re-rendered from its own generated report over the reachable route set; pruned symbols have no declaration to emit.",
+      cEmission: "requires-shermes-emit-c-consumer"
     },
     components: componentUsage ? {
       status: target === "dynamicHermesJsi"
@@ -244,9 +280,10 @@ export async function generateReleaseBuild(argv = []) {
     profiles: resolve(repositoryRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"),
     bindingsGenerator: resolve(repositoryRoot, "scripts/generate-bindings.mjs"),
     emissionGenerator: resolve(repositoryRoot, "scripts/generate-binding-emission-plan.mjs"),
-    canonicalFamilyGenerator: resolve(repositoryRoot, "scripts/generate-canonical-family-sources.mjs")
+    canonicalFamilyGenerator: resolve(repositoryRoot, "scripts/generate-canonical-family-sources.mjs"),
+    typedNativeLane: resolve(repositoryRoot, "packages/bindings/generated/defold-static-hermes-vmath.json")
   };
-  const [generatorSource, schemaSource, planSource, planSentinelSource, projectionSource, profilesSource, moduleUsageSource, defoldUsageSource, componentUsageSource, bindingsGeneratorSource, emissionGeneratorSource, canonicalFamilyGeneratorSource] = await Promise.all([
+  const [generatorSource, schemaSource, planSource, planSentinelSource, projectionSource, profilesSource, moduleUsageSource, defoldUsageSource, componentUsageSource, bindingsGeneratorSource, emissionGeneratorSource, canonicalFamilyGeneratorSource, typedNativeLaneSource] = await Promise.all([
     readFile(scriptPath),
     readFile(paths.schema),
     readFile(paths.plan),
@@ -258,7 +295,8 @@ export async function generateReleaseBuild(argv = []) {
     options.componentUsage ? readFile(options.componentUsage) : null,
     readFile(paths.bindingsGenerator),
     readFile(paths.emissionGenerator),
-    readFile(paths.canonicalFamilyGenerator)
+    readFile(paths.canonicalFamilyGenerator),
+    readFile(paths.typedNativeLane)
   ]);
   const plan = JSON.parse(planSource);
   const planSentinel = JSON.parse(planSentinelSource);
@@ -270,6 +308,7 @@ export async function generateReleaseBuild(argv = []) {
     bindingsGenerator: sha256(bindingsGeneratorSource),
     emissionGenerator: sha256(emissionGeneratorSource),
     canonicalFamilyGenerator: sha256(canonicalFamilyGeneratorSource),
+    typedNativeLane: sha256(typedNativeLaneSource),
     schema: sha256(schemaSource),
     planSentinel: sha256(planSentinelSource),
     scriptProjection: sha256(projectionSource),
@@ -301,11 +340,12 @@ export async function generateReleaseBuild(argv = []) {
   }
   const selectedSchema = filterSchemaForUsage(schema, moduleUsage);
   const generatedArtifacts = generateArtifacts(selectedSchema);
+  const defoldUsage = JSON.parse(defoldUsageSource);
   const emissionPlan = generateBindingEmissionPlan(
     plan,
     JSON.parse(projectionSource),
     JSON.parse(profilesSource),
-    JSON.parse(defoldUsageSource),
+    defoldUsage,
     {
       target: options.target,
       profile: options.profile,
@@ -315,20 +355,35 @@ export async function generateReleaseBuild(argv = []) {
     }
   );
   const canonical = generateCanonicalFamilyArtifacts(plan, emissionPlan);
+  // One reachable set drives every layer, including the tier-2 lane whose
+  // emitted C would otherwise carry a symbol for every route in the surface.
+  const typedNative = generateTypedNativeProjection({
+    vmathReport: JSON.parse(typedNativeLaneSource),
+    reachableRouteIds: canonical.manifest.groups.flatMap(({ routeIds }) => routeIds),
+    dynamicAccess: defoldUsage.dynamicAccess === true,
+    target: options.target
+  });
   const symbolMap = JSON.parse(generatedArtifacts.get("packages/bindings/generated/symbol-map.json"));
   const projection = releaseProjection({
     cacheKey,
     target: options.target,
     profile: options.profile,
     moduleUsage,
+    defoldUsage,
     componentUsage,
     emissionPlan,
     artifacts: symbolMap,
-    canonical
+    canonical,
+    typedNative
   });
   const staging = `${options.outputRoot}.staging-${process.pid}`;
   await rm(staging, { recursive: true, force: true });
   for (const [artifactPath, contents] of generatedArtifacts) {
+    const output = resolve(staging, artifactPath);
+    await mkdir(dirname(output), { recursive: true });
+    await writeFile(output, contents);
+  }
+  for (const [artifactPath, contents] of typedNative.artifacts) {
     const output = resolve(staging, artifactPath);
     await mkdir(dirname(output), { recursive: true });
     await writeFile(output, contents);
@@ -353,6 +408,7 @@ export async function generateReleaseBuild(argv = []) {
     "defold-build-projection.json": serializedProjection,
     ...(serializedComponentUsage ? { "component-reachability.json": serializedComponentUsage } : {}),
     ...Object.fromEntries(canonical.artifacts),
+    ...Object.fromEntries(typedNative.artifacts),
     ...Object.fromEntries(selectedTargetArtifacts(options.target).filter((item) => item !== "packages/bindings/generated/symbol-map.json").map((item) => [item, generatedArtifacts.get(item)]))
   };
   const sentinelOutputs = Object.fromEntries(Object.entries(sentinelContents).map(([item, contents]) => [item, Buffer.byteLength(contents)]));

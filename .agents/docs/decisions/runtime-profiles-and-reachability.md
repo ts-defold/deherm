@@ -56,7 +56,11 @@ import { add } from "@defold-hermes/sdk/ExampleMath";
 Every generated function lives in its own ESM input. After ttsc transforms and
 esbuild tree shaking, the bundler metafile reports which function inputs
 contributed bytes to each entrypoint. `scripts/build.mjs` converts that evidence
-into an adjacent versioned `*.usage.json` manifest. The binding compiler accepts
+into an adjacent versioned `*.usage.json` manifest. This chain governs the
+*extension module* surface, where one function is one module. The generated
+Defold API surface is not module-granular - a namespace is one object - so its
+reachability comes from the checker instead and lands in the adjacent
+`*.defold-api-usage.json`. The binding compiler accepts
 the manifest and emits a matching subset of TypeScript wrappers, C ABI
 declarations, JSI functions, Static Hermes imports, Emscripten dependencies,
 and memory layouts.
@@ -85,6 +89,12 @@ the dynamic registry contributes code to an entrypoint, the manifest sets
 `dynamicAccess: true` and conservatively retains the complete surface. Future
 configuration may allow an explicit dynamic allow-list, but an unknown string
 must never produce an unsound release artifact.
+
+This applies to the *extension module* registry. Dynamic access to the generated
+**Defold API** surface is no longer inferred at all: the checker detects a
+computed member access on it, names the site, and a release build refuses until
+the project declares `dynamicApiAccess`. See
+[Take release reachability from ttsc](./release-reachability-and-native-lowering.md).
 
 Callbacks, engine messages, serializers, and native module registration can
 introduce edges that are not ordinary JavaScript calls. Their generators must

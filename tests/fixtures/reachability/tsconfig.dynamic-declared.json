@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "transform": "../../../packages/compiler/ttsc.mjs",
+        "enabled": true,
+        "profile": "release",
+        "dynamicApiAccess": true,
+        "routeSymbols": "./.deherm/generated/script-route-symbol-index.json",
+        "apiUsage": "./.deherm/generated/defold-api-usage.dynamic-declared.json"
+      }
+    ]
+  },
+  "include": ["dynamic/**/*.ts"]
+}

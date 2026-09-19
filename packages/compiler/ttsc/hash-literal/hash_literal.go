@@ -144,6 +144,13 @@ func (plugin) ApplyProgram(program *driver.Program, ctx driver.PluginContext) er
 		}
 		findings = append(findings, checkResourceNames(program, table, sourceFile)...)
 	}
+	// Reachability is resolved against the same unmutated tree, for the same
+	// reason: hash lowering replaces literals and invalidates source positions.
+	usageFindings, err := collectDefoldApiUsage(program, ctx)
+	if err != nil {
+		return err
+	}
+	findings = append(findings, usageFindings...)
 	if len(findings) > 0 {
 		return fmt.Errorf("%s", strings.Join(findings, "\n"))
 	}

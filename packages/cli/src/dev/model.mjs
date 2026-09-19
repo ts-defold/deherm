@@ -28,6 +28,9 @@ export function createDevModel(options = {}) {
     // Where this session accumulates classified runtime defects, so any console
     // over the snapshot can read the pool without knowing the layout.
     bugPoolFile: options.bugPoolFile,
+    // What a release build would retain, recomputed on every compile and never
+    // applied: this session links the complete surface on purpose.
+    reachability: undefined,
     startedAt: options.now ?? Date.now()
   };
 }
@@ -43,6 +46,11 @@ function target(model, id) {
 export function applyDevEvent(model, event) {
   const at = event.at ?? Date.now();
   switch (event.type) {
+    case "reachability": {
+      if (!event.reachability) return false;
+      model.reachability = { ...event.reachability };
+      return changed(model);
+    }
     case "build-started": {
       if (!Number.isSafeInteger(event.generation) || event.generation <= model.generation) return false;
       model.generation = event.generation;
@@ -277,6 +285,7 @@ export function snapshotDevModel(model) {
   return {
     ...model,
     engine: { ...model.engine },
+    reachability: model.reachability ? { ...model.reachability } : undefined,
     defoldBuild: { ...model.defoldBuild, resources: model.defoldBuild.resources ? [...model.defoldBuild.resources] : undefined },
     activeBuild: model.activeBuild ? { ...model.activeBuild, changedSources: [...model.activeBuild.changedSources] } : undefined,
     lastBuildMetrics: model.lastBuildMetrics ? {

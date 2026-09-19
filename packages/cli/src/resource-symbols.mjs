@@ -7,6 +7,7 @@ import {
   readResource,
   resourcePath
 } from "../../compiler/src/resource-symbol-table.mjs";
+import { buildScriptRouteSymbolIndex } from "../../compiler/src/script-route-symbol-index.mjs";
 import { componentProxyConstants } from "../../compiler/src/component-proxy-contract.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -125,6 +126,29 @@ export async function writeProjectResourceSymbols(projectRoot, outputRoot, optio
   const file = path.join(directory, "resource-symbols.json");
   await writeFile(file, `${JSON.stringify(table, null, 2)}\n`);
   return { file, table };
+}
+
+/**
+ * Write `<outputRoot>/generated/script-route-symbol-index.json` for the ttsc
+ * reachability pass.
+ *
+ * This is the checker's second derived input, and it sits beside the resource
+ * symbol table for the same reason: both turn a name the checker can resolve
+ * into the canonical identity every later stage speaks. It is derived from the
+ * installed script API IR and lowering plan, so it belongs to the project's
+ * generated state rather than to the package.
+ */
+export async function writeProjectRouteSymbolIndex(outputRoot, options = {}) {
+  const directory = path.join(outputRoot, "generated");
+  const [scriptIr, loweringPlan] = await Promise.all([
+    readFile(options.scriptIrPath ?? path.join(generatedBindings, "defold-script-api-ir.json"), "utf8"),
+    readFile(options.loweringPlanPath ?? path.join(generatedBindings, "defold-binding-lowering-plan.json"), "utf8")
+  ]);
+  const index = buildScriptRouteSymbolIndex(JSON.parse(scriptIr), JSON.parse(loweringPlan));
+  await mkdir(directory, { recursive: true });
+  const file = path.join(directory, "script-route-symbol-index.json");
+  await writeFile(file, `${JSON.stringify(index, null, 2)}\n`);
+  return { file, index };
 }
 
 export { resourcePath };

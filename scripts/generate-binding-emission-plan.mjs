@@ -91,6 +91,30 @@ function validateProfileAuthority(scriptProjection, profileCatalog) {
   }
 }
 
+/**
+ * Why an explicitly reached route may legitimately not be emitted.
+ *
+ * Symbol-level usage names what a program calls, which is not the same claim as
+ * "this must become a native entry for this target". Two dispositions are
+ * honest non-emissions rather than gaps:
+ *
+ *   * a compile-time intrinsic never reaches any runtime target — the compiler
+ *     lowered it, so there is nothing to emit anywhere;
+ *   * a `typed-native` target is an acceleration tier layered over a baseline
+ *     transport, not a runtime of its own. A route that cannot be soundly typed
+ *     stays at the tier it qualifies for, in the same binary.
+ *
+ * Everything else still fails closed: on a baseline runtime transport a reached
+ * route with no emission is a hole in the shipped surface.
+ */
+function toleratedNonEmission(plan, target, selection) {
+  if (selection === "compile-time-intrinsic") return "compile-time-lowered-never-reaches-a-runtime-target";
+  if (plan.targetCapabilities[target]?.transport === "typed-native") {
+    return "route-stays-at-the-highest-tier-its-contract-allows";
+  }
+  return null;
+}
+
 function scriptAvailableInProfile(sourceRow, profileId) {
   if (sourceRow.availability.token === "core" || sourceRow.availability.token === "html5-host") return true;
   return sourceRow.availability.runtimeProfiles?.includes(profileId) === true;
@@ -122,6 +146,30 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
   if (!profileCatalog.profiles[profileId]) throw new Error(`Unknown Defold runtime profile '${profileId}'`);
   const byId = new Map(plan.units.map((unit, unitIndex) => [unit.identity.id, { unit, unitIndex }]));
   if (byId.size !== plan.coverage.units) throw new Error("Lowering plan contains duplicate public IDs");
+  // Two independent derivations disagreeing means one is wrong. Neither the
+  // pruned set nor the conservative fallback is trustworthy at that point, so
+  // the plan refuses rather than picking a winner.
+  if (usage.derivation?.crossCheck && usage.derivation.crossCheck.status !== "agree") {
+    const detail = (usage.derivation.crossCheck.disagreements ?? []).join("; ");
+    throw new Error(
+      `Defold API usage failed its module-graph cross-check (${usage.derivation.crossCheck.status})` +
+      `${detail ? `: ${detail}` : ""}`
+    );
+  }
+  // Dynamic access is a declaration, not an inference. Retaining the complete
+  // surface because a computed access was *observed* is how the optimisation
+  // was silently defeated for every project.
+  if (usage.dynamicAccess === true && usage.derivation && usage.derivation.declaredDynamicAccess !== true) {
+    const sites = (usage.derivation.dynamicSites ?? [])
+      .map(({ file, line, column, reason }) => `  ${file}(${line},${column}): ${reason}`)
+      .join("\n");
+    throw new Error(
+      "Defold API usage reaches the surface dynamically without declaring it, so a release build " +
+      "would silently retain every route.\n" +
+      "Set \"dynamicApiAccess\": true on the deherm ttsc plugin entry to opt into the complete surface.\n" +
+      (sites || "  (the deriving compiler recorded no site)")
+    );
+  }
   const explicitIds = usageIds(usage, byId);
   const candidates = usage.dynamicAccess === true ? [...byId.keys()].sort() : explicitIds;
   const normalizedUsage = {
@@ -144,8 +192,14 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
       }
     }
     if (backend.selection !== "emit") {
-      diagnostics.push({ id, selection: backend.selection, blockers: plan.tables.blockerSets[backend.blockerSet] });
-      if (usage.dynamicAccess !== true) {
+      const tolerated = toleratedNonEmission(plan, target, backend.selection);
+      diagnostics.push({
+        id,
+        selection: backend.selection,
+        blockers: plan.tables.blockerSets[backend.blockerSet],
+        ...(tolerated ? { toleratedForExplicitUsage: tolerated } : {})
+      });
+      if (usage.dynamicAccess !== true && !tolerated) {
         throw new Error(`${id} cannot emit for ${target}: ${backend.selection} (${plan.tables.blockerSets[backend.blockerSet].join(", ")})`);
       }
       continue;
@@ -189,7 +243,15 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
     usage: {
       dynamicAccess: usage.dynamicAccess === true,
       requestedCount: candidates.length,
-      usageSha256: sha256(JSON.stringify(normalizedUsage))
+      usageSha256: sha256(JSON.stringify(normalizedUsage)),
+      // Which derivation produced this set, and whether the independent one
+      // agreed with it. A plan that cannot name its authority is a plan built
+      // from a guess.
+      authority: usage.derivation?.authority ?? "unattributed",
+      routeIndexSha256: usage.derivation?.routeIndexSha256 ?? null,
+      crossCheck: usage.derivation?.crossCheck?.status ?? "not-performed",
+      declaredDynamicAccess: usage.derivation?.declaredDynamicAccess === true,
+      dynamicSiteCount: usage.derivation?.dynamicSites?.length ?? 0
     },
     evidenceBoundary: {
       selection: "Bindings are selected for a later emitter; this file does not contain emitted source.",
