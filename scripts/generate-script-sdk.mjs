@@ -15,7 +15,7 @@ import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs
 import { assertReviewedRevision, observeReviewedSource } from "./lib/reviewed-revision.mjs";
 import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 import { classifyGlobalDeclaration, readLifecycleCallbacks } from "./lib/script-lifecycle-callbacks.mjs";
-import { resolveDocumentedDuplication } from "./lib/documented-route-duplication.mjs";
+import { documentedSurface, resolveDocumentedDuplication } from "./lib/documented-route-duplication.mjs";
 import { componentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -125,9 +125,20 @@ function takeType(value) {
   return value;
 }
 
+// Defold 1.13.1 HTML-escapes seven `@param`/`@return` type expressions, so
+// `table<string,string>` arrives as `table&lt;string,string&gt;` and classifies
+// as an undeclared type rather than a table. 1.14.0 escapes none, so unescaping
+// changes nothing there. Only the TYPE is unescaped: descriptions are markup on
+// purpose and are rendered as documentation.
+const ENTITIES = new Map([["&lt;", "<"], ["&gt;", ">"], ["&amp;", "&"], ["&quot;", '"'], ["&#39;", "'"]]);
+
+function unescapeType(value) {
+  return value.replace(/&(?:lt|gt|amp|quot|#39);/g, (entity) => ENTITIES.get(entity) ?? entity);
+}
+
 function typeAndDescription(value) {
   const rawType = takeType(value);
-  return { rawType, description: value.slice(rawType.length).trim() };
+  return { rawType: unescapeType(rawType), description: value.slice(rawType.length).trim() };
 }
 
 function cleanDocumentation(lines) {
@@ -203,7 +214,13 @@ function parseArchive(lifecycleNames) {
   // `defold-global` becomes a route; the rest are the explicit statement of
   // what we do not bind and why. See `scripts/lib/script-lifecycle-callbacks.mjs`.
   const globals = [];
-  const files = Object.keys(archive).filter((name) => name.startsWith("doc/") && name.endsWith(".lua")).sort();
+  // Only the game runtime's stubs. The archive also documents the editor's own
+  // LuaJIT runtime and the Lua 5.1 standard library, which are different
+  // runtimes' APIs rather than parts of ours - see `documentedSurface`.
+  const files = Object.keys(archive)
+    .filter((name) => name.startsWith("doc/") && name.endsWith(".lua"))
+    .filter((name) => documentedSurface(name) === "game-runtime")
+    .sort();
   for (const source of files) {
     const lines = strFromU8(archive[source]).split(/\r?\n/);
     let currentClass;

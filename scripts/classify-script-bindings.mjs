@@ -107,7 +107,7 @@ function classifyType(rawType, registry, seen = new Set()) {
   // like collectionfactory.load out of the callback-lifecycle family and made
   // their reviewed lifecycle policy look wrong. The pinned revision uses
   // `function(` only in prose, so this changes nothing there.
-  if (source.startsWith("fun(") || source.startsWith("function(")) {
+  if (source === "function" || source.startsWith("fun(") || source.startsWith("function(")) {
     return { codecs: ["callback"], unresolved: [], flags: ["callback-lifetime"] };
   }
 
@@ -122,7 +122,9 @@ function classifyType(rawType, registry, seen = new Set()) {
       flags: element.flags
     };
   }
-  if (source.startsWith("table<") || source.startsWith("{") || source === "{}") {
+  if (source === "table" || source.startsWith("table<") || source.startsWith("{") || source === "{}") {
+    // Bare `table` is 1.13.1's spelling; 1.14.0 declares `---@alias` entries
+    // that resolve to the same thing. Either way it is a Lua table.
     return { codecs: ["table"], unresolved: [], flags: [] };
   }
   if (SCALARS.has(source)) return { codecs: [source === "nil" ? "nil" : "scalar"], unresolved: [], flags: [] };

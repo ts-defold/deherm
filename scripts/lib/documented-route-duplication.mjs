@@ -55,9 +55,50 @@ const VARIANT_PATTERNS = Object.freeze([
   Object.freeze({ feature: "bullet3d", pattern: /bullet3d/ })
 ]);
 
+/**
+ * Which surface a documented file belongs to.
+ *
+ * The reference archive documents three different runtimes and we bind one of
+ * them. At Defold 1.14.0 this does not come up, because the archive ships only
+ * the game runtime's stubs; at 1.13.1 it ships all three, and taking the lot
+ * produced editor routes, Lua standard-library routes, and duplicate names
+ * across surfaces that are not the same function.
+ *
+ *   game-runtime          what we bind.
+ *
+ *   editor                100 declarations across editor, http, image, json,
+ *                         localization, tilemap, zip and zlib. The editor runs
+ *                         its own LuaJIT inside the JVM editor
+ *                         (`editor/src/clj/editor/editor_extensions.clj`), so
+ *                         its `json.decode`, `zlib.inflate`, `http.request` and
+ *                         `pprint` are NOT the engine's functions of those
+ *                         names. Both revisions ship this surface; 1.13.1 ships
+ *                         it as `editor.apidoc_doc.lua` and 1.14.0 as
+ *                         `*.editor_script`, which is the only reason the
+ *                         pinned revision never hit it. Excluding it by name
+ *                         rather than by file extension is what makes that
+ *                         stable across revisions.
+ *
+ *   lua-standard-library  `lua_base`, `lua_math`, `lua_string`, `lua_table`,
+ *                         `lua_io`, `lua_os`, `lua_coroutine`, `lua_debug`,
+ *                         `lua_package` - Lua 5.1 itself, fixed by a language
+ *                         standard rather than by Defold. A TypeScript author
+ *                         has JavaScript's own equivalents and Hermes provides
+ *                         them; binding Lua's `math.max` would be binding the
+ *                         wrong language's library.
+ *
+ * Excluding a surface is not dropping API. It is saying which runtime's API
+ * this generator is for, which is the statement that was missing.
+ */
+export function documentedSurface(source) {
+  if (/(^|\/)editor\.apidoc|\.editor_script$/.test(source)) return "editor";
+  if (/(^|\/)lua_[a-z]+\.doc/.test(source)) return "lua-standard-library";
+  return "game-runtime";
+}
+
 /** The editor's own scripting API, which is not the game runtime. */
 export function isEditorSurface(source) {
-  return /(^|\/)editor\.apidoc/.test(source);
+  return documentedSurface(source) === "editor";
 }
 
 /** Which build feature a documented source belongs to, or null. */
