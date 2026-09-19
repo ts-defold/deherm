@@ -44,12 +44,19 @@ function normalizeResourcePath(value) {
 // forgot to run deherm" failure this seam exists to prevent.
 //
 // -O for release. Dev keeps -Og -g2 so a stack trace still names a line.
-async function emitBytecode(outputFile, { optimize }) {
+async function emitBytecode(outputFile, { optimize, sourceMapFile }) {
   const { requireHostTool } = await import("../host-compilers.mjs");
   const tool = await requireHostTool("hermesc");
   const bytecodeFile = `${outputFile}.hbc`;
+  // `-source-map` feeds the INPUT bundle's map into hermesc, so the debug info
+  // baked into the bytecode resolves through the bundle and back to the
+  // TypeScript the author wrote. Without it a stack trace or a breakpoint lands
+  // in generated bundle text, which is the same as having no source map at all.
+  // `-g2` keeps location info for every instruction; `-Og` keeps the
+  // optimisations that do not destroy that mapping.
   const result = spawnSync(tool.path, [
     ...(optimize ? ["-O"] : ["-Og", "-g2"]),
+    ...(sourceMapFile ? [`-source-map=${sourceMapFile}`] : []),
     "-emit-binary",
     `-out=${bytecodeFile}`,
     outputFile
@@ -57,7 +64,12 @@ async function emitBytecode(outputFile, { optimize }) {
   if (result.status !== 0) {
     throw new Error(`hermesc failed for ${outputFile}: ${result.stderr || result.stdout || "no output"}`);
   }
-  return { file: bytecodeFile, bytes: (await stat(bytecodeFile)).size, optimized: Boolean(optimize) };
+  return {
+    file: bytecodeFile,
+    bytes: (await stat(bytecodeFile)).size,
+    optimized: Boolean(optimize),
+    sourceMapped: Boolean(sourceMapFile)
+  };
 }
 
 export async function createIncrementalCompiler(options) {
@@ -160,7 +172,11 @@ export async function createIncrementalCompiler(options) {
       // Bytecode is produced from the written bundle, after the fingerprint is
       // stamped, so the .hbc corresponds to the exact bytes on disk.
       const bytecode = options.bytecode
-        ? await emitBytecode(outputFile, { optimize: options.bytecodeOptimize !== false })
+        ? await emitBytecode(outputFile, {
+            optimize: options.bytecodeOptimize !== false,
+            // The bundle's own map is written above, before this runs.
+            sourceMapFile: sourcemap ? `${outputFile}.map` : null
+          })
         : null;
       const sourceMap = result.outputFiles.find(({ path: file }) => path.resolve(file) === `${outputFile}.map`);
       for (const mirror of mirrors) {
