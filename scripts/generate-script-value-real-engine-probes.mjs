@@ -4,6 +4,8 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { publicScriptRootName } from "../packages/compiler/src/script-public-api-policy.mjs";
+import { declaredDerivation, expectReviewedCount } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const root = new URL("../", import.meta.url);
 const sourceUrl = new URL("packages/bindings/probes/defold-script-value-real-engine-probes.json", root);
@@ -139,7 +141,19 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
       }
       return { ...binding.generatedProbe, id: binding.id, generatedFamily: binding.generatedFamily };
     });
-  const probeInputs = [...source.probes, ...generatedProbeInputs];
+  // A probe for a route the value lane withdrew at this revision has nothing to
+  // exercise. At the reviewed revision that is a regression in this tree and
+  // stays fatal; in a declared derivation of another revision the probe is
+  // withdrawn with the route and reported.
+  const probeInputs = [...source.probes, ...generatedProbeInputs].filter((probe) => {
+    if (byId.has(probe.id)) return true;
+    if (!declaredDerivation()) throw new Error(`${probe.key}: ${probe.id} is not a generated value binding`);
+    recordAudit({
+      input: "packages/bindings/probes/defold-script-value-real-engine-probes.json",
+      id: probe.key, status: VOID, reason: "withdrawn-route", route: probe.id
+    });
+    return false;
+  });
   const probes = probeInputs.map((probe, index) => {
     if (typeof probe.key !== "string" || !probe.key || seenKeys.has(probe.key)) throw new Error(`Probe key must be unique: ${probe.key}`);
     seenKeys.add(probe.key);
@@ -275,9 +289,15 @@ export function generateScriptValueRealEngineProbes(sourceText, bindingsText) {
   }));
   const instrumentedSemanticSha256 = createHash("sha256")
     .update(JSON.stringify(instrumentedSemanticRows)).digest("hex");
-  if (instrumentedSemanticSha256 !== source.instrumentedProbeSet.semanticSha256) {
-    throw new Error(`Instrumented value probe semantics changed: ${instrumentedSemanticSha256}`);
-  }
+  // A hash of the instrumented probe set, recorded at the reviewed revision. It
+  // is fatal in an ordinary generation - the probes are the contract the real
+  // engine run asserts - and an observation inside a declared derivation, where
+  // the set necessarily differs because the routes it probes do.
+  expectReviewedCount({
+    input: "packages/bindings/probes/defold-script-value-real-engine-probes.json",
+    label: "instrumented probe-set semantics sha256",
+    expected: source.instrumentedProbeSet.semanticSha256, observed: instrumentedSemanticSha256
+  });
   const report = {
     schemaVersion: 1,
     defoldRevision: generated.defoldRevision,

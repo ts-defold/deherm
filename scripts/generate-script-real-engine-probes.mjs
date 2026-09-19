@@ -4,6 +4,9 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
+import { declaredDerivation } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
+
 const root = new URL("../", import.meta.url);
 const sourceUrl = new URL("packages/bindings/probes/defold-script-real-engine-probes.json", root);
 const descriptorsUrl = new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root);
@@ -100,26 +103,51 @@ function buildOutputs(sourceText, descriptorsText, irText) {
   const inputSha256 = createHash("sha256")
     .update(sourceText).update("\0").update(descriptorsText).update("\0").update(irText)
     .digest("hex");
-  const probes = source.probes.map((probe, index) => {
+  // A reviewed probe against THIS revision's generated descriptor.
+  //
+  // `sys.get_config_string.nullable` is the case that forced this. It calls the
+  // route with one argument and expects nil. At the pinned revision the archive
+  // documents `default_value` as `[optional]` and the result as `string|nil`,
+  // so the descriptor is 1..2 and nullable. Defold 1.13.1 documents the same
+  // parameter as required and the result as plain `string`, so the descriptor
+  // is 2..2 and the probe does not fit it.
+  //
+  // That is a real difference between what the two revisions DOCUMENT, and
+  // nothing here can say which describes the engine - the 1.13.1 prose still
+  // reads "(optional) default value to return if the value does not exist"
+  // while its annotation says otherwise. Widening the arity to keep the probe
+  // would be exactly the guess this repository exists not to make. So the probe
+  // is withdrawn for this revision and reported as queued review work, and at
+  // the reviewed revision every one of these stays fatal.
+  const probes = source.probes.flatMap((probe, index) => {
     if (typeof probe.key !== "string" || !probe.key || keys.has(probe.key)) throw new Error(`Probe key must be unique: ${probe.key}`);
     keys.add(probe.key);
     const binding = descriptorById.get(probe.id);
     const fn = functionById.get(probe.id);
-    if (!binding || !fn) throw new Error(`${probe.key}: ${probe.id} is not a generated scalar binding`);
-    if (!Array.isArray(probe.arguments)) throw new Error(`${probe.key}: arguments must be an array`);
-    if (probe.arguments.length < binding.requiredArgumentCount || probe.arguments.length > binding.maximumArgumentCount) {
-      throw new Error(`${probe.key}: ${probe.arguments.length} arguments violate generated range ${binding.requiredArgumentCount}..${binding.maximumArgumentCount}`);
-    }
-    for (let argumentIndex = 0; argumentIndex < probe.arguments.length; ++argumentIndex) {
-      const codec = binding.parameters[argumentIndex].codec;
-      if (!valueMatchesCodec(probe.arguments[argumentIndex], codec)) {
-        throw new Error(`${probe.key}: argument ${argumentIndex} does not match generated ${codec} codec`);
+    try {
+      if (!binding || !fn) throw new Error(`${probe.key}: ${probe.id} is not a generated scalar binding`);
+      if (!Array.isArray(probe.arguments)) throw new Error(`${probe.key}: arguments must be an array`);
+      if (probe.arguments.length < binding.requiredArgumentCount || probe.arguments.length > binding.maximumArgumentCount) {
+        throw new Error(`${probe.key}: ${probe.arguments.length} arguments violate generated range ${binding.requiredArgumentCount}..${binding.maximumArgumentCount}`);
       }
+      for (let argumentIndex = 0; argumentIndex < probe.arguments.length; ++argumentIndex) {
+        const codec = binding.parameters[argumentIndex].codec;
+        if (!valueMatchesCodec(probe.arguments[argumentIndex], codec)) {
+          throw new Error(`${probe.key}: argument ${argumentIndex} does not match generated ${codec} codec`);
+        }
+      }
+      validateExpectation(probe, binding);
+    } catch (error) {
+      if (!declaredDerivation()) throw error;
+      recordAudit({
+        input: "packages/bindings/probes/defold-script-real-engine-probes.json",
+        id: probe.key, status: VOID, reason: "descriptor-mismatch", route: probe.id, detail: error.message
+      });
+      return [];
     }
-    validateExpectation(probe, binding);
     const markerPrefix = `INFO:DEFOLD_HERMES: script-api:${probe.key}:`;
     const exactValue = exactMarkerValue(probe.expectation);
-    return {
+    return [{
       index,
       key: probe.key,
       id: probe.id,
@@ -135,7 +163,7 @@ function buildOutputs(sourceText, descriptorsText, irText) {
       expectation: probe.expectation,
       expectedMarkerPrefix: markerPrefix,
       ...(exactValue === undefined ? {} : { expectedMarker: `${markerPrefix}${exactValue}` })
-    };
+    }];
   });
 
   const roots = [...new Set(probes.map((probe) => probe.modulePath[0]))].sort();
