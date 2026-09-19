@@ -227,5 +227,53 @@ export async function createDefoldBuilder(options) {
     return operation;
   };
 
-  return { build, outputRoot, platform, close: async () => loop };
+  /**
+   * Produce a packaged bundle for a platform other than the one this builder
+   * builds for.
+   *
+   * Separate from `build` because it is a different operation, not a flag on
+   * the same one: it targets another platform, runs Bob's `bundle` command, and
+   * writes outside `outputRoot`. It is also far heavier - a bundle resolves and
+   * links native extensions through an Extender, hosted or local - so it is
+   * only ever run on demand, never as part of the watch loop.
+   */
+  const bundle = (options_ = {}) => {
+    const bundlePlatform = options_.platform ?? "wasm-web";
+    const bundleOutput = path.resolve(options_.bundleOutput
+      ?? path.join(projectRoot, "build", "bundle"));
+    const reason = options_.reason ?? `bundle ${bundlePlatform}`;
+    const operation = loop.then(async () => {
+      emit({ type: "defold-build-started", reason });
+      // Same reconciliation as `build`, for the bundle's platform: a
+      // typed-native unit is a Hermes-runtime transport and must not travel to
+      // a browser-runtime target.
+      const upload = await reconcileTypedNativeUpload({ projectRoot, platform: bundlePlatform });
+      if (upload.changed) emit({ type: "log", source: "bob", message: `typed-native: ${upload.message}` });
+      const args = [
+        "-jar", bob,
+        "--root", projectRoot,
+        "--bundle-output", bundleOutput,
+        "--platform", bundlePlatform,
+        "--architectures", bundlePlatform,
+        "--variant", options_.variant ?? "debug",
+        "--archive",
+        "--verbose"
+      ];
+      if (buildServer) args.push("--build-server", buildServer);
+      args.push("resolve", "build", "bundle");
+      try {
+        await run(java, args, { ...options, cwd: projectRoot, emit, source: "bob" });
+        emit({ type: "defold-build-succeeded", reason, resources: [] });
+        return { bundleOutput, platform: bundlePlatform };
+      } catch (error) {
+        await emitBobFailureDiagnostics(projectRoot, bundlePlatform, emit);
+        emit({ type: "defold-build-failed", reason, diagnostic: error instanceof Error ? error.message : String(error) });
+        throw error;
+      }
+    });
+    loop = operation.catch(() => {});
+    return operation;
+  };
+
+  return { build, bundle, outputRoot, platform, close: async () => loop };
 }

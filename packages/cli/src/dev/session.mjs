@@ -465,9 +465,27 @@ export async function runDevSession(options = {}) {
             // Launching serves the packaged wasm-web bundle on a scoped
             // loopback port, opens it in a dedicated headless Chrome profile,
             // and pushes the current bundle in. Stopping releases all three.
+            //
+            // A missing bundle is BUILT rather than reported, matching `play`,
+            // which builds before launching when the build is not ready. The
+            // asymmetry was a papercut: pressing this key on a fresh checkout
+            // said a bundle was missing and left the user to work out which
+            // command produces one. It is a slow operation - a bundle resolves
+            // native extensions through an Extender - so it is announced.
+            const launchBrowser = async () => {
+              try {
+                return await browser.launch();
+              } catch (error) {
+                if (!/No packaged HTML5 bundle found/.test(error?.message ?? "")) throw error;
+                emit({ type: "log", source: "browser", message: "no HTML5 bundle yet; bundling for wasm-web (this resolves native extensions and takes a while)" });
+                const activeBuilder = await ensureBuilder();
+                await activeBuilder.bundle({ platform: "wasm-web", reason: "manual web launch" });
+                return await browser.launch();
+              }
+            };
             const action = browser.running()
               ? browser.stop()
-              : browser.launch().then(async (started) => {
+              : launchBrowser().then(async (started) => {
                 if (started) await browser.activate(model.lastSuccessfulGeneration || undefined);
                 return started;
               });
