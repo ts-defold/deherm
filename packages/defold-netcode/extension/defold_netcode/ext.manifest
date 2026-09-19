@@ -1,0 +1,25 @@
+# The netcode extension declares a name and nothing else, deliberately.
+#
+# Extender merges every extension's `ext.manifest` context into ONE per-build
+# setting. A flag added here would land on `defold_hermes` too, which is the
+# trap `defold_hermes_typed_native/ext.manifest` already documents in this
+# repository. So the extension is built so that it needs no context at all:
+#
+#   * The vendored `netcode.c` opens libsodium with ANGLE brackets
+#     (`#include <sodium.h>`), which searches only the include path. Rather than
+#     declare an `includes:` context for it, `sodium.h` is vendored into this
+#     extension's own `include/`, which Extender puts on the include path by
+#     itself. `netcode.h` stays in `src/vendor` beside `netcode.c`, which opens
+#     it with quotes.
+#   * `netcode.c` and `netcode_capi.c` are C, not C++, so they do not need the
+#     `-std=c++17 -fexceptions` context `defold_hermes` declares, and they do
+#     not care which one is in force.
+#   * `netcode_lua.cpp` is the only C++ translation unit here, and it compiles
+#     under whatever C++ standard the merged context selects.
+#
+# Every platform is supported by compiling the same sources; there is no
+# per-target library to select. The one real difference between targets is which
+# transport the caller asks for - real UDP sockets on native, the host datagram
+# channel on HTML5 - and that is a runtime argument, not a build setting. See
+# .agents/docs/decisions/netcode-transport-per-target.md.
+name: "defold_netcode"
