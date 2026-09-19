@@ -74,6 +74,57 @@ def relative(path: Path) -> str:
     return path.resolve().relative_to(ROOT).as_posix()
 
 
+def cli_path(path: Path) -> str:
+    """Spell a filesystem path identically for Clang on every host.
+
+    Native ``WindowsPath`` stringification uses backslashes. Clang preserves
+    those spellings in diagnostics and anonymous-record type names, both of
+    which are authoritative inventory fields. Supplying POSIX separators keeps
+    the compiler's JSON/text output independent of the runner OS.
+    """
+    return path.resolve().as_posix()
+
+
+def canonical_checkout_root(root: Path | str = ROOT) -> str:
+    return str(root).replace("\\", "/").rstrip("/")
+
+
+def strip_checkout_path(text: str, root: Path | str = ROOT) -> str:
+    """Remove a checkout prefix and canonicalize its path separators.
+
+    The normalization happens on compiler-originated values *before* JSON
+    serialization. That distinction matters on Windows: JSON doubles each
+    backslash, so a serialized-text replacement cannot reliably recognize the
+    original path. Matching is case-insensitive because Windows drive and path
+    casing are not semantic inputs to the generated surface.
+    """
+    canonical = text.replace("\\", "/")
+    prefix = canonical_checkout_root(root) + "/"
+    if prefix.casefold() not in canonical.casefold():
+        return text
+    return re.sub(re.escape(prefix), "", canonical, flags=re.IGNORECASE)
+
+
+def normalize_generated_value(value: Any, root: Path | str = ROOT) -> Any:
+    """Recursively remove host checkout spellings from generated data."""
+    if isinstance(value, str):
+        return strip_checkout_path(value, root)
+    if isinstance(value, list):
+        return [normalize_generated_value(item, root) for item in value]
+    if isinstance(value, dict):
+        return {
+            key: normalize_generated_value(item, root)
+            for key, item in value.items()
+        }
+    return value
+
+
+def contains_checkout_path(text: str, root: Path | str = ROOT) -> bool:
+    """Recognize native, POSIX, and JSON-escaped checkout spellings."""
+    comparable = re.sub(r"[\\/]+", "/", text).casefold()
+    return canonical_checkout_root(root).casefold() in comparable
+
+
 def absolute_source(file_name: str | None) -> Path | None:
     if not file_name:
         return None
@@ -164,7 +215,7 @@ def normalize_type(type_name: str) -> str:
     # the store's whole claim to be addressed by the engine revision. Rewriting
     # the checkout prefix to a repository-relative path makes the IR - and every
     # artifact derived from it - reproducible across machines.
-    value = value.replace(f"{ROOT}/", "")
+    value = strip_checkout_path(value)
     value = re.sub(r"\s+", " ", value).strip()
     return value
 
@@ -477,9 +528,9 @@ def parse_flags() -> list[str]:
     defines = declared.get("defines") or {}
     return [
         "-nostdlibinc",
-        f"-isystem{parse_sysroot()}",
+        f"-isystem{cli_path(parse_sysroot())}",
         "-include",
-        str(spelling_prelude()),
+        cli_path(spelling_prelude()),
         *(f"-D{name}={value}" for name, value in sorted(defines.items())),
     ]
 
@@ -583,8 +634,8 @@ def parse_header(header: Path, includes: list[Path], target: str, flags: list[st
         "-target",
         target,
         *flags,
-        *(f"-I{path}" for path in includes),
-        str(header),
+        *(f"-I{cli_path(path)}" for path in includes),
+        cli_path(header),
     ]
     try:
         process = subprocess.run(
@@ -601,7 +652,7 @@ def parse_header(header: Path, includes: list[Path], target: str, flags: list[st
     # blocker evidence. Left as-is they put the checkout location into the
     # committed inventory, which made the derived API policy depend on where the
     # repository was cloned rather than on the engine revision it names.
-    stderr = process.stderr.decode("utf-8", errors="replace").replace(f"{ROOT}/", "")
+    stderr = strip_checkout_path(process.stderr.decode("utf-8", errors="replace"))
     try:
         ast = json.loads(process.stdout)
     except json.JSONDecodeError as error:
@@ -805,33 +856,18 @@ support, or runtime compatibility.
 """
 
 
-def strip_checkout_path(text: str) -> str:
-    """Remove this checkout's location from a generated artifact.
-
-    Nothing generated here may carry an absolute path.  Clang spells anonymous
-    records and diagnostics by where it found them, and those strings flow into
-    the dmSDK IR and from there into the derived API policy - which made the
-    policy a function of WHERE the repository was cloned rather than of the
-    engine revision its address names.  The same Defold revision produced three
-    different policy roots on a laptop, in a temporary worktree, and on a CI
-    runner, and the published store carried a developer's home directory.
-
-    Individual call sites are normalized too, but this is the catch-all: it is
-    applied to the serialized bytes, so a new leak cannot reach disk by taking a
-    code path nobody remembered to normalize.
-    """
-    return text.replace(f"{ROOT}/", "")
-
-
 def serialized_outputs() -> tuple[str, str]:
-    data = inventory()
+    # Normalize the structured values before JSON escaping. This is the
+    # catch-all for future Clang fields: a newly recorded diagnostic or type
+    # cannot make policy bytes depend on the checkout host.
+    data = normalize_generated_value(inventory())
     inventory_text = strip_checkout_path(json.dumps(data, indent=2, sort_keys=False) + "\n")
     report_text = strip_checkout_path(markdown(data))
     # Fail closed rather than publish a path. A leak that survives the rewrite
     # means the path was spelled some other way - a symlink, a relative prefix -
     # and silently shipping it is what this whole change exists to stop.
     for name, text in (("inventory", inventory_text), ("report", report_text)):
-        if str(ROOT) in text:
+        if contains_checkout_path(text):
             raise SystemExit(f"generated SDK {name} still contains the checkout path {ROOT}")
     return inventory_text, report_text
 

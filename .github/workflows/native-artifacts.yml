@@ -330,14 +330,14 @@ jobs:
   # surface's standard-library types require both sides to agree on.
   #
   # That registry refuses anonymous pulls but serves any AUTHENTICATED Google
-  # identity. The cross toolchain remains an explicit manual canary until its
-  # C++ standard-library probe is proven against the current image; release
-  # publication always runs the native MSVC lane below. A manual canary may run
-  # beside it, but is advisory and cannot block a complete release.
+  # identity. When the credential exists this is the release-producing lane:
+  # it is the exact toolchain Extender will use to link the archive. The native
+  # MSVC lane below is a fallback for forks and local mirrors that cannot reach
+  # Defold's registry. The two conditions are deliberately mutually exclusive,
+  # so they can never race to publish the same immutable asset.
   windows:
     needs: plan
-    if: github.event_name == 'workflow_dispatch' && needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential == 'true'
-    continue-on-error: true
+    if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential == 'true'
     runs-on: ubuntu-24.04
     strategy:
       matrix:
@@ -378,13 +378,12 @@ jobs:
             "${{ needs.plan.outputs.target_tag }}" "${{ github.repository }}" \
             "build/artifacts/$TARGET/hermes.tar.gz" "$ASSET"
 
-  # The release-producing Windows lane. It uses the platform's native MSVC
-  # environment, so the standard library and CRT are exercised by the compiler
-  # that will produce the published archive rather than inferred by a partial
-  # cross-toolchain file.
+  # Fallback release-producing Windows lane for repositories without the
+  # Defold registry credential. It uses the platform's native MSVC environment,
+  # so a fork still gets a usable archive without holding a Google identity.
   windows-native:
     needs: plan
-    if: needs.plan.outputs.windows_any == 'true'
+    if: needs.plan.outputs.windows_any == 'true' && needs.plan.outputs.registry_credential != 'true'
     runs-on: windows-2022
     strategy:
       matrix:

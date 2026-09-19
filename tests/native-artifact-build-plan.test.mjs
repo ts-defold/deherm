@@ -124,6 +124,13 @@ test("release publication uses authoritative platform inputs", async () => {
   assert.match(workflow, /push:\s+branches: \[main\]/u);
   assert.match(workflow, /--build-arg "ANDROID_ABI=\$ABI"/u);
   assert.doesNotMatch(workflow, /ANDROID_ABI=\$ANDROID_ABI/u);
-  assert.match(workflow, /windows-native:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true'/u);
-  assert.match(workflow, /windows:[\s\S]*?if: github\.event_name == 'workflow_dispatch'/u);
+  assert.match(
+    workflow,
+    /windows:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential == 'true'/u
+  );
+  assert.match(
+    workflow,
+    /windows-native:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential != 'true'/u
+  );
+  assert.doesNotMatch(workflow, /windows:[\s\S]*?continue-on-error: true/u);
 });

@@ -320,7 +320,25 @@ else if (command === "pull") {
   // second CLI or an authenticated session. The asset names come from the same
   // listing the CI completeness check uses, so no release listing is fetched to
   // discover them - see packages/cli/src/release-assets.mjs.
-  const rows = await publishedAssets(FAMILY, { root });
+  const requestedTargets = [];
+  for (let index = 0; index < args.length; index += 1) {
+    if (args[index] !== "--target") continue;
+    const target = args[index + 1];
+    if (!target || target.startsWith("--")) throw new Error("--target requires a Defold bundle target");
+    requestedTargets.push(target);
+    index += 1;
+  }
+  const published = await publishedAssets(FAMILY, { root });
+  const knownTargets = new Set(published.map((row) => row.target));
+  const unknownTargets = [...new Set(requestedTargets)].filter((target) => !knownTargets.has(target));
+  if (unknownTargets.length) {
+    throw new Error(
+      `No native artifact is published for ${unknownTargets.join(", ")}; ` +
+      `published targets are ${[...knownTargets].sort().join(", ")}`
+    );
+  }
+  const selected = new Set(requestedTargets);
+  const rows = selected.size ? published.filter((row) => selected.has(row.target)) : published;
   const { missing } = await downloadReleaseAssets({
     tag,
     assets: rows.map((row) => row.asset),
@@ -342,11 +360,20 @@ else if (command === "pull") {
     });
   }
   const installed = await install(destination);
+  const missingInstalls = rows.map((row) => row.target).filter((target) => !installed.includes(target));
+  if (!args.includes("--partial") && missingInstalls.length) {
+    throw new Error(`Downloaded archives did not install requested targets: ${missingInstalls.join(", ")}`);
+  }
   console.log(`installed ${installed.length} native artifact(s): ${installed.join(", ") || "none"}`);
-  await verify(!args.includes("--partial"), false);
+  // A targeted pull promises that row, not the entire release. The explicit
+  // missingInstalls check above is its completeness gate; asking verify() for
+  // global completeness here would make `--target x86_64-linux` fail because
+  // an unrelated iOS row was intentionally not downloaded.
+  await verify(!args.includes("--partial") && selected.size === 0, false);
 } else {
   throw new Error(
     "Usage: manage-native-artifacts.mjs {fingerprint|tag|release-metadata|expected-assets|report|" +
-    "verify [--complete] [--json]|install <dir>|record <target>|pull [--tag <tag>] [--partial]}"
+    "verify [--complete] [--json]|install <dir>|record <target>|" +
+    "pull [--tag <tag>] [--target <bundle-target>] [--partial]}"
   );
 }

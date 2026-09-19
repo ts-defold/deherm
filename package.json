@@ -314,7 +314,7 @@
     "verify": "pnpm test && pnpm test:binding-arena && pnpm test:scalar-lua-runtime && pnpm test:script-value-runtime && pnpm test:script-generated-families-runtime && pnpm test:script-handle-runtime && pnpm test:script-api-hermes && pnpm test:native && pnpm test:device-dev && pnpm test:lua-bridge && pnpm test:lua-hermes && pnpm test:static-hermes && pnpm check:static-hermes && pnpm check:extension-syntax && pnpm test:extension-retention && pnpm package:defold",
     "verify:engine:native": "pnpm bob:local:bundle && DEHERM_REQUIRE_ENGINE_ARTIFACTS=1 pnpm test:extension-retention && pnpm test:native-defold:runtime",
     "artifacts:record": "node scripts/manage-native-artifacts.mjs record",
-    "test:api-policy": "node --test tests/api-policy.test.mjs",
+    "test:api-policy": "python3 tests/import-defold-sdk-portability.py && node --test tests/api-policy.test.mjs",
     "test:revision-derivation": "node --test tests/revision-derivation.test.mjs"
   },
   "dependencies": {

@@ -218,3 +218,13 @@ test("the declared matrix verifies and the complete matrix names every gap", () 
     }
   }
 });
+
+test("a targeted artifact pull rejects a target that has no published row before downloading", () => {
+  const result = spawnSync(
+    process.execPath,
+    [path.join(repositoryRoot, "scripts", "manage-native-artifacts.mjs"), "pull", "--target", "not-a-defold-target"],
+    { cwd: repositoryRoot, encoding: "utf8" }
+  );
+  assert.notEqual(result.status, 0);
+  assert.match(`${result.stdout}${result.stderr}`, /No native artifact is published for not-a-defold-target/u);
+});
