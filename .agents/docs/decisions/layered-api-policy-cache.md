@@ -224,13 +224,35 @@ every engine revision.
 
 ## The URL scheme is the key
 
-A static site - GitHub Pages is sufficient - where the path *is* the hash:
+A static site - GitHub Pages is sufficient - where the path *is* the hash. Every
+object lives under a **single owned prefix**, never at the domain root:
 
 ```
-/index/<defold-sha>.json     -> { "policyRoot": "<hash>", "generator": "<rev>" }
-/policy/<root-hash>.json     -> the policy root, naming its subtrees
-/subtree/<subtree-hash>.json -> one namespace's derived surface
+<base>/v1/index/<defold-sha>.json  -> { "policyRoot": "<hash>", "generator": "<rev>" }
+<base>/v1/policy/<root-hash>.json  -> the policy root, naming its subtrees
+<base>/v1/object/<subtree-hash>.json -> one namespace's derived surface
 ```
+
+### The base is data, and the domain is shared
+
+This repository is `ts-defold/deherm`, and the organisation already publishes a
+site on a shared domain. A GitHub project page is served under its repository
+name, so the natural default is `https://<domain>/deherm/…`, which is already
+namespaced. That default must not be relied on:
+
+* **Nothing is published at a root-level segment.** A top-level `/index/` or
+  `/policy/` would collide with whatever the organisation site routes now or
+  later. Everything sits beneath one segment this project owns.
+* **The base URL is configuration carried in the shipped index, not a constant
+  in code.** Publishing from an organisation-site repository removes the
+  repository-name prefix; moving to a CDN or a different domain changes the host
+  entirely. Neither may be a code change.
+* **The schema version is in the path**, so a `v2` layout can be published
+  alongside `v1` during a migration rather than replacing it in place.
+
+Content-addressed objects are immutable and self-verifying, so they can be
+served from any host that has the bytes. Keeping the base in data is what makes
+relocation a configuration edit instead of a release.
 
 Every object under `/policy` and `/subtree` is **immutable and infinitely
 cacheable**, because a change produces a different path rather than a new
