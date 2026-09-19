@@ -23,6 +23,7 @@ Commands:
   generate-extension-api  Parse a C header and emit native-extension IR, TypeScript, and C ABI glue
   typecheck    Type-check shared, game-object, GUI, and render TypeScript projects
   verify-generated  Verify packaged IR plus generated context/config output sentinels
+  verify-bundle     Verify the bundle Bob will archive against the sources it was built from
   dev          Run the compiler/watch console; press p to launch or stop the built game
   bugs         Harvest engine/dev output into the deduplicated runtime bug pool
   conformance generate  Generate exhaustive API compile/runtime fixtures and a disposition plan
@@ -63,6 +64,8 @@ Options:
   --strict           Fail a report unless every required selected stage passed
   --check            Verify materialized output without writing it
   --force            Regenerate owned project outputs even when the input key is current
+  --recompute        For verify-bundle, re-bundle current sources to name the fingerprint they produce
+  --allow-unbound    For verify-bundle, report an unrecorded or absent artifact without failing
   --json             Print machine-readable JSON
   -h, --help         Show this help
 `;
@@ -87,6 +90,8 @@ export function parseArguments(argv) {
     else if (value === "--check" && options.command === "materialize-dmsdk") options.check = true;
     else if (value === "--strict") options.strict = true;
     else if (value === "--force") options.force = true;
+    else if (value === "--recompute") options.recompute = true;
+    else if (value === "--allow-unbound") options.allowUnbound = true;
     else if (value === "--once") options.once = true;
     else if (value === "--headless") options.headless = true;
     else if (value === "--no-launch") options.autoLaunch = false;
@@ -433,6 +438,42 @@ export async function run(argv = process.argv.slice(2)) {
     return 0;
   }
   if (options.command === "doctor") return await runDoctor(options);
+  if (options.command === "verify-bundle") {
+    // The pre-Bob gate. It never inspects the extension inventory or regenerates
+    // anything, so it stays usable on a build server that only ever runs Bob,
+    // and it costs a hash of the files the recorded build read.
+    const {
+      formatBuildArtifactReport, recomputeBundleFingerprint, summarizeBuildArtifacts, verifyProjectBuildArtifacts
+    } = await import("./build-artifacts.mjs");
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const result = await verifyProjectBuildArtifacts(projectRoot, { requireBinding: options.allowUnbound !== true });
+    if (options.recompute) {
+      for (const entry of result.entries) {
+        if (entry.kind !== "bundle" || !entry.build?.entryPoint) continue;
+        try {
+          const { fingerprint } = await recomputeBundleFingerprint(projectRoot, entry);
+          entry.fingerprint = { ...entry.fingerprint, fromCurrentSources: fingerprint };
+          // The cheap check is conservative: it fails on any source change,
+          // including one the bundler discards. A rebuild of the current
+          // sources that produces the artifact already on disk answers the
+          // question the gate actually asks, so it clears the failure.
+          if (fingerprint === entry.fingerprint.onDisk && ["stale-sources", "artifact-replaced"].includes(entry.status)) {
+            entry.status = "equivalent-rebuild";
+            entry.severity = "warn";
+          }
+        } catch (error) {
+          entry.recomputeError = error instanceof Error ? error.message : String(error);
+        }
+      }
+    }
+    if (options.recompute) summarizeBuildArtifacts(result);
+    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
+    else {
+      console.log(`${result.ok ? "ok" : "!!"} build artifacts in ${path.relative(process.cwd(), projectRoot) || "."}: ${result.status}`);
+      for (const line of formatBuildArtifactReport(result)) console.log(line);
+    }
+    return result.ok ? 0 : 1;
+  }
   const inventory = await inspectDefoldProject({
     project: options.project,
     selectProject: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined,
@@ -481,8 +522,13 @@ export async function run(argv = process.argv.slice(2)) {
       console.log(`ok component proxies: ${componentCount} generated resource(s)`);
       console.log(`ok lowering plan: ${result.planSha256}`);
       console.log(`ok Defold API: ${result.defoldRevision}`);
+      const { formatBuildArtifactReport } = await import("./build-artifacts.mjs");
+      for (const line of formatBuildArtifactReport(result.buildArtifacts)) console.log(line);
+      if (!result.buildArtifacts.ok) {
+        console.log("   Run 'deherm verify-bundle' before Bob to gate a build on this.");
+      }
     }
-    return 0;
+    return result.buildArtifacts.ok ? 0 : 1;
   }
   if (options.command === "typecheck") {
     const result = await typecheckGeneratedProject(inventory.projectRoot);

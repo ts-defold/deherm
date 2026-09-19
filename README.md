@@ -105,6 +105,14 @@ to the default web build. See the [HTML5 bundle decision](.agents/docs/decisions
 for the production loader, development reload, and optional Static Hermes AOT
 profile.
 
+Bob archives whatever `/deherm/app.dehermc` is on disk and relates it to
+nothing, so `deherm verify-bundle` compares that artifact against the sources
+`deherm.lock` records it was built from and names both fingerprints when they
+disagree. It is a hash comparison rather than a rebuild, runs before Bob in
+`scripts/bob.sh`, and needs no network - a build server that only ever runs Bob
+against committed artifacts is checked the same way as a machine that runs
+déherm itself.
+
 `run:device-dev` uses the matching host `hermesc` to produce bytecode and loads
 it in the same runtime binary. Published development tooling must keep the
 compiler and runtime revisions paired because Hermes bytecode is versioned.

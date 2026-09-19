@@ -11,6 +11,7 @@ import {
   assertUniquePublicScriptRoots,
   publicScriptModulePath
 } from "../../compiler/src/script-public-api-policy.mjs";
+import { verifyProjectBuildArtifacts } from "./build-artifacts.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
 import { defoldToolchain } from "./toolchains.mjs";
 
@@ -1322,6 +1323,12 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       projectExtensions: bindingIr.coverage
     }
   }, null, 2)}\n`);
+  // Regenerating the SDK does not rebuild the application bundle, so the
+  // artifact-to-source binding survives this write untouched. It is not
+  // rewritten either: the generated SDK is one of the bundle's own inputs, so a
+  // regeneration that changes it makes the carried-forward binding report the
+  // bundle as stale - which is exactly what it then is.
+  const previousBuildArtifacts = await readExistingBuildArtifacts(resolvedProjectRoot);
   await writeFile(path.join(inventory.projectRoot, "deherm.lock"), `${JSON.stringify({
     schemaVersion: 1,
     defoldRevision: core.revision,
@@ -1332,7 +1339,8 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     inputs: core.inputs,
     generatedOutputs,
     generatedSdkSha256,
-    engineProfiles
+    engineProfiles,
+    ...(previousBuildArtifacts ? { buildArtifacts: previousBuildArtifacts } : {})
   }, null, 2)}\n`);
   const tsconfigState = await migrateLegacyGeneratedTsconfig(
     path.join(inventory.projectRoot, "tsconfig.json"),
@@ -1367,6 +1375,16 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       tsconfig: tsconfigState.migrated
     }
   };
+}
+
+async function readExistingBuildArtifacts(resolvedProjectRoot) {
+  try {
+    const lock = JSON.parse((await readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock")).toString("utf8"));
+    return lock.buildArtifacts ?? null;
+  } catch (error) {
+    if (error?.code === "ENOENT" || error instanceof SyntaxError) return null;
+    throw error;
+  }
 }
 
 export async function verifyGeneratedProject(projectRoot, outputDirectory = ".deherm") {
@@ -1489,12 +1507,19 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
       JSON.stringify(lock.engineProfiles) !== JSON.stringify(manifest.engineProfiles)) {
     throw new Error("deherm.lock does not match the generated manifest contract");
   }
+  // Generated state being current says nothing about the application bundle
+  // Bob will archive, which is produced by a different step and can be older
+  // than every file verified above. The freshness binding is checked here so a
+  // single `verify-generated` covers both, and reported rather than thrown so
+  // the caller can print both fingerprints.
+  const buildArtifacts = await verifyProjectBuildArtifacts(resolvedProjectRoot);
   return {
     root,
     defoldRevision: manifest.defoldRevision,
     planSha256,
     checkedFiles: Object.keys(verified).length,
-    verified
+    verified,
+    buildArtifacts
   };
 }
 

@@ -36,6 +36,24 @@ export async function createIncrementalCompiler(options) {
   const mirrors = [...new Set((options.mirrors ?? []).map((file) => path.resolve(file)))];
   const resourcePath = normalizeResourcePath(options.resourcePath ?? path.basename(outputFile));
   const tsconfig = options.tsconfig ? path.resolve(options.tsconfig) : undefined;
+  const target = options.target ?? "es2020";
+  const sourcemap = options.sourcemap ?? true;
+  const useTtsc = options.useTtsc !== false;
+  // Identical TypeScript compiled through a different entry point, tsconfig, or
+  // output setting is a different program with a different fingerprint, so the
+  // freshness binding covers these settings alongside the source contents.
+  const configuration = {
+    entryPoint,
+    preludeEntries,
+    tsconfig,
+    resourcePath,
+    target,
+    sourcemap,
+    format: "iife",
+    platform: "neutral",
+    ttsc: useTtsc,
+    define: options.define ?? null
+  };
   const fingerprintPlaceholder = createBundleFingerprintPlaceholder();
   if (Object.hasOwn(options.define ?? {}, fingerprintGlobal)) {
     throw new Error(`${fingerprintGlobal} is reserved by the deherm compiler`);
@@ -58,12 +76,12 @@ export async function createIncrementalCompiler(options) {
     bundle: true,
     format: "iife",
     platform: "neutral",
-    target: options.target ?? "es2020",
-    plugins: options.useTtsc === false ? [] : [ttsc(tsconfig ? { project: tsconfig } : {})],
+    target,
+    plugins: useTtsc ? [ttsc(tsconfig ? { project: tsconfig } : {})] : [],
     ...(tsconfig ? { tsconfig } : {}),
     define: options.define,
     banner: { js: bundleFingerprintBanner(fingerprintPlaceholder) },
-    sourcemap: options.sourcemap ?? true,
+    sourcemap,
     sourcesContent: true,
     legalComments: "none",
     logLevel: "silent",
@@ -110,11 +128,17 @@ export async function createIncrementalCompiler(options) {
       await writeAtomically(outputFile, finalSource);
       const sourceMap = result.outputFiles.find(({ path: file }) => path.resolve(file) === `${outputFile}.map`);
       for (const mirror of mirrors) {
-        if ((options.sourcemap ?? true) && sourceMap) {
+        if (sourcemap && sourceMap) {
           await writeAtomically(`${mirror}.map`, sourceMap.contents);
         }
         await writeAtomically(mirror, finalSource);
       }
+      // Every file the bundler read is a build input, whether or not it
+      // contributed bytes: a type-only module can still change the emitted
+      // program through a ttsc transform. The freshness binding in deherm.lock
+      // is only as honest as this list, so it is the bundler's whole input
+      // closure and not the retained-module census below.
+      const sources = [...new Set(Object.keys(result.metafile.inputs).map((file) => path.resolve(file)))].sort();
       const output = Object.entries(result.metafile.outputs).find(([file]) => path.resolve(file) === outputFile)?.[1];
       const bytes = Buffer.byteLength(finalSource);
       const modules = Object.entries(output?.inputs ?? {})
@@ -129,7 +153,9 @@ export async function createIncrementalCompiler(options) {
         modules
       };
       previousBytes = bytes;
-      return { fingerprint, outputFile, resourcePaths: [resourcePath], metrics };
+      const build = { fingerprint, outputFile, mirrors, resourcePaths: [resourcePath], sources, configuration, metrics };
+      await options.afterRebuild?.(build);
+      return build;
     },
     dispose: () => buildContext.dispose()
   };

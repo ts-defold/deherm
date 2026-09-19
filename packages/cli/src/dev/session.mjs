@@ -6,6 +6,7 @@ import {
   componentProxyConstants,
   generateComponentProxies
 } from "../../../compiler/src/component-proxy-generator.mjs";
+import { recordBundleBuild } from "../build-artifacts.mjs";
 import { writeProjectResourceSymbols } from "../resource-symbols.mjs";
 import { createBugPoolRecorder, defaultBugPoolFile } from "./bug-pool.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
@@ -211,6 +212,7 @@ export async function runDevSession(options = {}) {
     });
   }
   let generatedComponents = false;
+  let reportedArtifactRecordingFailure = false;
   const compiler = await (services.createIncrementalCompiler ?? createIncrementalCompiler)({
     entryPoint,
     // The generated registry imports every authored component and installs the
@@ -223,6 +225,27 @@ export async function runDevSession(options = {}) {
     mirrors: [sourceMirror, buildMirror],
     resourcePath,
     useTtsc: options.useTtsc,
+    // Bob archives the mirrored bundle without knowing what produced it. Each
+    // successful build therefore rewrites the binding in deherm.lock, so the
+    // relation between the artifact on Bob's input path and the sources it came
+    // from is recorded at the moment it is true rather than inferred later.
+    // Recording hashes the files the bundler just read; it never recompiles.
+    afterRebuild: options.recordBuildArtifacts === false ? undefined : async (build) => {
+      try {
+        await recordBundleBuild({ projectRoot, build });
+      } catch (error) {
+        // Reported once: a project whose lock cannot be written fails every
+        // rebuild the same way, and the edit loop is not the place to repeat it.
+        if (reportedArtifactRecordingFailure) return;
+        reportedArtifactRecordingFailure = true;
+        emit({
+          type: "log",
+          level: "warn",
+          source: "dev",
+          message: `could not record the bundle freshness binding in deherm.lock: ${error instanceof Error ? error.message : String(error)}`
+        });
+      }
+    },
     beforeRebuild: options.components === false ? undefined : async (changedSources) => {
       if (generatedComponents && !changedSources.some(isComponentSource)) return;
       await generateComponentProxies({ projectRoot, outputRoot: projectRoot });

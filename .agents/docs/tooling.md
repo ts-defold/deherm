@@ -134,6 +134,50 @@ The runtime smoke emitted `init:hermes` and `module:42`. Full platform support,
 automated launch/termination, and the complete generated API remain separate
 work; a successful custom-engine link does not imply complete API coverage.
 
+# Bundle freshness before Bob
+
+Bob archives whatever `/deherm/app.dehermc` is on disk as a `custom_resources`
+entry and relates it to nothing. A project whose bundler has not run since the
+last TypeScript edit therefore packages old code silently - this has happened
+once already, as a stale `game.arcd`.
+
+Each successful bundle build records, in `deherm.lock` under `buildArtifacts`,
+the artifact's published `__DEFOLD_HERMES_BUILD_FINGERPRINT__`, its content
+hash, the build settings that produced it, and the SHA-256 of every file the
+bundler read. `deherm verify-bundle` recomputes that binding from the working
+tree:
+
+```sh
+pnpm exec deherm verify-bundle --project <project>   # exit 1 when stale
+pnpm exec deherm verify-bundle --recompute           # also re-bundle and name the exact fingerprint
+pnpm exec deherm verify-bundle --allow-unbound       # report, do not fail, an artifact with no binding
+```
+
+The default check is a hash comparison over the recorded inputs, not a
+recompile, so it is cheap enough for a pre-Bob step and for every rebuild.
+`scripts/bob.sh` runs it before invoking Bob; `DEFOLD_HERMES_SKIP_BUNDLE_CHECK=1`
+skips it.
+
+On a mismatch it names both fingerprints - the one `deherm.lock` records for
+these sources and the one on disk - and lists the source files that changed.
+Distinct states are reported distinctly: sources moved (`stale-sources`), the
+artifact is not the recorded one (`artifact-replaced`), the artifact disagrees
+with its own published fingerprint (`artifact-corrupt`), nothing binds it
+(`unbound`), or it does not exist (`artifact-absent`). `--recompute` bundles the
+current sources into a scratch directory and clears the failure when they
+compile to the artifact already on disk, which a discarded edit does.
+
+Both supported workflows pass through the same binding. If the bundle and the
+materialised extension sources are committed artifacts, the binding is committed
+with them and Bob's machine needs no compilers; if déherm runs on the build
+machine, the rebuild rewrites the binding before Bob reads it. The check needs
+no network and never rebuilds on its own.
+
+The `generated-sources` artifact kind records the same relation for files
+assembled into the extension before Bob uploads it - `shermes -emit-c` output
+and per-extension FFI glue. The emission lane is separate work; the freshness
+relation it will need is already recorded and checked here.
+
 # Published npm CLI
 
 The npm package now exposes project inspection and generation:
@@ -147,6 +191,7 @@ pnpm exec deherm generate
 pnpm exec deherm materialize-dmsdk --usage deherm.dmsdk.json --output generated/dmsdk-provider.cpp
 pnpm exec deherm typecheck
 pnpm exec deherm verify-generated
+pnpm exec deherm verify-bundle
 ```
 
 These are the installed-package commands verified from a local tarball. The
@@ -166,7 +211,8 @@ any `game.project` exists.
 .deherm/sdk/contexts/**       context-filtered SDK entrypoints
 .deherm/script-contexts.json  generated 926-route context projection
 .deherm/manifest.json         package/input/profile identities
-deherm.lock                   project-side copy of the generation contract
+deherm.lock                   project-side copy of the generation contract and the
+                              bundle-to-source freshness binding
 tsconfig.deherm.base.json     shared TS 7 + future ttsc configuration
 tsconfig.deherm.shared.json   ordinary context-free `*.ts`
 tsconfig.deherm.game-object.json  game-object `*.script.ts`
@@ -195,6 +241,7 @@ location return without rewriting generated files. It does not hash every
 output on this fast path.
 Use `npx deherm generate --force` to replace disposable generated output, and
 `npx deherm verify-generated --project <project>` for the exact integrity audit.
+`verify-generated` also reports the bundle freshness binding described below;
 `typecheck` runs that audit first, so stale schema-v2 plan, generator sentinel,
 manifest/lock, generated SDK tree, context entrypoint, or generated config state
 fails before `tsc`. The installed native-extension runtime has its own complete

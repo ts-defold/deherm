@@ -57,5 +57,73 @@
     "platforms": {},
     "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
     "handshakeSchema": "deherm.script-route-capabilities/v1"
+  },
+  "buildArtifacts": {
+    "schema": "deherm.build-artifacts/v1",
+    "artifacts": {
+      "deherm/app.dehermc": {
+        "kind": "bundle",
+        "resource": "/deherm/app.dehermc",
+        "fingerprint": "4afe2acc678b762cdfbe3f7bc16f4fc9e30aa166c9803a0f2b594dd6bd73c114",
+        "outputs": {
+          "deherm/app.dehermc": "b0249de989a6b0d615e3f3e26684709a5f6a25f034c9d8c751713b8a4c2c2ae5"
+        },
+        "build": {
+          "entryPoint": "main/player.script.ts",
+          "preludeEntries": [
+            ".deherm/generated/components/registry.ts"
+          ],
+          "tsconfig": "tsconfig.deherm.bundle.json",
+          "target": "es2020",
+          "format": "iife",
+          "platform": "neutral",
+          "sourcemap": true,
+          "ttsc": true,
+          "define": null,
+          "toolchain": {
+            "deherm": "0.0.0",
+            "esbuild": "0.25.10"
+          },
+          "syntheticInputCount": 1
+        },
+        "sources": {
+          "digest": "2b10326345dcbe941725716888c691d4c20c8332fdc8bb71f72267f25a0360eb",
+          "fileCount": 31,
+          "files": {
+            ".deherm/generated/components/registry.ts": "c48a02561731a7a02107b9206f6e19a2c0a8b68e596485e75667a0b9244865f4",
+            ".deherm/sdk/address.ts": "32420294482945e853794417e35e5614224af893df0338901259e63b62176649",
+            ".deherm/sdk/component.ts": "18e333f993c3de6ff36033e17d8b82eecc3ffc7825d137d43d0fd2e25a323929",
+            ".deherm/sdk/generated/dmsdk/enum-value.ts": "1e819070fc5b7289d5ff12980bd0325cc26535e50e9037dd928ac1fc51523db1",
+            ".deherm/sdk/generated/dmsdk/index.ts": "8b39847935c6dd89930806fca183fc62f54e259dcc50edacdc78daab5b4e9c8b",
+            ".deherm/sdk/generated/dmsdk/runtime.ts": "64dd20ae644d49cac406895d9a90951e84b9e57b17117d36b27dc3412116e42e",
+            ".deherm/sdk/generated/dmsdk/scalar.ts": "8c12e875b9d6cc1998a937e68b5eeea40f83bb54e0c0fcf76f494b2ae1ef5267",
+            ".deherm/sdk/generated/dmsdk/types.ts": "185912c5c706737f04bd1c69849b01aec76815ad970cb9f23d054343396b7e7a",
+            ".deherm/sdk/generated/dmsdk/universal.ts": "202d3adec9f08d3205dc4331a1dbe4fe01a50b94d585339fb960449f7c08aabe",
+            ".deherm/sdk/generated/script/fixed-tuple-target-support.ts": "86f9058dabddb9423c78b7fdea96551a62f9a3eb8dbef0723f9fd2709768c281",
+            ".deherm/sdk/generated/script/handle-lowering.ts": "5a587035645a6e46fdf4c5e289948452c7f583f7022d66a0b376f3d73d599183",
+            ".deherm/sdk/generated/script/index.ts": "8fc87fc95ddda4e98eb50ff3fb9fe59860a66dbbba4f00e8c39fd0feaea95fac",
+            ".deherm/sdk/generated/script/modules.ts": "b99cab0fe1aea0126990f234d759ea2734890d8ebbd36c471fd3659aac446159",
+            ".deherm/sdk/generated/script/runtime.ts": "cbf12680f27eae6b6810d99af45d441cceabc3f10ce779aefa10153d6ed6f268",
+            ".deherm/sdk/generated/script/value-target-support.ts": "5f6274478b098f8b07badfd52ccaf5a57485c7ca839e54158b9f1a855ece8344",
+            ".deherm/sdk/index.ts": "a59c900d88f8a36ade31b2cf1b8bf5f7b3731634da105d51475ef9525f785eda",
+            ".deherm/sdk/runtime.ts": "84a733642d38d5887bc16b1f472c5f1834ba8dc69928e8eace97cebe6ecf8988",
+            "main/camera.script.ts": "4595017829c5b33c03a04f8936610aec7fcbf2e35e270e23274fae3fa50f6a5a",
+            "main/player.script.ts": "2561d62636943d48d81f483a08600e9242aceac564d4e7a701db6d8a3238609d",
+            "main/rocket.script.ts": "068a171275eef337461a8686dd9a6d3f7c09d1f78399b44952d3aee3ca3a9b6a",
+            "main/ui.gui.ts": "331fe5d01a5970666e89273f9bc0555409914dcee27005806edf82f30890ca93",
+            "reference/battle.gui.ts": "c90b5d62440025083252c405f3c802b4f81fe9ca0d40c5728a2697fb2f7bb50a",
+            "src/capability-snapshot.ts": "1cc3bcb6342ff5dbbe53769645d426bb24e0f99eec5067a3995762e091625bf7",
+            "src/generated-war-battles/constants.ts": "c66493d2f98d2419bdc49651590fc05b41099faf7a7e716104c1832af2e75166",
+            "src/generated-war-battles/content.ts": "78f1fbbe4f2012288167297033750706ba9d4b485a841dba75bbff43918b58a4",
+            "src/generated-war-battles/index.ts": "6e71884075c6b098b34949c7c2a591b9fef37a2c18773c233f8b1be5f56fde6c",
+            "src/generated-war-battles/playable.ts": "2b8d002edf1f045fd33f2fb8ed79606a10bc74731d51416b2f38141821af96b2",
+            "src/generated-war-battles/protocol.ts": "ad030cfc8dc301017fcc60de3916824cc8f14bcb08012a616dcf920536afde3d",
+            "src/generated-war-battles/snapshot.ts": "28d9da96a8caf8ddc7e931ef1766f6bc6ca207e3723d6b6e1c498e5ac0b67a0f",
+            "src/generated-war-battles/transport.ts": "146850ba5ff99abf86854caaac5de72702d1764ed4c435fc986c46bfa4f190eb",
+            "src/generated-war-battles/world.ts": "dcaeec3b0eb78f65639f02a72d4a331523edc996aa4661b7488ba030f5116772"
+          }
+        }
+      }
+    }
   }
 }

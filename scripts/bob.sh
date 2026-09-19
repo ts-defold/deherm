@@ -63,6 +63,18 @@ case "$platform" in
     ;;
 esac
 
+# Bob archives whatever /deherm/app.dehermc is on disk as a custom_resources
+# entry, and nothing in Bob relates that file to the TypeScript beside it. The
+# freshness gate compares the bundle against the sources deherm.lock records it
+# was built from, so a build that never runs deherm interactively cannot package
+# a bundle older than its sources. It is a hash comparison, not a rebuild.
+# --allow-unbound reports, without failing, an artifact that predates the
+# fingerprint binding - this project's smoke bundle is one; a recorded bundle
+# that disagrees with its sources still fails the build.
+if [[ "${DEFOLD_HERMES_SKIP_BUNDLE_CHECK:-0}" != "1" ]]; then
+  node "$repo_root/bin/deherm.mjs" verify-bundle --project "$repo_root/defold" --allow-unbound
+fi
+
 arguments=(
   --root "$repo_root/defold"
   --output build/bob

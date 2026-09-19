@@ -158,14 +158,43 @@ an interactive session:
   since the last TypeScript edit, Bob packages a stale bundle and the game runs
   old code. This has already happened once in this project.
 * Every bundle carries `__DEFOLD_HERMES_BUILD_FINGERPRINT__`, a content hash of
-  the compiled program, and the runtime reports it on activation. Recomputing
-  the expected fingerprint from current sources and comparing it to the bundle
-  on disk turns "someone forgot to run déherm" from a black screen into a
-  diagnostic naming both fingerprints.
+  the compiled program, and the runtime reports it on activation. Comparing that
+  value, and the sources it was built from, against the working tree turns
+  "someone forgot to run déherm" from a black screen into a diagnostic naming
+  both fingerprints.
 * Either the bundle and materialised extension C are committed artifacts whose
   fingerprints must match the sources Bob sees, or déherm runs on the build
   machine and needs the host compilers there. Both are workable; an unchecked
   mismatch is not.
+
+## The binding that closes the seam
+
+`deherm.lock` gains a `buildArtifacts` section. Each entry names a materialised
+artifact, its content hash, its published fingerprint, the build settings that
+produced it, and the SHA-256 of every file the bundler read. A bundle build
+writes the entry; `deherm verify-bundle` and `deherm verify-generated` recompute
+it from the working tree.
+
+Recomputation is a hash comparison over the recorded inputs, never a compile,
+which is what makes it affordable in a watch loop and as a pre-Bob step in
+`scripts/bob.sh`. It needs no network. A source file that became reachable since
+the build cannot hide from it, because reaching it required editing a file that
+is already in the recorded set.
+
+The check distinguishes the states that need different answers: sources changed
+after the build, the artifact is not the recorded one, the artifact disagrees
+with its own fingerprint, nothing binds it, or it is absent. The first three are
+errors everywhere; the last two are reports by default and errors before Bob,
+where an artifact nobody can relate to a source tree is as unacceptable as one
+that provably disagrees with it. `--recompute` bundles the current sources into
+a scratch directory to name the exact fingerprint they produce, and clears the
+failure when that is the artifact already on disk.
+
+Both workflows keep working unchanged. A committed bundle is committed together
+with its binding; a build machine that runs déherm rewrites the binding before
+Bob reads it. The same record shape covers generated extension C - the
+`generated-sources` kind - so the assembler that writes `shermes -emit-c` output
+into the extension inherits the freshness relation rather than inventing one.
 
 # What builds what
 
