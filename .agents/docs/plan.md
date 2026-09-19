@@ -75,11 +75,11 @@ does not replace Defold script components.
 
 ## Phase 0 - Evidence and reproducibility
 
-1. Verify whether `tmikov/hermes-preview` exists.
-2. Otherwise pin Meta's latest `static_h`; also record `main` and Tzvetan
-   Mikov's current fork for comparison.
-3. Pin Defold's latest `dev` revision.
-4. Materialize ignored, shallow upstream checkouts from `upstream.lock`.
+1. Pin `facebook/hermes` `static_h`, the repository default and the Hermes 1.0
+   line that carries the runtime, `hermesc`, and `shermes`. No other Hermes
+   branch or fork is tracked.
+2. Pin Defold's latest `dev` revision.
+3. Materialize ignored, shallow upstream checkouts from `upstream.lock`.
 5. Record build prerequisites and upstream licenses.
 
 Exit: another contributor can retrieve the exact sources without committing

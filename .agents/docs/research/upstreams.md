@@ -10,10 +10,6 @@ sources:
     resource: https://x.com/tmikov/status/2095911349020700856
     title: Hermes preview repository proposal
     author: human:tmikov
-  - id: tmikov-github
-    resource: https://github.com/tmikov?tab=repositories
-    title: Tzvetan Mikov GitHub repositories
-    author: human:tmikov
   - id: meta-hermes
     resource: https://github.com/facebook/hermes
     title: Meta Hermes repository
@@ -25,10 +21,6 @@ sources:
 ---
 
 # Findings
-
-As of 2026-09-17, `https://github.com/tmikov/hermes-preview` returns
-"repository not found." The referenced post says a new repository will be
-created, probably under that name; it does not say one already exists.[^proposal]
 
 The baseline is `facebook/hermes` on `static_h`, which is the repository's
 default branch and carries `project(Hermes VERSION 1.0.0)`, `tools/shermes` and
@@ -56,8 +48,5 @@ engine until a native extension can no longer prove the required behavior.
 # Refresh policy
 
 Pins change only through an explicit refresh command and a reviewed knowledge
-log entry. If `tmikov/hermes-preview` appears, compare it against the pinned
-Meta revision before switching; preview features must not silently become core
-dependencies.
-
-[^proposal]: Tzvetan Mikov's public post proposing a higher-velocity preview repository.
+log entry. Hermes moves only along `static_h`, the repository default and the
+1.0 line; no other branch or fork is a candidate.
