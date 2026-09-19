@@ -238,3 +238,44 @@ test("the Windows archiver protects MSVC's /OUT option from Git Bash path rewrit
     path.join(build, "jsi", "jsi.lib")
   ]);
 });
+
+test("the POSIX packager merges explicit static runtime dependencies", async (t) => {
+  const candidates = ["llvm-ar", "/opt/homebrew/opt/llvm/bin/llvm-ar", "/usr/local/opt/llvm/bin/llvm-ar", "ar"];
+  let arTool = null;
+  for (const candidate of candidates) {
+    try {
+      const { stdout, stderr } = await execFileAsync(candidate, ["--version"]);
+      if (/GNU|LLVM/u.test(`${stdout}${stderr}`)) { arTool = candidate; break; }
+    } catch {
+      // BSD ar has no MRI mode; try the next deterministic archiver.
+    }
+  }
+  if (!arTool) return t.skip("no GNU/LLVM ar with MRI support on this host");
+  const directory = await scratch(t);
+  const build = path.join(directory, "build");
+  const objects = path.join(directory, "objects");
+  const dependency = path.join(directory, "libicuuc.a");
+  const output = path.join(directory, "libhermes.a");
+  await mkdir(path.join(build, "lib"), { recursive: true });
+  await mkdir(path.join(build, "jsi"), { recursive: true });
+  await mkdir(objects, { recursive: true });
+  const vm = path.join(objects, "vm.o");
+  const jsi = path.join(objects, "jsi.o");
+  const icu = path.join(objects, "icu.o");
+  await Promise.all([
+    writeFile(vm, "vm"),
+    writeFile(jsi, "jsi"),
+    writeFile(icu, "icu")
+  ]);
+  await execFileAsync(arTool, ["rcs", path.join(build, "lib", "libhermesvm_a.a"), vm]);
+  await execFileAsync(arTool, ["rcs", path.join(build, "jsi", "libjsi.a"), jsi]);
+  await execFileAsync(arTool, ["rcs", dependency, icu]);
+  await execFileAsync("bash", [
+    path.join(repositoryRoot, "toolchains/hermes/package-posix.sh"),
+    build,
+    output,
+    dependency
+  ], { env: { ...process.env, AR: arTool } });
+  const { stdout } = await execFileAsync(arTool, ["t", output]);
+  assert.deepEqual(new Set(stdout.trim().split(/\r?\n/u)), new Set(["vm.o", "jsi.o", "icu.o"]));
+});

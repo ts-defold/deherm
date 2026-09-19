@@ -70,7 +70,10 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
       -DHERMES_USE_STATIC_ICU=ON \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
     cmake --build /work/build --target hermesvm_a jsi --parallel && \
-    package-posix /work/build /out/libhermes.a
+    ICU_I18N="$(find /usr/lib -type f -name libicui18n.a -print -quit)" && \
+    test -n "${ICU_I18N}" && ICU_LIBDIR="$(dirname "${ICU_I18N}")" && \
+    package-posix /work/build /out/libhermes.a \
+      "${ICU_LIBDIR}/libicui18n.a" "${ICU_LIBDIR}/libicuuc.a" "${ICU_LIBDIR}/libicudata.a"
 
 # The development library: identical but for the debugger, in its own build
 # tree so neither variant can pick up the other's objects.
@@ -86,7 +89,10 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
       -DHERMES_USE_STATIC_ICU=ON \
       -DHERMES_BUILD_SHARED_JSI=OFF && \
     cmake --build /work/build-debug --target hermesvm_a jsi --parallel && \
-    package-posix /work/build-debug /out/libhermes.debug.a
+    ICU_I18N="$(find /usr/lib -type f -name libicui18n.a -print -quit)" && \
+    test -n "${ICU_I18N}" && ICU_LIBDIR="$(dirname "${ICU_I18N}")" && \
+    package-posix /work/build-debug /out/libhermes.debug.a \
+      "${ICU_LIBDIR}/libicui18n.a" "${ICU_LIBDIR}/libicuuc.a" "${ICU_LIBDIR}/libicudata.a"
 
 # One reproducible archive, named for the family rather than the target: the
 # workflow uploads it under `hermes-<target>.tar.gz`, and renaming a file does

@@ -11,6 +11,7 @@ set -euo pipefail
 
 build_root="$1"
 output="$2"
+shift 2
 ar_tool="${AR:-ar}"
 nm_tool="${NM:-nm}"
 temporary="$(mktemp -d)"
@@ -53,6 +54,19 @@ boost_archive="$build_root/external/boost/boost_1_86_0/libs/context/libboost_con
 if [[ -f "$boost_archive" ]]; then
   members+=("$boost_archive")
 fi
+
+# Static libraries do not absorb their link dependencies. A target build may
+# therefore name the exact static runtime archives Hermes was compiled against
+# after <build-root> and <output>; merge those into the one archive Extender
+# force-loads. Linux uses this for ICU. The paths are explicit rather than
+# rediscovered here so a cross/native recipe remains the authority for its SDK.
+for dependency in "$@"; do
+  if [[ ! -f "$dependency" ]]; then
+    echo "package-posix: missing runtime dependency $dependency" >&2
+    exit 1
+  fi
+  members+=("$dependency")
+done
 
 {
   echo "CREATE $output"
