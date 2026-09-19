@@ -19,6 +19,7 @@ import { promisify } from "node:util";
 import { parse as parseYaml } from "yaml";
 
 import { stableBindingId } from "./lib/binding-identity.mjs";
+import { LIFECYCLE_TABLES } from "./lib/script-lifecycle-callbacks.mjs";
 import {
   generatedScriptArtifacts,
   scriptGenerationSteps,
@@ -161,6 +162,14 @@ async function sourceEvidencePaths(repositoryRoot) {
       result.add(`upstream/defold/${confinedRelativePath(evidence.source, `${inputPath}.additionalSourceEvidence.source`)}`);
     }
   }
+  // The engine tables that define each script type's lifecycle callbacks. They
+  // are evidence like any override's cited source - they decide which documented
+  // globals are callbacks rather than callable API - but they are named by a
+  // module rather than by an overrides file, so they join the set here.
+  for (const table of LIFECYCLE_TABLES) {
+    result.add(`upstream/defold/${confinedRelativePath(table.source, `${table.proxyKind}.lifecycle.source`)}`);
+  }
+
   const matrix = JSON.parse(await readFile(
     path.join(repositoryRoot, "packages/bindings/probes/defold-script-real-engine-matrix.json"),
     "utf8"

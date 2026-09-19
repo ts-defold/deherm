@@ -13,7 +13,10 @@ import {
 } from "../packages/compiler/src/script-public-api-policy.mjs";
 import { loadScriptSemanticOverrides } from "./lib/script-semantic-overrides.mjs";
 import { assertReviewedRevision, observeReviewedSource } from "./lib/reviewed-revision.mjs";
-import { VOID } from "./lib/revision-audit.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
+import { classifyGlobalDeclaration, readLifecycleCallbacks } from "./lib/script-lifecycle-callbacks.mjs";
+import { resolveDocumentedDuplication } from "./lib/documented-route-duplication.mjs";
+import { componentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const archivePath = path.join(root, "upstream", "ref-doc.zip");
@@ -183,12 +186,16 @@ function parameterName(value, index) {
   return safeParameterIdentifier(candidate, index);
 }
 
-function parseArchive() {
+function parseArchive(lifecycleNames) {
   const archive = unzipSync(new Uint8Array(requireBuffer));
   const classes = new Map();
   const aliases = new Map();
   const enums = new Map();
   const functions = [];
+  // Every namespace-less declaration the archive carries, classified. Only
+  // `defold-global` becomes a route; the rest are the explicit statement of
+  // what we do not bind and why. See `scripts/lib/script-lifecycle-callbacks.mjs`.
+  const globals = [];
   const files = Object.keys(archive).filter((name) => name.startsWith("doc/") && name.endsWith(".lua")).sort();
   for (const source of files) {
     const lines = strFromU8(archive[source]).split(/\r?\n/);
@@ -252,6 +259,18 @@ function parseArchive() {
         const parts = fn[1].split(/[.:]/);
         const member = parts.pop();
         const modulePath = parts.length ? parts : ["builtins"];
+        if (!parts.length) {
+          // A namespace-less declaration. Defold documents three different
+          // things this way and only one of them is callable API, so classify
+          // before deciding whether it is a route.
+          const kind = classifyGlobalDeclaration({ name: member, source, lifecycleNames });
+          globals.push({ name: member, source, line: lineIndex + 1, kind });
+          if (kind !== "defold-global") {
+            pending = [];
+            docs = [];
+            continue;
+          }
+        }
         functions.push({
           id: `script:${fn[1]}`,
           rawName: fn[1],
@@ -276,7 +295,54 @@ function parseArchive() {
       }
     }
   }
-  return { files, classes: [...classes.values()], aliases: [...aliases.values()], enums: [...enums.values()], functions };
+  // One Lua name can legitimately be documented more than once - the archive is
+  // a set of per-source stub files. Resolve every such group into one route,
+  // with the reason recorded, rather than emitting duplicate route ids or
+  // letting the first declaration silently win. See
+  // `scripts/lib/documented-route-duplication.mjs`.
+  const byName = new Map();
+  for (const fn of functions) {
+    if (!byName.has(fn.rawName)) byName.set(fn.rawName, []);
+    byName.get(fn.rawName).push(fn);
+  }
+  const resolved = [];
+  const duplication = [];
+  for (const [name, declarations] of byName) {
+    const outcome = resolveDocumentedDuplication(name, declarations);
+    if (declarations.length > 1 || outcome.route === null) {
+      duplication.push({
+        name,
+        reason: outcome.reason,
+        declared: declarations.length,
+        variants: outcome.variants,
+        sources: [...new Set(declarations.map((row) => row.source))]
+      });
+    }
+    if (outcome.route === null) continue;
+    resolved.push(outcome.variants.length || outcome.overloads.length
+      ? {
+          ...outcome.route,
+          ...(outcome.variants.length ? { documentedVariants: outcome.variants } : {}),
+          // Additional documented signatures, kept as the archive's own overload
+          // spelling so `generate-script-overload-dispatch.mjs` sees them the
+          // same way it sees an `---@overload` tag.
+          overloads: [
+            ...outcome.route.overloads,
+            ...outcome.overloads.map((row) =>
+              `fun(${row.parameters.map((parameter) => parameter.rawName).join(", ")})`)
+          ]
+        }
+      : outcome.route);
+  }
+  return {
+    files,
+    classes: [...classes.values()],
+    aliases: [...aliases.values()],
+    enums: [...enums.values()],
+    functions: resolved,
+    globals,
+    duplication
+  };
 }
 
 let requireBuffer;
@@ -658,7 +724,41 @@ async function output(file, contents) {
 requireBuffer = await readFile(archivePath);
 const defoldRevision = (await readFile(path.join(root, "upstream.lock"), "utf8")).match(/^DEFOLD_REV=(\w+)$/m)?.[1] ?? "unknown";
 const semanticHandleTypes = await loadSemanticHandleTypes(defoldRevision);
-const model = parseArchive();
+
+// Read from the engine, not assumed: which documented globals are callbacks the
+// user implements rather than API the user calls. See
+// `scripts/lib/script-lifecycle-callbacks.mjs` for why this is read per
+// revision and what it catches.
+const lifecycle = await readLifecycleCallbacks(path.join(root, "upstream", "defold"));
+const model = parseArchive(lifecycle.names);
+
+// Account for every namespace-less declaration, exhaustively. "We do not bind
+// this" and "we did not notice this" must never look the same, so the classes
+// have to partition the set with nothing left over.
+const globalsByKind = new Map();
+for (const row of model.globals) {
+  if (!globalsByKind.has(row.kind)) globalsByKind.set(row.kind, []);
+  globalsByKind.get(row.kind).push(row);
+}
+{
+  const classified = [...globalsByKind.values()].reduce((total, rows) => total + rows.length, 0);
+  assert.equal(classified, model.globals.length,
+    "documented globals were classified into overlapping or missing classes");
+  const unknown = [...globalsByKind.keys()].filter((kind) => ![
+    "defold-global", "lifecycle-callback", "lua-standard-library", "editor-scripting"
+  ].includes(kind));
+  assert.deepEqual(unknown, [], `unaccounted documented-global classes: ${unknown.join(", ")}`);
+}
+
+// A lifecycle callback the engine declares but the component proxy contract does
+// not support is a real gap in what a TypeScript author can write, and naming it
+// here is what keeps it from being invisible. It is reported, not fatal: Defold
+// adding a callback must not stop a revision from being derived.
+const supportedLifecycle = new Set(componentProxyConstants.sourceKinds.flatMap(
+  (kind) => kind.lifecycle.supported.map((name) => name.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`))
+));
+const unsupportedLifecycle = [...lifecycle.byProxyKind].flatMap(([proxyKind, names]) =>
+  names.filter((name) => !supportedLifecycle.has(name)).map((name) => `${proxyKind}.${name}`));
 const semanticOverrides = await loadScriptSemanticOverrides(new URL("../", import.meta.url));
 const functionsById = new Map(model.functions.map((fn) => [fn.id, fn]));
 for (const [id, override] of semanticOverrides) {
@@ -676,6 +776,16 @@ const stableIds = new Map();
 for (const fn of model.functions) {
   fn.stableId = stableBindingId(fn.id);
   const collision = stableIds.get(fn.stableId);
+  // Two different ids hashing alike and one id arriving twice are different
+  // faults with different fixes, and reporting a duplicate as a hash collision
+  // sends a reader looking at the hash function. The archive really can declare
+  // one name twice - Defold documents each script type in its own file.
+  if (collision === fn.id) {
+    throw new Error(
+      `Duplicate script route id ${fn.id}, declared at ${fn.source}:${fn.line}. ` +
+      "The reference archive documents this name more than once, so it is not a " +
+      "single callable route. Classify it in scripts/lib/script-lifecycle-callbacks.mjs.");
+  }
   if (collision) throw new Error(`Stable script binding ID collision ${hexBindingId(fn.stableId)}: ${collision} and ${fn.id}`);
   stableIds.set(fn.stableId, fn.id);
 }
@@ -696,8 +806,28 @@ assertUniquePublicScriptRoots(new Set([
     .map(({ name }) => name.slice("defold_api.".length).split(".")[0])
 ]));
 const trees = buildApiTrees(model);
-for (const rawType of semanticHandleTypes.keys()) {
-  assert.ok(model.aliases.some(({ name }) => name === rawType), `${rawType}: reviewed semantic handle type is absent from the script API aliases`);
+
+// A reviewed semantic handle type the archive does not declare at this revision
+// is a type that does not exist here - a backend that was not shipped, or a
+// spelling that changed. That is a policy difference for this revision, not an
+// error: the kind is withdrawn and the raw type falls back to opaque, the same
+// outcome as evidence going void. Refusing instead would mean no revision that
+// dropped a handle type could ever be derived.
+const absentHandleTypes = [...semanticHandleTypes.keys()]
+  .filter((rawType) => !model.aliases.some(({ name }) => name === rawType));
+for (const rawType of absentHandleTypes) {
+  semanticHandleTypes.delete(rawType);
+  recordAudit({
+    input: "packages/bindings/overrides/script-borrowed-handle-classification.json",
+    id: `${rawType}: semantic-handle-type`,
+    source: null,
+    status: VOID,
+    reason: "absent",
+    derived: defoldRevision
+  });
+}
+if (absentHandleTypes.length) {
+  console.log(`semantic handle types withdrawn at ${defoldRevision} (absent from the archive): ${absentHandleTypes.sort().join(", ")}`);
 }
 const typesSource = generateTypes(model, renderer, trees, semanticHandleTypes);
 const unresolvedTypes = [...renderer.unresolved].sort();
@@ -719,3 +849,19 @@ await output(path.join(generatedRoot, "modules.ts"), generateModules(trees));
 await output(path.join(generatedRoot, "runtime.ts"), generateRuntime());
 await output(path.join(generatedRoot, "index.ts"), generateIndex(trees));
 console.log(`${check ? "checked" : "generated"} ${model.functions.length} script functions, ${model.classes.length + model.aliases.length + model.enums.length} types, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);
+
+// The census of documented globals, always printed, so what we did not bind is
+// visible rather than inferable from a count that did not move.
+console.log(`documented globals: ${[...globalsByKind]
+  .map(([kind, rows]) => `${rows.length} ${kind}`)
+  .sort()
+  .join(", ")} (${model.globals.length} total)`);
+if (model.duplication.length) {
+  const byReason = new Map();
+  for (const row of model.duplication) byReason.set(row.reason, (byReason.get(row.reason) ?? 0) + 1);
+  console.log(`documented duplications resolved: ${[...byReason]
+    .map(([reason, count]) => `${count} ${reason}`).sort().join(", ")}`);
+}
+if (unsupportedLifecycle.length) {
+  console.log(`engine lifecycle callbacks the component contract does not support: ${unsupportedLifecycle.join(", ")}`);
+}
