@@ -63,7 +63,7 @@ try {
 for (const [name, script, key] of [
   ["target archives", "manage-native-artifacts.mjs", "targets"],
   // Host tools are reported per tool, not per host: hermesc and shermes are
-  // built per architecture and deherm-tsc cross-compiles to every host from one
+  // built per architecture and dehermc cross-compiles to every host from one
   // job, so "3/15 available" is the honest count and "which tool" is the
   // actionable half of it.
   ["host tools", "manage-host-compilers.mjs", "hosts"]

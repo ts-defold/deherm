@@ -233,7 +233,7 @@ async function runDoctor(options) {
   // Every host tool is reported by name. A rolled-up "host compilers" failure
   // would say this host cannot build without saying which of the three is
   // missing, and the three come from different builders: hermesc and shermes
-  // are LLVM built per architecture, deherm-tsc is pure Go cross-compiled for
+  // are LLVM built per architecture, dehermc is pure Go cross-compiled for
   // every host at once. Which one is absent decides what the user does next.
   for (const tool of Object.values(currentHost?.tools ?? {})) {
     if (!tool.ok) failures.push(`${tool.tool} (${hosts.currentHost}): ${tool.detail}`);

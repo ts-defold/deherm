@@ -5,8 +5,8 @@
 #
 # `gh release upload <file>#<text>` does NOT name the asset; the `#` suffix sets
 # a display LABEL, and the asset name is always the file's basename. Every lane
-# here relied on it to disambiguate, so all five host lanes uploaded an asset
-# literally named `deherm-tsc` and all ten target lanes would have uploaded
+# here relied on it to disambiguate, so all five host lanes uploaded one asset
+# named after the tool's own basename and all ten target lanes would have uploaded
 # `libhermes.a`. With `--clobber` that is not a collision that fails loudly - the
 # lanes delete and overwrite each other, and the release ends up holding one
 # arbitrary survivor per basename. The first run left two assets of fifteen

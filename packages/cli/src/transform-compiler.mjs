@@ -1,4 +1,4 @@
-// Driving deherm-tsc, déherm's precompiled TypeScript transform compiler.
+// Driving dehermc, déherm's precompiled TypeScript transform compiler.
 //
 // This is the call site that exists so ttsc's does not. Left to ttsc, reaching
 // these transforms means `loadProjectPlugins` → `buildSourcePlugin` → `go build`
@@ -17,7 +17,7 @@
 //     declares no transforms". A silent no-op is the worst possible failure for
 //     a pass whose whole job is lowering literals.
 //   * ttsc "pairs registrations with linked manifest entries by build order, not
-//     by package name" (`driver/plugins.go`). deherm-tsc links exactly one
+//     by package name" (`driver/plugins.go`). dehermc links exactly one
 //     registered plugin, so the manifest is exactly one entry and its `name` is
 //     a label for diagnostics, not a routing key.
 
@@ -42,7 +42,7 @@ export function dehermPluginManifest(config = {}) {
 const MAX_OUTPUT_BYTES = 256 * 1024 * 1024;
 
 async function invoke(command, { tsconfig, cwd, config, outDir }) {
-  const tool = await requireHostTool("deherm-tsc");
+  const tool = await requireHostTool("dehermc");
   const args = [command, "--tsconfig", tsconfig, "--plugins-json", dehermPluginManifest(config)];
   if (cwd) args.push("--cwd", cwd);
   if (outDir) args.push("--outdir", outDir);
@@ -72,7 +72,7 @@ async function invoke(command, { tsconfig, cwd, config, outDir }) {
 export async function transformProject(options) {
   const result = await invoke("transform", options);
   if (!result.ok) {
-    throw new Error(`deherm-tsc transform failed (exit ${result.status}):\n${result.stderr || result.stdout}`);
+    throw new Error(`dehermc transform failed (exit ${result.status}):\n${result.stderr || result.stdout}`);
   }
   return JSON.parse(result.stdout);
 }
@@ -94,7 +94,7 @@ export async function checkProject(options) {
 
 /** The binary's own identity, for `deherm doctor` and for build provenance. */
 export async function transformCompilerIdentity() {
-  const tool = await requireHostTool("deherm-tsc");
+  const tool = await requireHostTool("dehermc");
   const { stdout } = await run(tool.path, ["version"], { maxBuffer: 1024 * 1024 });
   return { ...JSON.parse(stdout), sha256: tool.sha256, path: tool.path };
 }

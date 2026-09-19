@@ -1,13 +1,13 @@
 // Resolving the three tools déherm runs on the user's machine.
 //
 // hermesc (TypeScript/JavaScript to Hermes bytecode), shermes (typed TypeScript
-// to C) and deherm-tsc (déherm's own TypeScript transforms) are indexed by the
+// to C) and dehermc (déherm's own TypeScript transforms) are indexed by the
 // USER'S HOST, never by the Defold bundle target Bob is building for. None of
 // them imposes a native toolchain requirement: hermesc and shermes are pure
 // compilers - text in, text out - shermes only emits C and Extender compiles it,
-// and deherm-tsc emits transformed TypeScript and a JSON manifest.
+// and dehermc emits transformed TypeScript and a JSON manifest.
 //
-// deherm-tsc is here for the same reason the other two are. ttsc builds a
+// dehermc is here for the same reason the other two are. ttsc builds a
 // plugin's Go source into a sidecar on demand and accepts source only; its own
 // `ITtscPlugin.source` documentation states it "does not accept a prebuilt
 // binary path", and its plugin cache key hashes the SHA-256 of the user's `go`
@@ -27,7 +27,7 @@
 // packages/toolchains/host-compilers.json, exactly like the target archives.
 //
 // Status is recorded per tool, not per host. The three come from different
-// builders on different schedules - deherm-tsc cross-compiles to all five hosts
+// builders on different schedules - dehermc cross-compiles to all five hosts
 // from one job, while hermesc and shermes must each be built on a runner of
 // their own architecture - so a host-wide status would either hide a published
 // tool behind an unpublished one or claim a host is ready when it is not.
@@ -121,7 +121,7 @@ export async function inspectHostCompilers(key, manifest) {
       ok: false,
       status: "unknown-host",
       tools: {},
-      detail: `déherm declares no hermesc/shermes/deherm-tsc build for ${key}; supported hosts are ${Object.keys(resolved.hosts ?? {}).join(", ")}`
+      detail: `déherm declares no hermesc/shermes/dehermc build for ${key}; supported hosts are ${Object.keys(resolved.hosts ?? {}).join(", ")}`
     };
   }
   const roots = [];
@@ -182,7 +182,7 @@ export async function hostCompilerReport(manifest) {
 
 // Fail closed. A build that silently proceeds without hermesc produces a stale
 // or absent bundle, which is exactly the "someone forgot to run déherm" failure
-// the build seam exists to prevent; one that proceeds without deherm-tsc emits a
+// the build seam exists to prevent; one that proceeds without dehermc emits a
 // program whose DefoldHash literals were never lowered and whose reachability
 // manifest was never written, which fails later and further from the cause.
 export async function requireHostCompilers() {

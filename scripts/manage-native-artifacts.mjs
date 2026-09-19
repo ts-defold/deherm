@@ -4,6 +4,8 @@ import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
 import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+
+import { downloadReleaseAssets } from "../packages/cli/src/release-assets.mjs";
 import { fileURLToPath } from "node:url";
 
 import { allTargetNames, buildInputPath, deriveBundleTargets, readBundleTargets } from "./generate-defold-bundle-targets.mjs";
@@ -270,7 +272,18 @@ else if (command === "pull") {
   const tag = tagIndex >= 0 ? args[tagIndex + 1] : `native-artifacts-${await fingerprint()}`;
   const destination = path.join(root, "build", "native-artifact-downloads", tag);
   await mkdir(destination, { recursive: true });
-  await run("gh", ["release", "download", tag, "--repo", "ts-defold/deherm", "--dir", destination, "--clobber", "--pattern", "hermes-*"]);
+  // By URL, not through `gh`: a user vendoring artifacts should not need a
+  // second CLI or an authenticated session. The asset names come from the same
+  // listing the CI completeness check uses, so no release listing is fetched to
+  // discover them - see packages/cli/src/release-assets.mjs.
+  const { missing } = await downloadReleaseAssets({
+    tag,
+    assets: await expectedAssets(),
+    destination,
+    optional: args.includes("--partial"),
+    onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
+  });
+  if (missing.length) console.log(`${missing.length} asset(s) not published for these inputs`);
   // Release assets are flat files named hermes-<target>-<library>; `install`
   // matches on the directory segment, so unpack each into its own.
   for (const file of await filesBelow(destination)) {

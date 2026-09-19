@@ -3,11 +3,11 @@
 // The host half of the toolchain, kept deliberately separate from
 // manage-native-artifacts.mjs because the two matrices are sized independently:
 // `libhermes.a` is indexed by the Defold BUNDLE TARGET Bob uploads to Extender,
-// while hermesc, shermes and deherm-tsc are indexed by the USER'S HOST. A user
+// while hermesc, shermes and dehermc are indexed by the USER'S HOST. A user
 // on macOS bundling for Android needs the macOS host tools and the Android
 // archive, and neither matrix implies the other.
 //
-// Status is recorded per tool rather than per host. deherm-tsc cross-compiles to
+// Status is recorded per tool rather than per host. dehermc cross-compiles to
 // all five hosts from one job; hermesc and shermes must each be built on a
 // runner of their own architecture. A host-wide status would either hide a
 // published tool behind an unpublished one or claim a host is ready when only
@@ -17,22 +17,24 @@ import { createHash } from "node:crypto";
 import { spawn } from "node:child_process";
 import { chmod, cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+
+import { downloadReleaseAssets } from "../packages/cli/src/release-assets.mjs";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifestPath = path.join(root, "packages", "toolchains", "host-compilers.json");
 
 // What determines the bytes of a host tool. The Hermes compilers come from the
-// pinned Hermes revision through one build script; deherm-tsc comes from its own
+// pinned Hermes revision through one build script; dehermc comes from its own
 // Go sources, its build script, and the ttsc module version pinned by the
 // lockfile. All of it is content, so a rebuild with unchanged inputs produces
 // the same fingerprint and CI can treat the release as already published.
 const inputs = [
   "upstream.lock",
   "toolchains/hermes/build-host-compilers.sh",
-  "toolchains/go/build-deherm-tsc.sh",
+  "toolchains/go/build-dehermc.sh",
   "packages/compiler/go.mod",
-  "packages/compiler/ttsc/cmd/deherm-tsc/main.go",
+  "packages/compiler/ttsc/cmd/dehermc/main.go",
   "packages/compiler/ttsc/hash-literal/hash_literal.go",
   "packages/compiler/ttsc/hash-literal/resource_name.go",
   "packages/compiler/ttsc/hash-literal/api_usage.go"
@@ -43,7 +45,7 @@ const knownStatuses = new Set(["vendored", "required-missing", "blocked"]);
 
 // A host tool small enough to be a wrapper script or a Git LFS pointer is not
 // the artifact, and pinning its digest would make the lie permanent. hermesc and
-// shermes are multi-megabyte LLVM binaries; deherm-tsc links the whole
+// shermes are multi-megabyte LLVM binaries; dehermc links the whole
 // typescript-go compiler and lands around 20 MB.
 const MINIMUM_PLAUSIBLE_BYTES = 1_000_000;
 
@@ -58,7 +60,7 @@ async function fingerprint() {
     hash.update(`${relative}\0${bytes.byteLength}\0`);
     hash.update(bytes);
   }
-  // The ttsc npm version decides which typescript-go deherm-tsc is linked
+  // The ttsc npm version decides which typescript-go dehermc is linked
   // against, so it belongs in the fingerprint even though no file above
   // contains it.
   const manifest = await readManifest();
@@ -312,7 +314,17 @@ else if (command === "pull") {
   const tag = tagIndex >= 0 ? args[tagIndex + 1] : `host-tools-${await fingerprint()}`;
   const destination = path.join(root, "build", "host-compiler-downloads", tag);
   await mkdir(destination, { recursive: true });
-  await run("gh", ["release", "download", tag, "--repo", "ts-defold/deherm", "--dir", destination, "--clobber", "--pattern", "host-compilers-*"]);
+  // By URL, not through `gh` - see packages/cli/src/release-assets.mjs. The
+  // asset names are the same listing CI checks the release against, so nothing
+  // is fetched to discover what to fetch.
+  const { missing } = await downloadReleaseAssets({
+    tag,
+    assets: await expectedAssets(),
+    destination,
+    optional: args.includes("--partial"),
+    onProgress: ({ asset, status }) => console.log(`${status === "missing" ? "absent" : "fetched"} ${asset}`)
+  });
+  if (missing.length) console.log(`${missing.length} asset(s) not published for these inputs`);
   // Release assets are flat files named host-compilers-<host>-<tool>[.exe];
   // `install` matches on the directory segment, so unpack each into its own.
   for (const file of await filesBelow(destination)) {
@@ -337,8 +349,8 @@ else if (command === "pull") {
   for (const [tool, toolRecord] of Object.entries(record.tools ?? {})) {
     if (only && tool !== only) continue;
     const name = path.basename(toolRecord.file);
-    // hermesc and shermes land in a CMake build's bin/; deherm-tsc lands
-    // wherever build-deherm-tsc.sh was pointed. Accept either shape.
+    // hermesc and shermes land in a CMake build's bin/; dehermc lands
+    // wherever build-dehermc.sh was pointed. Accept either shape.
     const candidates = [path.resolve(buildDir, "bin", name), path.resolve(buildDir, name)];
     let source = null;
     for (const candidate of candidates) {

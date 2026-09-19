@@ -11,7 +11,7 @@ name: native-artifacts
 #     native toolchain requirement on the user. Each pair must be built on a
 #     runner of its own architecture: they are LLVM, and a cross build would
 #     need a second toolchain per host.
-#   * the transform compiler - deherm-tsc, also per USER HOST, but pure Go with
+#   * the transform compiler - dehermc, also per USER HOST, but pure Go with
 #     CGO_ENABLED=0, so ONE runner cross-compiles the whole matrix. It is the
 #     cheapest artifact déherm ships and the one whose absence used to make
 #     every user's first build run a `go build` of the typescript-go compiler.
@@ -176,7 +176,7 @@ jobs:
 
   # ── The transform compiler ──────────────────────────────────────────────────
   #
-  # One job, five hosts. deherm-tsc is pure Go: CGO_ENABLED=0 links it with no C
+  # One job, five hosts. dehermc is pure Go: CGO_ENABLED=0 links it with no C
   # toolchain on any host, so GOOS/GOARCH is the whole of cross-compilation and
   # the five binaries are byte-reproducible from the same inputs. Contrast the
   # host-compilers lane below, which needs a runner per architecture because
@@ -203,11 +203,11 @@ jobs:
         with:
           go-version-file: packages/compiler/go.mod
           cache: false
-      - run: bash toolchains/go/build-deherm-tsc.sh ${{ matrix.host }} build/artifacts/host-compilers/${{ matrix.host }}/bin
+      - run: bash toolchains/go/build-dehermc.sh ${{ matrix.host }} build/artifacts/host-compilers/${{ matrix.host }}/bin
       # A binary that cannot answer for itself is not shippable. `version` is
       # the identity `deherm doctor` reads back.
       - if: matrix.host == 'linux-x64'
-        run: build/artifacts/host-compilers/linux-x64/bin/deherm-tsc version
+        run: build/artifacts/host-compilers/linux-x64/bin/dehermc version
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |

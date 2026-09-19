@@ -1,7 +1,7 @@
 ---
 type: Architecture Decision
 title: Ship precompiled target libraries and host tools, and emit C into the extension for Bob
-description: CI builds Hermes per target in containers and cross-compiles deherm-tsc for every host from one job, the package vendors those plus per-host hermesc/shermes, and generated C is assembled into the extension so Bob and Extender compile it - locally or in the cloud.
+description: CI builds Hermes per target in containers and cross-compiles dehermc for every host from one job, the package vendors those plus per-host hermesc/shermes, and generated C is assembled into the extension so Bob and Extender compile it - locally or in the cloud.
 tags: [decision, packaging, toolchain, bob, extender, static-hermes, ci]
 status: accepted
 generated: { by: claude/opus-5, at: 2026-09-18T23:50:00-04:00 }
@@ -37,7 +37,7 @@ confusion in review.
 | --- | --- | --- | --- |
 | `libhermes.a` | this project's CI | per release | Defold **target** platform |
 | `hermesc`, `shermes` | this project's CI | per release | user's **host** platform |
-| `deherm-tsc` | this project's CI | per release | user's **host** platform |
+| `dehermc` | this project's CI | per release | user's **host** platform |
 | generated C from TypeScript | `shermes` on the user's host | per build | the user's project |
 | extension objects and the engine | Bob → Extender, local or cloud | per build | target platform |
 
@@ -135,7 +135,7 @@ package raises an error naming the host, the tool, and the exact package to
 install. There is no fallback to whatever compiler happens to be on `PATH`,
 because a build that silently proceeds without `hermesc` produces exactly the
 stale-bundle failure the build seam exists to prevent, and one that proceeds
-without `deherm-tsc` emits a program whose `DefoldHash` literals were never
+without `dehermc` emits a program whose `DefoldHash` literals were never
 lowered and whose reachability manifest was never written - which fails later
 and further from its cause.
 
@@ -176,24 +176,24 @@ before any TypeScript of theirs compiles.
 
 ## So déherm ships its own compiler
 
-`packages/compiler/ttsc/cmd/deherm-tsc` is a `package main` that links ttsc's
+`packages/compiler/ttsc/cmd/dehermc` is a `package main` that links ttsc's
 linked-plugin host together with our transform package, whose `init()` registers
 it through `driver.RegisterPlugin` exactly as it does when ttsc links it as a
 contributor into its own host. It is the same program ttsc would have built,
 built once, in CI, taking the arguments we define:
 
 ```
-deherm-tsc transform --tsconfig <path> --plugins-json <manifest>
-deherm-tsc check     --tsconfig <path> --plugins-json <manifest>
-deherm-tsc build     --tsconfig <path> --outdir <dir>
-deherm-tsc serve     --tsconfig <path>
-deherm-tsc version
+dehermc transform --tsconfig <path> --plugins-json <manifest>
+dehermc check     --tsconfig <path> --plugins-json <manifest>
+dehermc build     --tsconfig <path> --outdir <dir>
+dehermc serve     --tsconfig <path>
+dehermc version
 ```
 
 The ttsc Go module, and the typescript-go checkout under its `shim/`, arrive
 with the npm package and are pinned by `pnpm-lock.yaml`. They are deliberately
 not vendored into this repository, so the compiler's provenance is stated in
-exactly one place. `toolchains/go/build-deherm-tsc.sh` reconstructs the
+exactly one place. `toolchains/go/build-dehermc.sh` reconstructs the
 workspace ttsc itself uses — every `require` in its `go.mod` is `v0.0.0` behind
 a local `replace` — rather than re-pinning typescript-go here.
 
@@ -226,13 +226,13 @@ different scratch directories produced the identical SHA-256
 
 ## Accounting
 
-`deherm-tsc` is a third host-keyed tool and is tracked exactly like the other
+`dehermc` is a third host-keyed tool and is tracked exactly like the other
 two: pinned digest, fail-closed resolution, named diagnostic when absent. It
 extends `packages/toolchains/host-compilers.json` and
 `packages/cli/src/host-compilers.mjs` rather than introducing a second resolver.
 
 Status moved from **per host** to **per tool** to accommodate it. The three
-tools come from different builders on different schedules — `deherm-tsc` reaches
+tools come from different builders on different schedules — `dehermc` reaches
 all five hosts from one job, while `hermesc` and `shermes` each need a runner of
 their own architecture — so a host-wide status would either hide a published
 tool behind an unpublished one or claim a host is ready when only part of it is.
@@ -246,7 +246,7 @@ transforms. What is **not** yet done is the consumption seam: the build path
 still reaches the transforms through `@ttsc/unplugin/esbuild`, which calls
 `loadProjectPlugins` → `buildSourcePlugin` and therefore still builds Go on the
 user's machine. Switching `packages/cli/src/dev/compiler.mjs` to spawn
-`deherm-tsc transform` and serve modules from its JSON envelope is what actually
+`dehermc transform` and serve modules from its JSON envelope is what actually
 removes the Go requirement from a user's first build; until that lands, this
 artifact is shipped and verified but not yet on the path.
 
@@ -334,7 +334,7 @@ the derived SDK pins once and feeds them to the cross builds.
 | `android` | `ubuntu-24.04` | `armv7`, `arm64`, `x86_64` via `Dockerfile.android` and the engine's NDK pin |
 | `apple` | `macos-15` | `arm64-osx`, `x86_64-osx`, `arm64-ios`, `arm64_sim-ios` via `build-apple.sh` |
 | `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts |
-| `go-compiler` | one `ubuntu-24.04` | `deherm-tsc` for all five hosts, `CGO_ENABLED=0` |
+| `go-compiler` | one `ubuntu-24.04` | `dehermc` for all five hosts, `CGO_ENABLED=0` |
 
 iOS and macOS x64 need the Apple SDKs, so they have no container path and run on
 a macOS runner. Android needs the NDK, pinned by digest inside the container
