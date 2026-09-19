@@ -23,6 +23,7 @@ output="$3"
 cmake -S "$hermes_source" -B "$work" -G Ninja \
   -DCMAKE_BUILD_TYPE=Release \
   -DHERMES_ENABLE_TEST_SUITE=OFF \
+  -DHERMES_ENABLE_NAPI=OFF \
   -DHERMES_ENABLE_INTL=OFF
 cmake --build "$work" --target hermesc shermes --parallel
 

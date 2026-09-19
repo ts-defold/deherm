@@ -13,6 +13,7 @@ WORKDIR /work
 RUN cmake -S /src/hermes -B /work/host -G Ninja \
       -DCMAKE_BUILD_TYPE=Release \
       -DHERMES_ENABLE_TEST_SUITE=OFF \
+      -DHERMES_ENABLE_NAPI=OFF \
       -DHERMES_ENABLE_INTL=OFF && \
     cmake --build /work/host --target hermesc shermes --parallel
 
