@@ -95,18 +95,40 @@ Reachability is still computed in development, but only to *report*: the
 operator console can show what a release build would retain, long before anyone
 produces one. It never prunes what is linked.
 
-## The asymmetry this creates, and the gate it demands
+## One projection among several, by design
 
-Development and release therefore do not link the same thing, and that is the
-one place this design can bite. A route exercised all through development can be
-absent from release if the checker failed to see its call site - a dynamic
-index, a computed member, a call reached only through a code path ttsc could not
-resolve.
+Development-full and release-pruned are not a build and a variant of it. They
+are two projections of one IR, and so is the browser/Wasm build, and so is each
+native platform a release targets.
 
-This is precisely why dynamic access must be *declared and diagnosed* rather
-than inferred, and why conformance evidence has to be attributed to the pruned
-projection. A release build is not a subset of a development build that has been
-tested; it is a different artifact, and it carries its own evidence.
+A projection is selected by four parameters and nothing else:
+
+| Parameter | Development native | Release native | Release browser |
+| --- | --- | --- | --- |
+| Runtime | `hermes` | `hermes` | `browser` |
+| Transport per route | `jsi` | highest tier the contract allows | `direct-memory` |
+| Reachable set | complete | ttsc-resolved | ttsc-resolved |
+| Profile | engine-detected | engine-detected | browser |
+
+Nothing in the pipeline is special-cased for any of them. The canonical plan
+holds every unit's disposition per transport, contracts and marshalling programs
+are interned so a shape is described once and reused, target capabilities are
+declared as data, and reachability is a filter applied at the end. That is what
+makes a Wasm build the same operation as an arm64 release rather than a separate
+port, and it is why adding a platform is a capability declaration plus a
+`libhermes.a`, not new code paths.
+
+The consequence is not a caveat to watch for; it falls out of the design.
+**Every projection carries its own evidence**, because every projection is a
+first-class artifact rather than a filtered copy of another. The completion
+matrix is already per-target for this reason. A route proven on `jsi` is not
+thereby proven on `direct-memory`, and one retained in a development link is not
+thereby present in a release one.
+
+What still has to be enforced is only that the projections agree where they
+claim to: the ttsc symbol set and the bundler module graph must not disagree
+about what a build reaches, and dynamic access must be declared rather than
+inferred, so a projection's reachable set is a statement rather than a guess.
 
 # Native lowering as a tier, not a target
 
