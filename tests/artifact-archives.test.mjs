@@ -239,6 +239,29 @@ test("the Windows archiver protects MSVC's /OUT option from Git Bash path rewrit
   ]);
 });
 
+test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () => {
+  const source = await readFile(
+    path.join(repositoryRoot, "toolchains/hermes/windows-msvc.cmake"),
+    "utf8"
+  );
+
+  // A target triple alone is insufficient: clang otherwise reaches the host's
+  // Linux C++ headers, and Hermes' first `<atomic>` probe fails. These are the
+  // environment-owned roots in Defold's Extender win32 `systemIncludes`.
+  for (const suffix of [
+    "$ENV{WINDOWS_MSVC_DIR}/include",
+    "$ENV{WINDOWS_MSVC_DIR}/atlmfc/include",
+    "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/ucrt",
+    "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/winrt",
+    "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/um",
+    "$ENV{WINDOWS_SDK_DIR}/Include/$ENV{WINDOWS_SDK_VERSION}/shared"
+  ]) {
+    assert.match(source, new RegExp(suffix.replace(/[{}$]/g, "\\$&")));
+  }
+  assert.match(source, /-nostdinc\+\+/);
+  assert.match(source, /if\(NOT IS_DIRECTORY "\$\{include_root\}"\)/);
+});
+
 test("the POSIX packager merges explicit static runtime dependencies", async (t) => {
   const candidates = ["llvm-ar", "/opt/homebrew/opt/llvm/bin/llvm-ar", "/usr/local/opt/llvm/bin/llvm-ar", "ar"];
   let arTool = null;
