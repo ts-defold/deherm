@@ -60,7 +60,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: end-to-end-${{ github.ref }}
+  # A cheap push proof and a full artifact-dispatched/Bob proof are different
+  # lanes. A follow-up push may replace an older cheap run, but it must never
+  # cancel the full matrix that native-artifacts started after publication.
+  group: end-to-end-${{ github.ref }}-${{ github.event_name == 'push' && 'push' || 'full' }}
   cancel-in-progress: true
 
 jobs:

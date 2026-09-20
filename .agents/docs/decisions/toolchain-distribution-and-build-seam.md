@@ -183,7 +183,10 @@ consumer check. A push-time end-to-end run exercises the current Linux host
 assets when both content-addressed releases already contain them. If the same
 push rotated a host-tool fingerprint, it defers only that host-tool stage; the
 native-artifacts summary verifies every row and dispatches the full end-to-end
-workflow after publication. The dispatched run never defers the stage.
+workflow after publication. The dispatched run never defers the stage. Cheap
+push proofs and full dispatched proofs use separate concurrency keys, so a
+follow-up push may replace an obsolete cheap run but cannot cancel the Bob
+matrix consuming the just-published artifacts.
 
 The published Linux compilers are built on `ubuntu-22.04` runners, which sets
 their glibc floor at 2.35.
