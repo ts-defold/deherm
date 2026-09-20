@@ -52,6 +52,8 @@ shrinks as implementation lands.
 
 ## 1. Complete generated exact-call verification
 
+Public ledger: [#92 Complete generated exact-call verification across emitted transports](https://github.com/ts-defold/deherm/issues/92).
+
 ### Lua/script surface
 
 1. Generate one verification vector per emitted route from the same projection

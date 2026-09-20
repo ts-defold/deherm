@@ -51,31 +51,77 @@ const char* handleName(ScriptHandleKind kind, uint8_t semantic) {
   return "unknown";
 }
 
+void appendNumber(double value, std::string& out) {
+  char buffer[48];
+  std::snprintf(buffer, sizeof(buffer), "%.0f", value);
+  out += buffer;
+}
+
+uint64_t u64Sentinel(uint32_t seed) {
+  return (static_cast<uint64_t>(seed + UINT32_C(0x10000)) << 32u) | seed;
+}
+
+void appendU64(uint64_t value, std::string& out) {
+  char buffer[32];
+  std::snprintf(buffer, sizeof(buffer), "%llu", static_cast<unsigned long long>(value));
+  out += buffer;
+}
+
 void renderValue(const ScriptValue& value, std::string& out, uint32_t depth) {
   if (depth > 8) { out += "deep"; return; }
   switch (value.tag) {
     case ScriptValueTag::kUndefined: out += "undef"; return;
     case ScriptValueTag::kNull: out += "null"; return;
-    case ScriptValueTag::kBoolean: out += "bool"; return;
-    case ScriptValueTag::kNumber: out += "num"; return;
+    case ScriptValueTag::kBoolean:
+      out += "bool:"; out += value.number != 0.0 ? "1" : "0"; return;
+    case ScriptValueTag::kNumber:
+      out += "num:"; appendNumber(value.number, out); return;
     case ScriptValueTag::kString: {
-      char buffer[32];
-      std::snprintf(buffer, sizeof(buffer), "str:%u", value.length);
-      out += buffer;
+      out += "str:";
+      if (value.data && value.length) out.append(static_cast<const char*>(value.data), value.length);
       return;
     }
     case ScriptValueTag::kHandle:
-      if (value.handleKind == ScriptHandleKind::kHash) { out += "hash"; return; }
-      if (value.handleKind == ScriptHandleKind::kUrl) { out += "url"; return; }
+      if (value.handleKind == ScriptHandleKind::kHash) {
+        out += "hash:"; appendU64(value.payload, out); return;
+      }
+      if (value.handleKind == ScriptHandleKind::kUrl) {
+        out += "url:";
+        const auto* slot = static_cast<const ScriptUrlArena<32>::Slot*>(value.data);
+        if (!slot) { out += "invalid"; return; }
+        appendU64(slot->value.socket, out); out += ",";
+        appendU64(slot->value.reserved, out); out += ",";
+        appendU64(slot->value.path, out); out += ",";
+        appendU64(slot->value.fragment, out);
+        return;
+      }
       out += "h:";
       out += handleName(value.handleKind, value.reserved);
       return;
     case ScriptValueTag::kDefoldValue:
       switch (value.defoldKind) {
-        case ScriptDefoldValueKind::kVector3: out += "dv:v3"; return;
-        case ScriptDefoldValueKind::kVector4: out += "dv:v4"; return;
-        case ScriptDefoldValueKind::kQuaternion: out += "dv:quat"; return;
-        case ScriptDefoldValueKind::kMatrix4: out += "dv:mat4"; return;
+        case ScriptDefoldValueKind::kVector3:
+        case ScriptDefoldValueKind::kVector4:
+        case ScriptDefoldValueKind::kQuaternion: {
+          const uint32_t lanes = value.defoldKind == ScriptDefoldValueKind::kVector3 ? 3 : 4;
+          out += value.defoldKind == ScriptDefoldValueKind::kVector3 ? "dv:v3:"
+              : value.defoldKind == ScriptDefoldValueKind::kVector4 ? "dv:v4:" : "dv:quat:";
+          for (uint32_t lane = 0; lane < lanes; ++lane) {
+            if (lane) out += ",";
+            appendNumber(value.defoldValue[lane], out);
+          }
+          return;
+        }
+        case ScriptDefoldValueKind::kMatrix4: {
+          out += "dv:mat4:";
+          const auto* slot = static_cast<const ScriptMatrix4Arena::Slot*>(value.data);
+          if (!slot) { out += "invalid"; return; }
+          for (uint32_t lane = 0; lane < 16; ++lane) {
+            if (lane) out += ",";
+            appendNumber(slot->elements[lane], out);
+          }
+          return;
+        }
         default: out += "dv:unknown"; return;
       }
     case ScriptValueTag::kTable: {
@@ -174,29 +220,52 @@ bool matches(const ScriptValue& value, uint32_t shapeIndex, std::string& failure
   }
 }
 
+bool InvokeRecordedCallback(
+    void*, const ScriptCallFrame*, void* consumeContext,
+    ScriptCallbackConsume consume, char*, size_t) noexcept {
+  ScriptCallFrame results{};
+  return !consume || consume(consumeContext, &results);
+}
+
+void RetainRecordedCallback(void*) noexcept {}
+void ReleaseRecordedCallback(void*) noexcept {}
+
+ScriptCallback gRecordedCallback{
+  nullptr, InvokeRecordedCallback, RetainRecordedCallback, ReleaseRecordedCallback
+};
+
+uint32_t childSentinel(uint32_t seed, uint32_t index) {
+  return ((seed * 17u + index + 1u) % 10000u) + 1u;
+}
+
 struct Synthesizer {
   ScriptCallFrame* frame;
   std::string failure;
 
-  bool value(uint32_t shapeIndex, ScriptValue* out) {
+  bool value(uint32_t shapeIndex, ScriptValue* out, uint32_t seed) {
     const auto& shape = kDehermRecordingShapes[shapeIndex];
     *out = {};
     switch (shape.code) {
       case DEHERM_RECORDING_SHAPE_UNDEFINED: out->tag = ScriptValueTag::kUndefined; return true;
       case DEHERM_RECORDING_SHAPE_NULL: out->tag = ScriptValueTag::kNull; return true;
       case DEHERM_RECORDING_SHAPE_BOOLEAN:
-        out->tag = ScriptValueTag::kBoolean; out->number = 1.0; return true;
+        out->tag = ScriptValueTag::kBoolean; out->number = seed % 2u; return true;
       case DEHERM_RECORDING_SHAPE_NUMBER:
-        out->tag = ScriptValueTag::kNumber; out->number = 1.0; return true;
-      case DEHERM_RECORDING_SHAPE_STRING: return string("deherm", out);
+        out->tag = ScriptValueTag::kNumber; out->number = seed; return true;
+      case DEHERM_RECORDING_SHAPE_STRING: {
+        const std::string literal = "d" + std::to_string(seed);
+        return string(literal.c_str(), out);
+      }
       case DEHERM_RECORDING_SHAPE_HASH:
         out->tag = ScriptValueTag::kHandle;
         out->handleKind = ScriptHandleKind::kHash;
-        out->payload = UINT64_C(0x123456789abcdef0);
+        out->payload = u64Sentinel(seed);
         return true;
       case DEHERM_RECORDING_SHAPE_URL:
         if (!frame->urlArena) { failure = "result-url-needs-a-frame-url-arena"; return false; }
-        if (!frame->urlArena->store({1, 0, 2, 3}, out)) {
+        if (!frame->urlArena->store({
+            u64Sentinel(seed), u64Sentinel(seed + 1u),
+            u64Sentinel(seed + 2u), u64Sentinel(seed + 3u)}, out)) {
           failure = "result-url-arena-exhausted";
           return false;
         }
@@ -217,19 +286,23 @@ struct Synthesizer {
       case DEHERM_RECORDING_SHAPE_VECTOR3:
         out->tag = ScriptValueTag::kDefoldValue;
         out->defoldKind = ScriptDefoldValueKind::kVector3;
-        out->defoldValue[0] = 1.0f; out->defoldValue[1] = 2.0f; out->defoldValue[2] = 3.0f;
+        out->defoldValue[0] = static_cast<float>(seed);
+        out->defoldValue[1] = static_cast<float>(seed + 1u);
+        out->defoldValue[2] = static_cast<float>(seed + 2u);
         return true;
       case DEHERM_RECORDING_SHAPE_VECTOR4:
       case DEHERM_RECORDING_SHAPE_QUATERNION:
         out->tag = ScriptValueTag::kDefoldValue;
         out->defoldKind = shape.code == DEHERM_RECORDING_SHAPE_VECTOR4
             ? ScriptDefoldValueKind::kVector4 : ScriptDefoldValueKind::kQuaternion;
-        for (uint32_t lane = 0; lane < 4; ++lane) out->defoldValue[lane] = static_cast<float>(lane + 1);
+        for (uint32_t lane = 0; lane < 4; ++lane) {
+          out->defoldValue[lane] = static_cast<float>(seed + lane);
+        }
         return true;
       case DEHERM_RECORDING_SHAPE_MATRIX4: {
         if (!frame->matrix4Arena) { failure = "result-matrix4-needs-a-frame-arena"; return false; }
         float elements[16];
-        for (uint32_t lane = 0; lane < 16; ++lane) elements[lane] = static_cast<float>(lane);
+        for (uint32_t lane = 0; lane < 16; ++lane) elements[lane] = static_cast<float>(seed + lane);
         if (!frame->matrix4Arena->store(elements, out)) {
           failure = "result-matrix4-arena-exhausted";
           return false;
@@ -241,7 +314,8 @@ struct Synthesizer {
         ScriptTableEntry entry{};
         entry.key.tag = ScriptValueTag::kNumber;
         entry.key.number = 1.0;
-        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.value)) return false;
+        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.value,
+            childSentinel(seed, 0))) return false;
         return table(ScriptTableKind::kSequence, 1, &entry, out);
       }
       case DEHERM_RECORDING_SHAPE_RECORD: {
@@ -249,17 +323,23 @@ struct Synthesizer {
         for (uint32_t index = 0; index < shape.childCount; ++index) {
           const uint32_t child = kDehermRecordingShapeRefs[shape.childFirst + index];
           if (!string(textOf(kDehermRecordingShapes[child].key), &entries[index].key)) return false;
-          if (!value(child, &entries[index].value)) return false;
+          if (!value(child, &entries[index].value, childSentinel(seed, index))) return false;
         }
         return table(ScriptTableKind::kRecord, shape.childCount,
             entries.empty() ? nullptr : entries.data(), out);
       }
       case DEHERM_RECORDING_SHAPE_MAP: {
         ScriptTableEntry entry{};
-        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.key)) return false;
-        if (!value(kDehermRecordingShapeRefs[shape.childFirst + 1], &entry.value)) return false;
+        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.key,
+            childSentinel(seed, 0))) return false;
+        if (!value(kDehermRecordingShapeRefs[shape.childFirst + 1], &entry.value,
+            childSentinel(seed, 1))) return false;
         return table(ScriptTableKind::kMap, 1, &entry, out);
       }
+      case DEHERM_RECORDING_SHAPE_CALLBACK:
+        out->tag = ScriptValueTag::kCallback;
+        out->data = &gRecordedCallback;
+        return true;
       default:
         failure = "unsupported-declared-result-shape";
         return false;
@@ -309,6 +389,28 @@ struct Synthesizer {
 };
 
 bool Dispatch(void*, ScriptCallFrame* frame) {
+  for (uint32_t index = 0; index < DEHERM_RECORDING_HANDLE_SEED_COUNT; ++index) {
+    const auto& seed = kDehermRecordingHandleSeeds[index];
+    if (seed.stableId != frame->stableId) continue;
+    if (frame->argumentCount != 0 || !frame->results || frame->resultCapacity < 1) {
+      std::snprintf(gLastError, sizeof(gLastError), "recording handle seed received an invalid frame");
+      ++gViolations;
+      return false;
+    }
+    ScriptValue& result = frame->results[0];
+    result = {};
+    result.tag = ScriptValueTag::kHandle;
+    result.handleKind = seed.shapeCode == DEHERM_RECORDING_SHAPE_GUI_NODE
+        ? ScriptHandleKind::kGuiNode
+        : seed.shapeCode == DEHERM_RECORDING_SHAPE_USERDATA
+            ? ScriptHandleKind::kLuaUserdata
+            : ScriptHandleKind::kLuaSemanticHandle;
+    result.reserved = seed.semantic;
+    result.length = 1;
+    result.payload = (static_cast<uint64_t>(index + 1) << 32u) | UINT64_C(1);
+    frame->resultCount = 1;
+    return true;
+  }
   const uint32_t route = deherm_recording_find_route(frame->stableId);
   if (route >= DEHERM_RECORDING_ROUTE_COUNT) {
     std::snprintf(gLastError, sizeof(gLastError), "recording engine has no route for stable id %u",
@@ -355,7 +457,8 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
 
   Synthesizer synthesizer{frame, {}};
   for (uint32_t index = 0; index < descriptor.resultCount; ++index) {
-    if (!synthesizer.value(kDehermRecordingShapeRefs[descriptor.resultFirst + index], &frame->results[index])) {
+    if (!synthesizer.value(kDehermRecordingShapeRefs[descriptor.resultFirst + index],
+        &frame->results[index], 257u + index)) {
       observation.violation = synthesizer.failure;
       ++gViolations;
       std::snprintf(gLastError, sizeof(gLastError), "recording result synthesis failed: %s",

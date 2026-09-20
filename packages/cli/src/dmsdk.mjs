@@ -38,14 +38,25 @@ function validateUsageDocument(value, source) {
   return value;
 }
 
-async function writeAtomically(target, contents) {
-  await mkdir(path.dirname(target), { recursive: true });
-  const temporary = `${target}.deherm-tmp-${process.pid}`;
+async function writePublishedSet(members, sentinel) {
+  const staged = members.map(([target, contents]) => ({
+    target,
+    contents,
+    temporary: `${target}.deherm-tmp-${process.pid}`,
+  }));
   try {
-    await writeFile(temporary, contents);
-    await rename(temporary, target);
+    await Promise.all(staged.map(async ({ target, contents, temporary }) => {
+      await mkdir(path.dirname(target), { recursive: true });
+      await writeFile(temporary, contents);
+    }));
+    for (const member of staged.filter(({ target }) => target !== sentinel)) {
+      await rename(member.temporary, member.target);
+    }
+    const published = staged.find(({ target }) => target === sentinel);
+    if (!published) throw new Error(`dmSDK output set has no sentinel ${sentinel}`);
+    await rename(published.temporary, published.target);
   } finally {
-    await rm(temporary, { force: true });
+    await Promise.all(staged.map(({ temporary }) => rm(temporary, { force: true })));
   }
 }
 
@@ -64,6 +75,10 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
   const usagePath = path.resolve(usage);
   const outputPath = path.resolve(output);
   const reportPath = `${outputPath}.json`;
+  const outputExtension = path.extname(outputPath);
+  const outputStem = outputExtension ? outputPath.slice(0, -outputExtension.length) : outputPath;
+  const verificationSourcePath = `${outputStem}.verify${outputExtension || ".cpp"}`;
+  const verificationReportPath = `${outputStem}.verify.json`;
   const catalogPath = await resolveCatalogPath({ catalog, project, usagePath });
   const [usageSource, catalogSource] = await Promise.all([
     readFile(usagePath, "utf8"),
@@ -88,36 +103,56 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     catalogSha256: document.catalogSha256
   });
   const source = generated.source.endsWith("\n") ? generated.source : `${generated.source}\n`;
+  const verificationSource = generated.verificationSource.endsWith("\n")
+    ? generated.verificationSource
+    : `${generated.verificationSource}\n`;
+  const verificationReport = `${JSON.stringify(generated.verification, null, 2)}\n`;
   const report = `${JSON.stringify({
     schemaVersion: 1,
     source: "deherm-dmsdk-usage-materializer",
     usageSha256: sha256(usageSource),
     catalogSourceSha256: sha256(catalogSource),
     outputSha256: sha256(source),
+    verificationOutputSha256: sha256(verificationSource),
+    verificationReportSha256: sha256(verificationReport),
+    verificationManifestSha256: generated.verification.manifestSha256,
     catalogSha256: generated.catalogSha256,
     provider: generated.provider,
     materializedCount: generated.manifest.length,
     declarations: generated.manifest,
   }, null, 2)}\n`;
   if (check) {
-    const [existingSource, existingReport] = await Promise.all([
+    const [existingSource, existingReport, existingVerificationSource, existingVerificationReport] = await Promise.all([
       readFile(outputPath, "utf8"),
       readFile(reportPath, "utf8"),
+      readFile(verificationSourcePath, "utf8"),
+      readFile(verificationReportPath, "utf8"),
     ]);
     if (existingSource !== source) throw new Error(`${outputPath} is stale; rerun dmSDK materialization`);
     if (existingReport !== report) throw new Error(`${reportPath} is stale; rerun dmSDK materialization`);
+    if (existingVerificationSource !== verificationSource) {
+      throw new Error(`${verificationSourcePath} is stale; rerun dmSDK materialization`);
+    }
+    if (existingVerificationReport !== verificationReport) {
+      throw new Error(`${verificationReportPath} is stale; rerun dmSDK materialization`);
+    }
   } else {
-    await Promise.all([
-      writeAtomically(outputPath, source),
-      writeAtomically(reportPath, report),
-    ]);
+    await writePublishedSet([
+      [outputPath, source],
+      [verificationSourcePath, verificationSource],
+      [verificationReportPath, verificationReport],
+      [reportPath, report],
+    ], reportPath);
   }
   return {
     usage: usagePath,
     catalog: catalogPath,
     output: outputPath,
     report: reportPath,
+    verificationSource: verificationSourcePath,
+    verificationReport: verificationReportPath,
     provider: generated.provider,
+    verificationProvider: generated.verification.provider,
     materializedCount: generated.manifest.length,
     checked: check,
   };

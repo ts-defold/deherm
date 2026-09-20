@@ -130,6 +130,8 @@ function renderHeader(model, native, counts) {
 #define DEHERM_RECORDING_TEXT_COUNT ${counts.text}u
 #define DEHERM_RECORDING_TRANSPORT_COUNT ${transportOrder.length}u
 #define DEHERM_RECORDING_SEMANTIC_HANDLE_COUNT ${counts.semanticNames}u
+#define DEHERM_RECORDING_HANDLE_SEED_COUNT ${model.handleSeeds.length}u
+#define DEHERM_RECORDING_HANDLE_SEED_STORAGE_COUNT ${Math.max(1, model.handleSeeds.length)}u
 
 enum DehermRecordingShapeCode {
 ${codes}
@@ -166,6 +168,12 @@ typedef struct DehermRecordingRoute {
   int32_t reason[DEHERM_RECORDING_TRANSPORT_COUNT];
 } DehermRecordingRoute;
 
+typedef struct DehermRecordingHandleSeed {
+  uint32_t stableId;
+  uint8_t shapeCode;
+  uint8_t semantic;
+} DehermRecordingHandleSeed;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -177,6 +185,7 @@ extern const DehermRecordingRoute kDehermRecordingRoutes[DEHERM_RECORDING_ROUTE_
 extern const uint32_t kDehermRecordingOrder[DEHERM_RECORDING_ROUTE_COUNT];
 extern const char* const kDehermRecordingSemanticHandleNames[DEHERM_RECORDING_SEMANTIC_HANDLE_COUNT];
 extern const char* const kDehermRecordingTransportNames[DEHERM_RECORDING_TRANSPORT_COUNT];
+extern const DehermRecordingHandleSeed kDehermRecordingHandleSeeds[DEHERM_RECORDING_HANDLE_SEED_STORAGE_COUNT];
 
 /** Installs the recording provider underneath the real script bridge seam. */
 void deherm_recording_install(void);
@@ -226,6 +235,8 @@ function renderTables(model, native, shapeRefs) {
   const order = model.order.map((id) => `  ${routeIndex.get(id)}u`).join(",\n");
   const semantic = model.semanticHandleKindNames.map((name) => `  ${cString(name)}`).join(",\n");
   const transports = transportOrder.map((transport) => `  ${cString(transport)}`).join(",\n");
+  const seeds = model.handleSeeds.map((seed) =>
+    `  {${seed.stableId}u, ${seed.shapeCode}, ${seed.semantic}}`).join(",\n");
   return `${banner}
 #include "generated_script_recording_engine.h"
 
@@ -257,6 +268,10 @@ ${semantic}
 
 const char* const kDehermRecordingTransportNames[DEHERM_RECORDING_TRANSPORT_COUNT] = {
 ${transports}
+};
+
+const DehermRecordingHandleSeed kDehermRecordingHandleSeeds[DEHERM_RECORDING_HANDLE_SEED_STORAGE_COUNT] = {
+${seeds || "  {0u, 0u, 0u}"}
 };
 
 }  // extern "C"
@@ -316,31 +331,77 @@ const char* handleName(ScriptHandleKind kind, uint8_t semantic) {
   return "unknown";
 }
 
+void appendNumber(double value, std::string& out) {
+  char buffer[48];
+  std::snprintf(buffer, sizeof(buffer), "%.0f", value);
+  out += buffer;
+}
+
+uint64_t u64Sentinel(uint32_t seed) {
+  return (static_cast<uint64_t>(seed + UINT32_C(0x10000)) << 32u) | seed;
+}
+
+void appendU64(uint64_t value, std::string& out) {
+  char buffer[32];
+  std::snprintf(buffer, sizeof(buffer), "%llu", static_cast<unsigned long long>(value));
+  out += buffer;
+}
+
 void renderValue(const ScriptValue& value, std::string& out, uint32_t depth) {
   if (depth > 8) { out += "deep"; return; }
   switch (value.tag) {
     case ScriptValueTag::kUndefined: out += "undef"; return;
     case ScriptValueTag::kNull: out += "null"; return;
-    case ScriptValueTag::kBoolean: out += "bool"; return;
-    case ScriptValueTag::kNumber: out += "num"; return;
+    case ScriptValueTag::kBoolean:
+      out += "bool:"; out += value.number != 0.0 ? "1" : "0"; return;
+    case ScriptValueTag::kNumber:
+      out += "num:"; appendNumber(value.number, out); return;
     case ScriptValueTag::kString: {
-      char buffer[32];
-      std::snprintf(buffer, sizeof(buffer), "str:%u", value.length);
-      out += buffer;
+      out += "str:";
+      if (value.data && value.length) out.append(static_cast<const char*>(value.data), value.length);
       return;
     }
     case ScriptValueTag::kHandle:
-      if (value.handleKind == ScriptHandleKind::kHash) { out += "hash"; return; }
-      if (value.handleKind == ScriptHandleKind::kUrl) { out += "url"; return; }
+      if (value.handleKind == ScriptHandleKind::kHash) {
+        out += "hash:"; appendU64(value.payload, out); return;
+      }
+      if (value.handleKind == ScriptHandleKind::kUrl) {
+        out += "url:";
+        const auto* slot = static_cast<const ScriptUrlArena<32>::Slot*>(value.data);
+        if (!slot) { out += "invalid"; return; }
+        appendU64(slot->value.socket, out); out += ",";
+        appendU64(slot->value.reserved, out); out += ",";
+        appendU64(slot->value.path, out); out += ",";
+        appendU64(slot->value.fragment, out);
+        return;
+      }
       out += "h:";
       out += handleName(value.handleKind, value.reserved);
       return;
     case ScriptValueTag::kDefoldValue:
       switch (value.defoldKind) {
-        case ScriptDefoldValueKind::kVector3: out += "dv:v3"; return;
-        case ScriptDefoldValueKind::kVector4: out += "dv:v4"; return;
-        case ScriptDefoldValueKind::kQuaternion: out += "dv:quat"; return;
-        case ScriptDefoldValueKind::kMatrix4: out += "dv:mat4"; return;
+        case ScriptDefoldValueKind::kVector3:
+        case ScriptDefoldValueKind::kVector4:
+        case ScriptDefoldValueKind::kQuaternion: {
+          const uint32_t lanes = value.defoldKind == ScriptDefoldValueKind::kVector3 ? 3 : 4;
+          out += value.defoldKind == ScriptDefoldValueKind::kVector3 ? "dv:v3:"
+              : value.defoldKind == ScriptDefoldValueKind::kVector4 ? "dv:v4:" : "dv:quat:";
+          for (uint32_t lane = 0; lane < lanes; ++lane) {
+            if (lane) out += ",";
+            appendNumber(value.defoldValue[lane], out);
+          }
+          return;
+        }
+        case ScriptDefoldValueKind::kMatrix4: {
+          out += "dv:mat4:";
+          const auto* slot = static_cast<const ScriptMatrix4Arena::Slot*>(value.data);
+          if (!slot) { out += "invalid"; return; }
+          for (uint32_t lane = 0; lane < 16; ++lane) {
+            if (lane) out += ",";
+            appendNumber(slot->elements[lane], out);
+          }
+          return;
+        }
         default: out += "dv:unknown"; return;
       }
     case ScriptValueTag::kTable: {
@@ -439,29 +500,52 @@ bool matches(const ScriptValue& value, uint32_t shapeIndex, std::string& failure
   }
 }
 
+bool InvokeRecordedCallback(
+    void*, const ScriptCallFrame*, void* consumeContext,
+    ScriptCallbackConsume consume, char*, size_t) noexcept {
+  ScriptCallFrame results{};
+  return !consume || consume(consumeContext, &results);
+}
+
+void RetainRecordedCallback(void*) noexcept {}
+void ReleaseRecordedCallback(void*) noexcept {}
+
+ScriptCallback gRecordedCallback{
+  nullptr, InvokeRecordedCallback, RetainRecordedCallback, ReleaseRecordedCallback
+};
+
+uint32_t childSentinel(uint32_t seed, uint32_t index) {
+  return ((seed * 17u + index + 1u) % 10000u) + 1u;
+}
+
 struct Synthesizer {
   ScriptCallFrame* frame;
   std::string failure;
 
-  bool value(uint32_t shapeIndex, ScriptValue* out) {
+  bool value(uint32_t shapeIndex, ScriptValue* out, uint32_t seed) {
     const auto& shape = kDehermRecordingShapes[shapeIndex];
     *out = {};
     switch (shape.code) {
       case DEHERM_RECORDING_SHAPE_UNDEFINED: out->tag = ScriptValueTag::kUndefined; return true;
       case DEHERM_RECORDING_SHAPE_NULL: out->tag = ScriptValueTag::kNull; return true;
       case DEHERM_RECORDING_SHAPE_BOOLEAN:
-        out->tag = ScriptValueTag::kBoolean; out->number = 1.0; return true;
+        out->tag = ScriptValueTag::kBoolean; out->number = seed % 2u; return true;
       case DEHERM_RECORDING_SHAPE_NUMBER:
-        out->tag = ScriptValueTag::kNumber; out->number = 1.0; return true;
-      case DEHERM_RECORDING_SHAPE_STRING: return string("deherm", out);
+        out->tag = ScriptValueTag::kNumber; out->number = seed; return true;
+      case DEHERM_RECORDING_SHAPE_STRING: {
+        const std::string literal = "d" + std::to_string(seed);
+        return string(literal.c_str(), out);
+      }
       case DEHERM_RECORDING_SHAPE_HASH:
         out->tag = ScriptValueTag::kHandle;
         out->handleKind = ScriptHandleKind::kHash;
-        out->payload = UINT64_C(0x123456789abcdef0);
+        out->payload = u64Sentinel(seed);
         return true;
       case DEHERM_RECORDING_SHAPE_URL:
         if (!frame->urlArena) { failure = "result-url-needs-a-frame-url-arena"; return false; }
-        if (!frame->urlArena->store({1, 0, 2, 3}, out)) {
+        if (!frame->urlArena->store({
+            u64Sentinel(seed), u64Sentinel(seed + 1u),
+            u64Sentinel(seed + 2u), u64Sentinel(seed + 3u)}, out)) {
           failure = "result-url-arena-exhausted";
           return false;
         }
@@ -482,19 +566,23 @@ struct Synthesizer {
       case DEHERM_RECORDING_SHAPE_VECTOR3:
         out->tag = ScriptValueTag::kDefoldValue;
         out->defoldKind = ScriptDefoldValueKind::kVector3;
-        out->defoldValue[0] = 1.0f; out->defoldValue[1] = 2.0f; out->defoldValue[2] = 3.0f;
+        out->defoldValue[0] = static_cast<float>(seed);
+        out->defoldValue[1] = static_cast<float>(seed + 1u);
+        out->defoldValue[2] = static_cast<float>(seed + 2u);
         return true;
       case DEHERM_RECORDING_SHAPE_VECTOR4:
       case DEHERM_RECORDING_SHAPE_QUATERNION:
         out->tag = ScriptValueTag::kDefoldValue;
         out->defoldKind = shape.code == DEHERM_RECORDING_SHAPE_VECTOR4
             ? ScriptDefoldValueKind::kVector4 : ScriptDefoldValueKind::kQuaternion;
-        for (uint32_t lane = 0; lane < 4; ++lane) out->defoldValue[lane] = static_cast<float>(lane + 1);
+        for (uint32_t lane = 0; lane < 4; ++lane) {
+          out->defoldValue[lane] = static_cast<float>(seed + lane);
+        }
         return true;
       case DEHERM_RECORDING_SHAPE_MATRIX4: {
         if (!frame->matrix4Arena) { failure = "result-matrix4-needs-a-frame-arena"; return false; }
         float elements[16];
-        for (uint32_t lane = 0; lane < 16; ++lane) elements[lane] = static_cast<float>(lane);
+        for (uint32_t lane = 0; lane < 16; ++lane) elements[lane] = static_cast<float>(seed + lane);
         if (!frame->matrix4Arena->store(elements, out)) {
           failure = "result-matrix4-arena-exhausted";
           return false;
@@ -506,7 +594,8 @@ struct Synthesizer {
         ScriptTableEntry entry{};
         entry.key.tag = ScriptValueTag::kNumber;
         entry.key.number = 1.0;
-        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.value)) return false;
+        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.value,
+            childSentinel(seed, 0))) return false;
         return table(ScriptTableKind::kSequence, 1, &entry, out);
       }
       case DEHERM_RECORDING_SHAPE_RECORD: {
@@ -514,17 +603,23 @@ struct Synthesizer {
         for (uint32_t index = 0; index < shape.childCount; ++index) {
           const uint32_t child = kDehermRecordingShapeRefs[shape.childFirst + index];
           if (!string(textOf(kDehermRecordingShapes[child].key), &entries[index].key)) return false;
-          if (!value(child, &entries[index].value)) return false;
+          if (!value(child, &entries[index].value, childSentinel(seed, index))) return false;
         }
         return table(ScriptTableKind::kRecord, shape.childCount,
             entries.empty() ? nullptr : entries.data(), out);
       }
       case DEHERM_RECORDING_SHAPE_MAP: {
         ScriptTableEntry entry{};
-        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.key)) return false;
-        if (!value(kDehermRecordingShapeRefs[shape.childFirst + 1], &entry.value)) return false;
+        if (!value(kDehermRecordingShapeRefs[shape.childFirst], &entry.key,
+            childSentinel(seed, 0))) return false;
+        if (!value(kDehermRecordingShapeRefs[shape.childFirst + 1], &entry.value,
+            childSentinel(seed, 1))) return false;
         return table(ScriptTableKind::kMap, 1, &entry, out);
       }
+      case DEHERM_RECORDING_SHAPE_CALLBACK:
+        out->tag = ScriptValueTag::kCallback;
+        out->data = &gRecordedCallback;
+        return true;
       default:
         failure = "unsupported-declared-result-shape";
         return false;
@@ -574,6 +669,28 @@ struct Synthesizer {
 };
 
 bool Dispatch(void*, ScriptCallFrame* frame) {
+  for (uint32_t index = 0; index < DEHERM_RECORDING_HANDLE_SEED_COUNT; ++index) {
+    const auto& seed = kDehermRecordingHandleSeeds[index];
+    if (seed.stableId != frame->stableId) continue;
+    if (frame->argumentCount != 0 || !frame->results || frame->resultCapacity < 1) {
+      std::snprintf(gLastError, sizeof(gLastError), "recording handle seed received an invalid frame");
+      ++gViolations;
+      return false;
+    }
+    ScriptValue& result = frame->results[0];
+    result = {};
+    result.tag = ScriptValueTag::kHandle;
+    result.handleKind = seed.shapeCode == DEHERM_RECORDING_SHAPE_GUI_NODE
+        ? ScriptHandleKind::kGuiNode
+        : seed.shapeCode == DEHERM_RECORDING_SHAPE_USERDATA
+            ? ScriptHandleKind::kLuaUserdata
+            : ScriptHandleKind::kLuaSemanticHandle;
+    result.reserved = seed.semantic;
+    result.length = 1;
+    result.payload = (static_cast<uint64_t>(index + 1) << 32u) | UINT64_C(1);
+    frame->resultCount = 1;
+    return true;
+  }
   const uint32_t route = deherm_recording_find_route(frame->stableId);
   if (route >= DEHERM_RECORDING_ROUTE_COUNT) {
     std::snprintf(gLastError, sizeof(gLastError), "recording engine has no route for stable id %u",
@@ -620,7 +737,8 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
 
   Synthesizer synthesizer{frame, {}};
   for (uint32_t index = 0; index < descriptor.resultCount; ++index) {
-    if (!synthesizer.value(kDehermRecordingShapeRefs[descriptor.resultFirst + index], &frame->results[index])) {
+    if (!synthesizer.value(kDehermRecordingShapeRefs[descriptor.resultFirst + index],
+        &frame->results[index], 257u + index)) {
       observation.violation = synthesizer.failure;
       ++gViolations;
       std::snprintf(gLastError, sizeof(gLastError), "recording result synthesis failed: %s",
@@ -751,6 +869,26 @@ const char* handleName(uint8_t kind, uint8_t semantic) {
   return "unknown";
 }
 
+uint32_t childSentinel(uint32_t seed, uint32_t index) {
+  return ((seed * 17u + index + 1u) % 10000u) + 1u;
+}
+
+void appendNumber(double value, std::string& out) {
+  char buffer[48];
+  std::snprintf(buffer, sizeof(buffer), "%.0f", value);
+  out += buffer;
+}
+
+uint64_t u64Sentinel(uint32_t seed) {
+  return (static_cast<uint64_t>(seed + UINT32_C(0x10000)) << 32u) | seed;
+}
+
+void appendU64(uint64_t value, std::string& out) {
+  char buffer[32];
+  std::snprintf(buffer, sizeof(buffer), "%llu", static_cast<unsigned long long>(value));
+  out += buffer;
+}
+
 // ---------------------------------------------------------------------------
 // direct-memory transport: the exported universal wire the browser host calls.
 // ---------------------------------------------------------------------------
@@ -784,23 +922,27 @@ struct WireInput {
     return push(value);
   }
 
-  uint32_t build(uint32_t shapeIndex) {
+  uint32_t build(uint32_t shapeIndex, uint32_t seed) {
     const auto& shape = kDehermRecordingShapes[shapeIndex];
     DehermScriptUniversalValue value{};
     switch (shape.code) {
       case DEHERM_RECORDING_SHAPE_UNDEFINED: value.tag = 0; return push(value);
       case DEHERM_RECORDING_SHAPE_NULL: value.tag = 1; return push(value);
-      case DEHERM_RECORDING_SHAPE_BOOLEAN: value.tag = 2; value.number = 1.0; return push(value);
-      case DEHERM_RECORDING_SHAPE_NUMBER: return pushNumber(1.0);
-      case DEHERM_RECORDING_SHAPE_STRING: return pushString("deherm");
+      case DEHERM_RECORDING_SHAPE_BOOLEAN: value.tag = 2; value.number = seed % 2u; return push(value);
+      case DEHERM_RECORDING_SHAPE_NUMBER: return pushNumber(seed);
+      case DEHERM_RECORDING_SHAPE_STRING: {
+        const std::string literal = "d" + std::to_string(seed);
+        return pushString(literal.c_str());
+      }
       case DEHERM_RECORDING_SHAPE_HASH:
         value.tag = 5;
         value.handle_kind = 1;
-        value.payload = UINT64_C(0x123456789abcdef0);
+        value.payload = u64Sentinel(seed);
         return push(value);
       case DEHERM_RECORDING_SHAPE_URL: {
         DehermScriptUniversalUrl url{};
-        url.socket = 1; url.reserved = 0; url.path = 2; url.fragment = 3;
+        url.socket = u64Sentinel(seed); url.reserved = u64Sentinel(seed + 1u);
+        url.path = u64Sentinel(seed + 2u); url.fragment = u64Sentinel(seed + 3u);
         urls.push_back(url);
         value.tag = 5;
         value.handle_kind = 2;
@@ -823,20 +965,21 @@ struct WireInput {
         value.tag = 8;
         value.defold_kind = shape.code == DEHERM_RECORDING_SHAPE_VECTOR3 ? 1
             : shape.code == DEHERM_RECORDING_SHAPE_VECTOR4 ? 2 : 3;
-        for (uint32_t lane = 0; lane < 4; ++lane) value.lanes[lane] = static_cast<float>(lane + 1);
+        for (uint32_t lane = 0; lane < 4; ++lane) value.lanes[lane] = static_cast<float>(seed + lane);
         return push(value);
       case DEHERM_RECORDING_SHAPE_MATRIX4: {
         value.tag = 8;
         value.defold_kind = 4;
         value.length = 16;
         value.data_offset = static_cast<uint32_t>(floats.size());
-        for (uint32_t lane = 0; lane < 16; ++lane) floats.push_back(static_cast<float>(lane));
+        for (uint32_t lane = 0; lane < 16; ++lane) floats.push_back(static_cast<float>(seed + lane));
         return push(value);
       }
       case DEHERM_RECORDING_SHAPE_SEQUENCE: {
         std::vector<DehermScriptUniversalEntry> pending;
         for (uint32_t index = 0; index < shape.childCount; ++index) {
-          const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + index]);
+          const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + index],
+              childSentinel(seed, index));
           const uint32_t key = pushNumber(static_cast<double>(index + 1));
           pending.push_back({key, item});
         }
@@ -847,14 +990,14 @@ struct WireInput {
         for (uint32_t index = 0; index < shape.childCount; ++index) {
           const uint32_t child = kDehermRecordingShapeRefs[shape.childFirst + index];
           const uint32_t key = pushString(textOf(kDehermRecordingShapes[child].key));
-          const uint32_t item = build(child);
+          const uint32_t item = build(child, childSentinel(seed, index));
           pending.push_back({key, item});
         }
         return pushTable(2, pending);
       }
       case DEHERM_RECORDING_SHAPE_MAP: {
-        const uint32_t key = build(kDehermRecordingShapeRefs[shape.childFirst]);
-        const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + 1]);
+        const uint32_t key = build(kDehermRecordingShapeRefs[shape.childFirst], childSentinel(seed, 0));
+        const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + 1], childSentinel(seed, 1));
         std::vector<DehermScriptUniversalEntry> pending{{key, item}};
         return pushTable(3, pending);
       }
@@ -888,26 +1031,51 @@ struct WireOutput {
   void render(uint32_t index, std::string& out, uint32_t depth) const {
     if (depth > 8 || index >= valueCount) { out += "invalid"; return; }
     const auto& value = values[index];
-    char buffer[32];
     switch (value.tag) {
       case 0: out += "undef"; return;
       case 1: out += "null"; return;
-      case 2: out += "bool"; return;
-      case 3: out += "num"; return;
+      case 2: out += "bool:"; out += value.number != 0.0 ? "1" : "0"; return;
+      case 3: out += "num:"; appendNumber(value.number, out); return;
       case 4:
-        std::snprintf(buffer, sizeof(buffer), "str:%u", value.length);
-        out += buffer;
+        out += "str:";
+        out.append(strings.data() + value.data_offset, value.length);
         return;
       case 5:
-        if (value.handle_kind == 1) { out += "hash"; return; }
-        if (value.handle_kind == 2) { out += "url"; return; }
+        if (value.handle_kind == 1) {
+          out += "hash:"; appendU64(value.payload, out); return;
+        }
+        if (value.handle_kind == 2) {
+          out += "url:";
+          if (value.data_offset >= urlCount) { out += "invalid"; return; }
+          const auto& url = urls[value.data_offset];
+          appendU64(url.socket, out); out += ",";
+          appendU64(url.reserved, out); out += ",";
+          appendU64(url.path, out); out += ",";
+          appendU64(url.fragment, out);
+          return;
+        }
         out += "h:";
         out += handleName(value.handle_kind, value.auxiliary);
         return;
-      case 8:
-        out += value.defold_kind == 1 ? "dv:v3" : value.defold_kind == 2 ? "dv:v4"
-            : value.defold_kind == 3 ? "dv:quat" : value.defold_kind == 4 ? "dv:mat4" : "dv:unknown";
+      case 8: {
+        if (value.defold_kind == 4) {
+          out += "dv:mat4:";
+          if (value.data_offset + 16 > floatCount) { out += "invalid"; return; }
+          for (uint32_t lane = 0; lane < 16; ++lane) {
+            if (lane) out += ",";
+            appendNumber(floats[value.data_offset + lane], out);
+          }
+          return;
+        }
+        const uint32_t lanes = value.defold_kind == 1 ? 3 : 4;
+        out += value.defold_kind == 1 ? "dv:v3:" : value.defold_kind == 2 ? "dv:v4:"
+            : value.defold_kind == 3 ? "dv:quat:" : "dv:unknown:";
+        for (uint32_t lane = 0; lane < lanes; ++lane) {
+          if (lane) out += ",";
+          appendNumber(value.lanes[lane], out);
+        }
         return;
+      }
       case 7: {
         const char* open = value.auxiliary == 1 ? "seq(" : value.auxiliary == 2 ? "rec(" : "map(";
         out += open;
@@ -941,7 +1109,7 @@ void driveDirectMemory(uint32_t route) {
   WireInput input;
   std::vector<uint32_t> roots;
   for (uint32_t index = 0; index < descriptor.argumentCount; ++index) {
-    roots.push_back(input.build(kDehermRecordingShapeRefs[descriptor.argumentFirst + index]));
+    roots.push_back(input.build(kDehermRecordingShapeRefs[descriptor.argumentFirst + index], index + 1u));
   }
   if (!input.failure.empty()) {
     deherm_recording_record_results(route, DEHERM_RECORDING_TRANSPORT_DIRECT_MEMORY, 0, "",
@@ -989,16 +1157,26 @@ struct StaticBuilder {
   DehermScriptUniversalStaticFrame* frame;
   std::string failure;
 
-  uint32_t build(uint32_t shapeIndex) {
+  uint32_t build(uint32_t shapeIndex, uint32_t seed) {
     const auto& shape = kDehermRecordingShapes[shapeIndex];
     switch (shape.code) {
       case DEHERM_RECORDING_SHAPE_UNDEFINED: return deherm_script_static_push_undefined(frame);
       case DEHERM_RECORDING_SHAPE_NULL: return deherm_script_static_push_null(frame);
-      case DEHERM_RECORDING_SHAPE_BOOLEAN: return deherm_script_static_push_boolean(frame, 1);
-      case DEHERM_RECORDING_SHAPE_NUMBER: return deherm_script_static_push_number(frame, 1.0);
-      case DEHERM_RECORDING_SHAPE_STRING: return pushString("deherm");
+      case DEHERM_RECORDING_SHAPE_BOOLEAN: return deherm_script_static_push_boolean(frame, seed % 2u);
+      case DEHERM_RECORDING_SHAPE_NUMBER: return deherm_script_static_push_number(frame, seed);
+      case DEHERM_RECORDING_SHAPE_STRING: {
+        const std::string literal = "d" + std::to_string(seed);
+        return pushString(literal.c_str());
+      }
       case DEHERM_RECORDING_SHAPE_HASH:
-        return deherm_script_static_push_handle(frame, 1, 0, 0, 0x9abcdef0u, 0x12345678u);
+        return deherm_script_static_push_handle(
+            frame, 1, 0, 0, seed, seed + UINT32_C(0x10000));
+      case DEHERM_RECORDING_SHAPE_URL:
+        return deherm_script_static_push_url(frame,
+            seed, seed + UINT32_C(0x10000),
+            seed + 1u, seed + 1u + UINT32_C(0x10000),
+            seed + 2u, seed + 2u + UINT32_C(0x10000),
+            seed + 3u, seed + 3u + UINT32_C(0x10000));
       case DEHERM_RECORDING_SHAPE_HANDLE:
       case DEHERM_RECORDING_SHAPE_GUI_NODE:
       case DEHERM_RECORDING_SHAPE_USERDATA:
@@ -1007,15 +1185,26 @@ struct StaticBuilder {
                 : shape.code == DEHERM_RECORDING_SHAPE_USERDATA ? 4 : 5,
             shape.aux, 1, 1, 1);
       case DEHERM_RECORDING_SHAPE_VECTOR3:
-        return deherm_script_static_push_defold_value(frame, 1, 1.0f, 2.0f, 3.0f, 0.0f);
+        return deherm_script_static_push_defold_value(frame, 1,
+            static_cast<float>(seed), static_cast<float>(seed + 1u),
+            static_cast<float>(seed + 2u), 0.0f);
       case DEHERM_RECORDING_SHAPE_VECTOR4:
       case DEHERM_RECORDING_SHAPE_QUATERNION:
         return deherm_script_static_push_defold_value(frame,
-            shape.code == DEHERM_RECORDING_SHAPE_VECTOR4 ? 2 : 3, 1.0f, 2.0f, 3.0f, 4.0f);
+            shape.code == DEHERM_RECORDING_SHAPE_VECTOR4 ? 2 : 3,
+            static_cast<float>(seed), static_cast<float>(seed + 1u),
+            static_cast<float>(seed + 2u), static_cast<float>(seed + 3u));
+      case DEHERM_RECORDING_SHAPE_MATRIX4:
+        return deherm_script_static_push_matrix4(frame,
+            seed, seed + 1u, seed + 2u, seed + 3u,
+            seed + 4u, seed + 5u, seed + 6u, seed + 7u,
+            seed + 8u, seed + 9u, seed + 10u, seed + 11u,
+            seed + 12u, seed + 13u, seed + 14u, seed + 15u);
       case DEHERM_RECORDING_SHAPE_SEQUENCE: {
         std::vector<std::pair<uint32_t, uint32_t>> pending;
         for (uint32_t index = 0; index < shape.childCount; ++index) {
-          const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + index]);
+          const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + index],
+              childSentinel(seed, index));
           const uint32_t key = deherm_script_static_push_number(frame, static_cast<double>(index + 1));
           pending.emplace_back(key, item);
         }
@@ -1026,14 +1215,14 @@ struct StaticBuilder {
         for (uint32_t index = 0; index < shape.childCount; ++index) {
           const uint32_t child = kDehermRecordingShapeRefs[shape.childFirst + index];
           const uint32_t key = pushString(textOf(kDehermRecordingShapes[child].key));
-          const uint32_t item = build(child);
+          const uint32_t item = build(child, childSentinel(seed, index));
           pending.emplace_back(key, item);
         }
         return pushTable(2, pending);
       }
       case DEHERM_RECORDING_SHAPE_MAP: {
-        const uint32_t key = build(kDehermRecordingShapeRefs[shape.childFirst]);
-        const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + 1]);
+        const uint32_t key = build(kDehermRecordingShapeRefs[shape.childFirst], childSentinel(seed, 0));
+        const uint32_t item = build(kDehermRecordingShapeRefs[shape.childFirst + 1], childSentinel(seed, 1));
         std::vector<std::pair<uint32_t, uint32_t>> pending{{key, item}};
         return pushTable(3, pending);
       }
@@ -1065,29 +1254,56 @@ struct StaticBuilder {
   void render(uint32_t index, std::string& out, uint32_t depth) const {
     if (depth > 8) { out += "deep"; return; }
     const uint8_t tag = deherm_script_static_value_tag(frame, index);
-    char buffer[32];
     switch (tag) {
       case 0: out += "undef"; return;
       case 1: out += "null"; return;
-      case 2: out += "bool"; return;
-      case 3: out += "num"; return;
+      case 2:
+        out += "bool:"; out += deherm_script_static_value_number(frame, index) != 0.0 ? "1" : "0"; return;
+      case 3:
+        out += "num:"; appendNumber(deherm_script_static_value_number(frame, index), out); return;
       case 4:
-        std::snprintf(buffer, sizeof(buffer), "str:%u",
-            deherm_script_static_value_length(frame, index));
-        out += buffer;
+        out += "str:";
+        if (const char* bytes = deherm_script_static_value_string(
+            const_cast<DehermScriptUniversalStaticFrame*>(frame), index)) {
+          out.append(bytes, deherm_script_static_value_length(frame, index));
+        }
         return;
       case 5: {
         const uint8_t kind = deherm_script_static_value_handle_kind(frame, index);
-        if (kind == 1) { out += "hash"; return; }
-        if (kind == 2) { out += "url"; return; }
+        if (kind == 1) {
+          out += "hash:";
+          appendU64(
+              (static_cast<uint64_t>(deherm_script_static_value_payload_high(frame, index)) << 32u) |
+                  deherm_script_static_value_payload_low(frame, index),
+              out);
+          return;
+        }
+        if (kind == 2) {
+          out += "url:";
+          for (uint32_t lane = 0; lane < 4; ++lane) {
+            if (lane) out += ",";
+            appendU64(
+                (static_cast<uint64_t>(deherm_script_static_value_url_high(frame, index, lane)) << 32u) |
+                    deherm_script_static_value_url_low(frame, index, lane),
+                out);
+          }
+          return;
+        }
         out += "h:";
         out += handleName(kind, deherm_script_static_value_auxiliary(frame, index));
         return;
       }
       case 8: {
         const uint8_t kind = deherm_script_static_value_defold_kind(frame, index);
-        out += kind == 1 ? "dv:v3" : kind == 2 ? "dv:v4" : kind == 3 ? "dv:quat"
-            : kind == 4 ? "dv:mat4" : "dv:unknown";
+        out += kind == 1 ? "dv:v3:" : kind == 2 ? "dv:v4:" : kind == 3 ? "dv:quat:"
+            : kind == 4 ? "dv:mat4:" : "dv:unknown:";
+        const uint32_t lanes = kind == 1 ? 3 : kind == 4 ? 16 : 4;
+        for (uint32_t lane = 0; lane < lanes; ++lane) {
+          if (lane) out += ",";
+          appendNumber(kind == 4
+              ? deherm_script_static_value_element(frame, index, lane)
+              : deherm_script_static_value_lane(frame, index, lane), out);
+        }
         return;
       }
       case 7: {
@@ -1133,7 +1349,8 @@ void driveTypedNative(uint32_t route) {
   deherm_script_static_frame_reset(frame);
   StaticBuilder builder{frame, {}};
   for (uint32_t index = 0; index < descriptor.argumentCount; ++index) {
-    const uint32_t value = builder.build(kDehermRecordingShapeRefs[descriptor.argumentFirst + index]);
+    const uint32_t value = builder.build(
+        kDehermRecordingShapeRefs[descriptor.argumentFirst + index], index + 1u);
     deherm_script_static_set_argument(frame, index, value);
   }
   if (!builder.failure.empty()) {
@@ -1376,6 +1593,7 @@ const ROUTES = [
 ${routes.map((entry) => `  ${entry}`).join(",\n")}
 ];
 const ORDER = [${order.join(",")}];
+const HANDLE_SEEDS = ${JSON.stringify(model.handleSeeds.map(({ stableId, name }) => [stableId, name]))};
 
 const CODE = ${JSON.stringify(shapeCodes)};
 
@@ -1384,6 +1602,14 @@ if (!bridge || typeof bridge.call !== "function") throw new Error("script bridge
 
 /** Retained engine handles the recorder minted on an earlier recorded call. */
 const pool = new Map();
+
+function childSentinel(seed, index) {
+  return ((seed * 17 + index + 1) % 10000) + 1;
+}
+
+function u64Sentinel(seed) {
+  return (BigInt(seed + 0x10000) << 32n) | BigInt(seed);
+}
 
 function needs(index, into, seen) {
   if (seen.has(index)) return;
@@ -1408,30 +1634,41 @@ function harvest(value) {
   for (const key of Object.keys(value)) harvest(value[key]);
 }
 
-function build(index) {
+function build(index, seed) {
   const [code, aux, key, children] = SHAPES[index];
   switch (code) {
     case CODE.undefined: return undefined;
     case CODE.null: return null;
-    case CODE.boolean: return true;
-    case CODE.number: return 1;
-    case CODE.string: return "deherm";
-    case CODE.hash: return 0x123456789abcdef0n;
-    case CODE.url: return { socket: 1n, reserved: 0n, path: 2n, fragment: 3n, __dehermUrlV1: true };
+    case CODE.boolean: return (seed % 2) !== 0;
+    case CODE.number: return seed;
+    case CODE.string: return "d" + seed;
+    case CODE.hash: return u64Sentinel(seed);
+    case CODE.url: return {
+      socket: u64Sentinel(seed), reserved: u64Sentinel(seed + 1),
+      path: u64Sentinel(seed + 2), fragment: u64Sentinel(seed + 3), __dehermUrlV1: true
+    };
     case CODE.handle: return pool.get(SEMANTIC[aux]);
     case CODE.guiNode: return pool.get("gui-node");
     case CODE.userdata: return pool.get("lua-userdata");
-    case CODE.vector3: return { x: 1, y: 2, z: 3, __dehermValueKind: "vector3" };
-    case CODE.vector4: return { x: 1, y: 2, z: 3, w: 4, __dehermValueKind: "vector4" };
-    case CODE.quaternion: return { x: 1, y: 2, z: 3, w: 4, __dehermValueKind: "quaternion" };
-    case CODE.matrix4: return Array.from({ length: 16 }, (unused, lane) => lane);
-    case CODE.sequence: return children.map((child) => build(child));
+    case CODE.vector3: return { x: seed, y: seed + 1, z: seed + 2, __dehermValueKind: "vector3" };
+    case CODE.vector4: return { x: seed, y: seed + 1, z: seed + 2, w: seed + 3, __dehermValueKind: "vector4" };
+    case CODE.quaternion: return { x: seed, y: seed + 1, z: seed + 2, w: seed + 3, __dehermValueKind: "quaternion" };
+    case CODE.matrix4: return Array.from({ length: 16 }, (unused, lane) => seed + lane);
+    case CODE.sequence: return children.map((child, childIndex) =>
+      build(child, childSentinel(seed, childIndex)));
     case CODE.record: {
       const record = {};
-      for (const child of children) record[SHAPES[child][2]] = build(child);
+      for (let childIndex = 0; childIndex < children.length; ++childIndex) {
+        const child = children[childIndex];
+        record[SHAPES[child][2]] = build(child, childSentinel(seed, childIndex));
+      }
       return record;
     }
-    case CODE.map: return new Map([[build(children[0]), build(children[1])]]);
+    case CODE.map: return new Map([[
+      build(children[0], childSentinel(seed, 0)),
+      build(children[1], childSentinel(seed, 1))
+    ]]);
+    case CODE.callback: return function dehermRecordedCallback() {};
     default: throw new Error("unsupported jsi argument shape " + code + " " + key);
   }
 }
@@ -1450,13 +1687,15 @@ function render(value, depth) {
   if (value === undefined) return "undef";
   if (value === null) return "null";
   const type = typeof value;
-  if (type === "boolean") return "bool";
-  if (type === "number") return "num";
-  if (type === "string") return "str:" + utf8Length(value);
-  if (type === "bigint") return "hash";
+  if (type === "boolean") return "bool:" + (value ? "1" : "0");
+  if (type === "number") return "num:" + value;
+  if (type === "string") return "str:" + value;
+  if (type === "bigint") return "hash:" + value;
   if (type === "function") return "cb";
   if (Array.isArray(value)) {
-    if (value.length === 16 && value.every((item) => typeof item === "number")) return "dv:mat4";
+    if (value.length === 16 && value.every((item) => typeof item === "number")) {
+      return "dv:mat4:" + value.join(",");
+    }
     return "seq(" + value.map((item) => render(item, depth + 1)).join(",") + ")";
   }
   if (value instanceof Map) {
@@ -1464,14 +1703,22 @@ function render(value, depth) {
     for (const [key, item] of value) parts.push(render(key, depth + 1) + "=>" + render(item, depth + 1));
     return "map(" + parts.join(",") + ")";
   }
-  if (value.__dehermUrlV1) return "url";
+  if (value.__dehermUrlV1) {
+    return "url:" + value.socket + "," + value.reserved + "," + value.path + "," + value.fragment;
+  }
   const kind = value.__dehermValueKind;
-  if (kind === "vector3") return "dv:v3";
-  if (kind === "vector4") return "dv:v4";
-  if (kind === "quaternion") return "dv:quat";
+  if (kind === "vector3") return "dv:v3:" + value.x + "," + value.y + "," + value.z;
+  if (kind === "vector4") return "dv:v4:" + value.x + "," + value.y + "," + value.z + "," + value.w;
+  if (kind === "quaternion") return "dv:quat:" + value.x + "," + value.y + "," + value.z + "," + value.w;
   if (typeof value.kind === "string" && typeof value.dispose === "function") return "h:" + value.kind;
   const fields = Object.keys(value).map((key) => key + "=" + render(value[key], depth + 1));
   return "rec(" + fields.join(",") + ")";
+}
+
+for (const [stableId, kind] of HANDLE_SEEDS) {
+  const value = bridge.call(stableId, []);
+  harvest(value);
+  if (!pool.has(kind)) throw new Error("recording handle fixture failed to mint " + kind);
 }
 
 for (const slot of ORDER) {
@@ -1486,7 +1733,7 @@ for (const slot of ORDER) {
     for (const kind of missing) {
       if (!pool.has(kind)) throw new Error("no recorded handle source for " + kind + " (" + canonical + ")");
     }
-    const args = argumentShapes.map((shape) => build(shape));
+    const args = argumentShapes.map((shape, argumentIndex) => build(shape, argumentIndex + 1));
     const value = bridge.call(stableId, args);
     harvest(value);
     let values;

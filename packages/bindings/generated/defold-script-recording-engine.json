@@ -44,6 +44,20 @@
     "gui-node",
     "render-constant-buffer"
   ],
+  "handleSeeds": [
+    {
+      "name": "box2d-shape",
+      "stableId": 3495418691,
+      "shapeCode": 7,
+      "semantic": 4
+    },
+    {
+      "name": "graphics-texture",
+      "stableId": 3484652730,
+      "shapeCode": 7,
+      "semantic": 13
+    }
+  ],
   "text": [
     "body",
     "impulse",
@@ -3673,8 +3687,10 @@
     "script:bullet3d.rigid_body.set_mass_properties",
     "script:bullet3d.rigid_body.set_sleeping_thresholds",
     "script:bullet3d.world.cast_ray",
+    "script:bullet3d.world.cast_ray_async",
     "script:bullet3d.world.cast_ray_closest",
     "script:bullet3d.world.cast_shape",
+    "script:bullet3d.world.cast_shape_async",
     "script:bullet3d.world.cast_shape_closest",
     "script:bullet3d.world.contact_pair_test",
     "script:bullet3d.world.contact_test",
@@ -3710,9 +3726,11 @@
     "script:camera.world_to_screen",
     "script:collectionfactory.create",
     "script:collectionfactory.get_status",
+    "script:collectionfactory.load",
     "script:collectionfactory.set_prototype",
     "script:collectionfactory.unload",
     "script:collectionproxy.get_resources",
+    "script:collectionproxy.load",
     "script:collectionproxy.set_collection",
     "script:compute.get_constants",
     "script:compute.get_samplers",
@@ -3733,10 +3751,12 @@
     "script:crash.write_dump",
     "script:factory.create",
     "script:factory.get_status",
+    "script:factory.load",
     "script:factory.set_prototype",
     "script:factory.unload",
     "script:font.add_font",
     "script:font.get_info",
+    "script:font.prewarm_text",
     "script:font.remove_font",
     "script:font.set_style",
     "script:go.cancel_animations",
@@ -3804,6 +3824,8 @@
     "script:gui.new_text_node",
     "script:gui.new_texture",
     "script:gui.pick_node",
+    "script:gui.play_flipbook",
+    "script:gui.play_particlefx",
     "script:gui.reset_keyboard",
     "script:gui.reset_material",
     "script:gui.reset_nodes",
@@ -3858,6 +3880,8 @@
     "script:hash",
     "script:hash_to_hex",
     "script:html5.run",
+    "script:html5.set_interaction_listener",
+    "script:http.request",
     "script:image.get_astc_header",
     "script:image.load",
     "script:image.load_buffer",
@@ -3866,6 +3890,7 @@
     "script:label.get_layout_objects",
     "script:label.get_text",
     "script:label.set_text",
+    "script:liveupdate.add_mount",
     "script:liveupdate.get_mounts",
     "script:liveupdate.is_built_with_excluded_files",
     "script:liveupdate.remove_mount",
@@ -3883,11 +3908,13 @@
     "script:model.get_go",
     "script:model.get_mesh_aabb",
     "script:model.get_mesh_enabled",
+    "script:model.play_anim",
     "script:model.reset_constant",
     "script:model.set_blend_weights",
     "script:model.set_mesh_enabled",
     "script:msg.post",
     "script:msg.url",
+    "script:particlefx.play",
     "script:particlefx.reset_constant",
     "script:particlefx.set_constant",
     "script:particlefx.stop",
@@ -3902,6 +3929,7 @@
     "script:physics.get_shape",
     "script:physics.raycast",
     "script:physics.raycast_async",
+    "script:physics.set_event_listener",
     "script:physics.set_gravity",
     "script:physics.set_group",
     "script:physics.set_hflip",
@@ -3948,6 +3976,7 @@
     "script:render.set_cull_face",
     "script:render.set_depth_func",
     "script:render.set_depth_mask",
+    "script:render.set_listener",
     "script:render.set_polygon_offset",
     "script:render.set_projection",
     "script:render.set_render_target",
@@ -3961,6 +3990,7 @@
     "script:resource.create_buffer",
     "script:resource.create_sound_data",
     "script:resource.create_texture",
+    "script:resource.create_texture_async",
     "script:resource.get_atlas",
     "script:resource.get_buffer",
     "script:resource.get_render_target_info",
@@ -3980,6 +4010,8 @@
     "script:socket.dns.tohostname",
     "script:socket.dns.toip",
     "script:socket.gettime",
+    "script:socket.newtry",
+    "script:socket.protect",
     "script:socket.select",
     "script:socket.skip",
     "script:socket.sleep",
@@ -3995,10 +4027,12 @@
     "script:sound.is_music_playing",
     "script:sound.is_phone_call_active",
     "script:sound.pause",
+    "script:sound.play",
     "script:sound.set_gain",
     "script:sound.set_group_gain",
     "script:sound.set_pan",
     "script:sound.stop",
+    "script:sprite.play_flipbook",
     "script:sprite.reset_constant",
     "script:sprite.set_hflip",
     "script:sprite.set_vflip",
@@ -4019,6 +4053,7 @@
     "script:sys.get_sys_info",
     "script:sys.load",
     "script:sys.load_buffer",
+    "script:sys.load_buffer_async",
     "script:sys.load_resource",
     "script:sys.open_url",
     "script:sys.reboot",
@@ -4026,6 +4061,7 @@
     "script:sys.serialize",
     "script:sys.set_connectivity_host",
     "script:sys.set_engine_throttle",
+    "script:sys.set_error_handler",
     "script:sys.set_render_enable",
     "script:sys.set_update_frequency",
     "script:sys.set_vsync_swap_interval",
@@ -4090,6 +4126,7 @@
     "script:window.get_safe_area",
     "script:window.get_size",
     "script:window.set_dim_mode",
+    "script:window.set_listener",
     "script:window.set_mouse_lock",
     "script:window.set_position",
     "script:window.set_size",
@@ -4307,6 +4344,8 @@
     "script:bullet3d.shape.is_valid",
     "script:bullet3d.shape.set_local_transform",
     "script:bullet3d.shape.set_shape",
+    "script:go.animate",
+    "script:gui.animate",
     "script:gui.cancel_animations",
     "script:gui.cancel_flipbook",
     "script:gui.clone",
@@ -4362,33 +4401,8 @@
     "script:b2d.shape.ray_cast",
     "script:b2d.shape.set_material",
     "script:b2d.shape.set_shape",
-    "script:bullet3d.world.cast_ray_async",
-    "script:bullet3d.world.cast_shape_async",
-    "script:collectionfactory.load",
-    "script:collectionproxy.load",
-    "script:factory.load",
-    "script:font.prewarm_text",
-    "script:go.animate",
-    "script:gui.animate",
-    "script:gui.play_flipbook",
-    "script:gui.play_particlefx",
-    "script:html5.set_interaction_listener",
-    "script:http.request",
-    "script:liveupdate.add_mount",
-    "script:model.play_anim",
-    "script:particlefx.play",
-    "script:physics.set_event_listener",
     "script:render.disable_texture",
-    "script:render.enable_texture",
-    "script:render.set_listener",
-    "script:resource.create_texture_async",
-    "script:socket.newtry",
-    "script:socket.protect",
-    "script:sound.play",
-    "script:sprite.play_flipbook",
-    "script:sys.load_buffer_async",
-    "script:sys.set_error_handler",
-    "script:window.set_listener"
+    "script:render.enable_texture"
   ],
   "routes": [
     {
@@ -8764,8 +8778,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16251,8 +16265,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16309,8 +16323,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16367,8 +16381,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16425,8 +16439,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16482,8 +16496,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16539,8 +16553,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16596,8 +16610,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16653,8 +16667,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16711,8 +16725,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16770,8 +16784,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16828,8 +16842,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16886,8 +16900,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -16944,8 +16958,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17002,8 +17016,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17060,8 +17074,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17118,8 +17132,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17176,8 +17190,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17234,8 +17248,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17292,8 +17306,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17353,8 +17367,8 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17410,8 +17424,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -17468,8 +17482,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:box2d-shape"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -29605,19 +29619,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:bullet3d.world.cast_ray_closest",
@@ -29789,19 +29803,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:bullet3d.world.cast_shape_closest",
@@ -30511,8 +30525,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -30569,8 +30583,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -30683,8 +30697,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -30741,8 +30755,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -30799,8 +30813,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -30857,8 +30871,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -30915,8 +30929,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -30973,8 +30987,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31031,8 +31045,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31089,8 +31103,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31147,8 +31161,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31206,8 +31220,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31266,8 +31280,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31323,8 +31337,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31380,8 +31394,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31437,8 +31451,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31494,8 +31508,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31551,8 +31565,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31608,8 +31622,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31665,8 +31679,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31724,8 +31738,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -31893,19 +31907,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:collectionfactory.set_prototype",
@@ -32072,8 +32086,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -32122,19 +32136,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:collectionproxy.set_collection",
@@ -33333,19 +33347,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:factory.set_prototype",
@@ -33621,19 +33635,19 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:font.remove_font",
@@ -33799,19 +33813,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:go.cancel_animations",
@@ -35196,8 +35210,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -35363,19 +35377,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:gui.cancel_animations",
@@ -39301,19 +39315,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:gui.play_particlefx",
@@ -39358,19 +39372,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:gui.reset_keyboard",
@@ -42498,19 +42512,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:http.request",
@@ -42559,19 +42573,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:image.get_astc_header",
@@ -43087,19 +43101,19 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:liveupdate.get_mounts",
@@ -44125,19 +44139,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:model.reset_constant",
@@ -44468,19 +44482,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:particlefx.reset_constant",
@@ -45346,19 +45360,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:physics.set_gravity",
@@ -46974,8 +46988,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:graphics-texture"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -47316,8 +47330,8 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "no-recorded-handle-source:graphics-texture"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "exercise",
@@ -48012,8 +48026,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -48343,19 +48357,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:render.set_polygon_offset",
@@ -48464,8 +48478,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -48807,8 +48821,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -49157,19 +49171,19 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:resource.get_atlas",
@@ -50319,19 +50333,19 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "result-callback-is-not-synthesizable"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "result-callback-is-not-synthesizable"
+          "reason": "callback-result-is-emitted-only-by-the-jsi-transport"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "result-callback-is-not-synthesizable"
+          "reason": "callback-result-is-emitted-only-by-the-jsi-transport"
         }
       },
-      "universalSkip": "result-callback-is-not-synthesizable"
+      "universalSkip": null
     },
     {
       "id": "script:socket.protect",
@@ -50377,19 +50391,19 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "result-callback-is-not-synthesizable"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "result-callback-is-not-synthesizable"
+          "reason": "callback-result-is-emitted-only-by-the-jsi-transport"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "result-callback-is-not-synthesizable"
+          "reason": "callback-result-is-emitted-only-by-the-jsi-transport"
         }
       },
-      "universalSkip": "result-callback-is-not-synthesizable"
+      "universalSkip": null
     },
     {
       "id": "script:socket.select",
@@ -51303,19 +51317,19 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:sound.set_gain",
@@ -51590,19 +51604,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:sprite.reset_constant",
@@ -52801,19 +52815,19 @@
       ],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:sys.load_resource",
@@ -53264,19 +53278,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:sys.set_render_enable",
@@ -54676,8 +54690,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -55797,8 +55811,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -56148,8 +56162,8 @@
           "reason": ""
         },
         "typed-native": {
-          "status": "skip",
-          "reason": "static-frame-has-no-url-or-matrix4-argument-push"
+          "status": "exercise",
+          "reason": ""
         }
       },
       "universalSkip": null
@@ -57056,19 +57070,19 @@
       "resultShapes": [],
       "transports": {
         "jsi": {
-          "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "status": "exercise",
+          "reason": ""
         },
         "direct-memory": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-requires-the-html5-browser-registry"
         },
         "typed-native": {
           "status": "skip",
-          "reason": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+          "reason": "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame"
         }
       },
-      "universalSkip": "callback-argument-lifetime-is-not-modelled-by-the-recorder"
+      "universalSkip": null
     },
     {
       "id": "script:window.set_mouse_lock",
@@ -57435,18 +57449,22 @@
       "graphics-render-target",
       "render-constant-buffer"
     ],
+    "handleKindsMintedByGeneratedFixtures": [
+      "box2d-shape",
+      "graphics-texture"
+    ],
     "byTransport": {
       "jsi": {
-        "exercised": 865,
-        "skipped": 50
+        "exercised": 915,
+        "skipped": 0
       },
       "direct-memory": {
         "exercised": 890,
         "skipped": 25
       },
       "typed-native": {
-        "exercised": 861,
-        "skipped": 54
+        "exercised": 890,
+        "skipped": 25
       }
     },
     "blockerCount": 0
@@ -57461,11 +57479,11 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "c24a1d8ba21557623fc732c16fcf90525874ea2c582474b504def31645494dc7",
-    "tables": "df47c2547e5f4a3fa3822861b0aea9b4989641b8f00d1bfb2c46949656dd8775",
-    "provider": "576c3fb87089a0b968abe465b809de407d0027a286dd165c783325f853c63171",
-    "driver": "04230cea34fba2a1418c110364ee6f101525b393106b6a42f26e7ff2644c86e2",
-    "driverJs": "5dc503db68fb631b0db31a39c7db5796a8c44491c655522194158426a2f48744",
-    "expectedTrace": "970ad1433a95563d3a6e2fa56075c372bd33cb04ff0fecd0e63d5dd3704747a9"
+    "header": "dc0de65c7c94ce09161f7e9b20d95e559ec884ccb299a6b7a67250b82e16aea3",
+    "tables": "a92bc128f6e1d64148ff7faf9d4c1762978660f6142cc67cd52567b33681f0c8",
+    "provider": "9ce2e8a0ed8fd8b3e42702c5ea746bb20b0806c602ec4e618db1fd2aa26173be",
+    "driver": "bbe58abba9260aaecd329fd2883fb352d6dd56cb62f785e3da7968407181964f",
+    "driverJs": "37f08b380634f43b606c6582b0510eaa8b694fd41c3de85731c4c1e02e0ebf0d",
+    "expectedTrace": "2b0a609881fa026c2abd0aa71d28a080bdc18d0009a037d63919e5c9081b87ee"
   }
 }

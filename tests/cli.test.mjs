@@ -162,12 +162,47 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   const generated = await materializeDmSdkUsageFile({ usage, output });
   assert.equal(generated.materializedCount, 1);
   assert.equal(generated.provider.install, "deherm_dmsdk_generated_provider_install");
+  assert.equal(
+    generated.verificationProvider.install,
+    "deherm_dmsdk_generated_provider_install_exact_verification",
+  );
   assert.match(await readFile(output, "utf8"), /fixture_to_network/);
+  const verificationSource = output.replace(/\.cpp$/, ".verify.cpp");
+  const verificationReport = output.replace(/\.cpp$/, ".verify.json");
+  assert.match(await readFile(verificationSource, "utf8"), /fixture_to_network__exact_callee/);
+  const verification = JSON.parse(await readFile(verificationReport, "utf8"));
+  assert.equal(verification.vectorCount, 1);
+  assert.equal(verification.vectors[0].nativeSymbol, "dmEndian::ToNetwork");
+  assert.equal(verification.vectors[0].parameters[0].resolvedNativeType, "uint32_t");
+  assert.match(verification.vectors[0].vectorSha256, /^[0-9a-f]{64}$/);
   const report = JSON.parse(await readFile(`${output}.json`, "utf8"));
   assert.equal(report.materializedCount, 1);
   assert.equal(report.declarations[0].declarationId, recipe.declarationId);
+  assert.equal(report.verificationManifestSha256, verification.manifestSha256);
+  assert.equal(
+    report.verificationReportSha256,
+    createHash("sha256").update(await readFile(verificationReport, "utf8")).digest("hex"),
+  );
   const checked = await materializeDmSdkUsageFile({ usage, output, check: true });
   assert.equal(checked.checked, true);
+  await writeFile(verificationSource, "// stale exact-call twin\n");
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage, output, check: true }),
+    /dmsdk-provider\.verify\.cpp is stale/,
+  );
+  await materializeDmSdkUsageFile({ usage, output });
+  await writeFile(verificationReport, "{}\n");
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage, output, check: true }),
+    /dmsdk-provider\.verify\.json is stale/,
+  );
+  await materializeDmSdkUsageFile({ usage, output });
+  await writeFile(`${output}.json`, "{}\n");
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage, output, check: true }),
+    /dmsdk-provider\.cpp\.json is stale/,
+  );
+  await materializeDmSdkUsageFile({ usage, output });
   await writeFile(output, "// stale\n");
   await assert.rejects(materializeDmSdkUsageFile({ usage, output, check: true }), /is stale/);
   const cliOutput = path.join(root, "generated", "dmsdk-provider-cli.cpp");
@@ -178,6 +213,10 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   assert.equal(cli.status, 0, `${cli.stdout}\n${cli.stderr}`);
   assert.equal(JSON.parse(cli.stdout).materializedCount, 1);
   assert.match(await readFile(cliOutput, "utf8"), /fixture_to_network/);
+  assert.match(
+    await readFile(cliOutput.replace(/\.cpp$/, ".verify.cpp"), "utf8"),
+    /fixture_to_network__exact_call/,
+  );
 });
 
 test("project discovery resolves nearest and bounded descendant projects deterministically", async () => {

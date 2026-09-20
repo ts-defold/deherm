@@ -94,6 +94,52 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   assert.equal(Object.keys(materialized.descriptor.sdk).length, 28);
   await readFile(path.join(packedSurfaceRoot, "sdk", "generated", "script", "types.ts"), "utf8");
 
+  // The installed compiler must materialize the production and exact-call
+  // dmSDK twins from policy-derived IR without reaching back into this checkout.
+  const packedCatalog = path.join(packedSurfaceRoot, "ir", "defold-dmsdk-universal-bindings.json");
+  const packedCatalogDocument = JSON.parse(await readFile(packedCatalog, "utf8"));
+  const packedRecipe = packedCatalogDocument.recipes.find(({ symbol, declarationKind, abi }) =>
+    symbol === "dmEndian::ToNetwork" && declarationKind === "function" &&
+    abi.parameters[0]?.nativeType === "uint32_t");
+  assert.ok(packedRecipe);
+  const packedUsage = path.join(root, "packed-dmsdk-usage.json");
+  const packedProvider = path.join(root, "packed-dmsdk-provider.cpp");
+  await writeFile(packedUsage, `${JSON.stringify({
+    schemaVersion: 1,
+    catalogSha256: packedCatalogDocument.sourceHashes.catalog,
+    usages: [{
+      declarationId: packedRecipe.declarationId,
+      wrapper: "packed_to_network",
+      acknowledgements: {
+        generatedAdapterBypass: {
+          reason: "packed npm smoke",
+          evidence: "the installed CLI emits and checks the exact-call twin"
+        }
+      }
+    }]
+  }, null, 2)}\n`);
+  const packedMaterialization = run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "materialize-dmsdk",
+    "--usage", packedUsage,
+    "--catalog", packedCatalog,
+    "--output", packedProvider,
+    "--json"
+  ], { cwd: root });
+  assert.equal(JSON.parse(packedMaterialization.stdout).materializedCount, 1);
+  await readFile(packedProvider, "utf8");
+  await readFile(`${packedProvider}.json`, "utf8");
+  await readFile(packedProvider.replace(/\.cpp$/, ".verify.cpp"), "utf8");
+  await readFile(packedProvider.replace(/\.cpp$/, ".verify.json"), "utf8");
+  run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "materialize-dmsdk",
+    "--usage", packedUsage,
+    "--catalog", packedCatalog,
+    "--output", packedProvider,
+    "--check"
+  ], { cwd: root });
+
   const help = run(process.execPath, [path.join(packageRoot, "bin", "deherm.mjs"), "--help"]);
   assert.match(help.stdout, /deherm <command>/);
 

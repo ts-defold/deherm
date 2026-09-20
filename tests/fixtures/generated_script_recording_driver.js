@@ -510,7 +510,7 @@ const ROUTES = [
   [1345069645,"b2d.body.set_type",[0,36],[],0,1,0],
   [2241017567,"b2d.body.set_user_data",[0,37],[],0,1,0],
   [469246619,"b2d.chain.destroy",[38],[],0,1,0],
-  [2813724309,"b2d.chain.from_shape",[39],[8],1,0,1],
+  [2813724309,"b2d.chain.from_shape",[39],[8],1,1,1],
   [180453284,"b2d.chain.get_friction",[38],[13],1,1,1],
   [2230884954,"b2d.chain.get_geometry",[38],[6],1,1,1],
   [2336375595,"b2d.chain.get_material",[38],[13],1,1,1],
@@ -639,28 +639,28 @@ const ROUTES = [
   [1701854609,"b2d.joint.set_spring_damping_ratio",[55,57],[],0,1,0],
   [4171464106,"b2d.joint.set_spring_hertz",[55,58],[],0,1,0],
   [1338862049,"b2d.joint.wake_bodies",[55],[],0,1,0],
-  [3217929986,"b2d.shape.are_contact_events_enabled",[39],[25],1,0,1],
-  [834096625,"b2d.shape.are_hit_events_enabled",[39],[25],1,0,1],
-  [3741389297,"b2d.shape.are_pre_solve_events_enabled",[39],[25],1,0,1],
-  [2311969276,"b2d.shape.are_sensor_events_enabled",[39],[25],1,0,1],
-  [610292833,"b2d.shape.enable_contact_events",[39,12],[],0,0,0],
-  [945131398,"b2d.shape.enable_hit_events",[39,12],[],0,0,0],
-  [1486378210,"b2d.shape.enable_pre_solve_events",[39,12],[],0,0,0],
-  [1203246873,"b2d.shape.enable_sensor_events",[39,12],[],0,0,0],
-  [2944082506,"b2d.shape.get_body",[39],[21],1,0,1],
-  [3839784544,"b2d.shape.get_closest_point",[39,71],[14],1,0,1],
-  [4016957215,"b2d.shape.get_contact_capacity",[39],[13],1,0,1],
-  [555667827,"b2d.shape.get_contact_data",[39],[9],1,0,1],
-  [2170719947,"b2d.shape.get_mass_data",[39],[6],1,0,1],
-  [3295889835,"b2d.shape.get_material",[39],[13],1,0,1],
-  [1923506897,"b2d.shape.get_sensor_capacity",[39],[13],1,0,1],
-  [3266602473,"b2d.shape.get_sensor_overlaps",[39],[9],1,0,1],
-  [510086131,"b2d.shape.get_shape",[39],[6],1,0,1],
-  [1138630650,"b2d.shape.get_world",[39],[23],1,0,1],
-  [889829034,"b2d.shape.is_valid",[39],[25],1,0,1],
-  [2941793277,"b2d.shape.ray_cast",[39,72,73,74],[6],1,0,1],
-  [3344304063,"b2d.shape.set_material",[39,41],[],0,0,0],
-  [447070167,"b2d.shape.set_shape",[39,7,46],[],0,0,0],
+  [3217929986,"b2d.shape.are_contact_events_enabled",[39],[25],1,1,1],
+  [834096625,"b2d.shape.are_hit_events_enabled",[39],[25],1,1,1],
+  [3741389297,"b2d.shape.are_pre_solve_events_enabled",[39],[25],1,1,1],
+  [2311969276,"b2d.shape.are_sensor_events_enabled",[39],[25],1,1,1],
+  [610292833,"b2d.shape.enable_contact_events",[39,12],[],0,1,0],
+  [945131398,"b2d.shape.enable_hit_events",[39,12],[],0,1,0],
+  [1486378210,"b2d.shape.enable_pre_solve_events",[39,12],[],0,1,0],
+  [1203246873,"b2d.shape.enable_sensor_events",[39,12],[],0,1,0],
+  [2944082506,"b2d.shape.get_body",[39],[21],1,1,1],
+  [3839784544,"b2d.shape.get_closest_point",[39,71],[14],1,1,1],
+  [4016957215,"b2d.shape.get_contact_capacity",[39],[13],1,1,1],
+  [555667827,"b2d.shape.get_contact_data",[39],[9],1,1,1],
+  [2170719947,"b2d.shape.get_mass_data",[39],[6],1,1,1],
+  [3295889835,"b2d.shape.get_material",[39],[13],1,1,1],
+  [1923506897,"b2d.shape.get_sensor_capacity",[39],[13],1,1,1],
+  [3266602473,"b2d.shape.get_sensor_overlaps",[39],[9],1,1,1],
+  [510086131,"b2d.shape.get_shape",[39],[6],1,1,1],
+  [1138630650,"b2d.shape.get_world",[39],[23],1,1,1],
+  [889829034,"b2d.shape.is_valid",[39],[25],1,1,1],
+  [2941793277,"b2d.shape.ray_cast",[39,72,73,74],[6],1,1,1],
+  [3344304063,"b2d.shape.set_material",[39,41],[],0,1,0],
+  [447070167,"b2d.shape.set_shape",[39,7,46],[],0,1,0],
   [81357101,"b2d.world.cast_mover",[75,76,73,47],[13],1,1,1],
   [508811620,"b2d.world.cast_ray",[75,72,73,47,77],[9,6],2,1,2],
   [404878944,"b2d.world.cast_ray_closest",[75,72,73,47],[6],1,1,1],
@@ -868,10 +868,10 @@ const ROUTES = [
   [972753009,"bullet3d.shape.set_local_transform",[160,33,117],[],0,1,0],
   [3770671780,"bullet3d.shape.set_shape",[160,30],[],0,1,0],
   [4013454581,"bullet3d.world.cast_ray",[161,72,73,47,77],[9],1,1,1],
-  [214949730,"bullet3d.world.cast_ray_async",[161,72,73,162,47,77],[],0,0,0],
+  [214949730,"bullet3d.world.cast_ray_async",[161,72,73,162,47,77],[],0,1,0],
   [3246574173,"bullet3d.world.cast_ray_closest",[161,72,73,47],[6],1,1,1],
   [2801399124,"bullet3d.world.cast_shape",[161,49,73,47,77],[9],1,1,1],
-  [3637746507,"bullet3d.world.cast_shape_async",[161,49,73,162,47,77],[],0,0,0],
+  [3637746507,"bullet3d.world.cast_shape_async",[161,49,73,162,47,77],[],0,1,0],
   [2301414672,"bullet3d.world.cast_shape_closest",[161,49,73,47],[6],1,1,1],
   [4259613133,"bullet3d.world.contact_pair_test",[161,163,164,77],[9],1,1,1],
   [3921827144,"bullet3d.world.contact_test",[161,107,47,77],[9],1,1,1],
@@ -907,11 +907,11 @@ const ROUTES = [
   [3205603148,"camera.world_to_screen",[179,167],[14],1,1,1],
   [3514780936,"collectionfactory.create",[50,33,117,181,28],[182],1,1,1],
   [4238240607,"collectionfactory.get_status",[50],[13],1,1,1],
-  [4139911040,"collectionfactory.load",[50,183],[],0,0,0],
+  [4139911040,"collectionfactory.load",[50,183],[],0,1,0],
   [3724333493,"collectionfactory.set_prototype",[50,184],[],0,1,0],
   [1613326455,"collectionfactory.unload",[50],[],0,1,0],
   [4052177648,"collectionproxy.get_resources",[185],[186],1,1,1],
-  [620577334,"collectionproxy.load",[50,187,162],[],0,0,0],
+  [620577334,"collectionproxy.load",[50,187,162],[],0,1,0],
   [803274747,"collectionproxy.set_collection",[50,184],[25,13],2,1,2],
   [2714229261,"compute.get_constants",[188],[9],1,1,1],
   [1345946881,"compute.get_samplers",[188],[9],1,1,1],
@@ -932,15 +932,15 @@ const ROUTES = [
   [2139022713,"crash.write_dump",[],[],0,1,0],
   [96184340,"factory.create",[50,33,117,196,28],[22],1,1,1],
   [3501057803,"factory.get_status",[50],[13],1,1,1],
-  [1808015212,"factory.load",[50,183],[],0,0,0],
+  [1808015212,"factory.load",[50,183],[],0,1,0],
   [3506659009,"factory.set_prototype",[50,184],[],0,1,0],
   [826508291,"factory.unload",[50],[],0,1,0],
   [638454056,"font.add_font",[197,198],[],0,1,0],
   [1863401472,"font.get_info",[197],[6],1,1,1],
-  [2848412671,"font.prewarm_text",[197,199,162],[13],1,0,1],
+  [2848412671,"font.prewarm_text",[197,199,162],[13],1,1,1],
   [2369627843,"font.remove_font",[197,198],[],0,1,0],
   [2283853637,"font.set_style",[197,31,200],[],0,1,0],
-  [1302980535,"go.animate",[50,201,202,203,205,206,207,183],[],0,0,0],
+  [1302980535,"go.animate",[50,201,202,203,205,206,207,183],[],0,1,0],
   [1183026732,"go.cancel_animations",[50,201],[],0,1,0],
   [2920192283,"go.delete",[208,209],[],0,1,0],
   [1311027776,"go.exists",[50],[25],1,1,1],
@@ -967,7 +967,7 @@ const ROUTES = [
   [2265777619,"go.world_to_local_transform",[212,50],[169],1,1,1],
   [1995008024,"graphics.get_adapter_info",[],[6],1,1,1],
   [1938117379,"graphics.get_engine_adapters",[],[186],1,1,1],
-  [1559320978,"gui.animate",[213,201,203,214,206,207,183,202],[],0,0,0],
+  [1559320978,"gui.animate",[213,201,203,214,206,207,183,202],[],0,1,0],
   [4228476809,"gui.cancel_animations",[213,216],[],0,1,0],
   [884883204,"gui.cancel_flipbook",[213],[],0,1,0],
   [1520695164,"gui.clone",[213],[217],1,1,1],
@@ -1035,8 +1035,8 @@ const ROUTES = [
   [763092804,"gui.new_text_node",[170,199],[217],1,1,1],
   [2832050683,"gui.new_texture",[227,228,229,230,231,232],[25,13],2,1,2],
   [642239255,"gui.pick_node",[213,82,171],[25],1,1,1],
-  [1867420328,"gui.play_flipbook",[213,233,183,234],[],0,0,0],
-  [3924164150,"gui.play_particlefx",[213,235],[],0,0,0],
+  [1867420328,"gui.play_flipbook",[213,233,183,234],[],0,1,0],
+  [3924164150,"gui.play_particlefx",[213,235],[],0,1,0],
   [3823880698,"gui.reset_keyboard",[],[],0,1,0],
   [3266845946,"gui.reset_material",[213],[],0,1,0],
   [2107179008,"gui.reset_nodes",[],[],0,1,0],
@@ -1091,8 +1091,8 @@ const ROUTES = [
   [2845099200,"hash",[265],[22],1,1,1],
   [754452606,"hash_to_hex",[266],[20],1,1,1],
   [475687915,"html5.run",[267],[20],1,1,1],
-  [1164539114,"html5.set_interaction_listener",[162],[],0,0,0],
-  [125289847,"http.request",[50,269,162,270,271,187],[],0,0,0],
+  [1164539114,"html5.set_interaction_listener",[162],[],0,1,0],
+  [125289847,"http.request",[50,269,162,270,271,187],[],0,1,0],
   [3935561203,"image.get_astc_header",[231],[6],1,1,1],
   [172398549,"image.load",[231,272],[6],1,1,1],
   [1439789256,"image.load_buffer",[231,272],[6],1,1,1],
@@ -1101,7 +1101,7 @@ const ROUTES = [
   [4187510320,"label.get_layout_objects",[50],[9],1,1,1],
   [1547809370,"label.get_text",[50],[20],1,1,1],
   [1888249062,"label.set_text",[50,199],[],0,1,0],
-  [3865730920,"liveupdate.add_mount",[31,275,276,162],[13],1,0,1],
+  [3865730920,"liveupdate.add_mount",[31,275,276,162],[13],1,1,1],
   [2185826800,"liveupdate.get_mounts",[],[278],1,1,1],
   [2617193436,"liveupdate.is_built_with_excluded_files",[],[25],1,1,1],
   [3486747409,"liveupdate.remove_mount",[31],[13],1,1,1],
@@ -1119,13 +1119,13 @@ const ROUTES = [
   [1244796042,"model.get_go",[50,281],[22],1,1,1],
   [4275324396,"model.get_mesh_aabb",[50],[282],1,1,1],
   [2409536311,"model.get_mesh_enabled",[50,283],[25],1,1,1],
-  [1281580293,"model.play_anim",[50,284,202,234,183],[],0,0,0],
+  [1281580293,"model.play_anim",[50,284,202,234,183],[],0,1,0],
   [250460089,"model.reset_constant",[50,285],[],0,1,0],
   [4149119709,"model.set_blend_weights",[50,286],[],0,1,0],
   [2492040859,"model.set_mesh_enabled",[50,283,48],[],0,1,0],
   [1111726479,"msg.post",[287,288,290],[],0,1,0],
   [806414134,"msg.url",[],[166],1,1,1],
-  [2809933664,"particlefx.play",[50,235],[],0,0,0],
+  [2809933664,"particlefx.play",[50,235],[],0,1,0],
   [3569310218,"particlefx.reset_constant",[50,291,285],[],0,1,0],
   [3047358751,"particlefx.set_constant",[50,291,285,292],[],0,1,0],
   [3044283654,"particlefx.stop",[50,187],[],0,1,0],
@@ -1140,7 +1140,7 @@ const ROUTES = [
   [1220373797,"physics.get_shape",[50,302],[6],1,1,1],
   [2636616,"physics.raycast",[303,304,305,187],[9],1,1,1],
   [2653555167,"physics.raycast_async",[303,304,305,306],[],0,1,0],
-  [1107212821,"physics.set_event_listener",[162],[],0,0,0],
+  [1107212821,"physics.set_event_listener",[162],[],0,1,0],
   [1277170138,"physics.set_gravity",[81],[],0,1,0],
   [3028485791,"physics.set_group",[50,301],[],0,1,0],
   [2879664679,"physics.set_hflip",[50,232],[],0,1,0],
@@ -1169,13 +1169,13 @@ const ROUTES = [
   [1966474874,"render.delete_render_target",[314],[],0,1,0],
   [2431147342,"render.disable_material",[],[],0,1,0],
   [182835960,"render.disable_state",[109],[],0,1,0],
-  [2525269590,"render.disable_texture",[316],[],0,0,0],
+  [2525269590,"render.disable_texture",[316],[],0,1,0],
   [1831038998,"render.dispatch_compute",[82,171,317,187],[],0,1,0],
   [1437640116,"render.draw",[318,187],[],0,1,0],
   [2546261723,"render.draw_debug3d",[187],[],0,1,0],
   [3764411239,"render.enable_material",[319],[],0,1,0],
   [3190141495,"render.enable_state",[109],[],0,1,0],
-  [97040005,"render.enable_texture",[320,321,322],[],0,0,0],
+  [97040005,"render.enable_texture",[320,321,322],[],0,1,0],
   [286597108,"render.get_height",[],[13],1,1,1],
   [4039286113,"render.get_render_target_height",[314,322],[13],1,1,1],
   [3723698286,"render.get_render_target_width",[314,322],[13],1,1,1],
@@ -1193,7 +1193,7 @@ const ROUTES = [
   [3782563365,"render.set_cull_face",[339],[],0,1,0],
   [1832879575,"render.set_depth_func",[340],[],0,1,0],
   [2443358201,"render.set_depth_mask",[341],[],0,1,0],
-  [2106330303,"render.set_listener",[162],[],0,0,0],
+  [2106330303,"render.set_listener",[162],[],0,1,0],
   [851073219,"render.set_polygon_offset",[61,342],[],0,1,0],
   [2094481018,"render.set_projection",[343],[],0,1,0],
   [787481085,"render.set_render_target",[314,187],[],0,1,0],
@@ -1207,7 +1207,7 @@ const ROUTES = [
   [684194101,"resource.create_buffer",[194,308],[22],1,1,1],
   [109392419,"resource.create_sound_data",[194,187],[22],1,1,1],
   [646924158,"resource.create_texture",[194,308,99],[22],1,1,1],
-  [2463011221,"resource.create_texture_async",[194,308,99,162],[22,13],2,0,2],
+  [2463011221,"resource.create_texture_async",[194,308,99,162],[22,13],2,1,2],
   [3804314878,"resource.get_atlas",[188],[6],1,1,1],
   [4087860613,"resource.get_buffer",[188],[98],1,1,1],
   [3518036150,"resource.get_render_target_info",[188],[6],1,1,1],
@@ -1227,8 +1227,8 @@ const ROUTES = [
   [1298827590,"socket.dns.tohostname",[350],[20,6],2,1,2],
   [4052701394,"socket.dns.toip",[350],[20,6],2,1,2],
   [1053915798,"socket.gettime",[],[13],1,1,1],
-  [407150266,"socket.newtry",[355],[268],1,0,1],
-  [2218837340,"socket.protect",[356],[268],1,0,1],
+  [407150266,"socket.newtry",[355],[268],1,1,1],
+  [2218837340,"socket.protect",[356],[268],1,1,1],
   [238271325,"socket.select",[357,358,359],[360,360,20],3,1,3],
   [2601339186,"socket.skip",[361,85],[13],1,1,1],
   [902564824,"socket.sleep",[362],[],0,1,0],
@@ -1244,12 +1244,12 @@ const ROUTES = [
   [2034901354,"sound.is_music_playing",[],[25],1,1,1],
   [1027591192,"sound.is_phone_call_active",[],[25],1,1,1],
   [1502096075,"sound.pause",[50,365],[],0,1,0],
-  [900417529,"sound.play",[50,234,183],[13],1,0,1],
+  [900417529,"sound.play",[50,234,183],[13],1,1,1],
   [4220725117,"sound.set_gain",[50,366],[],0,1,0],
   [497116905,"sound.set_group_gain",[301,366],[],0,1,0],
   [665323993,"sound.set_pan",[50,367],[],0,1,0],
   [851439019,"sound.stop",[50,368],[],0,1,0],
-  [2116188218,"sprite.play_flipbook",[50,208,183,234],[],0,0,0],
+  [2116188218,"sprite.play_flipbook",[50,208,183,234],[],0,1,0],
   [4156456045,"sprite.reset_constant",[50,285],[],0,1,0],
   [1703142815,"sprite.set_hflip",[50,232],[],0,1,0],
   [2316635445,"sprite.set_vflip",[50,232],[],0,1,0],
@@ -1270,7 +1270,7 @@ const ROUTES = [
   [1715761682,"sys.get_sys_info",[187],[6],1,1,1],
   [1260100361,"sys.load",[375],[289],1,1,1],
   [667618348,"sys.load_buffer",[194],[98],1,1,1],
-  [2461929107,"sys.load_buffer_async",[194,378],[13],1,0,1],
+  [2461929107,"sys.load_buffer_async",[194,378],[13],1,1,1],
   [2308150026,"sys.load_resource",[375],[20,20],2,1,2],
   [2064699563,"sys.open_url",[50,379],[25],1,1,1],
   [309934808,"sys.reboot",[380,381,382,383,384,385],[],0,1,0],
@@ -1278,7 +1278,7 @@ const ROUTES = [
   [466939425,"sys.serialize",[386],[20],1,1,1],
   [161653622,"sys.set_connectivity_host",[387],[],0,1,0],
   [2847174763,"sys.set_engine_throttle",[12,388],[],0,1,0],
-  [2791701985,"sys.set_error_handler",[389],[],0,0,0],
+  [2791701985,"sys.set_error_handler",[389],[],0,1,0],
   [606958618,"sys.set_render_enable",[12],[],0,1,0],
   [3058596528,"sys.set_update_frequency",[62],[],0,1,0],
   [1577053319,"sys.set_vsync_swap_interval",[390],[],0,1,0],
@@ -1343,7 +1343,7 @@ const ROUTES = [
   [1389820634,"window.get_safe_area",[],[6],1,1,1],
   [3950716894,"window.get_size",[],[13,13],2,1,2],
   [2490982863,"window.set_dim_mode",[177],[],0,1,0],
-  [1282520203,"window.set_listener",[162],[],0,0,0],
+  [1282520203,"window.set_listener",[162],[],0,1,0],
   [1050223476,"window.set_mouse_lock",[424],[],0,1,0],
   [2677153760,"window.set_position",[82,171],[],0,1,0],
   [1882390770,"window.set_size",[228,229],[],0,1,0],
@@ -1351,7 +1351,8 @@ const ROUTES = [
   [314843756,"zlib.deflate",[426],[20],1,1,1],
   [3500234696,"zlib.inflate",[426],[20],1,1,1]
 ];
-const ORDER = [103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,271,272,273,274,275,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,432,434,435,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,473,474,475,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,498,499,500,501,503,504,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,538,553,554,560,562,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,602,603,604,605,606,607,608,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,658,659,660,661,662,663,664,665,667,668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,685,686,687,688,689,691,692,693,694,695,696,697,698,699,700,701,702,703,704,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720,721,722,723,724,725,726,727,728,729,730,732,733,735,737,738,739,741,744,745,746,747,748,749,750,751,752,753,754,755,756,757,759,760,761,762,763,764,765,766,767,768,769,770,771,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,810,811,812,813,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,836,837,838,839,840,841,842,844,845,846,847,848,849,850,851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,887,888,889,890,891,892,893,894,895,896,897,898,899,900,901,902,903,904,905,906,907,909,910,911,912,913,914,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,269,270,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,424,425,426,427,428,429,430,431,533,534,535,536,537,539,540,541,542,543,544,545,546,547,548,549,550,551,552,555,556,557,558,559,561,563,564,565,731,736,742,743,75,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,433,436,472,476,497,502,505,532,600,601,656,657,666,684,690,705,734,740,758,772,792,793,809,814,835,843,908];
+const ORDER = [103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,271,272,273,274,275,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,483,484,485,486,487,488,489,490,491,492,493,494,495,496,497,498,499,500,501,502,503,504,506,507,508,509,510,511,512,513,514,515,516,517,518,519,520,521,522,523,524,525,526,527,528,529,530,531,538,553,554,560,562,566,567,568,569,570,571,572,573,574,575,576,577,578,579,580,581,582,583,584,585,586,587,588,589,590,591,592,593,594,595,596,597,598,599,600,601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,677,678,679,680,681,682,683,684,685,686,687,688,689,690,691,692,693,694,695,696,697,698,699,700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720,721,722,723,724,725,726,727,728,729,730,732,733,735,737,738,739,741,744,745,746,747,748,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799,800,801,802,803,804,805,806,807,808,809,810,811,812,813,814,815,816,817,818,819,820,821,822,823,824,825,826,827,828,829,830,831,832,833,834,835,836,837,838,839,840,841,842,843,844,845,846,847,848,849,850,851,852,853,854,855,856,857,858,859,860,861,862,863,864,865,866,867,868,869,870,871,872,873,874,875,876,877,878,879,880,881,882,883,884,885,886,887,888,889,890,891,892,893,894,895,896,897,898,899,900,901,902,903,904,905,906,907,908,909,910,911,912,913,914,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,269,270,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,424,425,426,427,428,429,430,431,505,532,533,534,535,536,537,539,540,541,542,543,544,545,546,547,548,549,550,551,552,555,556,557,558,559,561,563,564,565,731,736,742,743,75,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,734,740];
+const HANDLE_SEEDS = [[3495418691,"box2d-shape"],[3484652730,"graphics-texture"]];
 
 const CODE = {"undefined":0,"null":1,"boolean":2,"number":3,"string":4,"hash":5,"url":6,"handle":7,"guiNode":8,"userdata":9,"vector3":10,"vector4":11,"quaternion":12,"matrix4":13,"sequence":14,"record":15,"map":16,"callback":17,"unsupported":18};
 
@@ -1360,6 +1361,14 @@ if (!bridge || typeof bridge.call !== "function") throw new Error("script bridge
 
 /** Retained engine handles the recorder minted on an earlier recorded call. */
 const pool = new Map();
+
+function childSentinel(seed, index) {
+  return ((seed * 17 + index + 1) % 10000) + 1;
+}
+
+function u64Sentinel(seed) {
+  return (BigInt(seed + 0x10000) << 32n) | BigInt(seed);
+}
 
 function needs(index, into, seen) {
   if (seen.has(index)) return;
@@ -1384,30 +1393,41 @@ function harvest(value) {
   for (const key of Object.keys(value)) harvest(value[key]);
 }
 
-function build(index) {
+function build(index, seed) {
   const [code, aux, key, children] = SHAPES[index];
   switch (code) {
     case CODE.undefined: return undefined;
     case CODE.null: return null;
-    case CODE.boolean: return true;
-    case CODE.number: return 1;
-    case CODE.string: return "deherm";
-    case CODE.hash: return 0x123456789abcdef0n;
-    case CODE.url: return { socket: 1n, reserved: 0n, path: 2n, fragment: 3n, __dehermUrlV1: true };
+    case CODE.boolean: return (seed % 2) !== 0;
+    case CODE.number: return seed;
+    case CODE.string: return "d" + seed;
+    case CODE.hash: return u64Sentinel(seed);
+    case CODE.url: return {
+      socket: u64Sentinel(seed), reserved: u64Sentinel(seed + 1),
+      path: u64Sentinel(seed + 2), fragment: u64Sentinel(seed + 3), __dehermUrlV1: true
+    };
     case CODE.handle: return pool.get(SEMANTIC[aux]);
     case CODE.guiNode: return pool.get("gui-node");
     case CODE.userdata: return pool.get("lua-userdata");
-    case CODE.vector3: return { x: 1, y: 2, z: 3, __dehermValueKind: "vector3" };
-    case CODE.vector4: return { x: 1, y: 2, z: 3, w: 4, __dehermValueKind: "vector4" };
-    case CODE.quaternion: return { x: 1, y: 2, z: 3, w: 4, __dehermValueKind: "quaternion" };
-    case CODE.matrix4: return Array.from({ length: 16 }, (unused, lane) => lane);
-    case CODE.sequence: return children.map((child) => build(child));
+    case CODE.vector3: return { x: seed, y: seed + 1, z: seed + 2, __dehermValueKind: "vector3" };
+    case CODE.vector4: return { x: seed, y: seed + 1, z: seed + 2, w: seed + 3, __dehermValueKind: "vector4" };
+    case CODE.quaternion: return { x: seed, y: seed + 1, z: seed + 2, w: seed + 3, __dehermValueKind: "quaternion" };
+    case CODE.matrix4: return Array.from({ length: 16 }, (unused, lane) => seed + lane);
+    case CODE.sequence: return children.map((child, childIndex) =>
+      build(child, childSentinel(seed, childIndex)));
     case CODE.record: {
       const record = {};
-      for (const child of children) record[SHAPES[child][2]] = build(child);
+      for (let childIndex = 0; childIndex < children.length; ++childIndex) {
+        const child = children[childIndex];
+        record[SHAPES[child][2]] = build(child, childSentinel(seed, childIndex));
+      }
       return record;
     }
-    case CODE.map: return new Map([[build(children[0]), build(children[1])]]);
+    case CODE.map: return new Map([[
+      build(children[0], childSentinel(seed, 0)),
+      build(children[1], childSentinel(seed, 1))
+    ]]);
+    case CODE.callback: return function dehermRecordedCallback() {};
     default: throw new Error("unsupported jsi argument shape " + code + " " + key);
   }
 }
@@ -1426,13 +1446,15 @@ function render(value, depth) {
   if (value === undefined) return "undef";
   if (value === null) return "null";
   const type = typeof value;
-  if (type === "boolean") return "bool";
-  if (type === "number") return "num";
-  if (type === "string") return "str:" + utf8Length(value);
-  if (type === "bigint") return "hash";
+  if (type === "boolean") return "bool:" + (value ? "1" : "0");
+  if (type === "number") return "num:" + value;
+  if (type === "string") return "str:" + value;
+  if (type === "bigint") return "hash:" + value;
   if (type === "function") return "cb";
   if (Array.isArray(value)) {
-    if (value.length === 16 && value.every((item) => typeof item === "number")) return "dv:mat4";
+    if (value.length === 16 && value.every((item) => typeof item === "number")) {
+      return "dv:mat4:" + value.join(",");
+    }
     return "seq(" + value.map((item) => render(item, depth + 1)).join(",") + ")";
   }
   if (value instanceof Map) {
@@ -1440,14 +1462,22 @@ function render(value, depth) {
     for (const [key, item] of value) parts.push(render(key, depth + 1) + "=>" + render(item, depth + 1));
     return "map(" + parts.join(",") + ")";
   }
-  if (value.__dehermUrlV1) return "url";
+  if (value.__dehermUrlV1) {
+    return "url:" + value.socket + "," + value.reserved + "," + value.path + "," + value.fragment;
+  }
   const kind = value.__dehermValueKind;
-  if (kind === "vector3") return "dv:v3";
-  if (kind === "vector4") return "dv:v4";
-  if (kind === "quaternion") return "dv:quat";
+  if (kind === "vector3") return "dv:v3:" + value.x + "," + value.y + "," + value.z;
+  if (kind === "vector4") return "dv:v4:" + value.x + "," + value.y + "," + value.z + "," + value.w;
+  if (kind === "quaternion") return "dv:quat:" + value.x + "," + value.y + "," + value.z + "," + value.w;
   if (typeof value.kind === "string" && typeof value.dispose === "function") return "h:" + value.kind;
   const fields = Object.keys(value).map((key) => key + "=" + render(value[key], depth + 1));
   return "rec(" + fields.join(",") + ")";
+}
+
+for (const [stableId, kind] of HANDLE_SEEDS) {
+  const value = bridge.call(stableId, []);
+  harvest(value);
+  if (!pool.has(kind)) throw new Error("recording handle fixture failed to mint " + kind);
 }
 
 for (const slot of ORDER) {
@@ -1462,7 +1492,7 @@ for (const slot of ORDER) {
     for (const kind of missing) {
       if (!pool.has(kind)) throw new Error("no recorded handle source for " + kind + " (" + canonical + ")");
     }
-    const args = argumentShapes.map((shape) => build(shape));
+    const args = argumentShapes.map((shape, argumentIndex) => build(shape, argumentIndex + 1));
     const value = bridge.call(stableId, args);
     harvest(value);
     let values;

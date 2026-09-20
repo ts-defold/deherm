@@ -305,6 +305,25 @@ pnpm exec deherm verify-generated
 pnpm exec deherm verify-bundle
 ```
 
+`materialize-dmsdk` writes a deterministic production/verification set. Each
+member is replaced atomically and the binding manifest is published last, so a
+reader can reject an interrupted or mixed set from its content hashes. For an
+`--output generated/dmsdk-provider.cpp` invocation the files are:
+
+```text
+generated/dmsdk-provider.cpp              production usage-pruned provider
+generated/dmsdk-provider.cpp.json         keyed production manifest
+generated/dmsdk-provider.verify.cpp       exact-call provider and fake-callee ABI
+generated/dmsdk-provider.verify.json      content-addressed verification vectors
+```
+
+The verification C++ deliberately leaves each uniquely named fake callee for a
+test harness to define. Its signature is generated from the same resolved
+receiver, substitutions, native parameter types, and result type as the
+production call. The manifests bind the members of the set, and `--check`
+verifies all four files together; deleting or editing any one requires
+rematerialization.
+
 These are the installed-package commands verified from a local tarball. The
 package name is not published yet; in this checkout use `pnpm cli --` before
 the command and options. No arguments launches the TUI; `create` works before

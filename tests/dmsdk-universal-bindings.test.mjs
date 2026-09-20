@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -17,6 +18,17 @@ const policyCatalog = Object.freeze({
   sourceHashes: Object.freeze({ catalog: dmSdkUniversalCatalogSha256 }),
   recipes: dmSdkUniversalRecipes
 });
+
+function canonicalJson(value) {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  return `{${Object.keys(value).sort().map((key) =>
+    `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+}
+
+function sha256(value) {
+  return createHash("sha256").update(value).digest("hex");
+}
 
 function run(command, args) {
   return execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe" });
@@ -193,18 +205,43 @@ test("usage materializer compiles, links, and runs direct, function-template, co
   ];
   const generated = materializeDmSdkUsages(usages, { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
   assert.equal(generated.manifest.length, usages.length);
+  assert.equal(generated.verification.vectorCount, usages.length);
+  assert.equal(generated.verification.vectors.length, usages.length);
+  assert.match(generated.verification.manifestSha256, /^[0-9a-f]{64}$/);
+  const { manifestSha256, ...verificationPayload } = generated.verification;
+  assert.equal(manifestSha256, sha256(canonicalJson(verificationPayload)));
+  assert.deepEqual(
+    generated.verification.vectors.map(({ invocation }) => invocation.kind),
+    [
+      "direct-function",
+      "direct-function",
+      "placement-constructor",
+      "member-function",
+      "explicit-destructor",
+      "function-template-specialization",
+    ],
+  );
+  for (const [index, vector] of generated.verification.vectors.entries()) {
+    assert.equal(vector.declarationId, usages[index].declarationId);
+    assert.equal(vector.productionWrapper, generated.manifest[index].wrapper);
+    assert.equal(vector.vectorSha256, generated.manifest[index].verificationVectorSha256);
+    assert.match(vector.vectorSha256, /^[0-9a-f]{64}$/);
+  }
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-materialized-"));
   try {
     const materialized = path.join(output, "materialized.cpp");
+    const verification = path.join(output, "materialized.verify.cpp");
     const harness = path.join(output, "harness.cpp");
     const executable = path.join(output, "universal-test");
     await writeFile(materialized, generated.source);
+    await writeFile(verification, generated.verificationSource);
     await writeFile(harness, `
 #include <defold_hermes/generated_dmsdk_universal.h>
 #include <dmsdk/dlib/array.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "materialized.verify.cpp"
 
 static uint64_t allocations = 0;
 void* operator new(size_t size) { ++allocations; if (void* value = malloc(size)) return value; abort(); }
@@ -217,6 +254,44 @@ extern "C" DehermDmSdkUniversalStatus wrap_array_capacity(const DehermDmSdkUnive
 extern "C" DehermDmSdkUniversalStatus wrap_array_destroy(const DehermDmSdkUniversalValue*, uint32_t, DehermDmSdkUniversalValue*);
 extern "C" DehermDmSdkUniversalStatus wrap_clamp_i32(const DehermDmSdkUniversalValue*, uint32_t, DehermDmSdkUniversalValue*);
 extern "C" void deherm_dmsdk_generated_provider_install(void);
+extern "C" void deherm_dmsdk_generated_provider_install_exact_verification(void);
+
+static uint32_t exact_calls = 0;
+static dmArray<uint32_t>* exact_receiver = nullptr;
+static uint32_t* exact_backing = nullptr;
+static uint32_t exact_size = 0;
+static uint32_t exact_capacity = 0;
+
+extern "C" uint32_t wrap_to_network__exact_callee(uint32_t value) {
+  ++exact_calls;
+  return value ^ UINT32_C(0x55aa55aa);
+}
+extern "C" uint32_t wrap_to_host__exact_callee(uint32_t value) {
+  ++exact_calls;
+  return value ^ UINT32_C(0xaa55aa55);
+}
+extern "C" dmArray<uint32_t>* wrap_array_construct__exact_callee(
+    dmArray<uint32_t>* receiver, uint32_t* backing, uint32_t size, uint32_t capacity) {
+  ++exact_calls;
+  exact_receiver = receiver;
+  exact_backing = backing;
+  exact_size = size;
+  exact_capacity = capacity;
+  return receiver;
+}
+extern "C" uint32_t wrap_array_capacity__exact_callee(dmArray<uint32_t>* receiver) {
+  ++exact_calls;
+  exact_receiver = receiver;
+  return 91;
+}
+extern "C" void wrap_array_destroy__exact_callee(dmArray<uint32_t>* receiver) {
+  ++exact_calls;
+  exact_receiver = receiver;
+}
+extern "C" int32_t wrap_clamp_i32__exact_callee(int32_t value, int32_t minimum, int32_t maximum) {
+  ++exact_calls;
+  return value + minimum + maximum;
+}
 
 int main() {
   if (deherm_dmsdk_universal_count() != 1361) return 1;
@@ -262,6 +337,27 @@ int main() {
   };
   if (deherm_dmsdk_universal_dispatch(${clamp.numericId}, clamp_args, 3, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
       result.tag != DEHERM_DMSDK_UNIVERSAL_I64 || static_cast<int64_t>(result.payload) != -10) return 9;
+
+  // Install the automatically generated exact-call twin. The same stable IDs,
+  // checks, native decoders, result encoders and receiver expressions now call
+  // ABI-compatible fake callees whose observations are asserted below.
+  deherm_dmsdk_generated_provider_install_exact_verification();
+  scalar[0].tag = DEHERM_DMSDK_UNIVERSAL_U64;
+  scalar[0].payload = UINT32_C(0x12345678);
+  if (deherm_dmsdk_universal_dispatch(${toNetwork.numericId}, scalar, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
+      result.payload != (UINT32_C(0x12345678) ^ UINT32_C(0x55aa55aa))) return 20;
+  if (deherm_dmsdk_universal_dispatch(${toHost.numericId}, scalar, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
+      result.payload != (UINT32_C(0x12345678) ^ UINT32_C(0xaa55aa55))) return 21;
+  if (deherm_dmsdk_universal_dispatch(${constructor.numericId}, ctor, 4, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
+      result.tag != DEHERM_DMSDK_UNIVERSAL_VOID || exact_receiver != reinterpret_cast<dmArray<uint32_t>*>(storage) ||
+      exact_backing != backing || exact_size != 2 || exact_capacity != 4) return 22;
+  if (deherm_dmsdk_universal_dispatch(${capacity.numericId}, ctor, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
+      result.payload != 91 || exact_receiver != reinterpret_cast<dmArray<uint32_t>*>(storage)) return 23;
+  if (deherm_dmsdk_universal_dispatch(${destructor.numericId}, ctor, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
+      result.tag != DEHERM_DMSDK_UNIVERSAL_VOID || exact_receiver != reinterpret_cast<dmArray<uint32_t>*>(storage)) return 24;
+  if (deherm_dmsdk_universal_dispatch(${clamp.numericId}, clamp_args, 3, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
+      result.tag != DEHERM_DMSDK_UNIVERSAL_I64 || static_cast<int64_t>(result.payload) != -17) return 25;
+  if (exact_calls != 6) return 26;
   puts("dmsdk-universal:ok");
   return 0;
 }
@@ -295,10 +391,37 @@ test("usage materializer normalizes JavaScript numeric cells for f32 arguments a
 test("usage materializer fails closed on catalog drift, unsafe bypass, arity overrides, and scalar narrowing", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const toNetwork = recipe(report, "dmEndian::ToNetwork", (item) => item.abi.parameters[0]?.nativeType === "uint32_t");
+  const configFloat = recipe(report, "ConfigFileGetFloat");
   assert.throws(() => materializeDmSdkUsages([], {}), /requires a resolved policy catalog/);
   assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /generatedAdapterBypass/);
   assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, parameters: [], acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /override parameters only/);
   const generated = materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
   assert.match(generated.source, /payload <= UINT32_MAX/);
   assert.equal(generated.catalogSha256, dmSdkUniversalCatalogSha256);
+  assert.throws(() => materializeDmSdkUsages([{
+    declarationId: toNetwork.declarationId,
+    receiverCppType: "uint32_t",
+    acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } },
+  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }),
+  /may not declare receiverCppType for direct-function/);
+
+  const configUsage = {
+    declarationId: configFloat.declarationId,
+    acknowledgements: {
+      recordLayout: { reason: "opaque handle fixture", evidence: "digest-precondition test" },
+    },
+  };
+  const nonNull = materializeDmSdkUsages([configUsage], {
+    catalog: policyCatalog,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+  });
+  const nullable = materializeDmSdkUsages([{ ...configUsage, nullableParameters: [0] }], {
+    catalog: policyCatalog,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+  });
+  assert.notEqual(
+    nonNull.verification.vectors[0].vectorSha256,
+    nullable.verification.vectors[0].vectorSha256,
+    "verification vectors must bind emitted precondition behavior",
+  );
 });

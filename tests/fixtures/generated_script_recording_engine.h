@@ -6,13 +6,15 @@
 #define DEHERM_RECORDING_SCHEMA_VERSION 1u
 #define DEHERM_RECORDING_DEFOLD_REVISION "7f0f554f41f9dce1e0ddff99bf08200657d1ee05"
 #define DEHERM_RECORDING_PLAN_SHA256 "f54a583869ef3fb0050755e363238cc9d5d8886a9157e81f69fc874d4993c8b0"
-#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "970ad1433a95563d3a6e2fa56075c372bd33cb04ff0fecd0e63d5dd3704747a9"
+#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "2b0a609881fa026c2abd0aa71d28a080bdc18d0009a037d63919e5c9081b87ee"
 #define DEHERM_RECORDING_ROUTE_COUNT 915u
 #define DEHERM_RECORDING_SHAPE_COUNT 427u
 #define DEHERM_RECORDING_SHAPE_REF_COUNT 2253u
-#define DEHERM_RECORDING_TEXT_COUNT 1264u
+#define DEHERM_RECORDING_TEXT_COUNT 1262u
 #define DEHERM_RECORDING_TRANSPORT_COUNT 3u
 #define DEHERM_RECORDING_SEMANTIC_HANDLE_COUNT 16u
+#define DEHERM_RECORDING_HANDLE_SEED_COUNT 2u
+#define DEHERM_RECORDING_HANDLE_SEED_STORAGE_COUNT 2u
 
 enum DehermRecordingShapeCode {
   DEHERM_RECORDING_SHAPE_UNDEFINED = 0,
@@ -68,6 +70,12 @@ typedef struct DehermRecordingRoute {
   int32_t reason[DEHERM_RECORDING_TRANSPORT_COUNT];
 } DehermRecordingRoute;
 
+typedef struct DehermRecordingHandleSeed {
+  uint32_t stableId;
+  uint8_t shapeCode;
+  uint8_t semantic;
+} DehermRecordingHandleSeed;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -79,6 +87,7 @@ extern const DehermRecordingRoute kDehermRecordingRoutes[DEHERM_RECORDING_ROUTE_
 extern const uint32_t kDehermRecordingOrder[DEHERM_RECORDING_ROUTE_COUNT];
 extern const char* const kDehermRecordingSemanticHandleNames[DEHERM_RECORDING_SEMANTIC_HANDLE_COUNT];
 extern const char* const kDehermRecordingTransportNames[DEHERM_RECORDING_TRANSPORT_COUNT];
+extern const DehermRecordingHandleSeed kDehermRecordingHandleSeeds[DEHERM_RECORDING_HANDLE_SEED_STORAGE_COUNT];
 
 /** Installs the recording provider underneath the real script bridge seam. */
 void deherm_recording_install(void);

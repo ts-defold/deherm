@@ -58,12 +58,30 @@ checks its stable ID, module, member, and contract against the generated policy;
 this includes the source correction from documented `sys.set_render_enable` to
 registered `sys.set_render_enabled`.
 
+The generated recording engine now executes all 915 universal rows through the
+real Dynamic Hermes/JSI bridge. Two input-only handle kinds (`box2d-shape` and
+`graphics-texture`) have no public constructor or return route, so generated,
+collision-checked provider fixture IDs mint genuine JSI HostObjects before the
+census; they are not substituted with plain JavaScript objects. The
+direct-memory and typed-native drivers each execute 890 rows. Their remaining
+25 rows are an explicit target partition: 23 callback-input routes require the
+HTML5 callback registry or JSI fallback, and two routes return functions that
+only JSI emits. Static URL and Matrix4 arguments are exercised through their
+real bounded frame helpers rather than skipped by the harness.
+
 The dmSDK surface has 1,361 runtime declarations and 1,361 materializable
-recipes with silent omission forbidden. Its current native materializer test
-compiles, links, and runs representative direct functions, a template
-specialization, a constructor, a member function, and a destructor. The
-remaining work is to make the exact-call verification artifact an automatic
-output of every usage materialization rather than a representative test only.
+recipes with silent omission forbidden. Every concrete usage materialization
+now emits two artifacts from one resolved call plan: the production wrapper and
+an exact-call wrapper/provider targeting a uniquely named ABI-compatible fake
+callee. A content-addressed vector records the source symbol, invocation kind,
+receiver, template arguments, ordered native parameters and slots, result
+shape, requirements, and both wrapper identities. The native test compiles,
+links, and executes that twin for direct functions, a template specialization,
+a constructor, a member function, and a destructor, asserting receiver and
+ordered native values as well as result re-encoding. The remaining census work
+is transport-driving each reachable concrete usage through JSI, Static Hermes,
+and browser/Wasm adapters where that usage is emitted; abstract recipes remain
+available but are not falsely described as concrete calls.
 
 # Integration tests are sentinels
 

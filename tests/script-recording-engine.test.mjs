@@ -12,6 +12,10 @@ import { buildRecordingEngineModel } from "../packages/compiler/src/script-recor
 const root = path.resolve(import.meta.dirname, "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-script-recording-engine.json");
 
+function u64Sentinel(seed) {
+  return (BigInt(seed + 0x10000) << 32n) | BigInt(seed);
+}
+
 function run(command, args, options = {}) {
   return execFileSync(command, args, { cwd: root, stdio: "pipe", encoding: "utf8", ...options });
 }
@@ -74,6 +78,34 @@ test("the recording engine is generated from the same IR as the bindings, and is
     }
   }
 
+  // JSI emits every universal row. Two documented input handle kinds have no
+  // public constructor/return path, so deterministic provider fixtures mint
+  // genuine HostObjects through the bridge before the census begins.
+  assert.deepEqual(report.summary.byTransport.jsi, { exercised: 915, skipped: 0 });
+  assert.deepEqual(
+    report.handleSeeds.map(({ name }) => name),
+    ["box2d-shape", "graphics-texture"],
+  );
+  assert.equal(new Set(report.handleSeeds.map(({ stableId }) => stableId)).size, report.handleSeeds.length);
+  assert.ok(report.handleSeeds.every(({ stableId }) =>
+    !report.routes.some((route) => route.stableId === stableId)));
+
+  // Static URL/Matrix4 push support is now exercised, not hidden by an old
+  // harness limitation. Only callback rows remain transport-inapplicable:
+  // browser callbacks need the HTML5 registry and Static Hermes falls back to
+  // JSI for function values.
+  assert.deepEqual(report.summary.byTransport["direct-memory"], { exercised: 890, skipped: 25 });
+  assert.deepEqual(report.summary.byTransport["typed-native"], { exercised: 890, skipped: 25 });
+  assert.ok(report.routes.every((route) =>
+    route.transports["typed-native"].reason !== "static-frame-has-no-url-or-matrix4-argument-push"));
+  const directSkips = report.routes
+    .filter((route) => route.transports["direct-memory"].status === "skip")
+    .map((route) => route.transports["direct-memory"].reason);
+  assert.deepEqual(new Set(directSkips), new Set([
+    "callback-input-requires-the-html5-browser-registry",
+    "callback-result-is-emitted-only-by-the-jsi-transport",
+  ]));
+
   // Transports the canonical plan models but this harness cannot drive are
   // declared rather than silently absent.
   assert.deepEqual(report.transports.undrivable.map(({ transport }) => transport), ["lua-stack"]);
@@ -111,4 +143,19 @@ test("the expected trace is derived from the contract and covers every drivable 
   assert.equal(lines.length, expectedLines);
   assert.ok(lines.every((line) => /^(call|recv|end|skip) /.test(line)));
   assert.ok(lines.filter((line) => line.startsWith("call ")).every((line) => / c\d+ arity=\d+ /.test(line)));
+  const bitBand = report.routes.find(({ id }) => id === "script:bit.band");
+  const screenToWorld = report.routes.find(({ id }) => id === "script:camera.screen_xy_to_world");
+  assert.ok(lines.includes(
+    `call bit.band jsi c${bitBand.contract} arity=2 args=[num:1 num:2] ctx=context-policy-unresolved`,
+  ));
+  assert.ok(lines.includes(
+    `call camera.screen_xy_to_world typed-native c${screenToWorld.contract} ` +
+    `arity=3 args=[num:1 num:2 url:${[3, 4, 5, 6].map(u64Sentinel).join(",")}] ` +
+    "ctx=context-policy-unresolved",
+  ));
+  assert.ok(lines.some((line) =>
+    line.startsWith("recv b2d.joint.get_anchor_a jsi ") && line.endsWith("[dv:v3:257,258,259]")));
+  assert.ok(lines.some((line) => /args=\[[^\]]*str:d1 str:d2/.test(line)));
+  assert.ok(lines.some((line) => line.includes(`hash:${u64Sentinel(1)}`)),
+    "the trace must carry a nonzero upper 32-bit hash sentinel");
 });

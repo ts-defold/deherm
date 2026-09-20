@@ -49,6 +49,16 @@ export const undrivableTransports = Object.freeze([
   })
 ]);
 
+function seedStableId(revision, name, used) {
+  const digest = createHash("sha256")
+    .update(`${revision}\0deherm-recording-handle-seed\0${name}`)
+    .digest();
+  let candidate = digest.readUInt32LE(0);
+  while (used.has(candidate)) candidate = (candidate + 1) >>> 0;
+  used.add(candidate);
+  return candidate;
+}
+
 /**
  * Structural alias policy from projected `defold-value` names onto the generated
  * handle-kind ledger. These are value-shape rules, not route allowlists: an
@@ -155,32 +165,48 @@ function handleKindLedger(handleLowering) {
  * the generated driver, the generated JavaScript driver, and this expectation
  * renderer must all produce byte-identical text for the same observed value.
  */
-export function renderShapeSpec(shapes, index, semanticNames) {
+function childSentinel(seed, index) {
+  return ((seed * 17 + index + 1) % 10000) + 1;
+}
+
+function u64Sentinel(seed) {
+  return (BigInt(seed + 0x10000) << 32n) | BigInt(seed);
+}
+
+export function renderShapeSpec(shapes, index, semanticNames, seed = 1) {
   const shape = shapes[index];
   switch (shape.code) {
     case SHAPE.undefined: return "undef";
     case SHAPE.null: return "null";
-    case SHAPE.boolean: return "bool";
-    case SHAPE.number: return "num";
-    case SHAPE.string: return "str:6";
-    case SHAPE.hash: return "hash";
-    case SHAPE.url: return "url";
+    case SHAPE.boolean: return `bool:${seed % 2}`;
+    case SHAPE.number: return `num:${seed}`;
+    case SHAPE.string: return `str:d${seed}`;
+    case SHAPE.hash: return `hash:${u64Sentinel(seed)}`;
+    case SHAPE.url: return `url:${Array.from({ length: 4 }, (_, lane) =>
+      u64Sentinel(seed + lane)).join(",")}`;
     case SHAPE.handle: return `h:${semanticNames[shape.aux] ?? "unknown"}`;
     case SHAPE.guiNode: return "h:gui-node";
     case SHAPE.userdata: return "h:lua-userdata";
-    case SHAPE.vector3: return "dv:v3";
-    case SHAPE.vector4: return "dv:v4";
-    case SHAPE.quaternion: return "dv:quat";
-    case SHAPE.matrix4: return "dv:mat4";
+    case SHAPE.vector3: return `dv:v3:${seed},${seed + 1},${seed + 2}`;
+    case SHAPE.vector4: return `dv:v4:${seed},${seed + 1},${seed + 2},${seed + 3}`;
+    case SHAPE.quaternion: return `dv:quat:${seed},${seed + 1},${seed + 2},${seed + 3}`;
+    case SHAPE.matrix4: return `dv:mat4:${Array.from({ length: 16 }, (_, lane) => seed + lane).join(",")}`;
     case SHAPE.sequence:
-      return `seq(${shape.children.map((child) => renderShapeSpec(shapes, child, semanticNames)).join(",")})`;
+      return `seq(${shape.children.map((child, childIndex) =>
+        renderShapeSpec(shapes, child, semanticNames, childSentinel(seed, childIndex))).join(",")})`;
     case SHAPE.record:
-      return `rec(${shape.children.map((child) => {
+      return `rec(${shape.children.map((child, childIndex) => {
         const field = shapes[child];
-        return `${field.keyText}=${renderShapeSpec(shapes, child, semanticNames)}`;
+        return `${field.keyText}=${renderShapeSpec(
+          shapes, child, semanticNames, childSentinel(seed, childIndex),
+        )}`;
       }).join(",")})`;
     case SHAPE.map:
-      return `map(${renderShapeSpec(shapes, shape.children[0], semanticNames)}=>${renderShapeSpec(shapes, shape.children[1], semanticNames)})`;
+      return `map(${renderShapeSpec(
+        shapes, shape.children[0], semanticNames, childSentinel(seed, 0),
+      )}=>${renderShapeSpec(
+        shapes, shape.children[1], semanticNames, childSentinel(seed, 1),
+      )})`;
     case SHAPE.callback: return "cb";
     default: return "unsupported";
   }
@@ -433,10 +459,6 @@ export function buildRecordingEngineModel(inputs) {
       universalSkip = "projected-arity-below-generated-minimum";
     } else if (route.results.driven !== route.results.declared) {
       universalSkip = "projected-result-count-differs-from-generated";
-    } else if (resultsHave(route, (shape) => shape.code === SHAPE.callback)) {
-      universalSkip = "result-callback-is-not-synthesizable";
-    } else if (argumentsHave(route, (shape) => shape.code === SHAPE.callback)) {
-      universalSkip = "callback-argument-lifetime-is-not-modelled-by-the-recorder";
     }
     route.universalSkip = universalSkip;
   }
@@ -483,8 +505,26 @@ export function buildRecordingEngineModel(inputs) {
 
   const handleName = (kind) => kind === -1 ? "gui-node" : kind === -2 ? "lua-userdata" : (semanticNames[kind] ?? "unknown");
 
+  // A few public APIs consume retained engine handles for which the documented
+  // Lua surface exposes no constructor or return path. A real JSI call still
+  // needs a genuine HostObject, not a hand-shaped JavaScript object. Generate
+  // deterministic test-only provider routes that mint exactly those missing
+  // handle kinds through the same bridge decoder before the route census runs.
+  const missingHandleKinds = [...new Set(routes.flatMap((route) =>
+    [...needs.get(route.id)].filter((kind) => !pool.has(kind))))].sort((left, right) => left - right);
+  const usedStableIds = new Set(routes.map(({ stableId }) => stableId));
+  const handleSeeds = missingHandleKinds.map((kind) => ({
+    name: handleName(kind),
+    stableId: seedStableId(projection.defoldRevision, handleName(kind), usedStableIds),
+    shapeCode: kind === -1 ? SHAPE.guiNode : kind === -2 ? SHAPE.userdata : SHAPE.handle,
+    semantic: kind > 0 ? kind : 0
+  }));
+  const seededKinds = new Set(missingHandleKinds);
+
   for (const route of routes) {
-    const missing = [...needs.get(route.id)].filter((kind) => !pool.has(kind)).sort((a, b) => a - b);
+    const missing = [...needs.get(route.id)]
+      .filter((kind) => !pool.has(kind) && !seededKinds.has(kind))
+      .sort((a, b) => a - b);
     for (const transport of transportOrder) {
       let status = "exercise";
       let reason = "";
@@ -494,10 +534,18 @@ export function buildRecordingEngineModel(inputs) {
       } else if (transport === "jsi" && missing.length) {
         status = "skip";
         reason = `no-recorded-handle-source:${missing.map(handleName).join("+")}`;
-      } else if (transport === "typed-native" && argumentsHave(route,
-        (shape) => shape.code === SHAPE.url || shape.code === SHAPE.matrix4)) {
+      } else if (transport !== "jsi" && resultsHave(route,
+        (shape) => shape.code === SHAPE.callback)) {
         status = "skip";
-        reason = "static-frame-has-no-url-or-matrix4-argument-push";
+        reason = "callback-result-is-emitted-only-by-the-jsi-transport";
+      } else if (transport === "direct-memory" && argumentsHave(route,
+        (shape) => shape.code === SHAPE.callback)) {
+        status = "skip";
+        reason = "callback-input-requires-the-html5-browser-registry";
+      } else if (transport === "typed-native" && argumentsHave(route,
+        (shape) => shape.code === SHAPE.callback)) {
+        status = "skip";
+        reason = "callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame";
       }
       route.transports[transport] = { status, reason };
     }
@@ -509,6 +557,7 @@ export function buildRecordingEngineModel(inputs) {
     contractCount: new Set(routes.map((route) => route.contract)).size,
     marshallingProgramCount: new Set(routes.map((route) => route.marshallingPrograms.dynamicHermesJsi)).size,
     handleKindsMintedByRecordedResults: [...pool].sort((a, b) => a - b).map(handleName),
+    handleKindsMintedByGeneratedFixtures: handleSeeds.map(({ name }) => name),
     byTransport: Object.fromEntries(transportOrder.map((transport) => [transport, {
       exercised: routes.filter((route) => route.transports[transport].status === "exercise").length,
       skipped: routes.filter((route) => route.transports[transport].status === "skip").length
@@ -552,6 +601,7 @@ export function buildRecordingEngineModel(inputs) {
       undrivable: undrivableTransports
     },
     semanticHandleKindNames: semanticNames,
+    handleSeeds,
     text: text.entries,
     shapes: shapeList,
     order: ordered.map((route) => route.id),
@@ -580,8 +630,10 @@ export function renderExpectedTrace(model) {
         lines.push(`skip ${head} ${disposition.reason}`);
         continue;
       }
-      const args = route.argumentShapes.map((index) => renderShapeSpec(model.shapes, index, names));
-      const results = route.resultShapes.map((index) => renderShapeSpec(model.shapes, index, names));
+      const args = route.argumentShapes.map((index, slot) =>
+        renderShapeSpec(model.shapes, index, names, slot + 1));
+      const results = route.resultShapes.map((index, slot) =>
+        renderShapeSpec(model.shapes, index, names, 257 + slot));
       lines.push(`call ${head} arity=${route.arity.driven} args=[${args.join(" ")}] ctx=${route.context}`);
       lines.push(`recv ${head} results=${route.results.driven} [${results.join(" ")}]`);
       lines.push(`end ${head} status=ok`);
