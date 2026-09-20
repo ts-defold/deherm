@@ -1,5 +1,31 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - The ready dmSDK exact corpus became a generated artifact
+
+The 486 declaration-only universal-ready calls now come from one compiler-owned
+helper that verifies the catalog content hash and authenticated release-call
+symbol index, filters readiness mechanically, and orders vectors by numeric
+recipe ID. The universal generator commits the resulting exact plan plus its
+production and recording-fake C++ sources; clean-room regeneration owns and
+reproduces all three byte-for-byte. The plan records the ordered declaration
+identities and vector hashes, both source hashes, provider manifest, catalog
+identity, and symbol-index identity. The focused native census compiles the
+committed production source and executes the committed verification driver for
+all 486 vectors. This makes the corpus reusable by later JSI, Static Hermes,
+and browser transport runners. The same authenticated corpus now runs through
+real Hermes/JSI, a Shermes-compiled Static Hermes client, and real Emscripten
+Wasm in Chrome. The browser run exposed Defold's WebGPU aliases changing from
+native integers to browser-supplied pointer handles; the projection generator
+now classifies every platform-supplied replacement as a target-dependent
+opaque handle and uses the allocation-free compile-time pointer/integer codec.
+This is exact bridge and carrier evidence against recording fake callees, not
+Defold implementation-semantic evidence.
+
+The policy workflow's Linux engine lane also installs `libgl-dev`; the pinned
+SDK's `graphics_native.h` requires `GL/glx.h` even for the generated headless
+exact-call census. Host-parity now carries the regenerated target-conditional
+report that was stale after the preceding SDK import change.
+
 ## 2026-09-20 - Host parity installs the exact SDK support input
 
 The source-typed dmSDK importer resolves generated DDF and platform support

@@ -4,6 +4,11 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
+import {
+  dmSdkUniversalReadyCorpusArtifacts,
+  materializeDmSdkUniversalReadyCorpus,
+} from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer-core.mjs";
 import {
   assertDmSdkUniversalStaticFrameCapacity,
@@ -35,6 +40,9 @@ const artifacts = Object.freeze([
   "tests/fixtures/generated_dmsdk_universal_test_ids.h",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
   "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
+  dmSdkUniversalReadyCorpusArtifacts.plan,
+  dmSdkUniversalReadyCorpusArtifacts.productionSource,
+  dmSdkUniversalReadyCorpusArtifacts.verificationSource,
 ]);
 
 const valueKind = Object.freeze({
@@ -393,6 +401,9 @@ export async function buildUniversalDmSdkBindings({
     artifacts,
     recipes,
   };
+  const callIndex = buildDmSdkCallSymbolIndex(ir, report);
+  const readyCorpus = materializeDmSdkUniversalReadyCorpus(callIndex, report);
+  report.coverage.universalReadyExactVectors = readyCorpus.report.verification.vectorCount;
   const outputs = new Map([
     [artifacts[0], `${JSON.stringify(report, null, 2)}\n`],
     [artifacts[1], renderHeader(maxArguments, catalogHash)],
@@ -406,6 +417,9 @@ export async function buildUniversalDmSdkBindings({
     [artifacts[9], renderRecipesModule(recipes, sourceHash, catalogHash)],
     [artifacts[12], staticFrame.header],
     [artifacts[13], staticFrame.source],
+    [dmSdkUniversalReadyCorpusArtifacts.plan, `${JSON.stringify(readyCorpus.report, null, 2)}\n`],
+    [dmSdkUniversalReadyCorpusArtifacts.productionSource, readyCorpus.generated.source],
+    [dmSdkUniversalReadyCorpusArtifacts.verificationSource, readyCorpus.generated.verificationSource],
   ]);
   const endianRecipes = ["dmEndian::ToNetwork", "dmEndian::ToHost"].map((symbol) => {
     const matches = recipes.filter((recipe) => recipe.symbol === symbol && recipe.abi.parameters[0]?.nativeType === "uint32_t");

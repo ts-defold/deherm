@@ -3,13 +3,13 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "8d2b0087073a1680578bda42826ddb51d870e7ab6f38d448806cb0014b49df43",
+  "planSha256": "bd0c30a4f703144b4412a5b04456d92be89a546422c404063201efe8dcecd9b4",
   "planFallback": null,
   "inputHashes": {
     "projection": "f8241dbffcd0d96c439a78f0da8a8a43643fe4ce09e22f67e8e113350536eeb9",
     "universal": "127a1ac3f1ed0edf7ece38696feab15b20bfafa89316f87ca7276751f9a63fb2",
     "handleLowering": "5c767e7f0d11cd13c56079b992a54814f88788de823d8e1b221f8baf74ced43d",
-    "loweringPlan": "a6d334cdb1f4dd9fae2f0abd2e2132b0c371d0a8dfe45cf724acaa381e295b1b"
+    "loweringPlan": "976c0db5bfd82e19c79d44a5ec2b4c8edc0da1ad9c7906fccb44d62ccb865a54"
   },
   "planInputDrift": [],
   "transports": {
@@ -57479,11 +57479,11 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "b2f3c89b7abaa8386d09f6024b378e36134a0563e043ac059ea9723969b18844",
+    "header": "654a66f1c7439cd9ceefcaf4064bc8e11a6d8e457afff27635009af62f1e0ce1",
     "tables": "cc14b006bf6084af8bb8fe7a163e55cd30362bac828eb5c7007ba414d71461c8",
     "provider": "9ce2e8a0ed8fd8b3e42702c5ea746bb20b0806c602ec4e618db1fd2aa26173be",
     "driver": "bbe58abba9260aaecd329fd2883fb352d6dd56cb62f785e3da7968407181964f",
     "driverJs": "37f08b380634f43b606c6582b0510eaa8b694fd41c3de85731c4c1e02e0ebf0d",
-    "expectedTrace": "052e51e05ff573321139c130deef595cc3070ac9b6960ec109bd816cc88f4947"
+    "expectedTrace": "73cdd340d3e904947e8c38e996b770f5f05956ae33628237d9975a21f37a9acb"
   }
 }

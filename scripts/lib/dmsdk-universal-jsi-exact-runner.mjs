@@ -38,11 +38,13 @@ function expectedResultSetup(vector, index) {
   } else if (["u64", "bool"].includes(expected.tag)) {
     lines.push(`${name}.payload=UINT64_C(${expected.value});`);
   } else if (expected.tag === "address") {
-    let expression = "nullptr";
+    let expression = null;
     if (expected.fixture === "cstring") expression = `deherm_exact_vector_${index}_return_cstring`;
     if (expected.fixture === "value-object") expression = `&deherm_exact_vector_${index}_return_reference`;
     if (expected.fixture === "aligned-address-token") expression = `&deherm_exact_vector_${index}_return_address`;
-    lines.push(`${name}.payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${expression}));`);
+    lines.push(expression
+      ? `${name}.payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${expression}));`
+      : `${name}.payload=UINT64_C(${expected.value});`);
   }
   return { name, source: lines.join("\n ") };
 }

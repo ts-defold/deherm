@@ -39,10 +39,12 @@
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "classification": "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
     "symbolEvidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+    "targetConditionals": "packages/bindings/generated/defold-dmsdk-target-conditionals.json",
     "hashes": {
       "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
       "classification": "d6ad0e5c99963eca0deacb5f6827d52e26eb1dd630947797d9b343081ed9c52f",
       "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+      "targetConditionals": "cc01a8a5e6b0e85af728d55a00cd80801177d3e8eb54f1308de9279a01ed60d9",
       "loweringEvidence": {
         "scalar": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
         "enumValue": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555",
@@ -165,17 +167,17 @@
     "callback": 114,
     "cstring": 269,
     "enum": 378,
-    "handle": 857,
-    "named": 458,
-    "opaque": 6,
-    "pointer": 1670,
+    "handle": 870,
+    "named": 451,
+    "opaque": 22,
+    "pointer": 1661,
     "record": 1440,
     "reference": 136,
-    "scalar": 1425,
+    "scalar": 1418,
     "template": 11,
     "type-parameter": 55,
     "variadic": 1,
-    "void": 740
+    "void": 731
   },
   "effectSummary": {
     "callbacks": 95,
@@ -221,9 +223,9 @@
     "callback-registration-unregistration": 95,
     "callback-thread-reentrancy-lifetime": 90,
     "enum-width-domain-validation": 308,
-    "handle-ownership-nullability-lifetime": 634,
+    "handle-ownership-nullability-lifetime": 640,
     "native-symbol-linkage": 1361,
-    "opaque-type-abi-contract": 6,
+    "opaque-type-abi-contract": 22,
     "out-storage-initialization-failure": 534,
     "pointer-bounds-nullability-lifetime": 787,
     "receiver-provenance-lifetime": 186,
@@ -78816,12 +78818,30 @@
           "kind": "handle",
           "name": "jobject",
           "representation": {
-            "kind": "pointer",
-            "to": {
-              "kind": "void"
-            },
-            "constPointee": false,
-            "nullable": "unspecified"
+            "kind": "opaque",
+            "name": "jobject",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-android",
+              "armv7-android",
+              "x86_64-android"
+            ],
+            "liveIn": [
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "EGL/egl.h",
+              "condition": "defined(ANDROID)"
+            }
           },
           "nullable": "unspecified"
         },
@@ -78884,6 +78904,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -78926,12 +78947,30 @@
             "kind": "handle",
             "name": "android_app",
             "representation": {
-              "kind": "pointer",
-              "to": {
-                "kind": "void"
-              },
-              "constPointee": false,
-              "nullable": "unspecified"
+              "kind": "opaque",
+              "name": "android_app",
+              "reason": "target-platform-supplied",
+              "targetDependent": true,
+              "absentIn": [
+                "arm64-android",
+                "armv7-android",
+                "x86_64-android"
+              ],
+              "liveIn": [
+                "arm64-ios",
+                "arm64-linux",
+                "arm64-osx",
+                "arm64_sim-ios",
+                "wasm-web",
+                "wasm_pthread-web",
+                "x86_64-linux",
+                "x86_64-osx",
+                "x86_64-win32"
+              ],
+              "replacement": {
+                "include": "EGL/egl.h",
+                "condition": "defined(ANDROID)"
+              }
             },
             "nullable": "unspecified"
           },
@@ -78997,6 +79036,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix"
       ],
@@ -79037,12 +79077,30 @@
           "kind": "handle",
           "name": "EGLContext",
           "representation": {
-            "kind": "pointer",
-            "to": {
-              "kind": "void"
-            },
-            "constPointee": false,
-            "nullable": "unspecified"
+            "kind": "opaque",
+            "name": "EGLContext",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-android",
+              "armv7-android",
+              "x86_64-android"
+            ],
+            "liveIn": [
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "EGL/egl.h",
+              "condition": "defined(ANDROID)"
+            }
           },
           "nullable": "unspecified"
         },
@@ -79105,6 +79163,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -79144,12 +79203,30 @@
           "kind": "handle",
           "name": "EGLSurface",
           "representation": {
-            "kind": "pointer",
-            "to": {
-              "kind": "void"
-            },
-            "constPointee": false,
-            "nullable": "unspecified"
+            "kind": "opaque",
+            "name": "EGLSurface",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-android",
+              "armv7-android",
+              "x86_64-android"
+            ],
+            "liveIn": [
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "EGL/egl.h",
+              "condition": "defined(ANDROID)"
+            }
           },
           "nullable": "unspecified"
         },
@@ -79212,6 +79289,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -79254,12 +79332,30 @@
             "kind": "handle",
             "name": "JavaVM",
             "representation": {
-              "kind": "pointer",
-              "to": {
-                "kind": "void"
-              },
-              "constPointee": false,
-              "nullable": "unspecified"
+              "kind": "opaque",
+              "name": "JavaVM",
+              "reason": "target-platform-supplied",
+              "targetDependent": true,
+              "absentIn": [
+                "arm64-android",
+                "armv7-android",
+                "x86_64-android"
+              ],
+              "liveIn": [
+                "arm64-ios",
+                "arm64-linux",
+                "arm64-osx",
+                "arm64_sim-ios",
+                "wasm-web",
+                "wasm_pthread-web",
+                "x86_64-linux",
+                "x86_64-osx",
+                "x86_64-win32"
+              ],
+              "replacement": {
+                "include": "EGL/egl.h",
+                "condition": "defined(ANDROID)"
+              }
             },
             "nullable": "unspecified"
           },
@@ -79325,6 +79421,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix"
       ],
@@ -79362,9 +79459,35 @@
       },
       "signature": {
         "result": {
-          "kind": "opaque",
+          "kind": "handle",
           "name": "id",
-          "reason": "objective-c-object"
+          "representation": {
+            "kind": "opaque",
+            "name": "id",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "x86_64-osx"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-linux",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "objc/objc.h",
+              "condition": "defined(__APPLE_CC__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [],
         "variadic": false
@@ -79375,11 +79498,11 @@
           "parameters": []
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": []
         },
         "lifetime": {
-          "result": "value-or-static",
+          "result": "unspecified-requires-token",
           "policy": "resource-lifetimes-require-semantic-token"
         },
         "context": {
@@ -79423,6 +79546,7 @@
       },
       "semanticTokensNeeded": [
         "call-thread-affinity",
+        "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
         "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
@@ -79461,9 +79585,35 @@
       },
       "signature": {
         "result": {
-          "kind": "opaque",
+          "kind": "handle",
           "name": "id",
-          "reason": "objective-c-object"
+          "representation": {
+            "kind": "opaque",
+            "name": "id",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "x86_64-osx"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-linux",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "objc/objc.h",
+              "condition": "defined(__APPLE_CC__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [],
         "variadic": false
@@ -79474,11 +79624,11 @@
           "parameters": []
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": []
         },
         "lifetime": {
-          "result": "value-or-static",
+          "result": "unspecified-requires-token",
           "policy": "resource-lifetimes-require-semantic-token"
         },
         "context": {
@@ -79522,6 +79672,7 @@
       },
       "semanticTokensNeeded": [
         "call-thread-affinity",
+        "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
         "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
@@ -79560,9 +79711,35 @@
       },
       "signature": {
         "result": {
-          "kind": "opaque",
+          "kind": "handle",
           "name": "id",
-          "reason": "objective-c-object"
+          "representation": {
+            "kind": "opaque",
+            "name": "id",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "x86_64-osx"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-linux",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "objc/objc.h",
+              "condition": "defined(__APPLE_CC__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [],
         "variadic": false
@@ -79573,11 +79750,11 @@
           "parameters": []
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": []
         },
         "lifetime": {
-          "result": "value-or-static",
+          "result": "unspecified-requires-token",
           "policy": "resource-lifetimes-require-semantic-token"
         },
         "context": {
@@ -79621,6 +79798,7 @@
       },
       "semanticTokensNeeded": [
         "call-thread-affinity",
+        "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
         "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
@@ -79659,9 +79837,35 @@
       },
       "signature": {
         "result": {
-          "kind": "opaque",
+          "kind": "handle",
           "name": "id",
-          "reason": "objective-c-object"
+          "representation": {
+            "kind": "opaque",
+            "name": "id",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "x86_64-osx"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-linux",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "objc/objc.h",
+              "condition": "defined(__APPLE_CC__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [],
         "variadic": false
@@ -79672,11 +79876,11 @@
           "parameters": []
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": []
         },
         "lifetime": {
-          "result": "value-or-static",
+          "result": "unspecified-requires-token",
           "policy": "resource-lifetimes-require-semantic-token"
         },
         "context": {
@@ -79720,6 +79924,7 @@
       },
       "semanticTokensNeeded": [
         "call-thread-affinity",
+        "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
         "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
@@ -79758,9 +79963,35 @@
       },
       "signature": {
         "result": {
-          "kind": "opaque",
+          "kind": "handle",
           "name": "id",
-          "reason": "objective-c-object"
+          "representation": {
+            "kind": "opaque",
+            "name": "id",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "x86_64-osx"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-linux",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "objc/objc.h",
+              "condition": "defined(__APPLE_CC__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [],
         "variadic": false
@@ -79771,11 +80002,11 @@
           "parameters": []
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": []
         },
         "lifetime": {
-          "result": "value-or-static",
+          "result": "unspecified-requires-token",
           "policy": "resource-lifetimes-require-semantic-token"
         },
         "context": {
@@ -79819,6 +80050,7 @@
       },
       "semanticTokensNeeded": [
         "call-thread-affinity",
+        "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
         "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
@@ -79857,9 +80089,35 @@
       },
       "signature": {
         "result": {
-          "kind": "opaque",
+          "kind": "handle",
           "name": "id",
-          "reason": "objective-c-object"
+          "representation": {
+            "kind": "opaque",
+            "name": "id",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "x86_64-osx"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-linux",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "objc/objc.h",
+              "condition": "defined(__APPLE_CC__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [],
         "variadic": false
@@ -79870,11 +80128,11 @@
           "parameters": []
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": []
         },
         "lifetime": {
-          "result": "value-or-static",
+          "result": "unspecified-requires-token",
           "policy": "resource-lifetimes-require-semantic-token"
         },
         "context": {
@@ -79918,6 +80176,7 @@
       },
       "semanticTokensNeeded": [
         "call-thread-affinity",
+        "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
         "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
@@ -79958,12 +80217,30 @@
           "kind": "handle",
           "name": "HGLRC",
           "representation": {
-            "kind": "pointer",
-            "to": {
-              "kind": "void"
-            },
-            "constPointee": false,
-            "nullable": "unspecified"
+            "kind": "opaque",
+            "name": "HGLRC",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "x86_64-win32"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx"
+            ],
+            "replacement": {
+              "include": "Windows.h",
+              "condition": "defined(_WIN32)"
+            }
           },
           "nullable": "unspecified"
         },
@@ -80026,6 +80303,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -80064,12 +80342,30 @@
           "kind": "handle",
           "name": "HWND",
           "representation": {
-            "kind": "pointer",
-            "to": {
-              "kind": "void"
-            },
-            "constPointee": false,
-            "nullable": "unspecified"
+            "kind": "opaque",
+            "name": "HWND",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "x86_64-win32"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx"
+            ],
+            "replacement": {
+              "include": "Windows.h",
+              "condition": "defined(_WIN32)"
+            }
           },
           "nullable": "unspecified"
         },
@@ -80132,6 +80428,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -80171,12 +80468,30 @@
           "kind": "handle",
           "name": "GLXContext",
           "representation": {
-            "kind": "pointer",
-            "to": {
-              "kind": "void"
-            },
-            "constPointee": false,
-            "nullable": "unspecified"
+            "kind": "opaque",
+            "name": "GLXContext",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-linux",
+              "x86_64-linux"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "GL/glx.h",
+              "condition": "defined(__linux__) && !defined(ANDROID)"
+            }
           },
           "nullable": "unspecified"
         },
@@ -80239,6 +80554,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -80278,12 +80594,30 @@
           "kind": "handle",
           "name": "Window",
           "representation": {
-            "kind": "pointer",
-            "to": {
-              "kind": "void"
-            },
-            "constPointee": false,
-            "nullable": "unspecified"
+            "kind": "opaque",
+            "name": "Window",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "arm64-linux",
+              "x86_64-linux"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "wasm-web",
+              "wasm_pthread-web",
+              "x86_64-android",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "GL/glx.h",
+              "condition": "defined(__linux__) && !defined(ANDROID)"
+            }
           },
           "nullable": "unspecified"
         },
@@ -80346,6 +80680,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -94207,12 +94542,35 @@
       },
       "signature": {
         "result": {
-          "kind": "named",
+          "kind": "handle",
           "name": "WGPUCommandEncoder",
-          "target": {
-            "kind": "scalar",
-            "name": "i32"
-          }
+          "representation": {
+            "kind": "opaque",
+            "name": "WGPUCommandEncoder",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "wasm-web",
+              "wasm_pthread-web"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "webgpu/webgpu_wagyu.h",
+              "condition": "defined(__EMSCRIPTEN__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [
           {
@@ -94250,7 +94608,7 @@
           ]
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": [
             "borrowed-or-transferred-requires-token"
           ]
@@ -94302,6 +94660,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -94470,12 +94829,35 @@
       },
       "signature": {
         "result": {
-          "kind": "named",
+          "kind": "handle",
           "name": "WGPUAdapter",
-          "target": {
-            "kind": "scalar",
-            "name": "i32"
-          }
+          "representation": {
+            "kind": "opaque",
+            "name": "WGPUAdapter",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "wasm-web",
+              "wasm_pthread-web"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "webgpu/webgpu_wagyu.h",
+              "condition": "defined(__EMSCRIPTEN__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [
           {
@@ -94513,7 +94895,7 @@
           ]
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": [
             "borrowed-or-transferred-requires-token"
           ]
@@ -94565,6 +94947,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -94601,12 +94984,35 @@
       },
       "signature": {
         "result": {
-          "kind": "named",
+          "kind": "handle",
           "name": "WGPUDevice",
-          "target": {
-            "kind": "scalar",
-            "name": "i32"
-          }
+          "representation": {
+            "kind": "opaque",
+            "name": "WGPUDevice",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "wasm-web",
+              "wasm_pthread-web"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "webgpu/webgpu_wagyu.h",
+              "condition": "defined(__EMSCRIPTEN__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [
           {
@@ -94644,7 +95050,7 @@
           ]
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": [
             "borrowed-or-transferred-requires-token"
           ]
@@ -94696,6 +95102,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -94732,12 +95139,35 @@
       },
       "signature": {
         "result": {
-          "kind": "named",
+          "kind": "handle",
           "name": "WGPUInstance",
-          "target": {
-            "kind": "scalar",
-            "name": "i32"
-          }
+          "representation": {
+            "kind": "opaque",
+            "name": "WGPUInstance",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "wasm-web",
+              "wasm_pthread-web"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "webgpu/webgpu_wagyu.h",
+              "condition": "defined(__EMSCRIPTEN__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [
           {
@@ -94775,7 +95205,7 @@
           ]
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": [
             "borrowed-or-transferred-requires-token"
           ]
@@ -94827,6 +95257,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -94863,12 +95294,35 @@
       },
       "signature": {
         "result": {
-          "kind": "named",
+          "kind": "handle",
           "name": "WGPUQueue",
-          "target": {
-            "kind": "scalar",
-            "name": "i32"
-          }
+          "representation": {
+            "kind": "opaque",
+            "name": "WGPUQueue",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "wasm-web",
+              "wasm_pthread-web"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "webgpu/webgpu_wagyu.h",
+              "condition": "defined(__EMSCRIPTEN__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [
           {
@@ -94906,7 +95360,7 @@
           ]
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": [
             "borrowed-or-transferred-requires-token"
           ]
@@ -94958,6 +95412,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -94994,12 +95449,35 @@
       },
       "signature": {
         "result": {
-          "kind": "named",
+          "kind": "handle",
           "name": "WGPUTexture",
-          "target": {
-            "kind": "scalar",
-            "name": "i32"
-          }
+          "representation": {
+            "kind": "opaque",
+            "name": "WGPUTexture",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "wasm-web",
+              "wasm_pthread-web"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "webgpu/webgpu_wagyu.h",
+              "condition": "defined(__EMSCRIPTEN__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [
           {
@@ -95056,7 +95534,7 @@
           ]
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": [
             "borrowed-or-transferred-requires-token",
             "borrowed-or-transferred-requires-token"
@@ -95109,6 +95587,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {
@@ -95145,12 +95624,35 @@
       },
       "signature": {
         "result": {
-          "kind": "named",
+          "kind": "handle",
           "name": "WGPUTextureView",
-          "target": {
-            "kind": "scalar",
-            "name": "i32"
-          }
+          "representation": {
+            "kind": "opaque",
+            "name": "WGPUTextureView",
+            "reason": "target-platform-supplied",
+            "targetDependent": true,
+            "absentIn": [
+              "wasm-web",
+              "wasm_pthread-web"
+            ],
+            "liveIn": [
+              "arm64-android",
+              "arm64-ios",
+              "arm64-linux",
+              "arm64-osx",
+              "arm64_sim-ios",
+              "armv7-android",
+              "x86_64-android",
+              "x86_64-linux",
+              "x86_64-osx",
+              "x86_64-win32"
+            ],
+            "replacement": {
+              "include": "webgpu/webgpu_wagyu.h",
+              "condition": "defined(__EMSCRIPTEN__)"
+            }
+          },
+          "nullable": "unspecified"
         },
         "parameters": [
           {
@@ -95207,7 +95709,7 @@
           ]
         },
         "ownership": {
-          "result": "not-resource",
+          "result": "borrowed-or-owned-requires-token",
           "parameters": [
             "borrowed-or-transferred-requires-token",
             "borrowed-or-transferred-requires-token"
@@ -95260,6 +95762,7 @@
         "call-thread-affinity",
         "handle-ownership-nullability-lifetime",
         "native-symbol-linkage",
+        "opaque-type-abi-contract",
         "target-feature-symbol-matrix"
       ],
       "lowering": {

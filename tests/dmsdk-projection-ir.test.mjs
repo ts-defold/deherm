@@ -127,6 +127,41 @@ test("source support types preserve nested enums, variadics, and target-dependen
     "struct VkImage_T *");
   assert.equal(vulkanImage.signature.result.representation.targetTypes["wasm-web"], "uint64_t");
 
+  const webGpuAdapter = report.rows.find(({ symbol }) => symbol === "dmGraphics::WebGPUGetAdapter");
+  assert.deepEqual(webGpuAdapter.signature.result, {
+    kind: "handle",
+    name: "WGPUAdapter",
+    representation: {
+      kind: "opaque",
+      name: "WGPUAdapter",
+      reason: "target-platform-supplied",
+      targetDependent: true,
+      absentIn: ["wasm-web", "wasm_pthread-web"],
+      liveIn: [
+        "arm64-android", "arm64-ios", "arm64-linux", "arm64-osx", "arm64_sim-ios",
+        "armv7-android", "x86_64-android", "x86_64-linux", "x86_64-osx", "x86_64-win32",
+      ],
+      replacement: {
+        include: "webgpu/webgpu_wagyu.h",
+        condition: "defined(__EMSCRIPTEN__)",
+      },
+    },
+    nullable: "unspecified",
+  });
+
+  const nativeAppleWindow = report.rows.find(({ symbol }) => symbol === "dmGraphics::GetNativeiOSUIWindow");
+  assert.equal(nativeAppleWindow.signature.result.kind, "handle");
+  assert.equal(nativeAppleWindow.signature.result.name, "id");
+  assert.equal(nativeAppleWindow.signature.result.representation.reason, "target-platform-supplied");
+  assert.equal(nativeAppleWindow.signature.result.representation.targetDependent, true);
+  assert.deepEqual(nativeAppleWindow.signature.result.representation.absentIn, [
+    "arm64-ios", "arm64-osx", "arm64_sim-ios", "x86_64-osx",
+  ]);
+  assert.deepEqual(nativeAppleWindow.signature.result.representation.replacement, {
+    include: "objc/objc.h",
+    condition: "defined(__APPLE_CC__)",
+  });
+
   const variadics = report.rows.filter(({ signature }) => signature.variadic);
   assert.equal(variadics.length, 7);
   assert.ok(variadics.every(({ semanticTokensNeeded }) =>

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "kind": "deherm.fixture.old-pipeline-sdk",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "treeSha256": "49352b60bde2958bcef998e9a50fde74e70ef70a2db42d1c0637204fc69ffa4a",
+  "treeSha256": "895c08cdf8d0c0502bdbafbc4379001381727e2155745bf9908d4fba3f82a725",
   "source": "Frozen SHA-256 golden captured from the checkout-backed packages/sdk/src/generated tree produced by the source pipeline. It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
   "files": {
     "dmsdk/borrowed-handle.ts": {
@@ -11,7 +11,7 @@
     },
     "dmsdk/browser-arena.ts": {
       "bytes": 5476,
-      "sha256": "b4cb6190eff827275d49a3e6526be9a40a15b59d371cd8dc834a3d025884152b"
+      "sha256": "feb32f2c472102268ce2a3fcb7b508a7eb9aa53681b8d46afd31f506338ea7b7"
     },
     "dmsdk/cstring-value.ts": {
       "bytes": 4753,
@@ -47,7 +47,7 @@
     },
     "dmsdk/universal.ts": {
       "bytes": 148212,
-      "sha256": "46a7f5b3410c390ab9e9049c3354dec1672cbfb7b9819d2c7e48497798f6ffbf"
+      "sha256": "54ca44b311ad936913cae50ba339a55ebc303ec0f907c67b48bf5b90d7d78cd5"
     },
     "script/browser-target-support.ts": {
       "bytes": 567,

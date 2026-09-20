@@ -7,15 +7,15 @@ import {
 } from "../scripts/check-dmsdk-browser-exact-call.mjs";
 
 test("browser exact-call materialization consumes real dmSDK recipes and owns no mock-memory lane", () => {
-  const { materialized, selections } = materializeBrowserExactVectors();
-  assert.equal(selections.length, 4);
-  assert.equal(materialized.verification.vectorCount, selections.length);
+  const { materialized, corpus } = materializeBrowserExactVectors();
+  assert.equal(corpus.report.universalReadyCount, 486);
+  assert.equal(materialized.verification.vectorCount, 486);
   assert.deepEqual(
-    materialized.verification.vectors.map(({ declarationId }) => declarationId),
-    selections.map(({ recipe }) => recipe.declarationId),
+    materialized.verification.vectors.map(({ vectorSha256 }) => vectorSha256),
+    corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256),
   );
   assert.ok(materialized.verification.vectors.every(({ vectorSha256 }) => /^[0-9a-f]{64}$/.test(vectorSha256)));
-  assert.match(materialized.verificationSource, /deherm_browser_exact_install_run_exact_verification/);
+  assert.match(materialized.verificationSource, /deherm_dmsdk_universal_ready_provider_install_run_exact_verification/);
   assert.doesNotMatch(materialized.verificationSource, /HEAP(?:8|U8|32|U32)|WebAssembly\.Memory/);
 });
 

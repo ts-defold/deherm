@@ -160,11 +160,20 @@ records and aliases, and target-specific native-handle spellings. The current
 projection has zero unknown value constructors. Target-dependent handles such
 as `VkImage` retain their per-bundle spelling and use one generated bit codec
 that packs or unpacks either a pointer or an integer at C++ compile time.
+Aliases that a Defold header replaces with a platform-supplied definition are
+classified from the generated target-conditional report as opaque handles.
+That structural rule covers WebGPU's native integer aliases and Emscripten
+pointer handles without a WebGPU symbol allowlist.
 
-The native declaration-only census materializes all 486 ready recipes from the
-catalog, compiles production and exact-call twins against the pinned SDK,
-links recording callees, and executes every vector. It checks preconditions,
-receiver and ordered argument decoding, exact callee count, and result encoding.
+The compiler derives one canonical, numeric-ID-ordered corpus for all 486 ready
+recipes from the authenticated catalog and release-call symbol index. Its
+committed plan, production source, and verification source are clean-room-owned
+generated artifacts; the plan authenticates the index, ordered vector hashes,
+both source hashes, and the materializer manifest without owning a handwritten
+declaration list. The native declaration-only census compiles those production
+and exact-call twins against the pinned SDK, links recording callees, and
+executes every vector. It checks preconditions, receiver and ordered argument
+decoding, exact callee count, and result encoding.
 Complete pointee fixtures use the source type's actual alignment; incomplete
 and `void` pointees never form `alignof` expressions. This is exact bridge
 evidence, not execution of Defold implementation semantics.
@@ -182,27 +191,27 @@ multi-header project assembly, records, unsafe pointers, and callback ownership
 remain explicit follow-on shape work rather than implied support.
 
 The browser-target dmSDK lane has a separate target gate because host-native
-execution is not wasm32 evidence. `pnpm test:dmsdk-browser-exact-call` materializes four
-real dmSDK recipes through the same exact-call generator, compiles the generated
-provider, recording callees, observations, driver, and universal dispatcher
-with the pinned Emscripten toolchain, and runs the emitted `.wasm` from a
+execution is not wasm32 evidence. `pnpm test:dmsdk-browser-exact-call`
+materializes the canonical 486-call corpus through the same exact-call
+generator, compiles the generated provider, recording callees, observations,
+driver, and universal dispatcher with the pinned Emscripten toolchain, and runs
+the emitted `.wasm` from a
 loopback page in Chrome. Success is a manifest-bound marker printed by code
 executing inside that Wasm module. The gate never substitutes a JavaScript
 `WebAssembly.Memory` or a mock heap. Missing pinned Emscripten activation or a
 real browser is a named prerequisite failure, not a skipped or downgraded test.
-The current bounded vector set proves unsigned integer, float, boolean, and C
-string calls in a real browser-loaded wasm32 C ABI. It does not yet drive those
-cells through the production JavaScript browser arena/dispatcher, and it is not
-evidence for every dmSDK recipe or a Defold engine implementation.
+This proves all declaration-only ready exact-call vectors in a real
+browser-loaded wasm32 C ABI. It does not yet drive those cells through the
+production JavaScript browser arena/dispatcher, cover the 875
+usage-specialized recipes, or execute a Defold engine implementation.
 
 The Dynamic Hermes lane generates a C++ runner from generator-owned,
-lane-specific materialized vectors, creates a real packaged Hermes runtime,
+the canonical 486-call corpus, creates a real packaged Hermes runtime,
 installs the production
 `DmSdkUniversal.call` JSI host function, and verifies native recording-callee
-observations and decoded JavaScript results. Its current vectors cover boolean,
-integer, floating-point, address/handle, constructor, and template argument
-ordering. Callback transport remains an explicit gap because the production
-JSI encoder has no callback wire-value representation.
+observations and decoded JavaScript results for every declaration-only ready
+recipe. The 875 usage-specialized recipes remain selected and generated only
+when a release program supplies their missing call-site facts.
 
 The Static Hermes lane uses a generated, thread-local four-frame pool rather
 than exposing the raw universal-dispatch pointer ABI to sound TypeScript. Each
@@ -210,12 +219,10 @@ frame owns 32 24-byte argument cells and one result cell; that capacity and the
 frame emitter are a versioned package capability, while a policy carries and
 cross-checks its recipe-derived maximum (currently fifteen). Acquire, cell
 copy, dispatch, result access, and release are the only Static Hermes FFI
-operations. A strict `shermes` unit replays nine lane-specific exact vectors
-covering bool, float, enum, C string, handle, pointer, reference, and callback
-shapes. It compares payload low/high, auxiliary low/high, tag, and type ID, and
-checks C-string address identity. This proves the bounded frame transport and
-generated fake observations, not Defold semantics or retained handle/callback
-lifetime policy.
+operations. A strict `shermes` unit replays the canonical 486-call corpus and
+checks the generated fake observations and bounded frame transport. This does
+not prove Defold implementation semantics or retained handle/callback lifetime
+policy for the 875 recipes that require call-site specialization.
 
 # Integration tests are sentinels
 

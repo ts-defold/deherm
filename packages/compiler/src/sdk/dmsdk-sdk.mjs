@@ -3,7 +3,6 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { strFromU8, unzipSync } from "fflate";
 import { safeParameterIdentifier } from "../names.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
@@ -164,11 +163,12 @@ function documentation(value, indent = "") {
 }
 
 function docsByHeader(archive) {
+  const decoder = new TextDecoder();
   const result = new Map();
   for (const [name, bytes] of Object.entries(archive)) {
     if (!name.startsWith("doc/dmsdk-") || !name.endsWith("_doc.json")) continue;
     let parsed;
-    try { parsed = JSON.parse(strFromU8(bytes)); } catch { continue; }
+    try { parsed = JSON.parse(decoder.decode(bytes)); } catch { continue; }
     const elements = new Map();
     for (const element of parsed.elements ?? []) {
       if (!element?.name) continue;
@@ -482,30 +482,32 @@ async function output(file, contents) {
 }
 
 export async function runDmSdkGenerator() {
-const inventory = JSON.parse(await readFile(inventoryPath, "utf8"));
-const referenceArchive = unzipSync(new Uint8Array(await readFile(path.join(root, "upstream", "ref-doc.zip"))));
-const ir = enrich({ ...inventory, declarations: attachDocumentation(inventory, docsByHeader(referenceArchive)) });
-const renderer = createTypeRenderer(ir);
-const typesSource = generateTypes(ir, renderer);
-const runtimeSource = generateRuntime(ir, renderer);
-ir.unresolvedTypes = [...renderer.unresolved].sort(([left], [right]) => compareCodeUnits(left, right)).map(([name, contexts]) => ({
-  name,
-  contexts: [...contexts].sort()
-}));
-ir.opaqueTypes = [...renderer.opaque].sort(([left], [right]) => compareCodeUnits(left, right)).map(([name, item]) => ({
-  name,
-  reason: item.reason,
-  contexts: [...item.contexts].sort()
-}));
-ir.typeSurfaceUnresolvedCount = ir.unresolvedTypes.length;
-await output(irPath, JSON.stringify(ir, null, 2));
-await output(path.join(generatedRoot, "types.ts"), typesSource);
-await output(path.join(generatedRoot, "runtime.ts"), runtimeSource);
-await output(
-  path.join(generatedRoot, "index.ts"),
-  `${banner}\nexport * from "./types";\nexport * from "./runtime";\nexport * from "./scalar";\nexport * from "./enum-value";\nexport * from "./universal";\n`
-);
-console.log(`${check ? "checked" : "generated"} ${ir.declarationCount} dmSDK declarations, ${Object.keys(inventory.countsByKind).length} kinds, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);
+  const { unzipSync } = await import("fflate");
+  const inventory = JSON.parse(await readFile(inventoryPath, "utf8"));
+  const referenceArchive = unzipSync(new Uint8Array(await readFile(path.join(root, "upstream", "ref-doc.zip"))));
+  const ir = enrich({ ...inventory, declarations: attachDocumentation(inventory, docsByHeader(referenceArchive)) });
+  const renderer = createTypeRenderer(ir);
+  const typesSource = generateTypes(ir, renderer);
+  const runtimeSource = generateRuntime(ir, renderer);
+  ir.unresolvedTypes = [...renderer.unresolved]
+    .sort(([left], [right]) => compareCodeUnits(left, right))
+    .map(([name, contexts]) => ({ name, contexts: [...contexts].sort() }));
+  ir.opaqueTypes = [...renderer.opaque]
+    .sort(([left], [right]) => compareCodeUnits(left, right))
+    .map(([name, item]) => ({ name, reason: item.reason, contexts: [...item.contexts].sort() }));
+  ir.typeSurfaceUnresolvedCount = ir.unresolvedTypes.length;
+  await output(irPath, JSON.stringify(ir, null, 2));
+  await output(path.join(generatedRoot, "types.ts"), typesSource);
+  await output(path.join(generatedRoot, "runtime.ts"), runtimeSource);
+  await output(
+    path.join(generatedRoot, "index.ts"),
+    `${banner}\nexport * from "./types";\nexport * from "./runtime";\nexport * from "./scalar";\nexport * from "./enum-value";\nexport * from "./universal";\n`,
+  );
+  console.log(
+    `${check ? "checked" : "generated"} ${ir.declarationCount} dmSDK declarations, ` +
+    `${Object.keys(inventory.countsByKind).length} kinds, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ` +
+    `${ir.runtimeUnimplementedCount} runtime bindings pending`,
+  );
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await runDmSdkGenerator();

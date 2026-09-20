@@ -9,6 +9,7 @@ const defaultIrPath = resolve(repositoryRoot, "packages/bindings/generated/defol
 const defaultClassificationPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json");
 const defaultOutputPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-projection-ir.json");
 const defaultSymbolEvidencePath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-symbol-evidence.json");
+const defaultTargetConditionalsPath = resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-target-conditionals.json");
 
 /**
  * The dmSDK headers that are the Lua transport itself rather than an API to
@@ -101,6 +102,7 @@ function parseOptions(argv) {
     ir: defaultIrPath,
     classification: defaultClassificationPath,
     symbolEvidence: defaultSymbolEvidencePath,
+    targetConditionals: defaultTargetConditionalsPath,
     output: defaultOutputPath,
     check: false,
   };
@@ -110,13 +112,14 @@ function parseOptions(argv) {
     else if (argument === "--ir") options.ir = resolve(argv[++index]);
     else if (argument === "--classification") options.classification = resolve(argv[++index]);
     else if (argument === "--symbol-evidence") options.symbolEvidence = resolve(argv[++index]);
+    else if (argument === "--target-conditionals") options.targetConditionals = resolve(argv[++index]);
     else if (argument === "--output") options.output = resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argument}`);
   }
   return options;
 }
 
-function buildTypeIndex(declarations, opaqueTypes) {
+function buildTypeIndex(declarations, opaqueTypes, targetConditionals = null) {
   const exact = new Map();
   const leaves = new Map();
   for (const declaration of declarations) {
@@ -127,7 +130,17 @@ function buildTypeIndex(declarations, opaqueTypes) {
     candidates.push(declaration);
     leaves.set(leaf, candidates);
   }
-  return { exact, leaves, opaque: new Map((opaqueTypes ?? []).map((entry) => [entry.name, entry])) };
+  const platformSupplied = new Map((targetConditionals?.declarations ?? [])
+    .filter((entry) => entry.kind === "type-alias" &&
+      entry.absentDisposition === "platform-supplied" &&
+      entry.respelledAs?.disposition === "platform-supplied")
+    .map((entry) => [entry.name, entry]));
+  return {
+    exact,
+    leaves,
+    opaque: new Map((opaqueTypes ?? []).map((entry) => [entry.name, entry])),
+    platformSupplied,
+  };
 }
 
 function resolveDeclaration(type, owner, index) {
@@ -227,7 +240,6 @@ function lowerType(type, owner, index, state = { aliases: new Set() }) {
   if (/^(?:T|KEY|VALUE|U|V)$/.test(base)) return { kind: "type-parameter", name: base };
   const opaque = index.opaque.get(base);
   if (opaque) return { kind: "opaque", name: opaque.name, reason: opaque.reason, contexts: opaque.contexts ?? [] };
-  if (base === "id") return { kind: "opaque", name: "id", reason: "objective-c-object" };
 
   const resolved = resolveDeclaration(base, owner, index);
   if (resolved?.kind === "enum") {
@@ -244,6 +256,26 @@ function lowerType(type, owner, index, state = { aliases: new Set() }) {
       return { kind: "unknown", spelling: base, reason: "recursive-alias", aliasId: resolved.id };
     }
     const nextState = { aliases: new Set(state.aliases).add(resolved.id) };
+    const platformSupplied = index.platformSupplied.get(resolved.name);
+    if (platformSupplied) {
+      return {
+        kind: "handle",
+        name: resolved.name,
+        representation: {
+          kind: "opaque",
+          name: resolved.name,
+          reason: "target-platform-supplied",
+          targetDependent: true,
+          absentIn: [...platformSupplied.absentIn].sort(),
+          liveIn: [...platformSupplied.liveIn].sort(),
+          replacement: {
+            include: platformSupplied.respelledAs.include,
+            condition: platformSupplied.respelledAs.condition,
+          },
+        },
+        nullable: "unspecified",
+      };
+    }
     const aliasTarget = cleanType(resolved.type);
     const callbackAlias = parseCallback(aliasTarget, resolved.name, index, nextState);
     if (callbackAlias) return { ...callbackAlias, name: resolved.name, aliasId: resolved.id };
@@ -270,6 +302,7 @@ function lowerType(type, owner, index, state = { aliases: new Set() }) {
       target: representation,
     };
   }
+  if (base === "id") return { kind: "opaque", name: "id", reason: "objective-c-object" };
   if (/^H[A-Z]/.test(leafName(base)) || /Handle(?:$|[A-Z_])/.test(leafName(base))) {
     return { kind: "handle", name: base, representation: { kind: "unknown", spelling: base, reason: "unresolved-handle-representation" }, nullable: "unspecified" };
   }
@@ -358,9 +391,10 @@ function collectIndices(signature, kinds) {
 
 function semanticTokens(declaration, binding, signature, effects) {
   const nodes = surfaceNodesOf(signature);
+  const allNodes = nodesOf(signature);
   const tokens = new Set(["native-symbol-linkage"]);
   if (nodes.some(({ kind }) => kind === "unknown")) tokens.add("native-type-resolution");
-  if (nodes.some(({ kind }) => kind === "opaque")) tokens.add("opaque-type-abi-contract");
+  if (allNodes.some(({ kind }) => kind === "opaque")) tokens.add("opaque-type-abi-contract");
   if (nodes.some(({ kind }) => kind === "handle")) tokens.add("handle-ownership-nullability-lifetime");
   if (nodes.some(({ kind }) => ["pointer", "reference", "cstring"].includes(kind))) tokens.add("pointer-bounds-nullability-lifetime");
   if (nodes.some(({ kind }) => ["record", "template-record"].includes(kind))) tokens.add("record-layout-alignment-copy");
@@ -538,12 +572,22 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
   };
 }
 
-export async function build(irContent, classificationContent, loweringEvidenceContents = {}, symbolEvidenceContent = null) {
+export async function build(
+  irContent,
+  classificationContent,
+  loweringEvidenceContents = {},
+  symbolEvidenceContent = null,
+  targetConditionalsContent = null,
+) {
   const ir = JSON.parse(irContent);
   const classification = JSON.parse(classificationContent);
   const symbolEvidence = symbolEvidenceContent ? JSON.parse(symbolEvidenceContent) : null;
+  const targetConditionals = targetConditionalsContent ? JSON.parse(targetConditionalsContent) : null;
   if (symbolEvidence && symbolEvidence.defoldRevision !== ir.defoldRevision) {
     throw new Error("dmSDK symbol evidence revision differs from dmSDK IR");
+  }
+  if (targetConditionals && targetConditionals.defoldRevision !== ir.defoldRevision) {
+    throw new Error("dmSDK target conditionals revision differs from dmSDK IR");
   }
   const symbolEvidenceById = new Map(Object.entries(symbolEvidence?.declarations ?? {}));
   const loweringReports = Object.fromEntries(Object.entries(loweringEvidenceContents).map(([name, content]) => [name, JSON.parse(content)]));
@@ -559,6 +603,7 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
   const typeIndex = buildTypeIndex(
     [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])],
     ir.opaqueTypes,
+    targetConditionals,
   );
   const seen = new Set();
   for (const id of loweringById.keys()) {
@@ -613,10 +658,12 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
       ir: "packages/bindings/generated/defold-sdk-ir.json",
       classification: "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
       symbolEvidence: "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+      targetConditionals: "packages/bindings/generated/defold-dmsdk-target-conditionals.json",
       hashes: {
         ir: sha256(irContent),
         classification: sha256(classificationContent),
         symbolEvidence: symbolEvidenceContent ? sha256(symbolEvidenceContent) : null,
+        targetConditionals: targetConditionalsContent ? sha256(targetConditionalsContent) : null,
         loweringEvidence: Object.fromEntries(Object.entries(loweringEvidenceContents).map(([name, content]) => [name, sha256(content)])),
         headers: headerHashes,
       },
@@ -655,7 +702,14 @@ export async function run(argv = process.argv.slice(2)) {
     await readFile(resolve(repositoryRoot, relative), "utf8")
   ])));
   const symbolEvidenceContent = await readFile(options.symbolEvidence, "utf8");
-  const report = await build(irContent, classificationContent, loweringEvidenceContents, symbolEvidenceContent);
+  const targetConditionalsContent = await readFile(options.targetConditionals, "utf8");
+  const report = await build(
+    irContent,
+    classificationContent,
+    loweringEvidenceContents,
+    symbolEvidenceContent,
+    targetConditionalsContent,
+  );
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (options.check) {
     if (await readFile(options.output, "utf8") !== serialized) throw new Error(`${options.output} is stale; regenerate dmSDK projection IR`);

@@ -9,6 +9,11 @@ import test from "node:test";
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
 import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
 import {
+  dmSdkUniversalReadyCorpusArtifacts,
+  dmSdkUniversalReadyUsages,
+  materializeDmSdkUniversalReadyCorpus,
+} from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
+import {
   DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
   emitDmSdkUniversalStaticFrame,
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
@@ -61,6 +66,7 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     silentlyOmitted: 0,
     preferredSpecialized: 146,
     usageMaterializedFallback: 1215,
+    universalReadyExactVectors: 486,
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
   assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, 1361);
@@ -158,26 +164,57 @@ int main(void) {
 test("every declaration-only universal-ready recipe compiles and executes its exact-call twin", async () => {
   const sdkIr = JSON.parse(await readFile(sdkIrPath, "utf8"));
   const index = buildDmSdkCallSymbolIndex(sdkIr, policyCatalog);
-  const usages = Object.entries(index.declarations)
-    .filter(([, declaration]) => declaration.materialization.state === "universal-ready")
-    .map(([declarationId]) => ({ declarationId }));
+  const usages = dmSdkUniversalReadyUsages(index, policyCatalog);
   assert.equal(usages.length, 486);
-  const generated = materializeDmSdkUsages(usages, {
-    catalog: policyCatalog,
-    catalogSha256: dmSdkUniversalCatalogSha256,
-    providerName: "deherm_dmsdk_ready_provider",
-    installName: "deherm_dmsdk_ready_provider_install",
-  });
+  const corpus = materializeDmSdkUniversalReadyCorpus(index, policyCatalog);
+  const { generated } = corpus;
   assert.equal(generated.verification.vectorCount, usages.length);
+  assert.equal(corpus.report.universalReadyCount, usages.length);
+  assert.equal(corpus.report.ordering, "numeric-id-ascending");
+  assert.equal(corpus.report.symbolIndexSha256, index.indexSha256);
+  assert.deepEqual(
+    generated.verification.vectors.map(({ declarationId }) => declarationId),
+    usages.map(({ declarationId }) => declarationId),
+  );
+  assert.deepEqual(
+    corpus.report.production.manifest.map(({ declarationId, numericId, verificationVectorSha256 }) =>
+      ({ declarationId, numericId, vectorSha256: verificationVectorSha256 })),
+    corpus.report.verification.vectors.map(({ declarationId, numericId, vectorSha256 }) =>
+      ({ declarationId, numericId, vectorSha256 })),
+  );
+  assert.deepEqual(
+    generated.verification.vectors.map(({ numericId }) => numericId),
+    generated.verification.vectors.map(({ numericId }) => numericId).toSorted((left, right) => left - right),
+  );
+  assert.ok(generated.verification.vectors.every(({ vectorSha256 }) => /^[0-9a-f]{64}$/.test(vectorSha256)));
+  assert.equal(new Set(generated.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, usages.length);
+  const tamperedIndex = structuredClone(index);
+  tamperedIndex.universalReadyCount += 1;
+  assert.throws(
+    () => materializeDmSdkUniversalReadyCorpus(tamperedIndex, policyCatalog),
+    /indexSha256 does not authenticate the canonical index body/,
+  );
+  const tamperedCatalog = structuredClone(policyCatalog);
+  tamperedCatalog.recipes[0].symbol += "_tampered";
+  assert.throws(
+    () => materializeDmSdkUniversalReadyCorpus(index, tamperedCatalog),
+    /catalog identity does not match its recipes and symbol index/,
+  );
+  const [committedPlan, committedProduction, committedVerification, helperSource] = await Promise.all([
+    readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.plan), "utf8"),
+    readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.productionSource), "utf8"),
+    readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.verificationSource), "utf8"),
+    readFile(path.join(root, "packages/compiler/src/dmsdk-universal-ready-corpus.mjs"), "utf8"),
+  ]);
+  assert.deepEqual(JSON.parse(committedPlan), corpus.report);
+  assert.equal(committedProduction, generated.source);
+  assert.equal(committedVerification, generated.verificationSource);
+  assert.doesNotMatch(helperSource, /dmsdk:[^"'\s]+@/, "the corpus helper must not own declaration IDs");
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-ready-census-"));
   try {
-    const production = path.join(output, "ready.cpp");
-    const verification = path.join(output, "ready.verify.cpp");
     const harness = path.join(output, "ready-harness.cpp");
     const executable = path.join(output, "ready-census");
-    await writeFile(production, generated.source);
-    await writeFile(verification, generated.verificationSource);
-    await writeFile(harness, `#include "ready.verify.cpp"\nint main(){return deherm_dmsdk_ready_provider_install_run_exact_verification();}\n`);
+    await writeFile(harness, `extern "C" int ${generated.verification.driver.function}(void);\nint main(){return ${generated.verification.driver.function}();}\n`);
     const sdkRoot = path.join(root,
       "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
     const includeArgs = [
@@ -188,9 +225,11 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
       "-DDLIB_LOG_DOMAIN=\"deherm\"",
     ];
     run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      ...includeArgs, "-c", production, "-o", path.join(output, "ready.o")]);
+      ...includeArgs, "-c", path.join(root, dmSdkUniversalReadyCorpusArtifacts.productionSource),
+      "-o", path.join(output, "ready.o")]);
     run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      ...includeArgs, "defold/defold_hermes/src/generated_dmsdk_universal.cpp", harness,
+      ...includeArgs, "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
+      path.join(root, dmSdkUniversalReadyCorpusArtifacts.verificationSource), harness,
       "-o", executable]);
     run(executable, []);
   } finally {

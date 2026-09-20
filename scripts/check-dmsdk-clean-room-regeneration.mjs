@@ -133,7 +133,7 @@ async function walk(root, relative = "") {
 export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositoryRootDefault) {
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
-    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings)\.json$/.test(file)) {
+    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|universal-ready-exact-plan)\.json$/.test(file)) {
       result.add(`packages/bindings/generated/${file}`);
     }
   }
@@ -171,7 +171,9 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
     "native/generated_dmsdk_borrowed_handle_header_audit.cpp",
     "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp",
     "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
-    "tests/fixtures/generated_dmsdk_universal_test_ids.h"
+    "tests/fixtures/generated_dmsdk_universal_test_ids.h",
+    "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
+    "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp"
   ]) {
     try {
       if ((await lstat(path.join(repositoryRoot, relative))).isFile()) result.add(relative);
@@ -211,7 +213,7 @@ async function compareArtifacts(cleanRoot, repositoryRoot) {
 
 async function validateReports(root) {
   const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
-  const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, arenaSpan, projection, borrowedHandle, scratchScalarOut, cstringValue, universal] = await Promise.all([
+  const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, arenaSpan, projection, borrowedHandle, scratchScalarOut, cstringValue, universal, readyExact] = await Promise.all([
     load("packages/bindings/generated/defold-dmsdk-binding-patterns.json"),
     load("packages/bindings/generated/defold-dmsdk-scalar-thunks.json"),
     load("packages/bindings/generated/defold-dmsdk-abi-shapes.json"),
@@ -227,7 +229,8 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"),
-    load("packages/bindings/generated/defold-dmsdk-universal-bindings.json")
+    load("packages/bindings/generated/defold-dmsdk-universal-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-universal-ready-exact-plan.json")
   ]);
   assert(patterns.coverage.runtimePendingCount === 1361 && patterns.coverage.classifiedCount === 1361,
     "dmSDK classifier did not account for all 1,361 runtime-pending declarations");
@@ -311,6 +314,14 @@ async function validateReports(root) {
     universal.coverage.staticHermesDeclarations === 1361 && universal.coverage.browserDirectMemoryMetadata === 1361 &&
     universal.coverage.typescriptStableIds === 1361 && universal.coverage.silentlyOmitted === 0,
   "universal dmSDK fallback does not cover every declaration and target");
+  assert(universal.coverage.universalReadyExactVectors === 486 &&
+    readyExact.universalReadyCount === 486 && readyExact.verification.vectorCount === 486 &&
+    readyExact.production.manifest.length === 486 &&
+    readyExact.catalogSha256 === universal.sourceHashes.catalog &&
+    readyExact.verification.catalogSha256 === universal.sourceHashes.catalog &&
+    /^[0-9a-f]{64}$/.test(readyExact.symbolIndexSha256) &&
+    /^[0-9a-f]{64}$/.test(readyExact.corpusSha256),
+  "universal-ready exact corpus does not preserve its authenticated 486-vector plan");
   const scalarIds = new Set(scalar.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const enumIds = new Set(enumValue.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const fixedDigestIds = new Set(fixedDigest.declarations.map(({ id }) => id));
@@ -431,6 +442,7 @@ async function validateReports(root) {
     scratchScalarOutBlockedCount: scratchScalarOut.coverage.blocked,
     cstringValueGeneratedCount: cstringValue.coverage.generated,
     universalRecipeCount: universal.coverage.recipes,
+    universalReadyExactVectorCount: readyExact.verification.vectorCount,
     arenaSpanCensusCount: arenaSpan.coverage.arenaSpanCensus,
     arenaSpanPriorWaveCount: arenaSpan.coverage.coveredByPriorWaves,
     arenaSpanBlockedCount: arenaSpan.coverage.blocked,

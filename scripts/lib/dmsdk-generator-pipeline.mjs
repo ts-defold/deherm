@@ -23,14 +23,19 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/lib/dmsdk-generator-pipeline.mjs",
   "scripts/lib/reviewed-revision.mjs",
   "scripts/lib/revision-audit.mjs",
+  "packages/compiler/src/dmsdk-call-symbol-index.mjs",
+  "packages/compiler/src/dmsdk-universal-ready-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-materializer-core.mjs",
   "packages/compiler/src/dmsdk-universal-materializer.mjs",
-  "packages/compiler/src/dmsdk-universal-static-frame.mjs"
+  "packages/compiler/src/dmsdk-universal-static-frame.mjs",
+  "packages/compiler/src/names.mjs",
+  "packages/compiler/src/sdk/dmsdk-sdk.mjs"
 ]);
 
 export const dmSdkPinnedInputs = Object.freeze([
   "upstream.lock",
   "packages/bindings/generated/defold-sdk-ir.json",
+  "packages/bindings/generated/defold-dmsdk-target-conditionals.json",
   // Measured against the pinned engine/defoldsdk.zip, which is 533MB and is
   // therefore not part of the clean room. The measurement travels as this
   // committed artifact, exactly as the Clang-derived IR above does.
@@ -138,6 +143,7 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "packages/sdk/src/generated/dmsdk/cstring-value.ts",
   "packages/static-hermes/src/generated/dmsdk-cstring-value.ts",
   "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
+  "packages/bindings/generated/defold-dmsdk-universal-ready-exact-plan.json",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
@@ -150,7 +156,9 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "packages/static-hermes/src/generated/dmsdk-universal.ts",
   "packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
   "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
-  "tests/fixtures/generated_dmsdk_universal_test_ids.h"
+  "tests/fixtures/generated_dmsdk_universal_test_ids.h",
+  "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
+  "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp"
 ]);
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.

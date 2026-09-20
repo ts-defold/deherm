@@ -32,7 +32,7 @@
     "bundleTargets": "packages/toolchains/defold-bundle-targets.json",
     "bundleTargetsSha256": "65a25d0043db47b09903d8b07b1708f59de16f425700203888e63dd35204db44",
     "inventory": "packages/bindings/generated/defold-sdk-inventory.json",
-    "inventorySha256": "7c8222aecb5e2892a2b06dc0bd7b910440cbf8a8163f6eddd206728007eece9d"
+    "inventorySha256": "f7d4ab9849a242746a0acf30b5e277366ad769e9d01097145a6a69cdb79a54bc"
   },
   "buildVariants": {
     "note": "Every target is resolved once per build variant and the three are required to agree; a header conditional that disagreed would fail this pass rather than be averaged away. `NDEBUG` and `DM_PROFILE_NULL` - the two macros dmsdk/dlib/profile.h gates its entire API on - are defined by no variant, so an extension is compiled against the full profiler API in all three. The debug/release difference is which archive is linked, and that is measured in the symbol evidence.",

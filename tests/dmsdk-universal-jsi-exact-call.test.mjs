@@ -6,7 +6,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
+import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
+import { materializeDmSdkUniversalReadyCorpus } from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
 import {
   dmSdkUniversalCatalogSha256,
   dmSdkUniversalRecipes,
@@ -14,18 +15,12 @@ import {
 import { renderDmSdkUniversalJsiExactRunner } from "../scripts/lib/dmsdk-universal-jsi-exact-runner.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
-const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json");
+const sdkIrPath = path.join(root, "packages/bindings/generated/defold-sdk-ir.json");
 const compiler = process.env.CXX || "clang++";
 const policyCatalog = Object.freeze({
   sourceHashes: Object.freeze({ catalog: dmSdkUniversalCatalogSha256 }),
   recipes: dmSdkUniversalRecipes,
 });
-
-function recipe(report, symbol, predicate = () => true) {
-  const matches = report.recipes.filter((item) => item.symbol === symbol && predicate(item));
-  assert.equal(matches.length, 1, `expected one recipe for ${symbol}, got ${matches.length}`);
-  return matches[0];
-}
 
 function run(command, args) {
   return execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe" });
@@ -56,68 +51,21 @@ test("dynamic Hermes JSI runner executes exact dmSDK vectors through the product
     context.skip(`no packaged Hermes archive for ${process.platform}-${process.arch}`);
     return;
   }
-  const report = JSON.parse(await readFile(reportPath, "utf8"));
-  const boolean = recipe(report, "dmUtf8::IsWhiteSpace");
-  const floating = recipe(report, "dmTrigLookup::Cos");
-  const pointerHandle = recipe(report, "ConfigFileGetFloat");
-  const constructor = recipe(report, "dmArray::dmArray::dmArray<T>", (item) => item.line === 101);
-  const clamp = recipe(report, "dmMath::Clamp");
-  const callback = recipe(report, "dmLog::RegisterLogListener");
-  const i32 = (name, position) => ({
-    name,
-    position,
-    nativeType: "int32_t",
-    direction: "value",
-    shape: { kind: "scalar", name: "i32" },
-    requirements: [],
-  });
-  const generated = materializeDmSdkUsages([
-    {
-      declarationId: boolean.declarationId,
-      wrapper: "jsi_verify_bool",
-      acknowledgements: { generatedAdapterBypass: { reason: "exercise universal JSI transport", evidence: "real Hermes exact-call runner" } },
-    },
-    {
-      declarationId: floating.declarationId,
-      wrapper: "jsi_verify_float",
-      acknowledgements: { generatedAdapterBypass: { reason: "exercise universal JSI transport", evidence: "real Hermes exact-call runner" } },
-    },
-    {
-      declarationId: pointerHandle.declarationId,
-      wrapper: "jsi_verify_pointer_handle",
-      acknowledgements: { recordLayout: { reason: "opaque handle remains an identity token", evidence: "real Hermes address-cell round trip without dereference" } },
-    },
-    {
-      declarationId: constructor.declarationId,
-      wrapper: "jsi_verify_constructor",
-      receiverCppType: "dmArray<uint32_t>",
-      typeSubstitutions: { T: "uint32_t" },
-      acknowledgements: { outStorageInitializationFailure: { reason: "fixture owns aligned receiver storage", evidence: "real Hermes exact-call runner verifies receiver and argument order" } },
-    },
-    {
-      declarationId: clamp.declarationId,
-      wrapper: "jsi_verify_template",
-      templateArguments: ["int32_t"],
-      parameters: [i32("value", 0), i32("minimum", 1), i32("maximum", 2)],
-      resultCppType: "int32_t",
-      resultShape: { kind: "scalar", name: "i32" },
-    },
-    {
-      declarationId: callback.declarationId,
-      wrapper: "jsi_verify_callback",
-      callbackTrampolines: { 0: "native_log_listener" },
-      acknowledgements: { callbackTrampoline: { reason: "retain the native callback contract", evidence: "runner report must keep the unsupported JSI wire boundary explicit" } },
-    },
-  ], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+  const sdkIr = JSON.parse(await readFile(sdkIrPath, "utf8"));
+  const corpus = materializeDmSdkUniversalReadyCorpus(
+    buildDmSdkCallSymbolIndex(sdkIr, policyCatalog),
+    policyCatalog,
+  );
+  const { generated } = corpus;
   const runner = renderDmSdkUniversalJsiExactRunner(generated);
   assert.equal(runner.report.transport, "dynamic-hermes-jsi");
-  assert.equal(runner.report.vectorCount, 6);
-  assert.equal(runner.report.executableVectorCount, 5);
-  assert.deepEqual(runner.report.unsupported, [{
-    declarationId: callback.declarationId,
-    numericId: callback.numericId,
-    reason: "production JSI encoder has no callback wire-value representation",
-  }]);
+  assert.equal(runner.report.vectorCount, 486);
+  assert.equal(runner.report.executableVectorCount, 486);
+  assert.deepEqual(runner.report.unsupported, []);
+  assert.deepEqual(
+    generated.verification.vectors.map(({ vectorSha256 }) => vectorSha256),
+    corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256),
+  );
   assert.match(runner.report.evidenceBoundary, /production DmSdkUniversal JSI host function/);
   assert.match(runner.report.evidenceBoundary, /does not execute Defold implementation semantics/);
   assert.equal(runner.report.verificationManifestSha256, generated.verification.manifestSha256);
@@ -125,6 +73,12 @@ test("dynamic Hermes JSI runner executes exact dmSDK vectors through the product
 
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-jsi-exact-"));
   try {
+    const sdkRoot = path.join(
+      root,
+      "upstream/extender/server/app/sdk",
+      corpus.report.defoldRevision,
+      "defoldsdk",
+    );
     const verification = path.join(output, "materialized.verify.cpp");
     const runnerSource = path.join(output, "jsi-exact-runner.cpp");
     const harness = path.join(output, "harness.cpp");
@@ -140,6 +94,9 @@ test("dynamic Hermes JSI runner executes exact dmSDK vectors through the product
       "-DDLIB_LOG_DOMAIN=\"deherm\"",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
       "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
+      "-isystem", path.join(sdkRoot, "sdk/include"),
+      "-isystem", path.join(sdkRoot, "include"),
+      "-isystem", path.join(sdkRoot, "ext/include"),
       "-isystem", path.join(root, "upstream/hermes/API"),
       "-isystem", path.join(root, "upstream/hermes/API/jsi"),
       "-isystem", path.join(root, "upstream/hermes/public"),

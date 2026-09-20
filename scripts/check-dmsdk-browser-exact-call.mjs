@@ -8,7 +8,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
+import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
+import { materializeDmSdkUniversalReadyCorpus } from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
 import {
   dmSdkUniversalCatalogSha256,
   dmSdkUniversalRecipes,
@@ -20,7 +21,7 @@ import {
 } from "../packages/cli/src/dev/browser-host.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const policyReportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json");
+const sdkIrPath = path.join(root, "packages/bindings/generated/defold-sdk-ir.json");
 const universalRuntimePath = path.join(root, "defold/defold_hermes/src/generated_dmsdk_universal.cpp");
 const universalIncludePath = path.join(root, "defold/defold_hermes/include");
 const dlibIncludePath = path.join(root, "upstream/defold/engine/dlib/src");
@@ -106,57 +107,17 @@ export function resolveBrowserExactPrerequisites(environment = process.env) {
   };
 }
 
-function uniqueRecipe(recipes, symbol, predicate = () => true) {
-  const matches = recipes.filter((recipe) => recipe.symbol === symbol && predicate(recipe));
-  if (matches.length !== 1) {
-    throw new Error(`browser dmSDK exact-call fixture expected one ${symbol} recipe, found ${matches.length}`);
-  }
-  return matches[0];
-}
-
 export function materializeBrowserExactVectors() {
-  const policy = JSON.parse(readFileSync(policyReportPath, "utf8"));
-  const selections = [
-    {
-      recipe: uniqueRecipe(policy.recipes, "dmEndian::ToNetwork", (recipe) =>
-        recipe.abi.parameters[0]?.nativeType === "uint32_t"),
-      wrapper: "deherm_browser_exact_endian_u32",
-    },
-    {
-      recipe: uniqueRecipe(policy.recipes, "dmTrigLookup::Cos"),
-      wrapper: "deherm_browser_exact_cos_f32",
-    },
-    {
-      recipe: uniqueRecipe(policy.recipes, "dmUtf8::IsWhiteSpace"),
-      wrapper: "deherm_browser_exact_utf8_whitespace",
-    },
-    {
-      recipe: uniqueRecipe(policy.recipes, "dmHashString32"),
-      wrapper: "deherm_browser_exact_hash_string32",
-    },
-  ];
-  const usages = selections.map(({ recipe, wrapper }) => ({
-    declarationId: recipe.declarationId,
-    wrapper,
-    acknowledgements: recipe.preferredLowering.state === "generated-adapter"
-      ? {
-          generatedAdapterBypass: {
-            reason: "exercise the generated universal fallback in a real browser Wasm module",
-            evidence: "the Emscripten module executes its generated recording callee and observation assertions",
-          },
-        }
-      : undefined,
-  }));
-  const materialized = materializeDmSdkUsages(usages, {
-    catalog: {
-      sourceHashes: { catalog: dmSdkUniversalCatalogSha256 },
-      recipes: dmSdkUniversalRecipes,
-    },
-    catalogSha256: dmSdkUniversalCatalogSha256,
-    providerName: "deherm_browser_exact_provider",
-    installName: "deherm_browser_exact_install",
-  });
-  return { materialized, selections };
+  const catalog = {
+    sourceHashes: { catalog: dmSdkUniversalCatalogSha256 },
+    recipes: dmSdkUniversalRecipes,
+  };
+  const sdkIr = JSON.parse(readFileSync(sdkIrPath, "utf8"));
+  const corpus = materializeDmSdkUniversalReadyCorpus(
+    buildDmSdkCallSymbolIndex(sdkIr, catalog),
+    catalog,
+  );
+  return { materialized: corpus.generated, corpus };
 }
 
 function browserHarness(materialized) {
@@ -172,7 +133,7 @@ function browserHarness(materialized) {
 }
 
 export async function buildBrowserExactModule({ output, prerequisites }) {
-  const { materialized, selections } = materializeBrowserExactVectors();
+  const { materialized, corpus } = materializeBrowserExactVectors();
   const harness = browserHarness(materialized);
   await mkdir(output, { recursive: true });
   const verificationPath = path.join(output, "dmsdk-exact.verify.cpp");
@@ -184,6 +145,8 @@ export async function buildBrowserExactModule({ output, prerequisites }) {
     writeFile(path.join(output, "dmsdk-exact.verify.json"), `${JSON.stringify(materialized.verification, null, 2)}\n`),
   ]);
   await mkdir(prerequisites.emCache, { recursive: true });
+  const defoldRevision = lockValue("DEFOLD_REV");
+  const sdkRoot = path.join(root, "upstream/extender/server/app/sdk", defoldRevision, "defoldsdk");
   execFileSync(prerequisites.emxx, [
     "-std=c++17",
     "-O2",
@@ -192,7 +155,11 @@ export async function buildBrowserExactModule({ output, prerequisites }) {
     "-sEXIT_RUNTIME=1",
     "-sFILESYSTEM=0",
     `-I${universalIncludePath}`,
-    `-I${dlibIncludePath}`,
+    "-isystem", dlibIncludePath,
+    "-isystem", path.join(sdkRoot, "sdk/include"),
+    "-isystem", path.join(sdkRoot, "include"),
+    "-isystem", path.join(sdkRoot, "ext/include"),
+    "-DDLIB_LOG_DOMAIN=\"deherm\"",
     universalRuntimePath,
     verificationPath,
     harnessPath,
@@ -226,7 +193,7 @@ export async function buildBrowserExactModule({ output, prerequisites }) {
     output,
     marker: harness.marker,
     materialized,
-    selections,
+    corpus,
     artifacts: {
       html: { path: htmlPath, sha256: sha256(await readFile(htmlPath)) },
       javascript: { path: jsPath, sha256: sha256(await readFile(jsPath)) },

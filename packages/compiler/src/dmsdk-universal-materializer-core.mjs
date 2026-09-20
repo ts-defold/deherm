@@ -414,7 +414,11 @@ function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue, con
       statement: `return deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value}));`,
       cell: { tag: cellTag, value },
       ...(cellTag === "address"
-        ? { addressExpression: `deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value}))` }
+        ? {
+          addressExpression: `deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value}))`,
+          addressPayloadExpression:
+            `deherm_dmsdk_pack_handle(deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value})))`,
+        }
         : {}),
     };
   }
@@ -537,7 +541,9 @@ function expectedResultCheck(plan, result = "result") {
   if (cell.tag === "u64" || cell.tag === "bool") {
     return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_${cell.tag.toUpperCase()} && ${result}.payload==UINT64_C(${cell.value})`;
   }
-  return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_ADDRESS && ${result}.payload==static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${plan.result.addressExpression}))`;
+  const expectedPayload = plan.result.addressPayloadExpression ??
+    `static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${plan.result.addressExpression}))`;
+  return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_ADDRESS && ${result}.payload==${expectedPayload}`;
 }
 
 export function materializeDmSdkUsages(usages, options = {}) {

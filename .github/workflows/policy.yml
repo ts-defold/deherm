@@ -293,7 +293,7 @@ jobs:
         with: { node-version: '22', cache: 'pnpm' }
       - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: '25' }
-      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build clang lld libgl-dev
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: defold-sdk
         run: sed -n 's/^DEFOLD_SDK_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"

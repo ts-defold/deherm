@@ -3,7 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
+import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
+import { materializeDmSdkUniversalReadyCorpus } from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
 import {
   dmSdkUniversalCatalogSha256,
   dmSdkUniversalRecipes,
@@ -16,43 +17,16 @@ const outputDirectory = args.get("--output-dir");
 assert.ok(shermes, "--shermes is required");
 assert.ok(outputDirectory, "--output-dir is required");
 
-const report = JSON.parse(await readFile("packages/bindings/generated/defold-dmsdk-universal-bindings.json", "utf8"));
-const recipe = (symbol, predicate = () => true) => {
-  const matches = report.recipes.filter((item) => item.symbol === symbol && predicate(item));
-  assert.equal(matches.length, 1, `expected one dmSDK recipe for ${symbol}`);
-  return matches[0];
+const catalog = {
+  sourceHashes: { catalog: dmSdkUniversalCatalogSha256 },
+  recipes: dmSdkUniversalRecipes,
 };
-const bypass = { generatedAdapterBypass: { reason: "exercise Static Hermes exact universal decoding", evidence: "generated recording callee observes values replayed through the bounded frame" } };
-const usages = [
-  { declarationId: recipe("dmUtf8::IsWhiteSpace").declarationId, wrapper: "verify_bool", acknowledgements: bypass },
-  { declarationId: recipe("dmTrigLookup::Cos").declarationId, wrapper: "verify_float", acknowledgements: bypass },
-  { declarationId: recipe("dmBuffer::GetSizeForValueType").declarationId, wrapper: "verify_enum", enumDomains: { 0: [0] }, acknowledgements: bypass },
-  { declarationId: recipe("dmHashString32").declarationId, wrapper: "verify_cstring", acknowledgements: bypass },
-  { declarationId: recipe("dmHashReverseSafe32").declarationId, wrapper: "verify_address_result", acknowledgements: bypass },
-  { declarationId: recipe("dmBuffer::IsBufferValid").declarationId, wrapper: "verify_handle", typeSubstitutions: { HBuffer: "dmBuffer::HBuffer" }, acknowledgements: bypass },
-  {
-    declarationId: recipe("ConfigFileGetFloat").declarationId,
-    wrapper: "verify_pointer_handle",
-    acknowledgements: { recordLayout: { reason: "opaque pointer-handle fixture", evidence: "generated aligned identity token is never dereferenced" } },
-  },
-  {
-    declarationId: recipe("dmArray::dmArray::Push").declarationId,
-    wrapper: "verify_reference",
-    receiverCppType: "dmArray<uint32_t>",
-    typeSubstitutions: { T: "uint32_t" },
-    acknowledgements: bypass,
-  },
-  {
-    declarationId: recipe("dmLog::RegisterLogListener").declarationId,
-    wrapper: "verify_callback",
-    callbackTrampolines: { 0: "native_log_listener" },
-    acknowledgements: { callbackTrampoline: { reason: "exercise exact callback transport", evidence: "generated typed trampoline identity is recorded" } },
-  },
-];
-const generated = materializeDmSdkUsages(usages, {
-  catalog: { abi: report.abi, sourceHashes: { catalog: dmSdkUniversalCatalogSha256 }, recipes: dmSdkUniversalRecipes },
-  catalogSha256: dmSdkUniversalCatalogSha256,
-});
+const sdkIr = JSON.parse(await readFile("packages/bindings/generated/defold-sdk-ir.json", "utf8"));
+const corpus = materializeDmSdkUniversalReadyCorpus(
+  buildDmSdkCallSymbolIndex(sdkIr, catalog),
+  catalog,
+);
+const { generated } = corpus;
 const vectors = generated.verification.vectors;
 const prefix = (index) => `deherm_exact_vector_${index}`;
 const switchExpression = (expression) => vectors.map((_, index) => `case ${index}:return ${expression(index)};`).join("");
@@ -97,8 +71,7 @@ const expectedAddressExpression = (cell, index) => {
   if (cell.fixture === "cstring") return `${prefix(index)}_return_cstring`;
   if (cell.fixture === "value-object") return `&${prefix(index)}_return_reference`;
   if (cell.fixture === "aligned-address-token") return `&${prefix(index)}_return_address`;
-  assert.equal(cell.value, 0, `vector ${index} address result needs a known native fixture`);
-  return "nullptr";
+  return null;
 };
 const expectedResultCase = (vector, index) => {
   const cell = vector.result.fakeReturn;
@@ -108,7 +81,12 @@ const expectedResultCase = (vector, index) => {
   if (cell.tag === "bool" || cell.tag === "u64") statements.push(`result.payload=UINT64_C(${cell.value});`);
   else if (cell.tag === "i64") statements.push(`result.payload=static_cast<uint64_t>(INT64_C(${cell.value}));`);
   else if (cell.tag === "f64") statements.push(`{const double value=${Number(cell.value).toFixed(2)};memcpy(&result.payload,&value,sizeof(value));}`);
-  else if (cell.tag === "address") statements.push(`result.payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${expectedAddressExpression(cell, index)}));`);
+  else if (cell.tag === "address") {
+    const expression = expectedAddressExpression(cell, index);
+    statements.push(expression
+      ? `result.payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${expression}));`
+      : `result.payload=UINT64_C(${cell.value});`);
+  }
   return `case ${index}:{${statements.join("")}return result;}`;
 };
 const resultFieldAccessor = (name, expression) => `extern "C" uint32_t deherm_static_dmsdk_exact_result_${name}(uint32_t vector){const DehermDmSdkUniversalValue result=deherm_static_dmsdk_exact_expected_result(vector);return static_cast<uint32_t>(${expression});}`;
@@ -173,6 +151,8 @@ await Promise.all([
   writeFile(evidencePath, `${JSON.stringify({
     schemaVersion: 1,
     transport: "static-hermes-c-abi-bounded-frame",
+    corpusSha256: corpus.report.corpusSha256,
+    verificationManifestSha256: generated.verification.manifestSha256,
     vectorCount: vectors.length,
     vectorSha256: vectors.map(({ vectorSha256 }) => vectorSha256),
     evidenceBoundary: "The emitted sound-typed Static Hermes unit copies every generator-owned exact vector cell into DehermDmSdkUniversalFrame/v1, dispatches through its bounded C ABI, observes the generated exact wrapper and recording fake callee, and compares all six returned wire-cell fields with generator-owned native expectations. The native exact driver runs first to initialize address-bearing fixtures, including the cstring result identity checked by Static Hermes; observations are reset before Static Hermes runs. This does not execute Defold implementation semantics or prove retained handle/callback ownership lifecycles.",

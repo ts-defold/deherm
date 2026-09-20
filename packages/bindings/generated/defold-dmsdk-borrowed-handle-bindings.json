@@ -10,7 +10,7 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "projection": "9f9a4bf56ba785edd2e63924f91c7084f163b49d3fddfc7614077c24e42f3e3f",
+    "projection": "ccde0d5efee6829232e288a923a1eb40bee78eb8ffa451118d1a100ea37f72f0",
     "policy": "7ca752daca9f7077460bf6bdfef1e5919b60272d4659932196f09349afa44b4c"
   },
   "selector": "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",
@@ -2986,6 +2986,7 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
@@ -3000,6 +3001,7 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
@@ -3014,6 +3016,7 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
@@ -3028,6 +3031,7 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
@@ -3042,6 +3046,7 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
@@ -3056,6 +3061,7 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
@@ -3070,6 +3076,7 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"

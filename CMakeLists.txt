@@ -8,6 +8,16 @@ endif()
 
 project(DefoldHermesSpike LANGUAGES C CXX)
 
+# Every generated dmSDK target consumes the same revision-pinned SDK support
+# closure. Derive its root once from the authoritative lock instead of baking a
+# revision into individual targets.
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/upstream.lock" DEHERM_DEFOLD_REV_LINE
+  REGEX "^DEFOLD_REV=[0-9a-f]+$")
+string(REPLACE "DEFOLD_REV=" "" DEHERM_DEFOLD_REV "${DEHERM_DEFOLD_REV_LINE}")
+set(DEHERM_DEFOLD_SDK_DIR
+  "${CMAKE_CURRENT_SOURCE_DIR}/upstream/extender/server/app/sdk/${DEHERM_DEFOLD_REV}/defoldsdk"
+  CACHE PATH "Pinned Defold SDK payload used by generated dmSDK and engine targets")
+
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/upstream/hermes/CMakeLists.txt")
   message(FATAL_ERROR
     "Pinned Hermes source is missing. Run ./scripts/bootstrap-upstreams.sh first.")
@@ -269,10 +279,13 @@ add_custom_command(
   DEPENDS
     shermes
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-dmsdk-exact-verification.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-call-symbol-index.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-ready-corpus.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-materializer.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-materializer-core.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-static-frame.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/generated/dmsdk-universal-recipes.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-sdk-ir.json"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-dmsdk-universal-bindings.json"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/dmsdk-universal.ts"
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -294,7 +307,10 @@ target_include_directories(defold-hermes-static-dmsdk-exact-test PRIVATE
   defold/defold_hermes/include
   "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR}")
 target_include_directories(defold-hermes-static-dmsdk-exact-test SYSTEM PRIVATE
-  upstream/defold/engine/dlib/src)
+  upstream/defold/engine/dlib/src
+  "${DEHERM_DEFOLD_SDK_DIR}/sdk/include"
+  "${DEHERM_DEFOLD_SDK_DIR}/include"
+  "${DEHERM_DEFOLD_SDK_DIR}/ext/include")
 target_link_libraries(defold-hermes-static-dmsdk-exact-test PRIVATE
   defold-hermes-runtime)
 
@@ -469,8 +485,8 @@ target_compile_definitions(defold-hermes-dmsdk-cstring-value-test PRIVATE
 )
 target_include_directories(defold-hermes-dmsdk-cstring-value-test PRIVATE
   defold/defold_hermes/include
-  upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include
-  upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/include
+  "${DEHERM_DEFOLD_SDK_DIR}/sdk/include"
+  "${DEHERM_DEFOLD_SDK_DIR}/include"
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
   target_compile_options(defold-hermes-dmsdk-cstring-value-test PRIVATE
@@ -678,13 +694,6 @@ target_link_libraries(defold-hermes-component-runtime-e2e PRIVATE
 # pinned Defold SDK payload and the packaged Hermes archive, both of which are
 # produced by the local toolchain rather than checked in.
 # ---------------------------------------------------------------------------
-file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/upstream.lock" DEHERM_DEFOLD_REV_LINE
-  REGEX "^DEFOLD_REV=[0-9a-f]+$")
-string(REPLACE "DEFOLD_REV=" "" DEHERM_DEFOLD_REV "${DEHERM_DEFOLD_REV_LINE}")
-set(DEHERM_DEFOLD_SDK_DIR
-  "${CMAKE_CURRENT_SOURCE_DIR}/upstream/extender/server/app/sdk/${DEHERM_DEFOLD_REV}/defoldsdk"
-  CACHE PATH "Pinned Defold SDK payload used by the headless conformance driver")
-
 # The Defold SDK's platform directory, and the directory our own Hermes archive
 # lives in. The two use different spellings for the same platform - Defold's SDK
 # says `arm64-macos` where the bundle target says `arm64-osx` - so both are
