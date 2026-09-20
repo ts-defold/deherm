@@ -111,11 +111,15 @@ test("the Bob matrix consumes the package's pinned Hermes public headers", async
   assert.match(workflow, /path: defold\/defold_hermes\/include/u);
 });
 
-test("pushes run only the cheap consumer half while artifact-dispatched runs require target archives", async () => {
+test("pushes run the available cheap consumer half while artifact-dispatched runs require every artifact", async () => {
   const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
   const local = workflow.slice(workflow.indexOf("  local:"), workflow.indexOf("  extension-headers:"));
   assert.match(local, /if \[ "\$\{\{ github\.event_name \}\}" != push \]; then[\s\S]*stages\+=\(--stage target-archives\)/u);
-  assert.match(local, /--stage policy[\s\S]*--stage host-tools[\s\S]*--stage scaffold[\s\S]*--stage generate/u);
+  assert.match(local, /--stage policy[\s\S]*--stage scaffold[\s\S]*--stage generate/u);
+  assert.match(local, /\[ "\$\{\{ steps\.published-host-tools\.outputs\.available \}\}" = true \][\s\S]*stages\+=\(--stage host-tools\)/u);
+  assert.match(local, /for \(const family of \["hermes-host", "dehermc"\]\)/u);
+  assert.match(local, /tags\[family\]\.assets\["linux-x64"\]/u);
+  assert.match(local, /ordered artifact dispatch will exercise it/u);
   assert.match(workflow, /extension-headers:[\s\S]*if: github\.event_name != 'push'/u);
   assert.match(workflow, /bob:[\s\S]*if: github\.event_name != 'push'/u);
 });

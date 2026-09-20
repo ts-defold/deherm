@@ -178,6 +178,13 @@ the replacement members there, and only then atomically replaces the corrupt
 family directory. If the downloaded bytes also mismatch, the old cache remains
 in place and resolution still fails closed.
 
+CI preserves that same ordering without turning publication latency into a red
+consumer check. A push-time end-to-end run exercises the current Linux host
+assets when both content-addressed releases already contain them. If the same
+push rotated a host-tool fingerprint, it defers only that host-tool stage; the
+native-artifacts summary verifies every row and dispatches the full end-to-end
+workflow after publication. The dispatched run never defers the stage.
+
 The published Linux compilers are built on `ubuntu-22.04` runners, which sets
 their glibc floor at 2.35.
 

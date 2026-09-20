@@ -24,6 +24,15 @@
   transformation, and packaged-tool evidence, not Defold linkage or gameplay
   evidence.
 
+* **The host-tool publication race is now represented as ordering, not
+  failure**: the first push containing a new `dehermc` fingerprint started the
+  cheap end-to-end consumer proof before `tools-3f8fdf0e9ace` existed, so its
+  host-tool stage failed during the expected publication window. Push runs now
+  exercise both current Linux host assets when present and otherwise defer only
+  that stage. The native-artifacts summary remains the authority: it verifies
+  every immutable row, then dispatches a non-push end-to-end run that requires
+  the host tools and cannot defer them.
+
 ## 2026-09-20 - dmSDK reachability is checker-derived
 
 * **Authored calls now select exact recipes without a handwritten manifest**:

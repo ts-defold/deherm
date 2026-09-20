@@ -95,14 +95,50 @@ jobs:
           ' >> "$GITHUB_OUTPUT"
           node scripts/check-end-to-end.mjs --plan >> "$GITHUB_STEP_SUMMARY"
 
+      # A push may be the same push that rotates a content-addressed host-tool
+      # fingerprint. native-artifacts publishes those immutable rows in a
+      # separate workflow and dispatches this workflow again only after every
+      # row exists. The cheap push proof must not race that publication and
+      # report the expected window as a product failure. When both current
+      # linux-x64 assets already exist we still exercise them immediately; when
+      # either is absent we defer only that stage to the ordered dispatch.
+      - id: published-host-tools
+        name: Determine whether this push can exercise published host tools
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != push ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          available=true
+          while IFS=$'\t' read -r family tag asset; do
+            if ! gh release view "$tag" --repo "${{ github.repository }}" \
+              --json assets --jq '.assets[].name' | grep -Fxq "$asset"; then
+              available=false
+              echo "::notice::$family asset $asset in $tag is still publishing; the ordered artifact dispatch will exercise it"
+            fi
+          done < <(node -e '
+            const tags = require("./packages/toolchains/release-tags.json").families;
+            for (const family of ["hermes-host", "dehermc"])
+              console.log(`${family}\t${tags[family].tag}\t${tags[family].assets["linux-x64"]}`);
+          ')
+          echo "available=$available" >> "$GITHUB_OUTPUT"
+          if [ "$available" = false ]; then
+            echo "Host-tool consumer proof deferred until native-artifacts publishes the current fingerprint and dispatches this workflow." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Policy, published tools, scaffold and generate
         run: |
           stages=(
             --stage policy
-            --stage host-tools
             --stage scaffold
             --stage generate
           )
+          if [ "${{ github.event_name }}" != push ] || [ "${{ steps.published-host-tools.outputs.available }}" = true ]; then
+            stages+=(--stage host-tools)
+          fi
           # A push is the cheap consumer half. A new native fingerprint may be
           # publishing concurrently, so only the artifact-dispatched/manual/
           # scheduled run may require the target archive and launch Bob.
