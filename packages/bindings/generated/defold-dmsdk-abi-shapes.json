@@ -4,8 +4,8 @@
   "sourceIr": "packages/bindings/generated/defold-sdk-ir.json",
   "sourceClassification": "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
   "sourceHashes": {
-    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
-    "classification": "a6740e8619d3894dc981497ee47c514db5ac668e815738cd1634979fcf941e0b",
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "classification": "d6ad0e5c99963eca0deacb5f6827d52e26eb1dd630947797d9b343081ed9c52f",
     "headers": {
       "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",
       "upstream/defold/engine/dlib/src/dmsdk/dlib/array.h": "38b74d81c9e9f060e2498757e5f1b22c5a5ff42a523470a26b49644f572ff52b",
@@ -111,7 +111,7 @@
   "coverage": {
     "runtimePending": 1361,
     "shaped": 1361,
-    "uniqueShapes": 880,
+    "uniqueShapes": 888,
     "tranches": 15,
     "unshaped": 0
   },
@@ -153,7 +153,6 @@
     "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32)": 15,
     "scalar:void(inout:pointer:record:lua_State,value:scalar:i32)": 15,
     "opaque-pointer()": 11,
-    "scalar:i32(value:handle:dmGraphics::HContext:opaque)": 11,
     "scalar:u32()": 11,
     "scalar:void(value:scalar:u32)": 10,
     "scalar:bool()": 9,
@@ -175,6 +174,7 @@
     "scalar:void(value:callback)": 6,
     "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)": 5,
     "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,value:scalar:i32)": 5,
+    "scalar:i32(value:handle:dmGraphics::HContext:opaque)": 5,
     "scalar:u16(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)": 5,
     "scalar:u32(value:handle:HTextLayout:opaque)": 5,
     "scalar:void(value:handle:dmMutex::HMutex:opaque)": 5,
@@ -184,7 +184,6 @@
     "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)": 4,
     "scalar:i32(inout:pointer:record:lua_State,in:cstring-in)": 4,
     "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in)": 4,
-    "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)": 4,
     "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)": 4,
     "scalar:void(inout:pointer:record:dmSpinlock::Spinlock)": 4,
     "scalar:void(inout:pointer:record:lua_State)": 4,
@@ -264,6 +263,7 @@
     "scalar:i32(in:pointer:record:dmSys::StatInfo)": 2,
     "scalar:i32(in:pointer:record:HttpResponseInfo)": 2,
     "scalar:i32(inout:pointer:record:lua_State,value:callback,inout:opaque-pointer)": 2,
+    "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)": 2,
     "scalar:isize(inout:pointer:record:lua_State,value:scalar:i32)": 2,
     "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)": 2,
     "scalar:u32(in:cstring-in)": 2,
@@ -436,7 +436,7 @@
     "enum:dmMessage::Result(in:pointer:record:dmMessage::URL,in:pointer:record:dmMessage::URL,value:scalar:u64,value:scalar:usize,value:scalar:usize,value:scalar:usize,in:opaque-pointer,value:scalar:u32,value:callback)": 1,
     "enum:dmMessage::Result(inout:pointer:record:lua_State,in:cstring-in,out:pointer:record:dmMessage::URL,inout:pointer:record:dmMessage::URL)": 1,
     "enum:dmRender::Result(value:handle:dmRender::HConstant:opaque,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)": 1,
-    "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:scalar:i32)": 1,
+    "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)": 1,
     "enum:dmRender::Result(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderObject)": 1,
     "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,in:cstring-in,value:callback,inout:opaque-pointer)": 1,
     "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,inout:pointer:record:dmGameSystem::FontInfo)": 1,
@@ -548,7 +548,7 @@
     "handle:dmGraphics::HContext:opaque()": 1,
     "handle:dmGraphics::HContext:opaque(in:record-ref:dmGraphics::ContextParams)": 1,
     "handle:dmGraphics::HIndexBuffer:usize(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,in:opaque-pointer,value:enum:dmGraphics::BufferUsage)": 1,
-    "handle:dmGraphics::HProgram:usize(value:handle:dmGraphics::HContext:opaque,inout:pointer:scalar:i32,inout:cstring-mutable,value:scalar:u32)": 1,
+    "handle:dmGraphics::HProgram:usize(value:handle:dmGraphics::HContext:opaque,inout:pointer:unknown:ShaderDesc,inout:cstring-mutable,value:scalar:u32)": 1,
     "handle:dmGraphics::HRenderTarget:u64(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,value:record-value:dmGraphics::RenderTargetCreationParams)": 1,
     "handle:dmGraphics::HTexture:u64(value:handle:dmGraphics::HContext:opaque,in:record-ref:dmGraphics::TextureCreationParams)": 1,
     "handle:dmGraphics::HTexture:u64(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:enum:dmGraphics::BufferType)": 1,
@@ -559,7 +559,7 @@
     "handle:dmGraphics::HVertexBuffer:usize(value:handle:dmGraphics::HContext:opaque,value:scalar:u32,in:opaque-pointer,value:enum:dmGraphics::BufferUsage)": 1,
     "handle:dmGraphics::HVertexDeclaration:opaque(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexStreamDeclaration:opaque,value:scalar:u32)": 1,
     "handle:dmGraphics::HVertexDeclaration:opaque(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HVertexStreamDeclaration:opaque)": 1,
-    "handle:dmGraphics::HVertexStreamDeclaration:opaque(value:handle:dmGraphics::HContext:opaque,value:scalar:i32)": 1,
+    "handle:dmGraphics::HVertexStreamDeclaration:opaque(value:handle:dmGraphics::HContext:opaque,value:unknown:VertexStepFunction)": 1,
     "handle:dmGraphics::HVertexStreamDeclaration:opaque(value:handle:dmGraphics::HContext:opaque)": 1,
     "handle:dmGui::HNode:u32(inout:pointer:record:lua_State,value:scalar:i32)": 1,
     "handle:dmGui::HNode:u32(value:handle:dmGui::HScene:opaque,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Vector3,value:enum:dmGui::NodeType,value:scalar:u32)": 1,
@@ -637,7 +637,7 @@
     "pointer:record:dmGameSystem::TTFResource(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque)": 1,
     "pointer:record:dmRender::RenderListEntry(value:handle:dmRender::HRenderContext:opaque,value:scalar:u32)": 1,
     "pointer:record:dmRig::IKTarget(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)": 1,
-    "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:scalar:i32,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)": 1,
+    "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)": 1,
     "pointer:record:dmScript::LuaCallbackInfo(inout:pointer:record:lua_State,value:scalar:i32)": 1,
     "pointer:record:lua_State()": 1,
     "pointer:record:lua_State(in:pointer:record:dmGameSystem::CompGuiNodeTypeCtx)": 1,
@@ -652,11 +652,11 @@
     "pointer:record:TextLine(value:handle:HTextLayout:opaque)": 1,
     "pointer:record:TextParagraph(value:handle:HTextLayout:opaque)": 1,
     "pointer:scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,out:pointer:scalar:u32)": 1,
-    "pointer:scalar:i32(inout:pointer:record:dmGameSystem::DataResource)": 1,
     "pointer:scalar:u64(inout:pointer:record:lua_State,value:scalar:i32)": 1,
-    "pointer:scalar:u8(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:scalar:i32,in:unknown:dmVMath::Matrix4,in:unknown:dmVMath::Matrix4,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:u32,out:pointer:scalar:u8)": 1,
+    "pointer:scalar:u8(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,in:unknown:dmVMath::Matrix4,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:u32,out:pointer:scalar:u8)": 1,
     "pointer:unknown:android_app()": 1,
     "pointer:unknown:dmArray<BonePose>(value:handle:dmRig::HRigInstance:opaque)": 1,
+    "pointer:unknown:dmGameSystemDDF::Data(inout:pointer:record:dmGameSystem::DataResource)": 1,
     "pointer:unknown:dmVMath::Vector4(value:handle:dmRender::HConstant:opaque,inout:pointer:scalar:u32)": 1,
     "pointer:unknown:JavaVM()": 1,
     "pointer:unknown:T(value:scalar:u32)": 1,
@@ -703,13 +703,13 @@
     "scalar:bool(value:handle:dmMutex::HMutex:opaque)": 1,
     "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)": 1,
     "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)": 1,
-    "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:scalar:i32)": 1,
+    "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType)": 1,
     "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32)": 1,
     "scalar:bool(value:handle:dmResource::HPreloadHintInfo:opaque,in:cstring-in)": 1,
     "scalar:bool(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)": 1,
     "scalar:bool(value:handle:HResourceType:opaque)": 1,
-    "scalar:bool(value:scalar:i32,value:scalar:u16,out:pointer:scalar:i32)": 1,
     "scalar:bool(value:scalar:u64)": 1,
+    "scalar:bool(value:unknown:VkDevice,value:scalar:u16,out:pointer:unknown:VkDescriptorPool)": 1,
     "scalar:f32()": 1,
     "scalar:f32(value:handle:dmConfigFile::HConfig:opaque,in:cstring-in,value:scalar:f32)": 1,
     "scalar:f32(value:handle:dmGraphics::HContext:opaque)": 1,
@@ -745,8 +745,6 @@
     "scalar:i32(value:handle:dmConfigFile::HConfig:opaque,in:cstring-in,value:scalar:i32)": 1,
     "scalar:i32(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64)": 1,
     "scalar:i32(value:handle:dmGameSystem::HComponentRenderConstants:opaque)": 1,
-    "scalar:i32(value:handle:dmRender::HConstant:opaque)": 1,
-    "scalar:i32(value:handle:dmRender::HMaterial:opaque)": 1,
     "scalar:i32(value:handle:dmSocket::Socket:i32)": 1,
     "scalar:i32(value:handle:HConfigFile:opaque,in:cstring-in,value:scalar:i32)": 1,
     "scalar:i32(value:handle:HContextRegistry:opaque,in:cstring-in,inout:opaque-pointer)": 1,
@@ -827,7 +825,7 @@
     "scalar:void(inout:pointer:record:dmFileDescriptor::Poller)": 1,
     "scalar:void(inout:pointer:record:dmFixedMemAllocator,value:scalar:usize,inout:opaque-pointer)": 1,
     "scalar:void(inout:pointer:record:dmGameSystem::CompGuiNodeType,inout:opaque-pointer)": 1,
-    "scalar:void(inout:pointer:record:dmGraphics::WriteAttributeParams,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:i32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,value:scalar:i32,in:pointer-out:scalar:f32,value:scalar:u32)": 1,
+    "scalar:void(inout:pointer:record:dmGraphics::WriteAttributeParams,in:pointer:record:dmGraphics::VertexAttributeInfos,value:unknown:dmGraphics::VertexStepFunction,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,value:unknown:dmGraphics::VertexAttribute::VectorType,in:pointer-out:scalar:f32,value:scalar:u32)": 1,
     "scalar:void(inout:pointer:record:dmMessage::URL,value:handle:dmMessage::HSocket:u64)": 1,
     "scalar:void(inout:pointer:record:dmMessage::URL)": 1,
     "scalar:void(inout:pointer:record:dmRender::RenderObject,value:handle:dmGameSystem::HComponentRenderConstants:opaque)": 1,
@@ -868,10 +866,10 @@
     "scalar:void(inout:pointer:record:luaL_Buffer,in:cstring-in,value:scalar:usize)": 1,
     "scalar:void(inout:pointer:record:luaL_Buffer,in:cstring-in)": 1,
     "scalar:void(inout:pointer:record:WindowCreateParams)": 1,
-    "scalar:void(inout:pointer:scalar:i32)": 1,
+    "scalar:void(inout:pointer:unknown:dmLuaDDF::LuaModule)": 1,
     "scalar:void(inout:pointer:unknown:dmVMath::Matrix4)": 1,
     "scalar:void(inout:record-ref:dmSpinlock::Spinlock)": 1,
-    "scalar:void(inout:scalar:i32,inout:template:dmArray<RigBone>)": 1,
+    "scalar:void(inout:unknown:dmRigDDF::Skeleton,inout:template:dmArray<RigBone>)": 1,
     "scalar:void(out:cstring-mutable,value:scalar:usize,value:scalar:i32)": 1,
     "scalar:void(value:enum:LogSeverity,in:cstring-in,in:cstring-in)": 1,
     "scalar:void(value:handle:dmBuffer::HBuffer:u32,value:enum:dmScript::LuaBufferOwnership)": 1,
@@ -959,14 +957,14 @@
     "scalar:void(value:handle:dmHID::HTouchDevice:opaque,value:scalar:i32,value:scalar:i32,value:scalar:u32,value:enum:dmHID::Phase)": 1,
     "scalar:void(value:handle:dmImage::HImage:opaque)": 1,
     "scalar:void(value:handle:dmRender::HConstant:opaque,value:handle:dmGraphics::HUniformLocation:i64)": 1,
-    "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:i32)": 1,
     "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:u64)": 1,
+    "scalar:void(value:handle:dmRender::HConstant:opaque,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)": 1,
     "scalar:void(value:handle:dmRender::HConstant:opaque)": 1,
     "scalar:void(value:handle:dmRender::HMaterial:opaque,value:scalar:u32,in:pointer:scalar:u64)": 1,
     "scalar:void(value:handle:dmRender::HMaterial:opaque)": 1,
     "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,inout:pointer:unknown:HConstant,value:scalar:u32)": 1,
     "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:callback,inout:opaque-pointer)": 1,
-    "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:i32)": 1,
+    "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)": 1,
     "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)": 1,
     "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64)": 1,
     "scalar:void(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderListEntry,inout:pointer:record:dmRender::RenderListEntry)": 1,
@@ -1013,6 +1011,8 @@
     "scalar:void(value:unknown:dmVMath::Vector4)": 1,
     "template:dmArray<T>()": 1,
     "template:KEY()": 1,
+    "unknown:dmRenderDDF::MaterialDesc::ConstantType(value:handle:dmRender::HConstant:opaque)": 1,
+    "unknown:dmRenderDDF::MaterialDesc::VertexSpace(value:handle:dmRender::HMaterial:opaque)": 1,
     "unknown:dmVMath::Matrix4(in:record-ref:dmTransform::Transform)": 1,
     "unknown:dmVMath::Matrix4(value:handle:dmGameObject::HInstance:opaque)": 1,
     "unknown:dmVMath::Matrix4(value:handle:dmRender::HRenderContext:opaque)": 1,
@@ -1027,7 +1027,15 @@
     "unknown:dmVMath::Vector4(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property)": 1,
     "unknown:Matrix4(value:unknown:Matrix4,value:unknown:Vector3)": 1,
     "unknown:Vector3(value:unknown:Quat,value:unknown:Vector3)": 1,
-    "unknown:Vector4(value:unknown:Vector4)": 1
+    "unknown:Vector4(value:unknown:Vector4)": 1,
+    "unknown:VkCommandBuffer(value:handle:dmGraphics::HContext:opaque)": 1,
+    "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)": 1,
+    "unknown:VkImage(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)": 1,
+    "unknown:VkImageView(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)": 1,
+    "unknown:VkInstance(value:handle:dmGraphics::HContext:opaque)": 1,
+    "unknown:VkPhysicalDevice(value:handle:dmGraphics::HContext:opaque)": 1,
+    "unknown:VkQueue(value:handle:dmGraphics::HContext:opaque)": 1,
+    "unknown:VkRenderPass(value:handle:dmGraphics::HContext:opaque)": 1
   },
   "rows": [
     {
@@ -14183,9 +14191,10 @@
       "primaryFamily": "constructor",
       "families": [
         "constructor",
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
-      "shape": "scalar:void(inout:pointer:scalar:i32)",
+      "shape": "scalar:void(inout:pointer:unknown:dmLuaDDF::LuaModule)",
       "result": {
         "role": "scalar:void",
         "direction": "value",
@@ -14195,9 +14204,9 @@
         {
           "position": 0,
           "name": "lua_module",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:unknown:dmLuaDDF::LuaModule",
           "direction": "inout",
-          "nativeType": "int *"
+          "nativeType": "dmLuaDDF::LuaModule *"
         }
       ],
       "tranche": "pointer-lifetime-adapters",
@@ -18180,13 +18189,14 @@
       "line": 55,
       "primaryFamily": "pointer",
       "families": [
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
-      "shape": "pointer:scalar:i32(inout:pointer:record:dmGameSystem::DataResource)",
+      "shape": "pointer:unknown:dmGameSystemDDF::Data(inout:pointer:record:dmGameSystem::DataResource)",
       "result": {
-        "role": "pointer:scalar:i32",
+        "role": "pointer:unknown:dmGameSystemDDF::Data",
         "direction": "in",
-        "nativeType": "const int *"
+        "nativeType": "const dmGameSystemDDF::Data *"
       },
       "parameters": [
         {
@@ -23186,7 +23196,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "handle:dmGraphics::HProgram:usize(value:handle:dmGraphics::HContext:opaque,inout:pointer:scalar:i32,inout:cstring-mutable,value:scalar:u32)",
+      "shape": "handle:dmGraphics::HProgram:usize(value:handle:dmGraphics::HContext:opaque,inout:pointer:unknown:ShaderDesc,inout:cstring-mutable,value:scalar:u32)",
       "result": {
         "role": "handle:dmGraphics::HProgram:usize",
         "direction": "value",
@@ -23203,9 +23213,9 @@
         {
           "position": 1,
           "name": "ddf",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:unknown:ShaderDesc",
           "direction": "inout",
-          "nativeType": "int *"
+          "nativeType": "ShaderDesc *"
         },
         {
           "position": 2,
@@ -23498,7 +23508,7 @@
       "families": [
         "enum-handle"
       ],
-      "shape": "handle:dmGraphics::HVertexStreamDeclaration:opaque(value:handle:dmGraphics::HContext:opaque,value:scalar:i32)",
+      "shape": "handle:dmGraphics::HVertexStreamDeclaration:opaque(value:handle:dmGraphics::HContext:opaque,value:unknown:VertexStepFunction)",
       "result": {
         "role": "handle:dmGraphics::HVertexStreamDeclaration:opaque",
         "direction": "value",
@@ -23515,15 +23525,16 @@
         {
           "position": 1,
           "name": "step_function",
-          "role": "scalar:i32",
+          "role": "unknown:VertexStepFunction",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "VertexStepFunction"
         }
       ],
       "tranche": "owned-handle-producers",
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
-        "native-symbol-linkage-unverified"
+        "native-symbol-linkage-unverified",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25231,9 +25242,10 @@
       "families": [
         "platform-gated",
         "out-param",
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
-      "shape": "scalar:bool(value:scalar:i32,value:scalar:u16,out:pointer:scalar:i32)",
+      "shape": "scalar:bool(value:unknown:VkDevice,value:scalar:u16,out:pointer:unknown:VkDescriptorPool)",
       "result": {
         "role": "scalar:bool",
         "direction": "value",
@@ -25243,9 +25255,9 @@
         {
           "position": 0,
           "name": "vk_device",
-          "role": "scalar:i32",
+          "role": "unknown:VkDevice",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "VkDevice"
         },
         {
           "position": 1,
@@ -25257,9 +25269,9 @@
         {
           "position": 2,
           "name": "vk_descriptor_pool_out",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:unknown:VkDescriptorPool",
           "direction": "out",
-          "nativeType": "int *"
+          "nativeType": "VkDescriptorPool *"
         }
       ],
       "tranche": "scratch-out-parameters",
@@ -25267,7 +25279,8 @@
         "native-symbol-linkage-unverified",
         "out-storage-initialization-and-failure-policy",
         "per-target-feature-and-symbol-matrix",
-        "pointer-bounds-direction-lifetime-policy"
+        "pointer-bounds-direction-lifetime-policy",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25314,11 +25327,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "shape": "unknown:VkCommandBuffer(value:handle:dmGraphics::HContext:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkCommandBuffer",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkCommandBuffer"
       },
       "parameters": [
         {
@@ -25333,7 +25346,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25347,11 +25361,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "shape": "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkDevice",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkDevice"
       },
       "parameters": [
         {
@@ -25366,7 +25380,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25380,11 +25395,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "shape": "unknown:VkQueue(value:handle:dmGraphics::HContext:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkQueue",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkQueue"
       },
       "parameters": [
         {
@@ -25399,7 +25414,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25446,11 +25462,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "shape": "unknown:VkImage(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkImage",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkImage"
       },
       "parameters": [
         {
@@ -25472,7 +25488,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25486,11 +25503,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
+      "shape": "unknown:VkImageView(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkImageView",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkImageView"
       },
       "parameters": [
         {
@@ -25512,7 +25529,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25526,11 +25544,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "shape": "unknown:VkInstance(value:handle:dmGraphics::HContext:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkInstance",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkInstance"
       },
       "parameters": [
         {
@@ -25545,7 +25563,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25559,11 +25578,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "shape": "unknown:VkPhysicalDevice(value:handle:dmGraphics::HContext:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkPhysicalDevice",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkPhysicalDevice"
       },
       "parameters": [
         {
@@ -25578,7 +25597,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -25592,11 +25612,11 @@
         "platform-gated",
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)",
+      "shape": "unknown:VkRenderPass(value:handle:dmGraphics::HContext:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:VkRenderPass",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "VkRenderPass"
       },
       "parameters": [
         {
@@ -25611,7 +25631,8 @@
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "per-target-feature-and-symbol-matrix"
+        "per-target-feature-and-symbol-matrix",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -32363,11 +32384,11 @@
       "families": [
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmRender::HConstant:opaque)",
+      "shape": "unknown:dmRenderDDF::MaterialDesc::ConstantType(value:handle:dmRender::HConstant:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:dmRenderDDF::MaterialDesc::ConstantType",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "dmRenderDDF::MaterialDesc::ConstantType"
       },
       "parameters": [
         {
@@ -32381,7 +32402,8 @@
       "tranche": "borrowed-handle-consumers",
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
-        "native-symbol-linkage-unverified"
+        "native-symbol-linkage-unverified",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -32581,11 +32603,11 @@
       "families": [
         "enum-handle"
       ],
-      "shape": "scalar:i32(value:handle:dmRender::HMaterial:opaque)",
+      "shape": "unknown:dmRenderDDF::MaterialDesc::VertexSpace(value:handle:dmRender::HMaterial:opaque)",
       "result": {
-        "role": "scalar:i32",
+        "role": "unknown:dmRenderDDF::MaterialDesc::VertexSpace",
         "direction": "value",
-        "nativeType": "int"
+        "nativeType": "dmRenderDDF::MaterialDesc::VertexSpace"
       },
       "parameters": [
         {
@@ -32599,7 +32621,8 @@
       "tranche": "borrowed-handle-consumers",
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
-        "native-symbol-linkage-unverified"
+        "native-symbol-linkage-unverified",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -32670,7 +32693,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:scalar:i32)",
+      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
       "result": {
         "role": "scalar:bool",
         "direction": "value",
@@ -32708,9 +32731,9 @@
         {
           "position": 4,
           "name": "constant_type",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
           "direction": "inout",
-          "nativeType": "int *"
+          "nativeType": "dmRenderDDF::MaterialDesc::ConstantType *"
         }
       ],
       "tranche": "scratch-out-parameters",
@@ -33286,7 +33309,7 @@
       "families": [
         "enum-handle"
       ],
-      "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:i32)",
+      "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
       "result": {
         "role": "scalar:void",
         "direction": "value",
@@ -33303,15 +33326,16 @@
         {
           "position": 1,
           "name": "type",
-          "role": "scalar:i32",
+          "role": "unknown:dmRenderDDF::MaterialDesc::ConstantType",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "dmRenderDDF::MaterialDesc::ConstantType"
         }
       ],
       "tranche": "borrowed-handle-consumers",
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
-        "native-symbol-linkage-unverified"
+        "native-symbol-linkage-unverified",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -33645,7 +33669,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:i32)",
+      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
       "result": {
         "role": "scalar:void",
         "direction": "value",
@@ -33683,16 +33707,17 @@
         {
           "position": 4,
           "name": "constant_type",
-          "role": "scalar:i32",
+          "role": "unknown:dmRenderDDF::MaterialDesc::ConstantType",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "dmRenderDDF::MaterialDesc::ConstantType"
         }
       ],
       "tranche": "borrowed-handle-consumers",
       "blockers": [
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "pointer-bounds-direction-lifetime-policy"
+        "pointer-bounds-direction-lifetime-policy",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -33706,7 +33731,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:scalar:i32)",
+      "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
       "result": {
         "role": "enum:dmRender::Result",
         "direction": "value",
@@ -33751,9 +33776,9 @@
         {
           "position": 5,
           "name": "constant_type",
-          "role": "scalar:i32",
+          "role": "unknown:dmRenderDDF::MaterialDesc::ConstantType",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "dmRenderDDF::MaterialDesc::ConstantType"
         }
       ],
       "tranche": "borrowed-handle-consumers",
@@ -33761,7 +33786,8 @@
         "enum-width-domain-validation-policy",
         "handle-provenance-ownership-nullability-policy",
         "native-symbol-linkage-unverified",
-        "pointer-bounds-direction-lifetime-policy"
+        "pointer-bounds-direction-lifetime-policy",
+        "type-lowering-unresolved"
       ]
     },
     {
@@ -35956,9 +35982,10 @@
       "families": [
         "template-opaque",
         "out-param",
-        "record-reference"
+        "record-reference",
+        "enum-handle"
       ],
-      "shape": "scalar:void(inout:scalar:i32,inout:template:dmArray<RigBone>)",
+      "shape": "scalar:void(inout:unknown:dmRigDDF::Skeleton,inout:template:dmArray<RigBone>)",
       "result": {
         "role": "scalar:void",
         "direction": "value",
@@ -35968,9 +35995,9 @@
         {
           "position": 0,
           "name": "skeleton",
-          "role": "scalar:i32",
+          "role": "unknown:dmRigDDF::Skeleton",
           "direction": "inout",
-          "nativeType": "int &"
+          "nativeType": "dmRigDDF::Skeleton &"
         },
         {
           "position": 1,
@@ -36031,7 +36058,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:scalar:i32,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)",
+      "shape": "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)",
       "result": {
         "role": "pointer:record:dmRig::RigModelVertex",
         "direction": "inout",
@@ -36055,9 +36082,9 @@
         {
           "position": 2,
           "name": "mesh",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:record:dmRigDDF::Mesh",
           "direction": "inout",
-          "nativeType": "int *"
+          "nativeType": "dmRigDDF::Mesh *"
         },
         {
           "position": 3,
@@ -36097,7 +36124,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "pointer:scalar:u8(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:scalar:i32,in:unknown:dmVMath::Matrix4,in:unknown:dmVMath::Matrix4,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:u32,out:pointer:scalar:u8)",
+      "shape": "pointer:scalar:u8(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,in:unknown:dmVMath::Matrix4,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:u32,out:pointer:scalar:u8)",
       "result": {
         "role": "pointer:scalar:u8",
         "direction": "inout",
@@ -36121,9 +36148,9 @@
         {
           "position": 2,
           "name": "mesh",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:record:dmRigDDF::Mesh",
           "direction": "inout",
-          "nativeType": "int *"
+          "nativeType": "dmRigDDF::Mesh *"
         },
         {
           "position": 3,
@@ -36998,9 +37025,10 @@
       "families": [
         "out-param",
         "pointer-span",
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
-      "shape": "scalar:void(inout:pointer:record:dmGraphics::WriteAttributeParams,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:i32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,value:scalar:i32,in:pointer-out:scalar:f32,value:scalar:u32)",
+      "shape": "scalar:void(inout:pointer:record:dmGraphics::WriteAttributeParams,in:pointer:record:dmGraphics::VertexAttributeInfos,value:unknown:dmGraphics::VertexStepFunction,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,value:unknown:dmGraphics::VertexAttribute::VectorType,in:pointer-out:scalar:f32,value:scalar:u32)",
       "result": {
         "role": "scalar:void",
         "direction": "value",
@@ -37024,9 +37052,9 @@
         {
           "position": 2,
           "name": "step_function",
-          "role": "scalar:i32",
+          "role": "unknown:dmGraphics::VertexStepFunction",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "dmGraphics::VertexStepFunction"
         },
         {
           "position": 3,
@@ -37094,9 +37122,9 @@
         {
           "position": 12,
           "name": "morph_target_weights_vector_type",
-          "role": "scalar:i32",
+          "role": "unknown:dmGraphics::VertexAttribute::VectorType",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "dmGraphics::VertexAttribute::VectorType"
         },
         {
           "position": 13,
@@ -37118,7 +37146,8 @@
         "native-symbol-linkage-unverified",
         "out-storage-initialization-and-failure-policy",
         "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
+        "span-element-unit-and-copy-policy",
+        "type-lowering-unresolved"
       ]
     },
     {

@@ -90,7 +90,10 @@ compile([
   "-o", universalOutput
 ]);
 compile([
-  "-fno-std-globals", "-parse-ts", "-typed", "-strict", "-O", "-emit-c",
+  // Static Hermes' sound-typed grammar is the FFI authority for this generated
+  // TS-compatible subset. The pinned ts2flow path currently leaves return type
+  // annotations on extern_c function expressions unlowered.
+  "-fno-std-globals", "-typed", "-strict", "-O", "-emit-c",
   "-exported-unit=deherm_static_vmath",
   vmathInput,
   "-o", vmathOutput

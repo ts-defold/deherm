@@ -44,7 +44,7 @@ function normalizeType(raw) {
 
 export function createTypeRenderer(ir) {
   const declarations = new Map();
-  for (const declaration of ir.declarations) {
+  for (const declaration of [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])]) {
     if (["record", "enum", "type-alias"].includes(declaration.kind) && !declarations.has(declaration.name)) {
       declarations.set(declaration.name, declaration);
     }
@@ -65,6 +65,7 @@ export function createTypeRenderer(ir) {
     ["int32_t", "number"], ["uint32_t", "number"], ["int", "number"], ["unsigned int", "number"],
     ["short", "number"], ["unsigned short", "number"], ["size_t", "number"], ["ptrdiff_t", "number"],
     ["int64_t", "bigint"], ["uint64_t", "bigint"], ["intptr_t", "bigint"], ["uintptr_t", "bigint"],
+    ["long", "bigint"], ["unsigned long", "bigint"],
     ["long long", "bigint"], ["unsigned long long", "bigint"]
   ]);
 
@@ -218,6 +219,12 @@ function enrich(inventory) {
       abiStrategies: strategies(normalized)
     };
   });
+  const typeSupportDeclarations = (inventory.typeSupportDeclarations ?? []).map((declaration, index) => ({
+    ...declaration,
+    id: `dmsdk-support:${declaration.name}@${declaration.header}:${declaration.line ?? 0}:${index}`,
+    disposition: "signature-type-support",
+    abiStrategies: ["type-metadata"],
+  }));
   return {
     schemaVersion: 1,
     defoldRevision: inventory.defoldRevision,
@@ -230,7 +237,8 @@ function enrich(inventory) {
     typeSurfaceUnresolvedCount: undefined,
     runtimeImplementedCount: 0,
     runtimeUnimplementedCount: declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call").length,
-    declarations
+    declarations,
+    typeSupportDeclarations,
   };
 }
 
@@ -370,7 +378,8 @@ export function generateTypes(ir, renderer) {
   }
   lines.push("}", "");
   const typeGroups = new Map();
-  for (const declaration of ir.declarations.filter((item) => ["record", "enum", "type-alias"].includes(item.kind))) {
+  for (const declaration of [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])]
+    .filter((item) => ["record", "enum", "type-alias"].includes(item.kind))) {
     const current = typeGroups.get(declaration.name);
     if (!current || (declaration.members?.length ?? 0) > (current.members?.length ?? 0)) typeGroups.set(declaration.name, declaration);
   }

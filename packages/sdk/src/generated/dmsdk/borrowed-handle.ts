@@ -46,49 +46,47 @@ export const DmSdkBorrowedHandleId={
   dmMessageIsSocketValid: 36,
   dmMutexTryLock: 37,
   dmRenderGetConstantName: 38,
-  dmRenderGetConstantType: 39,
-  dmRenderGetMaterialSamplerNameHash: 40,
-  dmRenderGetMaterialSamplerUnit: 41,
-  dmRenderGetMaterialTagListKey: 42,
-  dmRenderGetMaterialVertexSpace: 43,
-  dmRenderGetNamedConstantCount: 44,
-  dmResourceGetNameHashFromHDescriptor: 45,
-  dmResourceGetNameHashFromHResourceType: 46,
-  dmResourceGetResourceSize: 47,
-  dmRigGetAnimation: 48,
-  dmRigGetBoneCount: 49,
-  dmRigGetCursor: 50,
-  dmRigGetEnabled: 51,
-  dmRigGetMaxBoneCount: 52,
-  dmRigGetModel: 53,
-  dmRigGetPlaybackRate: 54,
-  dmRigGetVertexCount: 55,
-  dmRigHasPoseMatrixCacheAnimatedPose: 56,
-  dmRigIsValid: 57,
-  dmRigResetIktarget: 58,
-  dmSocketGetFd: 59,
-  fontCollectionGetFontCount: 60,
-  fontGetAscent: 61,
-  fontGetDescent: 62,
-  fontGetGlyphIndex: 63,
-  fontGetLineGap: 64,
-  fontGetPathHash: 65,
-  fontGetResourceSize: 66,
-  fontGetScaleFromSize: 67,
-  jobSystemGetWorkerCount: 68,
-  resourceDescriptorGetNameHash: 69,
-  resourceDescriptorGetResourceSize: 70,
-  resourceTypeGetNameHash: 71,
-  resourceTypeGetPreloadSize: 72,
-  resourceTypeIsStreaming: 73,
-  textLayoutGetDecorationCount: 74,
-  textLayoutGetGlyphCount: 75,
-  textLayoutGetLineCount: 76,
-  textLayoutGetObjectCount: 77,
-  textLayoutGetParagraphCount: 78,
-  windowGetDisplayScaleFactor: 79,
-  windowGetHeight: 80,
-  windowGetWidth: 81
+  dmRenderGetMaterialSamplerNameHash: 39,
+  dmRenderGetMaterialSamplerUnit: 40,
+  dmRenderGetMaterialTagListKey: 41,
+  dmRenderGetNamedConstantCount: 42,
+  dmResourceGetNameHashFromHDescriptor: 43,
+  dmResourceGetNameHashFromHResourceType: 44,
+  dmResourceGetResourceSize: 45,
+  dmRigGetAnimation: 46,
+  dmRigGetBoneCount: 47,
+  dmRigGetCursor: 48,
+  dmRigGetEnabled: 49,
+  dmRigGetMaxBoneCount: 50,
+  dmRigGetModel: 51,
+  dmRigGetPlaybackRate: 52,
+  dmRigGetVertexCount: 53,
+  dmRigHasPoseMatrixCacheAnimatedPose: 54,
+  dmRigIsValid: 55,
+  dmRigResetIktarget: 56,
+  dmSocketGetFd: 57,
+  fontCollectionGetFontCount: 58,
+  fontGetAscent: 59,
+  fontGetDescent: 60,
+  fontGetGlyphIndex: 61,
+  fontGetLineGap: 62,
+  fontGetPathHash: 63,
+  fontGetResourceSize: 64,
+  fontGetScaleFromSize: 65,
+  jobSystemGetWorkerCount: 66,
+  resourceDescriptorGetNameHash: 67,
+  resourceDescriptorGetResourceSize: 68,
+  resourceTypeGetNameHash: 69,
+  resourceTypeGetPreloadSize: 70,
+  resourceTypeIsStreaming: 71,
+  textLayoutGetDecorationCount: 72,
+  textLayoutGetGlyphCount: 73,
+  textLayoutGetLineCount: 74,
+  textLayoutGetObjectCount: 75,
+  textLayoutGetParagraphCount: 76,
+  windowGetDisplayScaleFactor: 77,
+  windowGetHeight: 78,
+  windowGetWidth: 79
 } as const;
 
 /** Provider-validated borrowed call for dmBuffer::IsBufferValid; does not transfer ownership. */
@@ -208,9 +206,6 @@ export function dmMutexTryLock(mutex: BorrowedHandle<"dmMutex::HMutex">): boolea
 /** Provider-validated borrowed call for dmRender::GetConstantName; does not transfer ownership. */
 export function dmRenderGetConstantName(constant: BorrowedHandle<"dmRender::HConstant">): bigint { return module().call(DmSdkBorrowedHandleId.dmRenderGetConstantName, constant) as bigint; }
 
-/** Provider-validated borrowed call for dmRender::GetConstantType; does not transfer ownership. */
-export function dmRenderGetConstantType(constant: BorrowedHandle<"dmRender::HConstant">): number { return module().call(DmSdkBorrowedHandleId.dmRenderGetConstantType, constant) as number; }
-
 /** Provider-validated borrowed call for dmRender::GetMaterialSamplerNameHash; does not transfer ownership. */
 export function dmRenderGetMaterialSamplerNameHash(material: BorrowedHandle<"dmRender::HMaterial">, unit: number): bigint { return module().call(DmSdkBorrowedHandleId.dmRenderGetMaterialSamplerNameHash, material, unit) as bigint; }
 
@@ -219,9 +214,6 @@ export function dmRenderGetMaterialSamplerUnit(material: BorrowedHandle<"dmRende
 
 /** Provider-validated borrowed call for dmRender::GetMaterialTagListKey; does not transfer ownership. */
 export function dmRenderGetMaterialTagListKey(material: BorrowedHandle<"dmRender::HMaterial">): number { return module().call(DmSdkBorrowedHandleId.dmRenderGetMaterialTagListKey, material) as number; }
-
-/** Provider-validated borrowed call for dmRender::GetMaterialVertexSpace; does not transfer ownership. */
-export function dmRenderGetMaterialVertexSpace(material: BorrowedHandle<"dmRender::HMaterial">): number { return module().call(DmSdkBorrowedHandleId.dmRenderGetMaterialVertexSpace, material) as number; }
 
 /** Provider-validated borrowed call for dmRender::GetNamedConstantCount; does not transfer ownership. */
 export function dmRenderGetNamedConstantCount(buffer: BorrowedHandle<"dmRender::HNamedConstantBuffer">): number { return module().call(DmSdkBorrowedHandleId.dmRenderGetNamedConstantCount, buffer) as number; }

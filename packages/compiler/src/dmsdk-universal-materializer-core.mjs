@@ -62,6 +62,28 @@ function scalarName(shape) {
   return null;
 }
 
+function canonicalTypeNames(shape) {
+  const names = [];
+  const visit = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (typeof node.name === "string" && node.name.includes("::")) names.push(node.name);
+    for (const key of ["to", "target", "representation", "element", "result"]) visit(node[key]);
+    for (const key of ["parameters", "arguments"]) for (const child of node[key] ?? []) visit(child);
+  };
+  visit(shape);
+  return names;
+}
+
+function qualifySourceType(shape, spelling) {
+  let result = spelling;
+  for (const qualified of canonicalTypeNames(shape)) {
+    const leaf = qualified.slice(qualified.lastIndexOf("::") + 2);
+    const expression = new RegExp(`(?<![:A-Za-z0-9_])${leaf}(?![A-Za-z0-9_])`, "g");
+    if (expression.test(result)) result = result.replace(expression, qualified);
+  }
+  return result;
+}
+
 function nativeType(shape, spelling, substitutions) {
   let result = String(spelling ?? "void");
   for (const [from, to] of Object.entries(substitutions ?? {})) {
@@ -72,6 +94,7 @@ function nativeType(shape, spelling, substitutions) {
       result === spelling) {
     throw new Error(`Native type ${spelling} needs a usage substitution`);
   }
+  result = qualifySourceType(shape, result);
   return cppType(result, "native type");
 }
 
@@ -89,6 +112,9 @@ function decodeScalar(name, type, slot) {
 function decode(parameter, slot, usage) {
   const shape = parameter.shape;
   const type = nativeType(shape, parameter.nativeType, usage.typeSubstitutions);
+  if (shape.kind === "handle") {
+    return `deherm_dmsdk_unpack_handle<${type}>(arguments[${slot}].payload)`;
+  }
   const name = scalarName(shape);
   if (name) return decodeScalar(name, type, slot);
   if (shape.kind === "callback") {
@@ -106,9 +132,6 @@ function decode(parameter, slot, usage) {
   if (shape.kind === "reference") {
     const target = type.replace(/\s*&&?\s*$/, "");
     return `*reinterpret_cast<${target}*>(static_cast<uintptr_t>(arguments[${slot}].payload))`;
-  }
-  if (shape.kind === "handle") {
-    return `reinterpret_cast<${type}>(static_cast<uintptr_t>(arguments[${slot}].payload))`;
   }
   throw new Error(`${parameter.name} (${shape.kind}) needs an explicit argumentExpressions entry`);
 }
@@ -139,6 +162,21 @@ function tagCheck(shape, slot) {
   return "true";
 }
 
+function containsUnalignablePointee(shape) {
+  let result = false;
+  const inspect = (node) => {
+    if (!node || typeof node !== "object") return;
+    if (node.kind === "void" ||
+        (["record", "template-record"].includes(node.kind) && node.complete === false)) {
+      result = true;
+    }
+    for (const key of ["to", "target", "representation", "element", "result"]) inspect(node[key]);
+    for (const key of ["parameters", "arguments"]) for (const child of node[key] ?? []) inspect(child);
+  };
+  inspect(shape);
+  return result;
+}
+
 function pointerCheck(parameter, slot, usage) {
   const shape = parameter.shape;
   if (!["cstring", "pointer", "reference", "opaque"].includes(shape.kind) &&
@@ -147,14 +185,18 @@ function pointerCheck(parameter, slot, usage) {
   const base = nativeType(shape, parameter.nativeType, usage.typeSubstitutions)
     .replace(/\s*&&?\s*$/, "")
     .replace(/\*+\s*$/, "");
+  const alignment = containsUnalignablePointee(shape)
+    ? "true"
+    : `(arguments[${slot}].payload == 0 || arguments[${slot}].payload % alignof(${base}) == 0)`;
   return `${nullable ? "true" : `arguments[${slot}].payload != 0`} && ` +
     `deherm_dmsdk_address_fits(arguments[${slot}].payload) && ` +
-    `(arguments[${slot}].payload == 0 || arguments[${slot}].payload % alignof(${base}) == 0)`;
+    alignment;
 }
 
 function enumCheck(parameter, slot, usage) {
   if (parameter.shape.kind !== "enum") return null;
-  const values = usage.enumDomains?.[parameter.position];
+  const values = usage.enumDomains?.[parameter.position] ??
+    parameter.enumeration?.members?.map(({ value }) => value);
   if (!Array.isArray(values) || !values.length || values.some((value) => !Number.isSafeInteger(value))) {
     throw new Error(
       `${usage.declarationId} enum parameter ${parameter.position} needs a non-empty safe-integer enumDomains.${parameter.position}`,
@@ -167,8 +209,12 @@ function enumCheck(parameter, slot, usage) {
 function resultBody(recipe, expression, resultType, custom) {
   if (custom) return custom.replaceAll("$result", "result").replaceAll("$value", expression);
   const shape = recipe.abi.resultShape;
-  const name = scalarName(shape);
   if (shape.kind === "void") return `${expression};\n  result->tag = DEHERM_DMSDK_UNIVERSAL_VOID;`;
+  if (shape.kind === "handle") {
+    return `auto value = ${expression}; result->payload = deherm_dmsdk_pack_handle(value); ` +
+      `result->tag = ${wireTag(shape)};`;
+  }
+  const name = scalarName(shape);
   if (name) {
     if (["f32", "f64"].includes(name)) {
       return `${resultType} value = ${expression};\n` +
@@ -264,7 +310,7 @@ function renderFakeDeclaration({ fakeCallee, wrapper, kind, receiverType, result
     aliases.push(`using ${alias} = ${parameter.resolvedNativeType};`);
     argumentAliases.push(alias);
   }
-  return `${aliases.join("\n")}\nextern "C" ${returnAlias} ${fakeCallee}(${argumentAliases.join(",")});`;
+  return `${aliases.join("\n")}\n${returnAlias} ${fakeCallee}(${argumentAliases.join(",")});`;
 }
 
 function wireTag(shape) {
@@ -293,53 +339,65 @@ function deterministicScalar(shape, seed, enumValues) {
   return seed;
 }
 
-function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expression }) {
+function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expression, constructorArguments }) {
   const tag = wireTag(shape);
   if (!tag) return null;
-  const name = scalarName(shape);
   const cell = { slot, tag: tag.replace("DEHERM_DMSDK_UNIVERSAL_", "").toLowerCase() };
   const setup = [];
   const declarations = [];
-  if (name) {
-    const value = deterministicScalar(shape, seed, enumValues);
-    cell.value = value;
-    if (["f32", "f64"].includes(name)) {
-      setup.push(`{ const double value = ${Number(value).toFixed(2)}; memcpy(&${prefix}_arguments[${slot}].payload,&value,sizeof(value)); }`);
-    } else if (signedNames.has(name)) {
-      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(INT64_C(${value}));`);
-    } else {
-      setup.push(`${prefix}_arguments[${slot}].payload=UINT64_C(${value});`);
-    }
+  if (shape.kind === "handle") {
+    cell.value = seed;
+    setup.push(`${prefix}_arguments[${slot}].payload=UINT64_C(${seed});`);
     setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
-  } else if (shape.kind === "cstring") {
-    const fixture = `${prefix}_cstring_${slot}`;
-    declarations.push(`static const char ${fixture}[]="deherm_exact_${seed}";`);
-    setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`);
-    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
-    cell.fixture = "cstring";
-    cell.value = `deherm_exact_${seed}`;
-  } else if (shape.kind === "reference") {
-    const fixture = `${prefix}_reference_${slot}`;
-    declarations.push(`static std::remove_cv_t<std::remove_reference_t<${nativeAlias}>> ${fixture}{};`);
-    setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
-    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
-    cell.fixture = "value-object";
-  } else if (shape.kind === "callback") {
-    setup.push(`${prefix}_arguments[${slot}].payload=UINT64_C(0);`);
-    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
-    cell.fixture = "fixed-trampoline";
   } else {
-    const fixture = `${prefix}_address_${slot}`;
-    declarations.push(`static std::max_align_t ${fixture}{};`);
-    setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
-    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
-    cell.fixture = "aligned-address-token";
+    const name = scalarName(shape);
+    if (name) {
+      const value = deterministicScalar(shape, seed, enumValues);
+      cell.value = value;
+      if (["f32", "f64"].includes(name)) {
+        setup.push(`{ const double value = ${Number(value).toFixed(2)}; memcpy(&${prefix}_arguments[${slot}].payload,&value,sizeof(value)); }`);
+      } else if (signedNames.has(name)) {
+        setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(INT64_C(${value}));`);
+      } else {
+        setup.push(`${prefix}_arguments[${slot}].payload=UINT64_C(${value});`);
+      }
+      setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+    } else if (shape.kind === "cstring") {
+      const fixture = `${prefix}_cstring_${slot}`;
+      declarations.push(`static const char ${fixture}[]="deherm_exact_${seed}";`);
+      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`);
+      setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+      cell.fixture = "cstring";
+      cell.value = `deherm_exact_${seed}`;
+    } else if (shape.kind === "reference") {
+      const fixture = `${prefix}_reference_${slot}`;
+      const initializer = constructorArguments?.length ? `(${constructorArguments.join(",")})` : "{}";
+      declarations.push(`static std::remove_cv_t<std::remove_reference_t<${nativeAlias}>> ${fixture}${initializer};`);
+      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
+      setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+      cell.fixture = "value-object";
+    } else if (shape.kind === "callback") {
+      setup.push(`${prefix}_arguments[${slot}].payload=UINT64_C(0);`);
+      setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+      cell.fixture = "fixed-trampoline";
+    } else {
+      const fixture = `${prefix}_address_${slot}`;
+      if (shape.kind === "pointer" && !containsUnalignablePointee(shape)) {
+        const pointee = `std::remove_cv_t<std::remove_pointer_t<${nativeAlias}>>`;
+        declarations.push(`alignas(${pointee}) static unsigned char ${fixture}[sizeof(${pointee})]{};`);
+      } else {
+        declarations.push(`static std::max_align_t ${fixture}{};`);
+      }
+      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
+      setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+      cell.fixture = "aligned-address-token";
+    }
   }
   const expectedExpression = expression.replaceAll("arguments", `${prefix}_arguments`);
   return { cell, declarations, setup, expectedExpression };
 }
 
-function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue }) {
+function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue, constructorArguments }) {
   if (kind === "placement-constructor") {
     return { declarations: [], statement: "return receiver;", cell: { tag: "void" } };
   }
@@ -348,6 +406,18 @@ function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue }) {
   }
   const tag = wireTag(shape);
   if (!tag) return null;
+  if (shape.kind === "handle") {
+    const value = seed;
+    const cellTag = tag.replace("DEHERM_DMSDK_UNIVERSAL_", "").toLowerCase();
+    return {
+      declarations: [],
+      statement: `return deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value}));`,
+      cell: { tag: cellTag, value },
+      ...(cellTag === "address"
+        ? { addressExpression: `deherm_dmsdk_unpack_handle<${returnAlias}>(UINT64_C(${value}))` }
+        : {}),
+    };
+  }
   const name = scalarName(shape);
   if (name) {
     if (shape.kind === "enum" && !Number.isSafeInteger(enumValue)) return null;
@@ -369,8 +439,9 @@ function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue }) {
   }
   if (shape.kind === "reference") {
     const fixture = `${prefix}_return_reference`;
+    const initializer = constructorArguments?.length ? `(${constructorArguments.join(",")})` : "{}";
     return {
-      declarations: [`static std::remove_cv_t<std::remove_reference_t<${returnAlias}>> ${fixture}{};`],
+      declarations: [`static std::remove_cv_t<std::remove_reference_t<${returnAlias}>> ${fixture}${initializer};`],
       statement: `return ${fixture};`,
       cell: { tag: "address", fixture: "value-object" },
       addressExpression: `&${fixture}`,
@@ -409,8 +480,49 @@ function renderRecordingFake({ fakeCallee, wrapper, kind, receiverType, paramete
       : `argument_${index}==${expected}`);
   }
   const condition = comparisons.length ? comparisons.join(" && ") : "true";
-  return `extern "C" ${returnAlias} ${fakeCallee}(${argumentsList.join(",")}){\n` +
+  return `${returnAlias} ${fakeCallee}(${argumentsList.join(",")}){\n` +
     ` ++${plan.prefix}_calls; if(!(${condition})) ++${plan.prefix}_failures; ${plan.result.statement}\n}`;
+}
+
+function constructorLiteral(parameter, seed) {
+  const type = nativeType(parameter.shape, parameter.nativeType, {});
+  const name = scalarName(parameter.shape);
+  if (!name) return null;
+  const enumValues = parameter.enumeration?.members?.map(({ value }) => value) ?? [];
+  const value = deterministicScalar(parameter.shape, seed, enumValues);
+  if (value === undefined || !Number.isFinite(value)) return null;
+  if (name === "bool") return value ? "true" : "false";
+  return `static_cast<${type}>(${value})`;
+}
+
+function constructorFixtureDefinition(recipe) {
+  if (recipe.invocation.sourceDefined) return null;
+  const type = cppType(recipe.invocation.receiver?.nativeType, "fixture constructor receiver type");
+  const member = identifier(recipe.invocation.member, "fixture constructor member");
+  const parameters = recipe.abi.parameters.map((parameter, index) =>
+    `${nativeType(parameter.shape, parameter.nativeType, {})} argument_${index}`);
+  return `${type}::${member}(${parameters.join(",")}){}`;
+}
+
+function referenceConstructorPlan(shape, recipes, seed) {
+  const names = new Set(canonicalTypeNames(shape));
+  if (!names.size) return null;
+  const candidates = recipes
+    .filter((recipe) => recipe.invocation.kind === "placement-constructor" &&
+      names.has(recipe.invocation.receiver?.nativeType))
+    .map((recipe) => ({
+      recipe,
+      arguments: recipe.abi.parameters.map((parameter, index) =>
+        constructorLiteral(parameter, seed + index + 1)),
+    }))
+    .filter(({ arguments: values }) => values.every((value) => value !== null))
+    .sort((left, right) => left.arguments.length - right.arguments.length ||
+      compareCodeUnits(left.recipe.declarationId, right.recipe.declarationId));
+  const selected = candidates[0];
+  return selected ? {
+    arguments: selected.arguments,
+    definition: constructorFixtureDefinition(selected.recipe),
+  } : null;
 }
 
 function expectedResultCheck(plan, result = "result") {
@@ -466,6 +578,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
   const exactWrappers = [];
   const fakeDeclarations = [];
   const recordingFakes = [];
+  const fixtureDefinitions = new Set();
   const verificationPlans = [];
   const callbackDeclarations = new Map();
   const callbackMacros = new Map();
@@ -526,9 +639,14 @@ export function materializeDmSdkUsages(usages, options = {}) {
     if (argumentCount > maxArguments) {
       throw new Error(`${usage.declarationId} exceeds frame capacity ${maxArguments}`);
     }
+    const recipeReceiverType = recipe.invocation.receiver?.source === "source-derived-nontemplate-owner"
+      ? recipe.invocation.receiver.nativeType
+      : undefined;
     const receiverType = usage.receiverCppType
       ? cppType(usage.receiverCppType, "receiverCppType")
-      : undefined;
+      : recipeReceiverType
+        ? cppType(recipeReceiverType, "recipe receiver nativeType")
+        : undefined;
     if (receiverType && !invocationConsumesReceiver) {
       throw new Error(`${usage.declarationId} may not declare receiverCppType for ${recipe.invocation.kind}`);
     }
@@ -575,6 +693,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
         direction: parameter.direction,
         resolvedNativeType,
         shape: copy(parameter.shape),
+        enumeration: copy(parameter.enumeration),
         requirements: copy(parameter.requirements ?? []),
         expression,
         exactExpression: expression,
@@ -621,6 +740,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
     const prefix = `deherm_exact_vector_${vectorIndex}`;
     const plan = {
       prefix,
+      preconditions: [...checks],
       declarations: [
         `static DehermDmSdkUniversalValue ${prefix}_arguments[${Math.max(1, argumentCount)}]{};`,
         `static uint32_t ${prefix}_calls=0;`,
@@ -643,14 +763,22 @@ export function materializeDmSdkUsages(usages, options = {}) {
       });
     }
     for (const [index, parameter] of parameters.entries()) {
+      const constructor = referenceConstructorPlan(
+        parameter.shape,
+        recipes,
+        (recipe.numericId + 1) * 23 + parameter.slot + 1,
+      );
+      if (constructor?.definition) fixtureDefinitions.add(constructor.definition);
       const argumentPlan = fixturePlan({
         shape: parameter.shape,
         slot: parameter.slot,
         seed: (recipe.numericId + 1) * 17 + parameter.slot + 1,
         prefix,
         nativeAlias: `DehermExact_${wrapper}_Arg${index}`,
-        enumValues: usage.enumDomains?.[parameter.position] ?? [],
+        enumValues: usage.enumDomains?.[parameter.position] ??
+          parameter.enumeration?.members?.map(({ value }) => value) ?? [],
         expression: parameter.exactExpression,
+        constructorArguments: constructor?.arguments,
       });
       if (!argumentPlan) {
         throw new Error(`${usage.declarationId} exact-call driver cannot derive a wire fixture for ${parameter.name} (${parameter.shape.kind})`);
@@ -659,13 +787,21 @@ export function materializeDmSdkUsages(usages, options = {}) {
       plan.setup.push(...argumentPlan.setup);
       plan.arguments.push(argumentPlan);
     }
+    const resultConstructor = referenceConstructorPlan(
+      effective.abi.resultShape,
+      recipes,
+      (recipe.numericId + 1) * 29 + 9001,
+    );
+    if (resultConstructor?.definition) fixtureDefinitions.add(resultConstructor.definition);
     plan.result = fakeReturnPlan({
       shape: effective.abi.resultShape,
       seed: (recipe.numericId + 1) * 19 + 7001,
       prefix,
       returnAlias: `DehermExact_${wrapper}_Return`,
       kind: recipe.invocation.kind,
-      enumValue: usage.resultEnumValue,
+      enumValue: usage.resultEnumValue ??
+        (!usage.resultShape ? effective.abi.resultEnumeration?.members?.[0]?.value : undefined),
+      constructorArguments: resultConstructor?.arguments,
     });
     if (!plan.result) {
       const detail = effective.abi.resultShape.kind === "enum" ? "; provide a safe-integer resultEnumValue" : "";
@@ -740,6 +876,20 @@ export function materializeDmSdkUsages(usages, options = {}) {
     });
   }
 
+  // An inline SDK record constructor can invoke a declaration-only default
+  // constructor for one of its members. The exact-call twin intentionally
+  // does not link the engine, so provide empty definitions only for constructor
+  // families reachable through headers this materialization already uses.
+  // Pulling every SDK constructor into a one-call materialization breaks the
+  // same reachable-only boundary the production linker relies on.
+  for (const candidate of recipes) {
+    if (!includes.has(`#include <${candidate.include}>`) ||
+        candidate.invocation.kind !== "placement-constructor" ||
+        candidate.invocation.sourceDefined || candidate.abi.parameters.length !== 0 ||
+        candidate.invocation.receiver?.source !== "source-derived-nontemplate-owner") continue;
+    fixtureDefinitions.add(constructorFixtureDefinition(candidate));
+  }
+
   const provider = renderProvider(providerName, installName, manifest, "wrapper");
   const exactProvider = renderProvider(exactProviderName, exactInstallName, manifest, "exactWrapper");
   const callbackDeclarationSource = [...callbackDeclarations.entries()].map(([symbol, { alias, resolvedNativeType }]) =>
@@ -758,15 +908,21 @@ export function materializeDmSdkUsages(usages, options = {}) {
     `extern "C" uint32_t ${exactFailuresName}(uint32_t id){switch(id){${verificationPlans.map((plan, index) =>
       `case UINT32_C(${manifest[index].numericId}):return ${plan.prefix}_failures;`).join("")}default:return UINT32_MAX;}}`;
   const exactFailureName = identifier(`${installName}_exact_failure`, "exact verification failureName");
-  const exactFailureReporter = `static int ${exactFailureName}(const char* stage,uint32_t vector,uint32_t id){` +
-    `fprintf(stderr,"dmSDK exact-call failure: stage=%s vector=%u id=%u\\n",stage,vector,id);return 1;}`;
+  const exactFailureReporter = `static int ${exactFailureName}(const char* stage,uint32_t vector,uint32_t id,int status=-1){` +
+    `fprintf(stderr,"dmSDK exact-call failure: stage=%s vector=%u id=%u status=%d\\n",stage,vector,id,status);return 1;}`;
   const verificationDriver = `extern "C" int ${exactDriverName}(void){\n ${exactInstallName}(); ${exactResetName}();\n` +
     verificationPlans.map((plan, index) => {
       const argumentPointer = manifest[index].argumentCount ? `${plan.prefix}_arguments` : "nullptr";
       const resultName = `${plan.prefix}_result`;
       const id = `UINT32_C(${manifest[index].numericId})`;
+      const statusName = `${plan.prefix}_status`;
+      const preconditionChecks = plan.preconditions.map((check, condition) =>
+        ` if(!(${check.replaceAll("arguments", `${plan.prefix}_arguments`)}))return ` +
+        `${exactFailureName}("precondition-${condition}",UINT32_C(${index}),${id});`).join("\n");
       return ` ${plan.setup.join("\n ")}\n DehermDmSdkUniversalValue ${resultName}{};\n` +
-        ` if(deherm_dmsdk_universal_dispatch(${id},${argumentPointer},UINT32_C(${manifest[index].argumentCount}),&${resultName})!=DEHERM_DMSDK_UNIVERSAL_OK)return ${exactFailureName}("dispatch",UINT32_C(${index}),${id});\n` +
+        `${preconditionChecks}\n` +
+        ` const DehermDmSdkUniversalStatus ${statusName}=deherm_dmsdk_universal_dispatch(${id},${argumentPointer},UINT32_C(${manifest[index].argumentCount}),&${resultName});\n` +
+        ` if(${statusName}!=DEHERM_DMSDK_UNIVERSAL_OK)return ${exactFailureName}("dispatch",UINT32_C(${index}),${id},static_cast<int>(${statusName}));\n` +
         ` if(${exactCallsName}(${id})!=UINT32_C(1))return ${exactFailureName}("call-count",UINT32_C(${index}),${id});\n` +
         ` if(${exactFailuresName}(${id})!=UINT32_C(0))return ${exactFailureName}("arguments",UINT32_C(${index}),${id});\n` +
         ` if(!(${expectedResultCheck(plan, resultName)}))return ${exactFailureName}("result",UINT32_C(${index}),${id});`;
@@ -774,7 +930,9 @@ export function materializeDmSdkUsages(usages, options = {}) {
   const preamble = `${[...includes].sort().join("\n")}\n` +
     "[[maybe_unused]] static int deherm_dmsdk_address_fits(uint64_t value){return sizeof(uintptr_t)>=sizeof(uint64_t)||value<=UINTPTR_MAX;}\n" +
     "[[maybe_unused]] static int64_t deherm_dmsdk_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}\n" +
-    "[[maybe_unused]] static double deherm_dmsdk_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}\n";
+    "[[maybe_unused]] static double deherm_dmsdk_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}\n" +
+    "template<typename T> [[maybe_unused]] static T deherm_dmsdk_unpack_handle(uint64_t bits){if constexpr(std::is_pointer_v<T>)return reinterpret_cast<T>(static_cast<uintptr_t>(bits));else return static_cast<T>(bits);}\n" +
+    "template<typename T> [[maybe_unused]] static uint64_t deherm_dmsdk_pack_handle(T value){if constexpr(std::is_pointer_v<T>)return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value));else return static_cast<uint64_t>(value);}\n";
   const verification = {
     schemaVersion: 1,
     source: "deherm-dmsdk-exact-call-verification",
@@ -803,6 +961,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
       "template<typename R,typename... A> struct DehermExactCallbackFixture<R(*)(A...)>{" +
       "static R call(A...){if constexpr(!std::is_void_v<R>)return R{};}};\n" +
       `${callbackDeclarationSource}\n${callbackMacroSource}\n` +
+      `${[...fixtureDefinitions].sort(compareCodeUnits).join("\n")}\n` +
       `${fakeDeclarations.join("\n")}\n` +
       `${verificationState}\n${recordingFakes.join("\n")}\n` +
       `${exactWrappers.join("\n")}\n${exactProvider}\n${observationApi}\n${exactFailureReporter}\n${verificationDriver}\n${callbackUndefSource}\n`,

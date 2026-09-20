@@ -164,14 +164,14 @@ steps in [the binding compiler decision](.agents/docs/decisions/binding-compiler
 Coverage is tracked against two upstream truths. `pnpm
 generate:sdk-inventory` runs Clang across every public dmSDK header; `pnpm
 generate:script-api-inventory` imports Defold's pinned generated Lua
-annotations. At the current pin this accounts for 121 headers / 2,140 native
+annotations. At the current pin this accounts for 121 headers / 2,141 native
 declarations and 40 modules / 2,734 script declarations. These are inventory
 numbers, not a claim that each declaration has a finished runtime lowering.
 The status of every declaration is machine-readable under
 `packages/bindings/generated/` and drift-gated by `pnpm check`.
 
 The current generated execution floor is also machine-readable: all 926 script
-functions and 2,140 dmSDK declarations compile as TypeScript types. One bounded
+functions and 2,141 dmSDK declarations compile as TypeScript types. One bounded
 universal value-graph ABI covers all 915 stable-ID script routes and composes
 with the specialized scalar, value, tuple, URL, handle, overload, and callback
 families. The canonical plan currently emits 911 profile-available routes for
@@ -183,14 +183,17 @@ The two `luasocket` routes that manufacture captured Lua closures fail closed.
 
 Every one of the 1,361 runtime dmSDK declarations has a deterministic universal
 recipe and stable ID. Release checking resolves every authored call to its
-exact recipe. `deherm materialize-dmsdk` currently turns the 320
+exact recipe. `deherm materialize-dmsdk` currently turns the 486
 declaration-only universal-ready shapes into tree-shakeable C++ thunks; the
-other 1,041 remain visible and receive source-located specialization diagnostics
+other 875 remain visible and receive source-located specialization diagnostics
 instead of being silently omitted. It reads the revision-matched catalog materialized at
 `.deherm/ir/dmsdk-universal-bindings.json`; `--catalog` can name that policy
 document explicitly. The package ships the catalog-free algorithm, not a
 Defold-version catalog. This is a complete generation path, not a claim that all
 native engine implementations have already been linked and behavior-tested.
+The native exact-call census compiles, links, and executes all 486 ready wrappers
+against generated recording callees, including target-dependent pointer/integer
+handles; that verifies the bridge contract, not Defold implementation semantics.
 The pinned arm64 macOS Defold engine currently proves selected generated calls,
 a packaged TypeScript GUI component, and a transactional Dynamic-Hermes
 reject/retain/recover reload; unobserved plan rows remain unproven.

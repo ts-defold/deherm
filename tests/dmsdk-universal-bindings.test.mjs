@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
+import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
 import {
   DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
   emitDmSdkUniversalStaticFrame,
@@ -58,8 +59,8 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     browserDirectMemoryMetadata: 1361,
     typescriptStableIds: 1361,
     silentlyOmitted: 0,
-    preferredSpecialized: 148,
-    usageMaterializedFallback: 1213,
+    preferredSpecialized: 146,
+    usageMaterializedFallback: 1215,
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
   assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, 1361);
@@ -81,6 +82,18 @@ test("universal dmSDK recipes cover every declaration and every target", async (
   const copiedRecord = recipe(report, "dmSocket::Connect");
   assert.ok(copiedRecord.abi.parameters[1].requirements.includes("record-layout"));
   assert.ok(copiedRecord.fallback.requirements.includes("record-layout"));
+  const enumInput = recipe(report, "dmBuffer::GetSizeForValueType");
+  assert.equal(enumInput.abi.parameters[0].enumeration.nativeName, "dmBuffer::ValueType");
+  assert.equal(enumInput.abi.parameters[0].enumeration.members.length, 10);
+  const enumResult = recipe(report, "dmBuffer::Copy");
+  assert.equal(enumResult.abi.resultEnumeration.nativeName, "dmBuffer::Result");
+  assert.equal(enumResult.abi.resultEnumeration.members[0].value, 0);
+  const receiverDefault = recipe(report, "dmTransform::Transform::SetIdentity");
+  assert.equal(receiverDefault.invocation.receiver.nativeType, "dmTransform::Transform");
+  assert.equal(receiverDefault.invocation.receiver.source, "source-derived-nontemplate-owner");
+  const templateReceiver = recipe(report, "dmArray::dmArray::Capacity");
+  assert.equal(templateReceiver.invocation.receiver.nativeType, null);
+  assert.equal(templateReceiver.invocation.receiver.source, "usage-substitution-required");
 });
 
 test("universal dmSDK artifacts regenerate byte-for-byte", async () => {
@@ -136,6 +149,49 @@ int main(void) {
       `-I${path.join(root, "defold/defold_hermes/include")}`, "-c", caller, "-o", object]);
     run(compiler, ["-std=c++17", `-I${path.join(root, "defold/defold_hermes/include")}`,
       "defold/defold_hermes/src/generated_dmsdk_universal.cpp", object, "-o", executable]);
+    run(executable, []);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("every declaration-only universal-ready recipe compiles and executes its exact-call twin", async () => {
+  const sdkIr = JSON.parse(await readFile(sdkIrPath, "utf8"));
+  const index = buildDmSdkCallSymbolIndex(sdkIr, policyCatalog);
+  const usages = Object.entries(index.declarations)
+    .filter(([, declaration]) => declaration.materialization.state === "universal-ready")
+    .map(([declarationId]) => ({ declarationId }));
+  assert.equal(usages.length, 486);
+  const generated = materializeDmSdkUsages(usages, {
+    catalog: policyCatalog,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+    providerName: "deherm_dmsdk_ready_provider",
+    installName: "deherm_dmsdk_ready_provider_install",
+  });
+  assert.equal(generated.verification.vectorCount, usages.length);
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-ready-census-"));
+  try {
+    const production = path.join(output, "ready.cpp");
+    const verification = path.join(output, "ready.verify.cpp");
+    const harness = path.join(output, "ready-harness.cpp");
+    const executable = path.join(output, "ready-census");
+    await writeFile(production, generated.source);
+    await writeFile(verification, generated.verificationSource);
+    await writeFile(harness, `#include "ready.verify.cpp"\nint main(){return deherm_dmsdk_ready_provider_install_run_exact_verification();}\n`);
+    const sdkRoot = path.join(root,
+      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+    const includeArgs = [
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "-isystem", path.join(sdkRoot, "sdk/include"),
+      "-isystem", path.join(sdkRoot, "include"),
+      "-isystem", path.join(sdkRoot, "ext/include"),
+      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+    ];
+    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      ...includeArgs, "-c", production, "-o", path.join(output, "ready.o")]);
+    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      ...includeArgs, "defold/defold_hermes/src/generated_dmsdk_universal.cpp", harness,
+      "-o", executable]);
     run(executable, []);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -477,7 +533,7 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
       wrapper: "verify_float",
       acknowledgements: { generatedAdapterBypass: { reason: "exercise exact universal decoding", evidence: "generated native driver records the f32 call and result" } },
     },
-    { declarationId: enumeration.declarationId, wrapper: "verify_enum", enumDomains: { 0: [0] }, acknowledgements: bypass },
+    { declarationId: enumeration.declarationId, wrapper: "verify_enum", acknowledgements: bypass },
     { declarationId: cstring.declarationId, wrapper: "verify_cstring", acknowledgements: bypass },
     {
       declarationId: handle.declarationId,
@@ -516,7 +572,7 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
       { arguments: ["i64"], result: "u64" },
       { arguments: ["cstring"], result: "u64" },
       { arguments: ["u64"], result: "bool" },
-      { arguments: ["aligned-address-token", "cstring", "f64"], result: "f64" },
+      { arguments: ["address", "cstring", "f64"], result: "f64" },
       { arguments: ["aligned-receiver-storage", "value-object"], result: "void" },
       { arguments: ["fixed-trampoline"], result: "void" },
     ],
@@ -604,10 +660,18 @@ test("usage materializer fails closed on catalog drift, unsafe bypass, arity ove
     acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } },
   }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }),
   /may not declare receiverCppType for direct-function/);
+  const generatedEnumResult = materializeDmSdkUsages([{
+    declarationId: enumResult.declarationId,
+    typeSubstitutions: { HBuffer: "dmBuffer::HBuffer", Result: "dmBuffer::Result" },
+  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+  assert.equal(generatedEnumResult.verification.vectors[0].result.fakeReturn.value, 0);
+  const missingEnumFactCatalog = structuredClone(policyCatalog);
+  delete missingEnumFactCatalog.recipes[enumResult.numericId].abi.resultEnumeration;
+  missingEnumFactCatalog.sourceHashes.catalog = "f".repeat(64);
   assert.throws(() => materializeDmSdkUsages([{
     declarationId: enumResult.declarationId,
     typeSubstitutions: { HBuffer: "dmBuffer::HBuffer", Result: "dmBuffer::Result" },
-  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /resultEnumValue/);
+  }], { catalog: missingEnumFactCatalog, catalogSha256: "f".repeat(64) }), /resultEnumValue/);
   assert.throws(() => materializeDmSdkUsages([{
     declarationId: recordArgument.declarationId,
     typeSubstitutions: { Socket: "dmSocket::Socket", Address: "dmSocket::Address", Result: "dmSocket::Result" },

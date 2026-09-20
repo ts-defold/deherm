@@ -3,8 +3,8 @@
   "family": "borrowed-handle-consumers",
   "expectedCoverage": {
     "candidates": 348,
-    "generated": 82,
-    "blocked": 266,
+    "generated": 80,
+    "blocked": 268,
     "handleKinds": 32,
     "maxArguments": 2
   },

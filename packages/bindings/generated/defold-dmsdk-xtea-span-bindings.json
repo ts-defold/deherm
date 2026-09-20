@@ -8,8 +8,8 @@
     "policy": "packages/bindings/overrides/dmsdk-xtea-span-bindings.json"
   },
   "sourceHashes": {
-    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
-    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "policy": "4c46725302c710ca2fc05e0fb83d43acc7b865dc8b3c67fcec865010b5be54fc"
   },
   "policy": {

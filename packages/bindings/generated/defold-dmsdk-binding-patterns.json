@@ -13,7 +13,7 @@
     "note": "Classification is code-generation planning metadata. It is not evidence that a binding adapter was generated, compiled, linked, executed, or conformance-tested."
   },
   "provenanceCaveats": {
-    "diagnosticHeaderCount": 55,
+    "diagnosticHeaderCount": 32,
     "note": "The source IR reports diagnostics only as a header count, so individual declarations cannot yet be marked diagnostic-derived here."
   },
   "familyCatalog": {
@@ -247,7 +247,7 @@
       ]
     },
     "enum-handle": {
-      "count": 862,
+      "count": 867,
       "representativeSymbols": [
         "ConfigFileGetFloat",
         "ConfigFileGetInt",
@@ -6222,19 +6222,21 @@
     {
       "id": "dmsdk:dmGameObject::LuaScript::LuaScript@upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h:27:1100",
       "symbol": "dmGameObject::LuaScript::LuaScript",
-      "signature": "dmGameObject::LuaScript::LuaScript(int *) -> void",
+      "signature": "dmGameObject::LuaScript::LuaScript(dmLuaDDF::LuaModule *) -> void",
       "kind": "constructor",
       "header": "upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h",
       "line": 27,
       "primaryFamily": "constructor",
       "families": [
         "constructor",
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
       "blockers": [
         "native symbol adapter is not generated or linked",
         "storage layout, allocation arena, ownership, and failure policy need implementation",
-        "pointee lifetime, mutability, alignment, and nullability need policy"
+        "pointee lifetime, mutability, alignment, and nullability need policy",
+        "enum width, handle ownership, and nullability need ABI policy"
       ]
     },
     {
@@ -7896,17 +7898,19 @@
     {
       "id": "dmsdk:dmGameSystem::GetDDFData@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h:55:1233",
       "symbol": "dmGameSystem::GetDDFData",
-      "signature": "dmGameSystem::GetDDFData(DataResource *) -> const int *",
+      "signature": "dmGameSystem::GetDDFData(DataResource *) -> const dmGameSystemDDF::Data *",
       "kind": "function",
       "header": "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h",
       "line": 55,
       "primaryFamily": "pointer",
       "families": [
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
       "blockers": [
         "native symbol adapter is not generated or linked",
-        "pointee lifetime, mutability, alignment, and nullability need policy"
+        "pointee lifetime, mutability, alignment, and nullability need policy",
+        "enum width, handle ownership, and nullability need ABI policy"
       ]
     },
     {
@@ -10099,7 +10103,7 @@
     {
       "id": "dmsdk:dmGraphics::NewProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1940:1474",
       "symbol": "dmGraphics::NewProgram",
-      "signature": "dmGraphics::NewProgram(HContext, int *, char *, uint32_t) -> HProgram",
+      "signature": "dmGraphics::NewProgram(HContext, ShaderDesc *, char *, uint32_t) -> HProgram",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
       "line": 1940,
@@ -10223,7 +10227,7 @@
     {
       "id": "dmsdk:dmGraphics::NewVertexStreamDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:932:1373",
       "symbol": "dmGraphics::NewVertexStreamDeclaration",
-      "signature": "dmGraphics::NewVertexStreamDeclaration(HContext, int) -> HVertexStreamDeclaration",
+      "signature": "dmGraphics::NewVertexStreamDeclaration(HContext, VertexStepFunction) -> HVertexStreamDeclaration",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
       "line": 932,
@@ -10807,7 +10811,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518",
       "symbol": "dmGraphics::VulkanCreateDescriptorPool",
-      "signature": "dmGraphics::VulkanCreateDescriptorPool(int, uint16_t, int *) -> bool",
+      "signature": "dmGraphics::VulkanCreateDescriptorPool(VkDevice, uint16_t, VkDescriptorPool *) -> bool",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 155,
@@ -10815,13 +10819,15 @@
       "families": [
         "platform-gated",
         "out-param",
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
       "blockers": [
         "native symbol adapter is not generated or linked",
         "availability and symbol linkage must be verified for every target platform",
         "output initialization, ownership transfer, and failure semantics need policy",
-        "pointee lifetime, mutability, alignment, and nullability need policy"
+        "pointee lifetime, mutability, alignment, and nullability need policy",
+        "enum width, handle ownership, and nullability need ABI policy"
       ]
     },
     {
@@ -10845,7 +10851,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1515",
       "symbol": "dmGraphics::VulkanGetCurrentFrameCommandBuffer",
-      "signature": "dmGraphics::VulkanGetCurrentFrameCommandBuffer(HContext) -> int",
+      "signature": "dmGraphics::VulkanGetCurrentFrameCommandBuffer(HContext) -> VkCommandBuffer",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 123,
@@ -10863,7 +10869,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509",
       "symbol": "dmGraphics::VulkanGetDevice",
-      "signature": "dmGraphics::VulkanGetDevice(HContext) -> int",
+      "signature": "dmGraphics::VulkanGetDevice(HContext) -> VkDevice",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 75,
@@ -10881,7 +10887,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513",
       "symbol": "dmGraphics::VulkanGetGraphicsQueue",
-      "signature": "dmGraphics::VulkanGetGraphicsQueue(HContext) -> int",
+      "signature": "dmGraphics::VulkanGetGraphicsQueue(HContext) -> VkQueue",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 107,
@@ -10917,7 +10923,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516",
       "symbol": "dmGraphics::VulkanGetImage",
-      "signature": "dmGraphics::VulkanGetImage(HContext, HTexture) -> int",
+      "signature": "dmGraphics::VulkanGetImage(HContext, HTexture) -> VkImage",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 133,
@@ -10935,7 +10941,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517",
       "symbol": "dmGraphics::VulkanGetImageView",
-      "signature": "dmGraphics::VulkanGetImageView(HContext, HTexture) -> int",
+      "signature": "dmGraphics::VulkanGetImageView(HContext, HTexture) -> VkImageView",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 143,
@@ -10953,7 +10959,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511",
       "symbol": "dmGraphics::VulkanGetInstance",
-      "signature": "dmGraphics::VulkanGetInstance(HContext) -> int",
+      "signature": "dmGraphics::VulkanGetInstance(HContext) -> VkInstance",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 91,
@@ -10971,7 +10977,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510",
       "symbol": "dmGraphics::VulkanGetPhysicalDevice",
-      "signature": "dmGraphics::VulkanGetPhysicalDevice(HContext) -> int",
+      "signature": "dmGraphics::VulkanGetPhysicalDevice(HContext) -> VkPhysicalDevice",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 83,
@@ -10989,7 +10995,7 @@
     {
       "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514",
       "symbol": "dmGraphics::VulkanGetRenderPass",
-      "signature": "dmGraphics::VulkanGetRenderPass(HContext) -> int",
+      "signature": "dmGraphics::VulkanGetRenderPass(HContext) -> VkRenderPass",
       "kind": "function",
       "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h",
       "line": 115,
@@ -14189,7 +14195,7 @@
     {
       "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1845",
       "symbol": "dmRender::GetConstantType",
-      "signature": "dmRender::GetConstantType(HConstant) -> int",
+      "signature": "dmRender::GetConstantType(HConstant) -> dmRenderDDF::MaterialDesc::ConstantType",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "line": 529,
@@ -14289,7 +14295,7 @@
     {
       "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1811",
       "symbol": "dmRender::GetMaterialVertexSpace",
-      "signature": "dmRender::GetMaterialVertexSpace(HMaterial) -> int",
+      "signature": "dmRender::GetMaterialVertexSpace(HMaterial) -> dmRenderDDF::MaterialDesc::VertexSpace",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "line": 126,
@@ -14325,7 +14331,7 @@
     {
       "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
       "symbol": "dmRender::GetNamedConstant",
-      "signature": "dmRender::GetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 **, uint32_t *, int *) -> bool",
+      "signature": "dmRender::GetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 **, uint32_t *, dmRenderDDF::MaterialDesc::ConstantType *) -> bool",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "line": 634,
@@ -14603,7 +14609,7 @@
     {
       "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846",
       "symbol": "dmRender::SetConstantType",
-      "signature": "dmRender::SetConstantType(HConstant, int) -> void",
+      "signature": "dmRender::SetConstantType(HConstant, dmRenderDDF::MaterialDesc::ConstantType) -> void",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "line": 537,
@@ -14707,7 +14713,7 @@
     {
       "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852",
       "symbol": "dmRender::SetNamedConstant",
-      "signature": "dmRender::SetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 *, uint32_t, int) -> void",
+      "signature": "dmRender::SetNamedConstant(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 *, uint32_t, dmRenderDDF::MaterialDesc::ConstantType) -> void",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "line": 589,
@@ -14725,7 +14731,7 @@
     {
       "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854",
       "symbol": "dmRender::SetNamedConstantAtIndex",
-      "signature": "dmRender::SetNamedConstantAtIndex(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 *, uint32_t, uint32_t, int) -> Result",
+      "signature": "dmRender::SetNamedConstantAtIndex(HNamedConstantBuffer, dmhash_t, dmVMath::Vector4 *, uint32_t, uint32_t, dmRenderDDF::MaterialDesc::ConstantType) -> Result",
       "kind": "function",
       "header": "upstream/defold/engine/render/src/dmsdk/render/render.h",
       "line": 609,
@@ -15653,7 +15659,7 @@
     {
       "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074",
       "symbol": "dmRig::CopyBindPose",
-      "signature": "dmRig::CopyBindPose(int &, dmArray<RigBone> &) -> void",
+      "signature": "dmRig::CopyBindPose(dmRigDDF::Skeleton &, dmArray<RigBone> &) -> void",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
       "line": 224,
@@ -15661,13 +15667,15 @@
       "families": [
         "template-opaque",
         "out-param",
-        "record-reference"
+        "record-reference",
+        "enum-handle"
       ],
       "blockers": [
         "native symbol adapter is not generated or linked",
         "the finite supported specialization set must be selected and instantiated",
         "output initialization, ownership transfer, and failure semantics need policy",
-        "record size, alignment, field layout, and reference lifetime need verification"
+        "record size, alignment, field layout, and reference lifetime need verification",
+        "enum width, handle ownership, and nullability need ABI policy"
       ]
     },
     {
@@ -15689,7 +15697,7 @@
     {
       "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054",
       "symbol": "dmRig::GenerateVertexData",
-      "signature": "dmRig::GenerateVertexData(HRigContext, dmRig::HRigInstance, int *, const dmVMath::Matrix4 &, RigModelVertex *) -> RigModelVertex *",
+      "signature": "dmRig::GenerateVertexData(HRigContext, dmRig::HRigInstance, dmRigDDF::Mesh *, const dmVMath::Matrix4 &, RigModelVertex *) -> RigModelVertex *",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
       "line": 196,
@@ -15711,7 +15719,7 @@
     {
       "id": "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053",
       "symbol": "dmRig::GenerateVertexDataFromAttributes",
-      "signature": "dmRig::GenerateVertexDataFromAttributes(dmRig::HRigContext, dmRig::HRigInstance, int *, const dmVMath::Matrix4 &, const dmVMath::Matrix4 &, const dmGraphics::VertexAttributeInfos *, uint32_t, uint8_t *) -> uint8_t *",
+      "signature": "dmRig::GenerateVertexDataFromAttributes(dmRig::HRigContext, dmRig::HRigInstance, dmRigDDF::Mesh *, const dmVMath::Matrix4 &, const dmVMath::Matrix4 &, const dmGraphics::VertexAttributeInfos *, uint32_t, uint8_t *) -> uint8_t *",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
       "line": 195,
@@ -16095,7 +16103,7 @@
     {
       "id": "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2052",
       "symbol": "dmRig::SetMeshWriteAttributeParams",
-      "signature": "dmRig::SetMeshWriteAttributeParams(dmGraphics::WriteAttributeParams *, const dmGraphics::VertexAttributeInfos *, int, const float **, const float **, const float **, const float **, const float **, const float **, const float **, const float **, const float **, int, const float **, uint32_t) -> void",
+      "signature": "dmRig::SetMeshWriteAttributeParams(dmGraphics::WriteAttributeParams *, const dmGraphics::VertexAttributeInfos *, dmGraphics::VertexStepFunction, const float **, const float **, const float **, const float **, const float **, const float **, const float **, const float **, const float **, dmGraphics::VertexAttribute::VectorType, const float **, uint32_t) -> void",
       "kind": "function",
       "header": "upstream/defold/engine/rig/src/dmsdk/rig/rig.h",
       "line": 178,
@@ -16103,13 +16111,15 @@
       "families": [
         "out-param",
         "pointer-span",
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
       "blockers": [
         "native symbol adapter is not generated or linked",
         "output initialization, ownership transfer, and failure semantics need policy",
         "element unit, bounds, direction, and copy-vs-borrow policy need verification",
-        "pointee lifetime, mutability, alignment, and nullability need policy"
+        "pointee lifetime, mutability, alignment, and nullability need policy",
+        "enum width, handle ownership, and nullability need ABI policy"
       ]
     },
     {

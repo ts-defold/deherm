@@ -34,18 +34,20 @@ test("borrowed-handle census is independently structural, exhaustive, and provid
     policy.selection.rejectedFamilies.every((family) => !row.families.includes(family))
   );
   assert.equal(candidates.length, 348);
-  assert.equal(generated.length, 82);
+  // GetConstantType and GetMaterialVertexSpace are nested-enum results in the
+  // exact SDK support facts, not scalar results eligible for this family.
+  assert.equal(generated.length, 80);
   assert.deepEqual(report.coverage, {
     candidates: 348,
-    generated: 82,
-    blocked: 266,
-    cAbiGenerated: 82,
-    dynamicHermesJsiGenerated: 82,
-    staticHermesGenerated: 82,
-    browserDirectMemoryGenerated: 82,
-    typescriptGenerated: 82,
-    pinnedHeaderSignatureCompiled: 82,
-    fakeProviderHostRuntimeTested: 82,
+    generated: 80,
+    blocked: 268,
+    cAbiGenerated: 80,
+    dynamicHermesJsiGenerated: 80,
+    staticHermesGenerated: 80,
+    browserDirectMemoryGenerated: 80,
+    typescriptGenerated: 80,
+    pinnedHeaderSignatureCompiled: 80,
+    fakeProviderHostRuntimeTested: 80,
     packagedEngineRuntimeVerified: 0,
     warmedDispatchIterations: 100000,
     warmedDispatchObservedCppAllocations: 0,
@@ -92,7 +94,7 @@ test("borrowed-handle generation is clean-room deterministic and rejects census 
   }
 });
 
-test("all 82 selected signatures compile against the complete pinned SDK projection", async () => {
+test("all 80 selected signatures compile against the complete pinned SDK projection", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-borrowed-handle-headers-"));
   try {
     run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-DDLIB_LOG_DOMAIN=\"deherm\"", ...includes, "-c", "native/generated_dmsdk_borrowed_handle_header_audit.cpp", "-o", path.join(directory, "audit.o")]);

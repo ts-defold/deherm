@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:3b8b257eef4263c8474c52e6eb47d217d8e7824ac49e90403cb45e22584f2826",
+  "generator": "sha256:9eb859fc95890765c4c7d14bda4d0b898ec1706c48c60e47cb84798e1a50e17b",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "8926e90095c3dae54e74fb5745baedb63015e554651d795d9b601a984f2908cb",
+  "policyRoot": "fa4afc60b314030977f126f269dbe42b4cbaaec16dab06703839a57e7f99ff81",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 83,
     "namespaces": 52,
-    "objectBytes": 28220373,
+    "objectBytes": 28955770,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,24 +54,24 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "c7a46551b5316f6cefdfea2edd7877633bec52c2970d0e042f6e2ee4bb7b63d6",
+      "hash": "7e44553f020a12538d99aae8b3f6549200472caddea8f782c796da94bf38a151",
       "bytes": 11691
     },
     "@compiler:document:defold-binding-lowering-plan.json": {
-      "hash": "a82e42f9b9b5a05042e6ef9c622c3c9f757c20e33513855f4eaae26cdb3dca2b",
-      "bytes": 10181210
+      "hash": "5c6b8ff88c199b93ead0f5bcbde588f2121f6837dddb8c7153020dbe183af4f0",
+      "bytes": 10459800
     },
     "@compiler:document:defold-binding-lowering-plan.sentinel.json": {
-      "hash": "9dc750715a6a5e42472ec4326feac4f7d582b445aed5adf5a861a6d4952e0866",
+      "hash": "5ca2e3cb97b1f9be23c7a99569642b30ec421f08b38ada69434d9850f6001c6c",
       "bytes": 6612
     },
     "@compiler:document:defold-dmsdk-scalar-thunks.json": {
-      "hash": "a21aead810317c8d6756830688462a97294c772e26c6c555aa21e98e36f20c9d",
+      "hash": "07b8b9b411a1ccba0582b49e8d2b91aba9abb4bb6e2385d0aaf1ae028a195df8",
       "bytes": 80506
     },
     "@compiler:document:defold-dmsdk-universal-bindings.json": {
-      "hash": "97d768faa09e6a444bf7013ba35ff5af4c45954633d87c48fd36c5cdcaa42db4",
-      "bytes": 2953048
+      "hash": "b678fea685c79717da8e559aabfabac8261d57fd6285eca8123c9837b3f6bb93",
+      "bytes": 3238681
     },
     "@compiler:document:defold-script-api-accounting.json": {
       "hash": "195f1bc7ef4378ed64f246167467c4b63a434aa8c0b824e6b9bf3f80750bd240",
@@ -98,16 +98,16 @@
       "bytes": 564468
     },
     "@compiler:document:defold-sdk-ir.json": {
-      "hash": "daf81bbcd7c83c70c9b949fb8980b8aefbec200cdf6cd906f10bde35610d13f6",
-      "bytes": 2706497
+      "hash": "8d83102a3baaeeb6746f22ccc62bc147e9edf5f71b365dea990e8314e926fcc5",
+      "bytes": 2830427
     },
     "@compiler:document:defold-value-layouts.json": {
       "hash": "9423a09d6ab1caf30e5c154dba0c821b22423449f31a72a22c72d472f63a0877",
       "bytes": 8237
     },
     "@compiler:sdk:dmsdk/borrowed-handle.ts": {
-      "hash": "24dc599b196e5360972fa11e0ddb45fa34abc940fd4403ff7cae7d306e5bb474",
-      "bytes": 29259
+      "hash": "3866777fd41556b1d83542c9d79f79dca18ebbacdde251fea77f512a21280b00",
+      "bytes": 28575
     },
     "@compiler:sdk:dmsdk/cstring-value.ts": {
       "hash": "e3747d1f1bfc61d6d00c1e528b04060fae9051ff4e2e7439640c6fe4c98b18c3",
@@ -170,8 +170,8 @@
       "bytes": 643793
     },
     "@shared": {
-      "hash": "bcd2fb6c1b94b287f62fb692b0a0687a9b8729372621cac071e808e71783f396",
-      "bytes": 164629
+      "hash": "463cfb9ee74a413eede5dfef3c06e5820c28c1ab8f29b1434ad34d94b5aba5ec",
+      "bytes": 175894
     },
     "@toolchain": {
       "hash": "8e4a825f66ee1ba9bcdd7de931f3463054637ccef636b038ad909a4234e4b484",
@@ -222,52 +222,52 @@
       "bytes": 40493
     },
     "ddf": {
-      "hash": "a06fda1a570ad0cea6cd988e87309c9e4029711b5e5c436d87c6c981659b12b2",
-      "bytes": 15356
+      "hash": "b3a809b17e9c51f05d6def545a431cd0fbaab32bca580f380effd627e5aeb554",
+      "bytes": 15510
     },
     "dlib": {
-      "hash": "34c004e19ea7360afea3a5a1b8eb47cbc488903b0816c93e3e4319395bb3ffa6",
-      "bytes": 769837
+      "hash": "e4a00dff4cb04080cbaeecdff8b109b56b14722427d03ada0f1e14a4e06fe8c3",
+      "bytes": 780656
     },
     "engine": {
-      "hash": "367c5ef1455d99fdb55e9364bc33e97104281480108d23d380d557f08cf96e29",
-      "bytes": 7373
+      "hash": "15a99d79f163a971e96f2e1a685d71a5b8b43115c41fa9ffdab76aa21f608d79",
+      "bytes": 7461
     },
     "extension": {
-      "hash": "540dc0d19c715f2c2f306e39546217fc6f10d52e50ce6567c07ee75d779f74f0",
-      "bytes": 74137
+      "hash": "1c0a3ac7731636d5ebfdcef71660ade33037ee57202a6879b41b140a3453617e",
+      "bytes": 74819
     },
     "factory": {
       "hash": "4417bd9424c4f115ea145a30d8d414f18ef4d6a0678381b99aa13e7121bcbc33",
       "bytes": 27541
     },
     "font": {
-      "hash": "fc243f5ada0e98a495eb2a04b7d15fb3b3283c41221ac83124137d3a58607af4",
-      "bytes": 106514
+      "hash": "9657eb61018720c6bd26c1504e6b1c7a94325fee579ac344e5b58fc042f7239a",
+      "bytes": 107415
     },
     "gameobject": {
-      "hash": "638d44aefe7ef377382de9272c8d753fa5f057fa15fd84224abf9312a26b7d6e",
-      "bytes": 345458
+      "hash": "137d44dbebe6817431adf9e97456cd9d76f4b1c4e0e6702bf8084bbf0f8b5ad9",
+      "bytes": 348644
     },
     "gamesys": {
-      "hash": "88815605ffd349ff5b186dd799d1dc7e5dfb87235c6429a7f783b3f321f36dac",
-      "bytes": 283605
+      "hash": "b57475b306c365d7ce148740021b959cbbb5cab315c2471f99c563b8575611ca",
+      "bytes": 286527
     },
     "go": {
       "hash": "7527903aa19411e70fe62a0b877b86a3d1cda16f764d0ceb31ff6af1bd14922b",
       "bytes": 153782
     },
     "graphics": {
-      "hash": "4496447a3ce40478c82ca664b7b613a373c5c86cf53ab98ab35678731022fa92",
-      "bytes": 460327
+      "hash": "c68ec90fdbf998b68ebe34eaf4252e597f8cf8bc2dbd95fc961efa90f3766375",
+      "bytes": 464832
     },
     "gui": {
-      "hash": "228626db8e7314fc32d459a47eb9c86839ae249cd8ffd36df0869d5229611b83",
-      "bytes": 531578
+      "hash": "26094ce635c610810a75f68e722b4abcea62402b79aaf401c6f1a276a0d7b220",
+      "bytes": 532106
     },
     "hid": {
-      "hash": "505fd74823fb85dc954075be7c073edce22c447d7908192682812dc17aca06a2",
-      "bytes": 66561
+      "hash": "f9beed313b21c99fb49320430bc9583fb71649967fcdefbf15e83f294f39d810",
+      "bytes": 67023
     },
     "html5": {
       "hash": "fbc7efbb42e2d9729d4744ff3ed2a7e7957c3f092636ca56c3187e7a458e2082",
@@ -294,8 +294,8 @@
       "bytes": 19431
     },
     "lua": {
-      "hash": "76ef3fae39d64d17e1f7ccfb7600ef147d674f8a4c36224533d618656d792663",
-      "bytes": 156418
+      "hash": "5e513fee6f9a58e8851c001737e4dddddde32fddcbc47174e7837c75ba979284",
+      "bytes": 158926
     },
     "material": {
       "hash": "9c0241aa5e5b9868176e61b66ce70150c86a91a788160ba4ae4eaecf99185a9b",
@@ -322,36 +322,36 @@
       "bytes": 131191
     },
     "platform": {
-      "hash": "0d8f97ea4ab0ae5d41772711c38e39664a1ddbebd63e61fa59ea30794fbb4b18",
-      "bytes": 25632
+      "hash": "990ca65f962a60924515899493afef38be710f5b7589a5c6b0ca0df924dea1a9",
+      "bytes": 25918
     },
     "profiler": {
       "hash": "b8e99c3f691114fed9a3457edcd119e284d88b6e233a71a90a31b2252f1cb8c4",
       "bytes": 42696
     },
     "render": {
-      "hash": "744ff27b418f784cf582014fa40b903facb6d422af0fb57c1f2c9642ea61e264",
-      "bytes": 281396
+      "hash": "3e96b341544dd212b6d84920c64af8c68ceac0c992fe0581f00c4df51b9c55e2",
+      "bytes": 285243
     },
     "resource": {
-      "hash": "7d0906a7977bdfac6260e088b35eec933f4a77d0a1aacbea749234705e2c02f1",
-      "bytes": 343606
+      "hash": "bc5e96222bf48b6de517b70d4fa57ecc7ef34e8225e19cb9277d619df0d22edb",
+      "bytes": 345630
     },
     "rig": {
-      "hash": "0b4a929197f63b8f2393f32ee1b4f5d706d18777fdee554c70e2e876540a847a",
-      "bytes": 65499
+      "hash": "391cb830d17bb31805fcb181beabab1ea4297855acd2847a86e89e92359cd1a9",
+      "bytes": 67908
     },
     "script": {
-      "hash": "f7974c50c2f13468574ff717cef59cb0a353d18c1b240b612b3ef2fcf1dbd37c",
-      "bytes": 99219
+      "hash": "1e7e5d4cc1c7cced1f11a10c1f0142bf5791f08526d8677610f31ce80e5f1783",
+      "bytes": 100495
     },
     "socket": {
       "hash": "134c2ccb8b63e2ff80e5e63fb7f6034aa31380af96f9101ec0a591ec8f0950d9",
       "bytes": 48011
     },
     "sound": {
-      "hash": "ce4df7669a453082f8f7f0df09c30976659abaacad1493748b6de0187bd08ceb",
-      "bytes": 62015
+      "hash": "91fc571a315a3e65dafb458b5ec27cb52e1dea40807cead27cfd4c2ce4cf32c5",
+      "bytes": 62081
     },
     "sprite": {
       "hash": "10cb953ed07c0ef5f7846f500f971ebae46ed1547eaf55d2a25e352ad7b83d51",

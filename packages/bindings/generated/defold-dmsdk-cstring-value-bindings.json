@@ -6,8 +6,8 @@
     "sdkIr": "packages/bindings/generated/defold-sdk-ir.json",
     "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
     "hashes": {
-      "projection": "492fc0a14d65270fb510caad4050bdf77ff48b9fa17c00f74e88e11d17dc3dd0",
-      "sdkIr": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
+      "projection": "9f9a4bf56ba785edd2e63924f91c7084f163b49d3fddfc7614077c24e42f3e3f",
+      "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
       "policy": "0eb7a1eb92d08fccc88e9151afa66d7edf75f91fb6d1d033e086a6451be875ca",
       "semanticEvidence": {
         "buffer-string-results": {
@@ -606,8 +606,8 @@
   "declarations": [
     {
       "id": "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
-      "projectionId": "dmsdk-projection:a356e91ea0258ba88522e629",
-      "stableId": 628241714,
+      "projectionId": "dmsdk-projection:81e0e25eccb99fdf881faca5",
+      "stableId": 4246203561,
       "denseId": 0,
       "symbol": "dmBuffer::GetResultString",
       "provenance": {
@@ -616,6 +616,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h",
         "line": 373,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmBuffer::GetResultString(Result) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -647,8 +648,8 @@
     },
     {
       "id": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
-      "projectionId": "dmsdk-projection:37acfc9a1a1b8741b70aba67",
-      "stableId": 3185040835,
+      "projectionId": "dmsdk-projection:448770b5f5b45ad5c6b55789",
+      "stableId": 3832218645,
       "denseId": 1,
       "symbol": "dmBuffer::GetValueTypeString",
       "provenance": {
@@ -657,6 +658,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h",
         "line": 383,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmBuffer::GetValueTypeString(ValueType) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -688,8 +690,8 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1721:1456",
-      "projectionId": "dmsdk-projection:846831b66fdab5ec93b9e963",
-      "stableId": 878697019,
+      "projectionId": "dmsdk-projection:08bbfafab6827f13554fa1ad",
+      "stableId": 1307085864,
       "denseId": null,
       "symbol": "dmGraphics::GetAdapterFamily",
       "provenance": {
@@ -698,6 +700,7 @@
         "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
         "line": 1721,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmGraphics::GetAdapterFamily(const char *) -> AdapterFamily",
         "primaryFamily": "pointer",
         "families": [
@@ -716,8 +719,8 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
-      "projectionId": "dmsdk-projection:91ed46ebfd360ef480721976",
-      "stableId": 3337053143,
+      "projectionId": "dmsdk-projection:252a316588029c69a580f28d",
+      "stableId": 3024038588,
       "denseId": 2,
       "symbol": "dmGraphics::GetTextureFormatLiteral",
       "provenance": {
@@ -726,6 +729,7 @@
         "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
         "line": 1388,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmGraphics::GetTextureFormatLiteral(TextureFormat) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -757,8 +761,8 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
-      "projectionId": "dmsdk-projection:231779713b56f6ce6ee07c7f",
-      "stableId": 3006735102,
+      "projectionId": "dmsdk-projection:9a977f075f257923ae17082e",
+      "stableId": 3072231216,
       "denseId": 3,
       "symbol": "dmGraphics::GetTextureTypeLiteral",
       "provenance": {
@@ -767,6 +771,7 @@
         "header": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
         "line": 1380,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmGraphics::GetTextureTypeLiteral(TextureType) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -798,8 +803,8 @@
     },
     {
       "id": "dmsdk:dmHashReverseSafe32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:134:218",
-      "projectionId": "dmsdk-projection:9f329df8359d3c5be687b2b4",
-      "stableId": 2781643289,
+      "projectionId": "dmsdk-projection:613cc4f382fd8d26f0fd3296",
+      "stableId": 1268414152,
       "denseId": null,
       "symbol": "dmHashReverseSafe32",
       "provenance": {
@@ -808,6 +813,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
         "line": 134,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmHashReverseSafe32(uint32_t) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -825,8 +831,8 @@
     },
     {
       "id": "dmsdk:dmHashReverseSafe64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:109:216",
-      "projectionId": "dmsdk-projection:65601bb8802e8e5723ef2f2e",
-      "stableId": 1408951733,
+      "projectionId": "dmsdk-projection:e461e122aefeb3f4c6098f5a",
+      "stableId": 3780011090,
       "denseId": null,
       "symbol": "dmHashReverseSafe64",
       "provenance": {
@@ -835,6 +841,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
         "line": 109,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmHashReverseSafe64(uint64_t) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -852,8 +859,8 @@
     },
     {
       "id": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
-      "projectionId": "dmsdk-projection:8475d4f3f294fc877bfbd3ef",
-      "stableId": 242908930,
+      "projectionId": "dmsdk-projection:a4df6705e98e7f42588c8eaa",
+      "stableId": 2315244108,
       "denseId": 4,
       "symbol": "dmHashString32",
       "provenance": {
@@ -862,6 +869,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
         "line": 88,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmHashString32(const char *) -> uint32_t",
         "primaryFamily": "pointer",
         "families": [
@@ -890,8 +898,8 @@
     },
     {
       "id": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
-      "projectionId": "dmsdk-projection:53d2c77e57af8c8ed773fd5e",
-      "stableId": 2606373769,
+      "projectionId": "dmsdk-projection:12c294333a01a3cf8c90f9ac",
+      "stableId": 160848907,
       "denseId": 5,
       "symbol": "dmHashString64",
       "provenance": {
@@ -900,6 +908,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
         "line": 97,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmHashString64(const char *) -> uint64_t",
         "primaryFamily": "pointer",
         "families": [
@@ -928,8 +937,8 @@
     },
     {
       "id": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
-      "projectionId": "dmsdk-projection:2c28f57f30a6ddea5d202726",
-      "stableId": 2353198740,
+      "projectionId": "dmsdk-projection:85693857e1cb0e290dba765e",
+      "stableId": 2307929698,
       "denseId": 6,
       "symbol": "dmResource::GetExtFromPath",
       "provenance": {
@@ -938,6 +947,7 @@
         "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
         "line": 141,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmResource::GetExtFromPath(const char *) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -969,8 +979,8 @@
     },
     {
       "id": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
-      "projectionId": "dmsdk-projection:07262e9d56b121403ddcc7fe",
-      "stableId": 2601716781,
+      "projectionId": "dmsdk-projection:b833e1d1faa687aab69c978a",
+      "stableId": 192950788,
       "denseId": 7,
       "symbol": "dmSocket::ResultToString",
       "provenance": {
@@ -979,6 +989,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h",
         "line": 388,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmSocket::ResultToString(Result) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -1010,8 +1021,8 @@
     },
     {
       "id": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
-      "projectionId": "dmsdk-projection:8b17042ca3399c474fe2b584",
-      "stableId": 2710125394,
+      "projectionId": "dmsdk-projection:5e4ebc9a4ef40e0979df916f",
+      "stableId": 4049516502,
       "denseId": 8,
       "symbol": "dmStrCaseCmp",
       "provenance": {
@@ -1020,6 +1031,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
         "line": 155,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmStrCaseCmp(const char *, const char *) -> int",
         "primaryFamily": "pointer",
         "families": [
@@ -1048,8 +1060,8 @@
     },
     {
       "id": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
-      "projectionId": "dmsdk-projection:f764cc372769ea3ac6924545",
-      "stableId": 412070535,
+      "projectionId": "dmsdk-projection:856d743a70a9da79c45d9790",
+      "stableId": 2659322050,
       "denseId": 9,
       "symbol": "dmSys::Exists",
       "provenance": {
@@ -1058,6 +1070,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
         "line": 117,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmSys::Exists(const char *) -> bool",
         "primaryFamily": "pointer",
         "families": [
@@ -1086,8 +1099,8 @@
     },
     {
       "id": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
-      "projectionId": "dmsdk-projection:b78e60c5cd486e3c1d293744",
-      "stableId": 2305180704,
+      "projectionId": "dmsdk-projection:0a31e3c9a5b7cfeabbfbbcbf",
+      "stableId": 3951801112,
       "denseId": 10,
       "symbol": "dmSys::Rename",
       "provenance": {
@@ -1096,6 +1109,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
         "line": 135,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmSys::Rename(const char *, const char *) -> Result",
         "primaryFamily": "pointer",
         "families": [
@@ -1125,8 +1139,8 @@
     },
     {
       "id": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
-      "projectionId": "dmsdk-projection:029cf6c251d40209d3bf013f",
-      "stableId": 1881914853,
+      "projectionId": "dmsdk-projection:f8211c3a971f4e9ff7d50328",
+      "stableId": 1182196387,
       "denseId": 11,
       "symbol": "dmSys::Unlink",
       "provenance": {
@@ -1135,6 +1149,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h",
         "line": 125,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmSys::Unlink(const char *) -> Result",
         "primaryFamily": "pointer",
         "families": [
@@ -1164,8 +1179,8 @@
     },
     {
       "id": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
-      "projectionId": "dmsdk-projection:01ad907038b03b065cbd792f",
-      "stableId": 4096644126,
+      "projectionId": "dmsdk-projection:12b68361abfc38033f6451b1",
+      "stableId": 690286625,
       "denseId": 12,
       "symbol": "dmUtf8::StrLen",
       "provenance": {
@@ -1174,6 +1189,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
         "line": 41,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "dmUtf8::StrLen(const char *) -> uint32_t",
         "primaryFamily": "pointer",
         "families": [
@@ -1202,8 +1218,8 @@
     },
     {
       "id": "dmsdk:ProfileScopeEnd@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:382:536",
-      "projectionId": "dmsdk-projection:dd8d893d86a39e42c941c33d",
-      "stableId": 3772994617,
+      "projectionId": "dmsdk-projection:cad5c27ce5a2eead2fd94a1d",
+      "stableId": 771297901,
       "denseId": null,
       "symbol": "ProfileScopeEnd",
       "provenance": {
@@ -1212,6 +1228,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 382,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "ProfileScopeEnd(const char *, uint64_t) -> ProfileResult",
         "primaryFamily": "pointer",
         "families": [
@@ -1230,8 +1247,8 @@
     },
     {
       "id": "dmsdk:ProfileSetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:348:532",
-      "projectionId": "dmsdk-projection:50e728091ec13ba561464803",
-      "stableId": 2196552160,
+      "projectionId": "dmsdk-projection:56bb51880fe19b0ef289a62f",
+      "stableId": 1379982155,
       "denseId": null,
       "symbol": "ProfileSetThreadName",
       "provenance": {
@@ -1240,6 +1257,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 348,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "ProfileSetThreadName(const char *) -> ProfileResult",
         "primaryFamily": "pointer",
         "families": [
@@ -1258,8 +1276,8 @@
     },
     {
       "id": "dmsdk:ProfileUnregisterProfiler@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:324:528",
-      "projectionId": "dmsdk-projection:e7849819d56c1e104a6cb673",
-      "stableId": 1854441597,
+      "projectionId": "dmsdk-projection:ae64b7acb8143edbdeac8857",
+      "stableId": 4184632611,
       "denseId": null,
       "symbol": "ProfileUnregisterProfiler",
       "provenance": {
@@ -1268,6 +1286,7 @@
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 324,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "ProfileUnregisterProfiler(const char *) -> void",
         "primaryFamily": "pointer",
         "families": [
@@ -1285,8 +1304,8 @@
     },
     {
       "id": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
-      "projectionId": "dmsdk-projection:e55cbba75cd74800473cbc52",
-      "stableId": 2686100197,
+      "projectionId": "dmsdk-projection:ebf8f7eee8901e1b69476d21",
+      "stableId": 3882152169,
       "denseId": 13,
       "symbol": "ResourceGetExtFromPath",
       "provenance": {
@@ -1295,6 +1314,7 @@
         "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
         "line": 314,
         "declarationKind": "function",
+        "sourceDefined": false,
         "nativeSignature": "ResourceGetExtFromPath(const char *) -> const char *",
         "primaryFamily": "pointer",
         "families": [
@@ -1338,10 +1358,10 @@
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h": "408a778f12d979ead1a51c46646167803d8142edb0862fa922bedafbd4c66dbc",
     "defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp": "6ee49f0b936b469b11160806c5343ea943666529461514b05ce96f071015d436",
-    "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp": "9c54ba65381655f46c8bed4e26de451160dffd20eee5ef39c5748588cd3e4af1",
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp": "bea4d1be59c4a304a1c227438f7dac0933cf28a5264690f2afe6c8a00faa8e50",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value_jsi.hpp": "196499429d7405c92a74ecdcf04f40a426341dbb3b10dc1a80b0661c7fc15e5b",
     "defold/defold_hermes/src/generated_dmsdk_cstring_value_jsi.cpp": "ea98014e301957e1252b72d6af3d32ccf26bc7523660f60abea70fcf328e3f17",
-    "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js": "196dc5c33ee7894e2677ee55e3416dfa4df4976aff3db0aab9c60034e481d472",
+    "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js": "636b752ccb8420828adc387e6d198ee6dffac0232bc14d1df7bfdbb094056114",
     "packages/sdk/src/generated/dmsdk/cstring-value.ts": "4077730cac0790dc8f995ae0b211caa4290f0cd8b2f2959255fcd00d0e06b456",
     "packages/static-hermes/src/generated/dmsdk-cstring-value.ts": "954f8335c66d82e0d37e1c97fba9b6b816ae0c7cfd3fcdbe00a1b19b27c91a47"
   }

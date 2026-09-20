@@ -10,6 +10,8 @@
 [[maybe_unused]] static int deherm_dmsdk_address_fits(uint64_t value){return sizeof(uintptr_t)>=sizeof(uint64_t)||value<=UINTPTR_MAX;}
 [[maybe_unused]] static int64_t deherm_dmsdk_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}
 [[maybe_unused]] static double deherm_dmsdk_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}
+template<typename T> [[maybe_unused]] static T deherm_dmsdk_unpack_handle(uint64_t bits){if constexpr(std::is_pointer_v<T>)return reinterpret_cast<T>(static_cast<uintptr_t>(bits));else return static_cast<T>(bits);}
+template<typename T> [[maybe_unused]] static uint64_t deherm_dmsdk_pack_handle(T value){if constexpr(std::is_pointer_v<T>)return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value));else return static_cast<uint64_t>(value);}
 
 extern "C" DehermDmSdkUniversalStatus deherm_test_to_network(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
  if(argument_count != UINT32_C(1)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;

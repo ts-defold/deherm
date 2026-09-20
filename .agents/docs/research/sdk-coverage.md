@@ -29,6 +29,12 @@ declarations. A declaration is accounted for when it is either a type-only
 dependency, a direct scalar ABI candidate, or explicitly blocked on a lowering
 policy. Nothing is silently discarded.
 
+The derivation parse resolves those source headers against the checksum-pinned
+Defold SDK for the same revision. It retains only the **91**
+transitively referenced enum, record, alias, and template facts needed to
+interpret public signatures. The SDK archive is derivation input, not a
+consumer dependency or a published source snapshot.
+
 ## Lowering state
 
 | State | Declarations |
@@ -66,7 +72,7 @@ None.
 
 ## Partial-AST diagnostics
 
-55 headers emitted Clang diagnostics, mostly because generated DDF headers are build artifacts not present in a source checkout. Clang still produced a target-header AST for the inventory. These headers must be re-imported against the packaged Defold SDK before code emission.
+32 headers emitted Clang diagnostics. Most are the pinned WASI libc guard observing that the deliberately platform-neutral parse triple does not identify itself as a WASI bundle target; a small remainder are header-local dependency or declaration-order diagnostics. Clang still produced each target-header AST, and the exact Defold SDK support headers resolved generated DDF and third-party signature types before policy emission.
 
 The machine-readable inventory is
 `packages/bindings/generated/defold-sdk-inventory.json`. CI regenerates and compares it

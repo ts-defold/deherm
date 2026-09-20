@@ -134,9 +134,13 @@ function resolveDeclaration(type, owner, index) {
   const name = stripCv(type).replace(/[&*]+/g, " ").replace(/\[[^\]]*\]/g, " ").replace(/\s+/g, " ").trim();
   if (!name) return undefined;
   if (index.exact.has(name)) return index.exact.get(name);
-  const namespace = namespaceOf(owner);
-  if (namespace && index.exact.has(`${namespace}::${name}`)) return index.exact.get(`${namespace}::${name}`);
-  const candidates = index.leaves.get(leafName(name)) ?? [];
+  const scope = namespaceOf(owner).split("::").filter(Boolean);
+  for (let length = scope.length; length > 0; length -= 1) {
+    const qualified = `${scope.slice(0, length).join("::")}::${name}`;
+    if (index.exact.has(qualified)) return index.exact.get(qualified);
+  }
+  const candidates = [...new Map((index.leaves.get(leafName(name)) ?? [])
+    .map((candidate) => [`${candidate.kind}:${candidate.name}`, candidate])).values()];
   const complete = candidates.filter(({ completeDefinition }) => completeDefinition);
   if (complete.length === 1) return complete[0];
   return candidates.length === 1 ? candidates[0] : undefined;
@@ -243,18 +247,27 @@ function lowerType(type, owner, index, state = { aliases: new Set() }) {
     const aliasTarget = cleanType(resolved.type);
     const callbackAlias = parseCallback(aliasTarget, resolved.name, index, nextState);
     if (callbackAlias) return { ...callbackAlias, name: resolved.name, aliasId: resolved.id };
-    if (/^H[A-Z]/.test(leafName(resolved.name)) || /Handle(?:$|[A-Z_])/.test(leafName(resolved.name))) {
+    const loweredTarget = lowerType(aliasTarget, resolved.name, index, nextState);
+    const targetTypes = Object.fromEntries(Object.entries(resolved.targetTypes ?? {}).sort());
+    const targetSpellings = Object.values(targetTypes);
+    const targetDependent = new Set(targetSpellings).size > 1;
+    const targetIncludesPointer = targetSpellings.some((spelling) => /\*/.test(spelling));
+    const representation = Object.keys(targetTypes).length
+      ? { ...loweredTarget, targetTypes, targetDependent }
+      : loweredTarget;
+    if (/^H[A-Z]/.test(leafName(resolved.name)) || /Handle(?:$|[A-Z_])/.test(leafName(resolved.name)) ||
+        ["pointer", "handle"].includes(loweredTarget.kind) || targetIncludesPointer) {
       return {
         kind: "handle",
         name: resolved.name,
-        representation: lowerType(aliasTarget, resolved.name, index, nextState),
+        representation,
         nullable: "unspecified",
       };
     }
     return {
       kind: "named",
       name: resolved.name,
-      target: lowerType(aliasTarget, resolved.name, index, nextState),
+      target: representation,
     };
   }
   if (/^H[A-Z]/.test(leafName(base)) || /Handle(?:$|[A-Z_])/.test(leafName(base))) {
@@ -354,7 +367,9 @@ function semanticTokens(declaration, binding, signature, effects) {
   if (nodes.some(({ kind }) => kind === "enum")) tokens.add("enum-width-domain-validation");
   if (nodes.some(({ kind }) => kind === "callback")) tokens.add("callback-thread-reentrancy-lifetime");
   if (nodes.some(({ kind }) => ["template", "template-record", "type-parameter"].includes(kind)) || declaration.kind === "function-template") tokens.add("template-specialization-set");
-  if (nodes.some(({ kind }) => kind === "variadic")) tokens.add("typed-nonvariadic-facade");
+  if (signature.variadic || nodes.some(({ kind }) => kind === "variadic")) {
+    tokens.add("typed-nonvariadic-facade");
+  }
   if (effects.spans.present) tokens.add("span-pairing-element-unit-copy");
   tokens.add("call-thread-affinity");
   // Availability is a dimension every native declaration has, not a suspicion
@@ -415,7 +430,8 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
   const signature = {
     result: lowerType(declaration.returns ?? "void", declaration.name, typeIndex),
     parameters,
-    variadic: parameters.some(({ type }) => type.kind === "variadic"),
+    variadic: parameters.some(({ type }) => type.kind === "variadic") ||
+      /(?:^|[, (])\.\.\.(?:\)|$)/.test(declaration.type ?? ""),
   };
   const callbackParameters = collectIndices(signature, new Set(["callback"]));
   let resultHasCallback = false;
@@ -489,6 +505,7 @@ function buildRow(declaration, binding, typeIndex, defoldRevision, loweringEvide
     header: declaration.header,
     line: declaration.line,
     declarationKind: declaration.kind,
+    sourceDefined: declaration.sourceDefined === true,
     nativeSignature: binding.signature,
     primaryFamily: binding.primaryFamily,
     families: [...binding.families].sort(),
@@ -539,7 +556,10 @@ export async function build(irContent, classificationContent, loweringEvidenceCo
   if (!Array.isArray(ir.declarations)) throw new Error("dmSDK IR is missing declarations");
   if (!Array.isArray(classification.bindings)) throw new Error("dmSDK classification is missing bindings");
   const declarationsById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  const typeIndex = buildTypeIndex(ir.declarations, ir.opaqueTypes);
+  const typeIndex = buildTypeIndex(
+    [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])],
+    ir.opaqueTypes,
+  );
   const seen = new Set();
   for (const id of loweringById.keys()) {
     if (!declarationsById.has(id)) throw new Error(`Lowering evidence names a declaration absent from source IR: ${id}`);

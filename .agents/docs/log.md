@@ -1,5 +1,35 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Complete source types unlock the 486-call dmSDK exact census
+
+* **The importer no longer treats Clang recovery as API truth**: public source
+  headers are parsed with the checksum-pinned SDK support headers for the same
+  Defold revision. The policy retains a compact 91-declaration transitive type
+  closure rather than the SDK source archive. Nested enums, DDF types, receiver
+  owners, constructor definitions, and per-bundle alias spellings now survive
+  mechanically into projection; the projected value algebra has zero unknown
+  constructors and the generated TypeScript surface has zero unresolved type
+  names.
+
+* **Every declaration-only ready dmSDK call now runs its generated twin**: 486
+  of 1,361 recipes are universal-ready and 875 require usage specialization.
+  One generated census compiles production and exact providers against the
+  pinned SDK, links ABI-compatible recording callees, and executes all 486
+  vectors. It checks preconditions, receiver and ordered argument values, one
+  exact callee hit, and fake-result encoding. Target-dependent Vulkan handles
+  use compile-time pointer-or-integer packing, complete pointer fixtures use
+  the pointee's real alignment, and incomplete/void pointees avoid invalid
+  alignment expressions. Focused projection, materializer, reachability, and
+  Static Hermes emitted-C tests pass 42/42. The Static Hermes vmath lane uses
+  its canonical sound-typed parser because the pinned optional `ts2flow`
+  transform leaves return annotations on `extern_c` function expressions;
+  genuinely TypeScript-only application units still use `-parse-ts`. This is
+  generated compile/link/exact-call evidence, not Defold implementation
+  semantics or cross-target execution evidence. The resealed policy root is
+  `fa4afc60b314`; its policy-only reconstruction matches the frozen old-pipeline
+  fixture with 13 locally rendered files / 3,784,443 bytes and 15 named
+  compatibility snapshots / 77,499 bytes.
+
 ## 2026-09-20 - dmSDK record requirements follow transport depth
 
 * **Opaque pointer and handle identities no longer pretend to copy their

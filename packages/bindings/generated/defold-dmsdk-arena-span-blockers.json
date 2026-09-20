@@ -15,15 +15,15 @@
     ]
   },
   "sourceHashes": {
-    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
-    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "policy": "bd6084d8e9a4bfe5ee3eb2dd2c0cb6d5f33819b21581d640231fc39aa155d41c",
     "priorWaveReports": {
-      "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "4682d8d85b435b949e36224a50952b2507919a24f4ac5fa3d1cd8be4b13545a9",
-      "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "f5ee872f3731b1dde9206d68bd19c0f0e91f57a2f8acd929303ae02c5857686c",
-      "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "14b4b2ae8dacdfa06b3c0379db8c2dee58b940dc4cd74ab4c53ba37ac70b3161",
-      "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "73430ebd5789d7df3c1db8c9275869c830aa4553c730af0c7eca09b05f5c3472",
-      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "666338f9d5a1053c5f69415a5e9b3cbcf86db57116a7ab61835a62314a4b8b5e"
+      "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
+      "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
+      "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
+      "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
+      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051"
     }
   },
   "scope": "Complete arena-backed-spans census after the five generated prior waves",
@@ -43,31 +43,31 @@
     {
       "report": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
       "policyVersion": "fixed-digest-v1",
-      "sha256": "4682d8d85b435b949e36224a50952b2507919a24f4ac5fa3d1cd8be4b13545a9",
+      "sha256": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
       "declarationCount": 4
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
       "policyVersion": "base64-span-v1",
-      "sha256": "f5ee872f3731b1dde9206d68bd19c0f0e91f57a2f8acd929303ae02c5857686c",
+      "sha256": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
       "policyVersion": "astc-probe-v1",
-      "sha256": "14b4b2ae8dacdfa06b3c0379db8c2dee58b940dc4cd74ab4c53ba37ac70b3161",
+      "sha256": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
       "policyVersion": "xtea-span-v1",
-      "sha256": "73430ebd5789d7df3c1db8c9275869c830aa4553c730af0c7eca09b05f5c3472",
+      "sha256": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
       "policyVersion": "hash-span-v1",
-      "sha256": "666338f9d5a1053c5f69415a5e9b3cbcf86db57116a7ab61835a62314a4b8b5e",
+      "sha256": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
       "declarationCount": 2
     }
   ],
@@ -1258,7 +1258,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "handle:dmGraphics::HProgram:usize(value:handle:dmGraphics::HContext:opaque,inout:pointer:scalar:i32,inout:cstring-mutable,value:scalar:u32)",
+      "shape": "handle:dmGraphics::HProgram:usize(value:handle:dmGraphics::HContext:opaque,inout:pointer:unknown:ShaderDesc,inout:cstring-mutable,value:scalar:u32)",
       "result": {
         "role": "handle:dmGraphics::HProgram:usize",
         "direction": "value",
@@ -1275,9 +1275,9 @@
         {
           "position": 1,
           "name": "ddf",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:unknown:ShaderDesc",
           "direction": "inout",
-          "nativeType": "int *"
+          "nativeType": "ShaderDesc *"
         },
         {
           "position": 2,
@@ -2717,7 +2717,7 @@
         "pointer",
         "enum-handle"
       ],
-      "shape": "pointer:scalar:u8(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:scalar:i32,in:unknown:dmVMath::Matrix4,in:unknown:dmVMath::Matrix4,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:u32,out:pointer:scalar:u8)",
+      "shape": "pointer:scalar:u8(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,in:unknown:dmVMath::Matrix4,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:u32,out:pointer:scalar:u8)",
       "result": {
         "role": "pointer:scalar:u8",
         "direction": "inout",
@@ -2741,9 +2741,9 @@
         {
           "position": 2,
           "name": "mesh",
-          "role": "pointer:scalar:i32",
+          "role": "pointer:record:dmRigDDF::Mesh",
           "direction": "inout",
-          "nativeType": "int *"
+          "nativeType": "dmRigDDF::Mesh *"
         },
         {
           "position": 3,
@@ -2811,9 +2811,10 @@
       "families": [
         "out-param",
         "pointer-span",
-        "pointer"
+        "pointer",
+        "enum-handle"
       ],
-      "shape": "scalar:void(inout:pointer:record:dmGraphics::WriteAttributeParams,in:pointer:record:dmGraphics::VertexAttributeInfos,value:scalar:i32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,value:scalar:i32,in:pointer-out:scalar:f32,value:scalar:u32)",
+      "shape": "scalar:void(inout:pointer:record:dmGraphics::WriteAttributeParams,in:pointer:record:dmGraphics::VertexAttributeInfos,value:unknown:dmGraphics::VertexStepFunction,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,in:pointer-out:scalar:f32,value:unknown:dmGraphics::VertexAttribute::VectorType,in:pointer-out:scalar:f32,value:scalar:u32)",
       "result": {
         "role": "scalar:void",
         "direction": "value",
@@ -2837,9 +2838,9 @@
         {
           "position": 2,
           "name": "step_function",
-          "role": "scalar:i32",
+          "role": "unknown:dmGraphics::VertexStepFunction",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "dmGraphics::VertexStepFunction"
         },
         {
           "position": 3,
@@ -2907,9 +2908,9 @@
         {
           "position": 12,
           "name": "morph_target_weights_vector_type",
-          "role": "scalar:i32",
+          "role": "unknown:dmGraphics::VertexAttribute::VectorType",
           "direction": "value",
-          "nativeType": "int"
+          "nativeType": "dmGraphics::VertexAttribute::VectorType"
         },
         {
           "position": 13,
@@ -2931,7 +2932,8 @@
         "native-symbol-linkage-unverified",
         "out-storage-initialization-and-failure-policy",
         "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
+        "span-element-unit-and-copy-policy",
+        "type-lowering-unresolved"
       ],
       "disposition": "blocked",
       "blocker": "record-layout-or-borrowed-record-lifetime",

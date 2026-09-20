@@ -31,7 +31,7 @@ test("all 1,361 runtime-pending declarations have one reproducible ABI shape and
   assert.deepEqual(report.coverage, {
     runtimePending: 1361,
     shaped: 1361,
-    uniqueShapes: 880,
+    uniqueShapes: 888,
     tranches: 15,
     unshaped: 0,
   });

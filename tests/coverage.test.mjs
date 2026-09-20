@@ -20,6 +20,13 @@ test("dmSDK inventory accounts for every parsed declaration", async () => {
     inventory.declarationCount,
   );
   assert.ok(inventory.declarations.every((declaration) => declaration.status));
+  assert.equal(inventory.typeSupportDeclarations.length, 91);
+  assert.doesNotMatch(JSON.stringify(inventory.typeSupportDeclarations),
+    new RegExp(inventory.defoldRevision));
+  const vulkanImage = inventory.typeSupportDeclarations.find(({ name }) => name === "VkImage");
+  assert.match(vulkanImage.header, /^upstream\/defold-sdk\//);
+  assert.equal(vulkanImage.targetTypes["arm64-osx"], "struct VkImage_T *");
+  assert.equal(vulkanImage.targetTypes["wasm-web"], "uint64_t");
 });
 
 test("script inventory accounts for every public annotation declaration", async () => {
@@ -52,6 +59,7 @@ test("generated dmSDK resolves every Clang declaration", async () => {
   assert.equal(ir.headerCount, inventory.headerCount);
   assert.equal(ir.declarationCount, inventory.declarationCount);
   assert.equal(ir.declarations.length, inventory.declarationCount);
+  assert.equal(ir.typeSupportDeclarations.length, inventory.typeSupportDeclarations.length);
   assert.equal(ir.typeSurfaceUnresolvedCount, 0);
   const publicCalls = ir.declarations.filter(({ kind, disposition }) => ["function", "method", "constructor", "destructor", "function-template"].includes(kind) && disposition === "generated-raw-call");
   assert.equal(ir.runtimeImplementedCount + ir.runtimeUnimplementedCount, publicCalls.length);
@@ -66,4 +74,7 @@ test("generated dmSDK resolves every Clang declaration", async () => {
   assert.match(types, /readonly "dmBuffer::Result": DmBufferResult;/);
   assert.match(types, /export const DmSocketResult = \{[\s\S]*RESULT_ACCES: -1/);
   assert.doesNotMatch(types, /readonly "dmBuffer::Result": DmNativeType/);
+  assert.match(types, /export const DmGraphicsVertexStepFunction = \{/);
+  assert.match(types, /readonly "dmGraphics::VertexStepFunction": DmGraphicsVertexStepFunction;/);
+  assert.match(types, /readonly VkImage: bigint;/);
 });

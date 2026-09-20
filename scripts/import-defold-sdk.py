@@ -56,6 +56,8 @@ CONTAINER_KINDS = {
     "ClassTemplateDecl",
 }
 
+TYPE_SUPPORT_KINDS = {"record", "enum", "type-alias", "class-template"}
+
 SAFE_SCALARS = {
     "void",
     "bool",
@@ -106,9 +108,20 @@ def strip_checkout_path(text: str, root: Path | str = ROOT) -> str:
 
 
 def normalize_generated_value(value: Any, root: Path | str = ROOT) -> Any:
-    """Recursively remove host checkout spellings from generated data."""
+    """Recursively remove host/cache spellings from generated data."""
     if isinstance(value, str):
-        return strip_checkout_path(value, root)
+        normalized = strip_checkout_path(value, root)
+        # The downloaded SDK is a revision-keyed derivation cache. Clang writes
+        # that physical path into provenance and anonymous type spellings, but
+        # the policy object itself must be content-addressed and shareable
+        # across revisions with identical source facts. Preserve which stable
+        # SDK tree supplied the declaration without embedding its cache key.
+        rewritten = re.sub(
+            r"upstream[/\\]extender[/\\]server[/\\]app[/\\]sdk[/\\][^/\\]+[/\\]defoldsdk[/\\]",
+            "upstream/defold-sdk/",
+            normalized,
+        )
+        return rewritten.replace("\\", "/") if rewritten != normalized else normalized
     if isinstance(value, list):
         return [normalize_generated_value(item, root) for item in value]
     if isinstance(value, dict):
@@ -289,6 +302,9 @@ def symbol_from_node(
         result, parameters = function_parts(node)
         symbol["returns"] = result
         symbol["parameters"] = parameters
+        symbol["sourceDefined"] = any(
+            child.get("kind") == "CompoundStmt" for child in node.get("inner", [])
+        )
     if kind == "record":
         symbol["recordKind"] = node.get("tagUsed", "class")
         symbol["completeDefinition"] = node.get("completeDefinition", False)
@@ -349,9 +365,135 @@ def declarations_for(ast: dict[str, Any], header: Path) -> list[dict[str, Any]]:
     return declarations
 
 
+def referenced_type_support(
+    ast: dict[str, Any], header: Path, declarations: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Return the minimal transitive type closure imported from support headers.
+
+    Generated DDF and third-party headers are necessary to understand public
+    dmSDK signatures, but their APIs are not themselves dmSDK declarations.
+    Keeping only referenced enum/record/alias facts preserves that boundary and
+    avoids copying the entire dependency AST into the policy.
+    """
+    target = header.resolve()
+    candidates: list[dict[str, Any]] = []
+
+    def visit_scope(
+        children: Iterable[dict[str, Any]],
+        scope: tuple[str, ...],
+        inherited_source: Path | None,
+        inherited_access: str = "public",
+    ) -> None:
+        last_source = inherited_source
+        current_access = inherited_access
+        for node in children:
+            explicit_source = node_source(node)
+            source = explicit_source or last_source
+            if explicit_source:
+                last_source = explicit_source
+            kind_name = node.get("kind", "")
+            if kind_name == "AccessSpecDecl":
+                current_access = node.get("access", current_access)
+                continue
+            public_kind = DECL_KINDS.get(kind_name)
+            if source and source != target and public_kind in TYPE_SUPPORT_KINDS:
+                try:
+                    source.relative_to(ROOT)
+                except ValueError:
+                    pass
+                else:
+                    symbol = symbol_from_node(node, public_kind, scope, source, current_access)
+                    if symbol:
+                        candidates.append(symbol)
+            if kind_name in CONTAINER_KINDS:
+                container_name = node.get("name")
+                child_scope = (*scope, container_name) if container_name else scope
+                child_access = (
+                    "public"
+                    if kind_name in {"NamespaceDecl", "LinkageSpecDecl", "ExternCContextDecl"}
+                    or node.get("tagUsed") == "struct"
+                    else "private"
+                )
+                visit_scope(node.get("inner", []), child_scope, source, child_access)
+
+    visit_scope(ast.get("inner", []), (), None)
+    unique: dict[tuple[str, str], dict[str, Any]] = {}
+    for candidate in candidates:
+        key = (candidate["kind"], candidate["name"])
+        prior = unique.get(key)
+        if prior is None or candidate.get("completeDefinition", False):
+            unique[key] = candidate
+
+    exact = {item["name"]: item for item in unique.values()}
+    leaves: dict[str, list[dict[str, Any]]] = {}
+    for item in unique.values():
+        leaves.setdefault(item["name"].split("::")[-1], []).append(item)
+
+    def type_texts(item: dict[str, Any]) -> list[str]:
+        return [
+            str(item.get("type", "")),
+            str(item.get("returns", "")),
+            *(str(parameter.get("type", "")) for parameter in item.get("parameters", [])),
+            *(str(member.get("type", "")) for member in item.get("members", [])),
+            *(str(base) for base in item.get("bases", [])),
+        ]
+
+    def resolve_token(token: str, owner: str) -> dict[str, Any] | None:
+        if token in exact:
+            return exact[token]
+        if "::" not in token:
+            scope = owner.split("::")[:-1]
+            for length in range(len(scope), 0, -1):
+                candidate = exact.get("::".join((*scope[:length], token)))
+                if candidate:
+                    return candidate
+        matches = leaves.get(token.split("::")[-1], [])
+        return matches[0] if len(matches) == 1 else None
+
+    selected: dict[tuple[str, str], dict[str, Any]] = {}
+    pending = list(declarations)
+    token_pattern = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*")
+    while pending:
+        item = pending.pop()
+        for text in type_texts(item):
+            for token in token_pattern.findall(text):
+                support = resolve_token(token, item.get("name", ""))
+                if not support:
+                    continue
+                key = (support["kind"], support["name"])
+                if key in selected:
+                    continue
+                selected[key] = support
+                pending.append(support)
+    return sorted(selected.values(), key=lambda item: (item["name"], item["kind"]))
+
+
 def include_roots() -> list[Path]:
     roots = {path.parent for path in ENGINE.glob("**/dmsdk") if path.is_dir()}
     roots.add(ENGINE / "sdk" / "src")
+    # The source checkout deliberately does not carry generated DDF headers or
+    # third-party platform headers such as Vulkan.  Parsing a public header
+    # without them still yields a partial Clang AST, but Clang recovers the
+    # missing names as `int`; treating that recovery value as API ground truth
+    # corrupts enum and native-handle bindings.  Resolve declarations against
+    # the digest-pinned SDK for this exact engine revision instead.  These are
+    # derivation-time support headers only: their resolved facts enter the
+    # policy, while consumers continue to materialize from policy + compiler.
+    revision = lock_value("DEFOLD_REV")
+    sdk_root = ROOT / "upstream" / "extender" / "server" / "app" / "sdk" / revision / "defoldsdk"
+    sentinel = sdk_root / ".deherm-sdk-sha256"
+    expected = lock_value("DEFOLD_SDK_SHA256")
+    observed = sentinel.read_text(encoding="utf-8").strip() if sentinel.is_file() else ""
+    if observed != expected:
+        raise SystemExit(
+            f"the pinned Defold SDK support headers are not present at {relative(sdk_root)} "
+            "or do not match upstream.lock; run `pnpm bootstrap:upstreams -- defold-sdk`"
+        )
+    for relative_root in ("sdk/include", "include", "ext/include"):
+        path = sdk_root / relative_root
+        if not path.is_dir():
+            raise SystemExit(f"the pinned Defold SDK is missing {relative(sdk_root / relative_root)}")
+        roots.add(path)
     return sorted(roots)
 
 
@@ -591,15 +733,23 @@ def merge_target_mangling(
 ) -> None:
     """Record, per BUNDLE TARGET, the symbol clang says that target would emit."""
     indexed: dict[str, dict[str, dict[tuple, str]]] = {}
+    support_types: dict[str, dict[str, dict[tuple[str, str], str]]] = {}
     for triple, entries in per_triple.items():
         by_header: dict[str, dict[tuple, str]] = {}
+        support_by_header: dict[str, dict[tuple[str, str], str]] = {}
         for entry in entries:
             by_header[entry.get("header")] = {
                 declaration_key(d): d["mangledName"]
                 for d in entry.get("declarations", [])
                 if d.get("mangledName")
             }
+            support_by_header[entry.get("header")] = {
+                (declaration["kind"], declaration["name"]): declaration["type"]
+                for declaration in entry.get("typeSupportDeclarations", [])
+                if declaration.get("type")
+            }
         indexed[triple] = by_header
+        support_types[triple] = support_by_header
 
     for entry in primary:
         header = entry.get("header")
@@ -612,6 +762,15 @@ def merge_target_mangling(
                     names[target] = mangled
             if names:
                 declaration["mangledNames"] = names
+        for declaration in entry.get("typeSupportDeclarations", []):
+            key = (declaration["kind"], declaration["name"])
+            types = {
+                target: support_types.get(triple, {}).get(header, {}).get(key)
+                for target, triple in triples.items()
+            }
+            types = {target: spelling for target, spelling in types.items() if spelling}
+            if types:
+                declaration["targetTypes"] = types
 
 
 def parse_header(header: Path, includes: list[Path], target: str, flags: list[str]) -> dict[str, Any]:
@@ -658,9 +817,11 @@ def parse_header(header: Path, includes: list[Path], target: str, flags: list[st
     except json.JSONDecodeError as error:
         detail = "\n".join(stderr.strip().splitlines()[-12:])
         return {"header": relative(header), "error": detail or f"invalid Clang JSON: {error}"}
+    declarations = declarations_for(ast, header)
     result = {
         "header": relative(header),
-        "declarations": declarations_for(ast, header),
+        "declarations": declarations,
+        "typeSupportDeclarations": referenced_type_support(ast, header, declarations),
     }
     if process.returncode != 0:
         result["diagnostics"] = "\n".join(stderr.strip().splitlines()[-12:])
@@ -722,12 +883,33 @@ def inventory() -> dict[str, Any]:
         if "diagnostics" in item
     ]
     declarations = [decl for item in parsed for decl in item["declarations"]]
+    type_support: dict[tuple[str, str], dict[str, Any]] = {}
+    for item in parsed:
+        for declaration in item.get("typeSupportDeclarations", []):
+            key = (declaration["kind"], declaration["name"])
+            prior = type_support.get(key)
+            if prior is None or declaration.get("completeDefinition", False):
+                type_support[key] = declaration
+            elif declaration.get("targetTypes"):
+                prior["targetTypes"] = {
+                    **prior.get("targetTypes", {}),
+                    **declaration["targetTypes"],
+                }
     counts: dict[str, int] = {}
     statuses: dict[str, int] = {}
     for declaration in declarations:
         counts[declaration["kind"]] = counts.get(declaration["kind"], 0) + 1
         statuses[declaration["status"]] = statuses.get(declaration["status"], 0) + 1
 
+    public_type_keys = {
+        (declaration["kind"], declaration["name"])
+        for declaration in declarations
+        if declaration["kind"] in TYPE_SUPPORT_KINDS
+    }
+    compact_type_support = [
+        declaration for key, declaration in type_support.items()
+        if key not in public_type_keys
+    ]
     return {
         "schemaVersion": 1,
         "defoldRevision": defold_revision(),
@@ -751,6 +933,9 @@ def inventory() -> dict[str, Any]:
         "failures": failures,
         "diagnostics": diagnostics,
         "declarations": declarations,
+        "typeSupportDeclarations": sorted(
+            compact_type_support, key=lambda item: (item["name"], item["kind"])
+        ),
     }
 
 
@@ -769,10 +954,12 @@ def markdown(data: dict[str, Any]) -> str:
     else:
         failures = "None."
     diagnostics = (
-        f"{data['diagnosticHeaderCount']} headers emitted Clang diagnostics, mostly because "
-        "generated DDF headers are build artifacts not present in a source checkout. Clang "
-        "still produced a target-header AST for the inventory. These headers must be "
-        "re-imported against the packaged Defold SDK before code emission."
+        f"{data['diagnosticHeaderCount']} headers emitted Clang diagnostics. Most are the "
+        "pinned WASI libc guard observing that the deliberately platform-neutral parse triple "
+        "does not identify itself as a WASI bundle target; a small remainder are header-local "
+        "dependency or declaration-order diagnostics. Clang still produced each target-header "
+        "AST, and the exact Defold SDK support headers resolved generated DDF and third-party "
+        "signature types before policy emission."
         if data["diagnosticHeaderCount"]
         else "None."
     )
@@ -806,6 +993,12 @@ Clang parsed **{data['parsedHeaderCount']} of {data['headerCount']}** public
 declarations. A declaration is accounted for when it is either a type-only
 dependency, a direct scalar ABI candidate, or explicitly blocked on a lowering
 policy. Nothing is silently discarded.
+
+The derivation parse resolves those source headers against the checksum-pinned
+Defold SDK for the same revision. It retains only the **{len(data.get('typeSupportDeclarations', []))}**
+transitively referenced enum, record, alias, and template facts needed to
+interpret public signatures. The SDK archive is derivation input, not a
+consumer dependency or a published source snapshot.
 
 ## Lowering state
 

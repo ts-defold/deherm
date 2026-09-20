@@ -15,8 +15,8 @@ family without symbol-name allowlists:
 
 | Disposition | Count | Rule |
 | --- | ---: | --- |
-| provider-gated handle/scalar ABI | 82 | Scalar result is `bool`, `f32`, `i32`, `u32`, or `u64`; every argument is a handle or the same bounded scalar algebra; at least one argument is a handle; no `platform-gated` family marker. |
-| blocked with row-local tokens | 266 | Pointer, record, enum, callback, void/handle/pointer result, unresolved value, or platform-specific ABI remains. |
+| provider-gated handle/scalar ABI | 80 | Scalar result is `bool`, `f32`, `i32`, `u32`, or `u64`; every argument is a handle or the same bounded scalar algebra; at least one argument is a handle; no `platform-gated` family marker. |
+| blocked with row-local tokens | 268 | Pointer, record, enum, callback, void/handle/pointer result, unresolved value, or platform-specific ABI remains. |
 
 The generated report is
 `packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json`. It retains all
@@ -29,7 +29,7 @@ exception.
 
 # Provider boundary
 
-The 82 generated declarations use one C ABI dispatcher with caller-owned
+The 80 generated declarations use one C ABI dispatcher with caller-owned
 64-bit argument and result slots. There are 32 deterministic semantic handle
 kinds and at most two arguments per selected call. A borrowed handle never
 crosses as a JavaScript number: Dynamic Hermes and TypeScript use `BigInt`,
@@ -55,7 +55,7 @@ The generated adapters cover:
 - Static Hermes `extern_c` direct-memory declaration;
 - browser/Wasm direct-memory descriptors and raw dispatcher;
 - nominal TypeScript `BorrowedHandle<Kind>` APIs; and
-- an 82-signature pinned-header audit across 22 dmSDK headers.
+- an 80-signature pinned-header audit across 22 dmSDK headers.
 
 # Evidence
 
@@ -69,12 +69,12 @@ node --test \
   tests/dmsdk-generator-pipeline.test.mjs
 ```
 
-The tests independently rederive the 348/82/266 census, regenerate every
+The tests independently rederive the 348/80/268 census, regenerate every
 artifact into a clean temporary directory, reject source/census drift, compile
 all selected signatures against the complete pinned SDK include projection,
 compile the C and JSI adapters, type-check the Dynamic/Static TypeScript
 surfaces, parse the browser adapter, and link/run the provider bridge under
-ASan and UBSan. The host harness dispatches every one of the 82 generated
+ASan and UBSan. The host harness dispatches every one of the 80 generated
 routes through the fake provider before the warmed native loop executes 100,000
 additional guarded dispatches with zero observed C++ `operator new` calls. The
 repository-wide clean-room pipeline reproduces all 79 owned dmSDK artifacts
@@ -85,7 +85,7 @@ byte-for-byte from pinned inputs.
 The runtime harness uses a deterministic fake provider. It proves descriptor
 layout, error ordering, provider callbacks, thread rejection, handle rejection,
 linkage of the generic bridge, sanitizer cleanliness, and warmed glue
-allocation behavior. It does not supply real Defold handles, link the 82 engine
+allocation behavior. It does not supply real Defold handles, link the 80 engine
 symbols, establish real subsystem thread policies, or prove packaged-engine
 behavior. Consequently the generated report records zero packaged-engine
 runtime verifications.
@@ -95,7 +95,10 @@ to the public SDK barrel or packaged extension build. Doing that safely depends
 on a real provider installation and target feature/symbol matrix; exporting the
 surface earlier would make currently unavailable calls appear executable.
 
-The 266 blocked declarations remain intentionally ungenerated. Unlocking them
+The 268 blocked declarations remain intentionally ungenerated. Two are
+`GetConstantType` and `GetMaterialVertexSpace`, which exact SDK support facts
+correctly classify as nested-enum results instead of scalar results; no dmSDK
+declaration disappeared. Unlocking the remaining rows
 requires reusable policies for enum domains, output initialization/failure,
 pointer bounds and nullability, record layout/copying, returned-handle
 ownership, callbacks, or per-target availability. Adding a one-off wrapper or

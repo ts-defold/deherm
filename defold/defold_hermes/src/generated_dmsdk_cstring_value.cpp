@@ -197,20 +197,20 @@ bool decode_dmSocket__Result(uint64_t raw,dmSocket::Result* output){
 }
 template <typename Enum> uint64_t encode_enum(Enum value){using Underlying=typename std::underlying_type<Enum>::type;if constexpr(std::is_signed<Underlying>::value)return static_cast<uint64_t>(static_cast<int64_t>(static_cast<Underlying>(value)));else return static_cast<uint64_t>(static_cast<Underlying>(value));}
 constexpr DehermDmSdkCStringDescriptor kDescriptors[]={
-  {UINT32_C(628241714),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:a356e91ea0258ba88522e629","dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100"},
-  {UINT32_C(3185040835),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:37acfc9a1a1b8741b70aba67","dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101"},
-  {UINT32_C(3337053143),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:91ed46ebfd360ef480721976","dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420"},
-  {UINT32_C(3006735102),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:231779713b56f6ce6ee07c7f","dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419"},
-  {UINT32_C(242908930),1,0,DEHERM_DMSDK_CSTRING_U32,0,"dmsdk-projection:8475d4f3f294fc877bfbd3ef","dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214"},
-  {UINT32_C(2606373769),1,0,DEHERM_DMSDK_CSTRING_U64,0,"dmsdk-projection:53d2c77e57af8c8ed773fd5e","dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215"},
-  {UINT32_C(2353198740),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:2c28f57f30a6ddea5d202726","dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969"},
-  {UINT32_C(2601716781),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:07262e9d56b121403ddcc7fe","dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568"},
-  {UINT32_C(2710125394),2,0,DEHERM_DMSDK_CSTRING_I32,0,"dmsdk-projection:8b17042ca3399c474fe2b584","dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183"},
-  {UINT32_C(412070535),1,0,DEHERM_DMSDK_CSTRING_BOOL,0,"dmsdk-projection:f764cc372769ea3ac6924545","dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595"},
-  {UINT32_C(2305180704),2,0,DEHERM_DMSDK_CSTRING_ENUM,0,"dmsdk-projection:b78e60c5cd486e3c1d293744","dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597"},
-  {UINT32_C(1881914853),1,0,DEHERM_DMSDK_CSTRING_ENUM,0,"dmsdk-projection:029cf6c251d40209d3bf013f","dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596"},
-  {UINT32_C(4096644126),1,0,DEHERM_DMSDK_CSTRING_U32,0,"dmsdk-projection:01ad907038b03b065cbd792f","dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657"},
-  {UINT32_C(2686100197),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:e55cbba75cd74800473cbc52","dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906"},
+  {UINT32_C(4246203561),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:81e0e25eccb99fdf881faca5","dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100"},
+  {UINT32_C(3832218645),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:448770b5f5b45ad5c6b55789","dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101"},
+  {UINT32_C(3024038588),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:252a316588029c69a580f28d","dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420"},
+  {UINT32_C(3072231216),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:9a977f075f257923ae17082e","dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419"},
+  {UINT32_C(2315244108),1,0,DEHERM_DMSDK_CSTRING_U32,0,"dmsdk-projection:a4df6705e98e7f42588c8eaa","dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214"},
+  {UINT32_C(160848907),1,0,DEHERM_DMSDK_CSTRING_U64,0,"dmsdk-projection:12c294333a01a3cf8c90f9ac","dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215"},
+  {UINT32_C(2307929698),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:85693857e1cb0e290dba765e","dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969"},
+  {UINT32_C(192950788),0,1,DEHERM_DMSDK_CSTRING_STRING,0,"dmsdk-projection:b833e1d1faa687aab69c978a","dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568"},
+  {UINT32_C(4049516502),2,0,DEHERM_DMSDK_CSTRING_I32,0,"dmsdk-projection:5e4ebc9a4ef40e0979df916f","dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183"},
+  {UINT32_C(2659322050),1,0,DEHERM_DMSDK_CSTRING_BOOL,0,"dmsdk-projection:856d743a70a9da79c45d9790","dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595"},
+  {UINT32_C(3951801112),2,0,DEHERM_DMSDK_CSTRING_ENUM,0,"dmsdk-projection:0a31e3c9a5b7cfeabbfbbcbf","dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597"},
+  {UINT32_C(1182196387),1,0,DEHERM_DMSDK_CSTRING_ENUM,0,"dmsdk-projection:f8211c3a971f4e9ff7d50328","dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596"},
+  {UINT32_C(690286625),1,0,DEHERM_DMSDK_CSTRING_U32,0,"dmsdk-projection:12b68361abfc38033f6451b1","dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657"},
+  {UINT32_C(3882152169),1,0,DEHERM_DMSDK_CSTRING_STRING,1,"dmsdk-projection:ebf8f7eee8901e1b69476d21","dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906"},
 }; struct FrameScope { DehermDmSdkCStringFrame* frame; ~FrameScope(){deherm_dmsdk_cstring_frame_end(frame);} }; }
 extern "C" {
 uint32_t deherm_dmsdk_cstring_value_count(void){return UINT32_C(14);}

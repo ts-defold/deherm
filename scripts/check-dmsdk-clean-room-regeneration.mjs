@@ -243,15 +243,14 @@ async function validateReports(root) {
   "dmSDK projection IR does not have a complete fail-closed 1,361-declaration projection");
   assert(scalar.coverage.reviewed === 31 && scalar.coverage.generated === 26 && scalar.coverage.blocked === 5,
     "scalar report does not have the pinned 26/31 disposition");
-  // 880, not 881. The six `dmGraphics::GetNative*` functions used to return the
-  // Objective-C `id` that only Apple's SDK declares, because the dmSDK was
-  // parsed on a Mac; parsed under the declared platform-neutral environment they
-  // return the `void *` the header itself supplies for every non-Apple target,
-  // which is a shape the census already had. See
+  // The exact SDK support headers preserve nested enums and platform-native
+  // handle aliases that a missing-include Clang recovery had collapsed to int.
+  // That source correction makes eight formerly conflated signatures distinct
+  // while keeping the 1,361-declaration / 15-tranche partition unchanged. See
   // `.agents/docs/decisions/target-directed-dmsdk-parse.md`.
   assert(shapes.coverage.runtimePending === 1361 && shapes.coverage.shaped === 1361 &&
-    shapes.coverage.uniqueShapes === 880 && shapes.coverage.tranches === 15,
-  "ABI-shape report does not have the pinned 1,361/880/15 census");
+    shapes.coverage.uniqueShapes === 888 && shapes.coverage.tranches === 15,
+  "ABI-shape report does not have the pinned 1,361/888/15 census");
   assert(enumValue.coverage.discovered === 10 && enumValue.coverage.emitted === 7 &&
     enumValue.coverage.blocked === 3 && enumValue.coverage.remainingWithoutGeneratedAdapters === 1328,
   "enum-value report does not have the pinned 7/10 disposition or 1,328 remainder");
@@ -277,17 +276,20 @@ async function validateReports(root) {
     arenaSpan.coverage.blocked === 67 && arenaSpan.coverage.executableAdaptersEmitted === 0 &&
     arenaSpan.coverage.overlap === 0 && arenaSpan.coverage.unaccounted === 0,
   "arena-span blocker report does not have the pinned complete 12 generated + 67 blocked partition");
-  assert(borrowedHandle.coverage.candidates === 348 && borrowedHandle.coverage.generated === 82 &&
-    borrowedHandle.coverage.blocked === 266 && borrowedHandle.coverage.cAbiGenerated === 82 &&
-    borrowedHandle.coverage.dynamicHermesJsiGenerated === 82 &&
-    borrowedHandle.coverage.staticHermesGenerated === 82 &&
-    borrowedHandle.coverage.browserDirectMemoryGenerated === 82 &&
-    borrowedHandle.coverage.typescriptGenerated === 82 &&
-    borrowedHandle.coverage.pinnedHeaderSignatureCompiled === 82 &&
-    borrowedHandle.coverage.fakeProviderHostRuntimeTested === 82 &&
+  // Exact nested-enum support facts move GetConstantType and
+  // GetMaterialVertexSpace into the enum family. No declaration disappeared;
+  // the structural selector now correctly rejects those two as non-scalars.
+  assert(borrowedHandle.coverage.candidates === 348 && borrowedHandle.coverage.generated === 80 &&
+    borrowedHandle.coverage.blocked === 268 && borrowedHandle.coverage.cAbiGenerated === 80 &&
+    borrowedHandle.coverage.dynamicHermesJsiGenerated === 80 &&
+    borrowedHandle.coverage.staticHermesGenerated === 80 &&
+    borrowedHandle.coverage.browserDirectMemoryGenerated === 80 &&
+    borrowedHandle.coverage.typescriptGenerated === 80 &&
+    borrowedHandle.coverage.pinnedHeaderSignatureCompiled === 80 &&
+    borrowedHandle.coverage.fakeProviderHostRuntimeTested === 80 &&
     borrowedHandle.coverage.packagedEngineRuntimeVerified === 0 &&
     borrowedHandle.coverage.warmedDispatchObservedCppAllocations === 0,
-  "borrowed-handle report does not preserve its pinned 82 generated + 266 blocked provider boundary");
+  "borrowed-handle report does not preserve its pinned 80 generated + 268 blocked provider boundary");
   assert(scratchScalarOut.coverage.candidates === 79 && scratchScalarOut.coverage.generated === 7 &&
     scratchScalarOut.coverage.blocked === 72 && scratchScalarOut.coverage.cAbiGenerated === 7 &&
     scratchScalarOut.coverage.dynamicHermesJsiGenerated === 7 &&
@@ -324,7 +326,7 @@ async function validateReports(root) {
     .map(({ id }) => id));
   assert(scalarIds.size === 26 && enumIds.size === 7 && fixedDigestIds.size === 4 && base64SpanIds.size === 2 && astcProbeIds.size === 2 && xteaSpanIds.size === 2 && hashSpanIds.size === 2,
     "generated dmSDK IDs are not unique within a family");
-  assert(borrowedHandleIds.size === 82, "borrowed-handle family contains duplicate generated IDs");
+  assert(borrowedHandleIds.size === 80, "borrowed-handle family contains duplicate generated IDs");
   assert(scratchScalarOutIds.size === 7, "scratch scalar-out family contains duplicate generated IDs");
   const priorGeneratedIds = new Set([
     ...scalarIds,

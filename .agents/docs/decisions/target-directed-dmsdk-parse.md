@@ -85,6 +85,18 @@ their place, so those headers come from a digest and from nowhere else. Parsing
 with no libc at all is worse than either host: `size_t` degrades to `int` and
 the mangled name goes with it, silently.
 
+**Generated and third-party signature types come from the exact Defold SDK.**
+The source checkout does not carry generated DDF headers or every platform
+support header (notably Vulkan). Clang can recover through those missing
+includes, but it may silently turn an unresolved enum or native handle into
+`int`. The importer therefore verifies the pinned SDK archive digest for the
+same `DEFOLD_REV`, adds its three public include roots during derivation, and
+retains only the transitive type facts referenced by public dmSDK signatures.
+The archive is never a consumer input and its source tree is not published in
+the policy. Per-target parses record alias spellings such as pointer-backed
+`VkImage` on native 64-bit targets and `uint64_t` on wasm, so one policy can
+materialize the correct host-independent recipe.
+
 wasi-sysroot is the pin because it is a **single host-independent archive** -
 there is no per-host build to choose between, so the bytes are the same
 everywhere by construction - it is Apache-2.0 with LLVM exceptions, and its

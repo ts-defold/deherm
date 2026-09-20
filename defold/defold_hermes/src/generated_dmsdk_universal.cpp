@@ -804,13 +804,13 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(796), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(797), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(798), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
-  {UINT32_C(799), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(799), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(800), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(801), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(802), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(803), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(804), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
-  {UINT32_C(805), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(805), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(806), UINT16_C(4), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(807), UINT16_C(5), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(808), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
@@ -1373,7 +1373,7 @@ void* g_context = nullptr;
 
 extern "C" {
 uint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(1361); }
-const char* deherm_dmsdk_universal_catalog_sha256(void) { return "3f1c1ff779bd6575c7679eb07a4b6fc92ed092e5925c200ad615298cb34ff9fc"; }
+const char* deherm_dmsdk_universal_catalog_sha256(void) { return "5f614648e0e78fdecc4d8d2007addb28291060c8199ea14a3ccb32a2e654ff79"; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {
   return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;

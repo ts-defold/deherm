@@ -144,15 +144,30 @@ generated callable type at those escape sites and records a source-located
 unresolved call until a mechanically modeled indirect-call contract exists.
 
 The checker manifest proves total declaration selection and classifies the
-executable lowering at the call site. Of the current 1,361 recipes, 320 are
-universal-ready from declaration identity alone and 1,041 require generated
-specialization. The latter includes 148 preferred-adapter candidates: 45 have
-real native wrappers but no generated route from the universal bridge, while
-103 are provider-boundary/private rows without a production provider or public
-registration path. They are not called executable merely because source exists.
+executable lowering at the call site. Of the current 1,361 recipes, 486 are
+universal-ready from declaration identity alone and 875 require generated
+specialization. The latter includes 146 preferred specialized-adapter recipes
+that still require a generated selected route from the universal bridge. They
+are not called executable merely because source exists.
 All declarations remain generated and addressable. Release checking rejects a
 reached specialization-required declaration at its source location rather than
 writing an apparently complete manifest.
+
+The declaration parse resolves public source headers against the exact,
+checksum-pinned Defold SDK support headers for the same revision. Only the 91
+transitively referenced type facts enter the IR: nested enums, generated DDF
+records and aliases, and target-specific native-handle spellings. The current
+projection has zero unknown value constructors. Target-dependent handles such
+as `VkImage` retain their per-bundle spelling and use one generated bit codec
+that packs or unpacks either a pointer or an integer at C++ compile time.
+
+The native declaration-only census materializes all 486 ready recipes from the
+catalog, compiles production and exact-call twins against the pinned SDK,
+links recording callees, and executes every vector. It checks preconditions,
+receiver and ordered argument decoding, exact callee count, and result encoding.
+Complete pointee fixtures use the source type's actual alignment; incomplete
+and `void` pointees never form `alignof` expressions. This is exact bridge
+evidence, not execution of Defold implementation semantics.
 
 The arbitrary-extension C-header lane follows the same rule. Function identity
 is derived from module, native symbol, ordered native parameter spellings, and

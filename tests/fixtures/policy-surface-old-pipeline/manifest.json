@@ -2,16 +2,16 @@
   "schemaVersion": 2,
   "kind": "deherm.fixture.old-pipeline-sdk",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "treeSha256": "2fe219d9b44fd8478b95be277ee7b2f20b40326d48f1caa94459f6aa27bbce82",
+  "treeSha256": "49352b60bde2958bcef998e9a50fde74e70ef70a2db42d1c0637204fc69ffa4a",
   "source": "Frozen SHA-256 golden captured from the checkout-backed packages/sdk/src/generated tree produced by the source pipeline. It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
   "files": {
     "dmsdk/borrowed-handle.ts": {
-      "bytes": 28570,
-      "sha256": "a95b9833a9be14a8768625449bc3689fc3dcd4ccd52272ff4b04aad6639985ef"
+      "bytes": 27898,
+      "sha256": "c44facb9dfe0bc0c6fd94f1a24874ee50882d1c51f8257348279f8e52891d003"
     },
     "dmsdk/browser-arena.ts": {
       "bytes": 5476,
-      "sha256": "252ca6e0b2e412aba391e02105187c4f3bfc699ed817345c98d91ea66d4857b1"
+      "sha256": "b4cb6190eff827275d49a3e6526be9a40a15b59d371cd8dc834a3d025884152b"
     },
     "dmsdk/cstring-value.ts": {
       "bytes": 4753,
@@ -30,8 +30,8 @@
       "sha256": "0842327ac1027cc217c52197e351df2f252bb2a76655d19403075985582b0509"
     },
     "dmsdk/runtime.ts": {
-      "bytes": 243675,
-      "sha256": "4e8f168290afc3bfbf6c720ab253b034c03c2f4eea42c583c4a944ec1b85f6c8"
+      "bytes": 244348,
+      "sha256": "34088132599e703809570a1d604bd912a32204835c82a6b363646ca399926f4c"
     },
     "dmsdk/scalar.ts": {
       "bytes": 6007,
@@ -42,12 +42,12 @@
       "sha256": "ad871b1ed12b8708aa7d79a770cf5cd658d46c24c7c960375d1d835f86d1612a"
     },
     "dmsdk/types.ts": {
-      "bytes": 1445858,
-      "sha256": "bf838d3c6c4e7caddb9fc65570faaf4004bd43083932327987e1a7e111e7f14e"
+      "bytes": 1480910,
+      "sha256": "0478360421ef53f314aa216f2e67611e57a5d5f5ec910e299ac18383cc66e9cd"
     },
     "dmsdk/universal.ts": {
       "bytes": 148212,
-      "sha256": "c7024da875e2c5f774770488a422d71dc6a3725235ad1845d7377969a6587a46"
+      "sha256": "46a7f5b3410c390ab9e9049c3354dec1672cbfb7b9819d2c7e48497798f6ffbf"
     },
     "script/browser-target-support.ts": {
       "bytes": 567,

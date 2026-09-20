@@ -4217,7 +4217,7 @@ export interface DmSdkCalls {
     (instance: DmSdkTypes["dmGameObject::HInstance"]): boolean;
   };
   readonly "dmGameObject::LuaScript::LuaScript": {
-    (lua_module: DmPointer<"int">): void;
+    (lua_module: DmPointer<"dmLuaDDF::LuaModule">): void;
   };
   /**
    * Create a new gameobject instance
@@ -4909,7 +4909,7 @@ export interface DmSdkCalls {
      * @returns Pointer to the DDF
      * data message, or  0  if the resource is invalid.
      */
-    (res: DmPointer<"dmGameSystem::DataResource">): DmReadonlyPointer<"int">;
+    (res: DmPointer<"dmGameSystem::DataResource">): DmReadonlyPointer<"dmGameSystemDDF::Data">;
   };
   readonly "dmGameSystem::GetFactory": {
     (ctx: DmReadonlyPointer<"dmGameSystem::CompGuiNodeTypeCtx">): DmSdkTypes["dmResource::HFactory"];
@@ -6095,7 +6095,7 @@ export interface DmSdkCalls {
      * @param error_buffer_size Size of the error buffer
      * @returns New program handle, or INVALID_PROGRAM_HANDLE on failure
      */
-    (context: DmSdkTypes["dmGraphics::HContext"], ddf: DmPointer<"int">, error_buffer: DmPointer<"char">, error_buffer_size: number): DmSdkTypes["dmGraphics::HProgram"];
+    (context: DmSdkTypes["dmGraphics::HContext"], ddf: DmPointer<"dmGraphics::ShaderDesc">, error_buffer: DmPointer<"char">, error_buffer_size: number): DmSdkTypes["dmGraphics::HProgram"];
   };
   readonly "dmGraphics::NewRenderTarget": {
     /**
@@ -6159,7 +6159,7 @@ export interface DmSdkCalls {
      * @param context the context
      * @returns the vertex declaration
      */
-    (context: DmSdkTypes["dmGraphics::HContext"], step_function: number): DmSdkTypes["dmGraphics::HVertexStreamDeclaration"];
+    (context: DmSdkTypes["dmGraphics::HContext"], step_function: DmSdkTypes["dmGraphics::VertexStepFunction"]): DmSdkTypes["dmGraphics::HVertexStreamDeclaration"];
   };
   /**
    * Get the default framebuffer ID
@@ -6484,7 +6484,7 @@ export interface DmSdkCalls {
      * @param vk_descriptor_pool_out result Vulkan descriptor pool
      * @returns true if creation was successful. Otherwise returns false
      */
-    (vk_device: number, max_descriptors: number, vk_descriptor_pool_out: DmPointer<"int">): boolean;
+    (vk_device: DmSdkTypes["VkDevice"], max_descriptors: number, vk_descriptor_pool_out: DmPointer<"VkDescriptorPool">): boolean;
   };
   /**
    * Get the current swap chain texture
@@ -6504,7 +6504,7 @@ export interface DmSdkCalls {
      * @param context the Vulkan context
      * @returns the Vulkan command buffer
      */
-    (context: DmSdkTypes["dmGraphics::HContext"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"]): DmSdkTypes["VkCommandBuffer"];
   };
   /**
    * Get Vulkan device handle. Only available when using Mac/iOS.
@@ -6514,7 +6514,7 @@ export interface DmSdkCalls {
      * @param context the Vulkan context
      * @returns the Vulkan device handle
      */
-    (context: DmSdkTypes["dmGraphics::HContext"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"]): DmSdkTypes["VkDevice"];
   };
   /**
    * Get Vulkan graphics queue handle. Only available when using Mac/iOS.
@@ -6524,7 +6524,7 @@ export interface DmSdkCalls {
      * @param context the Vulkan context
      * @returns the Vulkan graphics queue
      */
-    (context: DmSdkTypes["dmGraphics::HContext"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"]): DmSdkTypes["VkQueue"];
   };
   /**
    * Get Vulkan queue family. Only available when using Mac/iOS.
@@ -6546,7 +6546,7 @@ export interface DmSdkCalls {
      * @param texture the texture handle
      * @returns the Vulkan image handle
      */
-    (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]): DmSdkTypes["VkImage"];
   };
   /**
    * Get the native Vulkan image view handle from an engine texture handle.
@@ -6558,7 +6558,7 @@ export interface DmSdkCalls {
      * @param texture the texture handle
      * @returns the Vulkan image view handle
      */
-    (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]): DmSdkTypes["VkImageView"];
   };
   /**
    * Get Vulkan instance handle. Only available when using Mac/iOS.
@@ -6568,7 +6568,7 @@ export interface DmSdkCalls {
      * @param context the Vulkan context
      * @returns the Vulkan instance handle
      */
-    (context: DmSdkTypes["dmGraphics::HContext"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"]): DmSdkTypes["VkInstance"];
   };
   /**
    * Get Vulkan physical device handle. Only available when using Mac/iOS.
@@ -6578,7 +6578,7 @@ export interface DmSdkCalls {
      * @param context the Vulkan context
      * @returns the Vulkan physical device handle
      */
-    (context: DmSdkTypes["dmGraphics::HContext"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"]): DmSdkTypes["VkPhysicalDevice"];
   };
   /**
    * Get Vulkan render pass handle. Only available when using Mac/iOS.
@@ -6588,7 +6588,7 @@ export interface DmSdkCalls {
      * @param context the Vulkan context
      * @returns the Vulkan render pass handle
      */
-    (context: DmSdkTypes["dmGraphics::HContext"]): number;
+    (context: DmSdkTypes["dmGraphics::HContext"]): DmSdkTypes["VkRenderPass"];
   };
   /**
    * Get the native MTLCommandQueue from the Vulkan context. Only available when using Mac/iOS.
@@ -8132,7 +8132,7 @@ export interface DmSdkCalls {
      * @param constant The shader constant
      * @returns the type of the constant
      */
-    (constant: DmSdkTypes["dmRender::HConstant"]): number;
+    (constant: DmSdkTypes["dmRender::HConstant"]): DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"];
   };
   /**
    * Gets the shader program constant values
@@ -8172,7 +8172,7 @@ export interface DmSdkCalls {
      * @param material the material
      * @returns the vertex space
      */
-    (material: DmSdkTypes["dmRender::HMaterial"]): number;
+    (material: DmSdkTypes["dmRender::HMaterial"]): DmSdkTypes["dmRenderDDF::MaterialDesc::VertexSpace"];
   };
   /**
    * Gets a named constant from the buffer
@@ -8193,7 +8193,7 @@ export interface DmSdkCalls {
      * @param num_values (out) the number of values. May not be null.
      * @returns true if constant existed.
      */
-    (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: DmPointer<"uint32_t">, constant_type: DmPointer<"int">): boolean;
+    (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: DmPointer<"uint32_t">, constant_type: DmPointer<"dmRenderDDF::MaterialDesc::ConstantType">): boolean;
   };
   /**
    * Gets number of constants in the buffer
@@ -8328,7 +8328,7 @@ export interface DmSdkCalls {
      * @param constant The shader constant
      * @param type the type of the constant
      */
-    (constant: DmSdkTypes["dmRender::HConstant"], type: number): void;
+    (constant: DmSdkTypes["dmRender::HConstant"], type: DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"]): void;
   };
   /**
    * Sets the shader program constant values
@@ -8366,7 +8366,7 @@ export interface DmSdkCalls {
      * @param values the values
      * @param num_values the number of values
      */
-    (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, constant_type: number): void;
+    (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, constant_type: DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"]): void;
   };
   /**
    * Sets a named constant in the buffer at a specific index
@@ -8378,7 +8378,7 @@ export interface DmSdkCalls {
      * @param value_index the index of the value to set
      * @returns the result
      */
-    (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, value_index: number, constant_type: number): DmSdkTypes["dmRender::Result"];
+    (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, value_index: number, constant_type: DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"]): DmSdkTypes["dmRender::Result"];
   };
   /**
    * Sets a list of named constants to the buffer
@@ -8728,16 +8728,16 @@ export interface DmSdkCalls {
     (instance: DmSdkTypes["dmRig::HRigInstance"]): DmSdkTypes["dmRig::Result"];
   };
   readonly "dmRig::CopyBindPose": {
-    (skeleton: DmReference<number>, bind_pose: DmReference<DmNativeType<"dmArray<RigBone>">>): void;
+    (skeleton: DmReference<DmSdkTypes["dmRigDDF::Skeleton"]>, bind_pose: DmReference<DmNativeType<"dmArray<RigBone>">>): void;
   };
   readonly "dmRig::DeleteContext": {
     (context: DmSdkTypes["dmRig::HRigContext"]): void;
   };
   readonly "dmRig::GenerateVertexData": {
-    (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"int">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, vertex_data_out: DmPointer<"dmRig::RigModelVertex">): DmPointer<"dmRig::RigModelVertex">;
+    (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"dmRigDDF::Mesh">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, vertex_data_out: DmPointer<"dmRig::RigModelVertex">): DmPointer<"dmRig::RigModelVertex">;
   };
   readonly "dmRig::GenerateVertexDataFromAttributes": {
-    (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"int">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, normal_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, vertex_stride: number, vertex_data_out: DmPointer<"uint8_t">): DmPointer<"uint8_t">;
+    (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"dmRigDDF::Mesh">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, normal_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, vertex_stride: number, vertex_data_out: DmPointer<"uint8_t">): DmPointer<"uint8_t">;
   };
   readonly "dmRig::GetAnimation": {
     (instance: DmSdkTypes["dmRig::HRigInstance"]): DmSdkTypes["dmhash_t"];
@@ -8803,7 +8803,7 @@ export interface DmSdkCalls {
     (instance: DmSdkTypes["dmRig::HRigInstance"], event_callback: DmSdkTypes["dmRig::RigEventCallback"], user_data1: DmPointer<"void">, user_data2: DmPointer<"void">): void;
   };
   readonly "dmRig::SetMeshWriteAttributeParams": {
-    (params: DmPointer<"dmGraphics::WriteAttributeParams">, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, step_function: number, world_matrix: DmReadonlyPointer<"float">, normal_matrix: DmReadonlyPointer<"float">, positions_world_space: DmReadonlyPointer<"float">, positions_local_space: DmReadonlyPointer<"float">, normals: DmReadonlyPointer<"float">, tangents: DmReadonlyPointer<"float">, colors: DmReadonlyPointer<"float">, texture_transform_2d: DmReadonlyPointer<"float">, morph_target_weights: DmReadonlyPointer<"float">, morph_target_weights_vector_type: number, uv_channels: DmReadonlyPointer<"float">, uv_channels_count: number): void;
+    (params: DmPointer<"dmGraphics::WriteAttributeParams">, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, step_function: DmSdkTypes["dmGraphics::VertexStepFunction"], world_matrix: DmReadonlyPointer<"float">, normal_matrix: DmReadonlyPointer<"float">, positions_world_space: DmReadonlyPointer<"float">, positions_local_space: DmReadonlyPointer<"float">, normals: DmReadonlyPointer<"float">, tangents: DmReadonlyPointer<"float">, colors: DmReadonlyPointer<"float">, texture_transform_2d: DmReadonlyPointer<"float">, morph_target_weights: DmReadonlyPointer<"float">, morph_target_weights_vector_type: DmSdkTypes["dmGraphics::VertexAttribute::VectorType"], uv_channels: DmReadonlyPointer<"float">, uv_channels_count: number): void;
   };
   readonly "dmRig::SetModel": {
     (instance: DmSdkTypes["dmRig::HRigInstance"], model_id: DmSdkTypes["dmhash_t"]): DmSdkTypes["dmRig::Result"];
@@ -11894,7 +11894,7 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmGameObject::PropertyContainerDestroy@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:189:1096": (container: DmSdkTypes["dmGameObject::HPropertyContainer"]) => void;
   readonly "dmsdk:dmGameObject::PropertyContainerCopy@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:197:1097": (original: DmSdkTypes["dmGameObject::HPropertyContainer"]) => DmSdkTypes["dmGameObject::HPropertyContainer"];
   readonly "dmsdk:dmGameObject::PropertyContainerMerge@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:208:1098": (original: DmSdkTypes["dmGameObject::HPropertyContainer"], overrides: DmSdkTypes["dmGameObject::HPropertyContainer"]) => DmSdkTypes["dmGameObject::HPropertyContainer"];
-  readonly "dmsdk:dmGameObject::LuaScript::LuaScript@upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h:27:1100": (lua_module: DmPointer<"int">) => void;
+  readonly "dmsdk:dmGameObject::LuaScript::LuaScript@upstream/defold/engine/gameobject/src/dmsdk/gameobject/res_lua.h:27:1100": (lua_module: DmPointer<"dmLuaDDF::LuaModule">) => void;
   readonly "dmsdk:dmGameObject::PostScriptMessage@upstream/defold/engine/gameobject/src/dmsdk/gameobject/script.h:42:1102": (descriptor: DmReadonlyPointer<"dmDDF::Descriptor">, payload: DmReadonlyPointer<"uint8_t">, payload_size: number, sender: DmReadonlyPointer<"dmMessage::URL">, receiver: DmReadonlyPointer<"dmMessage::URL">, function_ref: number, unref_function_after_call: boolean) => DmSdkTypes["dmGameObject::Result"];
   readonly "dmsdk:dmGameObject::PostScriptUnrefMessage@upstream/defold/engine/gameobject/src/dmsdk/gameobject/script.h:53:1103": (sender: DmReadonlyPointer<"dmMessage::URL">, receiver: DmReadonlyPointer<"dmMessage::URL">, reference: number) => DmSdkTypes["dmGameObject::Result"];
   readonly "dmsdk:dmGameObject::PostDDF@upstream/defold/engine/gameobject/src/dmsdk/gameobject/script.h:67:1104": () => void;
@@ -11957,7 +11957,7 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmGameSystem::CollectionFactoryResource::operator=@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:28:1218": (other: DmReference<DmSdkTypes["dmGameSystem::CollectionFactoryResource"]>) => DmReference<DmSdkTypes["dmGameSystem::CollectionFactoryResource"]>;
   readonly "dmsdk:dmGameSystem::ResCollectionFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:39:1219": (factory: DmSdkTypes["dmResource::HFactory"], collectionc: DmReadonlyPointer<"char">, load_dynamically: boolean, dynamic_prototype: boolean, out_res: DmPointer<"dmGameSystem::CollectionFactoryResource">) => DmSdkTypes["dmResource::Result"];
   readonly "dmsdk:dmGameSystem::ResCollectionFactoryDestroyResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:41:1220": (factory: DmSdkTypes["dmResource::HFactory"], resource: DmPointer<"dmGameSystem::CollectionFactoryResource">) => void;
-  readonly "dmsdk:dmGameSystem::GetDDFData@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h:55:1233": (res: DmPointer<"dmGameSystem::DataResource">) => DmReadonlyPointer<"int">;
+  readonly "dmsdk:dmGameSystem::GetDDFData@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_data.h:55:1233": (res: DmPointer<"dmGameSystem::DataResource">) => DmReadonlyPointer<"dmGameSystemDDF::Data">;
   readonly "dmsdk:dmGameSystem::ResFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:36:1235": (factory: DmSdkTypes["dmResource::HFactory"], goc_path: DmReadonlyPointer<"char">, load_dynamically: boolean, dynamic_prototype: boolean, out_res: DmPointer<"dmGameSystem::FactoryResource">) => DmSdkTypes["dmResource::Result"];
   readonly "dmsdk:dmGameSystem::ResFactoryDestroyResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:38:1236": (factory: DmSdkTypes["dmResource::HFactory"], resource: DmPointer<"dmGameSystem::FactoryResource">) => void;
   readonly "dmsdk:dmGameSystem::ResFontGetHandle@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:86:1241": (font: DmPointer<"dmGameSystem::FontResource">) => DmSdkTypes["dmRender::HFontMap"];
@@ -11998,7 +11998,7 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmGraphics::TextureCreationParams::TextureCreationParams@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:796:1368": () => void;
   readonly "dmsdk:dmGraphics::TextureParams::TextureParams@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:851:1370": () => void;
   readonly "dmsdk:dmGraphics::NewVertexStreamDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:922:1372": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["dmGraphics::HVertexStreamDeclaration"];
-  readonly "dmsdk:dmGraphics::NewVertexStreamDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:932:1373": (context: DmSdkTypes["dmGraphics::HContext"], step_function: number) => DmSdkTypes["dmGraphics::HVertexStreamDeclaration"];
+  readonly "dmsdk:dmGraphics::NewVertexStreamDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:932:1373": (context: DmSdkTypes["dmGraphics::HContext"], step_function: DmSdkTypes["dmGraphics::VertexStepFunction"]) => DmSdkTypes["dmGraphics::HVertexStreamDeclaration"];
   readonly "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:942:1374": (stream_declaration: DmSdkTypes["dmGraphics::HVertexStreamDeclaration"], name: DmReadonlyPointer<"char">, size: number, type: DmSdkTypes["dmGraphics::Type"], normalize: boolean) => void;
   readonly "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:952:1375": (stream_declaration: DmSdkTypes["dmGraphics::HVertexStreamDeclaration"], name_hash: DmSdkTypes["dmhash_t"], size: number, type: DmSdkTypes["dmGraphics::Type"], normalize: boolean) => void;
   readonly "dmsdk:dmGraphics::DeleteVertexStreamDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:959:1376": (stream_declaration: DmSdkTypes["dmGraphics::HVertexStreamDeclaration"]) => void;
@@ -12097,7 +12097,7 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmGraphics::SetConstantV4@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1901:1471": (context: DmSdkTypes["dmGraphics::HContext"], data: DmReadonlyPointer<"dmVMath::Vector4">, count: number, base_location: DmSdkTypes["dmGraphics::HUniformLocation"]) => void;
   readonly "dmsdk:dmGraphics::SetConstantM4@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1914:1472": (context: DmSdkTypes["dmGraphics::HContext"], data: DmReadonlyPointer<"dmVMath::Matrix4">, count: number, base_location: DmSdkTypes["dmGraphics::HUniformLocation"]) => void;
   readonly "dmsdk:dmGraphics::SetSampler@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1926:1473": (context: DmSdkTypes["dmGraphics::HContext"], location: DmSdkTypes["dmGraphics::HUniformLocation"], unit: number) => void;
-  readonly "dmsdk:dmGraphics::NewProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1940:1474": (context: DmSdkTypes["dmGraphics::HContext"], ddf: DmPointer<"int">, error_buffer: DmPointer<"char">, error_buffer_size: number) => DmSdkTypes["dmGraphics::HProgram"];
+  readonly "dmsdk:dmGraphics::NewProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1940:1474": (context: DmSdkTypes["dmGraphics::HContext"], ddf: DmPointer<"dmGraphics::ShaderDesc">, error_buffer: DmPointer<"char">, error_buffer_size: number) => DmSdkTypes["dmGraphics::HProgram"];
   readonly "dmsdk:dmGraphics::DeleteProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1951:1475": (context: DmSdkTypes["dmGraphics::HContext"], program: DmSdkTypes["dmGraphics::HProgram"]) => void;
   readonly "dmsdk:dmGraphics::Clear@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1968:1476": (context: DmSdkTypes["dmGraphics::HContext"], flags: number, red: number, green: number, blue: number, alpha: number, depth: number, stencil: number) => void;
   readonly "dmsdk:dmGraphics::FindUniformLocation@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1981:1477": (program: DmSdkTypes["dmGraphics::HProgram"], name_hash: DmSdkTypes["dmhash_t"]) => DmSdkTypes["dmGraphics::HUniformLocation"];
@@ -12122,16 +12122,16 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmGraphics::VulkanGetActiveSwapChainTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:50:1506": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["dmGraphics::HTexture"];
   readonly "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1507": (context: DmSdkTypes["dmGraphics::HContext"], texture: DmReference<DmSdkTypes["dmGraphics::HTexture"]>) => DmPointer<"void">;
   readonly "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1508": (context: DmSdkTypes["dmGraphics::HContext"]) => DmPointer<"void">;
-  readonly "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509": (context: DmSdkTypes["dmGraphics::HContext"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510": (context: DmSdkTypes["dmGraphics::HContext"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511": (context: DmSdkTypes["dmGraphics::HContext"]) => number;
+  readonly "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["VkDevice"];
+  readonly "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["VkPhysicalDevice"];
+  readonly "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["VkInstance"];
   readonly "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1512": (context: DmSdkTypes["dmGraphics::HContext"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513": (context: DmSdkTypes["dmGraphics::HContext"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514": (context: DmSdkTypes["dmGraphics::HContext"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1515": (context: DmSdkTypes["dmGraphics::HContext"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516": (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517": (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]) => number;
-  readonly "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518": (vk_device: number, max_descriptors: number, vk_descriptor_pool_out: DmPointer<"int">) => boolean;
+  readonly "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["VkQueue"];
+  readonly "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["VkRenderPass"];
+  readonly "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1515": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["VkCommandBuffer"];
+  readonly "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516": (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]) => DmSdkTypes["VkImage"];
+  readonly "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517": (context: DmSdkTypes["dmGraphics::HContext"], texture: DmSdkTypes["dmGraphics::HTexture"]) => DmSdkTypes["VkImageView"];
+  readonly "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518": (vk_device: DmSdkTypes["VkDevice"], max_descriptors: number, vk_descriptor_pool_out: DmPointer<"VkDescriptorPool">) => boolean;
   readonly "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1527": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["WGPUInstance"];
   readonly "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1528": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["WGPUAdapter"];
   readonly "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1529": (context: DmSdkTypes["dmGraphics::HContext"]) => DmSdkTypes["WGPUDevice"];
@@ -12314,7 +12314,7 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1792": (window: DmSdkTypes["HWindow"]) => number;
   readonly "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1793": (window: DmSdkTypes["HWindow"], width: number, height: number) => void;
   readonly "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1794": (window: DmSdkTypes["HWindow"]) => void;
-  readonly "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1811": (material: DmSdkTypes["dmRender::HMaterial"]) => number;
+  readonly "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1811": (material: DmSdkTypes["dmRender::HMaterial"]) => DmSdkTypes["dmRenderDDF::MaterialDesc::VertexSpace"];
   readonly "dmsdk:dmRender::StencilTestParams::StencilTestParams@upstream/defold/engine/render/src/dmsdk/render/render.h:144:1813": () => void;
   readonly "dmsdk:dmRender::StencilTestParams::Init@upstream/defold/engine/render/src/dmsdk/render/render.h:145:1814": () => void;
   readonly "dmsdk:dmRender::RenderObject::RenderObject@upstream/defold/engine/render/src/dmsdk/render/render.h:203:1816": () => void;
@@ -12333,18 +12333,18 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1842": (constant: DmSdkTypes["dmRender::HConstant"], name: DmSdkTypes["dmhash_t"]) => void;
   readonly "dmsdk:dmRender::GetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:513:1843": (constant: DmSdkTypes["dmRender::HConstant"]) => DmSdkTypes["dmGraphics::HUniformLocation"];
   readonly "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1844": (constant: DmSdkTypes["dmRender::HConstant"], location: DmSdkTypes["dmGraphics::HUniformLocation"]) => void;
-  readonly "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1845": (constant: DmSdkTypes["dmRender::HConstant"]) => number;
-  readonly "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846": (constant: DmSdkTypes["dmRender::HConstant"], type: number) => void;
+  readonly "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1845": (constant: DmSdkTypes["dmRender::HConstant"]) => DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"];
+  readonly "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846": (constant: DmSdkTypes["dmRender::HConstant"], type: DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"]) => void;
   readonly "dmsdk:dmRender::NewNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:544:1847": () => DmSdkTypes["dmRender::HNamedConstantBuffer"];
   readonly "dmsdk:dmRender::DeleteNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:551:1848": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"]) => void;
   readonly "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1849": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"]) => void;
   readonly "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1850": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"]) => void;
   readonly "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1851": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number) => void;
-  readonly "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, constant_type: number) => void;
+  readonly "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, constant_type: DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"]) => void;
   readonly "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], constants: DmPointer<"dmRender::HConstant">, num_constants: number) => void;
-  readonly "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, value_index: number, constant_type: number) => DmSdkTypes["dmRender::Result"];
+  readonly "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: number, value_index: number, constant_type: DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"]) => DmSdkTypes["dmRender::Result"];
   readonly "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: DmPointer<"uint32_t">) => boolean;
-  readonly "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: DmPointer<"uint32_t">, constant_type: DmPointer<"int">) => boolean;
+  readonly "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: DmPointer<"uint32_t">, constant_type: DmPointer<"dmRenderDDF::MaterialDesc::ConstantType">) => boolean;
   readonly "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"]) => number;
   readonly "dmsdk:dmRender::IterateNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:660:1859": (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], callback: DmSdkTypes["dmRender::IterateNamedConstantsFn"], ctx: DmPointer<"void">) => void;
   readonly "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1860": (render_context: DmSdkTypes["dmRender::HRenderContext"]) => DmReference<DmSdkTypes["dmVMath::Matrix4"]>;
@@ -12459,9 +12459,9 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2049": (instance: DmSdkTypes["dmRig::HRigInstance"], animation_id: DmSdkTypes["dmhash_t"], playback: DmSdkTypes["dmRig::RigPlayback"], blend_duration: number, offset: number, playback_rate: number) => DmSdkTypes["dmRig::Result"];
   readonly "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2050": (instance: DmSdkTypes["dmRig::HRigInstance"]) => DmSdkTypes["dmRig::Result"];
   readonly "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2051": (instance: DmSdkTypes["dmRig::HRigInstance"]) => DmSdkTypes["dmhash_t"];
-  readonly "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2052": (params: DmPointer<"dmGraphics::WriteAttributeParams">, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, step_function: number, world_matrix: DmReadonlyPointer<"float">, normal_matrix: DmReadonlyPointer<"float">, positions_world_space: DmReadonlyPointer<"float">, positions_local_space: DmReadonlyPointer<"float">, normals: DmReadonlyPointer<"float">, tangents: DmReadonlyPointer<"float">, colors: DmReadonlyPointer<"float">, texture_transform_2d: DmReadonlyPointer<"float">, morph_target_weights: DmReadonlyPointer<"float">, morph_target_weights_vector_type: number, uv_channels: DmReadonlyPointer<"float">, uv_channels_count: number) => void;
-  readonly "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053": (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"int">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, normal_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, vertex_stride: number, vertex_data_out: DmPointer<"uint8_t">) => DmPointer<"uint8_t">;
-  readonly "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054": (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"int">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, vertex_data_out: DmPointer<"dmRig::RigModelVertex">) => DmPointer<"dmRig::RigModelVertex">;
+  readonly "dmsdk:dmRig::SetMeshWriteAttributeParams@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:178:2052": (params: DmPointer<"dmGraphics::WriteAttributeParams">, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, step_function: DmSdkTypes["dmGraphics::VertexStepFunction"], world_matrix: DmReadonlyPointer<"float">, normal_matrix: DmReadonlyPointer<"float">, positions_world_space: DmReadonlyPointer<"float">, positions_local_space: DmReadonlyPointer<"float">, normals: DmReadonlyPointer<"float">, tangents: DmReadonlyPointer<"float">, colors: DmReadonlyPointer<"float">, texture_transform_2d: DmReadonlyPointer<"float">, morph_target_weights: DmReadonlyPointer<"float">, morph_target_weights_vector_type: DmSdkTypes["dmGraphics::VertexAttribute::VectorType"], uv_channels: DmReadonlyPointer<"float">, uv_channels_count: number) => void;
+  readonly "dmsdk:dmRig::GenerateVertexDataFromAttributes@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:195:2053": (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"dmRigDDF::Mesh">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, normal_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, attribute_infos: DmReadonlyPointer<"dmGraphics::VertexAttributeInfos">, vertex_stride: number, vertex_data_out: DmPointer<"uint8_t">) => DmPointer<"uint8_t">;
+  readonly "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054": (context: DmSdkTypes["dmRig::HRigContext"], instance: DmSdkTypes["dmRig::HRigInstance"], mesh: DmPointer<"dmRigDDF::Mesh">, world_matrix: DmReference<DmSdkTypes["dmVMath::Matrix4"]>, vertex_data_out: DmPointer<"dmRig::RigModelVertex">) => DmPointer<"dmRig::RigModelVertex">;
   readonly "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2055": (instance: DmSdkTypes["dmRig::HRigInstance"]) => number;
   readonly "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2056": (instance: DmSdkTypes["dmRig::HRigInstance"], model_id: DmSdkTypes["dmhash_t"]) => DmSdkTypes["dmRig::Result"];
   readonly "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2057": (instance: DmSdkTypes["dmRig::HRigInstance"]) => DmSdkTypes["dmhash_t"];
@@ -12481,7 +12481,7 @@ export interface DmSdkDeclarationCalls {
   readonly "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2071": (instance: DmSdkTypes["dmRig::HRigInstance"], model_id: bigint, out_count: DmPointer<"uint32_t">) => DmReadonlyPointer<"float">;
   readonly "dmsdk:dmRig::SetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:219:2072": (instance: DmSdkTypes["dmRig::HRigInstance"], model_id: bigint, weights: DmReadonlyPointer<"float">, count: number) => void;
   readonly "dmsdk:dmRig::SetEventCallback@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:220:2073": (instance: DmSdkTypes["dmRig::HRigInstance"], event_callback: DmSdkTypes["dmRig::RigEventCallback"], user_data1: DmPointer<"void">, user_data2: DmPointer<"void">) => void;
-  readonly "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074": (skeleton: DmReference<number>, bind_pose: DmReference<DmNativeType<"dmArray<RigBone>">>) => void;
+  readonly "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074": (skeleton: DmReference<DmSdkTypes["dmRigDDF::Skeleton"]>, bind_pose: DmReference<DmNativeType<"dmArray<RigBone>">>) => void;
   readonly "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2078": (L: DmPointer<"lua_State">, diff: number, filename: DmReadonlyPointer<"char">, linenumber: number) => void;
   readonly "dmsdk:dmScript::LuaStackCheck::~LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:75:2079": () => void;
   readonly "dmsdk:dmScript::LuaStackCheck::Verify@upstream/defold/engine/script/src/dmsdk/script/script.h:76:2080": (diff: number) => void;
@@ -12898,6 +12898,22 @@ export const DmBufferValueType = {
 export type DmBufferValueType = (typeof DmBufferValueType)[keyof typeof DmBufferValueType];
 
 /**
+ * Native enum dmBufferDDF::ValueType.
+ */
+export const DmBufferDDFValueType = {
+  VALUE_TYPE_UINT8: 0,
+  VALUE_TYPE_UINT16: 1,
+  VALUE_TYPE_UINT32: 2,
+  VALUE_TYPE_UINT64: 3,
+  VALUE_TYPE_INT8: 4,
+  VALUE_TYPE_INT16: 5,
+  VALUE_TYPE_INT32: 6,
+  VALUE_TYPE_INT64: 7,
+  VALUE_TYPE_FLOAT32: 8,
+} as const;
+export type DmBufferDDFValueType = (typeof DmBufferDDFValueType)[keyof typeof DmBufferDDFValueType];
+
+/**
  * Result enumeration.
  */
 export const DmConnectionPoolResult = {
@@ -13164,6 +13180,76 @@ export const DmGameSystemRigModelVertexFormat = {
 export type DmGameSystemRigModelVertexFormat = (typeof DmGameSystemRigModelVertexFormat)[keyof typeof DmGameSystemRigModelVertexFormat];
 
 /**
+ * Native enum dmGameSystemDDF::LabelDesc::BlendMode.
+ */
+export const DmGameSystemDDFLabelDescBlendMode = {
+  BLEND_MODE_ALPHA: 0,
+  BLEND_MODE_ADD: 1,
+  BLEND_MODE_MULT: 3,
+  BLEND_MODE_SCREEN: 4,
+} as const;
+export type DmGameSystemDDFLabelDescBlendMode = (typeof DmGameSystemDDFLabelDescBlendMode)[keyof typeof DmGameSystemDDFLabelDescBlendMode];
+
+/**
+ * Native enum dmGameSystemDDF::LabelDesc::Pivot.
+ */
+export const DmGameSystemDDFLabelDescPivot = {
+  PIVOT_CENTER: 0,
+  PIVOT_N: 1,
+  PIVOT_NE: 2,
+  PIVOT_E: 3,
+  PIVOT_SE: 4,
+  PIVOT_S: 5,
+  PIVOT_SW: 6,
+  PIVOT_W: 7,
+  PIVOT_NW: 8,
+} as const;
+export type DmGameSystemDDFLabelDescPivot = (typeof DmGameSystemDDFLabelDescPivot)[keyof typeof DmGameSystemDDFLabelDescPivot];
+
+/**
+ * Native enum dmGameSystemDDF::SpriteDesc::BlendMode.
+ */
+export const DmGameSystemDDFSpriteDescBlendMode = {
+  BLEND_MODE_ALPHA: 0,
+  BLEND_MODE_ADD: 1,
+  BLEND_MODE_ADD_ALPHA: 2,
+  BLEND_MODE_MULT: 3,
+  BLEND_MODE_SCREEN: 4,
+} as const;
+export type DmGameSystemDDFSpriteDescBlendMode = (typeof DmGameSystemDDFSpriteDescBlendMode)[keyof typeof DmGameSystemDDFSpriteDescBlendMode];
+
+/**
+ * Native enum dmGameSystemDDF::SpriteDesc::SizeMode.
+ */
+export const DmGameSystemDDFSpriteDescSizeMode = {
+  SIZE_MODE_MANUAL: 0,
+  SIZE_MODE_AUTO: 1,
+} as const;
+export type DmGameSystemDDFSpriteDescSizeMode = (typeof DmGameSystemDDFSpriteDescSizeMode)[keyof typeof DmGameSystemDDFSpriteDescSizeMode];
+
+/**
+ * Native enum dmGameSystemDDF::TileGrid::BlendMode.
+ */
+export const DmGameSystemDDFTileGridBlendMode = {
+  BLEND_MODE_ALPHA: 0,
+  BLEND_MODE_ADD: 1,
+  BLEND_MODE_ADD_ALPHA: 2,
+  BLEND_MODE_MULT: 3,
+  BLEND_MODE_SCREEN: 4,
+} as const;
+export type DmGameSystemDDFTileGridBlendMode = (typeof DmGameSystemDDFTileGridBlendMode)[keyof typeof DmGameSystemDDFTileGridBlendMode];
+
+/**
+ * Native enum dmGamesysDDF::OrthoZoomMode.
+ */
+export const DmGamesysDDFOrthoZoomMode = {
+  ORTHO_MODE_FIXED: 0,
+  ORTHO_MODE_AUTO_FIT: 1,
+  ORTHO_MODE_AUTO_COVER: 2,
+} as const;
+export type DmGamesysDDFOrthoZoomMode = (typeof DmGamesysDDFOrthoZoomMode)[keyof typeof DmGamesysDDFOrthoZoomMode];
+
+/**
  * Graphics adapter family.
  * Identifies the type of graphics backend used by the rendering system
  */
@@ -13278,6 +13364,16 @@ export const DmGraphicsCompareFunc = {
   COMPARE_FUNC_ALWAYS: 7,
 } as const;
 export type DmGraphicsCompareFunc = (typeof DmGraphicsCompareFunc)[keyof typeof DmGraphicsCompareFunc];
+
+/**
+ * Native enum dmGraphics::CoordinateSpace.
+ */
+export const DmGraphicsCoordinateSpace = {
+  COORDINATE_SPACE_DEFAULT: 0,
+  COORDINATE_SPACE_WORLD: 1,
+  COORDINATE_SPACE_LOCAL: 2,
+} as const;
+export type DmGraphicsCoordinateSpace = (typeof DmGraphicsCoordinateSpace)[keyof typeof DmGraphicsCoordinateSpace];
 
 /**
  * Native enum dmGraphics::FaceType.
@@ -13442,6 +13538,53 @@ export const DmGraphicsTextureFormat = {
 export type DmGraphicsTextureFormat = (typeof DmGraphicsTextureFormat)[keyof typeof DmGraphicsTextureFormat];
 
 /**
+ * Native enum dmGraphics::TextureImage::TextureFormat.
+ */
+export const DmGraphicsTextureImageTextureFormat = {
+  TEXTURE_FORMAT_LUMINANCE: 0,
+  TEXTURE_FORMAT_RGB: 1,
+  TEXTURE_FORMAT_RGBA: 2,
+  TEXTURE_FORMAT_RGB_PVRTC_2BPPV1: 3,
+  TEXTURE_FORMAT_RGB_PVRTC_4BPPV1: 4,
+  TEXTURE_FORMAT_RGBA_PVRTC_2BPPV1: 5,
+  TEXTURE_FORMAT_RGBA_PVRTC_4BPPV1: 6,
+  TEXTURE_FORMAT_RGB_ETC1: 7,
+  TEXTURE_FORMAT_RGB_16BPP: 8,
+  TEXTURE_FORMAT_RGBA_16BPP: 9,
+  TEXTURE_FORMAT_LUMINANCE_ALPHA: 10,
+  TEXTURE_FORMAT_RGBA_ETC2: 11,
+  TEXTURE_FORMAT_RGBA_ASTC_4X4: 12,
+  TEXTURE_FORMAT_RGBA_ASTC_4x4: 12,
+  TEXTURE_FORMAT_RGB_BC1: 13,
+  TEXTURE_FORMAT_RGBA_BC3: 14,
+  TEXTURE_FORMAT_R_BC4: 15,
+  TEXTURE_FORMAT_RG_BC5: 16,
+  TEXTURE_FORMAT_RGBA_BC7: 17,
+  TEXTURE_FORMAT_RGB16F: 18,
+  TEXTURE_FORMAT_RGB32F: 19,
+  TEXTURE_FORMAT_RGBA16F: 20,
+  TEXTURE_FORMAT_RGBA32F: 21,
+  TEXTURE_FORMAT_R16F: 22,
+  TEXTURE_FORMAT_RG16F: 23,
+  TEXTURE_FORMAT_R32F: 24,
+  TEXTURE_FORMAT_RG32F: 25,
+  TEXTURE_FORMAT_RGBA_ASTC_5X4: 26,
+  TEXTURE_FORMAT_RGBA_ASTC_5X5: 27,
+  TEXTURE_FORMAT_RGBA_ASTC_6X5: 28,
+  TEXTURE_FORMAT_RGBA_ASTC_6X6: 29,
+  TEXTURE_FORMAT_RGBA_ASTC_8X5: 30,
+  TEXTURE_FORMAT_RGBA_ASTC_8X6: 31,
+  TEXTURE_FORMAT_RGBA_ASTC_8X8: 32,
+  TEXTURE_FORMAT_RGBA_ASTC_10X5: 33,
+  TEXTURE_FORMAT_RGBA_ASTC_10X6: 34,
+  TEXTURE_FORMAT_RGBA_ASTC_10X8: 35,
+  TEXTURE_FORMAT_RGBA_ASTC_10X10: 36,
+  TEXTURE_FORMAT_RGBA_ASTC_12X10: 37,
+  TEXTURE_FORMAT_RGBA_ASTC_12X12: 38,
+} as const;
+export type DmGraphicsTextureImageTextureFormat = (typeof DmGraphicsTextureImageTextureFormat)[keyof typeof DmGraphicsTextureImageTextureFormat];
+
+/**
  * Texture data upload status flags
  */
 export const DmGraphicsTextureStatusFlags = {
@@ -13514,6 +13657,63 @@ export const DmGraphicsType = {
   TYPE_TEXTURE_3D_ARRAY: 25,
 } as const;
 export type DmGraphicsType = (typeof DmGraphicsType)[keyof typeof DmGraphicsType];
+
+/**
+ * Native enum dmGraphics::VertexAttribute::DataType.
+ */
+export const DmGraphicsVertexAttributeDataType = {
+  TYPE_BYTE: 1,
+  TYPE_UNSIGNED_BYTE: 2,
+  TYPE_SHORT: 3,
+  TYPE_UNSIGNED_SHORT: 4,
+  TYPE_INT: 5,
+  TYPE_UNSIGNED_INT: 6,
+  TYPE_FLOAT: 7,
+} as const;
+export type DmGraphicsVertexAttributeDataType = (typeof DmGraphicsVertexAttributeDataType)[keyof typeof DmGraphicsVertexAttributeDataType];
+
+/**
+ * Native enum dmGraphics::VertexAttribute::SemanticType.
+ */
+export const DmGraphicsVertexAttributeSemanticType = {
+  SEMANTIC_TYPE_NONE: 1,
+  SEMANTIC_TYPE_POSITION: 2,
+  SEMANTIC_TYPE_TEXCOORD: 3,
+  SEMANTIC_TYPE_PAGE_INDEX: 4,
+  SEMANTIC_TYPE_COLOR: 5,
+  SEMANTIC_TYPE_NORMAL: 6,
+  SEMANTIC_TYPE_TANGENT: 7,
+  SEMANTIC_TYPE_WORLD_MATRIX: 8,
+  SEMANTIC_TYPE_NORMAL_MATRIX: 9,
+  SEMANTIC_TYPE_BONE_WEIGHTS: 10,
+  SEMANTIC_TYPE_BONE_INDICES: 11,
+  SEMANTIC_TYPE_TEXTURE_TRANSFORM_2D: 12,
+  SEMANTIC_TYPE_MORPH_TARGET_WEIGHTS: 13,
+} as const;
+export type DmGraphicsVertexAttributeSemanticType = (typeof DmGraphicsVertexAttributeSemanticType)[keyof typeof DmGraphicsVertexAttributeSemanticType];
+
+/**
+ * Native enum dmGraphics::VertexAttribute::VectorType.
+ */
+export const DmGraphicsVertexAttributeVectorType = {
+  VECTOR_TYPE_SCALAR: 1,
+  VECTOR_TYPE_VEC2: 2,
+  VECTOR_TYPE_VEC3: 3,
+  VECTOR_TYPE_VEC4: 4,
+  VECTOR_TYPE_MAT2: 5,
+  VECTOR_TYPE_MAT3: 6,
+  VECTOR_TYPE_MAT4: 7,
+} as const;
+export type DmGraphicsVertexAttributeVectorType = (typeof DmGraphicsVertexAttributeVectorType)[keyof typeof DmGraphicsVertexAttributeVectorType];
+
+/**
+ * Native enum dmGraphics::VertexStepFunction.
+ */
+export const DmGraphicsVertexStepFunction = {
+  VERTEX_STEP_FUNCTION_VERTEX: 0,
+  VERTEX_STEP_FUNCTION_INSTANCE: 1,
+} as const;
+export type DmGraphicsVertexStepFunction = (typeof DmGraphicsVertexStepFunction)[keyof typeof DmGraphicsVertexStepFunction];
 
 /**
  * Native enum dmGui::AdjustMode.
@@ -13624,6 +13824,115 @@ export const DmGuiResult = {
   RESULT_WRONG_TYPE: -10,
 } as const;
 export type DmGuiResult = (typeof DmGuiResult)[keyof typeof DmGuiResult];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::AdjustMode.
+ */
+export const DmGuiDDFNodeDescAdjustMode = {
+  ADJUST_MODE_FIT: 0,
+  ADJUST_MODE_ZOOM: 1,
+  ADJUST_MODE_STRETCH: 2,
+} as const;
+export type DmGuiDDFNodeDescAdjustMode = (typeof DmGuiDDFNodeDescAdjustMode)[keyof typeof DmGuiDDFNodeDescAdjustMode];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::BlendMode.
+ */
+export const DmGuiDDFNodeDescBlendMode = {
+  BLEND_MODE_ALPHA: 0,
+  BLEND_MODE_ADD: 1,
+  BLEND_MODE_ADD_ALPHA: 2,
+  BLEND_MODE_MULT: 3,
+  BLEND_MODE_SCREEN: 4,
+} as const;
+export type DmGuiDDFNodeDescBlendMode = (typeof DmGuiDDFNodeDescBlendMode)[keyof typeof DmGuiDDFNodeDescBlendMode];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::ClippingMode.
+ */
+export const DmGuiDDFNodeDescClippingMode = {
+  CLIPPING_MODE_NONE: 0,
+  CLIPPING_MODE_STENCIL: 2,
+} as const;
+export type DmGuiDDFNodeDescClippingMode = (typeof DmGuiDDFNodeDescClippingMode)[keyof typeof DmGuiDDFNodeDescClippingMode];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::PieBounds.
+ */
+export const DmGuiDDFNodeDescPieBounds = {
+  PIEBOUNDS_RECTANGLE: 0,
+  PIEBOUNDS_ELLIPSE: 1,
+} as const;
+export type DmGuiDDFNodeDescPieBounds = (typeof DmGuiDDFNodeDescPieBounds)[keyof typeof DmGuiDDFNodeDescPieBounds];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::Pivot.
+ */
+export const DmGuiDDFNodeDescPivot = {
+  PIVOT_CENTER: 0,
+  PIVOT_N: 1,
+  PIVOT_NE: 2,
+  PIVOT_E: 3,
+  PIVOT_SE: 4,
+  PIVOT_S: 5,
+  PIVOT_SW: 6,
+  PIVOT_W: 7,
+  PIVOT_NW: 8,
+} as const;
+export type DmGuiDDFNodeDescPivot = (typeof DmGuiDDFNodeDescPivot)[keyof typeof DmGuiDDFNodeDescPivot];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::SizeMode.
+ */
+export const DmGuiDDFNodeDescSizeMode = {
+  SIZE_MODE_MANUAL: 0,
+  SIZE_MODE_AUTO: 1,
+} as const;
+export type DmGuiDDFNodeDescSizeMode = (typeof DmGuiDDFNodeDescSizeMode)[keyof typeof DmGuiDDFNodeDescSizeMode];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::Type.
+ */
+export const DmGuiDDFNodeDescType = {
+  TYPE_BOX: 0,
+  TYPE_TEXT: 1,
+  TYPE_PIE: 2,
+  TYPE_TEMPLATE: 3,
+  TYPE_SPINE: 4,
+  TYPE_PARTICLEFX: 5,
+  TYPE_CUSTOM: 6,
+} as const;
+export type DmGuiDDFNodeDescType = (typeof DmGuiDDFNodeDescType)[keyof typeof DmGuiDDFNodeDescType];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::XAnchor.
+ */
+export const DmGuiDDFNodeDescXAnchor = {
+  XANCHOR_NONE: 0,
+  XANCHOR_LEFT: 1,
+  XANCHOR_RIGHT: 2,
+} as const;
+export type DmGuiDDFNodeDescXAnchor = (typeof DmGuiDDFNodeDescXAnchor)[keyof typeof DmGuiDDFNodeDescXAnchor];
+
+/**
+ * Native enum dmGuiDDF::NodeDesc::YAnchor.
+ */
+export const DmGuiDDFNodeDescYAnchor = {
+  YANCHOR_NONE: 0,
+  YANCHOR_TOP: 1,
+  YANCHOR_BOTTOM: 2,
+} as const;
+export type DmGuiDDFNodeDescYAnchor = (typeof DmGuiDDFNodeDescYAnchor)[keyof typeof DmGuiDDFNodeDescYAnchor];
+
+/**
+ * Native enum dmGuiDDF::SceneDesc::AdjustReference.
+ */
+export const DmGuiDDFSceneDescAdjustReference = {
+  ADJUST_REFERENCE_LEGACY: 0,
+  ADJUST_REFERENCE_PARENT: 1,
+  ADJUST_REFERENCE_DISABLED: 2,
+} as const;
+export type DmGuiDDFSceneDescAdjustReference = (typeof DmGuiDDFSceneDescAdjustReference)[keyof typeof DmGuiDDFSceneDescAdjustReference];
 
 /**
  * keyboard key enumeration
@@ -13849,6 +14158,16 @@ export const DmMemoryResult = {
 export type DmMemoryResult = (typeof DmMemoryResult)[keyof typeof DmMemoryResult];
 
 /**
+ * Native enum dmMeshDDF::MeshDesc::PrimitiveType.
+ */
+export const DmMeshDDFMeshDescPrimitiveType = {
+  PRIMITIVE_LINES: 1,
+  PRIMITIVE_TRIANGLES: 4,
+  PRIMITIVE_TRIANGLE_STRIP: 5,
+} as const;
+export type DmMeshDDFMeshDescPrimitiveType = (typeof DmMeshDDFMeshDescPrimitiveType)[keyof typeof DmMeshDDFMeshDescPrimitiveType];
+
+/**
  * Result enum
  */
 export const DmMessageResult = {
@@ -13861,6 +14180,29 @@ export const DmMessageResult = {
   RESULT_NAME_OK_SOCKET_NOT_FOUND: -6,
 } as const;
 export type DmMessageResult = (typeof DmMessageResult)[keyof typeof DmMessageResult];
+
+/**
+ * Native enum dmPhysicsDDF::CollisionObjectType.
+ */
+export const DmPhysicsDDFCollisionObjectType = {
+  COLLISION_OBJECT_TYPE_DYNAMIC: 0,
+  COLLISION_OBJECT_TYPE_KINEMATIC: 1,
+  COLLISION_OBJECT_TYPE_STATIC: 2,
+  COLLISION_OBJECT_TYPE_TRIGGER: 3,
+} as const;
+export type DmPhysicsDDFCollisionObjectType = (typeof DmPhysicsDDFCollisionObjectType)[keyof typeof DmPhysicsDDFCollisionObjectType];
+
+/**
+ * Native enum dmPhysicsDDF::CollisionShape::Type.
+ */
+export const DmPhysicsDDFCollisionShapeType = {
+  TYPE_SPHERE: 0,
+  TYPE_BOX: 1,
+  TYPE_CAPSULE: 2,
+  TYPE_HULL: 3,
+  TYPE_MESH: 4,
+} as const;
+export type DmPhysicsDDFCollisionShapeType = (typeof DmPhysicsDDFCollisionShapeType)[keyof typeof DmPhysicsDDFCollisionShapeType];
 
 /**
  * Frustum planes to use in a frustum
@@ -13912,6 +14254,92 @@ export const DmRenderVisibility = {
   VISIBILITY_FULL: 1,
 } as const;
 export type DmRenderVisibility = (typeof DmRenderVisibility)[keyof typeof DmRenderVisibility];
+
+/**
+ * Native enum dmRenderDDF::FontRenderMode.
+ */
+export const DmRenderDDFFontRenderMode = {
+  MODE_SINGLE_LAYER: 0,
+  MODE_MULTI_LAYER: 1,
+} as const;
+export type DmRenderDDFFontRenderMode = (typeof DmRenderDDFFontRenderMode)[keyof typeof DmRenderDDFFontRenderMode];
+
+/**
+ * Native enum dmRenderDDF::FontTextureFormat.
+ */
+export const DmRenderDDFFontTextureFormat = {
+  TYPE_BITMAP: 0,
+  TYPE_DISTANCE_FIELD: 1,
+} as const;
+export type DmRenderDDFFontTextureFormat = (typeof DmRenderDDFFontTextureFormat)[keyof typeof DmRenderDDFFontTextureFormat];
+
+/**
+ * Native enum dmRenderDDF::MaterialDesc::ConstantType.
+ */
+export const DmRenderDDFMaterialDescConstantType = {
+  CONSTANT_TYPE_USER: 0,
+  CONSTANT_TYPE_VIEWPROJ: 1,
+  CONSTANT_TYPE_WORLD: 2,
+  CONSTANT_TYPE_TEXTURE: 3,
+  CONSTANT_TYPE_VIEW: 4,
+  CONSTANT_TYPE_PROJECTION: 5,
+  CONSTANT_TYPE_NORMAL: 6,
+  CONSTANT_TYPE_WORLDVIEW: 7,
+  CONSTANT_TYPE_WORLDVIEWPROJ: 8,
+  CONSTANT_TYPE_USER_MATRIX4: 9,
+  CONSTANT_TYPE_TIME: 10,
+  CONSTANT_TYPE_WORLD_INVERSE: 11,
+  CONSTANT_TYPE_VIEW_INVERSE: 12,
+  CONSTANT_TYPE_PROJECTION_INVERSE: 13,
+  CONSTANT_TYPE_VIEWPROJ_INVERSE: 14,
+  CONSTANT_TYPE_WORLDVIEW_INVERSE: 15,
+  CONSTANT_TYPE_WORLDVIEWPROJ_INVERSE: 16,
+  CONSTANT_TYPE_USER_COLOR: 17,
+} as const;
+export type DmRenderDDFMaterialDescConstantType = (typeof DmRenderDDFMaterialDescConstantType)[keyof typeof DmRenderDDFMaterialDescConstantType];
+
+/**
+ * Native enum dmRenderDDF::MaterialDesc::FilterModeMag.
+ */
+export const DmRenderDDFMaterialDescFilterModeMag = {
+  FILTER_MODE_MAG_NEAREST: 0,
+  FILTER_MODE_MAG_LINEAR: 1,
+  FILTER_MODE_MAG_DEFAULT: 2,
+} as const;
+export type DmRenderDDFMaterialDescFilterModeMag = (typeof DmRenderDDFMaterialDescFilterModeMag)[keyof typeof DmRenderDDFMaterialDescFilterModeMag];
+
+/**
+ * Native enum dmRenderDDF::MaterialDesc::FilterModeMin.
+ */
+export const DmRenderDDFMaterialDescFilterModeMin = {
+  FILTER_MODE_MIN_NEAREST: 0,
+  FILTER_MODE_MIN_LINEAR: 1,
+  FILTER_MODE_MIN_NEAREST_MIPMAP_NEAREST: 2,
+  FILTER_MODE_MIN_NEAREST_MIPMAP_LINEAR: 3,
+  FILTER_MODE_MIN_LINEAR_MIPMAP_NEAREST: 4,
+  FILTER_MODE_MIN_LINEAR_MIPMAP_LINEAR: 5,
+  FILTER_MODE_MIN_DEFAULT: 6,
+} as const;
+export type DmRenderDDFMaterialDescFilterModeMin = (typeof DmRenderDDFMaterialDescFilterModeMin)[keyof typeof DmRenderDDFMaterialDescFilterModeMin];
+
+/**
+ * Native enum dmRenderDDF::MaterialDesc::VertexSpace.
+ */
+export const DmRenderDDFMaterialDescVertexSpace = {
+  VERTEX_SPACE_WORLD: 0,
+  VERTEX_SPACE_LOCAL: 1,
+} as const;
+export type DmRenderDDFMaterialDescVertexSpace = (typeof DmRenderDDFMaterialDescVertexSpace)[keyof typeof DmRenderDDFMaterialDescVertexSpace];
+
+/**
+ * Native enum dmRenderDDF::MaterialDesc::WrapMode.
+ */
+export const DmRenderDDFMaterialDescWrapMode = {
+  WRAP_MODE_REPEAT: 0,
+  WRAP_MODE_MIRRORED_REPEAT: 1,
+  WRAP_MODE_CLAMP_TO_EDGE: 2,
+} as const;
+export type DmRenderDDFMaterialDescWrapMode = (typeof DmRenderDDFMaterialDescWrapMode)[keyof typeof DmRenderDDFMaterialDescWrapMode];
 
 /**
  * ResourceResult
@@ -13978,6 +14406,31 @@ export const DmRigRigPlayback = {
   PLAYBACK_COUNT: 7,
 } as const;
 export type DmRigRigPlayback = (typeof DmRigRigPlayback)[keyof typeof DmRigRigPlayback];
+
+/**
+ * Native enum dmRigDDF::IndexBufferFormat.
+ */
+export const DmRigDDFIndexBufferFormat = {
+  INDEXBUFFER_FORMAT_16: 0,
+  INDEXBUFFER_FORMAT_32: 1,
+} as const;
+export type DmRigDDFIndexBufferFormat = (typeof DmRigDDFIndexBufferFormat)[keyof typeof DmRigDDFIndexBufferFormat];
+
+/**
+ * Native enum dmRigDDF::PrimitiveType.
+ */
+export const DmRigDDFPrimitiveType = {
+  PRIMITIVE_TYPE_INVALID: 0,
+  PRIMITIVE_TYPE_POINTS: 1,
+  PRIMITIVE_TYPE_LINES: 2,
+  PRIMITIVE_TYPE_LINE_LOOP: 3,
+  PRIMITIVE_TYPE_LINE_STRIP: 4,
+  PRIMITIVE_TYPE_TRIANGLES: 5,
+  PRIMITIVE_TYPE_TRIANGLE_STRIP: 6,
+  PRIMITIVE_TYPE_TRIANGLE_FAN: 7,
+  PRIMITIVE_TYPE_MAX_ENUM: 8,
+} as const;
+export type DmRigDDFPrimitiveType = (typeof DmRigDDFPrimitiveType)[keyof typeof DmRigDDFPrimitiveType];
 
 /**
  * Result enumeration.
@@ -14352,6 +14805,26 @@ export interface DmSdkTypes {
   readonly TextLine: Readonly<{ m_Width: number; m_Baseline: number; m_Index: number; m_Length: number; m_ParagraphIndex: number }>;
   readonly TextParagraph: Readonly<{ m_TextIndex: number; m_TextLength: number; m_LineIndex: number; m_LineCount: number; m_Direction: DmSdkTypes["TextDirection"] }>;
   readonly TextResult: TextResult;
+  readonly "Vectormath::Aos::Matrix3": DmNativeType<"Vectormath::Aos::Matrix3">;
+  readonly "Vectormath::Aos::Matrix4": DmNativeType<"Vectormath::Aos::Matrix4">;
+  readonly "Vectormath::Aos::Point3": DmNativeType<"Vectormath::Aos::Point3">;
+  readonly "Vectormath::Aos::Quat": DmNativeType<"Vectormath::Aos::Quat">;
+  readonly "Vectormath::Aos::Vector3": DmNativeType<"Vectormath::Aos::Vector3">;
+  readonly "Vectormath::Aos::Vector4": DmNativeType<"Vectormath::Aos::Vector4">;
+  readonly VkCommandBuffer: DmPointer<"VkCommandBuffer_T">;
+  readonly VkCommandBuffer_T: DmNativeType<"VkCommandBuffer_T">;
+  readonly VkDescriptorPool: bigint;
+  readonly VkDevice: DmPointer<"VkDevice_T">;
+  readonly VkDevice_T: DmNativeType<"VkDevice_T">;
+  readonly VkImage: bigint;
+  readonly VkImageView: bigint;
+  readonly VkInstance: DmPointer<"VkInstance_T">;
+  readonly VkInstance_T: DmNativeType<"VkInstance_T">;
+  readonly VkPhysicalDevice: DmPointer<"VkPhysicalDevice_T">;
+  readonly VkPhysicalDevice_T: DmNativeType<"VkPhysicalDevice_T">;
+  readonly VkQueue: DmPointer<"VkQueue_T">;
+  readonly VkQueue_T: DmNativeType<"VkQueue_T">;
+  readonly VkRenderPass: bigint;
   readonly WGPUAdapter: number;
   readonly WGPUCommandEncoder: number;
   readonly WGPUDevice: number;
@@ -14372,6 +14845,9 @@ export interface DmSdkTypes {
   readonly "dmBuffer::Result": DmBufferResult;
   readonly "dmBuffer::StreamDeclaration": Readonly<{ m_Name: DmSdkTypes["dmhash_t"]; m_Type: DmSdkTypes["dmBuffer::ValueType"]; m_Count: number; m_Flags: number; m_Reserved: number }>;
   readonly "dmBuffer::ValueType": DmBufferValueType;
+  readonly "dmBufferDDF::BufferDesc": Readonly<{ m_Streams: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/buffer_ddf.h:98:9)"> }>;
+  readonly "dmBufferDDF::ValueType": DmBufferDDFValueType;
+  readonly "dmCollectionProxyDDF::CollectionProxyDesc": Readonly<{ m_Collection: DmReadonlyPointer<"char">; m_Exclude: boolean }>;
   readonly "dmConditionVariable::ConditionVariable": DmNativeType<"dmConditionVariable::ConditionVariable">;
   readonly "dmConditionVariable::HConditionVariable": DmPointer<"dmConditionVariable::ConditionVariable">;
   readonly "dmConfigFile::HConfig": DmSdkTypes["HConfigFile"];
@@ -14468,7 +14944,7 @@ export interface DmSdkTypes {
   readonly "dmGameObject::Instance": DmNativeType<"dmGameObject::Instance">;
   readonly "dmGameObject::InstanceIdMap": DmNativeType<"dmHashTable<dmhash_t, dmhash_t>">;
   readonly "dmGameObject::InstancePropertyContainers": DmNativeType<"dmHashTable<dmhash_t, HPropertyContainer>">;
-  readonly "dmGameObject::LuaScript": Readonly<{ m_LuaModule: DmPointer<"int"> }>;
+  readonly "dmGameObject::LuaScript": Readonly<{ m_LuaModule: DmPointer<"dmLuaDDF::LuaModule"> }>;
   readonly "dmGameObject::Playback": DmGameObjectPlayback;
   readonly "dmGameObject::Properties": DmNativeType<"dmGameObject::Properties">;
   readonly "dmGameObject::PropertyContainer": DmNativeType<"dmGameObject::PropertyContainer">;
@@ -14494,16 +14970,16 @@ export interface DmSdkTypes {
   readonly "dmGameObject::ScriptInstance": DmNativeType<"dmGameObject::ScriptInstance">;
   readonly "dmGameObject::UpdateContext": Readonly<{ m_TimeScale: number; m_DT: number; m_AccumFrameTime: number; m_FixedUpdateFrequency: number }>;
   readonly "dmGameObject::UpdateResult": DmGameObjectUpdateResult;
-  readonly "dmGameSystem::AnimationSetResource": Readonly<{ m_AnimationSet: DmPointer<"int"> }>;
-  readonly "dmGameSystem::BufferResource": Readonly<{ m_BufferDDF: DmPointer<"int">; m_Buffer: DmSdkTypes["dmBuffer::HBuffer"]; m_NameHash: DmSdkTypes["dmhash_t"]; m_ElementCount: number; m_Stride: number; m_Version: number }>;
-  readonly "dmGameSystem::CameraResource": Readonly<{ m_DDF: DmPointer<"int"> }>;
+  readonly "dmGameSystem::AnimationSetResource": Readonly<{ m_AnimationSet: DmPointer<"dmRigDDF::AnimationSet"> }>;
+  readonly "dmGameSystem::BufferResource": Readonly<{ m_BufferDDF: DmPointer<"dmBufferDDF::BufferDesc">; m_Buffer: DmSdkTypes["dmBuffer::HBuffer"]; m_NameHash: DmSdkTypes["dmhash_t"]; m_ElementCount: number; m_Stride: number; m_Version: number }>;
+  readonly "dmGameSystem::CameraResource": Readonly<{ m_DDF: DmPointer<"dmGamesysDDF::CameraDesc"> }>;
   readonly "dmGameSystem::CollectionFactoryComponent": DmNativeType<"dmGameSystem::CollectionFactoryComponent">;
   readonly "dmGameSystem::CollectionFactoryResource": Readonly<{ m_PrototypePathHash: DmSdkTypes["dmhash_t"]; m_CollectionDesc: DmSdkTypes["dmGameObject::HCollectionDesc"]; m_CollectionResources: DmNativeType<"dmArray<void *>">; m_LoadDynamically: number; m_DynamicPrototype: number }>;
   readonly "dmGameSystem::CollectionFactoryWorld": DmNativeType<"dmGameSystem::CollectionFactoryWorld">;
   readonly "dmGameSystem::CollectionProxyComponent": DmNativeType<"dmGameSystem::CollectionProxyComponent">;
-  readonly "dmGameSystem::CollectionProxyResource": Readonly<{ m_DDF: DmPointer<"int">; m_UrlHash: DmSdkTypes["dmhash_t"] }>;
+  readonly "dmGameSystem::CollectionProxyResource": Readonly<{ m_DDF: DmPointer<"dmCollectionProxyDDF::CollectionProxyDesc">; m_UrlHash: DmSdkTypes["dmhash_t"] }>;
   readonly "dmGameSystem::CollectionProxyWorld": DmNativeType<"dmGameSystem::CollectionProxyWorld">;
-  readonly "dmGameSystem::CollisionObjectResource": Readonly<{ m_DDF: DmPointer<"int">; m_ShapeTranslation: DmPointer<"dmVMath::Vector3">; m_ShapeRotation: DmPointer<"dmVMath::Quat">; m_ShapeTypes: DmPointer<"int">; m_Mask: DmSpan<bigint>; m_Group: bigint; m_ShapeCount: number }>;
+  readonly "dmGameSystem::CollisionObjectResource": Readonly<{ m_DDF: DmPointer<"dmPhysicsDDF::CollisionObjectDesc">; m_ShapeTranslation: DmPointer<"dmVMath::Vector3">; m_ShapeRotation: DmPointer<"dmVMath::Quat">; m_ShapeTypes: DmPointer<"dmPhysicsDDF::CollisionShape::Type">; m_Mask: DmSpan<bigint>; m_Group: bigint; m_ShapeCount: number }>;
   readonly "dmGameSystem::CollisionObjectResourceBox2D": Readonly<{ m_BaseResource: DmSdkTypes["dmGameSystem::CollisionObjectResource"]; m_TileGridResource: DmPointer<"dmGameSystem::TileGridResource">; m_Shapes2D: DmPointer<"dmPhysics::HCollisionShape2D">; m_TileGridShapeCount: number; m_TileGrid: number }>;
   readonly "dmGameSystem::CollisionObjectResourceBullet3D": Readonly<{ m_BaseResource: DmSdkTypes["dmGameSystem::CollisionObjectResource"]; m_Shapes3D: DmPointer<"dmPhysics::HCollisionShape3D"> }>;
   readonly "dmGameSystem::CompCollectionFactoryStatus": DmGameSystemCompCollectionFactoryStatus;
@@ -14532,11 +15008,11 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::FactoryComponent": DmNativeType<"dmGameSystem::FactoryComponent">;
   readonly "dmGameSystem::FactoryResource": Readonly<{ m_Prototype: DmSdkTypes["dmGameObject::HPrototype"]; m_PrototypePath: DmReadonlyPointer<"char">; m_LoadDynamically: number; m_DynamicPrototype: number }>;
   readonly "dmGameSystem::FactoryWorld": DmNativeType<"dmGameSystem::FactoryWorld">;
-  readonly "dmGameSystem::FontInfo": Readonly<{ m_Size: number; m_ShadowX: number; m_ShadowY: number; m_ShadowBlur: number; m_ShadowAlpha: number; m_Alpha: number; m_OutlineAlpha: number; m_OutlineWidth: number; m_OutputFormat: number; m_RenderMode: number }>;
+  readonly "dmGameSystem::FontInfo": Readonly<{ m_Size: number; m_ShadowX: number; m_ShadowY: number; m_ShadowBlur: number; m_ShadowAlpha: number; m_Alpha: number; m_OutlineAlpha: number; m_OutlineWidth: number; m_OutputFormat: DmSdkTypes["dmRenderDDF::FontTextureFormat"]; m_RenderMode: DmSdkTypes["dmRenderDDF::FontRenderMode"] }>;
   readonly "dmGameSystem::FontResource": DmNativeType<"dmGameSystem::FontResource">;
   readonly "dmGameSystem::GuiNodeTypeCreateFunction": DmNativeCallback;
   readonly "dmGameSystem::GuiNodeTypeDestroyFunction": DmNativeCallback;
-  readonly "dmGameSystem::GuiSceneResource": Readonly<{ m_SceneDesc: DmPointer<"int">; m_Script: DmSdkTypes["dmGui::HScript"]; m_Fonts: DmNativeType<"dmArray<FontResource *>">; m_FontMapPaths: DmNativeType<"dmArray<dmhash_t>">; m_GuiTextureSets: DmNativeType<"dmArray<GuiSceneTextureSetResource>">; m_ParticlePrototypes: DmNativeType<"dmArray<dmParticle::HPrototype>">; m_Materials: DmNativeType<"dmArray<MaterialResource *>">; m_Path: DmReadonlyPointer<"char">; m_GuiContext: DmSdkTypes["dmGui::HContext"]; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Resources: DmNativeType<"dmHashTable64<void *>">; m_ResourceTypes: DmNativeType<"dmHashTable64<dmhash_t>"> }>;
+  readonly "dmGameSystem::GuiSceneResource": Readonly<{ m_SceneDesc: DmPointer<"dmGuiDDF::SceneDesc">; m_Script: DmSdkTypes["dmGui::HScript"]; m_Fonts: DmNativeType<"dmArray<FontResource *>">; m_FontMapPaths: DmNativeType<"dmArray<dmhash_t>">; m_GuiTextureSets: DmNativeType<"dmArray<GuiSceneTextureSetResource>">; m_ParticlePrototypes: DmNativeType<"dmArray<dmParticle::HPrototype>">; m_Materials: DmNativeType<"dmArray<MaterialResource *>">; m_Path: DmReadonlyPointer<"char">; m_GuiContext: DmSdkTypes["dmGui::HContext"]; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Resources: DmNativeType<"dmHashTable64<void *>">; m_ResourceTypes: DmNativeType<"dmHashTable64<dmhash_t>"> }>;
   readonly "dmGameSystem::GuiSceneTextureSetResource": Readonly<{ m_Resource: DmPointer<"void">; m_ResourceIsTextureSet: number }>;
   readonly "dmGameSystem::HCollectionFactoryComponent": DmPointer<"dmGameSystem::CollectionFactoryComponent">;
   readonly "dmGameSystem::HCollectionFactoryResource": DmPointer<"dmGameSystem::CollectionFactoryResource">;
@@ -14549,16 +15025,16 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::HFactoryWorld": DmPointer<"dmGameSystem::FactoryWorld">;
   readonly "dmGameSystem::HModelComponent": DmPointer<"dmGameSystem::ModelComponent">;
   readonly "dmGameSystem::HModelWorld": DmPointer<"dmGameSystem::ModelWorld">;
-  readonly "dmGameSystem::LabelResource": Readonly<{ m_DDF: DmPointer<"int">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Font: DmPointer<"dmGameSystem::FontResource"> }>;
+  readonly "dmGameSystem::LabelResource": Readonly<{ m_DDF: DmPointer<"dmGameSystemDDF::LabelDesc">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Font: DmPointer<"dmGameSystem::FontResource"> }>;
   readonly "dmGameSystem::LightResource": DmNativeType<"dmGameSystem::LightResource">;
-  readonly "dmGameSystem::MaterialInfo": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Attributes: DmPointer<"int">; m_AttributeCount: number; m_Textures: DmPointer<"dmGameSystem::MaterialTextureInfo">; m_TexturesCount: number; m_SortOrder: number }>;
+  readonly "dmGameSystem::MaterialInfo": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Attributes: DmPointer<"dmGraphics::VertexAttribute">; m_AttributeCount: number; m_Textures: DmPointer<"dmGameSystem::MaterialTextureInfo">; m_TexturesCount: number; m_SortOrder: number }>;
   readonly "dmGameSystem::MaterialResource": Readonly<{ m_Material: DmSdkTypes["dmRender::HMaterial"]; m_Textures: DmSpan<DmPointer<"dmGameSystem::TextureResource">>; m_TextureResourcePaths: DmSpan<DmSdkTypes["dmhash_t"]>; m_SamplerNames: DmSpan<DmSdkTypes["dmhash_t"]>; m_NumTextures: number }>;
   readonly "dmGameSystem::MaterialTextureInfo": Readonly<{ m_SamplerNameHash: DmSdkTypes["dmhash_t"]; m_Texture: DmPointer<"dmGameSystem::TextureResource">; m_RenderTarget: DmPointer<"dmGameSystem::RenderTargetResource"> }>;
   readonly "dmGameSystem::MeshInfo": Readonly<{ m_Buffers: DmPointer<"dmGameSystem::ModelResourceBuffers">; m_Model: DmPointer<"dmRigDDF::Model">; m_Mesh: DmPointer<"dmRigDDF::Mesh">; m_MorphTargetTexture: DmPointer<"dmGameSystem::TextureResource">; m_MorphModelId: DmSdkTypes["dmhash_t"] }>;
-  readonly "dmGameSystem::MeshResource": Readonly<{ m_MeshDDF: DmPointer<"int">; m_BufferResource: DmPointer<"dmGameSystem::BufferResource">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Textures: DmSpan<DmPointer<"dmGameSystem::TextureResource">>; m_RenderTargets: DmSpan<DmPointer<"dmGameSystem::RenderTargetResource">>; m_TexturePaths: DmSpan<DmSdkTypes["dmhash_t"]>; m_VertexDeclaration: DmSdkTypes["dmGraphics::HVertexDeclaration"]; m_VertexBuffer: DmSdkTypes["dmGraphics::HVertexBuffer"]; m_PrimitiveType: DmSdkTypes["dmGraphics::PrimitiveType"]; m_PositionStreamId: DmSdkTypes["dmhash_t"]; m_PositionStreamType: number; m_NormalStreamId: DmSdkTypes["dmhash_t"]; m_NormalStreamType: number; m_BufferVersion: number }>;
-  readonly "dmGameSystem::MeshSetResource": Readonly<{ m_MeshSet: DmPointer<"int"> }>;
+  readonly "dmGameSystem::MeshResource": Readonly<{ m_MeshDDF: DmPointer<"dmMeshDDF::MeshDesc">; m_BufferResource: DmPointer<"dmGameSystem::BufferResource">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Textures: DmSpan<DmPointer<"dmGameSystem::TextureResource">>; m_RenderTargets: DmSpan<DmPointer<"dmGameSystem::RenderTargetResource">>; m_TexturePaths: DmSpan<DmSdkTypes["dmhash_t"]>; m_VertexDeclaration: DmSdkTypes["dmGraphics::HVertexDeclaration"]; m_VertexBuffer: DmSdkTypes["dmGraphics::HVertexBuffer"]; m_PrimitiveType: DmSdkTypes["dmGraphics::PrimitiveType"]; m_PositionStreamId: DmSdkTypes["dmhash_t"]; m_PositionStreamType: DmSdkTypes["dmBufferDDF::ValueType"]; m_NormalStreamId: DmSdkTypes["dmhash_t"]; m_NormalStreamType: DmSdkTypes["dmBufferDDF::ValueType"]; m_BufferVersion: number }>;
+  readonly "dmGameSystem::MeshSetResource": Readonly<{ m_MeshSet: DmPointer<"dmRigDDF::MeshSet"> }>;
   readonly "dmGameSystem::ModelComponent": DmNativeType<"dmGameSystem::ModelComponent">;
-  readonly "dmGameSystem::ModelResource": Readonly<{ m_Model: DmPointer<"dmModelDDF::Model">; m_ModelsCount: number; m_RigScene: DmPointer<"dmGameSystem::RigSceneResource">; m_Meshes: number; m_Materials: number; m_SelectedModel: DmSdkTypes["dmRigDDF::Model"] }>;
+  readonly "dmGameSystem::ModelResource": Readonly<{ m_Model: DmPointer<"dmModelDDF::Model">; m_ModelsCount: number; m_RigScene: DmPointer<"dmGameSystem::RigSceneResource">; m_Meshes: DmNativeType<"dmArray<MeshInfo>">; m_Materials: DmNativeType<"dmArray<MaterialInfo>">; m_SelectedModel: DmSdkTypes["dmRigDDF::Model"] }>;
   readonly "dmGameSystem::ModelResourceBuffers": Readonly<{ m_VertexBuffer: DmSdkTypes["dmGraphics::HVertexBuffer"]; m_IndexBuffer: DmSdkTypes["dmGraphics::HIndexBuffer"]; m_VertexCount: number; m_IndexCount: number; m_IndexBufferElementType: DmSdkTypes["dmGraphics::Type"]; m_RigModelVertexFormat: DmSdkTypes["dmGameSystem::RigModelVertexFormat"]; m_LastUsedFrame: number }>;
   readonly "dmGameSystem::ModelWorld": DmNativeType<"dmGameSystem::ModelWorld">;
   readonly "dmGameSystem::PropVector3": Readonly<{ m_Vector: DmSdkTypes["dmhash_t"]; m_X: DmSdkTypes["dmhash_t"]; m_Y: DmSdkTypes["dmhash_t"]; m_Z: DmSdkTypes["dmhash_t"]; m_XY: DmSdkTypes["dmhash_t"]; m_ReadOnly: boolean }>;
@@ -14566,16 +15042,29 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::ProxyLoadCallback": DmNativeCallback;
   readonly "dmGameSystem::RenderTargetResource": DmNativeType<"dmGameSystem::RenderTargetResource">;
   readonly "dmGameSystem::RigModelVertexFormat": DmGameSystemRigModelVertexFormat;
-  readonly "dmGameSystem::RigSceneResource": Readonly<{ m_BindPose: DmNativeType<"dmArray<dmRig::RigBone>">; m_RigScene: DmPointer<"int">; m_SkeletonRes: DmPointer<"dmGameSystem::SkeletonResource">; m_MeshSetRes: DmPointer<"dmGameSystem::MeshSetResource">; m_AnimationSetRes: DmPointer<"dmGameSystem::AnimationSetResource">; m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource"> }>;
-  readonly "dmGameSystem::SkeletonResource": Readonly<{ m_Skeleton: DmPointer<"int">; m_BoneIndices: DmNativeType<"dmHashTable64<uint32_t>"> }>;
+  readonly "dmGameSystem::RigSceneResource": Readonly<{ m_BindPose: DmNativeType<"dmArray<dmRig::RigBone>">; m_RigScene: DmPointer<"dmRigDDF::RigScene">; m_SkeletonRes: DmPointer<"dmGameSystem::SkeletonResource">; m_MeshSetRes: DmPointer<"dmGameSystem::MeshSetResource">; m_AnimationSetRes: DmPointer<"dmGameSystem::AnimationSetResource">; m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource"> }>;
+  readonly "dmGameSystem::SkeletonResource": Readonly<{ m_Skeleton: DmPointer<"dmRigDDF::Skeleton">; m_BoneIndices: DmNativeType<"dmHashTable64<uint32_t>"> }>;
   readonly "dmGameSystem::Sound": Readonly<{ m_GroupHash: DmSdkTypes["dmhash_t"]; m_SoundDataRes: DmPointer<"dmGameSystem::SoundDataResource">; m_Gain: number; m_Pan: number; m_Speed: number; m_Loopcount: number; m_Looping: number }>;
   readonly "dmGameSystem::SoundDataResource": DmNativeType<"dmGameSystem::SoundDataResource">;
-  readonly "dmGameSystem::SpriteResource": Readonly<{ m_DDF: DmPointer<"int">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_DefaultAnimation: DmSdkTypes["dmhash_t"]; m_Textures: DmPointer<"dmGameSystem::SpriteTexture">; m_NumTextures: number }>;
+  readonly "dmGameSystem::SpriteResource": Readonly<{ m_DDF: DmPointer<"dmGameSystemDDF::SpriteDesc">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_DefaultAnimation: DmSdkTypes["dmhash_t"]; m_Textures: DmPointer<"dmGameSystem::SpriteTexture">; m_NumTextures: number }>;
   readonly "dmGameSystem::SpriteTexture": Readonly<{ m_SamplerNameHash: DmSdkTypes["dmhash_t"]; m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource"> }>;
   readonly "dmGameSystem::TTFResource": DmNativeType<"dmGameSystem::TTFResource">;
   readonly "dmGameSystem::TextureResource": Readonly<{ m_Texture: DmSdkTypes["dmGraphics::HTexture"]; m_OriginalWidth: number; m_OriginalHeight: number; m_Uploading: number; m_DelayDelete: number }>;
-  readonly "dmGameSystem::TextureSetResource": Readonly<{ m_HullCollisionGroups: number; m_AnimationIds: DmNativeType<"dmHashTable64<uint32_t>">; m_FrameIds: DmNativeType<"dmHashTable64<uint32_t>">; m_Texture: DmPointer<"dmGameSystem::TextureResource">; m_TexturePath: DmSdkTypes["dmhash_t"]; m_TextureSet: DmPointer<"int">; m_HullSet: DmSdkTypes["dmPhysics::HHullSet2D"]; m_TexturesGeneration: number }>;
-  readonly "dmGameSystem::TileGridResource": Readonly<{ m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource">; m_TileGrid: DmPointer<"int">; m_GridShapes: number; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_ColumnCount: number; m_RowCount: number; m_Dirty: number; m_MinCellX: number; m_MinCellY: number }>;
+  readonly "dmGameSystem::TextureSetResource": Readonly<{ m_HullCollisionGroups: DmNativeType<"dmArray<dmhash_t>">; m_AnimationIds: DmNativeType<"dmHashTable64<uint32_t>">; m_FrameIds: DmNativeType<"dmHashTable64<uint32_t>">; m_Texture: DmPointer<"dmGameSystem::TextureResource">; m_TexturePath: DmSdkTypes["dmhash_t"]; m_TextureSet: DmPointer<"dmGameSystemDDF::TextureSet">; m_HullSet: DmSdkTypes["dmPhysics::HHullSet2D"]; m_TexturesGeneration: number }>;
+  readonly "dmGameSystem::TileGridResource": Readonly<{ m_TextureSet: DmPointer<"dmGameSystem::TextureSetResource">; m_TileGrid: DmPointer<"dmGameSystemDDF::TileGrid">; m_GridShapes: DmNativeType<"dmArray<dmPhysics::HCollisionShape2D>">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_ColumnCount: number; m_RowCount: number; m_Dirty: number; m_MinCellX: number; m_MinCellY: number }>;
+  readonly "dmGameSystemDDF::Data": Readonly<{ m_Tags: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/data_ddf.h:34:9)">; m_Data: DmSdkTypes["dmStructDDF::Value"] }>;
+  readonly "dmGameSystemDDF::LabelDesc": Readonly<{ m_Size: DmSdkTypes["dmVMath::Vector4"]; m_Scale: DmSdkTypes["dmVMath::Vector4"]; m_Color: DmSdkTypes["dmVMath::Vector4"]; m_Outline: DmSdkTypes["dmVMath::Vector4"]; m_Shadow: DmSdkTypes["dmVMath::Vector4"]; m_Leading: number; m_Tracking: number; m_Pivot: DmSdkTypes["dmGameSystemDDF::LabelDesc::Pivot"]; m_BlendMode: DmSdkTypes["dmGameSystemDDF::LabelDesc::BlendMode"]; m_LineBreak: boolean; m_Text: DmReadonlyPointer<"char">; m_Font: DmReadonlyPointer<"char">; m_Material: DmReadonlyPointer<"char">; m_Style: DmReadonlyPointer<"char">; m_StyleHash: bigint }>;
+  readonly "dmGameSystemDDF::LabelDesc::BlendMode": DmGameSystemDDFLabelDescBlendMode;
+  readonly "dmGameSystemDDF::LabelDesc::Pivot": DmGameSystemDDFLabelDescPivot;
+  readonly "dmGameSystemDDF::SpriteDesc": Readonly<{ m_TileSet: DmReadonlyPointer<"char">; m_DefaultAnimation: DmReadonlyPointer<"char">; m_Material: DmReadonlyPointer<"char">; m_BlendMode: DmSdkTypes["dmGameSystemDDF::SpriteDesc::BlendMode"]; m_Slice9: DmSdkTypes["dmVMath::Vector4"]; m_Size: DmSdkTypes["dmVMath::Vector4"]; m_SizeMode: DmSdkTypes["dmGameSystemDDF::SpriteDesc::SizeMode"]; m_Offset: number; m_PlaybackRate: number; m_Attributes: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/sprite_ddf.h:73:9)">; m_Textures: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/sprite_ddf.h:81:9)"> }>;
+  readonly "dmGameSystemDDF::SpriteDesc::BlendMode": DmGameSystemDDFSpriteDescBlendMode;
+  readonly "dmGameSystemDDF::SpriteDesc::SizeMode": DmGameSystemDDFSpriteDescSizeMode;
+  readonly "dmGameSystemDDF::SpriteTexture": Readonly<{ m_Sampler: DmReadonlyPointer<"char">; m_Texture: DmReadonlyPointer<"char"> }>;
+  readonly "dmGameSystemDDF::TextureSet": Readonly<{ m_Texture: DmReadonlyPointer<"char">; m_Width: number; m_Height: number; m_TextureHash: bigint; m_Animations: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:95:9)">; m_TileWidth: number; m_TileHeight: number; m_TileCount: number; m_CollisionHullPoints: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:106:9)">; m_CollisionGroups: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:114:9)">; m_ConvexHulls: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:121:9)">; m_ImageNameHashes: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:129:9)">; m_FrameIndices: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:137:9)">; m_TexCoords: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:145:9)">; m_TexDims: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:153:9)">; m_Geometries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:161:9)">; m_UseGeometries: number; m_PageIndices: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/texture_set_ddf.h:170:9)">; m_PageCount: number }>;
+  readonly "dmGameSystemDDF::TileGrid": Readonly<{ m_TileSet: DmReadonlyPointer<"char">; m_Layers: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/tile_ddf.h:195:9)">; m_Material: DmReadonlyPointer<"char">; m_BlendMode: DmSdkTypes["dmGameSystemDDF::TileGrid::BlendMode"] }>;
+  readonly "dmGameSystemDDF::TileGrid::BlendMode": DmGameSystemDDFTileGridBlendMode;
+  readonly "dmGamesysDDF::CameraDesc": Readonly<{ m_AspectRatio: number; m_Fov: number; m_NearZ: number; m_FarZ: number; m_AutoAspectRatio: number; m_OrthographicProjection: number; m_OrthographicZoom: number; m_OrthographicMode: DmSdkTypes["dmGamesysDDF::OrthoZoomMode"] }>;
+  readonly "dmGamesysDDF::OrthoZoomMode": DmGamesysDDFOrthoZoomMode;
   readonly "dmGraphics::AdapterFamily": DmGraphicsAdapterFamily;
   readonly "dmGraphics::AttachmentOp": DmGraphicsAttachmentOp;
   readonly "dmGraphics::BlendEquation": DmGraphicsBlendEquation;
@@ -14585,6 +15074,7 @@ export interface DmSdkTypes {
   readonly "dmGraphics::BufferUsage": DmGraphicsBufferUsage;
   readonly "dmGraphics::CompareFunc": DmGraphicsCompareFunc;
   readonly "dmGraphics::ContextParams": Readonly<{ m_Window: DmSdkTypes["HWindow"]; m_JobContext: DmSdkTypes["HJobContext"]; m_DefaultTextureMinFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_DefaultTextureMagFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_Width: number; m_Height: number; m_GraphicsMemorySize: number; m_SwapInterval: number; m_GraphicsApiVersionMajorHint: number; m_GraphicsApiVersionMinorHint: number; m_VerifyGraphicsCalls: number; m_PrintDeviceInfo: number; m_UseValidationLayers: number }>;
+  readonly "dmGraphics::CoordinateSpace": DmGraphicsCoordinateSpace;
   readonly "dmGraphics::FaceType": DmGraphicsFaceType;
   readonly "dmGraphics::FaceWinding": DmGraphicsFaceWinding;
   readonly "dmGraphics::GraphicsContext": DmNativeType<"dmGraphics::GraphicsContext">;
@@ -14605,19 +15095,27 @@ export interface DmSdkTypes {
   readonly "dmGraphics::RenderTargetAttachment": DmGraphicsRenderTargetAttachment;
   readonly "dmGraphics::RenderTargetCreationParams": Readonly<{ m_ColorBufferCreationParams: DmSpan<DmSdkTypes["dmGraphics::TextureCreationParams"]>; m_DepthBufferCreationParams: DmSdkTypes["dmGraphics::TextureCreationParams"]; m_StencilBufferCreationParams: DmSdkTypes["dmGraphics::TextureCreationParams"]; m_ColorBufferParams: DmSpan<DmSdkTypes["dmGraphics::TextureParams"]>; m_DepthBufferParams: DmSdkTypes["dmGraphics::TextureParams"]; m_StencilBufferParams: DmSdkTypes["dmGraphics::TextureParams"]; m_SampleCount: number; m_ColorBufferLoadOps: DmSpan<DmSdkTypes["dmGraphics::AttachmentOp"]>; m_ColorBufferStoreOps: DmSpan<DmSdkTypes["dmGraphics::AttachmentOp"]>; m_ColorBufferClearValue: DmSpan<DmSpan<number>>; m_DepthTexture: number; m_StencilTexture: number }>;
   readonly "dmGraphics::SetTextureAsyncCallback": DmNativeCallback;
+  readonly "dmGraphics::ShaderDesc": Readonly<{ m_Shaders: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:685:9)">; m_Reflection: DmSdkTypes["dmGraphics::ShaderDesc::ShaderReflection"]; m_HlslRootSignature: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:694:9)">; m_VertexProgram: DmReadonlyPointer<"char">; m_FragmentProgram: DmReadonlyPointer<"char">; m_ComputeProgram: DmReadonlyPointer<"char"> }>;
+  readonly "dmGraphics::ShaderDesc::ShaderReflection": Readonly<{ m_UniformBuffers: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:566:13)">; m_StorageBuffers: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:574:13)">; m_Textures: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:582:13)">; m_Inputs: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:590:13)">; m_Outputs: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:598:13)">; m_Types: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:606:13)"> }>;
   readonly "dmGraphics::State": DmGraphicsState;
   readonly "dmGraphics::StencilOp": DmGraphicsStencilOp;
   readonly "dmGraphics::TextureCreationParams": Readonly<{ m_Type: DmSdkTypes["dmGraphics::TextureType"]; m_Width: number; m_Height: number; m_Depth: number; m_OriginalWidth: number; m_OriginalHeight: number; m_OriginalDepth: number; m_LayerCount: number; m_MipMapCount: number; m_UsageHintBits: number }>;
   readonly "dmGraphics::TextureFilter": DmGraphicsTextureFilter;
   readonly "dmGraphics::TextureFormat": DmGraphicsTextureFormat;
+  readonly "dmGraphics::TextureImage::TextureFormat": DmGraphicsTextureImageTextureFormat;
   readonly "dmGraphics::TextureParams": Readonly<{ m_Data: DmReadonlyPointer<"void">; m_DataSize: number; m_Format: DmSdkTypes["dmGraphics::TextureFormat"]; m_MinFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_MagFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_UWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_VWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_WWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_X: number; m_Y: number; m_Z: number; m_Slice: number; m_Width: number; m_Height: number; m_Depth: number; m_LayerCount: number; m_MipMap: number; m_SubUpdate: number }>;
   readonly "dmGraphics::TextureStatusFlags": DmGraphicsTextureStatusFlags;
   readonly "dmGraphics::TextureType": DmGraphicsTextureType;
   readonly "dmGraphics::TextureWrap": DmGraphicsTextureWrap;
   readonly "dmGraphics::Type": DmGraphicsType;
+  readonly "dmGraphics::VertexAttribute": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_NameHash: bigint; m_SemanticType: DmSdkTypes["dmGraphics::VertexAttribute::SemanticType"]; m_ElementCount: number; m_Normalize: boolean; m_DataType: DmSdkTypes["dmGraphics::VertexAttribute::DataType"]; m_CoordinateSpace: DmSdkTypes["dmGraphics::CoordinateSpace"]; m_StepFunction: DmSdkTypes["dmGraphics::VertexStepFunction"]; m_VectorType: DmSdkTypes["dmGraphics::VertexAttribute::VectorType"]; m_Values: DmNativeType<"union (unnamed union at upstream/defold-sdk/include/graphics/graphics_ddf.h:165:9)">; m_ValuesOneOfIndex: number }>;
+  readonly "dmGraphics::VertexAttribute::DataType": DmGraphicsVertexAttributeDataType;
+  readonly "dmGraphics::VertexAttribute::SemanticType": DmGraphicsVertexAttributeSemanticType;
+  readonly "dmGraphics::VertexAttribute::VectorType": DmGraphicsVertexAttributeVectorType;
   readonly "dmGraphics::VertexAttributeInfo": DmNativeType<"dmGraphics::VertexAttributeInfo">;
   readonly "dmGraphics::VertexAttributeInfos": DmNativeType<"dmGraphics::VertexAttributeInfos">;
   readonly "dmGraphics::VertexDeclaration": DmNativeType<"dmGraphics::VertexDeclaration">;
+  readonly "dmGraphics::VertexStepFunction": DmGraphicsVertexStepFunction;
   readonly "dmGraphics::VertexStreamDeclaration": DmNativeType<"dmGraphics::VertexStreamDeclaration">;
   readonly "dmGraphics::WriteAttributeParams": DmNativeType<"dmGraphics::WriteAttributeParams">;
   readonly "dmGui::AdjustMode": DmGuiAdjustMode;
@@ -14637,6 +15135,18 @@ export interface DmSdkTypes {
   readonly "dmGui::Result": DmGuiResult;
   readonly "dmGui::Scene": DmNativeType<"dmGui::Scene">;
   readonly "dmGui::Script": DmNativeType<"dmGui::Script">;
+  readonly "dmGuiDDF::NodeDesc": Readonly<{ m_Position: DmSdkTypes["dmVMath::Vector4"]; m_Rotation: DmSdkTypes["dmVMath::Vector4"]; m_Scale: DmSdkTypes["dmVMath::Vector4"]; m_Size: DmSdkTypes["dmVMath::Vector4"]; m_Color: DmSdkTypes["dmVMath::Vector4"]; m_Type: DmSdkTypes["dmGuiDDF::NodeDesc::Type"]; m_BlendMode: DmSdkTypes["dmGuiDDF::NodeDesc::BlendMode"]; m_Text: DmReadonlyPointer<"char">; m_Texture: DmReadonlyPointer<"char">; m_Font: DmReadonlyPointer<"char">; m_Id: DmReadonlyPointer<"char">; m_Xanchor: DmSdkTypes["dmGuiDDF::NodeDesc::XAnchor"]; m_Yanchor: DmSdkTypes["dmGuiDDF::NodeDesc::YAnchor"]; m_Pivot: DmSdkTypes["dmGuiDDF::NodeDesc::Pivot"]; m_Outline: DmSdkTypes["dmVMath::Vector4"]; m_Shadow: DmSdkTypes["dmVMath::Vector4"]; m_AdjustMode: DmSdkTypes["dmGuiDDF::NodeDesc::AdjustMode"]; m_LineBreak: boolean; m_Parent: DmReadonlyPointer<"char">; m_Layer: DmReadonlyPointer<"char">; m_InheritAlpha: boolean; m_Slice9: DmSdkTypes["dmVMath::Vector4"]; m_Outerbounds: DmSdkTypes["dmGuiDDF::NodeDesc::PieBounds"]; m_Innerradius: number; m_Perimetervertices: number; m_Piefillangle: number; m_ClippingMode: DmSdkTypes["dmGuiDDF::NodeDesc::ClippingMode"]; m_ClippingVisible: boolean; m_ClippingInverted: boolean; m_Alpha: number; m_OutlineAlpha: number; m_ShadowAlpha: number; m_OverriddenFields: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:178:9)">; m_Template: DmReadonlyPointer<"char">; m_TemplateNodeChild: boolean; m_TextLeading: number; m_TextTracking: number; m_SizeMode: DmSdkTypes["dmGuiDDF::NodeDesc::SizeMode"]; m_SpineScene: DmReadonlyPointer<"char">; m_SpineDefaultAnimation: DmReadonlyPointer<"char">; m_SpineSkin: DmReadonlyPointer<"char">; m_SpineNodeChild: boolean; m_Particlefx: DmReadonlyPointer<"char">; m_CustomType: number; m_Enabled: boolean; m_Visible: boolean; m_Material: DmReadonlyPointer<"char">; m_SpineCreateBones: boolean; m_CustomTypeName: DmReadonlyPointer<"char">; m_CustomProperties: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:202:9)">; m_Style: DmReadonlyPointer<"char"> }>;
+  readonly "dmGuiDDF::NodeDesc::AdjustMode": DmGuiDDFNodeDescAdjustMode;
+  readonly "dmGuiDDF::NodeDesc::BlendMode": DmGuiDDFNodeDescBlendMode;
+  readonly "dmGuiDDF::NodeDesc::ClippingMode": DmGuiDDFNodeDescClippingMode;
+  readonly "dmGuiDDF::NodeDesc::PieBounds": DmGuiDDFNodeDescPieBounds;
+  readonly "dmGuiDDF::NodeDesc::Pivot": DmGuiDDFNodeDescPivot;
+  readonly "dmGuiDDF::NodeDesc::SizeMode": DmGuiDDFNodeDescSizeMode;
+  readonly "dmGuiDDF::NodeDesc::Type": DmGuiDDFNodeDescType;
+  readonly "dmGuiDDF::NodeDesc::XAnchor": DmGuiDDFNodeDescXAnchor;
+  readonly "dmGuiDDF::NodeDesc::YAnchor": DmGuiDDFNodeDescYAnchor;
+  readonly "dmGuiDDF::SceneDesc": Readonly<{ m_Script: DmReadonlyPointer<"char">; m_Fonts: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:312:9)">; m_Textures: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:320:9)">; m_BackgroundColor: DmSdkTypes["dmVMath::Vector4"]; m_Nodes: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:329:9)">; m_Layers: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:337:9)">; m_Material: DmReadonlyPointer<"char">; m_Layouts: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:346:9)">; m_AdjustReference: DmSdkTypes["dmGuiDDF::SceneDesc::AdjustReference"]; m_MaxNodes: number; m_SpineScenes: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:356:9)">; m_Particlefxs: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:364:9)">; m_Resources: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:372:9)">; m_Materials: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/gui_ddf.h:380:9)">; m_MaxDynamicTextures: number }>;
+  readonly "dmGuiDDF::SceneDesc::AdjustReference": DmGuiDDFSceneDescAdjustReference;
   readonly "dmHID::Context": DmNativeType<"dmHID::Context">;
   readonly "dmHID::Gamepad": DmNativeType<"dmHID::Gamepad">;
   readonly "dmHID::GamepadGuid": Readonly<{ m_Bus: number; m_CRC16: number; m_Vendor: number; m_Product: number; m_Version: number; m_DriverSignature: number; m_DriverData: number }>;
@@ -14673,7 +15183,11 @@ export interface DmSdkTypes {
   readonly "dmIntersection::Frustum": Readonly<{ m_Planes: DmSpan<DmSdkTypes["dmIntersection::Plane"]>; m_NumPlanes: number }>;
   readonly "dmIntersection::Plane": DmSdkTypes["dmVMath::Vector4"];
   readonly "dmLog::LogParams": DmSdkTypes["LogParams"];
+  readonly "dmLuaDDF::LuaModule": Readonly<{ m_Source: DmSdkTypes["dmLuaDDF::LuaSource"]; m_Modules: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/lua_ddf.h:36:9)">; m_Resources: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/lua_ddf.h:43:9)">; m_Properties: DmSdkTypes["dmPropertiesDDF::PropertyDeclarations"]; m_PropertyResources: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/lua_ddf.h:51:9)"> }>;
+  readonly "dmLuaDDF::LuaSource": Readonly<{ m_Script: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:33:9)">; m_Filename: DmReadonlyPointer<"char">; m_Bytecode: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:42:9)">; m_Delta: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:50:9)">; m_Bytecode32: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:58:9)">; m_Bytecode64: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:66:9)"> }>;
   readonly "dmMemory::Result": DmMemoryResult;
+  readonly "dmMeshDDF::MeshDesc": Readonly<{ m_Material: DmReadonlyPointer<"char">; m_Vertices: DmReadonlyPointer<"char">; m_Textures: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/mesh_ddf.h:42:9)">; m_PrimitiveType: DmSdkTypes["dmMeshDDF::MeshDesc::PrimitiveType"]; m_PositionStream: DmReadonlyPointer<"char">; m_NormalStream: DmReadonlyPointer<"char"> }>;
+  readonly "dmMeshDDF::MeshDesc::PrimitiveType": DmMeshDDFMeshDescPrimitiveType;
   readonly "dmMessage::HSocket": DmSdkTypes["dmhash_t"];
   readonly "dmMessage::Message": Readonly<{ m_Sender: DmSdkTypes["dmMessage::URL"]; m_Receiver: DmSdkTypes["dmMessage::URL"]; m_Id: DmSdkTypes["dmhash_t"]; m_UserData1: bigint; m_UserData2: bigint; m_Descriptor: bigint; m_DataSize: number; m_Next: DmPointer<"dmMessage::Message">; m_DestroyCallback: DmSdkTypes["dmMessage::MessageDestroyCallback"]; m_Data: DmSpan<number> }>;
   readonly "dmMessage::MessageDestroyCallback": DmNativeCallback;
@@ -14692,6 +15206,11 @@ export interface DmSdkTypes {
   readonly "dmPhysics::HCollisionShape2D": DmPointer<"void">;
   readonly "dmPhysics::HCollisionShape3D": DmPointer<"void">;
   readonly "dmPhysics::HHullSet2D": DmPointer<"void">;
+  readonly "dmPhysicsDDF::CollisionObjectDesc": Readonly<{ m_CollisionShape: DmReadonlyPointer<"char">; m_Type: DmSdkTypes["dmPhysicsDDF::CollisionObjectType"]; m_Mass: number; m_Friction: number; m_Restitution: number; m_Group: DmReadonlyPointer<"char">; m_Mask: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/physics_ddf.h:151:9)">; m_EmbeddedCollisionShape: DmSdkTypes["dmPhysicsDDF::CollisionShape"]; m_LinearDamping: number; m_AngularDamping: number; m_LockedRotation: boolean; m_Bullet: boolean; m_EventCollision: boolean; m_EventContact: boolean; m_EventTrigger: boolean }>;
+  readonly "dmPhysicsDDF::CollisionObjectType": DmPhysicsDDFCollisionObjectType;
+  readonly "dmPhysicsDDF::CollisionShape": Readonly<{ m_Shapes: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/physics_ddf.h:114:9)">; m_Data: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/physics_ddf.h:122:9)">; m_Indices: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/physics_ddf.h:130:9)"> }>;
+  readonly "dmPhysicsDDF::CollisionShape::Type": DmPhysicsDDFCollisionShapeType;
+  readonly "dmPropertiesDDF::PropertyDeclarations": Readonly<{ m_NumberEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:53:9)">; m_HashEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:61:9)">; m_UrlEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:69:9)">; m_Vector3Entries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:77:9)">; m_Vector4Entries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:85:9)">; m_QuatEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:93:9)">; m_BoolEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:101:9)">; m_TextEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:109:9)">; m_FloatValues: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:117:9)">; m_HashValues: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:125:9)">; m_StringValues: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:133:9)"> }>;
   readonly "dmRender::Constant": DmNativeType<"dmRender::Constant">;
   readonly "dmRender::FontMap": DmNativeType<"dmRender::FontMap">;
   readonly "dmRender::FrustumOptions": Readonly<{ m_Matrix: DmSdkTypes["dmVMath::Matrix4"]; m_NumPlanes: DmSdkTypes["dmRender::FrustumPlanes"] }>;
@@ -14720,6 +15239,15 @@ export interface DmSdkTypes {
   readonly "dmRender::Sampler": DmNativeType<"dmRender::Sampler">;
   readonly "dmRender::StencilTestParams": Readonly<{ m_Front: DmNativeType<"(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)">; m_Back: DmNativeType<"(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)">; m_Ref: number; m_RefMask: number; m_BufferMask: number; m_ColorBufferMask: number; m_ClearBuffer: number; m_SeparateFaceStates: number }>;
   readonly "dmRender::Visibility": DmRenderVisibility;
+  readonly "dmRenderDDF::FontRenderMode": DmRenderDDFFontRenderMode;
+  readonly "dmRenderDDF::FontTextureFormat": DmRenderDDFFontTextureFormat;
+  readonly "dmRenderDDF::MaterialDesc::Constant": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_Type: DmSdkTypes["dmRenderDDF::MaterialDesc::ConstantType"]; m_Value: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/render/material_ddf.h:95:13)"> }>;
+  readonly "dmRenderDDF::MaterialDesc::ConstantType": DmRenderDDFMaterialDescConstantType;
+  readonly "dmRenderDDF::MaterialDesc::FilterModeMag": DmRenderDDFMaterialDescFilterModeMag;
+  readonly "dmRenderDDF::MaterialDesc::FilterModeMin": DmRenderDDFMaterialDescFilterModeMin;
+  readonly "dmRenderDDF::MaterialDesc::Sampler": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_WrapU: DmSdkTypes["dmRenderDDF::MaterialDesc::WrapMode"]; m_WrapV: DmSdkTypes["dmRenderDDF::MaterialDesc::WrapMode"]; m_FilterMin: DmSdkTypes["dmRenderDDF::MaterialDesc::FilterModeMin"]; m_FilterMag: DmSdkTypes["dmRenderDDF::MaterialDesc::FilterModeMag"]; m_MaxAnisotropy: number; m_NameIndirections: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/render/material_ddf.h:134:13)">; m_Texture: DmReadonlyPointer<"char">; m_NameHash: bigint; m_WrapW: DmSdkTypes["dmRenderDDF::MaterialDesc::WrapMode"] }>;
+  readonly "dmRenderDDF::MaterialDesc::VertexSpace": DmRenderDDFMaterialDescVertexSpace;
+  readonly "dmRenderDDF::MaterialDesc::WrapMode": DmRenderDDFMaterialDescWrapMode;
   readonly "dmResource::FDecryptResource": DmNativeCallback;
   readonly "dmResource::FReloadedCallback": DmSdkTypes["FResourceReloadedCallback"];
   readonly "dmResource::FResourceCreate": DmNativeCallback;
@@ -14743,7 +15271,7 @@ export interface DmSdkTypes {
   readonly "dmRig::HRigContext": DmPointer<"dmRig::RigContext">;
   readonly "dmRig::HRigInstance": DmPointer<"dmRig::RigInstance">;
   readonly "dmRig::IKTarget": Readonly<{ m_Mix: number; m_Position: DmSdkTypes["dmVMath::Vector3"]; m_Callback: DmSdkTypes["dmRig::RigIKTargetCallback"]; m_UserPtr: DmPointer<"void">; m_UserHash: DmSdkTypes["dmhash_t"] }>;
-  readonly "dmRig::InstanceCreateParams": Readonly<{ m_ModelId: DmSdkTypes["dmhash_t"]; m_DefaultAnimation: DmSdkTypes["dmhash_t"]; m_BindPose: DmReadonlyPointer<"dmArray<struct RigBone>">; m_BoneIndices: DmReadonlyPointer<"dmHashTable64<uint32_t>">; m_Skeleton: DmReadonlyPointer<"int">; m_MeshSet: DmReadonlyPointer<"int">; m_AnimationSet: DmReadonlyPointer<"int">; m_PoseCallback: DmSdkTypes["dmRig::RigPoseCallback"]; m_PoseCBUserData1: DmPointer<"void">; m_PoseCBUserData2: DmPointer<"void">; m_EventCallback: DmSdkTypes["dmRig::RigEventCallback"]; m_EventCBUserData1: DmPointer<"void">; m_EventCBUserData2: DmPointer<"void">; m_ForceAnimatePose: boolean }>;
+  readonly "dmRig::InstanceCreateParams": Readonly<{ m_ModelId: DmSdkTypes["dmhash_t"]; m_DefaultAnimation: DmSdkTypes["dmhash_t"]; m_BindPose: DmReadonlyPointer<"dmArray<struct RigBone>">; m_BoneIndices: DmReadonlyPointer<"dmHashTable64<uint32_t>">; m_Skeleton: DmReadonlyPointer<"dmRigDDF::Skeleton">; m_MeshSet: DmReadonlyPointer<"dmRigDDF::MeshSet">; m_AnimationSet: DmReadonlyPointer<"dmRigDDF::AnimationSet">; m_PoseCallback: DmSdkTypes["dmRig::RigPoseCallback"]; m_PoseCBUserData1: DmPointer<"void">; m_PoseCBUserData2: DmPointer<"void">; m_EventCallback: DmSdkTypes["dmRig::RigEventCallback"]; m_EventCBUserData1: DmPointer<"void">; m_EventCBUserData2: DmPointer<"void">; m_ForceAnimatePose: boolean }>;
   readonly "dmRig::NewContextParams": Readonly<{ m_MaxRigInstanceCount: number }>;
   readonly "dmRig::Result": DmRigResult;
   readonly "dmRig::RigBone": Readonly<{ m_ModelToLocal: DmSdkTypes["dmVMath::Matrix4"]; m_ParentIndex: number; m_Length: number }>;
@@ -14757,9 +15285,14 @@ export interface DmSdkTypes {
   readonly "dmRig::RigModelVertex": Readonly<{ pos: DmSpan<number>; normal: DmSpan<number>; tangent: DmSpan<number>; color: DmSpan<number>; uv0: DmSpan<number>; uv1: DmSpan<number> }>;
   readonly "dmRig::RigPlayback": DmRigRigPlayback;
   readonly "dmRig::RigPoseCallback": DmNativeCallback;
+  readonly "dmRigDDF::AnimationSet": Readonly<{ m_Animations: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:434:9)"> }>;
+  readonly "dmRigDDF::IndexBufferFormat": DmRigDDFIndexBufferFormat;
   readonly "dmRigDDF::Mesh": DmNativeType<"dmRigDDF::Mesh">;
+  readonly "dmRigDDF::MeshSet": Readonly<{ m_Models: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:588:9)">; m_Materials: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:596:9)">; m_BoneList: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:604:9)">; m_MaxBoneCount: number; m_RawModels: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:613:9)">; m_SplitModelIndices: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:621:9)"> }>;
   readonly "dmRigDDF::Model": DmNativeType<"dmRigDDF::Model">;
+  readonly "dmRigDDF::PrimitiveType": DmRigDDFPrimitiveType;
   readonly "dmRigDDF::RigScene": DmNativeType<"dmRigDDF::RigScene">;
+  readonly "dmRigDDF::Skeleton": Readonly<{ m_Bones: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:301:9)">; m_Iks: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:309:9)"> }>;
   readonly "dmSSLSocket::Result": DmSSLSocketResult;
   readonly "dmSSLSocket::SSLSocket": DmNativeType<"dmSSLSocket::SSLSocket">;
   readonly "dmSSLSocket::Socket": DmPointer<"dmSSLSocket::SSLSocket">;
@@ -14782,6 +15315,7 @@ export interface DmSdkTypes {
   readonly "dmSound::Result": DmSoundResult;
   readonly "dmSpinlock::ScopedLock": Readonly<{ m_Spinlock: DmReference<DmSdkTypes["dmSpinlock::Spinlock"]> }>;
   readonly "dmSpinlock::Spinlock": DmNativeType<"dmSpinlock::Spinlock">;
+  readonly "dmStructDDF::Value": Readonly<{ m_Kind: DmNativeType<"union (unnamed union at upstream/defold-sdk/include/ddf/ddf_struct.h:65:9)">; m_KindOneOfIndex: number }>;
   readonly "dmSys::Result": DmSysResult;
   readonly "dmSys::StatInfo": Readonly<{ m_Size: bigint; m_Mode: number; m_AccessTime: number; m_ModifiedTime: number }>;
   readonly "dmThread::Thread": bigint;
@@ -14790,12 +15324,12 @@ export interface DmSdkTypes {
   readonly "dmTransform::Transform": DmNativeType<"dmTransform::Transform">;
   readonly "dmURI::Parts": Readonly<{ m_Scheme: DmSpan<number>; m_Location: DmSpan<number>; m_Hostname: DmSpan<number>; m_Port: number; m_Path: DmSpan<number> }>;
   readonly "dmURI::Result": DmURIResult;
-  readonly "dmVMath::Matrix3": DmNativeType<"Vectormath::Aos::Matrix3">;
-  readonly "dmVMath::Matrix4": DmNativeType<"Vectormath::Aos::Matrix4">;
-  readonly "dmVMath::Point3": DmNativeType<"Vectormath::Aos::Point3">;
-  readonly "dmVMath::Quat": DmNativeType<"Vectormath::Aos::Quat">;
-  readonly "dmVMath::Vector3": DmNativeType<"Vectormath::Aos::Vector3">;
-  readonly "dmVMath::Vector4": DmNativeType<"Vectormath::Aos::Vector4">;
+  readonly "dmVMath::Matrix3": DmSdkTypes["Vectormath::Aos::Matrix3"];
+  readonly "dmVMath::Matrix4": DmSdkTypes["Vectormath::Aos::Matrix4"];
+  readonly "dmVMath::Point3": DmSdkTypes["Vectormath::Aos::Point3"];
+  readonly "dmVMath::Quat": DmSdkTypes["Vectormath::Aos::Quat"];
+  readonly "dmVMath::Vector3": DmSdkTypes["Vectormath::Aos::Vector3"];
+  readonly "dmVMath::Vector4": DmSdkTypes["Vectormath::Aos::Vector4"];
   readonly "dmWebServer::HServer": DmPointer<"dmWebServer::Server">;
   readonly "dmWebServer::Handler": DmNativeCallback;
   readonly "dmWebServer::HandlerParams": Readonly<{ m_Userdata: DmPointer<"void">; m_Handler: DmSdkTypes["dmWebServer::Handler"] }>;
@@ -14805,7 +15339,10 @@ export interface DmSdkTypes {
   readonly dmWindow: DmNativeType<"dmWindow">;
   readonly dmhash_t: bigint;
   readonly id: DmPointer<"void">;
+  readonly int16_t: number;
   readonly int32_atomic_t: number;
+  readonly int32_t: number;
+  readonly int64_t: bigint;
   readonly jobject: DmPointer<"void">;
   readonly luaL_Buffer: Readonly<{ p: DmPointer<"char">; lvl: number; L: DmPointer<"lua_State">; buffer: DmSpan<number> }>;
   readonly luaL_Reg: Readonly<{ name: DmReadonlyPointer<"char">; func: DmSdkTypes["lua_CFunction"] }>;
@@ -14818,6 +15355,13 @@ export interface DmSdkTypes {
   readonly lua_Reader: DmNativeCallback;
   readonly lua_State: DmNativeType<"lua_State">;
   readonly lua_Writer: DmNativeCallback;
+  readonly ptrdiff_t: bigint;
+  readonly size_t: bigint;
+  readonly uint16_t: number;
+  readonly uint32_t: number;
+  readonly uint64_t: bigint;
+  readonly uint8_t: number;
+  readonly uintptr_t: bigint;
 }
 
 export interface DmSdkVariables {

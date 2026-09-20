@@ -104,6 +104,35 @@ test("representative compound signatures are compositional rather than signature
   assert.equal(nestedCallback.effects.callbacks.nestedOrOpaque, true);
 });
 
+test("source support types preserve nested enums, variadics, and target-dependent handles", async () => {
+  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  const steppedVertexDeclaration = report.rows.find(({ symbol, signature }) =>
+    symbol === "dmGraphics::NewVertexStreamDeclaration" && signature.parameters.length === 2);
+  assert.deepEqual(steppedVertexDeclaration.signature.parameters[1].type, {
+    kind: "enum",
+    name: "dmGraphics::VertexStepFunction",
+    width: "unspecified",
+    domain: "declared-values",
+  });
+
+  const renderConstant = report.rows.find(({ symbol }) => symbol === "dmRender::SetConstantType");
+  assert.equal(renderConstant.signature.parameters[1].type.kind, "enum");
+  assert.equal(renderConstant.signature.parameters[1].type.name,
+    "dmRenderDDF::MaterialDesc::ConstantType");
+
+  const vulkanImage = report.rows.find(({ symbol }) => symbol === "dmGraphics::VulkanGetImage");
+  assert.equal(vulkanImage.signature.result.kind, "handle");
+  assert.equal(vulkanImage.signature.result.representation.targetDependent, true);
+  assert.equal(vulkanImage.signature.result.representation.targetTypes["arm64-osx"],
+    "struct VkImage_T *");
+  assert.equal(vulkanImage.signature.result.representation.targetTypes["wasm-web"], "uint64_t");
+
+  const variadics = report.rows.filter(({ signature }) => signature.variadic);
+  assert.equal(variadics.length, 7);
+  assert.ok(variadics.every(({ semanticTokensNeeded }) =>
+    semanticTokensNeeded.includes("typed-nonvariadic-facade")));
+});
+
 test("reconciles generated adapters and policy gates while projecting every pending lowering", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   assert.deepEqual(report.loweringSummary, {

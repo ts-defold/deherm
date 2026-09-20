@@ -63,6 +63,15 @@ class GeneratedPathPortabilityTests(unittest.TestCase):
             IMPORTER.contains_checkout_path('{"type":"upstream/x.h"}', root)
         )
 
+    def test_only_revision_keyed_sdk_cache_paths_are_rewritten(self) -> None:
+        self.assertEqual(
+            IMPORTER.normalize_generated_value(
+                r"upstream\extender\server\app\sdk\abc123\defoldsdk\include\vulkan.h"
+            ),
+            "upstream/defold-sdk/include/vulkan.h",
+        )
+        self.assertEqual(IMPORTER.normalize_generated_value(r"unrelated\value"), r"unrelated\value")
+
 
 if __name__ == "__main__":
     unittest.main()

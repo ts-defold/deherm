@@ -8,10 +8,10 @@
     "policy": "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json"
   },
   "sourceHashes": {
-    "ir": "cb6d3fcd4af5999f3983b2f4e17d99c185dfabe64fd942938f16db76391a5434",
-    "shapes": "c183aef177d74f2109de6352531c3f30ec20ade9427365017e7f5711201e70ca",
-    "projection": "492fc0a14d65270fb510caad4050bdf77ff48b9fa17c00f74e88e11d17dc3dd0",
-    "policy": "43312983e8fbabd48c3f2355c462308a2d11c46c969050d837bd93ad038b20a9"
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "projection": "9f9a4bf56ba785edd2e63924f91c7084f163b49d3fddfc7614077c24e42f3e3f",
+    "policy": "7ca752daca9f7077460bf6bdfef1e5919b60272d4659932196f09349afa44b4c"
   },
   "selector": "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",
   "policy": {
@@ -36,15 +36,15 @@
   },
   "coverage": {
     "candidates": 348,
-    "generated": 82,
-    "blocked": 266,
-    "cAbiGenerated": 82,
-    "dynamicHermesJsiGenerated": 82,
-    "staticHermesGenerated": 82,
-    "browserDirectMemoryGenerated": 82,
-    "typescriptGenerated": 82,
-    "pinnedHeaderSignatureCompiled": 82,
-    "fakeProviderHostRuntimeTested": 82,
+    "generated": 80,
+    "blocked": 268,
+    "cAbiGenerated": 80,
+    "dynamicHermesJsiGenerated": 80,
+    "staticHermesGenerated": 80,
+    "browserDirectMemoryGenerated": 80,
+    "typescriptGenerated": 80,
+    "pinnedHeaderSignatureCompiled": 80,
+    "fakeProviderHostRuntimeTested": 80,
     "packagedEngineRuntimeVerified": 0,
     "warmedDispatchIterations": 100000,
     "warmedDispatchObservedCppAllocations": 0
@@ -214,11 +214,11 @@
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle_jsi.hpp": "8cc9b660c994f4d9a2ce441f26ab57d87e9bfb6cb585e369cda9b2391059f121",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle.h": "08ddb61aab3b171e59d3a7b80d700f40435bd12c5c60b4c5169be4b35c0d57ce",
-    "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js": "669f4442c62d75c33a246beffb7854d2b11f387a5825e6846061777f4d7fae85",
+    "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js": "42639ed7d9494a98aa61c21e800f8a185300d3a09e5e2cc5201a3d6691483821",
     "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp": "77d5d21ea2042f031f072b5d193775a80bbcffa832c4081f87890114bc9055cc",
-    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp": "c7eabe0dd82e96a7362b71cc5739d66fe478c3b7d8ad9ad0204652e40930879c",
-    "native/generated_dmsdk_borrowed_handle_header_audit.cpp": "69926c44a65a07f6989b55cf543806dda1812760e37ed65b79a1795620a8e300",
-    "packages/sdk/src/generated/dmsdk/borrowed-handle.ts": "a95b9833a9be14a8768625449bc3689fc3dcd4ccd52272ff4b04aad6639985ef",
+    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp": "05783895db0a349a420d9f3f584639e6ac0122be29868bcab374930be725793f",
+    "native/generated_dmsdk_borrowed_handle_header_audit.cpp": "d2654039564a3e9cebd24e0bbb4442ef9609d062a0a6dd7cd9c25bfba0878cf6",
+    "packages/sdk/src/generated/dmsdk/borrowed-handle.ts": "c44facb9dfe0bc0c6fd94f1a24874ee50882d1c51f8257348279f8e52891d003",
     "packages/static-hermes/src/generated/dmsdk-borrowed-handle.ts": "0b78c09dda1b47099b29088274beaba9458296c08b55efbb11db44755e9f001d"
   },
   "artifacts": [
@@ -234,7 +234,7 @@
   "declarations": [
     {
       "id": "dmsdk:ContextRegistryGetByHash@upstream/defold/engine/dlib/src/dmsdk/dlib/context_registry.h:76:152",
-      "projectionId": "dmsdk-projection:71ab2322b019e8d3083f8f01",
+      "projectionId": "dmsdk-projection:d00f9dccdb9467c1e6b02804",
       "symbol": "ContextRegistryGetByHash",
       "disposition": "blocked",
       "blockers": [
@@ -249,7 +249,7 @@
     },
     {
       "id": "dmsdk:ContextRegistrySetByHash@upstream/defold/engine/dlib/src/dmsdk/dlib/context_registry.h:58:150",
-      "projectionId": "dmsdk-projection:57f1d9d23980c975ac4fd6e7",
+      "projectionId": "dmsdk-projection:a861b5c49949f9d7dbbc84a0",
       "symbol": "ContextRegistrySetByHash",
       "disposition": "blocked",
       "blockers": [
@@ -265,7 +265,7 @@
     },
     {
       "id": "dmsdk:dmBuffer::Copy@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:194:91",
-      "projectionId": "dmsdk-projection:f26700b50e144776dcf19e02",
+      "projectionId": "dmsdk-projection:00fd7f1fc45647ee412e3a83",
       "symbol": "dmBuffer::Copy",
       "disposition": "blocked",
       "blockers": [
@@ -280,7 +280,7 @@
     },
     {
       "id": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102",
-      "projectionId": "dmsdk-projection:84730b5a1b96860d0244eba6",
+      "projectionId": "dmsdk-projection:facae2be4886335518890e9f",
       "symbol": "dmBuffer::GetContentVersion",
       "disposition": "blocked",
       "blockers": [
@@ -298,7 +298,7 @@
     },
     {
       "id": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98",
-      "projectionId": "dmsdk-projection:43adf33b3a9be6e0cea74191",
+      "projectionId": "dmsdk-projection:8a2ac994c3a0a0ef8aa3a3ff",
       "symbol": "dmBuffer::GetStreamType",
       "disposition": "blocked",
       "blockers": [
@@ -317,7 +317,7 @@
     },
     {
       "id": "dmsdk:dmBuffer::IsBufferValid@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:227:93",
-      "projectionId": "dmsdk-projection:d1d3b63d03e0e81faf24f784",
+      "projectionId": "dmsdk-projection:988ee094fbf8b9917b84309b",
       "symbol": "dmBuffer::IsBufferValid",
       "disposition": "generated-provider-boundary",
       "bindingId": 0,
@@ -346,7 +346,7 @@
     },
     {
       "id": "dmsdk:dmBuffer::UpdateContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:401:103",
-      "projectionId": "dmsdk-projection:dc076f760b817d46195bff6a",
+      "projectionId": "dmsdk-projection:372c29a6d56870b43703f2ae",
       "symbol": "dmBuffer::UpdateContentVersion",
       "disposition": "blocked",
       "blockers": [
@@ -361,7 +361,7 @@
     },
     {
       "id": "dmsdk:dmBuffer::ValidateBuffer@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:249:94",
-      "projectionId": "dmsdk-projection:884eb5a5da44de8c4a06f7f9",
+      "projectionId": "dmsdk-projection:dff37385d410b2716af173ae",
       "symbol": "dmBuffer::ValidateBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -376,7 +376,7 @@
     },
     {
       "id": "dmsdk:dmConditionVariable::Broadcast@upstream/defold/engine/dlib/src/dmsdk/dlib/condition_variable.h:91:112",
-      "projectionId": "dmsdk-projection:b12fdb1b1a0a6c33fe9eaca6",
+      "projectionId": "dmsdk-projection:b9742b7ef4544d6695540e6c",
       "symbol": "dmConditionVariable::Broadcast",
       "disposition": "blocked",
       "blockers": [
@@ -390,7 +390,7 @@
     },
     {
       "id": "dmsdk:dmConditionVariable::Signal@upstream/defold/engine/dlib/src/dmsdk/dlib/condition_variable.h:81:111",
-      "projectionId": "dmsdk-projection:378f6a7b419c290c02d035ee",
+      "projectionId": "dmsdk-projection:5796eaefa1c5400689fbd8bd",
       "symbol": "dmConditionVariable::Signal",
       "disposition": "blocked",
       "blockers": [
@@ -404,7 +404,7 @@
     },
     {
       "id": "dmsdk:dmConditionVariable::Wait@upstream/defold/engine/dlib/src/dmsdk/dlib/condition_variable.h:71:110",
-      "projectionId": "dmsdk-projection:950a110b2d88af02342c6187",
+      "projectionId": "dmsdk-projection:00f4f035abd90dd53cfcf114",
       "symbol": "dmConditionVariable::Wait",
       "disposition": "blocked",
       "blockers": [
@@ -418,7 +418,7 @@
     },
     {
       "id": "dmsdk:dmConnectionPool::GetReuseCount@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:178:145",
-      "projectionId": "dmsdk-projection:882ad0725a6c963d4f269870",
+      "projectionId": "dmsdk-projection:ab871d1585caa31a36a26bb6",
       "symbol": "dmConnectionPool::GetReuseCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 1,
@@ -447,7 +447,7 @@
     },
     {
       "id": "dmsdk:dmConnectionPool::Return@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:143:141",
-      "projectionId": "dmsdk-projection:0d1a8cbc9f74b9cdb5c56a00",
+      "projectionId": "dmsdk-projection:c30e6ac37bc7bc68644fa60e",
       "symbol": "dmConnectionPool::Return",
       "disposition": "blocked",
       "blockers": [
@@ -461,7 +461,7 @@
     },
     {
       "id": "dmsdk:dmConnectionPool::Shutdown@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:189:146",
-      "projectionId": "dmsdk-projection:55bf1f1b778fc1c9af3ac3d8",
+      "projectionId": "dmsdk-projection:7070380385a2bca7309391c8",
       "symbol": "dmConnectionPool::Shutdown",
       "disposition": "blocked",
       "blockers": [
@@ -476,7 +476,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::AddDynamicResourceHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:899:1039",
-      "projectionId": "dmsdk-projection:6f5504561a87066798729508",
+      "projectionId": "dmsdk-projection:43d8105167ad144ba59496cd",
       "symbol": "dmGameObject::AddDynamicResourceHash",
       "disposition": "blocked",
       "blockers": [
@@ -490,7 +490,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::AssignInstanceIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:614:1007",
-      "projectionId": "dmsdk-projection:242b608dbf6822bf1239013a",
+      "projectionId": "dmsdk-projection:4a444888c8e549e425ad5aa4",
       "symbol": "dmGameObject::AssignInstanceIndex",
       "disposition": "blocked",
       "blockers": [
@@ -504,7 +504,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeGetContext@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:714:928",
-      "projectionId": "dmsdk-projection:380d02c5786785346a217ed1",
+      "projectionId": "dmsdk-projection:41a58a05a6950cccb0c60016",
       "symbol": "dmGameObject::ComponentTypeGetContext",
       "disposition": "blocked",
       "blockers": [
@@ -519,7 +519,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeGetTypeIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:545:907",
-      "projectionId": "dmsdk-projection:c12c4bb708e89ab2aec5cf18",
+      "projectionId": "dmsdk-projection:47f0b9138cb62da82ec3e271",
       "symbol": "dmGameObject::ComponentTypeGetTypeIndex",
       "disposition": "generated-provider-boundary",
       "bindingId": 2,
@@ -548,7 +548,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeSetContext@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:706:927",
-      "projectionId": "dmsdk-projection:d4c77102cbb02229571a6d6b",
+      "projectionId": "dmsdk-projection:7282e3b6b4adc8e807022a0f",
       "symbol": "dmGameObject::ComponentTypeSetContext",
       "disposition": "blocked",
       "blockers": [
@@ -565,7 +565,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeSetHasUserData@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:739:931",
-      "projectionId": "dmsdk-projection:71e0864d58bd7a377d63dfc2",
+      "projectionId": "dmsdk-projection:5856eae979c87cee01d7b666",
       "symbol": "dmGameObject::ComponentTypeSetHasUserData",
       "disposition": "blocked",
       "blockers": [
@@ -579,7 +579,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeSetPrio@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:731:930",
-      "projectionId": "dmsdk-projection:ed43b61e67505ef68c96f3f8",
+      "projectionId": "dmsdk-projection:b474b633b73dc2dbf4a75c1e",
       "symbol": "dmGameObject::ComponentTypeSetPrio",
       "disposition": "blocked",
       "blockers": [
@@ -593,7 +593,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::ComponentTypeSetReadsTransforms@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:723:929",
-      "projectionId": "dmsdk-projection:b293a4c6e11228ac4e98fbbc",
+      "projectionId": "dmsdk-projection:583938ebb17a791d664c1c98",
       "symbol": "dmGameObject::ComponentTypeSetReadsTransforms",
       "disposition": "blocked",
       "blockers": [
@@ -607,7 +607,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::GetComponentTypeIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:871:1036",
-      "projectionId": "dmsdk-projection:b738154fcf14767f3314a1d7",
+      "projectionId": "dmsdk-projection:6a1980199f2068f4abec0ebf",
       "symbol": "dmGameObject::GetComponentTypeIndex",
       "disposition": "generated-provider-boundary",
       "bindingId": 3,
@@ -636,7 +636,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::GetContext@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:889:1038",
-      "projectionId": "dmsdk-projection:cc1fb3e9ee8480f1dd78ad32",
+      "projectionId": "dmsdk-projection:e259c279f3879a8dded4ef08",
       "symbol": "dmGameObject::GetContext",
       "disposition": "blocked",
       "blockers": [
@@ -651,7 +651,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::GetGeneration@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:631:1009",
-      "projectionId": "dmsdk-projection:9f17ff5414d69211d5517a7c",
+      "projectionId": "dmsdk-projection:ba6fbc75346385060c9a3c26",
       "symbol": "dmGameObject::GetGeneration",
       "disposition": "generated-provider-boundary",
       "bindingId": 4,
@@ -680,7 +680,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::GetIdentifier@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:622:1008",
-      "projectionId": "dmsdk-projection:56c12d13fcdd062d0328a6dc",
+      "projectionId": "dmsdk-projection:7a2621cf0209ec625247d7c2",
       "symbol": "dmGameObject::GetIdentifier",
       "disposition": "generated-provider-boundary",
       "bindingId": 5,
@@ -709,7 +709,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::GetPosition@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:701:1016",
-      "projectionId": "dmsdk-projection:04f661d78b8c4681aa3d6865",
+      "projectionId": "dmsdk-projection:d6a92e40fae0fb2d0c9bed2c",
       "symbol": "dmGameObject::GetPosition",
       "disposition": "blocked",
       "blockers": [
@@ -717,14 +717,14 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Point3",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyOptionsCount@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:907:1040",
-      "projectionId": "dmsdk-projection:cdbba55ac3373b28b36391e0",
+      "projectionId": "dmsdk-projection:be999bf8cc86eace067bf269",
       "symbol": "dmGameObject::GetPropertyOptionsCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 6,
@@ -753,7 +753,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::GetRotation@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:717:1018",
-      "projectionId": "dmsdk-projection:07e1da21b129d38142f46524",
+      "projectionId": "dmsdk-projection:c88416a7230cbe72a2482bd0",
       "symbol": "dmGameObject::GetRotation",
       "disposition": "blocked",
       "blockers": [
@@ -761,14 +761,14 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Quat",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
       "id": "dmsdk:dmGameObject::GetScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:758:1023",
-      "projectionId": "dmsdk-projection:e599948f22c6507babbfc783",
+      "projectionId": "dmsdk-projection:bd12e46002c0c92b6c04a4ee",
       "symbol": "dmGameObject::GetScale",
       "disposition": "blocked",
       "blockers": [
@@ -776,14 +776,14 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Vector3",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
       "id": "dmsdk:dmGameObject::GetUniformScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:750:1022",
-      "projectionId": "dmsdk-projection:35602d7298311a2b570d04f9",
+      "projectionId": "dmsdk-projection:6c406f44b2fb42394e2d1565",
       "symbol": "dmGameObject::GetUniformScale",
       "disposition": "generated-provider-boundary",
       "bindingId": 7,
@@ -812,7 +812,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldMatrix@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:798:1028",
-      "projectionId": "dmsdk-projection:8c4704c8453028f2dd699a58",
+      "projectionId": "dmsdk-projection:b8a71834d6357929085f475b",
       "symbol": "dmGameObject::GetWorldMatrix",
       "disposition": "blocked",
       "blockers": [
@@ -820,15 +820,15 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Matrix4",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Matrix4(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldPosition@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:766:1024",
-      "projectionId": "dmsdk-projection:98316c5e87edc5b6480c8aa9",
+      "projectionId": "dmsdk-projection:f8272f4cf073074ad4a5531d",
       "symbol": "dmGameObject::GetWorldPosition",
       "disposition": "blocked",
       "blockers": [
@@ -836,14 +836,14 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Point3",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldRotation@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:774:1025",
-      "projectionId": "dmsdk-projection:2eb1fcab649c3d350cd510f4",
+      "projectionId": "dmsdk-projection:c9327244ce1aea083939058e",
       "symbol": "dmGameObject::GetWorldRotation",
       "disposition": "blocked",
       "blockers": [
@@ -851,14 +851,14 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Quat",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:782:1026",
-      "projectionId": "dmsdk-projection:319d2a3f56128d656d4c96ca",
+      "projectionId": "dmsdk-projection:ecb36984a8cbf875ae386fa5",
       "symbol": "dmGameObject::GetWorldScale",
       "disposition": "blocked",
       "blockers": [
@@ -866,14 +866,14 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Vector3",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
       "id": "dmsdk:dmGameObject::GetWorldUniformScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:790:1027",
-      "projectionId": "dmsdk-projection:9763612f2c60f19d7225b56e",
+      "projectionId": "dmsdk-projection:f2e42605b18a8c14296402b0",
       "symbol": "dmGameObject::GetWorldUniformScale",
       "disposition": "generated-provider-boundary",
       "bindingId": 8,
@@ -902,7 +902,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::IsBone@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:824:1031",
-      "projectionId": "dmsdk-projection:7df62476f377f2a9f8ea3676",
+      "projectionId": "dmsdk-projection:c1ab303c2264f87938208a41",
       "symbol": "dmGameObject::IsBone",
       "disposition": "generated-provider-boundary",
       "bindingId": 9,
@@ -931,7 +931,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerDestroy@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:189:1096",
-      "projectionId": "dmsdk-projection:5e95e4588e6d784d5f31c338",
+      "projectionId": "dmsdk-projection:7d9052c3bdc5fea16d9a3d37",
       "symbol": "dmGameObject::PropertyContainerDestroy",
       "disposition": "blocked",
       "blockers": [
@@ -945,7 +945,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:137:1090",
-      "projectionId": "dmsdk-projection:2f847165dce0fb281040e6f6",
+      "projectionId": "dmsdk-projection:cefe4b23eb3ee984bb239014",
       "symbol": "dmGameObject::PropertyContainerPushBool",
       "disposition": "blocked",
       "blockers": [
@@ -959,7 +959,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:101:1086",
-      "projectionId": "dmsdk-projection:792495a90326f1c776f17b23",
+      "projectionId": "dmsdk-projection:3687939ee2a18694a886d1ea",
       "symbol": "dmGameObject::PropertyContainerPushFloat",
       "disposition": "blocked",
       "blockers": [
@@ -973,7 +973,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:146:1091",
-      "projectionId": "dmsdk-projection:8f24dad75e4dd3c80336e0c2",
+      "projectionId": "dmsdk-projection:3af2202ae708d82e2419bc6a",
       "symbol": "dmGameObject::PropertyContainerPushHash",
       "disposition": "blocked",
       "blockers": [
@@ -987,7 +987,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushQuat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:128:1089",
-      "projectionId": "dmsdk-projection:96a85adad3dcf263f60566ec",
+      "projectionId": "dmsdk-projection:ef54f5aca3cd160ca087c92c",
       "symbol": "dmGameObject::PropertyContainerPushQuat",
       "disposition": "blocked",
       "blockers": [
@@ -1003,7 +1003,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushVector3@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:110:1087",
-      "projectionId": "dmsdk-projection:27c5539f2978bc5aab855490",
+      "projectionId": "dmsdk-projection:5983b00250871a841bed59e4",
       "symbol": "dmGameObject::PropertyContainerPushVector3",
       "disposition": "blocked",
       "blockers": [
@@ -1019,7 +1019,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::PropertyContainerPushVector4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:119:1088",
-      "projectionId": "dmsdk-projection:5d39ef160b6a967596e29891",
+      "projectionId": "dmsdk-projection:d928d8451d4be1ab2a24810f",
       "symbol": "dmGameObject::PropertyContainerPushVector4",
       "disposition": "blocked",
       "blockers": [
@@ -1035,7 +1035,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetBone@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:816:1030",
-      "projectionId": "dmsdk-projection:aa49fccecf41e4f0c288dad3",
+      "projectionId": "dmsdk-projection:baf1a92dd6395463b931ac13",
       "symbol": "dmGameObject::SetBone",
       "disposition": "blocked",
       "blockers": [
@@ -1049,7 +1049,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetIdentifier@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:641:1010",
-      "projectionId": "dmsdk-projection:0d521fa45df510b9390764d1",
+      "projectionId": "dmsdk-projection:c43cb306c285f3bdc7bdc242",
       "symbol": "dmGameObject::SetIdentifier",
       "disposition": "blocked",
       "blockers": [
@@ -1064,7 +1064,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetParent@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:854:1034",
-      "projectionId": "dmsdk-projection:6b50caf2bc143aeaa90c720d",
+      "projectionId": "dmsdk-projection:1fe09806a5f7d7ceacbd5001",
       "symbol": "dmGameObject::SetParent",
       "disposition": "blocked",
       "blockers": [
@@ -1079,7 +1079,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetPosition@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:693:1015",
-      "projectionId": "dmsdk-projection:f093d1678cbe363f3fdfdd72",
+      "projectionId": "dmsdk-projection:f32f0cc5eaddb7a85200e95a",
       "symbol": "dmGameObject::SetPosition",
       "disposition": "blocked",
       "blockers": [
@@ -1088,14 +1088,14 @@
         "native-symbol-linkage-unverified",
         "parameter-role-unsupported:1:unknown:dmVMath::Point3",
         "result-role-unsupported:scalar:void",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Point3)"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1093:1057",
-      "projectionId": "dmsdk-projection:45be3722f0519829e93feb65",
+      "projectionId": "dmsdk-projection:f948e9479d9cac68863e981b",
       "symbol": "dmGameObject::SetPropertyFromBool",
       "disposition": "blocked",
       "blockers": [
@@ -1110,7 +1110,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1049:1053",
-      "projectionId": "dmsdk-projection:ab6cf54b6d21abeb18035fab",
+      "projectionId": "dmsdk-projection:b189a2f21178baf02e94d57b",
       "symbol": "dmGameObject::SetPropertyFromFloat",
       "disposition": "blocked",
       "blockers": [
@@ -1125,7 +1125,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1038:1052",
-      "projectionId": "dmsdk-projection:1716b52c9a3370e567f0ce18",
+      "projectionId": "dmsdk-projection:7a33cd4b7810552f0c03941b",
       "symbol": "dmGameObject::SetPropertyFromHash",
       "disposition": "blocked",
       "blockers": [
@@ -1140,7 +1140,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromMatrix4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1127:1060",
-      "projectionId": "dmsdk-projection:5863fd4211b66cd17959ca8a",
+      "projectionId": "dmsdk-projection:347d5cb3bbe4c72bd3886811",
       "symbol": "dmGameObject::SetPropertyFromMatrix4",
       "disposition": "blocked",
       "blockers": [
@@ -1150,15 +1150,15 @@
         "parameter-role-unsupported:3:unknown:dmVMath::Matrix4",
         "result-role-unsupported:enum:dmGameObject::PropertyResult",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:unknown:dmVMath::Matrix4)"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromQuat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1082:1056",
-      "projectionId": "dmsdk-projection:99a6da567285973f2173a6ef",
+      "projectionId": "dmsdk-projection:926a6845a8694372d4091b71",
       "symbol": "dmGameObject::SetPropertyFromQuat",
       "disposition": "blocked",
       "blockers": [
@@ -1168,14 +1168,14 @@
         "parameter-role-unsupported:3:unknown:dmVMath::Quat",
         "result-role-unsupported:enum:dmGameObject::PropertyResult",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Quat)"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromVector3@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1060:1054",
-      "projectionId": "dmsdk-projection:fab60062ec8bb74ea34ddaa5",
+      "projectionId": "dmsdk-projection:76cd3c10b0b6732ec86d3bec",
       "symbol": "dmGameObject::SetPropertyFromVector3",
       "disposition": "blocked",
       "blockers": [
@@ -1185,14 +1185,14 @@
         "parameter-role-unsupported:3:unknown:dmVMath::Vector3",
         "result-role-unsupported:enum:dmGameObject::PropertyResult",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector3)"
     },
     {
       "id": "dmsdk:dmGameObject::SetPropertyFromVector4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1071:1055",
-      "projectionId": "dmsdk-projection:87848eb79fdccdf3d05b4456",
+      "projectionId": "dmsdk-projection:e2dec98965b89f41d7439b3f",
       "symbol": "dmGameObject::SetPropertyFromVector4",
       "disposition": "blocked",
       "blockers": [
@@ -1202,14 +1202,14 @@
         "parameter-role-unsupported:3:unknown:dmVMath::Vector4",
         "result-role-unsupported:enum:dmGameObject::PropertyResult",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector4)"
     },
     {
       "id": "dmsdk:dmGameObject::SetRotation@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:709:1017",
-      "projectionId": "dmsdk-projection:b4b96fc3360b1e1d166a17f9",
+      "projectionId": "dmsdk-projection:73a9a0eac2b9262483c45e99",
       "symbol": "dmGameObject::SetRotation",
       "disposition": "blocked",
       "blockers": [
@@ -1218,14 +1218,14 @@
         "native-symbol-linkage-unverified",
         "parameter-role-unsupported:1:unknown:dmVMath::Quat",
         "result-role-unsupported:scalar:void",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Quat)"
     },
     {
       "id": "dmsdk:dmGameObject::SetScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:725:1019",
-      "projectionId": "dmsdk-projection:d45689a22901c1e78076196a",
+      "projectionId": "dmsdk-projection:f25c3c908877accad4285aa4",
       "symbol": "dmGameObject::SetScale",
       "disposition": "blocked",
       "blockers": [
@@ -1239,7 +1239,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::SetScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:733:1020",
-      "projectionId": "dmsdk-projection:0d2101f31ff3064b417c36b4",
+      "projectionId": "dmsdk-projection:8f0b5297426e1aadfe9a632c",
       "symbol": "dmGameObject::SetScale",
       "disposition": "blocked",
       "blockers": [
@@ -1248,14 +1248,14 @@
         "native-symbol-linkage-unverified",
         "parameter-role-unsupported:1:unknown:dmVMath::Vector3",
         "result-role-unsupported:scalar:void",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Vector3)"
     },
     {
       "id": "dmsdk:dmGameObject::SetScaleXY@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:742:1021",
-      "projectionId": "dmsdk-projection:f6c6cf1720dcbe937270ea5b",
+      "projectionId": "dmsdk-projection:d3a4edd42975198c2495033b",
       "symbol": "dmGameObject::SetScaleXY",
       "disposition": "blocked",
       "blockers": [
@@ -1269,7 +1269,7 @@
     },
     {
       "id": "dmsdk:dmGameObject::TraverseGetRoot@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1225:1068",
-      "projectionId": "dmsdk-projection:6c6aec19009013afa8eefccf",
+      "projectionId": "dmsdk-projection:dbc01a9fa655a23218c5f43b",
       "symbol": "dmGameObject::TraverseGetRoot",
       "disposition": "blocked",
       "blockers": [
@@ -1286,7 +1286,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::AreRenderConstantsUpdated@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:146:1208",
-      "projectionId": "dmsdk-projection:1577b791fd2c70273600d327",
+      "projectionId": "dmsdk-projection:3d2660e5124e767198032324",
       "symbol": "dmGameSystem::AreRenderConstantsUpdated",
       "disposition": "generated-provider-boundary",
       "bindingId": 10,
@@ -1315,7 +1315,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ClearRenderConstant@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:130:1206",
-      "projectionId": "dmsdk-projection:b5555515e4af21e40a05d06e",
+      "projectionId": "dmsdk-projection:4ae18c924e3a795f8ef3cb42",
       "symbol": "dmGameSystem::ClearRenderConstant",
       "disposition": "generated-provider-boundary",
       "bindingId": 11,
@@ -1344,7 +1344,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxyDisable@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:39:1128",
-      "projectionId": "dmsdk-projection:7d0b8a8890a13200a1a82188",
+      "projectionId": "dmsdk-projection:83d4a7d3e8b9b63b934150d2",
       "symbol": "dmGameSystem::CompCollectionProxyDisable",
       "disposition": "blocked",
       "blockers": [
@@ -1359,7 +1359,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxyEnable@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:37:1127",
-      "projectionId": "dmsdk-projection:e785adf3686a77223312aff9",
+      "projectionId": "dmsdk-projection:01879ef477fe1c8374e0c3a2",
       "symbol": "dmGameSystem::CompCollectionProxyEnable",
       "disposition": "blocked",
       "blockers": [
@@ -1374,7 +1374,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxyFinalize@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:35:1126",
-      "projectionId": "dmsdk-projection:80afca592777f43bf4d82d99",
+      "projectionId": "dmsdk-projection:140296f59bba7fe1fc67f548",
       "symbol": "dmGameSystem::CompCollectionProxyFinalize",
       "disposition": "blocked",
       "blockers": [
@@ -1389,7 +1389,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxyInitialize@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:33:1125",
-      "projectionId": "dmsdk-projection:6ddb8292a464c514b0739a10",
+      "projectionId": "dmsdk-projection:0749834376f75cc6bea8ef61",
       "symbol": "dmGameSystem::CompCollectionProxyInitialize",
       "disposition": "blocked",
       "blockers": [
@@ -1404,7 +1404,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompCollectionProxySetTimeStep@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_proxy.h:44:1129",
-      "projectionId": "dmsdk-projection:dfd8604a2428931cb7ca8108",
+      "projectionId": "dmsdk-projection:3a40948428e4830af3ab286f",
       "symbol": "dmGameSystem::CompCollectionProxySetTimeStep",
       "disposition": "blocked",
       "blockers": [
@@ -1419,7 +1419,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompFactoryGetStatus@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_factory.h:54:1137",
-      "projectionId": "dmsdk-projection:1fa85c87f45ce8d53179b0a5",
+      "projectionId": "dmsdk-projection:bfb1cae0782f0a1621337bf8",
       "symbol": "dmGameSystem::CompFactoryGetStatus",
       "disposition": "blocked",
       "blockers": [
@@ -1434,7 +1434,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompFactoryIsDynamicPrototype@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_factory.h:56:1139",
-      "projectionId": "dmsdk-projection:925a008bee285f83b4b4a6ef",
+      "projectionId": "dmsdk-projection:aa2841e7d926f20fc752b05e",
       "symbol": "dmGameSystem::CompFactoryIsDynamicPrototype",
       "disposition": "generated-provider-boundary",
       "bindingId": 12,
@@ -1463,7 +1463,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::CompFactoryIsLoading@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_factory.h:55:1138",
-      "projectionId": "dmsdk-projection:a667a380de4a5ec4ed62af36",
+      "projectionId": "dmsdk-projection:155a518bd38118703cab4898",
       "symbol": "dmGameSystem::CompFactoryIsLoading",
       "disposition": "generated-provider-boundary",
       "bindingId": 13,
@@ -1492,7 +1492,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::EnableRenderObjectConstants@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:153:1209",
-      "projectionId": "dmsdk-projection:6b55dcd4483e245f5cc36308",
+      "projectionId": "dmsdk-projection:f1994a1a99e3b8f16dde7ec2",
       "symbol": "dmGameSystem::EnableRenderObjectConstants",
       "disposition": "blocked",
       "blockers": [
@@ -1510,7 +1510,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::GetRenderConstantCount@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:90:1202",
-      "projectionId": "dmsdk-projection:198d5e762f14f889a8396fbf",
+      "projectionId": "dmsdk-projection:7710a34c53e9f0cbb4b94fec",
       "symbol": "dmGameSystem::GetRenderConstantCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 14,
@@ -1539,7 +1539,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::HashRenderConstants@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:139:1207",
-      "projectionId": "dmsdk-projection:f2a45573d2fa5a62dc20271b",
+      "projectionId": "dmsdk-projection:365f6b5db49468b9d5002bcf",
       "symbol": "dmGameSystem::HashRenderConstants",
       "disposition": "blocked",
       "blockers": [
@@ -1557,7 +1557,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResCollectionFactoryDestroyResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:41:1220",
-      "projectionId": "dmsdk-projection:a5ebb399ddaa2b20fd24c4a5",
+      "projectionId": "dmsdk-projection:40e556425e419cbd69e8c70a",
       "symbol": "dmGameSystem::ResCollectionFactoryDestroyResource",
       "disposition": "blocked",
       "blockers": [
@@ -1575,7 +1575,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResFactoryDestroyResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:38:1236",
-      "projectionId": "dmsdk-projection:d729312bde977b9831736066",
+      "projectionId": "dmsdk-projection:cf823ca9242569e21c4e1911",
       "symbol": "dmGameSystem::ResFactoryDestroyResource",
       "disposition": "blocked",
       "blockers": [
@@ -1593,7 +1593,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontAddFontByPathHash@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:183:1252",
-      "projectionId": "dmsdk-projection:4896233632304d9004c4473f",
+      "projectionId": "dmsdk-projection:2180c38d5c8dd44ceab04a51",
       "symbol": "dmGameSystem::ResFontAddFontByPathHash",
       "disposition": "blocked",
       "blockers": [
@@ -1612,7 +1612,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontAddGlyph@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:163:1250",
-      "projectionId": "dmsdk-projection:64ed46b79e42aa6739213fd8",
+      "projectionId": "dmsdk-projection:91f3c5bfac2d37e59ebc0f1c",
       "symbol": "dmGameSystem::ResFontAddGlyph",
       "disposition": "blocked",
       "blockers": [
@@ -1632,7 +1632,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontGetPathHashFromFont@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:128:1246",
-      "projectionId": "dmsdk-projection:c6e7d0036ec511705d83fcdd",
+      "projectionId": "dmsdk-projection:10fce3cd874afaa661ab288c",
       "symbol": "dmGameSystem::ResFontGetPathHashFromFont",
       "disposition": "blocked",
       "blockers": [
@@ -1649,7 +1649,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontGetTTFResourceFromFont@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:120:1245",
-      "projectionId": "dmsdk-projection:b5337e769c5fbadd4da6e875",
+      "projectionId": "dmsdk-projection:88563ad0e823fc16fd43cd68",
       "symbol": "dmGameSystem::ResFontGetTTFResourceFromFont",
       "disposition": "blocked",
       "blockers": [
@@ -1667,7 +1667,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontIsGlyphIndexCached@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:154:1249",
-      "projectionId": "dmsdk-projection:e8ff8a4e0509982a46071c54",
+      "projectionId": "dmsdk-projection:ba0012d5ed25865e140cd97e",
       "symbol": "dmGameSystem::ResFontIsGlyphIndexCached",
       "disposition": "blocked",
       "blockers": [
@@ -1684,7 +1684,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::ResFontRemoveFont@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:192:1253",
-      "projectionId": "dmsdk-projection:4eb3411eb2606bd529be3903",
+      "projectionId": "dmsdk-projection:fb1b52273f46b46c08e34a70",
       "symbol": "dmGameSystem::ResFontRemoveFont",
       "disposition": "blocked",
       "blockers": [
@@ -1703,7 +1703,7 @@
     },
     {
       "id": "dmsdk:dmGameSystem::SetRenderConstant@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:121:1205",
-      "projectionId": "dmsdk-projection:a57e40ffdf3adfb81ceecae6",
+      "projectionId": "dmsdk-projection:7ff0fe7ad8b7984e0710e0b7",
       "symbol": "dmGameSystem::SetRenderConstant",
       "disposition": "blocked",
       "blockers": [
@@ -1712,16 +1712,16 @@
         "native-symbol-linkage-unverified",
         "parameter-role-unsupported:2:pointer:unknown:dmVMath::Vector4",
         "result-role-unsupported:scalar:void",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:out-storage-initialization-failure",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
       "id": "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:952:1375",
-      "projectionId": "dmsdk-projection:3172b1a18cf1509a8f03fe3c",
+      "projectionId": "dmsdk-projection:8604203bf81d88dfc11179e9",
       "symbol": "dmGraphics::AddVertexStream",
       "disposition": "blocked",
       "blockers": [
@@ -1737,7 +1737,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::BeginFrame@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1731:1457",
-      "projectionId": "dmsdk-projection:15086a9a5ce0dd1b2c6ee301",
+      "projectionId": "dmsdk-projection:6f36b5920b4aff9cb2c98d1d",
       "symbol": "dmGraphics::BeginFrame",
       "disposition": "blocked",
       "blockers": [
@@ -1751,7 +1751,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::Clear@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1968:1476",
-      "projectionId": "dmsdk-projection:18b5a5716de307fda4b17d55",
+      "projectionId": "dmsdk-projection:7f7e0cda418160cc367d7b3a",
       "symbol": "dmGraphics::Clear",
       "disposition": "blocked",
       "blockers": [
@@ -1765,7 +1765,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::DisableProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1808:1464",
-      "projectionId": "dmsdk-projection:73a480ccd28c72cd41f8b499",
+      "projectionId": "dmsdk-projection:6f0ddcf2bfb3f5cbbe1a7cc5",
       "symbol": "dmGraphics::DisableProgram",
       "disposition": "blocked",
       "blockers": [
@@ -1779,7 +1779,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::DisableState@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1487:1432",
-      "projectionId": "dmsdk-projection:c1ccc1a945cf6a0318c8afec",
+      "projectionId": "dmsdk-projection:d5933ef9986f37f1aeaf6f3a",
       "symbol": "dmGraphics::DisableState",
       "disposition": "blocked",
       "blockers": [
@@ -1795,7 +1795,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::DisableTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1372:1418",
-      "projectionId": "dmsdk-projection:acd4ca89c54ec0d611b33421",
+      "projectionId": "dmsdk-projection:c5f3ee099ad453eac62dc647",
       "symbol": "dmGraphics::DisableTexture",
       "disposition": "blocked",
       "blockers": [
@@ -1809,7 +1809,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::DisableVertexBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1857:1468",
-      "projectionId": "dmsdk-projection:b5a4b1c7e4d6b354d441dc84",
+      "projectionId": "dmsdk-projection:c6944c696eeacdb401a05457",
       "symbol": "dmGraphics::DisableVertexBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -1823,7 +1823,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::DisableVertexDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1833:1466",
-      "projectionId": "dmsdk-projection:236729e5c57282d189f0547d",
+      "projectionId": "dmsdk-projection:00cc32e50707b48964ac84a0",
       "symbol": "dmGraphics::DisableVertexDeclaration",
       "disposition": "blocked",
       "blockers": [
@@ -1837,7 +1837,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::Draw@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1872:1469",
-      "projectionId": "dmsdk-projection:a32ad4b1525582c915dea480",
+      "projectionId": "dmsdk-projection:204d4e6fe8cf7ea307928167",
       "symbol": "dmGraphics::Draw",
       "disposition": "blocked",
       "blockers": [
@@ -1853,7 +1853,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::DrawElements@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1888:1470",
-      "projectionId": "dmsdk-projection:2759f0ba42e87b2aa151b202",
+      "projectionId": "dmsdk-projection:dab06b9323e3a83a16ddca26",
       "symbol": "dmGraphics::DrawElements",
       "disposition": "blocked",
       "blockers": [
@@ -1870,7 +1870,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::EnableProgram@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1798:1463",
-      "projectionId": "dmsdk-projection:a35ad9b6e496299f01625d67",
+      "projectionId": "dmsdk-projection:9470e980bda144922b475930",
       "symbol": "dmGraphics::EnableProgram",
       "disposition": "blocked",
       "blockers": [
@@ -1884,7 +1884,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::EnableState@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1480:1431",
-      "projectionId": "dmsdk-projection:80a259c1f1733047a5c1bc82",
+      "projectionId": "dmsdk-projection:07dde3c02f4803505f0de8a0",
       "symbol": "dmGraphics::EnableState",
       "disposition": "blocked",
       "blockers": [
@@ -1900,7 +1900,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::EnableTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1358:1417",
-      "projectionId": "dmsdk-projection:6fccb3f3401562633947a33f",
+      "projectionId": "dmsdk-projection:6ce05f3a270a3babffcd43dc",
       "symbol": "dmGraphics::EnableTexture",
       "disposition": "blocked",
       "blockers": [
@@ -1914,7 +1914,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::EnableVertexBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1846:1467",
-      "projectionId": "dmsdk-projection:a71dc2e2b8d295fc36dba08b",
+      "projectionId": "dmsdk-projection:c78ccd163484eed2a4fce134",
       "symbol": "dmGraphics::EnableVertexBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -1928,7 +1928,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::EnableVertexDeclaration@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1822:1465",
-      "projectionId": "dmsdk-projection:a034f2efc5df9b603a6b9e69",
+      "projectionId": "dmsdk-projection:82bb9d90aa4884e27766111a",
       "symbol": "dmGraphics::EnableVertexDeclaration",
       "disposition": "blocked",
       "blockers": [
@@ -1942,7 +1942,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::Flip@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1741:1458",
-      "projectionId": "dmsdk-projection:1d13c6608bbf215e1f74443f",
+      "projectionId": "dmsdk-projection:54edaded7fa1efc070883299",
       "symbol": "dmGraphics::Flip",
       "disposition": "blocked",
       "blockers": [
@@ -1956,7 +1956,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetDisplayScaleFactor@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1636:1450",
-      "projectionId": "dmsdk-projection:7a803b24f176949f7c6de47d",
+      "projectionId": "dmsdk-projection:4775723d63702d6738ae2080",
       "symbol": "dmGraphics::GetDisplayScaleFactor",
       "disposition": "generated-provider-boundary",
       "bindingId": 15,
@@ -1985,7 +1985,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetHeight@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1428:1425",
-      "projectionId": "dmsdk-projection:9dfa6ac68e269a47d0230399",
+      "projectionId": "dmsdk-projection:554983d3f01df3f2806e38b9",
       "symbol": "dmGraphics::GetHeight",
       "disposition": "generated-provider-boundary",
       "bindingId": 16,
@@ -2014,7 +2014,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetMaxElementsIndices@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1097:1391",
-      "projectionId": "dmsdk-projection:11f416edc246f6c37cab948c",
+      "projectionId": "dmsdk-projection:eac86d9ca66ea8a6647e9d9c",
       "symbol": "dmGraphics::GetMaxElementsIndices",
       "disposition": "generated-provider-boundary",
       "bindingId": 17,
@@ -2043,7 +2043,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetMaxElementsVertices@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1041:1385",
-      "projectionId": "dmsdk-projection:2254fc2d2734979543454174",
+      "projectionId": "dmsdk-projection:b588e6066963f1af2529ee2c",
       "symbol": "dmGraphics::GetMaxElementsVertices",
       "disposition": "generated-provider-boundary",
       "bindingId": 18,
@@ -2072,7 +2072,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetMaxTextureSize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1396:1421",
-      "projectionId": "dmsdk-projection:76eedba49fee9cfde097753a",
+      "projectionId": "dmsdk-projection:87bafd5a32cfe4b4de6333bb",
       "symbol": "dmGraphics::GetMaxTextureSize",
       "disposition": "generated-provider-boundary",
       "bindingId": 19,
@@ -2101,7 +2101,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetNumSupportedExtensions@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1120:1394",
-      "projectionId": "dmsdk-projection:5a208de610bf7eb006989f12",
+      "projectionId": "dmsdk-projection:cd9ee4b78bd407516092d079",
       "symbol": "dmGraphics::GetNumSupportedExtensions",
       "disposition": "generated-provider-boundary",
       "bindingId": 20,
@@ -2130,7 +2130,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetNumTextureHandles@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1317:1414",
-      "projectionId": "dmsdk-projection:503684367c5b25efc46a92b6",
+      "projectionId": "dmsdk-projection:121197b6f083b65368804ef3",
       "symbol": "dmGraphics::GetNumTextureHandles",
       "disposition": "blocked",
       "blockers": [
@@ -2144,7 +2144,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetOriginalTextureHeight@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1289:1411",
-      "projectionId": "dmsdk-projection:ba9258bea1ada298391952ac",
+      "projectionId": "dmsdk-projection:062496fb5c76b2109a5ac08d",
       "symbol": "dmGraphics::GetOriginalTextureHeight",
       "disposition": "blocked",
       "blockers": [
@@ -2158,7 +2158,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetOriginalTextureWidth@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1280:1410",
-      "projectionId": "dmsdk-projection:6ce9cc05aab525acd5fd5a31",
+      "projectionId": "dmsdk-projection:a56db30adaf52cd63d2c003f",
       "symbol": "dmGraphics::GetOriginalTextureWidth",
       "disposition": "blocked",
       "blockers": [
@@ -2172,7 +2172,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetRenderTargetSampleCount@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1596:1445",
-      "projectionId": "dmsdk-projection:1d73284bbe67b9697993fad8",
+      "projectionId": "dmsdk-projection:3440cd87c4db76e186a1ec08",
       "symbol": "dmGraphics::GetRenderTargetSampleCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 21,
@@ -2201,7 +2201,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureDepth@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1271:1409",
-      "projectionId": "dmsdk-projection:2b975a59087fde2c3d8668cf",
+      "projectionId": "dmsdk-projection:ecbfb75f9a16ccca5e2d47ac",
       "symbol": "dmGraphics::GetTextureDepth",
       "disposition": "blocked",
       "blockers": [
@@ -2215,7 +2215,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureHeight@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1262:1408",
-      "projectionId": "dmsdk-projection:c30d2280d24da7e95f32c16f",
+      "projectionId": "dmsdk-projection:88796e0e5eadbfe01766b598",
       "symbol": "dmGraphics::GetTextureHeight",
       "disposition": "blocked",
       "blockers": [
@@ -2229,7 +2229,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureMipmapCount@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1298:1412",
-      "projectionId": "dmsdk-projection:4eb7946e07f51d8eb1411bf4",
+      "projectionId": "dmsdk-projection:d0f2d8fcfd2f3ce950cc88f5",
       "symbol": "dmGraphics::GetTextureMipmapCount",
       "disposition": "blocked",
       "blockers": [
@@ -2243,7 +2243,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureResourceSize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1244:1406",
-      "projectionId": "dmsdk-projection:8f6a9ba617c6adc5e0fc5369",
+      "projectionId": "dmsdk-projection:99b07a3882c1b88d393c997b",
       "symbol": "dmGraphics::GetTextureResourceSize",
       "disposition": "generated-provider-boundary",
       "bindingId": 22,
@@ -2272,7 +2272,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureStatusFlags@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1342:1416",
-      "projectionId": "dmsdk-projection:2e5c7a288789f92f8707a533",
+      "projectionId": "dmsdk-projection:38d93a9c7f443650a68838fd",
       "symbol": "dmGraphics::GetTextureStatusFlags",
       "disposition": "generated-provider-boundary",
       "bindingId": 23,
@@ -2301,7 +2301,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureType@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1307:1413",
-      "projectionId": "dmsdk-projection:34158fd88382db4766b98706",
+      "projectionId": "dmsdk-projection:aad994d0af3156efa939f103",
       "symbol": "dmGraphics::GetTextureType",
       "disposition": "blocked",
       "blockers": [
@@ -2316,7 +2316,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureUsageHintFlags@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1332:1415",
-      "projectionId": "dmsdk-projection:98bd99f9979d787ea66bfc23",
+      "projectionId": "dmsdk-projection:9930d392fb4a37c936911e82",
       "symbol": "dmGraphics::GetTextureUsageHintFlags",
       "disposition": "generated-provider-boundary",
       "bindingId": 24,
@@ -2345,7 +2345,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetTextureWidth@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1253:1407",
-      "projectionId": "dmsdk-projection:8c618b0dd5a934c1ffc5df4f",
+      "projectionId": "dmsdk-projection:01b51b04c2e56192c21d0975",
       "symbol": "dmGraphics::GetTextureWidth",
       "disposition": "blocked",
       "blockers": [
@@ -2359,7 +2359,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetVertexStreamOffset@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:995:1380",
-      "projectionId": "dmsdk-projection:4b1ff50b80ae03346849aa19",
+      "projectionId": "dmsdk-projection:d67a8172d50309d74631f4f3",
       "symbol": "dmGraphics::GetVertexStreamOffset",
       "disposition": "generated-provider-boundary",
       "bindingId": 25,
@@ -2388,7 +2388,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetWidth@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1420:1424",
-      "projectionId": "dmsdk-projection:2a5e2842668e5d37e9d8e9bb",
+      "projectionId": "dmsdk-projection:7a349b4881bb726a765e3ee1",
       "symbol": "dmGraphics::GetWidth",
       "disposition": "generated-provider-boundary",
       "bindingId": 26,
@@ -2417,7 +2417,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetWindowHeight@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1412:1423",
-      "projectionId": "dmsdk-projection:9f8a182e9104d71f43941a2e",
+      "projectionId": "dmsdk-projection:95a3139f1b9e540b78777019",
       "symbol": "dmGraphics::GetWindowHeight",
       "disposition": "generated-provider-boundary",
       "bindingId": 27,
@@ -2446,7 +2446,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::GetWindowWidth@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1404:1422",
-      "projectionId": "dmsdk-projection:58780efb83d45beb6659df3f",
+      "projectionId": "dmsdk-projection:bf29e719b8ed0ea3f20eafaf",
       "symbol": "dmGraphics::GetWindowWidth",
       "disposition": "generated-provider-boundary",
       "bindingId": 28,
@@ -2475,7 +2475,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::IsIndexBufferFormatSupported@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1089:1390",
-      "projectionId": "dmsdk-projection:b8d639f81aca9fdb20da60c4",
+      "projectionId": "dmsdk-projection:37563d13906877352bb09d0c",
       "symbol": "dmGraphics::IsIndexBufferFormatSupported",
       "disposition": "blocked",
       "blockers": [
@@ -2490,7 +2490,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::IsTextureFormatSupported@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1113:1393",
-      "projectionId": "dmsdk-projection:3079189f987a230d1662c8b8",
+      "projectionId": "dmsdk-projection:d5a3ff5924e889a7ca14b7fb",
       "symbol": "dmGraphics::IsTextureFormatSupported",
       "disposition": "blocked",
       "blockers": [
@@ -2505,7 +2505,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetBlendEquationSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1515:1435",
-      "projectionId": "dmsdk-projection:ba7626e61b00402cfcdb6fa3",
+      "projectionId": "dmsdk-projection:829246a98d95ecb56e64547a",
       "symbol": "dmGraphics::SetBlendEquationSeparate",
       "disposition": "blocked",
       "blockers": [
@@ -2522,7 +2522,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetBlendFunc@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1495:1433",
-      "projectionId": "dmsdk-projection:83fbf8be7088df3f00034e3e",
+      "projectionId": "dmsdk-projection:e49cdd489037e6104cc79b0c",
       "symbol": "dmGraphics::SetBlendFunc",
       "disposition": "blocked",
       "blockers": [
@@ -2539,7 +2539,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetBlendFuncSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1506:1434",
-      "projectionId": "dmsdk-projection:0401613ca8adc9958ea69d1f",
+      "projectionId": "dmsdk-projection:496603e4ddfce3e2462c1b2e",
       "symbol": "dmGraphics::SetBlendFuncSeparate",
       "disposition": "blocked",
       "blockers": [
@@ -2558,7 +2558,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetColorMask@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1525:1436",
-      "projectionId": "dmsdk-projection:ff9dfda9eb532a8de74ef471",
+      "projectionId": "dmsdk-projection:31377fed6d83b0505b1169b5",
       "symbol": "dmGraphics::SetColorMask",
       "disposition": "blocked",
       "blockers": [
@@ -2572,7 +2572,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetCullFace@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1619:1448",
-      "projectionId": "dmsdk-projection:6e3df74ee4adbd81d249bc8d",
+      "projectionId": "dmsdk-projection:ae4cabbae20deb36e17bfd1f",
       "symbol": "dmGraphics::SetCullFace",
       "disposition": "blocked",
       "blockers": [
@@ -2588,7 +2588,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetDepthFunc@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1539:1438",
-      "projectionId": "dmsdk-projection:63927d790e5c7832dbfb36f6",
+      "projectionId": "dmsdk-projection:2dfb4861f72c3fd8c66c486c",
       "symbol": "dmGraphics::SetDepthFunc",
       "disposition": "blocked",
       "blockers": [
@@ -2604,7 +2604,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetDepthMask@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1532:1437",
-      "projectionId": "dmsdk-projection:119e8f53800aee58c0ddd081",
+      "projectionId": "dmsdk-projection:9c7163961d0333636040df15",
       "symbol": "dmGraphics::SetDepthMask",
       "disposition": "blocked",
       "blockers": [
@@ -2618,7 +2618,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetRenderTarget@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1569:1442",
-      "projectionId": "dmsdk-projection:e5717ba1b5908b4790ccc9e5",
+      "projectionId": "dmsdk-projection:0154e7b1981e80cc69665681",
       "symbol": "dmGraphics::SetRenderTarget",
       "disposition": "blocked",
       "blockers": [
@@ -2632,7 +2632,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetRenderTargetSize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1605:1446",
-      "projectionId": "dmsdk-projection:a039d7f2d1b826b8580e1ef6",
+      "projectionId": "dmsdk-projection:dad578a4daacfd5544018c85",
       "symbol": "dmGraphics::SetRenderTargetSize",
       "disposition": "blocked",
       "blockers": [
@@ -2646,7 +2646,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetSampler@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1926:1473",
-      "projectionId": "dmsdk-projection:df1303ea54b01ce23da2e1fb",
+      "projectionId": "dmsdk-projection:b17c8012ddac53eff7023db2",
       "symbol": "dmGraphics::SetSampler",
       "disposition": "blocked",
       "blockers": [
@@ -2660,7 +2660,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetScissor@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1787:1462",
-      "projectionId": "dmsdk-projection:38c361670e1136f9292ad3e7",
+      "projectionId": "dmsdk-projection:fafef1bb3db6a9931f55631e",
       "symbol": "dmGraphics::SetScissor",
       "disposition": "blocked",
       "blockers": [
@@ -2674,7 +2674,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilFunc@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1444:1427",
-      "projectionId": "dmsdk-projection:b43756ee559e42db035f6705",
+      "projectionId": "dmsdk-projection:3a38a8b17ae88223833aa963",
       "symbol": "dmGraphics::SetStencilFunc",
       "disposition": "blocked",
       "blockers": [
@@ -2690,7 +2690,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilFuncSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1454:1428",
-      "projectionId": "dmsdk-projection:35c446cb69c5a6e5adafb85e",
+      "projectionId": "dmsdk-projection:bc5aa9daf5cd3e6dfb081f6c",
       "symbol": "dmGraphics::SetStencilFuncSeparate",
       "disposition": "blocked",
       "blockers": [
@@ -2707,7 +2707,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilMask@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1435:1426",
-      "projectionId": "dmsdk-projection:90a6e2c53937f3ca37ed82e9",
+      "projectionId": "dmsdk-projection:11dd44072e4d2b6d19f0e3fd",
       "symbol": "dmGraphics::SetStencilMask",
       "disposition": "blocked",
       "blockers": [
@@ -2721,7 +2721,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilOp@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1463:1429",
-      "projectionId": "dmsdk-projection:4742af5dc56075c30c856a16",
+      "projectionId": "dmsdk-projection:5075f67789b4ed39b437fca4",
       "symbol": "dmGraphics::SetStencilOp",
       "disposition": "blocked",
       "blockers": [
@@ -2739,7 +2739,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetStencilOpSeparate@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1473:1430",
-      "projectionId": "dmsdk-projection:054836794e66a8715ef9d0f6",
+      "projectionId": "dmsdk-projection:f871f4e62b4b92be64de4823",
       "symbol": "dmGraphics::SetStencilOpSeparate",
       "disposition": "blocked",
       "blockers": [
@@ -2758,7 +2758,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetTextureParams@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1221:1404",
-      "projectionId": "dmsdk-projection:e47694a43a5e0063eed12832",
+      "projectionId": "dmsdk-projection:e8072615cfd52db6c7b90de9",
       "symbol": "dmGraphics::SetTextureParams",
       "disposition": "blocked",
       "blockers": [
@@ -2778,7 +2778,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetTextureParams@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1235:1405",
-      "projectionId": "dmsdk-projection:4cbe228c06971196bf457861",
+      "projectionId": "dmsdk-projection:d4a28defa6c6152df327aef0",
       "symbol": "dmGraphics::SetTextureParams",
       "disposition": "blocked",
       "blockers": [
@@ -2797,7 +2797,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::SetViewport@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1773:1461",
-      "projectionId": "dmsdk-projection:c2678fc779b6c4c6d3eddb23",
+      "projectionId": "dmsdk-projection:b1ec4022267c4a1ca7e8db97",
       "symbol": "dmGraphics::SetViewport",
       "disposition": "blocked",
       "blockers": [
@@ -2811,7 +2811,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetCurrentFrameCommandBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:123:1515",
-      "projectionId": "dmsdk-projection:807f8184962650f5a59e84b3",
+      "projectionId": "dmsdk-projection:3bcd377d15989480717f81d8",
       "symbol": "dmGraphics::VulkanGetCurrentFrameCommandBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -2819,13 +2819,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkCommandBuffer",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkCommandBuffer(value:handle:dmGraphics::HContext:opaque)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:75:1509",
-      "projectionId": "dmsdk-projection:6d5ff3792d9d2b41799ff159",
+      "projectionId": "dmsdk-projection:37b64e8f7ead3d0fe559e948",
       "symbol": "dmGraphics::VulkanGetDevice",
       "disposition": "blocked",
       "blockers": [
@@ -2833,13 +2834,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkDevice",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:107:1513",
-      "projectionId": "dmsdk-projection:f9af88a485fab962a29d3c5c",
+      "projectionId": "dmsdk-projection:e0bec56f3ddd1ba67882868b",
       "symbol": "dmGraphics::VulkanGetGraphicsQueue",
       "disposition": "blocked",
       "blockers": [
@@ -2847,13 +2849,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkQueue",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkQueue(value:handle:dmGraphics::HContext:opaque)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetGraphicsQueueFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:99:1512",
-      "projectionId": "dmsdk-projection:75b7462ee307e1fe64c4b3cd",
+      "projectionId": "dmsdk-projection:6ab5733331a2af8668a48071",
       "symbol": "dmGraphics::VulkanGetGraphicsQueueFamily",
       "disposition": "blocked",
       "blockers": [
@@ -2868,7 +2871,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetImage@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:133:1516",
-      "projectionId": "dmsdk-projection:bacf74ddfaa5158917c1eb1f",
+      "projectionId": "dmsdk-projection:62e41c6c5c1f695d6e42e560",
       "symbol": "dmGraphics::VulkanGetImage",
       "disposition": "blocked",
       "blockers": [
@@ -2876,13 +2879,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkImage",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
+      "shape": "unknown:VkImage(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetImageView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:143:1517",
-      "projectionId": "dmsdk-projection:3a7ca46a46ca0bbf71ef6910",
+      "projectionId": "dmsdk-projection:bafb039c99f8323705d32a3c",
       "symbol": "dmGraphics::VulkanGetImageView",
       "disposition": "blocked",
       "blockers": [
@@ -2890,13 +2894,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkImageView",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
+      "shape": "unknown:VkImageView(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:91:1511",
-      "projectionId": "dmsdk-projection:d7029cc3aaba11b120f0c565",
+      "projectionId": "dmsdk-projection:8d872c0c0a6a5ad114d5e158",
       "symbol": "dmGraphics::VulkanGetInstance",
       "disposition": "blocked",
       "blockers": [
@@ -2904,13 +2909,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkInstance",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkInstance(value:handle:dmGraphics::HContext:opaque)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetPhysicalDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:83:1510",
-      "projectionId": "dmsdk-projection:8cc58ac9d1fa52c4b2629a41",
+      "projectionId": "dmsdk-projection:f6a04b42d63e12928d275940",
       "symbol": "dmGraphics::VulkanGetPhysicalDevice",
       "disposition": "blocked",
       "blockers": [
@@ -2918,13 +2924,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkPhysicalDevice",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkPhysicalDevice(value:handle:dmGraphics::HContext:opaque)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGetRenderPass@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:115:1514",
-      "projectionId": "dmsdk-projection:3d8207dd1e3f96c00963b086",
+      "projectionId": "dmsdk-projection:3676ef1711ea1dcd968f4105",
       "symbol": "dmGraphics::VulkanGetRenderPass",
       "disposition": "blocked",
       "blockers": [
@@ -2932,13 +2939,14 @@
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:VkRenderPass",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
+      "shape": "unknown:VkRenderPass(value:handle:dmGraphics::HContext:opaque)"
     },
     {
       "id": "dmsdk:dmGraphics::VulkanGraphicsCommandQueueToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:67:1508",
-      "projectionId": "dmsdk-projection:64e10e89b014cfa23d33bd63",
+      "projectionId": "dmsdk-projection:c296f05792f2d3a393981eb4",
       "symbol": "dmGraphics::VulkanGraphicsCommandQueueToMetal",
       "disposition": "blocked",
       "blockers": [
@@ -2954,7 +2962,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::VulkanTextureToMetal@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:59:1507",
-      "projectionId": "dmsdk-projection:4da81c2d6e998778bef8756d",
+      "projectionId": "dmsdk-projection:c4095530f96be5207babc106",
       "symbol": "dmGraphics::VulkanTextureToMetal",
       "disposition": "blocked",
       "blockers": [
@@ -2970,7 +2978,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetActiveCommandEncoder@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:57:1534",
-      "projectionId": "dmsdk-projection:f225b88eb6ea1271385a7185",
+      "projectionId": "dmsdk-projection:bd4aadae447d7b0d894cc81a",
       "symbol": "dmGraphics::WebGPUGetActiveCommandEncoder",
       "disposition": "blocked",
       "blockers": [
@@ -2984,7 +2992,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:51:1528",
-      "projectionId": "dmsdk-projection:13b7d6a617dee81178f8d63a",
+      "projectionId": "dmsdk-projection:d05897ed2615a046bffbfa0e",
       "symbol": "dmGraphics::WebGPUGetAdapter",
       "disposition": "blocked",
       "blockers": [
@@ -2998,7 +3006,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetDevice@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:52:1529",
-      "projectionId": "dmsdk-projection:b6945818d182ee58149468d9",
+      "projectionId": "dmsdk-projection:b37d3ee3403434b1f634d13e",
       "symbol": "dmGraphics::WebGPUGetDevice",
       "disposition": "blocked",
       "blockers": [
@@ -3012,7 +3020,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetInstance@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:50:1527",
-      "projectionId": "dmsdk-projection:ba5fff4480262bfe6cd911b1",
+      "projectionId": "dmsdk-projection:6d15ab475379758de48d1616",
       "symbol": "dmGraphics::WebGPUGetInstance",
       "disposition": "blocked",
       "blockers": [
@@ -3026,7 +3034,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetQueue@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:53:1530",
-      "projectionId": "dmsdk-projection:85da05b346ac53af3f4c28ca",
+      "projectionId": "dmsdk-projection:80e05062f3371f77cb1b29bf",
       "symbol": "dmGraphics::WebGPUGetQueue",
       "disposition": "blocked",
       "blockers": [
@@ -3040,7 +3048,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetTexture@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:55:1532",
-      "projectionId": "dmsdk-projection:64c45c37b2be6cae5c111971",
+      "projectionId": "dmsdk-projection:ec6792a57131810ef6960844",
       "symbol": "dmGraphics::WebGPUGetTexture",
       "disposition": "blocked",
       "blockers": [
@@ -3054,7 +3062,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPUGetTextureView@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:54:1531",
-      "projectionId": "dmsdk-projection:df673bd543a40501e20e6ad1",
+      "projectionId": "dmsdk-projection:c70e5966b31a600014e647df",
       "symbol": "dmGraphics::WebGPUGetTextureView",
       "disposition": "blocked",
       "blockers": [
@@ -3068,7 +3076,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPURenderPassBegin@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:60:1536",
-      "projectionId": "dmsdk-projection:5101d8708f9e30f9f0a6f9c1",
+      "projectionId": "dmsdk-projection:51409cc27ac8dff783dd6f93",
       "symbol": "dmGraphics::WebGPURenderPassBegin",
       "disposition": "blocked",
       "blockers": [
@@ -3083,7 +3091,7 @@
     },
     {
       "id": "dmsdk:dmGraphics::WebGPURenderPassEnd@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_webgpu.h:59:1535",
-      "projectionId": "dmsdk-projection:0033960ac95382e8920e7d83",
+      "projectionId": "dmsdk-projection:285ffa4b8bb4d5a52d089d0e",
       "symbol": "dmGraphics::WebGPURenderPassEnd",
       "disposition": "blocked",
       "blockers": [
@@ -3098,7 +3106,7 @@
     },
     {
       "id": "dmsdk:dmGui::GetNodeCustomData@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:437:1571",
-      "projectionId": "dmsdk-projection:2af5fdc6b6d80458fca493e4",
+      "projectionId": "dmsdk-projection:eabae2190c480a401e8e0a76",
       "symbol": "dmGui::GetNodeCustomData",
       "disposition": "blocked",
       "blockers": [
@@ -3113,7 +3121,7 @@
     },
     {
       "id": "dmsdk:dmGui::GetNodeCustomType@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:429:1570",
-      "projectionId": "dmsdk-projection:27d27922903d0bef00d3957e",
+      "projectionId": "dmsdk-projection:cb9aee0037ab69eedc5bf260",
       "symbol": "dmGui::GetNodeCustomType",
       "disposition": "generated-provider-boundary",
       "bindingId": 29,
@@ -3142,7 +3150,7 @@
     },
     {
       "id": "dmsdk:dmGui::GetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:261:1556",
-      "projectionId": "dmsdk-projection:fbda6bd6a06185d05c7ff322",
+      "projectionId": "dmsdk-projection:236c9588b516af72b5c39292",
       "symbol": "dmGui::GetNodeId",
       "disposition": "generated-provider-boundary",
       "bindingId": 30,
@@ -3171,7 +3179,7 @@
     },
     {
       "id": "dmsdk:dmGui::GetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:308:1561",
-      "projectionId": "dmsdk-projection:9397b476efdf154b4c02a294",
+      "projectionId": "dmsdk-projection:497165d0973a7518fbd648a1",
       "symbol": "dmGui::GetNodeIsBone",
       "disposition": "generated-provider-boundary",
       "bindingId": 31,
@@ -3200,7 +3208,7 @@
     },
     {
       "id": "dmsdk:dmGui::GetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:360:1564",
-      "projectionId": "dmsdk-projection:515eddab4dca9f0f5538b715",
+      "projectionId": "dmsdk-projection:04b8d3a2b2466f63cb620751",
       "symbol": "dmGui::GetNodeProperty",
       "disposition": "blocked",
       "blockers": [
@@ -3210,14 +3218,14 @@
         "parameter-role-unsupported:2:enum:dmGui::Property",
         "result-role-unsupported:unknown:dmVMath::Vector4",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Vector4(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property)"
     },
     {
       "id": "dmsdk:dmGui::GetNodeTextureId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:445:1572",
-      "projectionId": "dmsdk-projection:c13f8b7062e145202c08e875",
+      "projectionId": "dmsdk-projection:5f229173c006b17ecbc0a5cd",
       "symbol": "dmGui::GetNodeTextureId",
       "disposition": "generated-provider-boundary",
       "bindingId": 32,
@@ -3246,7 +3254,7 @@
     },
     {
       "id": "dmsdk:dmGui::GetResource@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:474:1575",
-      "projectionId": "dmsdk-projection:9a11abd2144c5000b8242353",
+      "projectionId": "dmsdk-projection:efe484560cdf99fcf7fae8ca",
       "symbol": "dmGui::GetResource",
       "disposition": "blocked",
       "blockers": [
@@ -3261,7 +3269,7 @@
     },
     {
       "id": "dmsdk:dmGui::LuaPushNode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:485:1576",
-      "projectionId": "dmsdk-projection:70491e2372898fb3d81eaaa2",
+      "projectionId": "dmsdk-projection:f10743a9f182600f4dd59c10",
       "symbol": "dmGui::LuaPushNode",
       "disposition": "blocked",
       "blockers": [
@@ -3279,7 +3287,7 @@
     },
     {
       "id": "dmsdk:dmGui::SetNodeAdjustMode@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:421:1569",
-      "projectionId": "dmsdk-projection:8177e2f50648e9ba6fbd1bc7",
+      "projectionId": "dmsdk-projection:1dc1898c3237037fb4119cf3",
       "symbol": "dmGui::SetNodeAdjustMode",
       "disposition": "blocked",
       "blockers": [
@@ -3295,7 +3303,7 @@
     },
     {
       "id": "dmsdk:dmGui::SetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:396:1567",
-      "projectionId": "dmsdk-projection:d10998df7dfcd130edf41a6c",
+      "projectionId": "dmsdk-projection:c597ca4bf238e2ac78de5ce0",
       "symbol": "dmGui::SetNodeCustomProperty",
       "disposition": "blocked",
       "blockers": [
@@ -3313,7 +3321,7 @@
     },
     {
       "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1555",
-      "projectionId": "dmsdk-projection:f2ca5fbd98689efe6163f9b3",
+      "projectionId": "dmsdk-projection:8419b586e2d9a5039fbd1e49",
       "symbol": "dmGui::SetNodeId",
       "disposition": "blocked",
       "blockers": [
@@ -3327,7 +3335,7 @@
     },
     {
       "id": "dmsdk:dmGui::SetNodeIsBone@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:317:1562",
-      "projectionId": "dmsdk-projection:c484109e45920c4f6766b40d",
+      "projectionId": "dmsdk-projection:ca081c5c9bec46675f029825",
       "symbol": "dmGui::SetNodeIsBone",
       "disposition": "blocked",
       "blockers": [
@@ -3341,7 +3349,7 @@
     },
     {
       "id": "dmsdk:dmGui::SetNodeParent@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:272:1557",
-      "projectionId": "dmsdk-projection:1712abd8dc6d58d4eb8c9a7a",
+      "projectionId": "dmsdk-projection:fa125979b3d5bd4f7a6d33fb",
       "symbol": "dmGui::SetNodeParent",
       "disposition": "blocked",
       "blockers": [
@@ -3356,7 +3364,7 @@
     },
     {
       "id": "dmsdk:dmGui::SetNodeProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:370:1565",
-      "projectionId": "dmsdk-projection:e4ffecf72e0edddb8209770b",
+      "projectionId": "dmsdk-projection:61f20bacd562c8731e674309",
       "symbol": "dmGui::SetNodeProperty",
       "disposition": "blocked",
       "blockers": [
@@ -3367,15 +3375,15 @@
         "parameter-role-unsupported:3:unknown:dmVMath::Vector4",
         "result-role-unsupported:scalar:void",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property,in:unknown:dmVMath::Vector4)"
     },
     {
       "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:453:1573",
-      "projectionId": "dmsdk-projection:fc4293512a13819c6e228049",
+      "projectionId": "dmsdk-projection:ce02f3001e0d641f5e832629",
       "symbol": "dmGui::SetNodeTexture",
       "disposition": "blocked",
       "blockers": [
@@ -3390,7 +3398,7 @@
     },
     {
       "id": "dmsdk:dmGui::SetNodeTexture@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:462:1574",
-      "projectionId": "dmsdk-projection:43396c32ade6f297474a20b6",
+      "projectionId": "dmsdk-projection:7e5dd0676cdbe7a9058d22b7",
       "symbol": "dmGui::SetNodeTexture",
       "disposition": "blocked",
       "blockers": [
@@ -3406,7 +3414,7 @@
     },
     {
       "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1629",
-      "projectionId": "dmsdk-projection:5312b2f107a0b41fcf0bee4e",
+      "projectionId": "dmsdk-projection:6112eaebadce97acb425c008",
       "symbol": "dmHID::AddKeyboardChar",
       "disposition": "blocked",
       "blockers": [
@@ -3420,7 +3428,7 @@
     },
     {
       "id": "dmsdk:dmHID::AddTouch@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:659:1620",
-      "projectionId": "dmsdk-projection:5315f787a1c12ee6d144ad15",
+      "projectionId": "dmsdk-projection:3b1156c6bb42aa35aebefebb",
       "symbol": "dmHID::AddTouch",
       "disposition": "blocked",
       "blockers": [
@@ -3436,7 +3444,7 @@
     },
     {
       "id": "dmsdk:dmHID::SetGamepadAxis@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:675:1622",
-      "projectionId": "dmsdk-projection:29d639d910beb7f15c0a6950",
+      "projectionId": "dmsdk-projection:7521b2eeb30b3f60896f4bb8",
       "symbol": "dmHID::SetGamepadAxis",
       "disposition": "blocked",
       "blockers": [
@@ -3450,7 +3458,7 @@
     },
     {
       "id": "dmsdk:dmHID::SetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:667:1621",
-      "projectionId": "dmsdk-projection:89d01643b20a2f61f83a9d18",
+      "projectionId": "dmsdk-projection:6530b084c152e23e5f5823a5",
       "symbol": "dmHID::SetGamepadButton",
       "disposition": "blocked",
       "blockers": [
@@ -3464,7 +3472,7 @@
     },
     {
       "id": "dmsdk:dmHID::SetKey@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:726:1628",
-      "projectionId": "dmsdk-projection:4106a4efab0b53d02573f6af",
+      "projectionId": "dmsdk-projection:c25d7773e92b55a43ef1274b",
       "symbol": "dmHID::SetKey",
       "disposition": "blocked",
       "blockers": [
@@ -3480,7 +3488,7 @@
     },
     {
       "id": "dmsdk:dmHID::SetMouseButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:683:1623",
-      "projectionId": "dmsdk-projection:d5477b5de08cc1b7fb07e616",
+      "projectionId": "dmsdk-projection:ec63491ed62c7fc2157c3f03",
       "symbol": "dmHID::SetMouseButton",
       "disposition": "blocked",
       "blockers": [
@@ -3496,7 +3504,7 @@
     },
     {
       "id": "dmsdk:dmHID::SetMousePosition@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:691:1624",
-      "projectionId": "dmsdk-projection:e0303dba30f825b531f5f108",
+      "projectionId": "dmsdk-projection:814685c126f7da1fe62e5c26",
       "symbol": "dmHID::SetMousePosition",
       "disposition": "blocked",
       "blockers": [
@@ -3510,7 +3518,7 @@
     },
     {
       "id": "dmsdk:dmHID::SetMouseWheel@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:698:1625",
-      "projectionId": "dmsdk-projection:b0bba8f1fc3cf0390a59178e",
+      "projectionId": "dmsdk-projection:ade2fe64d4a63845b51965fc",
       "symbol": "dmHID::SetMouseWheel",
       "disposition": "blocked",
       "blockers": [
@@ -3524,7 +3532,7 @@
     },
     {
       "id": "dmsdk:dmImage::GetData@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:121:348",
-      "projectionId": "dmsdk-projection:c00fe458048cc243e66efb4e",
+      "projectionId": "dmsdk-projection:9c708d3ca90b2ff4f73ebe6e",
       "symbol": "dmImage::GetData",
       "disposition": "blocked",
       "blockers": [
@@ -3539,7 +3547,7 @@
     },
     {
       "id": "dmsdk:dmImage::GetHeight@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:114:347",
-      "projectionId": "dmsdk-projection:520ff2888c4cbf6c4bb2755d",
+      "projectionId": "dmsdk-projection:f84f01dea0412f0a0bd80666",
       "symbol": "dmImage::GetHeight",
       "disposition": "generated-provider-boundary",
       "bindingId": 33,
@@ -3568,7 +3576,7 @@
     },
     {
       "id": "dmsdk:dmImage::GetType@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:100:345",
-      "projectionId": "dmsdk-projection:d027b0d253b3fd25621a3921",
+      "projectionId": "dmsdk-projection:44d53dcb33ce5ff4c97a07f3",
       "symbol": "dmImage::GetType",
       "disposition": "blocked",
       "blockers": [
@@ -3583,7 +3591,7 @@
     },
     {
       "id": "dmsdk:dmImage::GetWidth@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:107:346",
-      "projectionId": "dmsdk-projection:dca3a0e373c4b898d443c421",
+      "projectionId": "dmsdk-projection:d41399033e5133bb81d1d5db",
       "symbol": "dmImage::GetWidth",
       "disposition": "generated-provider-boundary",
       "bindingId": 34,
@@ -3612,7 +3620,7 @@
     },
     {
       "id": "dmsdk:dmMessage::GetSocketNameHash@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:159:417",
-      "projectionId": "dmsdk-projection:8461a93de5a9ad263cf65ec0",
+      "projectionId": "dmsdk-projection:9837ee2dba1fc3e188496198",
       "symbol": "dmMessage::GetSocketNameHash",
       "disposition": "generated-provider-boundary",
       "bindingId": 35,
@@ -3641,7 +3649,7 @@
     },
     {
       "id": "dmsdk:dmMessage::IsSocketValid@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:143:415",
-      "projectionId": "dmsdk-projection:69f7f6063a1dba5a8de46bbe",
+      "projectionId": "dmsdk-projection:aecae44dd981ebebc32a7890",
       "symbol": "dmMessage::IsSocketValid",
       "disposition": "generated-provider-boundary",
       "bindingId": 36,
@@ -3670,7 +3678,7 @@
     },
     {
       "id": "dmsdk:dmMessage::SetSocket@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:135:414",
-      "projectionId": "dmsdk-projection:2fecf6a435c6cd2f86c1932f",
+      "projectionId": "dmsdk-projection:8ba3094ae9c6f9e17b983282",
       "symbol": "dmMessage::SetSocket",
       "disposition": "blocked",
       "blockers": [
@@ -3688,7 +3696,7 @@
     },
     {
       "id": "dmsdk:dmMutex::GetNativeHandle@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:97:435",
-      "projectionId": "dmsdk-projection:6dc1935320ee847f11e5c7e2",
+      "projectionId": "dmsdk-projection:2a551e723417bb669c2aa9fd",
       "symbol": "dmMutex::GetNativeHandle",
       "disposition": "blocked",
       "blockers": [
@@ -3703,7 +3711,7 @@
     },
     {
       "id": "dmsdk:dmMutex::Lock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:67:432",
-      "projectionId": "dmsdk-projection:fd024d06e09d5c0f1b27644a",
+      "projectionId": "dmsdk-projection:7ce968c896920dc912ba9855",
       "symbol": "dmMutex::Lock",
       "disposition": "blocked",
       "blockers": [
@@ -3717,7 +3725,7 @@
     },
     {
       "id": "dmsdk:dmMutex::OptionalScopedMutexLock::OptionalScopedMutexLock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:139:440",
-      "projectionId": "dmsdk-projection:d96193ecd1dcb4fb4cb593d2",
+      "projectionId": "dmsdk-projection:6df225b6cd38a0e17f523e50",
       "symbol": "dmMutex::OptionalScopedMutexLock::OptionalScopedMutexLock",
       "disposition": "blocked",
       "blockers": [
@@ -3732,7 +3740,7 @@
     },
     {
       "id": "dmsdk:dmMutex::ScopedLock::ScopedLock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:102:437",
-      "projectionId": "dmsdk-projection:6435aac51929be4ce2822165",
+      "projectionId": "dmsdk-projection:26408835d7e2beab7b45d07d",
       "symbol": "dmMutex::ScopedLock::ScopedLock",
       "disposition": "blocked",
       "blockers": [
@@ -3747,7 +3755,7 @@
     },
     {
       "id": "dmsdk:dmMutex::TryLock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:78:433",
-      "projectionId": "dmsdk-projection:b8bf9be4d1d5200d728dee14",
+      "projectionId": "dmsdk-projection:7df60c7fc819c2c364e59765",
       "symbol": "dmMutex::TryLock",
       "disposition": "generated-provider-boundary",
       "bindingId": 37,
@@ -3776,7 +3784,7 @@
     },
     {
       "id": "dmsdk:dmMutex::Unlock@upstream/defold/engine/dlib/src/dmsdk/dlib/mutex.h:87:434",
-      "projectionId": "dmsdk-projection:93f1acff400cba7c6fea34e7",
+      "projectionId": "dmsdk-projection:6d412a3ceb8883e724df9d89",
       "symbol": "dmMutex::Unlock",
       "disposition": "blocked",
       "blockers": [
@@ -3790,7 +3798,7 @@
     },
     {
       "id": "dmsdk:dmRender::AddToRender@upstream/defold/engine/render/src/dmsdk/render/render.h:447:1835",
-      "projectionId": "dmsdk-projection:728285d87e6bcc4db202a7ea",
+      "projectionId": "dmsdk-projection:134a3f1aa95fcc28bd6868da",
       "symbol": "dmRender::AddToRender",
       "disposition": "blocked",
       "blockers": [
@@ -3809,7 +3817,7 @@
     },
     {
       "id": "dmsdk:dmRender::ApplyMaterialConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:755:1870",
-      "projectionId": "dmsdk-projection:bf08ac1c42393b1b62f6e2ff",
+      "projectionId": "dmsdk-projection:18c3513795afd36a1fb63ad5",
       "symbol": "dmRender::ApplyMaterialConstants",
       "disposition": "blocked",
       "blockers": [
@@ -3826,7 +3834,7 @@
     },
     {
       "id": "dmsdk:dmRender::ApplyMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:766:1871",
-      "projectionId": "dmsdk-projection:d532e2690ce4e96b2035d2c5",
+      "projectionId": "dmsdk-projection:ce450968c08bb769da046142",
       "symbol": "dmRender::ApplyMaterialSampler",
       "disposition": "blocked",
       "blockers": [
@@ -3840,7 +3848,7 @@
     },
     {
       "id": "dmsdk:dmRender::ClearMaterialTags@upstream/defold/engine/render/src/dmsdk/render/render.h:688:1863",
-      "projectionId": "dmsdk-projection:3a99c83fbdd9f81054479220",
+      "projectionId": "dmsdk-projection:a953ee2cf222654f1336804d",
       "symbol": "dmRender::ClearMaterialTags",
       "disposition": "blocked",
       "blockers": [
@@ -3854,7 +3862,7 @@
     },
     {
       "id": "dmsdk:dmRender::ClearNamedConstantBuffer@upstream/defold/engine/render/src/dmsdk/render/render.h:558:1849",
-      "projectionId": "dmsdk-projection:02175dd5bed08ede399f27a9",
+      "projectionId": "dmsdk-projection:dda95596d3e3c3655ddf655f",
       "symbol": "dmRender::ClearNamedConstantBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -3868,7 +3876,7 @@
     },
     {
       "id": "dmsdk:dmRender::GetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:497:1841",
-      "projectionId": "dmsdk-projection:eecc6f0175295fb1ef8bf093",
+      "projectionId": "dmsdk-projection:c8d261ef0d9e7394b2bf476b",
       "symbol": "dmRender::GetConstantName",
       "disposition": "generated-provider-boundary",
       "bindingId": 38,
@@ -3897,39 +3905,25 @@
     },
     {
       "id": "dmsdk:dmRender::GetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:529:1845",
-      "projectionId": "dmsdk-projection:ddee9f21c1065960fd082c83",
+      "projectionId": "dmsdk-projection:dcd9b01970edd04227c4fd3c",
       "symbol": "dmRender::GetConstantType",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 39,
-      "shape": "scalar:i32(value:handle:dmRender::HConstant:opaque)",
-      "resolvedPolicies": {
-        "ownership": "borrowed-only-no-transfer-no-release",
-        "nullability": "zero-handle-rejected-before-provider",
-        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
-        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
-      },
-      "engineProviderBlockers": [
+      "disposition": "blocked",
+      "blockers": [
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:dmRenderDDF::MaterialDesc::ConstantType",
+        "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
+      "shape": "unknown:dmRenderDDF::MaterialDesc::ConstantType(value:handle:dmRender::HConstant:opaque)"
     },
     {
       "id": "dmsdk:dmRender::GetMaterialSamplerNameHash@upstream/defold/engine/render/src/dmsdk/render/render.h:739:1868",
-      "projectionId": "dmsdk-projection:f56b6a44f64d8b76fa24560e",
+      "projectionId": "dmsdk-projection:a7047a36b2e8870984654ec5",
       "symbol": "dmRender::GetMaterialSamplerNameHash",
       "disposition": "generated-provider-boundary",
-      "bindingId": 40,
+      "bindingId": 39,
       "shape": "scalar:u64(value:handle:dmRender::HMaterial:opaque,value:scalar:u32)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -3955,10 +3949,10 @@
     },
     {
       "id": "dmsdk:dmRender::GetMaterialSamplerUnit@upstream/defold/engine/render/src/dmsdk/render/render.h:747:1869",
-      "projectionId": "dmsdk-projection:6550216a07b0e724faab5d3c",
+      "projectionId": "dmsdk-projection:97ba5cc5ca3535c362d4cdb4",
       "symbol": "dmRender::GetMaterialSamplerUnit",
       "disposition": "generated-provider-boundary",
-      "bindingId": 41,
+      "bindingId": 40,
       "shape": "scalar:u32(value:handle:dmRender::HMaterial:opaque,value:scalar:u64)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -3984,10 +3978,10 @@
     },
     {
       "id": "dmsdk:dmRender::GetMaterialTagListKey@upstream/defold/engine/render/src/dmsdk/render/render.h:455:1836",
-      "projectionId": "dmsdk-projection:d751879fac9efd652f76691e",
+      "projectionId": "dmsdk-projection:8c597212e510d352c6c1ac1f",
       "symbol": "dmRender::GetMaterialTagListKey",
       "disposition": "generated-provider-boundary",
-      "bindingId": 42,
+      "bindingId": 41,
       "shape": "scalar:u32(value:handle:dmRender::HMaterial:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4013,39 +4007,25 @@
     },
     {
       "id": "dmsdk:dmRender::GetMaterialVertexSpace@upstream/defold/engine/render/src/dmsdk/render/render.h:126:1811",
-      "projectionId": "dmsdk-projection:baf22c7e34d80d2a19a66b28",
+      "projectionId": "dmsdk-projection:2d8037a376e363a95af63a56",
       "symbol": "dmRender::GetMaterialVertexSpace",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 43,
-      "shape": "scalar:i32(value:handle:dmRender::HMaterial:opaque)",
-      "resolvedPolicies": {
-        "ownership": "borrowed-only-no-transfer-no-release",
-        "nullability": "zero-handle-rejected-before-provider",
-        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
-        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
-      },
-      "engineProviderBlockers": [
+      "disposition": "blocked",
+      "blockers": [
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "result-role-unsupported:unknown:dmRenderDDF::MaterialDesc::VertexSpace",
+        "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
+      "shape": "unknown:dmRenderDDF::MaterialDesc::VertexSpace(value:handle:dmRender::HMaterial:opaque)"
     },
     {
       "id": "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857",
-      "projectionId": "dmsdk-projection:e9fef5b2cdefd34bbe5a8d49",
+      "projectionId": "dmsdk-projection:660b79a8d65887cca6f378f5",
       "symbol": "dmRender::GetNamedConstantCount",
       "disposition": "generated-provider-boundary",
-      "bindingId": 44,
+      "bindingId": 42,
       "shape": "scalar:u32(value:handle:dmRender::HNamedConstantBuffer:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4071,7 +4051,7 @@
     },
     {
       "id": "dmsdk:dmRender::GetViewMatrix@upstream/defold/engine/render/src/dmsdk/render/render.h:667:1860",
-      "projectionId": "dmsdk-projection:99d15244bfe2871adaba425b",
+      "projectionId": "dmsdk-projection:7f7dc82abb79a842efec102b",
       "symbol": "dmRender::GetViewMatrix",
       "disposition": "blocked",
       "blockers": [
@@ -4079,15 +4059,15 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "result-role-unsupported:unknown:dmVMath::Matrix4",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "unknown:dmVMath::Matrix4(value:handle:dmRender::HRenderContext:opaque)"
     },
     {
       "id": "dmsdk:dmRender::RemoveNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:566:1850",
-      "projectionId": "dmsdk-projection:ce32ab68f7b0c741e38c2a42",
+      "projectionId": "dmsdk-projection:b87e85c9ec9511c10914f43f",
       "symbol": "dmRender::RemoveNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -4101,7 +4081,7 @@
     },
     {
       "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1833",
-      "projectionId": "dmsdk-projection:4698664325060ae7f861b99b",
+      "projectionId": "dmsdk-projection:de6444ac0885e7d093f89f3b",
       "symbol": "dmRender::RenderListAlloc",
       "disposition": "blocked",
       "blockers": [
@@ -4117,7 +4097,7 @@
     },
     {
       "id": "dmsdk:dmRender::RenderListSubmit@upstream/defold/engine/render/src/dmsdk/render/render.h:438:1834",
-      "projectionId": "dmsdk-projection:eabc11e7d38a03ddfc0b6a36",
+      "projectionId": "dmsdk-projection:8e27ec633b33979ba90bdfee",
       "symbol": "dmRender::RenderListSubmit",
       "disposition": "blocked",
       "blockers": [
@@ -4136,7 +4116,7 @@
     },
     {
       "id": "dmsdk:dmRender::SetConstantLocation@upstream/defold/engine/render/src/dmsdk/render/render.h:521:1844",
-      "projectionId": "dmsdk-projection:7ed0b8aa2e11dd2bf3e8cf67",
+      "projectionId": "dmsdk-projection:5a3d66773d1a40bcb62954ed",
       "symbol": "dmRender::SetConstantLocation",
       "disposition": "blocked",
       "blockers": [
@@ -4150,7 +4130,7 @@
     },
     {
       "id": "dmsdk:dmRender::SetConstantName@upstream/defold/engine/render/src/dmsdk/render/render.h:505:1842",
-      "projectionId": "dmsdk-projection:a310d7082b3e7c30a7c76272",
+      "projectionId": "dmsdk-projection:e590772975477e95de705193",
       "symbol": "dmRender::SetConstantName",
       "disposition": "blocked",
       "blockers": [
@@ -4164,21 +4144,23 @@
     },
     {
       "id": "dmsdk:dmRender::SetConstantType@upstream/defold/engine/render/src/dmsdk/render/render.h:537:1846",
-      "projectionId": "dmsdk-projection:efd338f4d44edc8eb5236164",
+      "projectionId": "dmsdk-projection:12a032ac6c7910c833350cc8",
       "symbol": "dmRender::SetConstantType",
       "disposition": "blocked",
       "blockers": [
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "parameter-role-unsupported:1:unknown:dmRenderDDF::MaterialDesc::ConstantType",
         "result-role-unsupported:scalar:void",
+        "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:scalar:i32)"
+      "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
     },
     {
       "id": "dmsdk:dmRender::SetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:489:1840",
-      "projectionId": "dmsdk-projection:dd0e72f17f84dd98ed343a30",
+      "projectionId": "dmsdk-projection:ee255a19c1e5c85b3e71961b",
       "symbol": "dmRender::SetConstantValues",
       "disposition": "blocked",
       "blockers": [
@@ -4188,16 +4170,16 @@
         "parameter-role-unsupported:1:pointer:unknown:dmVMath::Vector4",
         "result-role-unsupported:enum:dmRender::Result",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:out-storage-initialization-failure",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "enum:dmRender::Result(value:handle:dmRender::HConstant:opaque,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
       "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:711:1865",
-      "projectionId": "dmsdk-projection:fdbdee4ee575c75b470b7947",
+      "projectionId": "dmsdk-projection:9c4d0872fe3f78f6d2bce7a9",
       "symbol": "dmRender::SetMaterialSampler",
       "disposition": "blocked",
       "blockers": [
@@ -4216,7 +4198,7 @@
     },
     {
       "id": "dmsdk:dmRender::SetMaterialSampler@upstream/defold/engine/render/src/dmsdk/render/render.h:725:1866",
-      "projectionId": "dmsdk-projection:9c9c880a5e9f4651587e1310",
+      "projectionId": "dmsdk-projection:de53dbcb26e8da1a67a44ae8",
       "symbol": "dmRender::SetMaterialSampler",
       "disposition": "blocked",
       "blockers": [
@@ -4234,7 +4216,7 @@
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:576:1851",
-      "projectionId": "dmsdk-projection:a1f52e5e232d13c50b870474",
+      "projectionId": "dmsdk-projection:db80bf7873dd854292f574c2",
       "symbol": "dmRender::SetNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -4243,16 +4225,16 @@
         "native-symbol-linkage-unverified",
         "parameter-role-unsupported:2:pointer:unknown:dmVMath::Vector4",
         "result-role-unsupported:scalar:void",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:out-storage-initialization-failure",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:589:1852",
-      "projectionId": "dmsdk-projection:75cdadae4829f419a2ceda22",
+      "projectionId": "dmsdk-projection:20eb9ba06488bae1f4250a40",
       "symbol": "dmRender::SetNamedConstant",
       "disposition": "blocked",
       "blockers": [
@@ -4260,17 +4242,19 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "parameter-role-unsupported:2:pointer:unknown:dmVMath::Vector4",
+        "parameter-role-unsupported:4:unknown:dmRenderDDF::MaterialDesc::ConstantType",
         "result-role-unsupported:scalar:void",
-        "semantic-token-unresolved:opaque-type-abi-contract",
+        "semantic-token-unresolved:enum-width-domain-validation",
         "semantic-token-unresolved:out-storage-initialization-failure",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:i32)"
+      "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstantAtIndex@upstream/defold/engine/render/src/dmsdk/render/render.h:609:1854",
-      "projectionId": "dmsdk-projection:ccff968195e7c1792637a0d5",
+      "projectionId": "dmsdk-projection:6a02e544b9cf0297ea7f4b72",
       "symbol": "dmRender::SetNamedConstantAtIndex",
       "disposition": "blocked",
       "blockers": [
@@ -4278,18 +4262,19 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "parameter-role-unsupported:2:pointer:unknown:dmVMath::Vector4",
+        "parameter-role-unsupported:5:unknown:dmRenderDDF::MaterialDesc::ConstantType",
         "result-role-unsupported:enum:dmRender::Result",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:opaque-type-abi-contract",
         "semantic-token-unresolved:out-storage-initialization-failure",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:scalar:i32)"
+      "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
     },
     {
       "id": "dmsdk:dmRender::SetNamedConstants@upstream/defold/engine/render/src/dmsdk/render/render.h:598:1853",
-      "projectionId": "dmsdk-projection:3e5e7f682c5a73385bb928f5",
+      "projectionId": "dmsdk-projection:af90210b1e4c30c3048339da",
       "symbol": "dmRender::SetNamedConstants",
       "disposition": "blocked",
       "blockers": [
@@ -4306,7 +4291,7 @@
     },
     {
       "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1992",
-      "projectionId": "dmsdk-projection:9c5ee39fea93315424aa28dd",
+      "projectionId": "dmsdk-projection:55182dd2b0c42acfebeaee71",
       "symbol": "dmResource::GetContext",
       "disposition": "blocked",
       "blockers": [
@@ -4321,7 +4306,7 @@
     },
     {
       "id": "dmsdk:dmResource::GetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:182:2006",
-      "projectionId": "dmsdk-projection:dfa9e541b1b06c835056d08e",
+      "projectionId": "dmsdk-projection:141077aae76cba624ab58838",
       "symbol": "dmResource::GetDescriptorByHash",
       "disposition": "blocked",
       "blockers": [
@@ -4339,10 +4324,10 @@
     },
     {
       "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:246:2012",
-      "projectionId": "dmsdk-projection:e2ff7bacd7df3930d5575f98",
+      "projectionId": "dmsdk-projection:406cdf152c4350462aa62b6f",
       "symbol": "dmResource::GetNameHash",
       "disposition": "generated-provider-boundary",
-      "bindingId": 45,
+      "bindingId": 43,
       "shape": "scalar:u64(value:handle:dmResource::HDescriptor:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4368,10 +4353,10 @@
     },
     {
       "id": "dmsdk:dmResource::GetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:325:1995",
-      "projectionId": "dmsdk-projection:8aabe8bffd46f8ff2553e406",
+      "projectionId": "dmsdk-projection:79cf22fb04ebf4270e449950",
       "symbol": "dmResource::GetNameHash",
       "disposition": "generated-provider-boundary",
-      "bindingId": 46,
+      "bindingId": 44,
       "shape": "scalar:u64(value:handle:HResourceType:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4397,7 +4382,7 @@
     },
     {
       "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:133:1968",
-      "projectionId": "dmsdk-projection:10a26cff3b9cf73a9890ca19",
+      "projectionId": "dmsdk-projection:a8b63028451ed3d98affd40c",
       "symbol": "dmResource::GetPath",
       "disposition": "blocked",
       "blockers": [
@@ -4416,7 +4401,7 @@
     },
     {
       "id": "dmsdk:dmResource::GetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:270:2016",
-      "projectionId": "dmsdk-projection:252c14a8e8f2e44885e02259",
+      "projectionId": "dmsdk-projection:3a7fa58bcfbbe6c88f887dc1",
       "symbol": "dmResource::GetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -4431,7 +4416,7 @@
     },
     {
       "id": "dmsdk:dmResource::GetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:258:2014",
-      "projectionId": "dmsdk-projection:20837cba70f4d9c78a0e3556",
+      "projectionId": "dmsdk-projection:08f1e615dbd8c6de9629fb6e",
       "symbol": "dmResource::GetResource",
       "disposition": "blocked",
       "blockers": [
@@ -4446,10 +4431,10 @@
     },
     {
       "id": "dmsdk:dmResource::GetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:282:2018",
-      "projectionId": "dmsdk-projection:b7c8027df756e560badcc4fa",
+      "projectionId": "dmsdk-projection:30204764c6582de473c9b13c",
       "symbol": "dmResource::GetResourceSize",
       "disposition": "generated-provider-boundary",
-      "bindingId": 47,
+      "bindingId": 45,
       "shape": "scalar:u32(value:handle:dmResource::HDescriptor:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4475,7 +4460,7 @@
     },
     {
       "id": "dmsdk:dmResource::GetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:295:1987",
-      "projectionId": "dmsdk-projection:c8d49960b3f61c526faa588c",
+      "projectionId": "dmsdk-projection:662e9ec3f8a126140f4f82f3",
       "symbol": "dmResource::GetTypeFromExtensionHash",
       "disposition": "blocked",
       "blockers": [
@@ -4493,7 +4478,7 @@
     },
     {
       "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:221:1977",
-      "projectionId": "dmsdk-projection:9607c160f5916238830dff20",
+      "projectionId": "dmsdk-projection:171d18a76380cacf83843a2a",
       "symbol": "dmResource::IncRef",
       "disposition": "blocked",
       "blockers": [
@@ -4510,7 +4495,7 @@
     },
     {
       "id": "dmsdk:dmResource::IncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:229:1978",
-      "projectionId": "dmsdk-projection:7b00e74db9b9f08dbad937e5",
+      "projectionId": "dmsdk-projection:78912f251113b55358703ca8",
       "symbol": "dmResource::IncRef",
       "disposition": "blocked",
       "blockers": [
@@ -4524,7 +4509,7 @@
     },
     {
       "id": "dmsdk:dmResource::SetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:319:1993",
-      "projectionId": "dmsdk-projection:d7c6b9c0357ca3a622516d7e",
+      "projectionId": "dmsdk-projection:e2887a0359f62756e086f9a7",
       "symbol": "dmResource::SetContext",
       "disposition": "blocked",
       "blockers": [
@@ -4541,7 +4526,7 @@
     },
     {
       "id": "dmsdk:dmResource::SetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:264:2015",
-      "projectionId": "dmsdk-projection:abec52740f90e362695a6059",
+      "projectionId": "dmsdk-projection:f934c35c8b32c88978ab94b3",
       "symbol": "dmResource::SetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -4558,7 +4543,7 @@
     },
     {
       "id": "dmsdk:dmResource::SetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:252:2013",
-      "projectionId": "dmsdk-projection:835fb040632c31564f407af3",
+      "projectionId": "dmsdk-projection:90ce280f5d2d3534060e6e7f",
       "symbol": "dmResource::SetResource",
       "disposition": "blocked",
       "blockers": [
@@ -4575,7 +4560,7 @@
     },
     {
       "id": "dmsdk:dmResource::SetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:276:2017",
-      "projectionId": "dmsdk-projection:868f0a002233d917352869dd",
+      "projectionId": "dmsdk-projection:06bf42f071e799a026edd084",
       "symbol": "dmResource::SetResourceSize",
       "disposition": "blocked",
       "blockers": [
@@ -4589,7 +4574,7 @@
     },
     {
       "id": "dmsdk:dmResource::ValidateResourceType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:314:1991",
-      "projectionId": "dmsdk-projection:a16b3c2cbeb5b922fe0ef66f",
+      "projectionId": "dmsdk-projection:4845656e399447f2a4cc072f",
       "symbol": "dmResource::ValidateResourceType",
       "disposition": "blocked",
       "blockers": [
@@ -4604,7 +4589,7 @@
     },
     {
       "id": "dmsdk:dmRig::CancelAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:175:2050",
-      "projectionId": "dmsdk-projection:ec241b28d1cdb5fa175d51b1",
+      "projectionId": "dmsdk-projection:0eb5164989ac9d22d5691c9b",
       "symbol": "dmRig::CancelAnimation",
       "disposition": "blocked",
       "blockers": [
@@ -4619,10 +4604,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:176:2051",
-      "projectionId": "dmsdk-projection:29623d4ef9f2b5060b0760eb",
+      "projectionId": "dmsdk-projection:d8fa07993ec03df6bd299499",
       "symbol": "dmRig::GetAnimation",
       "disposition": "generated-provider-boundary",
-      "bindingId": 48,
+      "bindingId": 46,
       "shape": "scalar:u64(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4648,10 +4633,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:212:2068",
-      "projectionId": "dmsdk-projection:91d83017726d0c7e349dd99b",
+      "projectionId": "dmsdk-projection:25de2a43b9fed55d9a1f7639",
       "symbol": "dmRig::GetBoneCount",
       "disposition": "generated-provider-boundary",
-      "bindingId": 49,
+      "bindingId": 47,
       "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4677,10 +4662,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:202:2058",
-      "projectionId": "dmsdk-projection:51a6bc2a58e47d7124edb26a",
+      "projectionId": "dmsdk-projection:7ed6c384afe591ded5a5e601",
       "symbol": "dmRig::GetCursor",
       "disposition": "generated-provider-boundary",
-      "bindingId": 50,
+      "bindingId": 48,
       "shape": "scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:bool)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4706,10 +4691,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:210:2066",
-      "projectionId": "dmsdk-projection:a47bb4163866618e7585044a",
+      "projectionId": "dmsdk-projection:c59e771a3f05aa9ab6b33328",
       "symbol": "dmRig::GetEnabled",
       "disposition": "generated-provider-boundary",
-      "bindingId": 51,
+      "bindingId": 49,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4735,7 +4720,7 @@
     },
     {
       "id": "dmsdk:dmRig::GetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:207:2063",
-      "projectionId": "dmsdk-projection:eaf3f41fb0f3ccbede459b57",
+      "projectionId": "dmsdk-projection:ce29a5e750f4daf8dc2414fb",
       "symbol": "dmRig::GetIKTarget",
       "disposition": "blocked",
       "blockers": [
@@ -4751,10 +4736,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetMaxBoneCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:213:2069",
-      "projectionId": "dmsdk-projection:faff30e3945ab4ac36a3c93c",
+      "projectionId": "dmsdk-projection:4cc600a14e893b2ec97ebbe8",
       "symbol": "dmRig::GetMaxBoneCount",
       "disposition": "generated-provider-boundary",
-      "bindingId": 52,
+      "bindingId": 50,
       "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4780,10 +4765,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:200:2057",
-      "projectionId": "dmsdk-projection:4d0d600426f389e17266f7a2",
+      "projectionId": "dmsdk-projection:2a7b343577ce6bbf8c049f2b",
       "symbol": "dmRig::GetModel",
       "disposition": "generated-provider-boundary",
-      "bindingId": 53,
+      "bindingId": 51,
       "shape": "scalar:u64(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4809,10 +4794,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2060",
-      "projectionId": "dmsdk-projection:82decbd7bac53b6e67876ed5",
+      "projectionId": "dmsdk-projection:900febb2fb1affb47e6f0995",
       "symbol": "dmRig::GetPlaybackRate",
       "disposition": "generated-provider-boundary",
-      "bindingId": 54,
+      "bindingId": 52,
       "shape": "scalar:f32(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4838,7 +4823,7 @@
     },
     {
       "id": "dmsdk:dmRig::GetPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:206:2062",
-      "projectionId": "dmsdk-projection:7cec01c8e94b4bf1163884e4",
+      "projectionId": "dmsdk-projection:aee3002fe6b826f8fb7f1ea8",
       "symbol": "dmRig::GetPose",
       "disposition": "blocked",
       "blockers": [
@@ -4855,10 +4840,10 @@
     },
     {
       "id": "dmsdk:dmRig::GetVertexCount@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:197:2055",
-      "projectionId": "dmsdk-projection:4bbda521ff8c9ec071e7ea3c",
+      "projectionId": "dmsdk-projection:f434fee2684c845d1dc49e3b",
       "symbol": "dmRig::GetVertexCount",
       "disposition": "generated-provider-boundary",
-      "bindingId": 55,
+      "bindingId": 53,
       "shape": "scalar:u32(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4884,10 +4869,10 @@
     },
     {
       "id": "dmsdk:dmRig::HasPoseMatrixCacheAnimatedPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:215:2070",
-      "projectionId": "dmsdk-projection:6c6c76a6f544a09bdb08bb18",
+      "projectionId": "dmsdk-projection:8438c6d4bec852b20f3b75eb",
       "symbol": "dmRig::HasPoseMatrixCacheAnimatedPose",
       "disposition": "generated-provider-boundary",
-      "bindingId": 56,
+      "bindingId": 54,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4913,7 +4898,7 @@
     },
     {
       "id": "dmsdk:dmRig::InstanceDestroy@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:172:2048",
-      "projectionId": "dmsdk-projection:e00290484bc5b6c42d4c746a",
+      "projectionId": "dmsdk-projection:3060210a1214b8b0ff80af19",
       "symbol": "dmRig::InstanceDestroy",
       "disposition": "blocked",
       "blockers": [
@@ -4928,10 +4913,10 @@
     },
     {
       "id": "dmsdk:dmRig::IsValid@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:211:2067",
-      "projectionId": "dmsdk-projection:90f048ce5462eabaf88de483",
+      "projectionId": "dmsdk-projection:b29919e6d5501fcb4dc88d15",
       "symbol": "dmRig::IsValid",
       "disposition": "generated-provider-boundary",
-      "bindingId": 57,
+      "bindingId": 55,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -4957,7 +4942,7 @@
     },
     {
       "id": "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2049",
-      "projectionId": "dmsdk-projection:ddfaf61bf9e3e50cc5a48048",
+      "projectionId": "dmsdk-projection:53fe0899402d61a2f89d0746",
       "symbol": "dmRig::PlayAnimation",
       "disposition": "blocked",
       "blockers": [
@@ -4973,10 +4958,10 @@
     },
     {
       "id": "dmsdk:dmRig::ResetIKTarget@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:208:2064",
-      "projectionId": "dmsdk-projection:97d53a7046e2583d74788f87",
+      "projectionId": "dmsdk-projection:ff394b237828faf7b3b4a515",
       "symbol": "dmRig::ResetIKTarget",
       "disposition": "generated-provider-boundary",
-      "bindingId": 58,
+      "bindingId": 56,
       "shape": "scalar:bool(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5002,7 +4987,7 @@
     },
     {
       "id": "dmsdk:dmRig::SetCursor@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:203:2059",
-      "projectionId": "dmsdk-projection:7ca28b4f901ae9ccdf430cf4",
+      "projectionId": "dmsdk-projection:dc33a1a2e8ae8f5d6cd7481d",
       "symbol": "dmRig::SetCursor",
       "disposition": "blocked",
       "blockers": [
@@ -5017,7 +5002,7 @@
     },
     {
       "id": "dmsdk:dmRig::SetEnabled@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:209:2065",
-      "projectionId": "dmsdk-projection:c666c3acd96818238a48dc99",
+      "projectionId": "dmsdk-projection:2a4fa01b14a2f9ccdd3f6b3f",
       "symbol": "dmRig::SetEnabled",
       "disposition": "blocked",
       "blockers": [
@@ -5031,7 +5016,7 @@
     },
     {
       "id": "dmsdk:dmRig::SetModel@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:199:2056",
-      "projectionId": "dmsdk-projection:06a748b95b50bf8e26e60f2a",
+      "projectionId": "dmsdk-projection:2bb52600d2ae341d47d0d3ae",
       "symbol": "dmRig::SetModel",
       "disposition": "blocked",
       "blockers": [
@@ -5046,7 +5031,7 @@
     },
     {
       "id": "dmsdk:dmRig::SetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:205:2061",
-      "projectionId": "dmsdk-projection:de1919fac271b29349778177",
+      "projectionId": "dmsdk-projection:61e98262d06ea7f114529307",
       "symbol": "dmRig::SetPlaybackRate",
       "disposition": "blocked",
       "blockers": [
@@ -5061,7 +5046,7 @@
     },
     {
       "id": "dmsdk:dmRig::Update@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:169:2046",
-      "projectionId": "dmsdk-projection:f7dd715a661ccd2936a84121",
+      "projectionId": "dmsdk-projection:08a9069eeaec09238dff77fe",
       "symbol": "dmRig::Update",
       "disposition": "blocked",
       "blockers": [
@@ -5076,7 +5061,7 @@
     },
     {
       "id": "dmsdk:dmScript::GetLuaState@upstream/defold/engine/script/src/dmsdk/script/script.h:267:2088",
-      "projectionId": "dmsdk-projection:be403d67be9476439cda898b",
+      "projectionId": "dmsdk-projection:1629fbf148aa225d52e87b4b",
       "symbol": "dmScript::GetLuaState",
       "disposition": "blocked",
       "blockers": [
@@ -5092,7 +5077,7 @@
     },
     {
       "id": "dmsdk:dmScript::LuaHBuffer::LuaHBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:162:1315",
-      "projectionId": "dmsdk-projection:d7e58bcbaca2ebf7853918e7",
+      "projectionId": "dmsdk-projection:653aff7f51651ccc1d1ebadb",
       "symbol": "dmScript::LuaHBuffer::LuaHBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -5109,7 +5094,7 @@
     },
     {
       "id": "dmsdk:dmScript::LuaHBuffer::LuaHBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:163:1316",
-      "projectionId": "dmsdk-projection:ab8fe6b4db3c74ff96488d72",
+      "projectionId": "dmsdk-projection:61c2ef006c6eefedfdfffc6f",
       "symbol": "dmScript::LuaHBuffer::LuaHBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -5127,7 +5112,7 @@
     },
     {
       "id": "dmsdk:dmScript::LuaHBuffer::LuaHBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:165:1317",
-      "projectionId": "dmsdk-projection:8f6f77eb5ad2327089d4a551",
+      "projectionId": "dmsdk-projection:9a5bb4ecd427e260d941b114",
       "symbol": "dmScript::LuaHBuffer::LuaHBuffer",
       "disposition": "blocked",
       "blockers": [
@@ -5142,10 +5127,10 @@
     },
     {
       "id": "dmsdk:dmSocket::GetFD@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:264:556",
-      "projectionId": "dmsdk-projection:94d9152c54809739b10a0f37",
+      "projectionId": "dmsdk-projection:9667f829a6eb91c97d8aba05",
       "symbol": "dmSocket::GetFD",
       "disposition": "generated-provider-boundary",
-      "bindingId": 59,
+      "bindingId": 57,
       "shape": "scalar:i32(value:handle:dmSocket::Socket:i32)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5171,7 +5156,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SelectorClear@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:424:572",
-      "projectionId": "dmsdk-projection:b449cd0604dcebd48035e438",
+      "projectionId": "dmsdk-projection:4dcebda465bcb908d6d0c4ec",
       "symbol": "dmSocket::SelectorClear",
       "disposition": "blocked",
       "blockers": [
@@ -5191,7 +5176,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SelectorIsSet@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:444:574",
-      "projectionId": "dmsdk-projection:3b352c9621025ded2191f910",
+      "projectionId": "dmsdk-projection:1ec554872f6fedffdaf43795",
       "symbol": "dmSocket::SelectorIsSet",
       "disposition": "blocked",
       "blockers": [
@@ -5210,7 +5195,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SelectorSet@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:434:573",
-      "projectionId": "dmsdk-projection:87ac8f71baf7fd5167835965",
+      "projectionId": "dmsdk-projection:888b60dc1b06d584ea5c0ab0",
       "symbol": "dmSocket::SelectorSet",
       "disposition": "blocked",
       "blockers": [
@@ -5230,7 +5215,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SetBlocking@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:291:559",
-      "projectionId": "dmsdk-projection:206cf90443bd042c73cb486c",
+      "projectionId": "dmsdk-projection:5ff366eb834ccc0316ed26fb",
       "symbol": "dmSocket::SetBlocking",
       "disposition": "blocked",
       "blockers": [
@@ -5245,7 +5230,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SetBroadcast@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:282:558",
-      "projectionId": "dmsdk-projection:11b876b54a83298a70d0ad2f",
+      "projectionId": "dmsdk-projection:30146b3af2ea786c9cf34b91",
       "symbol": "dmSocket::SetBroadcast",
       "disposition": "blocked",
       "blockers": [
@@ -5260,7 +5245,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SetNoDelay@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:300:560",
-      "projectionId": "dmsdk-projection:a61fc96a26d7b072ba2d9af4",
+      "projectionId": "dmsdk-projection:fe5a7789e90a820242d551cd",
       "symbol": "dmSocket::SetNoDelay",
       "disposition": "blocked",
       "blockers": [
@@ -5275,7 +5260,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SetQuickAck@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:310:561",
-      "projectionId": "dmsdk-projection:c24f592e57176d004372a428",
+      "projectionId": "dmsdk-projection:15168cf4bd27049e90805538",
       "symbol": "dmSocket::SetQuickAck",
       "disposition": "blocked",
       "blockers": [
@@ -5290,7 +5275,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SetReceiveTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:332:563",
-      "projectionId": "dmsdk-projection:1b15474900836a1305b51921",
+      "projectionId": "dmsdk-projection:29e7e9b60cce3a1f264cc75e",
       "symbol": "dmSocket::SetReceiveTimeout",
       "disposition": "blocked",
       "blockers": [
@@ -5305,7 +5290,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SetReuseAddress@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:273:557",
-      "projectionId": "dmsdk-projection:d1ef0c3d64497064823d2921",
+      "projectionId": "dmsdk-projection:aa3959e3df7baeaf4070b460",
       "symbol": "dmSocket::SetReuseAddress",
       "disposition": "blocked",
       "blockers": [
@@ -5320,7 +5305,7 @@
     },
     {
       "id": "dmsdk:dmSocket::SetSendTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:321:562",
-      "projectionId": "dmsdk-projection:c48c158de8931d6135d3ab69",
+      "projectionId": "dmsdk-projection:7b52d814a0106a8953554595",
       "symbol": "dmSocket::SetSendTimeout",
       "disposition": "blocked",
       "blockers": [
@@ -5335,7 +5320,7 @@
     },
     {
       "id": "dmsdk:dmSocket::Shutdown@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:256:555",
-      "projectionId": "dmsdk-projection:cd3d827bf90c89640bff4116",
+      "projectionId": "dmsdk-projection:8c9c4ec5a2e762ba2447377e",
       "symbol": "dmSocket::Shutdown",
       "disposition": "blocked",
       "blockers": [
@@ -5351,7 +5336,7 @@
     },
     {
       "id": "dmsdk:dmSSLSocket::SetReceiveTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/sslsocket.h:136:593",
-      "projectionId": "dmsdk-projection:82efb28113b5c76738731bd3",
+      "projectionId": "dmsdk-projection:561d0cc452aaba449f627077",
       "symbol": "dmSSLSocket::SetReceiveTimeout",
       "disposition": "blocked",
       "blockers": [
@@ -5360,15 +5345,13 @@
         "native-symbol-linkage-unverified",
         "result-role-unsupported:enum:dmSocket::Result",
         "semantic-token-unresolved:enum-width-domain-validation",
-        "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
-        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
       "shape": "enum:dmSocket::Result(value:handle:dmSSLSocket::Socket:opaque,value:scalar:u64)"
     },
     {
       "id": "dmsdk:FontCollectionAddFont@upstream/defold/engine/font/src/dmsdk/font/fontcollection.h:58:825",
-      "projectionId": "dmsdk-projection:43d395c4728e29b97ca7b35f",
+      "projectionId": "dmsdk-projection:cb4f5a544e3248bfa22d884c",
       "symbol": "FontCollectionAddFont",
       "disposition": "blocked",
       "blockers": [
@@ -5383,7 +5366,7 @@
     },
     {
       "id": "dmsdk:FontCollectionDestroy@upstream/defold/engine/font/src/dmsdk/font/fontcollection.h:49:824",
-      "projectionId": "dmsdk-projection:c09f639f7bad2cc85bc0df5e",
+      "projectionId": "dmsdk-projection:354996858556b11f7ee1f9bc",
       "symbol": "FontCollectionDestroy",
       "disposition": "blocked",
       "blockers": [
@@ -5397,10 +5380,10 @@
     },
     {
       "id": "dmsdk:FontCollectionGetFontCount@upstream/defold/engine/font/src/dmsdk/font/fontcollection.h:73:827",
-      "projectionId": "dmsdk-projection:e791c73f35ecffbda4755fe5",
+      "projectionId": "dmsdk-projection:a0bb1864bae788d8b4b0a907",
       "symbol": "FontCollectionGetFontCount",
       "disposition": "generated-provider-boundary",
-      "bindingId": 60,
+      "bindingId": 58,
       "shape": "scalar:u32(value:handle:HFontCollection:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5426,7 +5409,7 @@
     },
     {
       "id": "dmsdk:FontCollectionRemoveFont@upstream/defold/engine/font/src/dmsdk/font/fontcollection.h:66:826",
-      "projectionId": "dmsdk-projection:30b9a704d42a5dd5f4783287",
+      "projectionId": "dmsdk-projection:cd12ab4583ca304898f99464",
       "symbol": "FontCollectionRemoveFont",
       "disposition": "blocked",
       "blockers": [
@@ -5441,7 +5424,7 @@
     },
     {
       "id": "dmsdk:FontDestroy@upstream/defold/engine/font/src/dmsdk/font/font.h:157:806",
-      "projectionId": "dmsdk-projection:33dc17bc99854e2c77003f79",
+      "projectionId": "dmsdk-projection:53c207d188785b43df0702d8",
       "symbol": "FontDestroy",
       "disposition": "blocked",
       "blockers": [
@@ -5455,7 +5438,7 @@
     },
     {
       "id": "dmsdk:FontFreeGlyph@upstream/defold/engine/font/src/dmsdk/font/font.h:298:820",
-      "projectionId": "dmsdk-projection:ec6c8f7d36edc205b3e4f960",
+      "projectionId": "dmsdk-projection:39a8b68a8384da7cbc7a4784",
       "symbol": "FontFreeGlyph",
       "disposition": "blocked",
       "blockers": [
@@ -5474,10 +5457,10 @@
     },
     {
       "id": "dmsdk:FontGetAscent@upstream/defold/engine/font/src/dmsdk/font/font.h:201:811",
-      "projectionId": "dmsdk-projection:82beb5b2d034b160c4f88dc7",
+      "projectionId": "dmsdk-projection:f5e3c24d652e07a71d73d9c7",
       "symbol": "FontGetAscent",
       "disposition": "generated-provider-boundary",
-      "bindingId": 61,
+      "bindingId": 59,
       "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5503,8 +5486,66 @@
     },
     {
       "id": "dmsdk:FontGetDescent@upstream/defold/engine/font/src/dmsdk/font/font.h:210:812",
-      "projectionId": "dmsdk-projection:6d9f3ebf2d8075437c5cb6df",
+      "projectionId": "dmsdk-projection:6005b12f92556550cb85a835",
       "symbol": "FontGetDescent",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 60,
+      "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
+      "resolvedPolicies": {
+        "ownership": "borrowed-only-no-transfer-no-release",
+        "nullability": "zero-handle-rejected-before-provider",
+        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
+        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
+        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
+      },
+      "engineProviderBlockers": [
+        "call-thread-affinity-unresolved",
+        "handle-ownership-nullability-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
+    },
+    {
+      "id": "dmsdk:FontGetGlyphIndex@upstream/defold/engine/font/src/dmsdk/font/font.h:239:815",
+      "projectionId": "dmsdk-projection:5a5f44cde62b186ac83277bf",
+      "symbol": "FontGetGlyphIndex",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 61,
+      "shape": "scalar:u32(value:handle:HFont:opaque,value:scalar:u32)",
+      "resolvedPolicies": {
+        "ownership": "borrowed-only-no-transfer-no-release",
+        "nullability": "zero-handle-rejected-before-provider",
+        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
+        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
+        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
+      },
+      "engineProviderBlockers": [
+        "call-thread-affinity-unresolved",
+        "handle-ownership-nullability-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
+    },
+    {
+      "id": "dmsdk:FontGetLineGap@upstream/defold/engine/font/src/dmsdk/font/font.h:219:813",
+      "projectionId": "dmsdk-projection:c00452c673673d805ad99f8c",
+      "symbol": "FontGetLineGap",
       "disposition": "generated-provider-boundary",
       "bindingId": 62,
       "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
@@ -5531,69 +5572,11 @@
       }
     },
     {
-      "id": "dmsdk:FontGetGlyphIndex@upstream/defold/engine/font/src/dmsdk/font/font.h:239:815",
-      "projectionId": "dmsdk-projection:f1c116978020ddd5c41c863f",
-      "symbol": "FontGetGlyphIndex",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 63,
-      "shape": "scalar:u32(value:handle:HFont:opaque,value:scalar:u32)",
-      "resolvedPolicies": {
-        "ownership": "borrowed-only-no-transfer-no-release",
-        "nullability": "zero-handle-rejected-before-provider",
-        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
-        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
-      },
-      "engineProviderBlockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
-    },
-    {
-      "id": "dmsdk:FontGetLineGap@upstream/defold/engine/font/src/dmsdk/font/font.h:219:813",
-      "projectionId": "dmsdk-projection:5e3f871d4143d9337afeba7f",
-      "symbol": "FontGetLineGap",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 64,
-      "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
-      "resolvedPolicies": {
-        "ownership": "borrowed-only-no-transfer-no-release",
-        "nullability": "zero-handle-rejected-before-provider",
-        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
-        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
-      },
-      "engineProviderBlockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
-    },
-    {
       "id": "dmsdk:FontGetPathHash@upstream/defold/engine/font/src/dmsdk/font/font.h:182:809",
-      "projectionId": "dmsdk-projection:dce34f0b45a250e6327fa5b1",
+      "projectionId": "dmsdk-projection:4474eb01f282c6365d2c0c26",
       "symbol": "FontGetPathHash",
       "disposition": "generated-provider-boundary",
-      "bindingId": 65,
+      "bindingId": 63,
       "shape": "scalar:u32(value:handle:HFont:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5619,10 +5602,10 @@
     },
     {
       "id": "dmsdk:FontGetResourceSize@upstream/defold/engine/font/src/dmsdk/font/font.h:227:814",
-      "projectionId": "dmsdk-projection:2979194bba34a247116df35b",
+      "projectionId": "dmsdk-projection:4e5026112063da0eec3f396e",
       "symbol": "FontGetResourceSize",
       "disposition": "generated-provider-boundary",
-      "bindingId": 66,
+      "bindingId": 64,
       "shape": "scalar:u32(value:handle:HFont:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5648,10 +5631,10 @@
     },
     {
       "id": "dmsdk:FontGetScaleFromSize@upstream/defold/engine/font/src/dmsdk/font/font.h:192:810",
-      "projectionId": "dmsdk-projection:b72504b7e967b6b79b336455",
+      "projectionId": "dmsdk-projection:feea0b63ba065e7a4b65e368",
       "symbol": "FontGetScaleFromSize",
       "disposition": "generated-provider-boundary",
-      "bindingId": 67,
+      "bindingId": 65,
       "shape": "scalar:f32(value:handle:HFont:opaque,value:scalar:f32)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5677,7 +5660,7 @@
     },
     {
       "id": "dmsdk:FontGetType@upstream/defold/engine/font/src/dmsdk/font/font.h:165:807",
-      "projectionId": "dmsdk-projection:4aac5af15a32718b79b3c7c0",
+      "projectionId": "dmsdk-projection:be4852438cd1d0429fd60b6b",
       "symbol": "FontGetType",
       "disposition": "blocked",
       "blockers": [
@@ -5692,7 +5675,7 @@
     },
     {
       "id": "dmsdk:HttpCancelRequest@upstream/defold/engine/dlib/src/dmsdk/dlib/http.h:490:335",
-      "projectionId": "dmsdk-projection:ed6be062b2b5d33d74812698",
+      "projectionId": "dmsdk-projection:f78c788d687478149415fc5c",
       "symbol": "HttpCancelRequest",
       "disposition": "blocked",
       "blockers": [
@@ -5711,7 +5694,7 @@
     },
     {
       "id": "dmsdk:JobSystemCancelJob@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:234:377",
-      "projectionId": "dmsdk-projection:407f873c5a3d14d4ddf8d65c",
+      "projectionId": "dmsdk-projection:dfc933a0d2e6e1b9826ffa9d",
       "symbol": "JobSystemCancelJob",
       "disposition": "blocked",
       "blockers": [
@@ -5726,7 +5709,7 @@
     },
     {
       "id": "dmsdk:JobSystemDestroy@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:169:371",
-      "projectionId": "dmsdk-projection:b281ee25e18dda1099599a81",
+      "projectionId": "dmsdk-projection:446c716ee38c7571068bedb3",
       "symbol": "JobSystemDestroy",
       "disposition": "blocked",
       "blockers": [
@@ -5740,7 +5723,7 @@
     },
     {
       "id": "dmsdk:JobSystemGetContext@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:250:379",
-      "projectionId": "dmsdk-projection:17bd9a8277d144848e9e29f7",
+      "projectionId": "dmsdk-projection:f6996e9b802f839bb041965e",
       "symbol": "JobSystemGetContext",
       "disposition": "blocked",
       "blockers": [
@@ -5755,7 +5738,7 @@
     },
     {
       "id": "dmsdk:JobSystemGetData@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:242:378",
-      "projectionId": "dmsdk-projection:ed7c5c12223c70295e37c0a1",
+      "projectionId": "dmsdk-projection:485916cae9c4e5a8aca19c74",
       "symbol": "JobSystemGetData",
       "disposition": "blocked",
       "blockers": [
@@ -5770,10 +5753,10 @@
     },
     {
       "id": "dmsdk:JobSystemGetWorkerCount@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:185:373",
-      "projectionId": "dmsdk-projection:b57fc656e02a00a8ac31a8fd",
+      "projectionId": "dmsdk-projection:37985a1c89401090944a59dd",
       "symbol": "JobSystemGetWorkerCount",
       "disposition": "generated-provider-boundary",
-      "bindingId": 68,
+      "bindingId": 66,
       "shape": "scalar:u32(value:handle:HJobContext:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5799,7 +5782,7 @@
     },
     {
       "id": "dmsdk:JobSystemPushJob@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:213:376",
-      "projectionId": "dmsdk-projection:9fd4cb2dd1bf63de48d1153a",
+      "projectionId": "dmsdk-projection:a38edcd63a079f10b18431df",
       "symbol": "JobSystemPushJob",
       "disposition": "blocked",
       "blockers": [
@@ -5814,7 +5797,7 @@
     },
     {
       "id": "dmsdk:JobSystemSetParent@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:204:375",
-      "projectionId": "dmsdk-projection:b83d1dd4f4d70f439554fc66",
+      "projectionId": "dmsdk-projection:39521700ff08b786eb832f23",
       "symbol": "JobSystemSetParent",
       "disposition": "blocked",
       "blockers": [
@@ -5829,7 +5812,7 @@
     },
     {
       "id": "dmsdk:JobSystemUpdate@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:178:372",
-      "projectionId": "dmsdk-projection:46f567dd656453e66eb42af1",
+      "projectionId": "dmsdk-projection:0f1c6dfe2af6ac4404614af4",
       "symbol": "JobSystemUpdate",
       "disposition": "blocked",
       "blockers": [
@@ -5843,7 +5826,7 @@
     },
     {
       "id": "dmsdk:ProfileFrameEnd@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:364:534",
-      "projectionId": "dmsdk-projection:06c5f0d4b80447196388af09",
+      "projectionId": "dmsdk-projection:d826f3d33e46a93526c5b046",
       "symbol": "ProfileFrameEnd",
       "disposition": "blocked",
       "blockers": [
@@ -5858,10 +5841,10 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:393:1913",
-      "projectionId": "dmsdk-projection:94fc7b93e4b13a5227333f10",
+      "projectionId": "dmsdk-projection:97ac61659bfc8559a0bae82c",
       "symbol": "ResourceDescriptorGetNameHash",
       "disposition": "generated-provider-boundary",
-      "bindingId": 69,
+      "bindingId": 67,
       "shape": "scalar:u64(value:handle:HResourceDescriptor:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5887,7 +5870,7 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1917",
-      "projectionId": "dmsdk-projection:7347d52a8866f8c4fe316f9a",
+      "projectionId": "dmsdk-projection:7367d008f8a0f943fc4eb5c9",
       "symbol": "ResourceDescriptorGetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -5902,7 +5885,7 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorGetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:407:1915",
-      "projectionId": "dmsdk-projection:15b0c8b1f37c515ea7889977",
+      "projectionId": "dmsdk-projection:f7f5f16732d54307186fd1ed",
       "symbol": "ResourceDescriptorGetResource",
       "disposition": "blocked",
       "blockers": [
@@ -5917,10 +5900,10 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorGetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:437:1919",
-      "projectionId": "dmsdk-projection:75f6add8138a9c0367be55d9",
+      "projectionId": "dmsdk-projection:ade1dccd420283cfe1557be8",
       "symbol": "ResourceDescriptorGetResourceSize",
       "disposition": "generated-provider-boundary",
-      "bindingId": 70,
+      "bindingId": 68,
       "shape": "scalar:u32(value:handle:HResourceDescriptor:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -5946,7 +5929,7 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:452:1921",
-      "projectionId": "dmsdk-projection:47b7d34b687434be649e833b",
+      "projectionId": "dmsdk-projection:0cc1e37032a6f7723fa075ef",
       "symbol": "ResourceDescriptorIncRef",
       "disposition": "blocked",
       "blockers": [
@@ -5960,7 +5943,7 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1916",
-      "projectionId": "dmsdk-projection:7ae76048aeca46d4ae6b54e3",
+      "projectionId": "dmsdk-projection:e609b1de387707c580783c88",
       "symbol": "ResourceDescriptorSetPrevResource",
       "disposition": "blocked",
       "blockers": [
@@ -5977,7 +5960,7 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorSetResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:400:1914",
-      "projectionId": "dmsdk-projection:139fbd3ca8615253680f8125",
+      "projectionId": "dmsdk-projection:71144b05ec3dfff5246d1db0",
       "symbol": "ResourceDescriptorSetResource",
       "disposition": "blocked",
       "blockers": [
@@ -5994,7 +5977,7 @@
     },
     {
       "id": "dmsdk:ResourceDescriptorSetResourceSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:430:1918",
-      "projectionId": "dmsdk-projection:6b7d449ffe2cfc7db44eb6ed",
+      "projectionId": "dmsdk-projection:b4b06412e32d3cbd216566f8",
       "symbol": "ResourceDescriptorSetResourceSize",
       "disposition": "blocked",
       "blockers": [
@@ -6008,7 +5991,7 @@
     },
     {
       "id": "dmsdk:ResourceGetDescriptorByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:276:1902",
-      "projectionId": "dmsdk-projection:069b2288a9cc0934c54aa95c",
+      "projectionId": "dmsdk-projection:604b3e17822d27bc9fc80e72",
       "symbol": "ResourceGetDescriptorByHash",
       "disposition": "blocked",
       "blockers": [
@@ -6026,7 +6009,7 @@
     },
     {
       "id": "dmsdk:ResourceIncRef@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:244:1899",
-      "projectionId": "dmsdk-projection:12220483a2ea1ab73c1bd8b0",
+      "projectionId": "dmsdk-projection:1cef47a229f9d0b77c4274fe",
       "symbol": "ResourceIncRef",
       "disposition": "blocked",
       "blockers": [
@@ -6043,7 +6026,7 @@
     },
     {
       "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1903",
-      "projectionId": "dmsdk-projection:407877661a1ffbfc3fe460d6",
+      "projectionId": "dmsdk-projection:bd87b146606f6e0184913485",
       "symbol": "ResourceRelease",
       "disposition": "blocked",
       "blockers": [
@@ -6060,7 +6043,7 @@
     },
     {
       "id": "dmsdk:ResourceTypeContextGetContextByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:457:1922",
-      "projectionId": "dmsdk-projection:4b15d3948bddb5ead2d74ddc",
+      "projectionId": "dmsdk-projection:7daba81e197c7a0eeb3206b1",
       "symbol": "ResourceTypeContextGetContextByHash",
       "disposition": "blocked",
       "blockers": [
@@ -6075,7 +6058,7 @@
     },
     {
       "id": "dmsdk:ResourceTypeGetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:537:1930",
-      "projectionId": "dmsdk-projection:b7befc749c0acdb475e981b0",
+      "projectionId": "dmsdk-projection:b464972fce7c4c2921f1bbd4",
       "symbol": "ResourceTypeGetContext",
       "disposition": "blocked",
       "blockers": [
@@ -6090,10 +6073,10 @@
     },
     {
       "id": "dmsdk:ResourceTypeGetNameHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:558:1933",
-      "projectionId": "dmsdk-projection:1d3ee5223ed23b45803be288",
+      "projectionId": "dmsdk-projection:83197af5850af5e7bc7a272a",
       "symbol": "ResourceTypeGetNameHash",
       "disposition": "generated-provider-boundary",
-      "bindingId": 71,
+      "bindingId": 69,
       "shape": "scalar:u64(value:handle:HResourceType:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -6119,10 +6102,10 @@
     },
     {
       "id": "dmsdk:ResourceTypeGetPreloadSize@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:597:1941",
-      "projectionId": "dmsdk-projection:14145270aff87430bc309145",
+      "projectionId": "dmsdk-projection:897d13d8cdc65e290932b221",
       "symbol": "ResourceTypeGetPreloadSize",
       "disposition": "generated-provider-boundary",
-      "bindingId": 72,
+      "bindingId": 70,
       "shape": "scalar:u32(value:handle:HResourceType:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -6148,10 +6131,10 @@
     },
     {
       "id": "dmsdk:ResourceTypeIsStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:596:1940",
-      "projectionId": "dmsdk-projection:c8c6b70496216ae738340cd0",
+      "projectionId": "dmsdk-projection:b15ef25d057495d92fca902b",
       "symbol": "ResourceTypeIsStreaming",
       "disposition": "generated-provider-boundary",
-      "bindingId": 73,
+      "bindingId": 71,
       "shape": "scalar:bool(value:handle:HResourceType:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -6177,7 +6160,7 @@
     },
     {
       "id": "dmsdk:ResourceTypeReset@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:600:1942",
-      "projectionId": "dmsdk-projection:7d1fe80ad38cf13435ac9590",
+      "projectionId": "dmsdk-projection:91d53d57f8a177db7c75413b",
       "symbol": "ResourceTypeReset",
       "disposition": "blocked",
       "blockers": [
@@ -6191,7 +6174,7 @@
     },
     {
       "id": "dmsdk:ResourceTypeSetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:544:1931",
-      "projectionId": "dmsdk-projection:fbc69e80d81bda588b60adbf",
+      "projectionId": "dmsdk-projection:01d1d8532eb9709f74ad64bd",
       "symbol": "ResourceTypeSetContext",
       "disposition": "blocked",
       "blockers": [
@@ -6208,7 +6191,7 @@
     },
     {
       "id": "dmsdk:ResourceTypeSetStreaming@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:595:1939",
-      "projectionId": "dmsdk-projection:9033f4c92993ab2cdca0ee3a",
+      "projectionId": "dmsdk-projection:b7519de95a53baf5137cd472",
       "symbol": "ResourceTypeSetStreaming",
       "disposition": "blocked",
       "blockers": [
@@ -6222,7 +6205,7 @@
     },
     {
       "id": "dmsdk:TextLayoutAcquire@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:368:850",
-      "projectionId": "dmsdk-projection:27997868efa4bc1ce8993d59",
+      "projectionId": "dmsdk-projection:2fdf3b544f41cc6c6a13d725",
       "symbol": "TextLayoutAcquire",
       "disposition": "blocked",
       "blockers": [
@@ -6236,7 +6219,7 @@
     },
     {
       "id": "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867",
-      "projectionId": "dmsdk-projection:140ec9aea8e0851c62a1ffb0",
+      "projectionId": "dmsdk-projection:01459ddbc4ba459ce190fe1c",
       "symbol": "TextLayoutGetBounds",
       "disposition": "blocked",
       "blockers": [
@@ -6254,8 +6237,98 @@
     },
     {
       "id": "dmsdk:TextLayoutGetDecorationCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:445:859",
-      "projectionId": "dmsdk-projection:0ed1626725be9bac17e1506e",
+      "projectionId": "dmsdk-projection:4310c7163f7e68a1ed332e60",
       "symbol": "TextLayoutGetDecorationCount",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 72,
+      "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
+      "resolvedPolicies": {
+        "ownership": "borrowed-only-no-transfer-no-release",
+        "nullability": "zero-handle-rejected-before-provider",
+        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
+        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
+        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
+      },
+      "engineProviderBlockers": [
+        "call-thread-affinity-unresolved",
+        "handle-ownership-nullability-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
+    },
+    {
+      "id": "dmsdk:TextLayoutGetDecorations@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:452:860",
+      "projectionId": "dmsdk-projection:7768cc25f5f2ab216f875768",
+      "symbol": "TextLayoutGetDecorations",
+      "disposition": "blocked",
+      "blockers": [
+        "call-thread-affinity-unresolved",
+        "handle-ownership-nullability-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "result-role-unsupported:pointer:record:TextDecoration",
+        "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "shape": "pointer:record:TextDecoration(value:handle:HTextLayout:opaque)"
+    },
+    {
+      "id": "dmsdk:TextLayoutGetGlyphCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:398:853",
+      "projectionId": "dmsdk-projection:3e93e31c94c21192b6d531f9",
+      "symbol": "TextLayoutGetGlyphCount",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 73,
+      "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
+      "resolvedPolicies": {
+        "ownership": "borrowed-only-no-transfer-no-release",
+        "nullability": "zero-handle-rejected-before-provider",
+        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
+        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
+        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
+      },
+      "engineProviderBlockers": [
+        "call-thread-affinity-unresolved",
+        "handle-ownership-nullability-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
+    },
+    {
+      "id": "dmsdk:TextLayoutGetGlyphs@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:406:854",
+      "projectionId": "dmsdk-projection:62e4cfbc3762afb5fa4c5d9c",
+      "symbol": "TextLayoutGetGlyphs",
+      "disposition": "blocked",
+      "blockers": [
+        "call-thread-affinity-unresolved",
+        "handle-ownership-nullability-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "result-role-unsupported:pointer:record:TextGlyph",
+        "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "shape": "pointer:record:TextGlyph(value:handle:HTextLayout:opaque)"
+    },
+    {
+      "id": "dmsdk:TextLayoutGetLineCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:414:855",
+      "projectionId": "dmsdk-projection:305b8385a4bc0cef70739ce5",
+      "symbol": "TextLayoutGetLineCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 74,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
@@ -6282,25 +6355,41 @@
       }
     },
     {
-      "id": "dmsdk:TextLayoutGetDecorations@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:452:860",
-      "projectionId": "dmsdk-projection:9e937a8b19b553a9c99e6eb3",
-      "symbol": "TextLayoutGetDecorations",
+      "id": "dmsdk:TextLayoutGetLines@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:422:856",
+      "projectionId": "dmsdk-projection:546ee1a4b17c3b14c5661a4d",
+      "symbol": "TextLayoutGetLines",
       "disposition": "blocked",
       "blockers": [
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
-        "result-role-unsupported:pointer:record:TextDecoration",
+        "result-role-unsupported:pointer:record:TextLine",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "pointer:record:TextDecoration(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextLine(value:handle:HTextLayout:opaque)"
     },
     {
-      "id": "dmsdk:TextLayoutGetGlyphCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:398:853",
-      "projectionId": "dmsdk-projection:eac5c08b7ac13084d542334e",
-      "symbol": "TextLayoutGetGlyphCount",
+      "id": "dmsdk:TextLayoutGetObjectAttributes@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:495:864",
+      "projectionId": "dmsdk-projection:be1be1cf14b82b73c324dfd2",
+      "symbol": "TextLayoutGetObjectAttributes",
+      "disposition": "blocked",
+      "blockers": [
+        "call-thread-affinity-unresolved",
+        "handle-ownership-nullability-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "result-role-unsupported:pointer:record:TextLayoutObjectAttribute",
+        "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
+        "semantic-token-unresolved:record-layout-alignment-copy",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "shape": "pointer:record:TextLayoutObjectAttribute(value:handle:HTextLayout:opaque)"
+    },
+    {
+      "id": "dmsdk:TextLayoutGetObjectCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:459:861",
+      "projectionId": "dmsdk-projection:32db75e16c61bc5e8c1de036",
+      "symbol": "TextLayoutGetObjectCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 75,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
@@ -6327,25 +6416,25 @@
       }
     },
     {
-      "id": "dmsdk:TextLayoutGetGlyphs@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:406:854",
-      "projectionId": "dmsdk-projection:935f8d357db9048b4ef28148",
-      "symbol": "TextLayoutGetGlyphs",
+      "id": "dmsdk:TextLayoutGetObjects@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:469:862",
+      "projectionId": "dmsdk-projection:ee383f89e91f0ef51b51f99d",
+      "symbol": "TextLayoutGetObjects",
       "disposition": "blocked",
       "blockers": [
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
-        "result-role-unsupported:pointer:record:TextGlyph",
+        "result-role-unsupported:pointer:record:TextLayoutObject",
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
-      "shape": "pointer:record:TextGlyph(value:handle:HTextLayout:opaque)"
+      "shape": "pointer:record:TextLayoutObject(value:handle:HTextLayout:opaque)"
     },
     {
-      "id": "dmsdk:TextLayoutGetLineCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:414:855",
-      "projectionId": "dmsdk-projection:85fec27e29d5ccd9a3b8953f",
-      "symbol": "TextLayoutGetLineCount",
+      "id": "dmsdk:TextLayoutGetParagraphCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:430:857",
+      "projectionId": "dmsdk-projection:b96df7f7dcd7cf7f40fef7d4",
+      "symbol": "TextLayoutGetParagraphCount",
       "disposition": "generated-provider-boundary",
       "bindingId": 76,
       "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
@@ -6372,114 +6461,8 @@
       }
     },
     {
-      "id": "dmsdk:TextLayoutGetLines@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:422:856",
-      "projectionId": "dmsdk-projection:012db61d6a089fda6ead1ee9",
-      "symbol": "TextLayoutGetLines",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "result-role-unsupported:pointer:record:TextLine",
-        "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "shape": "pointer:record:TextLine(value:handle:HTextLayout:opaque)"
-    },
-    {
-      "id": "dmsdk:TextLayoutGetObjectAttributes@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:495:864",
-      "projectionId": "dmsdk-projection:ac3c60ae340a0c12e4c7b175",
-      "symbol": "TextLayoutGetObjectAttributes",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "result-role-unsupported:pointer:record:TextLayoutObjectAttribute",
-        "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "shape": "pointer:record:TextLayoutObjectAttribute(value:handle:HTextLayout:opaque)"
-    },
-    {
-      "id": "dmsdk:TextLayoutGetObjectCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:459:861",
-      "projectionId": "dmsdk-projection:1bf3ad180c7b8a1cc468101d",
-      "symbol": "TextLayoutGetObjectCount",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 77,
-      "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
-      "resolvedPolicies": {
-        "ownership": "borrowed-only-no-transfer-no-release",
-        "nullability": "zero-handle-rejected-before-provider",
-        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
-        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
-      },
-      "engineProviderBlockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
-    },
-    {
-      "id": "dmsdk:TextLayoutGetObjects@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:469:862",
-      "projectionId": "dmsdk-projection:a9cef240d92d3af6d302bc89",
-      "symbol": "TextLayoutGetObjects",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "result-role-unsupported:pointer:record:TextLayoutObject",
-        "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "shape": "pointer:record:TextLayoutObject(value:handle:HTextLayout:opaque)"
-    },
-    {
-      "id": "dmsdk:TextLayoutGetParagraphCount@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:430:857",
-      "projectionId": "dmsdk-projection:289ec2243d87ed31d10a99d5",
-      "symbol": "TextLayoutGetParagraphCount",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 78,
-      "shape": "scalar:u32(value:handle:HTextLayout:opaque)",
-      "resolvedPolicies": {
-        "ownership": "borrowed-only-no-transfer-no-release",
-        "nullability": "zero-handle-rejected-before-provider",
-        "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
-        "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-        "result": "scalar-only-no-borrowed-pointer-or-handle-result"
-      },
-      "engineProviderBlockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
-    },
-    {
       "id": "dmsdk:TextLayoutGetParagraphs@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:438:858",
-      "projectionId": "dmsdk-projection:1e76ff46a499629f85bba13a",
+      "projectionId": "dmsdk-projection:866d9960fa6a0be7cf5d298c",
       "symbol": "TextLayoutGetParagraphs",
       "disposition": "blocked",
       "blockers": [
@@ -6495,7 +6478,7 @@
     },
     {
       "id": "dmsdk:TextLayoutRelease@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:375:851",
-      "projectionId": "dmsdk-projection:1e776e5fdda4c8f11ef693f9",
+      "projectionId": "dmsdk-projection:f9c8da9fde737a0c942230b3",
       "symbol": "TextLayoutRelease",
       "disposition": "blocked",
       "blockers": [
@@ -6509,7 +6492,7 @@
     },
     {
       "id": "dmsdk:TextLayoutSetObjectStyle@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:518:866",
-      "projectionId": "dmsdk-projection:ed76f30d389abb165d4a6d36",
+      "projectionId": "dmsdk-projection:974e9203430bd451f145f2f5",
       "symbol": "TextLayoutSetObjectStyle",
       "disposition": "blocked",
       "blockers": [
@@ -6523,7 +6506,7 @@
     },
     {
       "id": "dmsdk:TextLayoutUpdate@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:390:852",
-      "projectionId": "dmsdk-projection:01ecc257d12da082ee1d5505",
+      "projectionId": "dmsdk-projection:d431b0f3552fdd067588d21e",
       "symbol": "TextLayoutUpdate",
       "disposition": "blocked",
       "blockers": [
@@ -6537,7 +6520,7 @@
     },
     {
       "id": "dmsdk:WindowClose@upstream/defold/engine/platform/src/dmsdk/platform/window.h:267:1786",
-      "projectionId": "dmsdk-projection:f3a88c7274ba59ccde5d73f3",
+      "projectionId": "dmsdk-projection:7474268b57667f5ad83f00ff",
       "symbol": "WindowClose",
       "disposition": "blocked",
       "blockers": [
@@ -6551,7 +6534,7 @@
     },
     {
       "id": "dmsdk:WindowDelete@upstream/defold/engine/platform/src/dmsdk/platform/window.h:253:1784",
-      "projectionId": "dmsdk-projection:81e6fb71a0e2c9f7e26cf230",
+      "projectionId": "dmsdk-projection:a6b28936c1c250d52df5f946",
       "symbol": "WindowDelete",
       "disposition": "blocked",
       "blockers": [
@@ -6565,10 +6548,10 @@
     },
     {
       "id": "dmsdk:WindowGetDisplayScaleFactor@upstream/defold/engine/platform/src/dmsdk/platform/window.h:308:1792",
-      "projectionId": "dmsdk-projection:8918441528eb2f1aebf4f90d",
+      "projectionId": "dmsdk-projection:427256acf6bff8a6c2c44d3b",
       "symbol": "WindowGetDisplayScaleFactor",
       "disposition": "generated-provider-boundary",
-      "bindingId": 79,
+      "bindingId": 77,
       "shape": "scalar:f32(value:handle:HWindow:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -6594,10 +6577,10 @@
     },
     {
       "id": "dmsdk:WindowGetHeight@upstream/defold/engine/platform/src/dmsdk/platform/window.h:293:1790",
-      "projectionId": "dmsdk-projection:ba313e4bd60ff76e9ed59437",
+      "projectionId": "dmsdk-projection:75cb58a9a0fb8f617ca40694",
       "symbol": "WindowGetHeight",
       "disposition": "generated-provider-boundary",
-      "bindingId": 80,
+      "bindingId": 78,
       "shape": "scalar:u32(value:handle:HWindow:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -6623,7 +6606,7 @@
     },
     {
       "id": "dmsdk:WindowGetStateParam@upstream/defold/engine/platform/src/dmsdk/platform/window.h:301:1791",
-      "projectionId": "dmsdk-projection:cb68bcf797809aa4ff678cca",
+      "projectionId": "dmsdk-projection:b7c07967729d8aba85472f75",
       "symbol": "WindowGetStateParam",
       "disposition": "blocked",
       "blockers": [
@@ -6638,10 +6621,10 @@
     },
     {
       "id": "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1789",
-      "projectionId": "dmsdk-projection:1c7f9e9a0964b9a7c8258a6a",
+      "projectionId": "dmsdk-projection:15868fc9e6185e21868fbc3b",
       "symbol": "WindowGetWidth",
       "disposition": "generated-provider-boundary",
-      "bindingId": 81,
+      "bindingId": 79,
       "shape": "scalar:u32(value:handle:HWindow:opaque)",
       "resolvedPolicies": {
         "ownership": "borrowed-only-no-transfer-no-release",
@@ -6667,7 +6650,7 @@
     },
     {
       "id": "dmsdk:WindowIconify@upstream/defold/engine/platform/src/dmsdk/platform/window.h:279:1788",
-      "projectionId": "dmsdk-projection:05b909a630621389d755c3f1",
+      "projectionId": "dmsdk-projection:fb4ccb237e3d4a7dd1fb7775",
       "symbol": "WindowIconify",
       "disposition": "blocked",
       "blockers": [
@@ -6681,7 +6664,7 @@
     },
     {
       "id": "dmsdk:WindowOpen@upstream/defold/engine/platform/src/dmsdk/platform/window.h:261:1785",
-      "projectionId": "dmsdk-projection:d55ecc7c25ca160a0f12ab1f",
+      "projectionId": "dmsdk-projection:ef941ecd74c2fcceba8f4688",
       "symbol": "WindowOpen",
       "disposition": "blocked",
       "blockers": [
@@ -6699,7 +6682,7 @@
     },
     {
       "id": "dmsdk:WindowPollEvents@upstream/defold/engine/platform/src/dmsdk/platform/window.h:322:1794",
-      "projectionId": "dmsdk-projection:380f14e11c77980102bc251b",
+      "projectionId": "dmsdk-projection:18840cda8f4e4646e7a110c9",
       "symbol": "WindowPollEvents",
       "disposition": "blocked",
       "blockers": [
@@ -6713,7 +6696,7 @@
     },
     {
       "id": "dmsdk:WindowSetSize@upstream/defold/engine/platform/src/dmsdk/platform/window.h:316:1793",
-      "projectionId": "dmsdk-projection:10dd964d4d6488d068b6db0c",
+      "projectionId": "dmsdk-projection:a74b60b581bbf0f255e3e68d",
       "symbol": "WindowSetSize",
       "disposition": "blocked",
       "blockers": [
@@ -6727,7 +6710,7 @@
     },
     {
       "id": "dmsdk:WindowShow@upstream/defold/engine/platform/src/dmsdk/platform/window.h:273:1787",
-      "projectionId": "dmsdk-projection:542cd647cc15f1cd5f67137d",
+      "projectionId": "dmsdk-projection:a6e40a61afed860798e98ac5",
       "symbol": "WindowShow",
       "disposition": "blocked",
       "blockers": [

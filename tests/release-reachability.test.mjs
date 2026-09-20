@@ -84,9 +84,9 @@ test("every dmSDK recipe has a checker-resolvable overload identity", () => {
   assert.equal(Object.keys(dmSdkIndex.declarations).length, 1361);
   assert.equal(dmSdkIndex.overloadCount, 1335);
   assert.equal(dmSdkIndex.ambiguousOverloadCount, 21);
-  assert.equal(dmSdkIndex.universalReadyCount, 320);
+  assert.equal(dmSdkIndex.universalReadyCount, 486);
   assert.equal(dmSdkIndex.generatedAdapterCount, 0);
-  assert.equal(dmSdkIndex.specializationRequiredCount, 1041);
+  assert.equal(dmSdkIndex.specializationRequiredCount, 875);
   assert.equal(Object.keys(dmSdkIndex.markers).length, dmSdkIndex.overloadCount);
   assert.match(dmSdkIndex.indexSha256, /^[0-9a-f]{64}$/);
 });
@@ -630,7 +630,7 @@ test("the typed-native lane and its emitted C carry only reachable symbols", asy
     const prunedOutput = path.join(temporary, "pruned.c");
     await writeFile(prunedInput, `${source}${probe}`);
     execFileSync(shermes, [
-      "-fno-std-globals", "-parse-ts", "-typed", "-strict", "-O", "-emit-c",
+      "-fno-std-globals", "-typed", "-strict", "-O", "-emit-c",
       "-exported-unit=deherm_static_vmath", prunedInput, "-o", prunedOutput
     ], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
     const emitted = await readFile(prunedOutput, "utf8");
@@ -648,7 +648,7 @@ test("the typed-native lane and its emitted C carry only reachable symbols", asy
       "__report(2, vmathProjectVector3Vector3(2, 4, 6, 1, 2, 3));\n" +
       "__report(3, vmathLengthSqrVector3(3, 4, 12));\n");
     execFileSync(shermes, [
-      "-fno-std-globals", "-parse-ts", "-typed", "-strict", "-O", "-emit-c",
+      "-fno-std-globals", "-typed", "-strict", "-O", "-emit-c",
       "-exported-unit=deherm_static_vmath", fullInput, "-o", fullOutput
     ], { cwd: root, stdio: ["ignore", "pipe", "pipe"] });
     const fullEmitted = await readFile(fullOutput, "utf8");

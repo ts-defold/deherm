@@ -56,7 +56,9 @@ void operator delete(void* value, std::size_t) noexcept { std::free(value); }
 
 int main()
 {
-    assert(deherm_dmsdk_borrowed_count() == UINT32_C(82));
+    // Exact nested-enum support facts correctly move two former scalar rows to
+    // the enum family; this provider harness covers the remaining 80 routes.
+    assert(deherm_dmsdk_borrowed_count() == UINT32_C(80));
     assert(deherm_dmsdk_borrowed_handle_kind_count() == UINT32_C(32));
     const auto* descriptors = deherm_dmsdk_borrowed_descriptors();
     const auto* handle_kinds = deherm_dmsdk_borrowed_handle_kinds();
@@ -119,7 +121,7 @@ int main()
         assert(deherm_dmsdk_borrowed_dispatch(route.id, arguments, route.argument_count, &result) == DEHERM_DMSDK_BORROWED_OK);
     }
     assert(g_allocations.load(std::memory_order_relaxed) == before);
-    assert(context.invocations == UINT64_C(100083));
+    assert(context.invocations == UINT64_C(100001) + deherm_dmsdk_borrowed_count());
     assert(deherm_dmsdk_borrowed_set_provider(nullptr) == DEHERM_DMSDK_BORROWED_OK);
     assert(deherm_dmsdk_borrowed_dispatch(route.id, arguments, route.argument_count, &result) == DEHERM_DMSDK_BORROWED_PROVIDER_MISSING);
     std::puts("dmsdk-borrowed-handle:ok");

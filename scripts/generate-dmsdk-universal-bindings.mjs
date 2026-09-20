@@ -125,6 +125,33 @@ function templateParameters(row) {
   return [...values].sort();
 }
 
+function enumFact(shape, row, declarations) {
+  if (shape.kind !== "enum") return null;
+  let matches = declarations.filter((declaration) =>
+    declaration.kind === "enum" && declaration.name === shape.name);
+  if (matches.length !== 1) {
+    const leaf = shape.name.split("::").at(-1);
+    matches = declarations.filter((declaration) =>
+      declaration.kind === "enum" && declaration.header === row.provenance.header &&
+      declaration.name.split("::").at(-1) === leaf);
+  }
+  if (matches.length !== 1) {
+    throw new Error(`${row.id} enum ${shape.name} resolves to ${matches.length} SDK declarations`);
+  }
+  const declaration = matches[0];
+  const members = (declaration.members ?? []).map(({ name, value }) => ({ name, value }));
+  if (!members.length || members.some(({ name, value }) =>
+    typeof name !== "string" || !name || !Number.isSafeInteger(value))) {
+    throw new Error(`${row.id} enum ${shape.name} has no complete safe-integer domain`);
+  }
+  return {
+    declarationId: declaration.id,
+    nativeName: declaration.name,
+    domain: shape.domain ?? "declared-values",
+    members,
+  };
+}
+
 function requirementFor(node) {
   const kinds = nodeKinds(node);
   const requirements = [];
@@ -137,20 +164,25 @@ function requirementFor(node) {
   return requirements;
 }
 
-function buildRecipe(row, declaration, numericId, specialized) {
+function buildRecipe(row, declaration, numericId, specialized, context) {
   const kind = row.provenance.declarationKind;
   const receiver = ownerOf(row);
   const hasReceiver = ["method", "constructor", "destructor"].includes(kind);
-  const parameters = row.signature.parameters.map((parameter) => ({
-    position: parameter.position,
-    name: parameter.name,
-    nativeType: parameter.nativeType,
-    direction: parameter.direction,
-    cellKind: valueKind[parameter.type.kind],
-    shape: parameter.type,
-    requirements: requirementFor(parameter.type),
-  }));
+  const parameters = row.signature.parameters.map((parameter) => {
+    const enumeration = enumFact(parameter.type, row, context.declarations);
+    return {
+      position: parameter.position,
+      name: parameter.name,
+      nativeType: parameter.nativeType,
+      direction: parameter.direction,
+      cellKind: valueKind[parameter.type.kind],
+      shape: parameter.type,
+      requirements: requirementFor(parameter.type),
+      ...(enumeration ? { enumeration } : {}),
+    };
+  });
   const resultRequirements = requirementFor(row.signature.result);
+  const resultEnumeration = enumFact(row.signature.result, row, context.declarations);
   const requirements = new Set([...row.semanticTokensNeeded, ...resultRequirements, ...parameters.flatMap((item) => item.requirements)]);
   if (hasReceiver) requirements.add("receiver-native-type");
   const templates = templateParameters(row);
@@ -168,8 +200,17 @@ function buildRecipe(row, declaration, numericId, specialized) {
     invocation: {
       kind: invocationKind(kind),
       nativeSymbol: row.symbol,
+      sourceDefined: row.provenance.sourceDefined === true,
       member: ["method", "constructor", "destructor"].includes(kind) ? leafOf(row.symbol) : null,
-      receiver: hasReceiver ? { required: true, mode: kind === "constructor" ? "construction-storage" : "object", nativeType: receiver, source: receiver ? "ir-owner-or-usage-substitution" : "usage-substitution-required" } : null,
+      receiver: hasReceiver ? {
+        required: true,
+        mode: kind === "constructor" ? "construction-storage" : "object",
+        owner: receiver,
+        nativeType: receiver && !context.templatedReceiverOwners.has(receiver) ? receiver : null,
+        source: receiver && !context.templatedReceiverOwners.has(receiver)
+          ? "source-derived-nontemplate-owner"
+          : "usage-substitution-required",
+      } : null,
       templateArguments: { names: templates, source: "usage-required-when-unresolved" },
       monomorphization: kind === "function-template" ? {
         required: true,
@@ -183,6 +224,7 @@ function buildRecipe(row, declaration, numericId, specialized) {
       resultKind: valueKind[row.signature.result.kind],
       resultNativeType: declaration.returns ?? "void",
       resultShape: row.signature.result,
+      ...(resultEnumeration ? { resultEnumeration } : {}),
       parameters,
       frame: "DehermDmSdkUniversalFrame/v1",
     },
@@ -309,10 +351,18 @@ export async function buildUniversalDmSdkBindings({
     }
   }
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
+  const templatedReceiverOwners = new Set(projection.rows.flatMap((row) => {
+    const owner = ownerOf(row);
+    return owner && templateParameters(row).length ? [owner] : [];
+  }));
+  const context = {
+    declarations: [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])],
+    templatedReceiverOwners,
+  };
   const recipes = projection.rows.map((row, numericId) => {
     const declaration = declarations.get(row.id);
     if (!declaration) throw new Error(`Projection row is absent from SDK IR: ${row.id}`);
-    return buildRecipe(row, declaration, numericId, specialized);
+    return buildRecipe(row, declaration, numericId, specialized, context);
   });
   const expectedRuntimeDeclarations = ir.runtimeUnimplementedCount ?? projection.rows.length;
   if (recipes.length !== expectedRuntimeDeclarations) throw new Error(`Expected ${expectedRuntimeDeclarations} recipes, got ${recipes.length}`);
