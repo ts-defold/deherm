@@ -3,7 +3,6 @@ import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { context } from "esbuild";
-import ttsc from "@ttsc/unplugin/esbuild";
 
 import {
   BUNDLE_FINGERPRINT_GLOBAL as fingerprintGlobal,
@@ -11,6 +10,10 @@ import {
   bundleFingerprintBanner,
   createBundleFingerprintPlaceholder
 } from "../../../compiler/src/bundle-fingerprint.mjs";
+import {
+  loadDehermPluginConfig,
+  transformProject
+} from "../transform-compiler.mjs";
 
 let temporarySequence = 0;
 
@@ -82,6 +85,47 @@ export async function createIncrementalCompiler(options) {
   const target = options.target ?? "es2020";
   const sourcemap = options.sourcemap ?? true;
   const useTtsc = options.useTtsc !== false;
+  if (useTtsc && !tsconfig) {
+    throw new Error("The déherm transform compiler requires a generated tsconfig");
+  }
+  let transformedSources = new Map();
+  let transformInputFiles = [];
+  const transformedSourcePlugin = {
+    name: "deherm-precompiled-transform",
+    setup(build) {
+      build.onLoad({ filter: /\.[cm]?tsx?$/ }, (args) => {
+        const source = transformedSources.get(path.resolve(args.path));
+        if (source === undefined) return null;
+        return {
+          contents: source,
+          loader: args.path.endsWith("x") ? "tsx" : "ts",
+          watchFiles: transformInputFiles
+        };
+      });
+    }
+  };
+  const refreshTransforms = async () => {
+    if (!useTtsc) return;
+    const projectRoot = path.dirname(tsconfig);
+    const envelope = await transformProject({
+      tsconfig,
+      cwd: projectRoot,
+      config: await loadDehermPluginConfig(tsconfig)
+    });
+    transformedSources = new Map(Object.entries(envelope.typescript ?? {}).map(([file, source]) => [
+      path.resolve(projectRoot, file),
+      source
+    ]));
+    const observedHostInputs = Object.entries(envelope.hostInputHashes ?? {})
+      .filter(([, digest]) => typeof digest === "string")
+      .map(([file]) => path.resolve(projectRoot, file));
+    const configInputs = (envelope.graph?.configs ?? []).map((file) => path.resolve(projectRoot, file));
+    transformInputFiles = [...new Set([
+      ...transformedSources.keys(),
+      ...observedHostInputs,
+      ...configInputs
+    ])].sort();
+  };
   // Identical TypeScript compiled through a different entry point, tsconfig, or
   // output setting is a different program with a different fingerprint, so the
   // freshness binding covers these settings alongside the source contents.
@@ -95,6 +139,7 @@ export async function createIncrementalCompiler(options) {
     format: "iife",
     platform: "neutral",
     ttsc: useTtsc,
+    transformCompiler: useTtsc ? "dehermc" : null,
     define: options.define ?? null
   };
   const fingerprintPlaceholder = createBundleFingerprintPlaceholder();
@@ -120,7 +165,7 @@ export async function createIncrementalCompiler(options) {
     format: "iife",
     platform: "neutral",
     target,
-    plugins: useTtsc ? [ttsc(tsconfig ? { project: tsconfig } : {})] : [],
+    plugins: useTtsc ? [transformedSourcePlugin] : [],
     ...(tsconfig ? { tsconfig } : {}),
     define: options.define,
     banner: { js: bundleFingerprintBanner(fingerprintPlaceholder) },
@@ -136,6 +181,7 @@ export async function createIncrementalCompiler(options) {
   return {
     async rebuild(changedSources = []) {
       await options.beforeRebuild?.(changedSources);
+      await refreshTransforms();
       await mkdir(path.dirname(outputFile), { recursive: true });
       const startedAt = performance.now();
       const diagnosticChunks = [];
@@ -196,7 +242,10 @@ export async function createIncrementalCompiler(options) {
       // program through a ttsc transform. The freshness binding in deherm.lock
       // is only as honest as this list, so it is the bundler's whole input
       // closure and not the retained-module census below.
-      const sources = [...new Set(Object.keys(result.metafile.inputs).map((file) => path.resolve(file)))].sort();
+      const sources = [...new Set([
+        ...Object.keys(result.metafile.inputs).map((file) => path.resolve(file)),
+        ...transformInputFiles
+      ])].sort();
       const output = Object.entries(result.metafile.outputs).find(([file]) => path.resolve(file) === outputFile)?.[1];
       const bytes = Buffer.byteLength(finalSource);
       const modules = Object.entries(output?.inputs ?? {})

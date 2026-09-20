@@ -5,7 +5,6 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
-    "verbatimModuleSyntax": true,
     "noEmit": true,
     "paths": {
       "@ts-defold/deherm": ["../../../packages/sdk/src/index.ts"]
@@ -15,12 +14,10 @@
         "transform": "../../../packages/compiler/ttsc.mjs",
         "enabled": true,
         "profile": "release",
-        "routeSymbols": "./.deherm/generated/script-route-symbol-index.json",
-        "apiUsage": "./.deherm/generated/defold-api-usage.json",
         "dmsdkSymbols": "./.deherm/generated/dmsdk-call-symbol-index.json",
-        "dmsdkUsage": "./.deherm/generated/dmsdk-usage.json"
+        "dmsdkUsage": "./.deherm/generated/dmsdk-usage.exact.json"
       }
     ]
   },
-  "include": ["src/**/*.ts"]
+  "include": ["dmsdk/exact.ts"]
 }

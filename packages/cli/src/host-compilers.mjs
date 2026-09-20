@@ -85,7 +85,8 @@ async function inspectHostTool(key, tool, record, roots) {
     status: record.status,
     builder: record.builder ?? null,
     blocker: record.blocker ?? null,
-    file: record.file ?? null
+    file: record.file ?? null,
+    expectedSha256: record.sha256 ?? null
   };
   if (record.status === "blocked") {
     return { ...base, ok: false, detail: `${record.blocker?.code ?? "blocked"}: ${record.blocker?.reason ?? "no reason recorded"}` };
@@ -256,6 +257,13 @@ function familyForTool(tool) {
   return null;
 }
 
+function expectedFamilyDigests(result, family) {
+  return Object.fromEntries(Object.values(result.tools ?? {})
+    .filter((candidate) => familyForTool(candidate.tool) === family)
+    .filter((candidate) => candidate.file && /^[a-f0-9]{64}$/.test(candidate.expectedSha256 ?? ""))
+    .map((candidate) => [path.basename(candidate.file), candidate.expectedSha256]));
+}
+
 export async function requireHostTool(tool, options = {}) {
   const key = hostCompilerKey();
   let result = await inspectHostCompilers(key);
@@ -265,12 +273,16 @@ export async function requireHostTool(tool, options = {}) {
   // them on disk yet. Fetch the one archive this host needs before deciding the
   // tool is unavailable - failing closed here would be correct and useless,
   // since no other code path was ever going to populate it.
-  if (result.tools?.[tool] && !result.tools[tool].ok && options.fetch !== false) {
+  const offline = options.fetch === false || process.env.DEHERM_OFFLINE === "1";
+  if (result.tools?.[tool] && !result.tools[tool].ok && !offline) {
     const family = familyForTool(tool);
     if (family) {
       const { ensureHostFamily } = await import("./ensure-host-tool.mjs");
       try {
-        await ensureHostFamily(family, key, { onProgress: options.onProgress });
+        await ensureHostFamily(family, key, {
+          expectedDigests: expectedFamilyDigests(result, family),
+          onProgress: options.onProgress
+        });
       } catch (error) {
         // A network/release failure is context for the same unavailable-tool
         // diagnosis, not a replacement for it. Leaking bare "fetch failed"
@@ -286,7 +298,8 @@ export async function requireHostTool(tool, options = {}) {
   }
   if (!resolvedTool.ok) {
     const fetchDetail = fetchFailure ? `; automatic release fetch failed: ${fetchFailure.message}` : "";
-    throw new Error(`déherm cannot run ${tool} on this host: ${resolvedTool.detail}${fetchDetail}`);
+    const offlineDetail = offline ? "; automatic release fetch is disabled (DEHERM_OFFLINE=1)" : "";
+    throw new Error(`déherm cannot run ${tool} on this host: ${resolvedTool.detail}${fetchDetail}${offlineDetail}`);
   }
   return resolvedTool;
 }

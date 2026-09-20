@@ -1,7 +1,7 @@
 {
   "name": "@ts-defold/deherm-compilers-linux-arm64",
   "version": "0.0.0",
-  "description": "hermesc and shermes built for linux/arm64 hosts, consumed by @ts-defold/deherm",
+  "description": "hermesc, shermes, and dehermc built for linux/arm64 hosts, consumed by @ts-defold/deherm",
   "type": "module",
   "os": [
     "linux"
@@ -12,7 +12,8 @@
   "exports": {
     "./package.json": "./package.json",
     "./bin/hermesc": "./bin/hermesc",
-    "./bin/shermes": "./bin/shermes"
+    "./bin/shermes": "./bin/shermes",
+    "./bin/dehermc": "./bin/dehermc"
   },
   "files": [
     "bin/"

@@ -7,7 +7,11 @@ import {
   generateComponentProxies
 } from "../../../compiler/src/component-proxy-generator.mjs";
 import { recordBundleBuild } from "../build-artifacts.mjs";
-import { writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../resource-symbols.mjs";
+import {
+  writeProjectDmSdkCallSymbolIndex,
+  writeProjectResourceSymbols,
+  writeProjectRouteSymbolIndex
+} from "../resource-symbols.mjs";
 import { readReleaseReachability } from "./release-reachability.mjs";
 import { createBugPoolRecorder, defaultBugPoolFile } from "./bug-pool.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
@@ -267,6 +271,7 @@ export async function runDevSession(options = {}) {
       await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
       await writeProjectResourceSymbols(projectRoot, path.join(projectRoot, ".deherm"));
       await writeProjectRouteSymbolIndex(path.join(projectRoot, ".deherm"));
+      await writeProjectDmSdkCallSymbolIndex(path.join(projectRoot, ".deherm"));
       generatedComponents = true;
     }
   });

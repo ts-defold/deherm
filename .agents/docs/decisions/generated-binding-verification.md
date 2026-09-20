@@ -111,6 +111,49 @@ The remaining census work is generating an applicability manifest and expanding
 the relevant vectors across every emitted shape in each transport; abstract
 recipes remain available but are not falsely described as concrete calls.
 
+Concrete dmSDK usage is now checker-derived rather than hand-authored. The
+SDK generator places a content-addressed marker in the first parameter name of
+each emitted `callDmSdk` overload. Parameter names do not change TypeScript
+call syntax, while the resolved signature retains the marker. A generated
+project-local index joins that marker to the exact catalog declaration ID and
+dense numeric recipe ID. ttsc writes `.deherm/generated/dmsdk-usage.json`, and
+`deherm materialize-dmsdk` consumes that file by default to emit the production
+provider, verification provider, exact recording callee, driver, and report.
+The tested fixture selects `dmGraphics::Finalize` in TypeScript and directly
+materializes recipe 503 and both generated C++ artifacts without a handwritten
+usage manifest.
+
+The 1,361 recipes currently form 1,335 checker-visible overload shapes.
+Twenty-one shapes collapse more than one native declaration after C++ types are
+projected into TypeScript. A release compilation refuses to guess among those
+declarations and records every candidate at the call site. The generated
+`callDmSdkDeclaration(declarationId, ...args)` escape hatch addresses every
+recipe by canonical declaration ID; its literal selector is checker-resolved
+back to the same catalog. Selection is therefore total and tree-shakeable even
+when executable specialization is still required. Nonliteral or unknown exact
+selectors fail release compilation rather than being omitted from the usage
+manifest. This ambiguity is a projection fact, not an `unverified` API
+classification.
+
+Release reachability also fails closed on indirect invocation of these facades.
+`Function.call`, `Function.apply`, other invoked function properties, and
+`Reflect.apply` resolve to standard-library signatures rather than the
+generated overload declaration, so treating only resolved call signatures as
+evidence would silently omit their providers. The checker recognizes the
+generated callable type at those escape sites and records a source-located
+unresolved call until a mechanically modeled indirect-call contract exists.
+
+The checker manifest proves total declaration selection and classifies the
+executable lowering at the call site. Of the current 1,361 recipes, 59 are
+universal-ready from declaration identity alone and 1,302 require generated
+specialization. The latter includes 148 preferred-adapter candidates: 45 have
+real native wrappers but no generated route from the universal bridge, while
+103 are provider-boundary/private rows without a production provider or public
+registration path. They are not called executable merely because source exists.
+All declarations remain generated and addressable. Release checking rejects a
+reached specialization-required declaration at its source location rather than
+writing an apparently complete manifest.
+
 The arbitrary-extension C-header lane follows the same rule. Function identity
 is derived from module, native symbol, ordered native parameter spellings, and
 native result spelling plus the variadic call form, so inserting lines in a

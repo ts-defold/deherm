@@ -170,6 +170,14 @@ without `dehermc` emits a program whose `DefoldHash` literals were never
 lowered and whose reachability manifest was never written - which fails later
 and further from its cause.
 
+Automatic release resolution carries every pinned member digest for the
+requested family into the cache installer. A cache hit therefore means all
+members exist **and** match the manifest, not merely that their filenames are
+present. A mismatch downloads into a sibling staging directory, authenticates
+the replacement members there, and only then atomically replaces the corrupt
+family directory. If the downloaded bytes also mismatch, the old cache remains
+in place and resolution still fails closed.
+
 The published Linux compilers are built on `ubuntu-22.04` runners, which sets
 their glibc floor at 2.35.
 
@@ -237,11 +245,11 @@ statically linked with no libc floor at all.
 
 | Host | Bytes | Kind |
 | --- | --- | --- |
-| `darwin-arm64` | 20 367 026 | Mach-O arm64 |
-| `darwin-x64` | 21 127 088 | Mach-O x86_64 |
-| `linux-x64` | 20 832 382 | ELF x86-64, statically linked, stripped |
-| `linux-arm64` | 19 923 070 | ELF aarch64, statically linked, stripped |
-| `win32-x64` | 21 287 936 | PE32+ console x86-64 |
+| `darwin-arm64` | 20 418 210 | Mach-O arm64 |
+| `darwin-x64` | 21 177 856 | Mach-O x86_64 |
+| `linux-x64` | 20 873 342 | ELF x86-64, statically linked, stripped |
+| `linux-arm64` | 20 054 142 | ELF aarch64, statically linked, stripped |
+| `win32-x64` | 21 332 992 | PE32+ console x86-64 |
 
 That is the cheapest artifact in the set. `libhermes.a` needs a container or an
 Apple SDK per target; `hermesc` and `shermes` need a runner per architecture
@@ -252,7 +260,7 @@ the Linux and Windows Hermes recipes: `-trimpath -buildvcs=false`, `-ldflags
 "-s -w -buildid="`, and `GOAMD64`/`GOARM64` pinned to the baseline so a runner
 that exports a microarchitecture level cannot change the bytes. Two builds from
 different scratch directories produced the identical SHA-256
-`776a84344cc6a4d17952807deb4345df39fa49963abcd0f933b26db56fb272b1` for
+`fe728acf4d85d10156571fea44dd1f4aa6f87393305e62fbeb7ceceb8612dac5` for
 `darwin-arm64`.
 
 ## Accounting
@@ -272,14 +280,19 @@ running only the transforms should not be told `hermesc` is missing.
 
 ## Boundary
 
-The binary exists, cross-compiles, is reproducible, and runs all three
-transforms. What is **not** yet done is the consumption seam: the build path
-still reaches the transforms through `@ttsc/unplugin/esbuild`, which calls
-`loadProjectPlugins` → `buildSourcePlugin` and therefore still builds Go on the
-user's machine. Switching `packages/cli/src/dev/compiler.mjs` to spawn
-`dehermc transform` and serve modules from its JSON envelope is what actually
-removes the Go requirement from a user's first build; until that lands, this
-artifact is shipped and verified but not yet on the path.
+The binary exists, cross-compiles, is reproducible, and is now the consumption
+seam. Release type-checking runs the normal suffix-context TypeScript projects,
+then invokes `dehermc check` with the exact generated transform configuration.
+The development compiler invokes `dehermc transform`, reads its typed-source
+JSON envelope, and serves those modules to esbuild without
+`@ttsc/unplugin/esbuild` or a user-side Go build.
+
+The packed-package smoke test builds and stages one authenticated current-host
+binary in an isolated tool cache, forces offline resolution, and requires both
+release checking and the development compiler to report that exact path and
+SHA-256. This proves the installed package uses the precompiled seam without a
+network fallback. It is package/tool invocation evidence, not target-engine
+runtime evidence.
 
 # The build seam
 
@@ -365,7 +378,7 @@ neither spelling is restated here.
 | Family | Asset per row | Consumes | Does **not** consume |
 | --- | --- | --- | --- |
 | Hermes host compilers | one archive per host: hermesc + shermes | `HERMES_URL`, `HERMES_REV`, `build-host-compilers.sh`, `package-archive.sh` | anything of Defold's, anything of Go's |
-| The transform compiler | one archive per host: dehermc | `ttscVersion`, `packages/compiler/go.mod`, the ttsc Go sources, `build-dehermc.sh`, `package-archive.sh` | `upstream.lock` at all |
+| The transform compiler | one archive per host: dehermc | `ttscVersion`, `packages/compiler/go.mod`, every `.go` source under `packages/compiler/ttsc`, the stamped root package version, `build-dehermc.sh`, `package-archive.sh` | `upstream.lock` at all |
 | Target archives | one archive per bundle target: the library + its `.debug` sibling | `HERMES_URL`, `HERMES_REV`, the per-target build recipe, `package-archive.sh`, and the `sdk` and `targets` fields of `defold-bundle-targets.json` | `DEFOLD_REV`, `sourceSha256` |
 
 `package-archive.sh` is in all three input sets because it decides the published

@@ -4,7 +4,11 @@ import { createInterface } from "node:readline/promises";
 
 import { compileConformanceHarness, generateConformanceHarness, readConformanceReport } from "./conformance.mjs";
 import { generateComponentProxies } from "../../compiler/src/component-proxy-generator.mjs";
-import { writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "./resource-symbols.mjs";
+import {
+  writeProjectDmSdkCallSymbolIndex,
+  writeProjectResourceSymbols,
+  writeProjectRouteSymbolIndex
+} from "./resource-symbols.mjs";
 import { discoverProjectRoots, findProjectRoot, inspectDefoldProject } from "./project.mjs";
 import { installNativeExtension, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
 import { createDefoldProject } from "./scaffold.mjs";
@@ -20,7 +24,7 @@ Commands:
   policy       Fetch, authenticate, and cache the Pages policy for the project's Defold revision
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
-  materialize-dmsdk  Emit deterministic native provider C++ from a dmSDK usage document
+  materialize-dmsdk  Emit reachable dmSDK provider + exact-call twin from checker usage
   generate-extension-api  Parse a C header and emit native-extension IR, TypeScript, and C ABI glue
   typecheck    Type-check shared, game-object, GUI, and render TypeScript projects
   verify-generated  Verify packaged IR plus generated context/config output sentinels
@@ -38,7 +42,7 @@ Options:
   --defold-sdk <sha> Exact Defold engine SHA to generate for. Always wins over detection.
   --bob <path>       Bob jar interrogated for the project's engine SHA when nothing else names it
   --output <path>    Conformance harness output directory
-  --usage <path>     dmSDK usage document for materialize-dmsdk
+  --usage <path>     dmSDK usage (default: project .deherm/generated/dmsdk-usage.json)
   --catalog <path>   Resolved dmSDK policy catalog (defaults to project .deherm/ir)
   --header <path>    Public C header for generate-extension-api
   --module <name>    C symbol prefix/module name for generate-extension-api
@@ -71,6 +75,7 @@ Options:
   --no-bytecode      Keep the development bundle as JavaScript (offline diagnostic)
   --shard <i/n>      Stable zero-based shard selection (default: 0/1)
   --strict           Fail a report unless every required selected stage passed
+  --release          Type-check with release reachability and write release usage manifests
   --check            Verify materialized output without writing it
   --force            Regenerate owned project outputs even when the input key is current
   --recompute        For verify-bundle, re-bundle current sources to name the fingerprint they produce
@@ -98,6 +103,7 @@ export function parseArguments(argv) {
     if (value === "--json") options.json = true;
     else if (value === "--check" && options.command === "materialize-dmsdk") options.check = true;
     else if (value === "--strict") options.strict = true;
+    else if (value === "--release") options.release = true;
     else if (value === "--force") options.force = true;
     else if (value === "--recompute") options.recompute = true;
     else if (value === "--allow-unbound") options.allowUnbound = true;
@@ -180,6 +186,9 @@ async function scaffoldProject(options) {
   const generated = await writeGeneratedProject(inventory, options.outDir, { force: true });
   const nativeExtension = await installNativeExtension(scaffold.projectRoot, { force: true });
   const components = await generateComponentProxies({ projectRoot: scaffold.projectRoot, outputRoot: scaffold.projectRoot });
+  await writeProjectResourceSymbols(scaffold.projectRoot, generated.root);
+  await writeProjectRouteSymbolIndex(generated.root);
+  await writeProjectDmSdkCallSymbolIndex(generated.root);
   return {
     ...scaffold,
     generatedRoot: generated.root,
@@ -587,7 +596,8 @@ export async function run(argv = process.argv.slice(2)) {
     // still links the complete surface; the index only lets the compiler report
     // what a release build would retain.
     const routeSymbols = await writeProjectRouteSymbolIndex(output.root);
-    if (options.json) console.log(JSON.stringify({ ...output, nativeExtension, componentCount, resourceSymbols: { resources: resourceSymbols.table.resourceCount }, routeSymbols: { routes: routeSymbols.index.routeCount }, summary: inventory.summary }, null, 2));
+    const dmSdkSymbols = await writeProjectDmSdkCallSymbolIndex(output.root);
+    if (options.json) console.log(JSON.stringify({ ...output, nativeExtension, componentCount, resourceSymbols: { resources: resourceSymbols.table.resourceCount }, routeSymbols: { routes: routeSymbols.index.routeCount }, dmSdkSymbols: { recipes: dmSdkSymbols.index.recipeCount, overloads: dmSdkSymbols.index.overloadCount }, summary: inventory.summary }, null, 2));
     else {
       console.log(`${output.cached ? "Current" : "Generated"} extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
       console.log(`${nativeExtension.installed ? "Installed" : "Current"} native extension in ${path.relative(process.cwd(), nativeExtension.root) || "."}`);
@@ -598,6 +608,7 @@ export async function run(argv = process.argv.slice(2)) {
       }
       console.log(`Indexed ${resourceSymbols.table.resourceCount} Defold resource(s) for compile-time name resolution`);
       console.log(`Indexed ${routeSymbols.index.routeCount} Defold route(s) for compile-time reachability`);
+      console.log(`Indexed ${dmSdkSymbols.index.recipeCount} dmSDK recipe(s) across ${dmSdkSymbols.index.overloadCount} checker overload(s)`);
       for (const diagnostic of output.revisionDiagnostics ?? []) {
         console.log(`-- Defold revision: ${diagnostic.message}`);
       }
@@ -627,11 +638,13 @@ export async function run(argv = process.argv.slice(2)) {
     return result.buildArtifacts.ok ? 0 : 1;
   }
   if (options.command === "typecheck") {
-    const result = await typecheckGeneratedProject(inventory.projectRoot);
+    const result = await typecheckGeneratedProject(inventory.projectRoot, { release: options.release });
     if (options.json) {
       console.log(JSON.stringify(result, null, 2));
     } else if (result.passed) {
-      console.log("ok TypeScript contexts: shared, game-object, GUI, render");
+      console.log(options.release
+        ? "ok release TypeScript reachability and usage manifests"
+        : "ok TypeScript contexts: shared, game-object, GUI, render");
     } else {
       if (result.stdout.trim()) console.error(result.stdout.trimEnd());
       if (result.stderr.trim()) console.error(result.stderr.trimEnd());

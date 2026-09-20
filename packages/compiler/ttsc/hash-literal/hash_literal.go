@@ -151,6 +151,11 @@ func (plugin) ApplyProgram(program *driver.Program, ctx driver.PluginContext) er
 		return err
 	}
 	findings = append(findings, usageFindings...)
+	dmSdkFindings, err := collectDmSdkUsage(program, ctx)
+	if err != nil {
+		return err
+	}
+	findings = append(findings, dmSdkFindings...)
 	if len(findings) > 0 {
 		return fmt.Errorf("%s", strings.Join(findings, "\n"))
 	}

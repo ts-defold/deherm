@@ -77,6 +77,17 @@ async function digestOf(file) {
   return createHash("sha256").update(await readFile(file)).digest("hex");
 }
 
+async function cachedMembersMatch(destination, members, expectedDigests) {
+  for (const member of members) {
+    const file = path.join(destination, member);
+    const present = await stat(file).then((entry) => entry.isFile(), () => false);
+    if (!present) return false;
+    const expected = expectedDigests[member];
+    if (expected && await digestOf(file).catch(() => null) !== expected) return false;
+  }
+  return members.length > 0;
+}
+
 /**
  * Ensure every tool of one host family is present, and return where they live.
  *
@@ -91,11 +102,18 @@ export async function ensureHostFamily(family, host, options = {}) {
   const asset = reference.assets?.[host];
   if (!asset) throw new Error(`${family} publishes nothing for ${host}`);
 
-  const destination = path.join(toolCacheRoot(), reference.tag, host);
+  const destination = path.join(toolCacheRoot(options), reference.tag, host);
   const members = reference.contents?.[host] ?? [];
-  const present = await Promise.all(members.map(async (member) =>
-    stat(path.join(destination, member)).then(() => true, () => false)));
-  if (members.length > 0 && present.every(Boolean)) {
+  const expectedDigests = options.expectedDigests ?? {};
+  for (const [member, digest] of Object.entries(expectedDigests)) {
+    if (!members.includes(member)) {
+      throw new Error(`${family} digest manifest names ${member}, which ${asset} does not contain`);
+    }
+    if (!/^[a-f0-9]{64}$/.test(digest)) {
+      throw new Error(`${family} digest manifest records an invalid SHA-256 for ${member}`);
+    }
+  }
+  if (await cachedMembersMatch(destination, members, expectedDigests)) {
     return { destination, tag: reference.tag, cached: true, members };
   }
 
@@ -117,6 +135,8 @@ export async function ensureHostFamily(family, host, options = {}) {
       if (!await stat(file).then(() => true, () => false)) {
         throw new Error(`${asset} does not contain ${member}`);
       }
+      const expected = expectedDigests[member];
+      if (expected) await verifyAgainstManifest(file, expected);
       // Archives preserve the mode, but a defensive chmod costs nothing and
       // makes a hand-assembled cache work too.
       await chmod(file, 0o755).catch(() => {});

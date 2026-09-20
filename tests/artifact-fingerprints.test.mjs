@@ -7,7 +7,7 @@
 // checkout. Nothing in this file writes inside the repository.
 
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -42,6 +42,7 @@ async function scratchCheckout({ lock, bundleTargets } = {}) {
   for (const entry of ["toolchains", "scripts"]) {
     await symlink(path.join(repositoryRoot, entry), path.join(directory, entry));
   }
+  await symlink(path.join(repositoryRoot, "package.json"), path.join(directory, "package.json"));
   await mkdir(path.join(directory, "packages"), { recursive: true });
   await symlink(path.join(repositoryRoot, "packages", "compiler"), path.join(directory, "packages", "compiler"));
   await mkdir(path.join(directory, "packages", "toolchains"), { recursive: true });
@@ -115,6 +116,27 @@ test("repinning Hermes moves the Hermes artifacts and nothing else", async (t) =
   // dehermc links the typescript-go compiler and compiles TypeScript to
   // TypeScript. It has never touched Hermes.
   assert.equal(right.dehermc, left.dehermc, "dehermc must not be a function of HERMES_REV");
+});
+
+test("every dehermc Go source and its stamped package version rotate the tool tag", async (t) => {
+  const sourceChanged = await scratchCheckout();
+  const versionChanged = await scratchCheckout();
+  t.after(() => Promise.all([sourceChanged, versionChanged]
+    .map((directory) => rm(directory, { recursive: true, force: true }))));
+
+  const baseline = await fingerprintFamily("dehermc");
+  const compiler = path.join(sourceChanged, "packages", "compiler");
+  await rm(compiler, { recursive: true, force: true });
+  await cp(path.join(repositoryRoot, "packages", "compiler"), compiler, { recursive: true });
+  const dmsdkUsage = path.join(compiler, "ttsc", "hash-literal", "dmsdk_usage.go");
+  await writeFile(dmsdkUsage, `${await readFile(dmsdkUsage, "utf8")}\n// fingerprint regression fixture\n`);
+  assert.notEqual(await fingerprintFamily("dehermc", { root: sourceChanged }), baseline);
+
+  await rm(path.join(versionChanged, "package.json"));
+  const packageDocument = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
+  packageDocument.version = "99.0.0-fingerprint-test";
+  await writeFile(path.join(versionChanged, "package.json"), `${JSON.stringify(packageDocument, null, 2)}\n`);
+  assert.notEqual(await fingerprintFamily("dehermc", { root: versionChanged }), baseline);
 });
 
 test("Defold's SDK pins still move the target archives, and its provenance fields do not", async (t) => {

@@ -1,7 +1,9 @@
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { isDeepStrictEqual } from "node:util";
 
+import { verifyDmSdkCallSymbolIndex } from "../../compiler/src/dmsdk-call-symbol-index.mjs";
 import { materializeDmSdkUsages } from "../../compiler/src/dmsdk-universal-materializer.mjs";
 import { findProjectRoot } from "./project.mjs";
 
@@ -22,6 +24,28 @@ function validateUsageDocument(value, source) {
   }
   if (new Set(declarationIds).size !== declarationIds.length) {
     throw new Error(`${source}: dmSDK usage declarationIds must be unique`);
+  }
+  if (value.generator === "@ts-defold/deherm ttsc/dmsdk-usage/v1") {
+    if (value.profile !== "release") {
+      throw new Error(`${source}: checker-generated dmSDK usage must come from a release-profile typecheck`);
+    }
+    if (value.usageCount !== value.usages.length) {
+      throw new Error(`${source}: usageCount does not match the checker-generated usages array`);
+    }
+    for (const key of ["ambiguousSites", "unresolvedSites", "specializationRequiredSites"]) {
+      if (!Array.isArray(value[key])) throw new Error(`${source}: checker-generated dmSDK usage is missing ${key}`);
+      if (value[key].length) {
+        throw new Error(`${source}: checker-generated dmSDK usage has ${value[key].length} ${key}; fix the reported call sites before materialization`);
+      }
+    }
+    if (!/^[0-9a-f]{64}$/.test(value.symbolIndexSourceSha256 ?? "")) {
+      throw new Error(`${source}: checker-generated dmSDK usage needs the actual symbol-index source SHA-256`);
+    }
+    for (const usage of value.usages) {
+      if (!["universal-ready", "generated-adapter"].includes(usage?.materialization?.state)) {
+        throw new Error(`${source}: checker-generated usage ${usage?.declarationId ?? "<unknown>"} has no executable lowering state`);
+      }
+    }
   }
   if (value.options !== undefined) {
     if (!value.options || typeof value.options !== "object" || Array.isArray(value.options)) {
@@ -69,11 +93,55 @@ async function resolveCatalogPath({ catalog, project, usagePath }) {
   return path.join(projectRoot, ".deherm", "ir", "dmsdk-universal-bindings.json");
 }
 
+async function readCheckerSymbolIndex({ document, project, usagePath }) {
+  const candidates = [path.join(path.dirname(usagePath), "dmsdk-call-symbol-index.json")];
+  const projectRoot = await findProjectRoot(path.dirname(usagePath), project).catch(() => null);
+  if (projectRoot) candidates.push(path.join(projectRoot, ".deherm", "generated", "dmsdk-call-symbol-index.json"));
+  let lastError;
+  for (const candidate of [...new Set(candidates)]) {
+    try {
+      const source = await readFile(candidate, "utf8");
+      const sourceSha256 = sha256(source);
+      if (sourceSha256 !== document.symbolIndexSourceSha256) {
+        throw new Error(`${candidate}: source SHA-256 does not match the release typecheck manifest`);
+      }
+      let parsed;
+      try {
+        parsed = JSON.parse(source);
+      } catch (error) {
+        throw new Error(`${candidate}: invalid JSON: ${error.message}`);
+      }
+      const index = verifyDmSdkCallSymbolIndex(parsed, candidate);
+      if (document.catalogSha256 !== index.catalogSha256 || document.defoldRevision !== index.defoldRevision ||
+          document.surfaceRecipeCount !== index.recipeCount) {
+        throw new Error(`${candidate}: checker manifest identities do not match the authenticated symbol index`);
+      }
+      for (const usage of document.usages) {
+        const exact = index.declarations[usage.declarationId];
+        if (!exact || exact.numericId !== usage.numericId || exact.symbol !== usage.symbol ||
+            !isDeepStrictEqual(exact.materialization, usage.materialization)) {
+          throw new Error(`${candidate}: checker usage '${usage.declarationId}' does not match the authenticated symbol index`);
+        }
+      }
+      return { file: candidate, index, sourceSha256 };
+    } catch (error) {
+      if (error?.code === "ENOENT") {
+        lastError = error;
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error(`${usagePath}: checker-generated dmSDK usage requires its generated dmsdk-call-symbol-index.json (${lastError?.message ?? "not found"})`);
+}
+
 export async function materializeDmSdkUsageFile({ usage, output, catalog, project, check = false }) {
-  if (!usage) throw new Error("dmSDK materialization requires --usage <path>");
-  if (!output) throw new Error("dmSDK materialization requires --output <path>");
-  const usagePath = path.resolve(usage);
-  const outputPath = path.resolve(output);
+  let projectRoot;
+  if (!usage || !output) {
+    projectRoot = await findProjectRoot(process.cwd(), project);
+  }
+  const usagePath = path.resolve(usage ?? path.join(projectRoot, ".deherm", "generated", "dmsdk-usage.json"));
+  const outputPath = path.resolve(output ?? path.join(projectRoot, ".deherm", "generated", "dmsdk-reachable.cpp"));
   const reportPath = `${outputPath}.json`;
   const outputExtension = path.extname(outputPath);
   const outputStem = outputExtension ? outputPath.slice(0, -outputExtension.length) : outputPath;
@@ -91,13 +159,23 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     throw new Error(`${usagePath}: invalid JSON: ${error.message}`);
   }
   const document = validateUsageDocument(parsed, usagePath);
+  const checkerGenerated = document.generator === "@ts-defold/deherm ttsc/dmsdk-usage/v1";
+  const symbolIndex = checkerGenerated
+    ? await readCheckerSymbolIndex({ document, project, usagePath })
+    : null;
+  const materializerUsages = checkerGenerated
+    ? document.usages.filter(({ materialization }) => materialization.state === "universal-ready")
+    : document.usages;
+  const generatedAdapterCount = checkerGenerated
+    ? document.usages.length - materializerUsages.length
+    : 0;
   let catalogDocument;
   try {
     catalogDocument = JSON.parse(catalogSource);
   } catch (error) {
     throw new Error(`${catalogPath}: invalid JSON: ${error.message}`);
   }
-  const generated = materializeDmSdkUsages(document.usages, {
+  const generated = materializeDmSdkUsages(materializerUsages, {
     ...(document.options ?? {}),
     catalog: catalogDocument,
     catalogSha256: document.catalogSha256
@@ -112,6 +190,7 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     source: "deherm-dmsdk-usage-materializer",
     usageSha256: sha256(usageSource),
     catalogSourceSha256: sha256(catalogSource),
+    symbolIndexSourceSha256: symbolIndex?.sourceSha256 ?? null,
     outputSha256: sha256(source),
     verificationOutputSha256: sha256(verificationSource),
     verificationReportSha256: sha256(verificationReport),
@@ -119,6 +198,7 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     catalogSha256: generated.catalogSha256,
     provider: generated.provider,
     materializedCount: generated.manifest.length,
+    generatedAdapterCount,
     declarations: generated.manifest,
   }, null, 2)}\n`;
   if (check) {
@@ -154,6 +234,7 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     provider: generated.provider,
     verificationProvider: generated.verification.provider,
     materializedCount: generated.manifest.length,
+    generatedAdapterCount,
     checked: check,
   };
 }

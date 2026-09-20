@@ -1,7 +1,7 @@
 {
   "name": "@ts-defold/deherm-compilers-win32-x64",
   "version": "0.0.0",
-  "description": "hermesc and shermes built for win32/x64 hosts, consumed by @ts-defold/deherm",
+  "description": "hermesc, shermes, and dehermc built for win32/x64 hosts, consumed by @ts-defold/deherm",
   "type": "module",
   "os": [
     "win32"
@@ -12,7 +12,8 @@
   "exports": {
     "./package.json": "./package.json",
     "./bin/hermesc.exe": "./bin/hermesc.exe",
-    "./bin/shermes.exe": "./bin/shermes.exe"
+    "./bin/shermes.exe": "./bin/shermes.exe",
+    "./bin/dehermc.exe": "./bin/dehermc.exe"
   },
   "files": [
     "bin/"

@@ -22,6 +22,8 @@
 //     a label for diagnostics, not a routing key.
 
 import { execFile } from "node:child_process";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { promisify } from "node:util";
 
 import { requireHostTool } from "./host-compilers.mjs";
@@ -41,6 +43,47 @@ export function dehermPluginManifest(config = {}) {
 // default - a truncated envelope would surface as a parse error naming nothing.
 const MAX_OUTPUT_BYTES = 256 * 1024 * 1024;
 
+const pluginLoaderKeys = new Set(["enabled", "name", "stage", "transform"]);
+
+function isDehermTransform(plugin) {
+  if (!plugin || plugin.enabled === false || typeof plugin.transform !== "string") return false;
+  return plugin.transform === "@ts-defold/deherm/ttsc" ||
+    plugin.transform.endsWith("/packages/compiler/ttsc.mjs") ||
+    plugin.transform.endsWith("/compiler/ttsc.mjs") ||
+    plugin.transform.endsWith("packages/compiler/ttsc.mjs");
+}
+
+async function readConfigChain(configPath, seen = new Set()) {
+  const absolute = path.resolve(configPath);
+  if (seen.has(absolute)) {
+    throw new Error(`Generated TypeScript config inheritance contains a cycle at ${absolute}`);
+  }
+  seen.add(absolute);
+  const document = JSON.parse(await readFile(absolute, "utf8"));
+  const inherited = [];
+  if (typeof document.extends === "string") {
+    if (!document.extends.startsWith(".")) {
+      throw new Error(`Generated TypeScript config ${absolute} extends unsupported package config '${document.extends}'`);
+    }
+    const candidate = path.resolve(path.dirname(absolute), document.extends);
+    const parent = path.extname(candidate) ? candidate : `${candidate}.json`;
+    inherited.push(...await readConfigChain(parent, seen));
+  }
+  inherited.push(...(document.compilerOptions?.plugins ?? []));
+  return inherited;
+}
+
+/** Read the one generated déherm transform configuration dehermc must run. */
+export async function loadDehermPluginConfig(tsconfig) {
+  const plugins = (await readConfigChain(tsconfig)).filter(isDehermTransform);
+  if (plugins.length !== 1) {
+    throw new Error(`Expected exactly one enabled @ts-defold/deherm/ttsc transform in ${path.resolve(tsconfig)}, found ${plugins.length}`);
+  }
+  return Object.fromEntries(
+    Object.entries(plugins[0]).filter(([key]) => !pluginLoaderKeys.has(key))
+  );
+}
+
 async function invoke(command, { tsconfig, cwd, config, outDir }) {
   const tool = await requireHostTool("dehermc");
   const args = [command, "--tsconfig", tsconfig, "--plugins-json", dehermPluginManifest(config)];
@@ -48,13 +91,16 @@ async function invoke(command, { tsconfig, cwd, config, outDir }) {
   if (outDir) args.push("--outdir", outDir);
   try {
     const { stdout, stderr } = await run(tool.path, args, { maxBuffer: MAX_OUTPUT_BYTES, cwd });
-    return { ok: true, stdout, stderr };
+    return { ok: true, status: 0, signal: null, stdout, stderr, tool };
   } catch (error) {
     // A non-zero exit is a compiler answer, not a crash: check reports resource
     // name blockers this way. Hand back what it said rather than a wrapped
     // Error whose message is "Command failed".
     if (typeof error?.code === "number") {
-      return { ok: false, status: error.code, stdout: error.stdout ?? "", stderr: error.stderr ?? "" };
+      return { ok: false, status: error.code, signal: error.signal ?? null, stdout: error.stdout ?? "", stderr: error.stderr ?? "", tool };
+    }
+    if (error?.signal) {
+      return { ok: false, status: null, signal: error.signal, stdout: error.stdout ?? "", stderr: error.stderr ?? "", tool };
     }
     throw error;
   }
@@ -88,7 +134,13 @@ export async function checkProject(options) {
   const result = await invoke("check", options);
   return {
     ok: result.ok,
-    diagnostics: `${result.stdout}${result.stderr}`.trimEnd()
+    status: result.status,
+    signal: result.signal,
+    stdout: result.stdout,
+    stderr: result.stderr,
+    diagnostics: `${result.stdout}${result.stderr}`.trimEnd(),
+    compiler: result.tool.path,
+    compilerSha256: result.tool.sha256
   };
 }
 

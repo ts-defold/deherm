@@ -24,6 +24,7 @@ import {
 } from "./defold-surface.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
 import { defoldToolchain, hostDefoldPlatform } from "./toolchains.mjs";
+import { checkProject, loadDehermPluginConfig } from "./transform-compiler.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const require = createRequire(import.meta.url);
@@ -567,6 +568,7 @@ function generatedOutputPaths() {
       "tsconfig.deherm.base.json",
       ...authoredContexts.map(({ id }) => `tsconfig.deherm.${id}.json`),
       "tsconfig.deherm.bundle.json",
+      "tsconfig.deherm.release.json",
       "tsconfig.deherm.json"
     ]
   };
@@ -777,7 +779,7 @@ function contextSdkSource(context, modules) {
   return `${lines.join("\n")}\n`;
 }
 
-function projectBaseConfig(outputDirectory) {
+function projectBaseConfig(outputDirectory, profile = "development") {
   const generated = outputDirectory.split(path.sep).join("/");
   return {
     $schema: "https://json.schemastore.org/tsconfig",
@@ -797,7 +799,9 @@ function projectBaseConfig(outputDirectory) {
         resourceSymbols: `./${generated}/generated/resource-symbols.json`,
         routeSymbols: `./${generated}/generated/script-route-symbol-index.json`,
         apiUsage: `./${generated}/generated/defold-api-usage.json`,
-        profile: "development"
+        dmsdkSymbols: `./${generated}/generated/dmsdk-call-symbol-index.json`,
+        dmsdkUsage: `./${generated}/generated/dmsdk-usage.json`,
+        profile
       }]
     }
   };
@@ -827,6 +831,22 @@ function bundleProjectConfig(outputDirectory) {
     extends: "./tsconfig.deherm.base.json",
     compilerOptions: {
       noEmit: true,
+      paths: {
+        "@deherm/project": [`./${generated}/sdk/index.ts`]
+      }
+    },
+    include: ["**/*.ts", `${generated}/**/*.ts`],
+    exclude: ignoredAuthoredGlobs
+  };
+}
+
+function releaseProjectConfig(outputDirectory) {
+  const generated = outputDirectory.split(path.sep).join("/");
+  const base = projectBaseConfig(outputDirectory, "release");
+  return {
+    ...base,
+    compilerOptions: {
+      ...base.compilerOptions,
       paths: {
         "@deherm/project": [`./${generated}/sdk/index.ts`]
       }
@@ -1312,6 +1332,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       `${JSON.stringify(contextProjectConfig(relativeOutput, context), null, 2)}\n`
     ])),
     "tsconfig.deherm.bundle.json": `${JSON.stringify(bundleProjectConfig(relativeOutput), null, 2)}\n`,
+    "tsconfig.deherm.release.json": `${JSON.stringify(releaseProjectConfig(relativeOutput), null, 2)}\n`,
     "tsconfig.deherm.json": `${JSON.stringify(rootProjectConfig(), null, 2)}\n`
   };
   for (const [relative, source] of Object.entries(projectConfigSources)) {
@@ -1715,25 +1736,32 @@ async function validateAuthoredImportBoundaries(root) {
   return diagnostics.sort(compareCodeUnits);
 }
 
-export async function typecheckGeneratedProject(projectRoot) {
+export async function typecheckGeneratedProject(projectRoot, options = {}) {
   const root = path.resolve(projectRoot);
-  const config = path.join(root, "tsconfig.deherm.json");
-  try {
-    const information = await lstat(config);
-    if (!information.isFile() || information.isSymbolicLink()) throw new Error();
-  } catch {
-    throw new Error(`Generated TypeScript solution is missing at ${config}; run 'deherm generate' first`);
+  const release = options.release === true;
+  const config = path.join(root, release ? "tsconfig.deherm.release.json" : "tsconfig.deherm.json");
+  const contextConfig = path.join(root, "tsconfig.deherm.json");
+  for (const required of new Set([config, contextConfig])) {
+    try {
+      const information = await lstat(required);
+      if (!information.isFile() || information.isSymbolicLink()) throw new Error();
+    } catch {
+      throw new Error(`Generated TypeScript solution is missing at ${required}; run 'deherm generate' first`);
+    }
   }
   await verifyGeneratedProject(root);
   const typescriptPackage = require.resolve("typescript/package.json");
-  const tsc = path.join(path.dirname(typescriptPackage), "bin", "tsc");
+  const contextCompiler = path.join(path.dirname(typescriptPackage), "bin", "tsc");
+  const compiler = contextCompiler;
   const boundaryDiagnostics = await validateAuthoredImportBoundaries(root);
   if (boundaryDiagnostics.length) {
     return {
       schemaVersion: 1,
       project: root,
       config,
-      compiler: tsc,
+      compiler,
+      profile: release ? "release" : "development",
+      phase: "authored-boundaries",
       passed: false,
       status: 1,
       signal: null,
@@ -1741,9 +1769,10 @@ export async function typecheckGeneratedProject(projectRoot) {
       stderr: `${boundaryDiagnostics.join("\n")}\n`
     };
   }
-  return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [tsc, "--build", config, "--pretty", "false"], {
+  const runCompiler = (executable, arguments_, environment = process.env) => new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [executable, ...arguments_], {
       cwd: root,
+      env: environment,
       stdio: ["ignore", "pipe", "pipe"]
     });
     let stdout = "";
@@ -1753,16 +1782,45 @@ export async function typecheckGeneratedProject(projectRoot) {
     child.stdout.on("data", (chunk) => { stdout += chunk; });
     child.stderr.on("data", (chunk) => { stderr += chunk; });
     child.once("error", reject);
-    child.once("close", (status, signal) => resolve({
-      schemaVersion: 1,
-      project: root,
-      config,
-      compiler: tsc,
-      passed: status === 0,
-      status,
-      signal,
-      stdout,
-      stderr
-    }));
+    child.once("close", (status, signal) => resolve({ status, signal, stdout, stderr }));
   });
+  let contextResult = null;
+  if (release) {
+    contextResult = await runCompiler(contextCompiler, ["--build", contextConfig, "--pretty", "false"]);
+    if (contextResult.status !== 0) {
+      return {
+        schemaVersion: 1,
+        project: root,
+        config,
+        compiler,
+        contextConfig,
+        contextCompiler,
+        profile: "release",
+        phase: "context-typecheck",
+        passed: false,
+        ...contextResult
+      };
+    }
+  }
+  const result = release
+    ? await checkProject({
+        tsconfig: config,
+        cwd: root,
+        config: await loadDehermPluginConfig(config)
+      })
+    : await runCompiler(compiler, ["--build", config, "--pretty", "false"]);
+  return {
+    schemaVersion: 1,
+    project: root,
+    config,
+    compiler: result.compiler ?? compiler,
+    ...(result.compilerSha256 ? { compilerSha256: result.compilerSha256 } : {}),
+    contextConfig,
+    contextCompiler,
+    profile: release ? "release" : "development",
+    phase: release ? "release-reachability" : "context-typecheck",
+    passed: result.status === 0,
+    ...result,
+    context: contextResult
+  };
 }

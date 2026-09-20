@@ -33,10 +33,12 @@ Use one TypeScript authoring experience with two explicit runtime targets:
 
 # Compiler and bundler
 
-Pin TypeScript 7 and `ttsc` together. `ttsc check` owns diagnostics. The
-matching `@ttsc/unplugin` esbuild adapter runs the same TypeScript-Go plugin pass
-inside the JavaScript bundler; esbuild then resolves the module graph, removes
-types, emits one IIFE bundle, and writes source maps.
+Pin TypeScript 7 and the ttsc checker API together. Ordinary TypeScript solution
+builds own script-context diagnostics. The authenticated precompiled `dehermc`
+host runs the same TypeScript-Go plugin pass for release checking and produces a
+typed-source envelope for esbuild; esbuild then resolves the module graph,
+removes types, emits one IIFE bundle, and writes source maps. Installed projects
+do not compile the Go plugin host.
 
 The bundler also emits a per-entrypoint Defold symbol manifest from generated
 function inputs that survive tree shaking. `ttsc` will eventually contribute
@@ -44,8 +46,10 @@ non-syntactic edges such as callbacks and compiler intrinsics. This manifest is
 the contract between whole-program TypeScript analysis and reachable-only
 native generation; it is not inferred from runtime telemetry.
 
-The spike pins TypeScript 7.0.2 and matching `ttsc`/`@ttsc/unplugin` 0.30.4.
-This is wired and verified.
+The checker implementation remains pinned to TypeScript 7.0.2 and matching
+`ttsc` 0.30.4 internals. `dehermc` links that host in CI and ships as a
+host-specific precompiled tool. This is wired and verified through the packed,
+offline npm consumer test.
 
 # Lua backend boundary
 

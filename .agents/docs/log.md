@@ -1,5 +1,63 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Packed builds consume precompiled dehermc
+
+* **The installed release and development paths no longer compile the Go
+  transform host on the user's machine**: release checking runs the generated
+  suffix-context TypeScript projects and then invokes authenticated `dehermc
+  check`; the development compiler invokes `dehermc transform` and supplies its
+  typed-source envelope to esbuild. The packed-package smoke test stages an
+  exact current-host binary in an isolated cache, forces offline resolution,
+  and requires both paths to report its path and SHA-256. Five deterministic
+  host binaries cross-compiled successfully; two independent darwin-arm64
+  builds matched SHA-256
+  `fe728acf4d85d10156571fea44dd1f4aa6f87393305e62fbeb7ceceb8612dac5`.
+  The dehermc artifact fingerprint now covers every Go source in the compiler
+  tree and the package version stamped by the build script. An initial package
+  smoke failure was reproduced as disk exhaustion caused by retained multi-GB
+  scratch projects; deterministic test cleanup removed those directories and
+  the offline packed test then passed. The first-use resolver also now passes
+  the complete family's pinned member digests into cache installation: a
+  present-but-corrupt member forces a staged refresh, an authenticated repair
+  is reused without another download, and a corrupt replacement is rejected
+  before it can overwrite the existing cache. This is compiler resolution,
+  transformation, and packaged-tool evidence, not Defold linkage or gameplay
+  evidence.
+
+## 2026-09-20 - dmSDK reachability is checker-derived
+
+* **Authored calls now select exact recipes without a handwritten manifest**:
+  the dmSDK generator emits content-addressed overload markers, a deterministic
+  project index covers all 1,361 recipes across 1,335 checker-distinct TypeScript overload
+  shapes, and ttsc publishes exact declaration IDs, numeric recipe IDs, symbols,
+  and call sites. A fixture `callDmSdk("dmGraphics::Finalize")` selects recipe
+  503 and feeds the existing materializer, which emits both the production
+  wrapper and its generated exact-call twin. Twenty-one TypeScript shapes collapse
+  multiple native declarations; release compilation reports those sites rather
+  than guessing, while the generated canonical-ID selector keeps every recipe
+  accessible. Focused generator, checker, CLI-default, type, and materializer
+  tests pass; an executable generated-facade test also proves that the exact
+  selector preserves both the canonical declaration identity and native symbol
+  at the bridge. A deliberate runtime/index mismatch and a nonliteral exact ID
+  both fail closed. The generated call index classifies all 1,361 recipes: 59
+  are universal-ready and 1,302 need generated specialization. The latter
+  includes 45 existing native wrappers that still need a generated bridge route
+  and 103 provider-boundary/private candidates that lack a production provider;
+  neither is overstated as release-executable. Release checking names these at
+  their TypeScript call sites. It also recognizes the generated callable type
+  behind `.call`, `.apply`, other invoked function properties, and
+  `Reflect.apply`; those indirect sites fail closed rather than disappearing
+  behind a standard-library call signature. Materialization refuses incomplete
+  checker manifests or a usage/index identity mismatch. Both the script-route and dmSDK
+  checker indexes now derive from the project's policy-materialized revision,
+  not the package seed. `typecheck --release` first runs the suffix-context
+  projects, so release reachability cannot accidentally authorize GUI/render
+  APIs in the wrong Defold script kind. The packed package executes that release
+  command from a freshly scaffolded project. Typed generation of those 1,302
+  usage specializations is the next wave rather than evidence claimed here. This is
+  generation and fake-callee exact-call evidence, not real
+  Defold implementation behavior or cross-target linkage evidence.
+
 ## 2026-09-20 - Cross-platform policy and Bob delivery are green
 
 * **The Windows ICU change is now integrated evidence, not a manifest

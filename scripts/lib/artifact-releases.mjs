@@ -45,7 +45,7 @@
 // artifact identity on it.
 
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -101,16 +101,21 @@ export const artifactFamilies = Object.freeze({
     files: [
       "toolchains/go/build-dehermc.sh",
       "packages/compiler/go.mod",
-      "packages/compiler/ttsc/cmd/dehermc/main.go",
-      "packages/compiler/ttsc/hash-literal/hash_literal.go",
-      "packages/compiler/ttsc/hash-literal/resource_name.go",
-      "packages/compiler/ttsc/hash-literal/api_usage.go",
       archivePackager
     ],
+    // Every Go source below this root is linked into dehermc. Enumerating the
+    // tree, rather than today's filenames, makes a newly added transform an
+    // input automatically instead of silently publishing changed bytes under
+    // an old tag.
+    trees: [{ directory: "packages/compiler/ttsc", suffixes: [".go"] }],
     // The ttsc npm version decides which typescript-go dehermc is linked
     // against, so it belongs in the fingerprint even though no file above
     // contains it.
-    json: [{ file: "packages/toolchains/host-compilers.json", fields: ["ttscVersion"] }]
+    json: [
+      { file: "packages/toolchains/host-compilers.json", fields: ["ttscVersion"] },
+      // build-dehermc.sh stamps this value into the binary with -ldflags -X.
+      { file: "package.json", fields: ["version"] }
+    ]
   },
   "native-artifacts": {
     tagPrefix: "libs",
@@ -233,6 +238,30 @@ export async function fingerprintFamily(name, options = {}) {
     const bytes = await readFile(path.join(root, relative));
     hash.update(`${relative}\0${bytes.byteLength}\0`);
     hash.update(bytes);
+  }
+  for (const tree of family.trees ?? []) {
+    const directory = path.join(root, tree.directory);
+    const suffixes = tree.suffixes ?? [];
+    const files = [];
+    async function visit(current, prefix = "") {
+      const entries = await readdir(current, { withFileTypes: true });
+      entries.sort((left, right) => left.name.localeCompare(right.name));
+      for (const entry of entries) {
+        const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+        const absolute = path.join(current, entry.name);
+        if (entry.isDirectory()) await visit(absolute, relative);
+        else if (entry.isFile() && (suffixes.length === 0 || suffixes.some((suffix) => entry.name.endsWith(suffix)))) {
+          files.push(`${tree.directory}/${relative}`);
+        }
+      }
+    }
+    await visit(directory);
+    if (files.length === 0) throw new Error(`${tree.directory} contains no fingerprint inputs for ${name}`);
+    for (const relative of files) {
+      const bytes = await readFile(path.join(root, relative));
+      hash.update(`${relative}\0${bytes.byteLength}\0`);
+      hash.update(bytes);
+    }
   }
   for (const { file, fields } of family.json) {
     const document = JSON.parse(await readFile(path.join(root, file), "utf8"));

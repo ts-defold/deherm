@@ -55,7 +55,7 @@ editor.
 TypeScript-only edits do not rebuild Hermes or the custom engine:
 
 ```text
-save -> resident ttsc check/transform -> incremental bundle -> source map
+save -> precompiled dehermc transform -> incremental bundle -> source map
      -> dev transport/resource reload -> candidate runtime generation
      -> restore explicit state -> atomic swap or rollback
 ```

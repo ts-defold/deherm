@@ -8,8 +8,9 @@ import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, installNativeExtension, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, installNativeExtension, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
+import { writeProjectDmSdkCallSymbolIndex, writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../packages/cli/src/resource-symbols.mjs";
 import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
@@ -149,6 +150,13 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
     path.join(root, ".deherm", "ir", "dmsdk-universal-bindings.json"),
     await readFile(catalog)
   );
+  await writeFile(
+    path.join(root, ".deherm", "ir", "dmsdk.json"),
+    await readFile(path.resolve("packages/bindings/generated/defold-sdk-ir.json"))
+  );
+  const checkerIndex = await writeProjectDmSdkCallSymbolIndex(path.join(root, ".deherm"));
+  const checkerIndexSource = await readFile(checkerIndex.file, "utf8");
+  const checkerIndexSourceSha256 = createHash("sha256").update(checkerIndexSource).digest("hex");
   await writeFile(usage, `${JSON.stringify({
     schemaVersion: 1,
     catalogSha256: dmSdkUniversalCatalogSha256,
@@ -216,6 +224,95 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   assert.match(
     await readFile(cliOutput.replace(/\.cpp$/, ".verify.cpp"), "utf8"),
     /fixture_to_network__exact_call/,
+  );
+
+  const automaticRecipe = dmSdkUniversalRecipes.find(({ symbol }) => symbol === "dmGraphics::Finalize");
+  assert.ok(automaticRecipe);
+  const automaticUsage = path.join(root, ".deherm", "generated", "dmsdk-usage.json");
+  await mkdir(path.dirname(automaticUsage), { recursive: true });
+  await writeFile(automaticUsage, `${JSON.stringify({
+    schemaVersion: 1,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+    usages: [{ declarationId: automaticRecipe.declarationId }]
+  }, null, 2)}\n`);
+  const automatic = await materializeDmSdkUsageFile({ project: root });
+  assert.equal(automatic.materializedCount, 1);
+  assert.equal(automatic.usage, automaticUsage);
+  assert.equal(automatic.output, path.join(root, ".deherm", "generated", "dmsdk-reachable.cpp"));
+  assert.match(await readFile(automatic.output, "utf8"), /dmGraphics::Finalize/);
+
+  const checkerDocument = (profile, usages, overrides = {}) => ({
+    schemaVersion: 1,
+    generator: "@ts-defold/deherm ttsc/dmsdk-usage/v1",
+    profile,
+    defoldRevision: bundledDefoldRevision,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+    symbolIndexSourceSha256: checkerIndexSourceSha256,
+    surfaceRecipeCount: dmSdkUniversalRecipes.length,
+    usageCount: usages.length,
+    usages,
+    ambiguousSites: [],
+    unresolvedSites: [],
+    specializationRequiredSites: [],
+    ...overrides
+  });
+  const finalizeUsage = {
+    declarationId: automaticRecipe.declarationId,
+    numericId: automaticRecipe.numericId,
+    symbol: automaticRecipe.symbol,
+    materialization: { state: "universal-ready", requirements: [] },
+    sites: [{ file: "src/game.ts", line: 1, column: 1 }]
+  };
+  const checkerUsage = path.join(root, "checker-usage.json");
+  await writeFile(checkerUsage, `${JSON.stringify(checkerDocument("development", [finalizeUsage]))}\n`);
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage: checkerUsage, output: path.join(root, "generated", "development.cpp") }),
+    /release-profile typecheck/,
+  );
+  await writeFile(checkerUsage, `${JSON.stringify(checkerDocument("release", [], {
+    ambiguousSites: [{ file: "src/game.ts", line: 1, column: 1 }]
+  }))}\n`);
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage: checkerUsage, output: path.join(root, "generated", "ambiguous.cpp") }),
+    /has 1 ambiguousSites/,
+  );
+  await writeFile(checkerUsage, `${JSON.stringify(checkerDocument("release", [finalizeUsage]))}\n`);
+  const checkerGenerated = await materializeDmSdkUsageFile({
+    usage: checkerUsage,
+    output: path.join(root, "generated", "checker.cpp")
+  });
+  assert.equal(checkerGenerated.materializedCount, 1);
+  assert.equal(checkerGenerated.generatedAdapterCount, 0);
+
+  await writeFile(checkerIndex.file, `${checkerIndexSource} `);
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage: checkerUsage, output: path.join(root, "generated", "stale-index.cpp") }),
+    /source SHA-256 does not match the release typecheck manifest/,
+  );
+  await writeFile(checkerIndex.file, checkerIndexSource);
+  await writeFile(checkerUsage, `${JSON.stringify(checkerDocument("release", [{
+    ...finalizeUsage,
+    numericId: finalizeUsage.numericId + 1
+  }]))}\n`);
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage: checkerUsage, output: path.join(root, "generated", "wrong-usage.cpp") }),
+    /does not match the authenticated symbol index/,
+  );
+
+  const adapterRecipe = dmSdkUniversalRecipes.find(({ preferredLowering }) =>
+    preferredLowering?.state === "generated-adapter");
+  assert.ok(adapterRecipe);
+  const adapterUsage = {
+    declarationId: adapterRecipe.declarationId,
+    numericId: adapterRecipe.numericId,
+    symbol: adapterRecipe.symbol,
+    materialization: checkerIndex.index.declarations[adapterRecipe.declarationId].materialization,
+    sites: [{ file: "src/game.ts", line: 2, column: 1 }]
+  };
+  await writeFile(checkerUsage, `${JSON.stringify(checkerDocument("release", [adapterUsage]))}\n`);
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage: checkerUsage, output: path.join(root, "generated", "adapter.cpp") }),
+    /has no executable lowering state/,
   );
 });
 
@@ -320,6 +417,9 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
 
   const output = await writeGeneratedProject(inventory);
   await generateComponentProxies({ projectRoot: project, outputRoot: project });
+  await writeProjectResourceSymbols(project, output.root);
+  await writeProjectRouteSymbolIndex(output.root);
+  await writeProjectDmSdkCallSymbolIndex(output.root);
   const saved = await readFile(path.join(output.root, "extensions.d.ts"), "utf8");
   assert.equal(saved, types);
   assert.deepEqual(JSON.parse(await readFile(path.join(output.root, "bindings.ir.json"), "utf8")), ir);
@@ -407,7 +507,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.deepEqual(lock.generatedOutputs, manifest.generatedOutputs);
   assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
   const verified = await verifyGeneratedProject(project);
-  assert.equal(verified.checkedFiles, 23);
+  assert.equal(verified.checkedFiles, 24);
   assert.equal(verified.planSha256, loweringPlan.planSha256);
   const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
     cwd: process.cwd(),
@@ -478,6 +578,25 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
   assert.deepEqual(bundleConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
   assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**"]);
+  const releaseConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.release.json"), "utf8"));
+  assert.equal(releaseConfig.compilerOptions.plugins[0].profile, "release");
+  assert.equal(releaseConfig.compilerOptions.plugins[0].dmsdkSymbols,
+    "./.deherm/generated/dmsdk-call-symbol-index.json");
+  assert.equal(releaseConfig.compilerOptions.plugins[0].dmsdkUsage,
+    "./.deherm/generated/dmsdk-usage.json");
+  assert.deepEqual(releaseConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
+  const installedScope = path.join(project, "node_modules", "@ts-defold");
+  await mkdir(installedScope, { recursive: true });
+  await symlink(path.resolve("."), path.join(installedScope, "deherm"), process.platform === "win32" ? "junction" : "dir");
+  const releaseCheck = await typecheckGeneratedProject(project, { release: true });
+  assert.equal(releaseCheck.profile, "release");
+  assert.equal(releaseCheck.passed, true, `${releaseCheck.stdout}\n${releaseCheck.stderr}`);
+  const releaseUsage = JSON.parse(await readFile(
+    path.join(project, ".deherm", "generated", "dmsdk-usage.json"), "utf8"));
+  assert.equal(releaseUsage.profile, "release");
+  assert.deepEqual(releaseUsage.ambiguousSites, []);
+  assert.deepEqual(releaseUsage.unresolvedSites, []);
+  assert.deepEqual(releaseUsage.specializationRequiredSites, []);
   const contextManifest = JSON.parse(await readFile(path.join(output.root, "script-contexts.json"), "utf8"));
   assert.equal(contextManifest.source, "defold-binding-lowering-plan.contract.context");
   assert.equal(contextManifest.routeCount, 926);
@@ -636,6 +755,12 @@ test("suffix projects type-check legal APIs and reject APIs from other Defold co
     const rejected = compile("--project", path.join(project, config), "--noEmit");
     assert.notEqual(rejected.status, 0, `${name} unexpectedly accepted ${symbol}`);
     assert.match(rejected.stdout + rejected.stderr, symbol.startsWith("@") ? /cannot find module/i : new RegExp(`no exported member '${symbol}'`, "i"));
+    if (name === "player.script.ts") {
+      const releaseRejected = await typecheckGeneratedProject(project, { release: true });
+      assert.equal(releaseRejected.passed, false, "release checking must retain suffix-context API restrictions");
+      assert.equal(releaseRejected.phase, "context-typecheck");
+      assert.match(releaseRejected.stdout + releaseRejected.stderr, /no exported member 'gui'/i);
+    }
     await writeFile(target, original);
   }
 

@@ -17,6 +17,7 @@
     "./names": "./src/names.mjs",
     "./dmsdk-universal-materializer": "./src/dmsdk-universal-materializer.mjs",
     "./dmsdk-universal-static-frame": "./src/dmsdk-universal-static-frame.mjs",
+    "./dmsdk-call-symbol-index": "./src/dmsdk-call-symbol-index.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"

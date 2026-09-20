@@ -89,6 +89,40 @@ The release planner refuses a manifest that claims dynamic access without
 declaring it, so the profile the manifest was produced under cannot be used to
 slip past the gate.
 
+dmSDK calls use the same authority with a different join. The generated
+runtime overloads carry content-addressed parameter markers, and the
+project-local `dmsdk-call-symbol-index.json` maps each marker to canonical
+declaration and numeric recipe identities. ttsc resolves the selected overload
+and writes `dmsdk-usage.json`; the materializer consumes it directly. The full
+1,361-recipe catalog remains available independent of usage. Twenty-one projected
+overload shapes are natively ambiguous after TypeScript type collapse; release
+diagnostics list their candidate declaration IDs, and
+`callDmSdkDeclaration(...)` provides an exact literal selector instead of a
+handwritten build manifest or a guessed overload. Parameter names and result
+types do not participate in overload selection, so the index groups on ordered
+parameter types only. A nonliteral or unknown exact selector is also a release
+error; it cannot silently disappear from reachability. At runtime the exact
+selector decodes the canonical declaration ID back to its native symbol before
+calling the bridge; declaration identity is compiler metadata, not a different
+runtime symbol namespace.
+
+Reachability identity and usage specialization are separate steps. Against the
+current catalog, 59 of 1,361 recipes are universal-ready from declaration
+identity alone and 1,302 still need generated specialization. Within that
+second group, 45 preferred-adapter candidates have native wrappers but no
+generated universal-bridge route, and 103 provider-boundary/private candidates
+lack a production provider or public registration path. The remainder need
+call-site facts already named by their recipes, such as receiver C++ type,
+template arguments, record layout, callback trampoline, or output-storage
+ownership. The symbol index carries that classification. Release checking
+rejects a reached specialization-required declaration at its source location;
+release materialization rejects development, ambiguous, unresolved, or
+specialization-incomplete checker manifests. This wave therefore makes
+selection total and non-silent without pretending those specialization facts
+can be invented. The next exact-call wave must generate typed ways to supply or
+derive them, plus a selected adapter registry/provider for concrete wrapper
+lanes, and carry those choices in `dmsdk-usage.json`.
+
 # What the reachable set prunes
 
 One symbol set drives every layer, so nothing can disagree:
@@ -99,7 +133,7 @@ One symbol set drives every layer, so nothing can disagree:
 | Generated binding families | per-family C++ sources, route tables and registries |
 | CMake inputs | `sources.cmake` lists only the families a reachable route lands in |
 | Emitted C | the typed-native lane handed to `shermes -emit-c` is re-rendered over the reachable set, so a pruned route has no `extern_c` declaration to emit |
-| dmSDK provider | `materialize-dmsdk` already prunes to declared usage |
+| dmSDK provider | ttsc resolves exact catalog declarations; `materialize-dmsdk` consumes its generated usage file and emits the matching production and verification providers |
 | Target gates | unreachable routes are absent from the registry, the Static Hermes gate and the browser library, not merely disabled |
 
 A reached route may still legitimately not be emitted, and the plan says which

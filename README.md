@@ -25,11 +25,12 @@
 An experimental TypeScript runtime for Defold, backed by Hermes on native
 targets and the browser's JavaScript engine on HTML5.
 
-TypeScript 7 and `ttsc` own type-checking and the compiler-plugin pass;
-`@ttsc/unplugin` feeds transformed sources into esbuild for the dynamic
-Hermes/browser bundle. The product target is TypeScript-owned game logic with
-full generated Defold compatibility. TS-to-Lua remains a migration and
-fallback target, not a requirement for the new runtime.
+TypeScript 7 owns ordinary project type-checking. The precompiled `dehermc`
+host tool runs the checker-aware déherm transforms and feeds their transformed
+sources into esbuild for the dynamic Hermes/browser bundle, so an installed
+project does not cold-build Go tooling. The product target is TypeScript-owned
+game logic with full generated Defold compatibility. TS-to-Lua remains a
+migration and fallback target, not a requirement for the new runtime.
 
 This repository is an architecture spike. Start with the
 [knowledge base](.agents/docs/index.md), especially the
@@ -105,8 +106,10 @@ executable SDK modules consume that IR, including collision-checked camelCase
 names and per-target lowering status.
 `verify-generated` is the explicit slow integrity path: it hashes copied IR,
 validates the canonical plan, and checks package, manifest, and lock identities.
-The generated ttsc transform entry is present but disabled until that transform
-ships; ordinary TypeScript 7 checking works now.
+The generated checker transform is active for release reachability and the
+development bundle. Both paths resolve the authenticated, precompiled
+`dehermc` for the user's host; ordinary TypeScript 7 checking still runs first
+for the generated script-context projects.
 
 `run:native` executes the bundle in embedded Hermes through JSI. `run:web`
 executes that same bundle in the browser, without Hermes in Wasm. The sample
@@ -114,7 +117,7 @@ also exercises a typed `DefoldModules.getEnforcing()` lookup whose native
 implementation is a zero-serialization JSI host function.
 
 `bob:web:bundle` builds the actual Defold `wasm-web` game against local
-Extender. It first emits an IIFE application bundle through ttsc and esbuild,
+Extender. It first emits an IIFE application bundle through `dehermc` and esbuild,
 then stores it as the typed `/deherm/app.dehermc` resource in the game archive. Extender
 automatically links the generated module adapter and hand-written host library under the extension's `lib/web`
 directory as Emscripten JavaScript libraries. The HTML5 extension loads the
@@ -179,9 +182,11 @@ layout is derived from the pinned dmSDK headers.
 The two `luasocket` routes that manufacture captured Lua closures fail closed.
 
 Every one of the 1,361 runtime dmSDK declarations has a deterministic universal
-recipe and stable ID. `deherm materialize-dmsdk` turns a project's reachable
-recipe selection into tree-shakeable C++ thunks; specialized generated adapters
-remain preferred. It reads the revision-matched catalog materialized at
+recipe and stable ID. Release checking resolves every authored call to its
+exact recipe. `deherm materialize-dmsdk` currently turns the 59
+declaration-only universal-ready shapes into tree-shakeable C++ thunks; the
+other 1,302 remain visible and receive source-located specialization diagnostics
+instead of being silently omitted. It reads the revision-matched catalog materialized at
 `.deherm/ir/dmsdk-universal-bindings.json`; `--catalog` can name that policy
 document explicitly. The package ships the catalog-free algorithm, not a
 Defold-version catalog. This is a complete generation path, not a claim that all

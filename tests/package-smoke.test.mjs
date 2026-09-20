@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, readFile, symlink, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { cp, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -9,6 +11,7 @@ import { pathToFileURL } from "node:url";
 import { parseArguments } from "../packages/cli/src/cli.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
+const require = createRequire(import.meta.url);
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -18,6 +21,48 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")}\n${result.stdout}\n${result.stderr}`);
   return result;
+}
+
+async function stageCurrentHostDehermc(root) {
+  const host = `${process.platform}-${process.arch}`;
+  const executable = process.platform === "win32" ? "dehermc.exe" : "dehermc";
+  const manifest = JSON.parse(await readFile(path.join(
+    repositoryRoot, "packages", "toolchains", "host-compilers.json"
+  ), "utf8"));
+  const record = manifest.hosts?.[host]?.tools?.dehermc;
+  assert.equal(record?.status, "vendored", `${host} dehermc is not pinned`);
+  const built = path.join(root, "built-dehermc");
+  const ttscPackage = require.resolve("ttsc/package.json");
+  const ttscRequire = createRequire(ttscPackage);
+  const bundledGoRoot = path.dirname(ttscRequire.resolve(`@ttsc/${host}/package.json`));
+  const bundledGo = path.join(
+    bundledGoRoot,
+    "bin", "go", "bin",
+    process.platform === "win32" ? "go.exe" : "go"
+  );
+  run("bash", [
+    path.join(repositoryRoot, "toolchains", "go", "build-dehermc.sh"),
+    host,
+    built
+  ], {
+    env: {
+      ...process.env,
+      GOCACHE: path.join(root, "go-cache"),
+      PATH: `${path.dirname(bundledGo)}${path.delimiter}${process.env.PATH ?? ""}`
+    }
+  });
+  const source = path.join(built, executable);
+  const bytes = await readFile(source);
+  assert.equal(createHash("sha256").update(bytes).digest("hex"), record.sha256,
+    "locally reproduced dehermc does not match the packaged digest");
+  const tags = JSON.parse(await readFile(path.join(
+    repositoryRoot, "packages", "toolchains", "release-tags.json"
+  ), "utf8"));
+  const cacheRoot = path.join(root, "tool-cache");
+  const destination = path.join(cacheRoot, tags.families.dehermc.tag, host, executable);
+  await mkdir(path.dirname(destination), { recursive: true });
+  await cp(source, destination);
+  return { cacheRoot, destination, sha256: record.sha256 };
 }
 
 test("command-specific target parsing keeps dev endpoints separate from conformance targets", () => {
@@ -41,12 +86,14 @@ test("command-specific target parsing keeps dev endpoints separate from conforma
   assert.equal(conformance.target, "js-web");
   assert.deepEqual(conformance.targets, []);
   assert.equal(parseArguments(["materialize-dmsdk", "--check"]).check, true);
+  assert.equal(parseArguments(["typecheck", "--release"]).release, true);
   assert.equal(parseArguments(["dev", "--no-bytecode"]).bytecode, false);
   assert.throws(() => parseArguments(["generate", "--check"]), /Unknown option: --check/);
 });
 
-test("packed npm artifact loads its CLI and one-shot dev compiler", async () => {
+test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-package-smoke-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
   const cache = path.join(root, "npm-cache");
   const packed = JSON.parse(run("npm", [
     "pack",
@@ -224,6 +271,8 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   ], { cwd: consumer });
 
   const project = path.join(root, "project");
+  const dehermc = await stageCurrentHostDehermc(root);
+  const forbiddenGoCompiler = path.join(root, "user-side-go-build-must-not-run");
   const created = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),
     "create", project,
@@ -262,6 +311,31 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   ], { cwd: project });
   assert.equal(JSON.parse(checked.stdout).passed, true);
 
+  const releaseChecked = run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "typecheck",
+    "--release",
+    "--project", project,
+    "--json"
+  ], { cwd: project, env: {
+    ...process.env,
+    DEHERM_OFFLINE: "1",
+    DEHERM_TOOL_CACHE: dehermc.cacheRoot,
+    // ttsc gives this explicit path priority over every bundled/system Go
+    // compiler. It deliberately does not exist: either installed compiler path
+    // reaching buildSourcePlugin would make this smoke test fail.
+    TTSC_GO_BINARY: forbiddenGoCompiler
+  } });
+  const releaseResult = JSON.parse(releaseChecked.stdout);
+  assert.equal(releaseResult.profile, "release");
+  assert.equal(releaseResult.passed, true);
+  assert.equal(releaseResult.compiler, dehermc.destination);
+  assert.equal(releaseResult.compilerSha256, dehermc.sha256);
+  const packedReleaseUsage = JSON.parse(await readFile(
+    path.join(project, ".deherm", "generated", "dmsdk-usage.json"), "utf8"));
+  assert.equal(packedReleaseUsage.profile, "release");
+  assert.deepEqual(packedReleaseUsage.specializationRequiredSites, []);
+
   const development = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),
     "dev",
@@ -269,7 +343,12 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
     "--once",
     "--headless",
     "--no-bytecode"
-  ], { cwd: project });
+  ], { cwd: project, env: {
+    ...process.env,
+    DEHERM_OFFLINE: "1",
+    DEHERM_TOOL_CACHE: dehermc.cacheRoot,
+    TTSC_GO_BINARY: forbiddenGoCompiler
+  } });
   assert.match(development.stdout, /\[deherm\] build-succeeded generation=1/);
   await readFile(path.join(project, ".deherm", "dev", "app.dehermc"), "utf8");
 });

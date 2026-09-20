@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -7,6 +8,13 @@ import path from "node:path";
 import test from "node:test";
 
 import { buildScriptRouteSymbolIndex } from "../packages/compiler/src/script-route-symbol-index.mjs";
+import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
+import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
+import { writeProjectDmSdkCallSymbolIndex, writeProjectRouteSymbolIndex } from "../packages/cli/src/resource-symbols.mjs";
+import {
+  callDmSdkDeclaration,
+  installDmSdkBridge
+} from "../packages/sdk/src/generated/dmsdk/runtime.ts";
 import { generateTypedNativeProjection } from "../scripts/generate-typed-native-projection.mjs";
 import { generateBindingEmissionPlan } from "../scripts/generate-binding-emission-plan.mjs";
 import { generateReleaseBuild } from "../scripts/generate-release-build.mjs";
@@ -22,6 +30,19 @@ const fixture = path.join(root, "tests/fixtures/reachability");
 
 async function json(relative) {
   return JSON.parse(await readFile(path.join(root, relative), "utf8"));
+}
+
+function canonicalJson(value) {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  return `{${Object.keys(value).sort()
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+}
+
+function refreshIndexIdentity(indexDocument) {
+  const body = structuredClone(indexDocument);
+  delete body.indexSha256;
+  indexDocument.indexSha256 = createHash("sha256").update(canonicalJson(body)).digest("hex");
 }
 
 function runTtsc(project) {
@@ -46,6 +67,71 @@ await writeFile(
   path.join(fixture, ".deherm/generated/script-route-symbol-index.json"),
   `${JSON.stringify(index, null, 2)}\n`
 );
+const dmSdkCatalog = await json("packages/bindings/generated/defold-dmsdk-universal-bindings.json");
+const dmSdkIr = await json("packages/bindings/generated/defold-sdk-ir.json");
+const dmSdkIndex = buildDmSdkCallSymbolIndex(
+  dmSdkIr,
+  dmSdkCatalog
+);
+const dmSdkIndexFile = path.join(fixture, ".deherm/generated/dmsdk-call-symbol-index.json");
+await writeFile(
+  dmSdkIndexFile,
+  `${JSON.stringify(dmSdkIndex, null, 2)}\n`
+);
+
+test("every dmSDK recipe has a checker-resolvable overload identity", () => {
+  assert.equal(dmSdkIndex.recipeCount, 1361);
+  assert.equal(Object.keys(dmSdkIndex.declarations).length, 1361);
+  assert.equal(dmSdkIndex.overloadCount, 1335);
+  assert.equal(dmSdkIndex.ambiguousOverloadCount, 21);
+  assert.equal(dmSdkIndex.universalReadyCount, 59);
+  assert.equal(dmSdkIndex.generatedAdapterCount, 0);
+  assert.equal(dmSdkIndex.specializationRequiredCount, 1302);
+  assert.equal(Object.keys(dmSdkIndex.markers).length, dmSdkIndex.overloadCount);
+  assert.match(dmSdkIndex.indexSha256, /^[0-9a-f]{64}$/);
+});
+
+test("the project dmSDK index uses the policy-materialized revision inputs", async () => {
+  const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-index-"));
+  try {
+    await mkdir(path.join(outputRoot, "ir"), { recursive: true });
+    const revision = "a".repeat(40);
+    await Promise.all([
+      writeFile(path.join(outputRoot, "ir", "dmsdk.json"), `${JSON.stringify({ ...dmSdkIr, defoldRevision: revision })}\n`),
+      writeFile(path.join(outputRoot, "ir", "dmsdk-universal-bindings.json"), `${JSON.stringify(dmSdkCatalog)}\n`)
+    ]);
+    const generated = await writeProjectDmSdkCallSymbolIndex(outputRoot);
+    assert.equal(generated.index.defoldRevision, revision);
+    assert.equal(generated.index.recipeCount, dmSdkCatalog.recipes.length);
+    assert.equal(generated.file, path.join(outputRoot, "generated", "dmsdk-call-symbol-index.json"));
+  } finally {
+    await rm(outputRoot, { recursive: true, force: true });
+  }
+});
+
+test("the project script route index uses the policy-materialized revision inputs", async () => {
+  const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-script-index-"));
+  try {
+    await mkdir(path.join(outputRoot, "ir"), { recursive: true });
+    const revision = "b".repeat(40);
+    const projectIr = structuredClone(await json("packages/bindings/generated/defold-script-api-ir.json"));
+    const projectPlan = structuredClone(await json("packages/bindings/generated/defold-binding-lowering-plan.json"));
+    projectIr.defoldRevision = revision;
+    projectPlan.defoldRevision = revision;
+    delete projectPlan.planSha256;
+    projectPlan.planSha256 = createHash("sha256").update(JSON.stringify(projectPlan)).digest("hex");
+    await Promise.all([
+      writeFile(path.join(outputRoot, "ir", "script-api.json"), `${JSON.stringify(projectIr)}\n`),
+      writeFile(path.join(outputRoot, "ir", "binding-lowering-plan.json"), `${JSON.stringify(projectPlan)}\n`)
+    ]);
+    const generated = await writeProjectRouteSymbolIndex(outputRoot);
+    assert.equal(generated.index.defoldRevision, revision);
+    assert.equal(generated.index.loweringPlanSha256, projectPlan.planSha256);
+    assert.equal(generated.index.routeCount, 926);
+  } finally {
+    await rm(outputRoot, { recursive: true, force: true });
+  }
+});
 
 // The member paths the checker resolves have to be the ones the generated SDK
 // actually declares. `modules.ts` is an independent rendering of the same
@@ -117,6 +203,210 @@ test("the checker resolves a fixture project to its exact route set", async () =
   for (const route of manifest.routes) {
     for (const site of route.sites) assert.equal(site.file, "src/game.ts");
   }
+});
+
+test("the checker resolves dmSDK calls to exact materializable recipes", async () => {
+  runTtsc("tsconfig.json");
+  const manifest = JSON.parse(await readFile(
+    path.join(fixture, ".deherm/generated/dmsdk-usage.json"), "utf8"));
+  assert.equal(manifest.catalogSha256, dmSdkCatalog.sourceHashes.catalog);
+  assert.equal(manifest.surfaceRecipeCount, 1361);
+  assert.equal(manifest.usageCount, 1);
+  assert.deepEqual(manifest.ambiguousSites, []);
+  assert.equal(manifest.usages[0].declarationId,
+    "dmsdk:dmGraphics::Finalize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1759:1460");
+  assert.equal(manifest.usages[0].numericId, 503);
+  assert.equal(manifest.usages[0].symbol, "dmGraphics::Finalize");
+  assert.equal(manifest.usages[0].materialization.state, "universal-ready");
+  assert.equal(manifest.usages[0].sites[0].file, "src/game.ts");
+  assert.equal(
+    manifest.symbolIndexSourceSha256,
+    createHash("sha256").update(await readFile(dmSdkIndexFile)).digest("hex"),
+  );
+
+  const generated = materializeDmSdkUsages(manifest.usages, {
+    catalog: dmSdkCatalog,
+    catalogSha256: manifest.catalogSha256
+  });
+  assert.equal(generated.manifest.length, 1);
+  assert.equal(generated.manifest[0].declarationId, manifest.usages[0].declarationId);
+  assert.match(generated.source, /dmGraphics::Finalize/);
+  assert.equal(generated.verification.vectors[0].nativeSymbol, "dmGraphics::Finalize");
+  assert.match(generated.verificationSource, /deherm_dmsdk_usage_503__exact_callee/);
+});
+
+test("release reachability refuses a generated runtime/index mismatch", async () => {
+  const declarationId =
+    "dmsdk:dmGraphics::Finalize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1759:1460";
+  const marker = dmSdkIndex.declarations[declarationId].marker;
+  const mismatched = structuredClone(dmSdkIndex);
+  const staleMarker = `${marker}_stale`;
+  mismatched.markers[staleMarker] = mismatched.markers[marker];
+  delete mismatched.markers[marker];
+  for (const declaration of mismatched.markers[staleMarker].declarations) {
+    mismatched.declarations[declaration.declarationId].marker = staleMarker;
+  }
+  refreshIndexIdentity(mismatched);
+  await writeFile(dmSdkIndexFile, `${JSON.stringify(mismatched, null, 2)}\n`);
+  let failure = null;
+  try {
+    runTtsc("tsconfig.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  } finally {
+    await writeFile(dmSdkIndexFile, `${JSON.stringify(dmSdkIndex, null, 2)}\n`);
+  }
+  assert.ok(failure, "a marker missing from the project index must not disappear from reachability");
+  assert.match(failure, /resolved dmSDK overload marker is absent from the generated index/);
+  const manifest = JSON.parse(await readFile(
+    path.join(fixture, ".deherm/generated/dmsdk-usage.json"), "utf8"));
+  assert.equal(manifest.usageCount, 0);
+  assert.equal(manifest.unresolvedSites[0].marker, marker);
+});
+
+test("release reachability rejects a structurally tampered dmSDK index", async () => {
+  const declarationId =
+    "dmsdk:dmGraphics::Finalize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1759:1460";
+  const tampered = structuredClone(dmSdkIndex);
+  tampered.declarations[declarationId].numericId += 1;
+  await writeFile(dmSdkIndexFile, `${JSON.stringify(tampered, null, 2)}\n`);
+  let failure = null;
+  try {
+    runTtsc("tsconfig.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  } finally {
+    await writeFile(dmSdkIndexFile, `${JSON.stringify(dmSdkIndex, null, 2)}\n`);
+  }
+  assert.ok(failure, "marker/declaration disagreement must invalidate the dmSDK symbol index");
+  assert.match(failure, /no usable dmSDK symbol index was found/);
+});
+
+test("release reachability rejects a dmSDK index whose authenticated body changed", async () => {
+  const tampered = structuredClone(dmSdkIndex);
+  tampered.defoldRevision = "0".repeat(40);
+  await writeFile(dmSdkIndexFile, `${JSON.stringify(tampered, null, 2)}\n`);
+  let failure = null;
+  try {
+    runTtsc("tsconfig.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  } finally {
+    await writeFile(dmSdkIndexFile, `${JSON.stringify(dmSdkIndex, null, 2)}\n`);
+  }
+  assert.ok(failure, "changing an indexed fact without updating its identity must invalidate the index");
+  assert.match(failure, /no usable dmSDK symbol index was found/);
+});
+
+test("release reachability refuses dmSDK overloads collapsed by TypeScript", async () => {
+  let failure = null;
+  try {
+    runTtsc("tsconfig.dmsdk-ambiguous.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  }
+  assert.ok(failure, "an ambiguous native overload must not be guessed");
+  assert.match(failure, /dmSDK call dmEndian::ByteSwap collapses 2 native declarations/);
+  assert.match(failure, /dmsdk:dmEndian::ByteSwap@/);
+  const manifest = JSON.parse(await readFile(
+    path.join(fixture, ".deherm/generated/dmsdk-usage.ambiguous.json"), "utf8"));
+  assert.equal(manifest.usageCount, 0);
+  assert.equal(manifest.ambiguousSites.length, 1);
+  assert.equal(manifest.ambiguousSites[0].declarationIds.length, 2);
+});
+
+test("an exact selector resolves a collapsed overload before enforcing its adapter route", async () => {
+  let failure = null;
+  try {
+    runTtsc("tsconfig.dmsdk-exact.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  }
+  assert.ok(failure, "the selected adapter must not be treated as linked before its release route exists");
+  assert.match(failure, /requires generated usage specialization before release materialization/);
+  const manifest = JSON.parse(await readFile(
+    path.join(fixture, ".deherm/generated/dmsdk-usage.exact.json"), "utf8"));
+  assert.equal(manifest.usageCount, 0);
+  assert.deepEqual(manifest.ambiguousSites, []);
+  assert.equal(manifest.specializationRequiredSites.length, 1);
+  assert.equal(manifest.specializationRequiredSites[0].declarationId,
+    "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195");
+  assert.match(manifest.specializationRequiredSites[0].diagnostic, /has no release reachability route/);
+});
+
+test("release reachability diagnoses calls that need generated specialization", async () => {
+  let failure = null;
+  try {
+    runTtsc("tsconfig.dmsdk-specialization.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  }
+  assert.ok(failure, "a declaration needing usage facts must not appear universally materializable");
+  assert.match(failure, /requires generated usage specialization before release materialization/);
+  const manifest = JSON.parse(await readFile(
+    path.join(fixture, ".deherm/generated/dmsdk-usage.specialization.json"), "utf8"));
+  assert.equal(manifest.usageCount, 0);
+  assert.deepEqual(manifest.ambiguousSites, []);
+  assert.deepEqual(manifest.unresolvedSites, []);
+  assert.equal(manifest.specializationRequiredSites.length, 1);
+  assert.equal(manifest.specializationRequiredSites[0].declarationId,
+    "dmsdk:~dmArray<T>@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:403:50");
+  assert.ok(manifest.specializationRequiredSites[0].requirements.includes("receiver-native-type"));
+  assert.match(manifest.specializationRequiredSites[0].diagnostic, /receiverCppType/);
+});
+
+test("an exact declaration selector still calls the bridge's native symbol", () => {
+  let observed;
+  installDmSdkBridge({
+    call(symbol, args) {
+      observed = { symbol, args };
+      return 7;
+    },
+    callDeclaration(declarationId, symbol, args) {
+      observed = { declarationId, symbol, args };
+      return 7;
+    }
+  });
+  const declarationId =
+    "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195";
+  const result = callDmSdkDeclaration(
+    declarationId,
+    1,
+  );
+  assert.equal(result, 7);
+  assert.deepEqual(observed, { declarationId, symbol: "dmEndian::ByteSwap", args: [1] });
+});
+
+test("release reachability refuses a nonliteral exact dmSDK selector", async () => {
+  let failure = null;
+  try {
+    runTtsc("tsconfig.dmsdk-dynamic-exact.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  }
+  assert.ok(failure, "a nonliteral exact selector must not disappear from reachability");
+  assert.match(failure, /exact dmSDK declaration ID must be a string literal/);
+  const manifest = JSON.parse(await readFile(
+    path.join(fixture, ".deherm/generated/dmsdk-usage.dynamic-exact.json"), "utf8"));
+  assert.equal(manifest.usageCount, 0);
+  assert.equal(manifest.unresolvedSites.length, 1);
+});
+
+test("release reachability refuses indirect dmSDK callable escapes", async () => {
+  let failure = null;
+  try {
+    runTtsc("tsconfig.dmsdk-indirect.json");
+  } catch (error) {
+    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
+  }
+  assert.ok(failure, "indirect dmSDK calls must not disappear from reachability");
+  assert.match(failure, /indirect dmSDK invocation through \.call is not modeled/);
+  assert.match(failure, /indirect dmSDK invocation through \.apply is not modeled/);
+  assert.match(failure, /indirect dmSDK invocation through Reflect\.apply is not modeled/);
+  const manifest = JSON.parse(await readFile(
+    path.join(fixture, ".deherm/generated/dmsdk-usage.indirect.json"), "utf8"));
+  assert.equal(manifest.usageCount, 0);
+  assert.equal(manifest.unresolvedSites.length, 3);
 });
 
 test("undeclared dynamic access is a diagnostic naming the site", () => {
